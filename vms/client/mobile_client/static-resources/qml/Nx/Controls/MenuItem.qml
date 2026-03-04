@@ -19,6 +19,8 @@ MenuItem
     leftPadding: 20
     rightPadding: 20
     spacing: 8
+    icon.width: 20
+    icon.height: 20
 
     implicitWidth: enabled
         ? Math.max(
@@ -48,22 +50,43 @@ MenuItem
         }
     }
 
-    contentItem: Text
+    contentItem: Item
     {
-        id: text
+        implicitWidth: icon.implicitWidth + control.spacing + text.implicitWidth
+        visible: control.enabled
 
-        text: control.text
-        x: control.leftPadding
-        verticalAlignment: Text.AlignVCenter
-        width: control.availableWidth
-            - (control.indicator && control.checkable
-               ? indicator.width + control.spacing
-               : 0)
-        elide: Text.ElideRight
-        font: control.font
-        opacity: enabled ? 1 : 0.3
-        color: control.checked ? ColorTheme.colors.dark1 : ColorTheme.colors.light4
-        visible: enabled
+        ColoredImage
+        {
+            id: icon
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            sourcePath: control.icon.source
+            sourceSize: Qt.size(control.icon.width, control.icon.height)
+            primaryColor: text.color
+            visible: !!sourcePath
+        }
+
+        Text
+        {
+            id: text
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: icon.right
+            anchors.leftMargin: icon.visible ? control.spacing : 0
+            anchors.right: parent.right
+            anchors.rightMargin: control.indicator && control.checkable
+                ? indicator.width + control.spacing
+                : 0
+
+            text: control.text
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+            font: control.font
+            opacity: enabled ? 1 : 0.3
+            color: control.checked ? ColorTheme.colors.dark1 : ColorTheme.colors.light4
+        }
     }
 
     indicator: ColoredImage

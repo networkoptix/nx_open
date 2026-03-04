@@ -4,7 +4,7 @@ AdaptiveScreen 1.0 AdaptiveScreen.qml
 ArchiveCalendar 1.0 ArchiveCalendar.qml
 BookmarkList 1.0 BookmarkList.qml
 Breadcrumb 1.0 Breadcrumb.qml
-DownloadMediaButton 1.0 DownloadMediaButton.qml
+DownloadMediaAction 1.0 DownloadMediaAction.qml
 DummyMessage 1.0 DummyMessage.qml
 HorizontalSlide 1.0 HorizontalSlide.qml
 IssueLabel 1.0 IssueLabel.qml

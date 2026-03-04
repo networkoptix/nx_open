@@ -11,6 +11,7 @@ import Nx.Controls
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls
+import Nx.Mobile.Ui.Sheets
 import Nx.Models
 import Nx.Ui
 

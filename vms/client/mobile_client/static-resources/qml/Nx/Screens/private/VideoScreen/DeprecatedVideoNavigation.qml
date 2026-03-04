@@ -36,7 +36,7 @@ Item
     property bool hasCustomVisualArea: false;
     property bool drawingRoi: false
     property string warningText
-    readonly property alias forceVideoPause: downloadButton.menuOpened
+    readonly property alias forceVideoPause: downloadAction.menuOpened
 
     signal ptzButtonClicked()
     signal switchToNextCamera()
@@ -533,18 +533,32 @@ Item
                     }
                 }
 
-                DownloadMediaButton
+                IconButton
                 {
                     id: downloadButton
-
-                    enabled: !controller.mediaPlayer.liveMode && hasArchive
-                        && !controller.cannotDecryptMedia
-                    resource: controller.mediaPlayer.resource
-                    positionMs: controller.mediaPlayer.position
 
                     anchors.left:  motionSearchModeButton.right
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
+
+                    icon.source: downloadAction.icon.source
+                    icon.width: 24
+                    icon.height: 24
+
+                    padding: 0
+                    visible: downloadAction.isDownloadAvailable
+                    enabled: !controller.mediaPlayer.liveMode && hasArchive
+                        && !controller.cannotDecryptMedia
+
+                    onClicked: downloadAction.trigger()
+
+                    DownloadMediaAction
+                    {
+                        id: downloadAction
+
+                        resource: controller.mediaPlayer.resource
+                        positionMs: controller.mediaPlayer.position
+                    }
                 }
 
                 Row

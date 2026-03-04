@@ -111,9 +111,8 @@ AdaptiveScreen
 
     menuButton
     {
-        visible: screen.contentItem === detailsLoader.item && detailsLoader.hasMenu
-        icon.source: detailsLoader.icon
-        onClicked: detailsLoader.item.share()
+        visible: !!detailsLoader.menu && screen.contentItem === detailsLoader.item
+        onClicked: detailsLoader.menu.popup(menuButton, 0, menuButton.height)
     }
 
     TextButton // TODO: Should be right control, but tool bar does not work well with wide buttons. Need to refactor tool bar.
@@ -148,9 +147,8 @@ AdaptiveScreen
         color: ColorTheme.colors.dark4
         item: detailsLoader.item
 
-        menuButton.visible: detailsLoader.hasMenu
-        menuButton.icon.source: detailsLoader.icon
-        menuButton.onClicked: detailsLoader.item.share()
+        menuButton.visible: !!detailsLoader.menu
+        menuButton.onClicked: detailsLoader.menu.popup(rightPanel.menuButton, 0, menuButton.height)
 
         onItemChanged: rightPanel.visible = !!rightPanel.item
         onCloseButtonClicked: detailsLoader.setSource("")
@@ -160,17 +158,7 @@ AdaptiveScreen
     {
         id: detailsLoader
 
-        readonly property var backend: item?.backend
-        readonly property string icon:
-        {
-            if (!backend)
-                return ""
-
-            return backend.isShared && !screen.analyticsSearchMode
-                ? "image://skin/20x20/Solid/shared.svg?primary=light4&secondary=green"
-                : "image://skin/20x20/Solid/share.svg?primary=light4"
-        }
-        readonly property bool hasMenu: backend?.isAvailable || false
+        readonly property var menu: item?.menu
 
         Connections
         {

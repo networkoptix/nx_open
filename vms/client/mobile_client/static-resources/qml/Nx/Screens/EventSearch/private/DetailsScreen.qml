@@ -38,6 +38,7 @@ Page
     property int currentEventIndex: -1
     property alias backend: backend
     readonly property alias showControls: d.showControls
+    readonly property Menu menu: menu.available ? menu : null
 
     signal fullscreenButtonClicked
     signal searchRequested(string text)
@@ -878,6 +879,42 @@ Page
         onHasControlsChanged: updateStatusBarVisibility()
 
         onExclusionAreaYChanged: updateGestureExclusionArea()
+    }
+
+    Menu
+    {
+        id: menu
+
+        width: 200
+
+        readonly property bool available: menu.contentHeight > 0
+
+        MenuItem
+        {
+            id: downloadButton
+
+            enabled: action.enabled && !preview.cannotDecryptMedia
+
+            action: DownloadMediaAction
+            {
+                resource: preview.resource
+                positionMs: preview.startTimeMs
+                durationMs: preview.durationMs
+            }
+        }
+
+        MenuItem
+        {
+            text: backend.isShared ? qsTr("Shared") : qsTr("Share")
+
+            icon.source: backend.isShared && !eventDetailsScreen.isAnalyticsDetails
+                ? "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
+                : "image://skin/20x20/Solid/share.svg?primary=light10"
+
+            enabled: backend.isAvailable
+
+            onClicked: share()
+        }
     }
 
     Component.onCompleted:
