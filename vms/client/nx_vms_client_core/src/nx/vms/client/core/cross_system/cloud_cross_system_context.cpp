@@ -35,6 +35,7 @@
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/client/core/utils/log_strings_format.h>
+#include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx/vms/discovery/manager.h>
@@ -164,6 +165,7 @@ struct CloudCrossSystemContext::Private
         // is way more complex.
         const auto resources = systemContext->resourcePool()->getResources();
         const auto resourcePool = systemContext->resourcePool();
+        systemContext->pixelationSettings()->resetPixelationSettings();
         resourcePool->disconnect(q);
         resourcePool->removeResources(resources);
     }
