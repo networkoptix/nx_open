@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>Appinformation</translation>
+      <source>About</source>
+      <translation>Om</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>Använd flera avkodare för att förbättra prestandan</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>Starta om appen för att tillämpa ändringarna</translation>
     </message>
   </context>
   <context>
@@ -562,11 +558,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Data saknas</translation>
     </message>
   </context>
   <context>
@@ -663,10 +659,6 @@
     <message>
       <source>Server Time</source>
       <translation>Servertid</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>Visa servertid på kameror</translation>
     </message>
   </context>
   <context>
@@ -1014,6 +1006,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1178,10 +1177,6 @@
     <message>
       <source>Settings</source>
       <translation>Inställningar</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>Aviseringar</translation>
     </message>
   </context>
   <context>

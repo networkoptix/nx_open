@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>アプリ情報</translation>
+      <source>About</source>
+      <translation>本製品について</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>複数のデコーダーを使用してパフォーマンスを向上させます。</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>変更を適用するにはアプリを再起動してください。</translation>
     </message>
   </context>
   <context>
@@ -560,11 +556,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>データがありません</translation>
     </message>
   </context>
   <context>
@@ -661,10 +657,6 @@
     <message>
       <source>Server Time</source>
       <translation>サーバー時間</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>カメラにサーバー時刻を表示する</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1004,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1176,10 +1175,6 @@
     <message>
       <source>Settings</source>
       <translation>設定</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>通知</translation>
     </message>
   </context>
   <context>

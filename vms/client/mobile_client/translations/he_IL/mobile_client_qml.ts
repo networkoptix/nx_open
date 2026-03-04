@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation type="unfinished">App Info</translation>
+      <source>About</source>
+      <translation>שירותים</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation type="unfinished">Use multiple decoders to improve performance</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
@@ -566,11 +562,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>פרטים</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>אין נתונים</translation>
     </message>
   </context>
   <context>
@@ -667,10 +663,6 @@
     <message>
       <source>Server Time</source>
       <translation>זמן שרת</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation type="unfinished">Show server time on cameras</translation>
     </message>
   </context>
   <context>
@@ -1018,6 +1010,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1182,10 +1181,6 @@
     <message>
       <source>Settings</source>
       <translation>הגדרות</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>התראות</translation>
     </message>
   </context>
   <context>

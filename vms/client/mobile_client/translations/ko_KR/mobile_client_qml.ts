@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>앱 정보</translation>
+      <source>About</source>
+      <translation>정보</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>성능 향상을 위해 여러 개의 디코더를 사용하십시오</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>변경 사항을 적용하려면 앱을 재시작하세요</translation>
     </message>
   </context>
   <context>
@@ -560,11 +556,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>상세</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>데이터 없음</translation>
     </message>
   </context>
   <context>
@@ -661,10 +657,6 @@
     <message>
       <source>Server Time</source>
       <translation>서버시간</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>카메라에 서버 시간을 표시합니다</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1004,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1176,10 +1175,6 @@
     <message>
       <source>Settings</source>
       <translation>설정</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>알림</translation>
     </message>
   </context>
   <context>

@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>Informacje o aplikacji</translation>
+      <source>About</source>
+      <translation>Informacje o programie</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>Użyj wielu dekoderów, aby poprawić wydajność</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>Uruchom ponownie aplikację, aby zastosować zmiany</translation>
     </message>
   </context>
   <context>
@@ -566,11 +562,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Brak danych</translation>
     </message>
   </context>
   <context>
@@ -667,10 +663,6 @@
     <message>
       <source>Server Time</source>
       <translation>Czas serwera</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>Pokaż czas serwera na kamerach</translation>
     </message>
   </context>
   <context>
@@ -1018,6 +1010,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1182,10 +1181,6 @@
     <message>
       <source>Settings</source>
       <translation>Ustawienia</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>Powiadomienia</translation>
     </message>
   </context>
   <context>

@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>應用程式資訊</translation>
+      <source>About</source>
+      <translation>關於</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>使用多個解碼器以提高效能</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>請重新啟動應用程式以套用變更。</translation>
     </message>
   </context>
   <context>
@@ -560,11 +556,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>細節</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>無資料</translation>
     </message>
   </context>
   <context>
@@ -661,10 +657,6 @@
     <message>
       <source>Server Time</source>
       <translation>伺服器時間</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>在攝影機上顯示伺服器時間</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1004,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1176,10 +1175,6 @@
     <message>
       <source>Settings</source>
       <translation>設定</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>通知</translation>
     </message>
   </context>
   <context>

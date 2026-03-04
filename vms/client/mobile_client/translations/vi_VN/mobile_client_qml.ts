@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>Thông tin ứng dụng</translation>
+      <source>About</source>
+      <translation>Đối với</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>Sử dụng nhiều bộ giải mã để cải thiện hiệu suất</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>Vui lòng khởi động lại ứng dụng để áp dụng thay đổi</translation>
     </message>
   </context>
   <context>
@@ -560,11 +556,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Chi tiết</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Không có dữ liệu</translation>
     </message>
   </context>
   <context>
@@ -661,10 +657,6 @@
     <message>
       <source>Server Time</source>
       <translation>Thời gian máy chủ</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>Hiển thị thời gian máy chủ trên camera</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1004,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1176,10 +1175,6 @@
     <message>
       <source>Settings</source>
       <translation>Cài đặt</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>thông báo</translation>
     </message>
   </context>
   <context>

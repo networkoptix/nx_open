@@ -33,8 +33,8 @@
   <context>
     <name>AppInfoPage</name>
     <message>
-      <source>App Info</source>
-      <translation>Info Aplikasi</translation>
+      <source>About</source>
+      <translation>Tentang</translation>
     </message>
   </context>
   <context>
@@ -77,10 +77,6 @@
     <message>
       <source>Use multiple decoders to improve performance</source>
       <translation>Gunakan beberapa dekoder untuk meningkatkan kinerja</translation>
-    </message>
-    <message>
-      <source>Please restart the app to apply changes</source>
-      <translation>Silakan restart aplikasi untuk menerapkan perubahan</translation>
     </message>
   </context>
   <context>
@@ -560,11 +556,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detail</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Tidak ada data</translation>
     </message>
   </context>
   <context>
@@ -661,10 +657,6 @@
     <message>
       <source>Server Time</source>
       <translation>Server Time</translation>
-    </message>
-    <message>
-      <source>Show server time on cameras</source>
-      <translation>Tampilkan waktu server di kamera</translation>
     </message>
   </context>
   <context>
@@ -1012,6 +1004,13 @@
     </message>
   </context>
   <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+      <source>Please restart the app to apply changes</source>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1176,10 +1175,6 @@
     <message>
       <source>Settings</source>
       <translation>Pengaturan</translation>
-    </message>
-    <message>
-      <source>Notifications</source>
-      <translation>Notifikasi</translation>
     </message>
   </context>
   <context>
