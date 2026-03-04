@@ -178,7 +178,7 @@ Page
                     leftButtonImageSource:
                         "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
                     onLeftButtonClicked: goBack()
-                    title: accessor.getData(linearizationListModel.sourceRoot, "display")
+                    title: accessor.getData(sessionsScreen.rootIndex, "display")
                 }
 
                 rightButton
@@ -266,11 +266,21 @@ Page
         function resetSourceRoot()
         {
             linearizationListModel.sourceRoot = Qt.binding(
-                () => (localSitesVisible
-                    && !sessionsScreen.searching
-                    && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex())
-                        ? organizationsModel.sitesRoot
-                        : sessionsScreen.rootIndex)
+                () =>
+                {
+                    if (sessionsScreen.searching
+                        && sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex()
+                        && sessionsScreen.rootIndex !== organizationsModel.sitesRoot)
+                    {
+                        return NxGlobals.invalidModelIndex()
+                    }
+
+                    return (localSitesVisible
+                        && !sessionsScreen.searching
+                        && sessionsScreen.rootIndex === NxGlobals.invalidModelIndex())
+                            ? organizationsModel.sitesRoot
+                            : sessionsScreen.rootIndex
+                })
         }
     }
 
@@ -800,6 +810,24 @@ Page
         function onRowsRemoved() { updateVisibility() }
     }
 
+    Connections
+    {
+        target: siteList
+
+        function onSearchTextChanged()
+        {
+            if (sessionsScreen.state !== "inPartnerOrOrg")
+                return
+
+            const sourceRoot = sessionsScreen.searching
+                ? NxGlobals.invalidModelIndex()
+                : sessionsScreen.rootIndex
+
+            linearizationListModel.sourceRoot = sourceRoot
+            siteList.currentRoot = sessionsScreen.rootIndex
+        }
+    }
+
     function goInto(newIndex, animate = true)
     {
         endSearch()
@@ -895,7 +923,8 @@ Page
 
         if (state === "inPartnerOrOrg")
         {
-            linearizationListModel.sourceRoot = siteList.currentRoot
+            linearizationListModel.sourceRoot = sessionsScreen.rootIndex
+            siteList.currentRoot = sessionsScreen.rootIndex
         }
 
         searchField.clear()
