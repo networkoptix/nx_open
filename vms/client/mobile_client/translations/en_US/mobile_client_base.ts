@@ -24,6 +24,18 @@
     </message>
 </context>
 <context>
+    <name>QnMobileClientUiController</name>
+    <message>
+        <source>Cannot connect to the Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the Site &quot;%1&quot;</source>
+        <comment>%1 is a site name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
         <source>Can&apos;t download video</source>
@@ -81,18 +93,6 @@
     </message>
     <message>
         <source>Cannot share bookmark.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::mobile::UiController</name>
-    <message>
-        <source>Cannot connect to the Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the Site &quot;%1&quot;</source>
-        <comment>%1 is a site name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

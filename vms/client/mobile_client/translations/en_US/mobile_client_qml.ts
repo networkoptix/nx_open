@@ -33,7 +33,7 @@
 <context>
     <name>AppInfoPage</name>
     <message>
-        <source>App Info</source>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -76,10 +76,6 @@
     </message>
     <message>
         <source>Use multiple decoders to improve performance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please restart the app to apply changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -664,10 +660,6 @@
         <source>Server Time</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Show server time on cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1014,6 +1006,13 @@
     </message>
 </context>
 <context>
+    <name>RestartRequiredPopup</name>
+    <message>
+        <source>Please restart the app to apply changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SearchEdit</name>
     <message>
         <source>Search</source>
@@ -1178,10 +1177,6 @@
     <message>
         <source>Settings</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
