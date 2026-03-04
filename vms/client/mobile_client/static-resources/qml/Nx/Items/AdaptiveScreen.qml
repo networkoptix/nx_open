@@ -358,7 +358,7 @@ Item
     {
         target: LayoutController
 
-        function onIsPortraitChanged()
+        function onIsTabletLayoutChanged()
         {
             splash.close()
         }
