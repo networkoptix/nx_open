@@ -18,23 +18,35 @@ using namespace nx::vms::client::core;
 
 using MobileContextAccessor = nx::vms::client::mobile::SystemContextAccessor;
 
+namespace {
+
+struct ResourceEntry
+{
+    QnResourcePtr resource;
+    std::set<nx::Uuid> layoutItemSourceIds;
+};
+
+} // namespace
+
 class QnAvailableCameraListModelPrivate: public QObject
 {
     QnAvailableCameraListModel* q_ptr;
     Q_DECLARE_PUBLIC(QnAvailableCameraListModel)
 
 public:
-    QList<QnResourcePtr> resources;
+    QList<ResourceEntry> resources;
     QnLayoutResourcePtr layout;
 
 public:
     QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent);
 
     void setLayout(const QnLayoutResourcePtr& newLayout);
+
+private:
     void resetResources();
 
-    void addCamera(const QnResourcePtr& resource, bool silent = false);
-    void removeCamera(const QnResourcePtr& resource, bool silent = false);
+    void addCamera(const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent = false);
+    void removeCamera(const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent = false);
 
     void at_watcher_cameraAdded(const QnResourcePtr& resource);
     void at_watcher_cameraRemoved(const QnResourcePtr& resource);
@@ -72,7 +84,7 @@ QVariant QnAvailableCameraListModel::data(const QModelIndex& index, int role) co
     if (index.row() > d->resources.size())
         return QVariant();
 
-    const auto& resource = d->resources[index.row()];
+    const auto& resource = d->resources[index.row()].resource;
 
     switch (role)
     {
@@ -99,10 +111,16 @@ void QnAvailableCameraListModel::refreshResource(const QnResourcePtr& resource, 
 {
     Q_D(QnAvailableCameraListModel);
 
-    const auto row = d->resources.indexOf(resource);
-    if (row == -1)
+    const auto resourceIter = std::find_if(d->resources.begin(), d->resources.end(),
+        [resource](const ResourceEntry& entry)
+        {
+            return entry.resource == resource;
+        });
+
+    if (resourceIter == d->resources.end())
         return;
 
+    const int row = resourceIter - d->resources.begin();
     const auto idx = index(row);
 
     QVector<int> roles;
@@ -166,8 +184,8 @@ void QnAvailableCameraListModelPrivate::resetResources()
 
     q->beginResetModel();
 
-    for (const auto& resource: resources)
-        disconnect(resource.get(), nullptr, this, nullptr);
+    for (const auto& resourceEntry: resources)
+        disconnect(resourceEntry.resource.get(), nullptr, this, nullptr);
     resources.clear();
 
     if (layout)
@@ -177,7 +195,7 @@ void QnAvailableCameraListModelPrivate::resetResources()
             if (const auto camera = nx::vms::client::core::getResourceByDescriptor(
                 item.resource).dynamicCast<QnVirtualCameraResource>())
             {
-                addCamera(camera, true);
+                addCamera(camera, item.uuid, true);
             }
         }
     }
@@ -185,7 +203,7 @@ void QnAvailableCameraListModelPrivate::resetResources()
     {
         const auto cameras = camerasWatcher->availableCameras();
         for (const auto& camera: cameras)
-            addCamera(camera, true);
+            addCamera(camera, nx::Uuid(), true);
     }
 
     q->endResetModel();
@@ -216,10 +234,30 @@ void QnAvailableCameraListModelPrivate::resetResources()
     }
 }
 
-void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource, bool silent)
+void QnAvailableCameraListModelPrivate::addCamera(
+    const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent)
 {
-    if (resources.contains(resource))
+    const auto resourceIter = std::find_if(resources.begin(), resources.end(),
+        [resource](const ResourceEntry& entry)
+        {
+            return entry.resource == resource;
+        });
+
+    if (resourceIter != resources.end())
+    {
+        NX_ASSERT(!resourceIter->layoutItemSourceIds.contains(sourceId));
+        if (!NX_ASSERT(!resourceIter->layoutItemSourceIds.empty()))
+        {
+            NX_WARNING(this,
+                "Empty layoutItemSourceIds for resource: %1, sourceId: %2, layout: %3",
+                resource->getId(),
+                sourceId,
+                layout ? layout->getId() : nx::Uuid());
+        }
+
+        resourceIter->layoutItemSourceIds.insert(sourceId);
         return;
+    }
 
     Q_Q(QnAvailableCameraListModel);
 
@@ -240,7 +278,7 @@ void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource,
     if (!silent)
         q->beginInsertRows(QModelIndex(), row, row);
 
-    resources.append(resource);
+    resources.append({resource, {sourceId}});
 
     if (!silent)
         q->endInsertRows();
@@ -253,13 +291,34 @@ void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource,
     }
 }
 
-void QnAvailableCameraListModelPrivate::removeCamera(const QnResourcePtr& resource, bool silent)
+void QnAvailableCameraListModelPrivate::removeCamera(
+    const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent)
 {
     Q_Q(QnAvailableCameraListModel);
 
-    const auto row = resources.indexOf(resource);
-    if (row == -1)
+    const auto resourceIter = std::find_if(resources.begin(), resources.end(),
+        [resource](const ResourceEntry& entry)
+        {
+            return entry.resource == resource;
+        });
+
+    if (resourceIter == resources.end())
         return;
+
+    if (!NX_ASSERT(resourceIter->layoutItemSourceIds.contains(sourceId)))
+    {
+        NX_WARNING(this,
+            "layoutItemSourceId is not saved for resource: %1, item: %2, layout: %3",
+            resource->getId(),
+            sourceId,
+            layout ? layout->getId() : nx::Uuid());
+    }
+
+    resourceIter->layoutItemSourceIds.erase(sourceId);
+    if (!resourceIter->layoutItemSourceIds.empty())
+        return;
+
+    const int row = resourceIter - resources.begin();
 
     disconnect(resource.get(), nullptr, this, nullptr);
 
@@ -281,12 +340,12 @@ void QnAvailableCameraListModelPrivate::removeCamera(const QnResourcePtr& resour
 
 void QnAvailableCameraListModelPrivate::at_watcher_cameraAdded(const QnResourcePtr& resource)
 {
-    addCamera(resource);
+    addCamera(resource, nx::Uuid());
 }
 
 void QnAvailableCameraListModelPrivate::at_watcher_cameraRemoved(const QnResourcePtr& resource)
 {
-    removeCamera(resource);
+    removeCamera(resource, nx::Uuid());
 }
 
 void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
@@ -298,7 +357,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
     const auto camera = nx::vms::client::core::getResourceByDescriptor(item.resource);
 
     if (camera)
-        addCamera(camera);
+        addCamera(camera, item.uuid);
 }
 
 void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
@@ -310,7 +369,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
     const auto camera = nx::vms::client::core::getResourceByDescriptor(item.resource);
 
     if (camera)
-        removeCamera(camera);
+        removeCamera(camera, item.uuid);
 }
 
 void QnAvailableCameraListModelPrivate::handleResourceChanged(const QnResourcePtr& resource)
