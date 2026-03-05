@@ -34,7 +34,7 @@
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation>Nie można połączyć się ze stroną &quot;%1&quot;</translation>
+      <translation>Nie można połączyć się z systemem &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
