@@ -6,6 +6,8 @@
 
 namespace nx::vms::api {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzDeviceId, (json), PtzDeviceId_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPositionFilter, (json), PtzPositionFilter_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPosition, (json), PtzPosition_Fields)
@@ -25,6 +27,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPresetActivation, (json), PtzPresetActivatio
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzTourSpot, (json), PtzTourSpot_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzTour, (json), PtzTour_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzViewportMove, (json), PtzViewportMove_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzObject, (json), PtzObject_Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzAuxiliaryCommand, (json), PtzAuxiliaryCommand_Fields)
 
 QString PtzPositionFilter::toString() const
 {

@@ -397,6 +397,39 @@ void registerDeviceBaseHandlers(
         GlobalPermission::none,
         std::make_unique<ptz::PositionHandler>(serverModule, serverConnector));
 
+    /**%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/relativeMove
+     * Moves the Device to a relative position. Each component specifies a direction and magnitude
+     * in the range -1.0 to 1.0 relative to the current position.
+     * If all movement components (pan, tilt, zoom) are absent or zero, no movement command is
+     * sent to the Device. Similarly, if focus is absent or zero, no focus command is sent.
+     * Omitted components default to 0 (no movement).
+     * Supported Device PTZ capabilities can be obtained from "ptz.capabilities" field
+     * via `GET /rest/v{4-}/devices`
+     * %caption Relative PTZ move
+     * %ingroup Device PTZ
+     * %struct PtzMovement
+     *     %param[unused] type
+     *     %param[unused] speed
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/relativeMove",
+        GlobalPermission::none,
+        std::make_unique<ptz::RelativeMoveHandler>(serverModule, serverConnector));
+
+    /**%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/viewportMove
+     * Moves the Device PTZ by specifying a viewport rectangle. The viewport coordinates are
+     * normalized (0.0 to 1.0).
+     * %caption Viewport PTZ move
+     * %ingroup Device PTZ
+     * %struct PtzViewportMove
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/viewportMove",
+        GlobalPermission::none,
+        std::make_unique<ptz::ViewportMoveHandler>(serverModule, serverConnector));
+
     /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/limits
      * Retrieves the Device PTZ limitations.
      * %caption Get Device PTZ limits
@@ -517,4 +550,82 @@ void registerDeviceBaseHandlers(
     reg("rest/v{3-}/devices/:deviceId/ptz/tours/:id/active",
         GlobalPermission::none,
         std::make_unique<ptz::TourActivationHandler>(serverModule, serverConnector));
+
+    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/ptz/activeObject
+     * Retrieves the currently active PTZ object (preset or tour).
+     * The active object is set when a preset is activated or a tour is started, and cleared by
+     * any manual camera movement (continuous, absolute, viewport, or relative move).
+     * Returns 404 if no object is currently active.
+     * %caption Get active PTZ object
+     * %ingroup Device PTZ
+     * %struct PtzDeviceId
+     * %param[ref] _format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{PtzObject} Active PTZ object.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/activeObject",
+        GlobalPermission::none,
+        std::make_unique<ptz::ActiveObjectHandler>(serverModule, serverConnector));
+
+    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/ptz/homeObject
+     * Retrieves the PTZ home object (preset or tour). The home object is the preset or tour that
+     * the Device automatically returns to after a period of PTZ inactivity.
+     * Any camera movement resets the inactivity timer.
+     * Starting a tour clears home object.
+     * Returns 404 if the home object is not configured.
+     * %caption Get PTZ home object
+     * %ingroup Device PTZ
+     * %struct PtzDeviceId
+     * %param[ref] _format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{PtzObject} PTZ home object.
+     *
+     **%apidoc PUT /rest/v{4-}/devices/{deviceId}/ptz/homeObject
+     * Sets the PTZ home object.
+     * %caption Set PTZ home object
+     * %ingroup Device PTZ
+     * %struct PtzObject
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     *
+     **%apidoc DELETE /rest/v{4-}/devices/{deviceId}/ptz/homeObject
+     * Clears the PTZ home object.
+     * %caption Clear PTZ home object
+     * %ingroup Device PTZ
+     * %struct PtzDeviceId
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/homeObject",
+        GlobalPermission::none,
+        std::make_unique<ptz::HomeHandler>(serverModule, serverConnector));
+
+    /**%apidoc GET /rest/v{4-}/devices/{deviceId}/ptz/aux
+     * Retrieves the list of auxiliary trait names supported by the Device.
+     * %caption Get PTZ auxiliary traits
+     * %ingroup Device PTZ
+     * %struct PtzPositionFilter
+     *     %param[unused] type
+     * %param[ref] _format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{StringList} List of auxiliary trait names.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/aux",
+        GlobalPermission::none,
+        std::make_unique<ptz::AuxiliaryTraitsHandler>(serverModule, serverConnector));
+
+    /**%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/aux/{trait}
+     * Runs an auxiliary PTZ command on the Device.
+     * %caption Run PTZ auxiliary command
+     * %ingroup Device PTZ
+     * %struct PtzAuxiliaryCommand
+     * %param[ref] _local,_strict,_ticket
+     * %permissions Depends on Resource access rights.
+     */
+    reg("rest/v{4-}/devices/:deviceId/ptz/aux/:trait",
+        GlobalPermission::none,
+        std::make_unique<ptz::AuxiliaryCommandHandler>(serverModule, serverConnector));
 }
