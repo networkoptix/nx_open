@@ -770,10 +770,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
@@ -783,6 +779,10 @@
     </message>
     <message>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
