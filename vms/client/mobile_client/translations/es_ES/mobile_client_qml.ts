@@ -783,7 +783,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Movimiento</translation>
     </message>
   </context>
   <context>

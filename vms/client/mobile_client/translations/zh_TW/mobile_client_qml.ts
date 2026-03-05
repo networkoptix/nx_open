@@ -781,7 +781,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>位移</translation>
     </message>
   </context>
   <context>

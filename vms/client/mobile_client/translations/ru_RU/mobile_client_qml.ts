@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Движение</translation>
     </message>
   </context>
   <context>

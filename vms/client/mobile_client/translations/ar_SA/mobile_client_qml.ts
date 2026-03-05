@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Motion</translation>
     </message>
   </context>
   <context>
