@@ -27,6 +27,7 @@ BaseSettingsPage
         width: parent.width
         text: qsTr("Server Time")
         checkState: appContext.settings.serverTimeMode ? Qt.Checked : Qt.Unchecked
+        extraText: qsTr("Allows to show server time for the camera")
         onCheckStateChanged:
         {
             appContext.settings.serverTimeMode = checkState != Qt.Unchecked

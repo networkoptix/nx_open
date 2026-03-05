@@ -7,6 +7,7 @@ import Nx.Controls
 import Nx.Mobile
 import Nx.Mobile.Popups
 import Nx.Settings
+import Nx.Ui
 
 BaseSettingsPage
 {

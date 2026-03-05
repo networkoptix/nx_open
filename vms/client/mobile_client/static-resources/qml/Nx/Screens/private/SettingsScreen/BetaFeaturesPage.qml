@@ -4,6 +4,7 @@ import QtQuick
 
 import Nx.Controls
 import Nx.Settings
+import Nx.Ui
 
 BaseSettingsPage
 {

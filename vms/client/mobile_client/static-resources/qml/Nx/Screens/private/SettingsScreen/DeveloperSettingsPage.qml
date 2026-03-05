@@ -8,6 +8,7 @@ import Nx.Core
 import Nx.Dialogs
 import Nx.Screens
 import Nx.Settings
+import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
