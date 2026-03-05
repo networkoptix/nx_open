@@ -701,8 +701,15 @@ AdaptiveScreen
                     clip: true
                     showOnly:
                     {
-                        if (!systemTabsRow.visible)
+                        const onlySites = !organizationsModel.hasChannelPartners
+                            && !organizationsModel.hasOrganizations
+
+                        if (sessionsScreen.searching
+                            || organizationsModel.topLevelLoading
+                            || onlySites)
+                        {
                             return []
+                        }
 
                         if (currentTab === OrganizationsModel.ChannelPartnersTab)
                             return [OrganizationsModel.ChannelPartner]
