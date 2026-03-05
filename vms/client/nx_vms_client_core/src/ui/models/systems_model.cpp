@@ -2,24 +2,19 @@
 
 #include "systems_model.h"
 
-#include <QtCore/QCollator>
-#include <QtCore/QUrl>
-
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/api/data/peer_data.h>
 #include <nx/vms/client/core/settings/welcome_screen_info.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
 
 #include "abstract_systems_controller.h"
-#include "systems_controller.h"
 #include "system_hosts_model.h"
+#include "systems_controller.h"
 
 using namespace nx::vms::common;
 
@@ -59,7 +54,7 @@ const QHash<int, QByteArray> QnSystemsModel::kRoleNames{
     {QnSystemsModel::IsSaasShutDown, "isSaasShutDown"},
     {QnSystemsModel::IsSaasUninitialized, "isSaasUninitialized"},
     {QnSystemsModel::IsPending, "isPending"},
-    {QnSystemsModel::OrganizationIdRoleId, "organizationId"},
+    {QnSystemsModel::OrganizationIdRole, "organizationId"},
 };
 
 class QnSystemsModelPrivate: public QObject
@@ -288,7 +283,7 @@ QVariant QnSystemsModel::data(const QModelIndex& index, int role) const
             return system->saasState() == nx::vms::api::SaasState::uninitialized;
         case IsPending:
             return system->isPending();
-        case OrganizationIdRoleId:
+        case OrganizationIdRole:
             return system->organizationId().toQUuid();
         default:
             return QVariant();

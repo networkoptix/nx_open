@@ -19,10 +19,24 @@ using namespace nx::vms::client::core::entity_resource_tree;
 using NodeType = nx::vms::client::core::ResourceTree::NodeType;
 using nx::vms::client::core::ResourceIconCache;
 
-ResourceTreeItemFactory::ResourceTreeItemFactory(SystemContext* systemContext):
+ResourceTreeItemFactory::ResourceTreeItemFactory(core::SystemContext* systemContext):
     base_type(),
     SystemContextAware(systemContext)
 {
+}
+
+AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& systemId) const
+{
+    const auto nameProvider = cloudSystemNameProvider(systemId);
+    const auto nameInvalidator = cloudSystemNameInvalidator(systemId);
+    const auto iconProvider = cloudSystemIconProvider(systemId);
+    const auto iconInvalidator = cloudSystemIconInvalidator(systemId);
+    // TODO: #amalov Add additional roles if needed, see the desktop analog for the reference.
+
+    return GenericItemBuilder()
+        .withRole(Qt::DisplayRole, nameProvider, nameInvalidator)
+        .withRole(core::ResourceIconKeyRole, iconProvider, iconInvalidator)
+        .withRole(core::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createCamerasItem() const

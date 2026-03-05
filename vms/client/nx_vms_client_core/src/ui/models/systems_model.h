@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <QtCore/QStringListModel>
+#include <QtCore/QAbstractListModel>
+#include <QtCore/QHash>
 
 #include <nx/utils/uuid.h>
 
@@ -49,7 +50,7 @@ public:
         IsSaasUninitialized,
 
         IsPending,
-        OrganizationIdRoleId,
+        OrganizationIdRole,
 
         RolesCount
     };

@@ -30,11 +30,6 @@ public:
             high
         };
 
-        Request():
-            authType(nx::network::http::AuthType::authBasicAndDigest)
-        {
-        }
-
         bool isValid() const
         {
             return !method.toString().empty() && url.isValid();
@@ -45,7 +40,7 @@ public:
         nx::network::http::HttpHeaders headers;
         nx::String contentType;
         nx::String messageBody;
-        nx::network::http::AuthType authType;
+        nx::network::http::AuthType authType = nx::network::http::AuthType::authBasicAndDigest;
         std::optional<nx::network::http::Credentials> credentials;
         Priority priority = Priority::normal;
 
@@ -173,10 +168,10 @@ public:
 
     using ContextPtr = QSharedPointer<Context>;
 
+public:
     ClientPool();
     virtual ~ClientPool();
 
-public:
     ContextPtr createContext(nx::Uuid adapterFuncId, ssl::AdapterFunc adapterFunc)
     {
         // Setting pool timeouts to avoid reusing previous connection with custom timeouts.

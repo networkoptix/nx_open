@@ -6,6 +6,7 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/context_from_qml_handler.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/abstract_entity.h>
 #include <nx/vms/client/mobile/window_context_aware.h>
 
 namespace nx::vms::client::mobile {
@@ -28,7 +29,8 @@ public:
 signals:
     void rootEntityUpdated();
 
-private:
+protected:
+    void setRootEntity(core::entity_item_model::AbstractEntityPtr root);
     virtual void onContextReady() override;
 
 private:

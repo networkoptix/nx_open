@@ -5,14 +5,14 @@
 #include <QtCore/QVector>
 
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
-#include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace entity_resource_tree {
 
 namespace {
@@ -40,9 +40,28 @@ QVector<QString> getOtherCloudSystemsIds(const QString& thisCloudSystemId)
     return result;
 }
 
+QVector<QString> getOrganizationCloudSystemsIds(nx::Uuid organizationId)
+{
+    QVector<QString> result;
+
+    const auto cloudSystemsManager = appContext()->cloudCrossSystemManager();
+
+    for (const auto& systemId: cloudSystemsManager->cloudSystems())
+    {
+        const auto systemContext = cloudSystemsManager->systemContext(systemId);
+        const auto systemDescription = systemContext->systemDescription();
+
+        if (systemDescription->organizationId() == organizationId && !systemDescription->isPending())
+            result.append(systemId);
+    }
+
+    return result;
+}
+
 } // namespace
 
-CloudSystemsSource::CloudSystemsSource()
+CloudSystemsSource::CloudSystemsSource(nx::Uuid organizationId):
+    m_organizationId(organizationId)
 {
     initializeRequest =
         [this]
@@ -74,8 +93,9 @@ CloudSystemsSource::CloudSystemsSource()
                         (*removeKeyHandler)(systemId);
                     }));
 
-            setKeysHandler(
-                getOtherCloudSystemsIds(connectedCloudSystemId()));
+            setKeysHandler(m_organizationId.isNull()
+                ? getOtherCloudSystemsIds(connectedCloudSystemId())
+                : getOrganizationCloudSystemsIds(m_organizationId));
         };
 }
 

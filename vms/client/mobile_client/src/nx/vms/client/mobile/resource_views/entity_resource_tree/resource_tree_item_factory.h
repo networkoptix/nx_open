@@ -16,14 +16,17 @@ namespace entity_resource_tree {
 
 class ResourceTreeItemFactory:
     public QObject,
-    public SystemContextAware
+    public core::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
     using AbstractItemPtr = core::entity_item_model::AbstractItemPtr;
 
 public:
-    ResourceTreeItemFactory(SystemContext* systemContext);
+    ResourceTreeItemFactory(core::SystemContext* systemContext);
+
+    // Resource Tree organization level items.
+    AbstractItemPtr createCloudSystemItem(const QString& systemId) const;
 
     // Resource Tree top level group items.
     AbstractItemPtr createLayoutsItem() const;

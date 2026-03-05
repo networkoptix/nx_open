@@ -142,6 +142,8 @@ public:
      */
     UnifiedResourcePool* unifiedResourcePool() const;
 
+    virtual QnResourceFactory* resourceFactory() const { return nullptr; };
+
     virtual SystemContext* createSystemContext(
         SystemContext::Mode mode, QObject* parent = nullptr);
 

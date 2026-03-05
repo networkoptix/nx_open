@@ -4,8 +4,12 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
+#include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/core/system_finder/system_description.h>
 
 namespace nx::vms::client::core {
 namespace entity_resource_tree {
@@ -153,6 +157,96 @@ InvalidatorPtr cloudLayoutGroupIdInvalidator(const QnLayoutResourcePtr& layout)
             if (key == nx::vms::api::resource_properties::kCustomGroupIdPropertyKey)
                 invalidator->invalidate();
         }));
+
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Cloud System.
+
+GenericItem::DataProvider cloudSystemNameProvider(const QString& systemId)
+{
+    return
+        [systemId]
+        {
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+
+            if (context)
+                return context->systemDescription()->name();
+
+            return QString{};
+        };
+}
+
+InvalidatorPtr cloudSystemNameInvalidator(const QString& systemId)
+{
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    auto result = std::make_shared<Invalidator>();
+
+    if (!context)
+        return result;
+
+    result->connections()->add(QObject::connect(
+        context->systemDescription().get(),
+        &nx::vms::client::core::SystemDescription::systemNameChanged,
+        [invalidator = result.get()]
+        {
+            invalidator->invalidate();
+        }));
+
+    return result;
+}
+
+GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId)
+{
+    return
+        [systemId]
+        {
+            auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+            if (!context
+                || !context->systemDescription()->isOnline()
+                || context->status() == CloudCrossSystemContext::Status::uninitialized)
+            {
+                return static_cast<int>(
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Offline);
+            }
+
+            const auto status = context->status();
+            if (status == CloudCrossSystemContext::Status::connectionFailure)
+            {
+                return static_cast<int>(
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Locked);
+            }
+
+            if (status == CloudCrossSystemContext::Status::unsupportedTemporary)
+            {
+                return static_cast<int>(
+                    ResourceIconCache::CloudSystem | ResourceIconCache::Incompatible);
+            }
+
+            return static_cast<int>(ResourceIconCache::CloudSystem);
+        };
+}
+
+InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId)
+{
+    const auto context = appContext()->cloudCrossSystemManager()->systemContext(systemId);
+    auto result = std::make_shared<Invalidator>();
+
+    if (!context)
+        return result;
+
+    const auto invalidate = [invalidator = result.get()] { invalidator->invalidate(); };
+
+    result->connections()->add(QObject::connect(
+        context,
+        &CloudCrossSystemContext::statusChanged,
+        invalidate));
+
+    result->connections()->add(QObject::connect(
+        context->systemDescription().get(),
+        &nx::vms::client::core::SystemDescription::onlineStateChanged,
+        invalidate));
 
     return result;
 }

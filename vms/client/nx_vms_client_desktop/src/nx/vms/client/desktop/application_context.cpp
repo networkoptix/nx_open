@@ -1021,7 +1021,7 @@ RadassController* ApplicationContext::radassController() const
     return d->radassController.get();
 }
 
-ResourceFactory* ApplicationContext::resourceFactory() const
+QnResourceFactory* ApplicationContext::resourceFactory() const
 {
     return d->resourceFactory.get();
 }

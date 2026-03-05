@@ -32,7 +32,7 @@ ResourceTreeModel::ResourceTreeModel(QObject* parent):
 
 ResourceTreeModel::~ResourceTreeModel()
 {
-    d->baseTreeModel->setRootEntity({});
+    setRootEntity({});
     setSourceModel({});
 }
 
@@ -68,6 +68,15 @@ QModelIndex ResourceTreeModel::resourceIndex(QnResource* resource) const
     return {};
 }
 
+void ResourceTreeModel::setRootEntity(core::entity_item_model::AbstractEntityPtr root)
+{
+    d->baseTreeModel->setRootEntity({});
+    d->rootEntity = std::move(root);
+    d->baseTreeModel->setRootEntity(d->rootEntity.get());
+
+    emit rootEntityUpdated();
+}
+
 void ResourceTreeModel::onContextReady()
 {
     d->treeBuilder = std::make_unique<entity_resource_tree::ResourceTreeEntityBuilder>(
@@ -76,15 +85,14 @@ void ResourceTreeModel::onContextReady()
     const auto updateRootEntity =
         [this]()
         {
-            d->baseTreeModel->setRootEntity({});
-            d->rootEntity.reset();
             if (const auto user = windowContext()->mainSystemContext()->user())
             {
                 d->treeBuilder->setUser(user);
-                d->rootEntity = d->treeBuilder->createTreeEntity();
-                d->baseTreeModel->setRootEntity(d->rootEntity.get());
-
-                emit rootEntityUpdated();
+                setRootEntity(d->treeBuilder->createTreeEntity());
+            }
+            else
+            {
+                setRootEntity({});
             }
         };
 

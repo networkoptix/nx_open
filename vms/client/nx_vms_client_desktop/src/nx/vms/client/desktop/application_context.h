@@ -12,6 +12,7 @@ class QnClientRuntimeSettings;
 class QnForgottenSystemsManager;
 class QnPlatformAbstraction;
 class QnResourceDiscoveryManager;
+class QnResourceFactory;
 class QnResourcePool;
 class QOpenGLWidget;
 
@@ -32,7 +33,6 @@ class LocalProxyServer;
 class LocalSettings;
 class PerformanceMonitor;
 class RadassController;
-class ResourceFactory;
 class ResourceDirectoryBrowser;
 class ResourcesChangesManager;
 class RunningInstancesManager;
@@ -216,7 +216,7 @@ public:
 
     RadassController* radassController() const;
 
-    ResourceFactory* resourceFactory() const;
+    QnResourceFactory* resourceFactory() const;
 
     UploadManager* uploadManager() const;
 

@@ -43,7 +43,7 @@ public:
 
         IdRole,
         TypeRole,
-        SytemCountRole,
+        SystemCountRole,
         SectionRole,
         IsLoadingRole,
         IsFromSitesRole,

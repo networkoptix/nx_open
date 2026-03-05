@@ -165,6 +165,9 @@ struct NX_VMS_CLIENT_CORE_API Ini: nx::kit::IniConfig
     // setMaxFileDescriptors() does not scale well.
     NX_INI_FLAG(false, mobileUseModuleDiscoveryForCrossSite,
         "[Dev] If set to true, cross site module discovery is used in mobile client.\n");
+
+    // VMS-59794
+    NX_INI_FLAG(false, vmsdbPrototype, "[Dev] Prototype of delayed resource loading & subscription");
 };
 
 NX_VMS_CLIENT_CORE_API Ini& ini();

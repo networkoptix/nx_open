@@ -1,24 +1,23 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_entity_builder.h"
+#include "organization_tree_entity_builder.h"
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/resource_tree/cloud_layouts_source.h>
+#include <nx/vms/client/core/cross_system/resource_tree/cloud_systems_source.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/flattening_group_entity.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/grouping_entity.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/entity/single_item_entity.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/camera_resource_index.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/item_order/resource_tree_item_order.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/recorder_item_data_helper.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping_data.h>
-#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/accessible_resource_proxy_source.h>
-#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/composite_resource_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/resource_sources/camera_resource_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/resource_sources/layout_resource_source.h>
 #include <nx/vms/client/mobile/resource_views/entity_resource_tree/resource_tree_item_factory.h>
@@ -38,38 +37,16 @@ using GroupItemCreator = std::function<AbstractItemPtr(const QString&)>;
 
 UniqueResourceSourcePtr layoutsSource(const QnUserResourcePtr& user, SystemContext* systemContext)
 {
-    if (!user)
-        return {};
-
-    auto layouts = std::make_unique<AccessibleResourceProxySource>(
-        systemContext,
-        user,
+    return std::make_shared<ResourceSourceAdapter>(
         std::make_unique<LayoutResourceSource>(systemContext->resourcePool(), user, true));
-
-    if (!user->isCloud())
-        return std::make_shared<ResourceSourceAdapter>(std::move(layouts));
-
-    auto crossSystemLayouts = std::make_unique<CloudLayoutsSource>();
-    auto result = std::make_unique<CompositeResourceSource>(
-        std::move(layouts),
-        std::move(crossSystemLayouts));
-
-    return std::make_shared<ResourceSourceAdapter>(std::move(result));
 }
 
 UniqueResourceSourcePtr camerasSource(
-    const QnUserResourcePtr& user,
-    SystemContext* systemContext,
+    SystemContext* /*systemContext*/,
     CameraResourceIndex* camerasIndex)
 {
-    if (!user)
-        return {};
-
     return std::make_shared<ResourceSourceAdapter>(
-        std::make_unique<AccessibleResourceProxySource>(
-            systemContext,
-            user,
-            std::make_unique<CameraResourceSource>(camerasIndex, QnMediaServerResourcePtr())));
+        std::make_unique<CameraResourceSource>(camerasIndex, QnMediaServerResourcePtr()));
 }
 
 ResourceItemCreator resourceItemCreator(ResourceTreeItemFactory* factory)
@@ -103,61 +80,89 @@ GroupItemCreator userDefinedGroupItemCreator(ResourceTreeItemFactory* factory)
 namespace nx::vms::client::mobile {
 namespace entity_resource_tree {
 
-    ResourceTreeEntityBuilder::ResourceTreeEntityBuilder(core::SystemContext* systemContext):
+struct SystemHelpers
+{
+    std::unique_ptr<core::entity_resource_tree::CameraResourceIndex> cameraResourceIndex;
+    QSharedPointer<core::entity_resource_tree::RecorderItemDataHelper> recorderItemDataHelper;
+};
+
+struct OrganizationTreeEntityBuilder::Private
+{
+    nx::Uuid m_organizationId;
+    std::unique_ptr<ResourceTreeItemFactory> itemFactory;
+    mutable std::map<core::SystemContext*, SystemHelpers> helpers; //< TODO: #amalov Attach to source.
+};
+
+OrganizationTreeEntityBuilder::OrganizationTreeEntityBuilder():
     base_type(),
-    SystemContextAware(systemContext),
-    m_cameraResourceIndex(new CameraResourceIndex(resourcePool())),
-    m_recorderItemDataHelper(new core::entity_resource_tree::RecorderItemDataHelper(m_cameraResourceIndex.get())),
-    m_itemFactory(new ResourceTreeItemFactory(systemContext))
+    d(new Private{
+        .itemFactory = std::make_unique<ResourceTreeItemFactory>(
+            appContext()->currentSystemContext())
+    })
 {
-    auto userWatcher = new core::SessionResourcesSignalListener<QnUserResource>(
-        systemContext,
-        this);
-    userWatcher->setOnRemovedHandler(
-        [this](const QnUserResourceList& users)
+    // TODO: #amalov Share item factory between builders. Make it system context unaware.
+}
+
+OrganizationTreeEntityBuilder::~OrganizationTreeEntityBuilder()
+{
+}
+
+AbstractEntityPtr OrganizationTreeEntityBuilder::createRootTreeEntity(nx::Uuid organizationId) const
+{
+    auto systemItemCreator =
+        [this](const QString& systemId) -> AbstractItemPtr
         {
-            if (m_user && users.contains(m_user))
-                m_user.reset();
-        });
-    userWatcher->start();
+            return d->itemFactory->createCloudSystemItem(systemId);
+        };
+
+    auto systemContentCreator =
+        [this](const QString& systemId) -> AbstractEntityPtr
+        {
+            return createResourceTreeEntity(appContext()->systemContextByCloudSystemId(systemId));
+        };
+
+    auto cloudSystemsEntity =
+        makeUniqueKeyGroupList<QString>(systemItemCreator, systemContentCreator, numericOrder());
+
+    cloudSystemsEntity->installItemSource(
+        std::make_shared<core::entity_resource_tree::CloudSystemsSource>(organizationId));
+
+    return cloudSystemsEntity;
 }
 
-ResourceTreeEntityBuilder::~ResourceTreeEntityBuilder()
+AbstractEntityPtr OrganizationTreeEntityBuilder::createResourceTreeEntity(
+    core::SystemContext* systemContext) const
 {
-}
+    auto& helper = d->helpers[systemContext];
+    if (!helper.cameraResourceIndex)
+    {
+        helper.cameraResourceIndex =
+            std::make_unique<core::entity_resource_tree::CameraResourceIndex>(
+                systemContext->resourcePool());
+    }
 
-QnUserResourcePtr ResourceTreeEntityBuilder::user() const
-{
-    return m_user;
-}
-
-void ResourceTreeEntityBuilder::setUser(const QnUserResourcePtr& user)
-{
-    m_user = user;
-}
-
-AbstractEntityPtr ResourceTreeEntityBuilder::createTreeEntity() const
-{
     auto treeEntity = std::make_unique<CompositionEntity>();
-    treeEntity->addSubEntity(createLayoutsGroupEntity());
-    treeEntity->addSubEntity(createCamerasGroupEntity());
+    treeEntity->addSubEntity(createLayoutsGroupEntity(systemContext));
+    treeEntity->addSubEntity(createCamerasGroupEntity(systemContext));
+
     return treeEntity;
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasGroupEntity() const
+AbstractEntityPtr OrganizationTreeEntityBuilder::createCamerasGroupEntity(
+    core::SystemContext* systemContext) const
 {
     using GroupingRule = GroupingRule<QString, QnResourcePtr>;
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
     const auto recorderGroupCreator = recorderGroupItemCreator(
-        m_itemFactory.get(),
-        m_recorderItemDataHelper);
+        d->itemFactory.get(),
+        d->helpers.at(systemContext).recorderItemDataHelper);
 
     GroupingRuleStack groupingRuleStack;
 
     groupingRuleStack.push_back(
         {resource_grouping::getUserDefinedGroupId,
-        userDefinedGroupItemCreator(m_itemFactory.get()),
+        userDefinedGroupItemCreator(d->itemFactory.get()),
         core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -171,39 +176,40 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCamerasGroupEntity() const
     groupingRuleStack.push_back(recordersGroupingRule);
 
     auto camerasGroupingEntity = std::make_unique<GroupingEntity<QString, QnResourcePtr>>(
-        resourceItemCreator(m_itemFactory.get()),
+        resourceItemCreator(d->itemFactory.get()),
         core::ResourceRole,
         serverResourcesOrder(),
         groupingRuleStack);
 
-    if (auto source = camerasSource(m_user, systemContext(), m_cameraResourceIndex.get()))
+    if (auto source = camerasSource(systemContext, d->helpers.at(systemContext).cameraResourceIndex.get()))
         camerasGroupingEntity->installItemSource(source);
 
     return makeFlatteningGroup(
-        m_itemFactory->createCamerasItem(),
+        d->itemFactory->createCamerasItem(),
         std::move(camerasGroupingEntity),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy);
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
-AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
+AbstractEntityPtr OrganizationTreeEntityBuilder::createLayoutsGroupEntity(
+    core::SystemContext* systemContext) const
 {
     using GroupingRuleStack = GroupingEntity<QString, QnResourcePtr>::GroupingRuleStack;
 
-    auto layoutItemCreator =
-        [this, baseItemCreator = resourceItemCreator(m_itemFactory.get())]
+    const auto layoutItemCreator =
+        [this, baseItemCreator = resourceItemCreator(d->itemFactory.get())]
         (const QnResourcePtr& resource)
     {
-        auto layout = resource.objectCast<QnLayoutResource>();
+        const auto layout = resource.objectCast<QnLayoutResource>();
         NX_ASSERT(layout);
         if (layout->hasFlags(Qn::cross_system))
-            return m_itemFactory->createCloudLayoutItem(layout);
+            return d->itemFactory->createCloudLayoutItem(layout);
         else
             return baseItemCreator(layout);
     };
 
     GroupingRuleStack groupingRuleStack;
     groupingRuleStack.push_back({resource_grouping::getUserDefinedGroupId,
-        userDefinedGroupItemCreator(m_itemFactory.get()),
+        userDefinedGroupItemCreator(d->itemFactory.get()),
         core::ResourceTreeCustomGroupIdRole,
         resource_grouping::kUserDefinedGroupingDepth,
         numericOrder()});
@@ -214,17 +220,16 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createLayoutsGroupEntity() const
         layoutsOrder(),
         groupingRuleStack);
 
-    if (auto source = layoutsSource(m_user, systemContext()))
+    if (const auto source = layoutsSource(/*user*/ {}, systemContext))
         layoutsGroupingList->installItemSource(source);
 
     auto composition = std::make_unique<CompositionEntity>();
-    composition->addSubEntity(makeSingleItemEntity(m_itemFactory->createAllDevicesItem()));
     composition->addSubEntity(std::move(layoutsGroupingList));
 
     return makeFlatteningGroup(
-        m_itemFactory->createLayoutsItem(),
+        d->itemFactory->createLayoutsItem(),
         std::move(composition),
-        FlatteningGroupEntity::AutoFlatteningPolicy::noPolicy);
+        FlatteningGroupEntity::AutoFlatteningPolicy::noChildrenPolicy);
 }
 
 } // namespace entity_resource_tree

@@ -107,6 +107,8 @@ struct CloudCrossSystemContext::Private
         systemContext->resourceDataPool()->setExternalSource(
             appContext()->currentSystemContext()->resourceDataPool());
 
+        systemContext->globalSettings()->setCloudSystemId(systemDescription->cloudId());
+
         appContext()->addSystemContext(systemContext.get());
 
         connect(systemContext->resourcePool(),

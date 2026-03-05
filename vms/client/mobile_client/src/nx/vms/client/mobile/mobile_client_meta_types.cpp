@@ -19,7 +19,6 @@
 #include <nx/mobile_client/models/ptz_preset_model.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
-#include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/core/watchers/watermark_watcher.h>
@@ -27,10 +26,11 @@
 #include <nx/vms/client/mobile/camera/buttons/camera_buttons_model.h>
 #include <nx/vms/client/mobile/camera/media_download_backend.h>
 #include <nx/vms/client/mobile/camera/share_bookmark_backend.h>
+#include <nx/vms/client/mobile/cameras_grid/cameras_grid_helper.h>
 #include <nx/vms/client/mobile/event_search/models/parameters_visualization_model.h>
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/mobile/maintenance/remote_log_manager.h>
-#include <nx/vms/client/mobile/models/resource_tree_model.h>
+#include <nx/vms/client/mobile/models/organization_tree_model.h>
 #include <nx/vms/client/mobile/models/resource_tree_search_model.h>
 #include <nx/vms/client/mobile/push_notification/details/push_systems_selection_model.h>
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
@@ -41,8 +41,6 @@
 #include <nx/vms/client/mobile/timeline/objects_loader.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
-#include <nx/vms/client/mobile/cameras_grid/cameras_grid_helper.h>
-#include <private/qqmlvaluetype_p.h>
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/models/systems_model.h>
@@ -99,6 +97,7 @@ void registerQmlTypes()
 
     qmlRegisterType<nx::vms::client::mobile::ResourceTreeModel>(
         "nx.vms.client.mobile", 1, 0, "ResourceTreeModel");
+    OrganizationTreeModel::registerQmlType();
 
     qmlRegisterType<nx::vms::client::mobile::ResourceTreeSearchModel>(
         "nx.vms.client.mobile", 1, 0, "ResourceTreeSearchModel");
@@ -129,7 +128,7 @@ void registerQmlTypes()
     PushNotificationProvider::registerQmlType();
     QnCameraListModel::registerQmlType();
     CamerasGridHelper::registerQmlType();
-	timeline::ObjectsLoader::registerQmlTypes();
+    timeline::ObjectsLoader::registerQmlTypes();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

@@ -16,6 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/core/utils/log_strings_format.h>
 
@@ -420,6 +421,10 @@ CloudCrossSystemContextDataLoader::~CloudCrossSystemContextDataLoader()
 void CloudCrossSystemContextDataLoader::start(bool requestUser)
 {
     d->doRequestUser = requestUser;
+
+    // VMSDBE: Temporary suppress resource loading to test no-data scenario.
+    if (ini().vmsdbPrototype)
+        return;
 
     auto requestDataTimer = new QTimer(this);
     requestDataTimer->setInterval(kRequestDataRetryTimeout);

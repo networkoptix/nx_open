@@ -2,11 +2,7 @@
 
 #include "organizations_model.h"
 
-#include <QtCore/qtmetamacros.h>
 #include <ranges>
-
-#include <QtCore/QCoreApplication>
-#include <QtCore/QMetaObject>
 
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
@@ -851,7 +847,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
 
                 // System has organization id? Definitely SaaS is initialized.
                 if (!d->sitesModel->data(
-                    siteIndex, QnSystemsModel::OrganizationIdRoleId).value<QUuid>().isNull())
+                    siteIndex, QnSystemsModel::OrganizationIdRole).value<QUuid>().isNull())
                 {
                     return false;
                 }
@@ -861,7 +857,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             {
                 const auto parentOrgId = d->sitesModel->data(
                     d->mapToProxyModel(index),
-                    QnSystemsModel::OrganizationIdRoleId).value<QUuid>();
+                    QnSystemsModel::OrganizationIdRole).value<QUuid>();
 
                 return d->accessibleOrgs.contains(parentOrgId);
             }
@@ -878,7 +874,7 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return QVariant::fromValue(node->id);
         case QnSystemsModel::SystemIdRoleId:
             return node->id.toSimpleString();
-        case SytemCountRole:
+        case SystemCountRole:
             return node->systemCount;
         case TypeRole:
             return QVariant::fromValue(node->type);
@@ -912,6 +908,16 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
                 sectionNameParts << parent.data(Qt::DisplayRole).toString();
 
             return sectionNameParts.join(" / ");
+        }
+        case QnSystemsModel::OrganizationIdRole:
+        {
+            for (auto current = node; current; current = current->parentNode())
+            {
+                if (current->type == OrganizationsModel::Organization)
+                    return QVariant::fromValue(current->id);
+            }
+
+            return QVariant::fromValue(decltype(node->id)());
         }
         case IsLoadingRole:
             return node->loading;
@@ -1050,7 +1056,7 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {Qt::DisplayRole, "display"},
         {IdRole, "nodeId"},
         {TypeRole, "type"},
-        {SytemCountRole, "systemCount"},
+        {SystemCountRole, "systemCount"},
         {SectionRole, "section"},
         {IsLoadingRole, "isLoading"},
         {IsFromSitesRole, "isFromSites"},

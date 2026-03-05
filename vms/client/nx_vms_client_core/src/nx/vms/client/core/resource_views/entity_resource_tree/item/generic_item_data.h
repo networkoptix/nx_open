@@ -46,5 +46,11 @@ NX_VMS_CLIENT_CORE_API GenericItem::DataProvider cloudLayoutGroupIdProvider(
 NX_VMS_CLIENT_CORE_API InvalidatorPtr cloudLayoutGroupIdInvalidator(
     const QnLayoutResourcePtr& layout);
 
+NX_VMS_CLIENT_CORE_API GenericItem::DataProvider cloudSystemNameProvider(const QString& systemId);
+NX_VMS_CLIENT_CORE_API InvalidatorPtr cloudSystemNameInvalidator(const QString& systemId);
+
+NX_VMS_CLIENT_CORE_API GenericItem::DataProvider cloudSystemIconProvider(const QString& systemId);
+NX_VMS_CLIENT_CORE_API InvalidatorPtr cloudSystemIconInvalidator(const QString& systemId);
+
 } // namespace entity_resource_tree
 } // namespace nx::vms::client::mobile
