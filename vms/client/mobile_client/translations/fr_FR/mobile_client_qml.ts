@@ -770,10 +770,6 @@
       <translation>Afficher</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Signets</translation>
     </message>
@@ -784,6 +780,10 @@
     <message>
       <source>Close</source>
       <translation>Fermer</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

@@ -768,10 +768,6 @@
       <translation>보기</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>모션</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>즐겨찾기</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>닫기</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

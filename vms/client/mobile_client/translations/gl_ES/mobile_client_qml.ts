@@ -770,10 +770,6 @@
       <translation>Ver</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>Movementos</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Marcadores</translation>
     </message>
@@ -784,6 +780,10 @@
     <message>
       <source>Close</source>
       <translation>Pechar</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

@@ -772,10 +772,6 @@
       <translation type="unfinished">View</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bookmarks</translation>
     </message>
@@ -786,6 +782,10 @@
     <message>
       <source>Close</source>
       <translation>Close</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

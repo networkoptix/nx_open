@@ -944,9 +944,9 @@
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+      <translation>
+        <numerusform>%n grupos</numerusform>
+        <numerusform>%n grupos</numerusform>
       </translation>
     </message>
     <message numerus="yes">

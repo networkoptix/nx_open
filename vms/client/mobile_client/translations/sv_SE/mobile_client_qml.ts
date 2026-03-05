@@ -770,10 +770,6 @@
       <translation>Visa</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>Rörelser</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bokmärken</translation>
     </message>
@@ -784,6 +780,10 @@
     <message>
       <source>Close</source>
       <translation>Stäng</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

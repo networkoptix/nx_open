@@ -774,10 +774,6 @@
       <translation>הצג</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>סימניות</translation>
     </message>
@@ -788,6 +784,10 @@
     <message>
       <source>Close</source>
       <translation>סגירה</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

@@ -768,10 +768,6 @@
       <translation>ดู</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>บุ๊คมาร์ค</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>ปิด</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

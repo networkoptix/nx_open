@@ -768,10 +768,6 @@
       <translation>瀏覽</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>位移偵測</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>書籤</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>關閉​​​</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

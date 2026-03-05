@@ -768,10 +768,6 @@
       <translation>查看</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>书签</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>关闭</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

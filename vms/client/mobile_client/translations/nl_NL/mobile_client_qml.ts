@@ -770,10 +770,6 @@
       <translation>Toon</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation type="unfinished">Motions</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bladwijzers</translation>
     </message>
@@ -784,6 +780,10 @@
     <message>
       <source>Close</source>
       <translation>Sluiten</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

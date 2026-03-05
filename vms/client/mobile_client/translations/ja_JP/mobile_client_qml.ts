@@ -768,10 +768,6 @@
       <translation>表示</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>モーション</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>ブックマーク</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>閉じる</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

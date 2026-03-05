@@ -770,10 +770,6 @@
       <translation>Vis</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>Bevægelser</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bogmærker</translation>
     </message>
@@ -784,6 +780,10 @@
     <message>
       <source>Close</source>
       <translation>Luk</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

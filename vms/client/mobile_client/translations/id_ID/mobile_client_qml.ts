@@ -768,10 +768,6 @@
       <translation>Lihat</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>Gerakan</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Bookmark</translation>
     </message>
@@ -782,6 +778,10 @@
     <message>
       <source>Close</source>
       <translation>Tutup</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

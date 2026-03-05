@@ -663,7 +663,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
@@ -767,7 +767,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Valor</translation>
     </message>
   </context>
   <context>
@@ -1177,7 +1177,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
@@ -1534,7 +1534,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Cualquier %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1554,7 +1554,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>valor</translation>
     </message>
   </context>
   <context>
@@ -1896,7 +1896,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>

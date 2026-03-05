@@ -774,10 +774,6 @@
       <translation>Widok</translation>
     </message>
     <message>
-      <source>Motions</source>
-      <translation>Ruch</translation>
-    </message>
-    <message>
       <source>Bookmarks</source>
       <translation>Zakładki</translation>
     </message>
@@ -788,6 +784,10 @@
     <message>
       <source>Close</source>
       <translation>Zamknij</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>
