@@ -11,7 +11,11 @@ enum class Type
 {
     /**%apidoc[unused] */
     none = 0,
+
+    /**%apidoc Standard runtime PTZ control. */
     operational = 1 << 0,
+
+    /**%apidoc Alternative PTZ control mode (may have different coordinate ranges). */
     configurational = 1 << 1,
 
     /**%apidoc[unused] */

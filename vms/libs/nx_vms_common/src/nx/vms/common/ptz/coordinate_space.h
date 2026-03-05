@@ -9,8 +9,8 @@ namespace ptz {
 
 enum class CoordinateSpace
 {
-    device,
-    logical
+    device, //< Device-specific coordinate space.
+    logical //< VMS normalized coordinate space, degrees (-180..+180 for pan/tilt).
 };
 
 template<typename Visitor>

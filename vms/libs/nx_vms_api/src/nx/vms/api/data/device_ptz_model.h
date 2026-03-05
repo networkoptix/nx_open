@@ -11,8 +11,8 @@ namespace nx::vms::api {
 
 NX_REFLECTION_ENUM_CLASS(PtzApiType,
     none,
-    operational,
-    configurational,
+    operational, //< Standard runtime PTZ control.
+    configurational, //< Alternative PTZ control mode (may have different coordinate ranges).
     any
 );
 
@@ -24,6 +24,18 @@ NX_REFLECTION_ENUM_CLASS(PtzPositionType,
     /**%apidoc Logical position in the range -180 to 180. */
     logical
 );
+
+struct NX_VMS_API PtzDeviceId
+{
+    /**%apidoc:string
+     * Device id (can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
+    nx::Uuid deviceId;
+};
+#define PtzDeviceId_Fields (deviceId)
+QN_FUSION_DECLARE_FUNCTIONS(PtzDeviceId, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzDeviceId, PtzDeviceId_Fields)
 
 struct NX_VMS_API PtzPositionFilter
 {
@@ -144,6 +156,58 @@ struct NX_VMS_API PtzMovement: PtzPosition
 QN_FUSION_DECLARE_FUNCTIONS(PtzMovement, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PtzMovement, PtzMovement_Fields)
 
+struct NX_VMS_API PtzViewportMove
+{
+    /**%apidoc:string
+     * Device id (can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
+    nx::Uuid deviceId;
+
+    /**%apidoc
+     * Left edge of the viewport rectangle [0.0 to 1.0].
+     * %example 0.0
+     */
+    float viewportLeft = 0.f;
+
+    /**%apidoc
+     * Top edge of the viewport rectangle [0.0 to 1.0].
+     * %example 0.0
+     */
+    float viewportTop = 0.f;
+
+    /**%apidoc
+     * Right edge of the viewport rectangle [0.0 to 1.0].
+     * %example 1.0
+     */
+    float viewportRight = 0.f;
+
+    /**%apidoc
+     * Bottom edge of the viewport rectangle [0.0 to 1.0].
+     * %example 1.0
+     */
+    float viewportBottom = 0.f;
+
+    /**%apidoc
+     * Aspect ratio of the current view.
+     * %example 1.777
+     */
+    float aspectRatio = 0.f;
+
+    /**%apidoc[opt]
+     * Movement speed [0.0 to 1.0].
+     * %example 1.0
+     */
+    float speed = 1.f;
+
+    /**%apidoc[opt] API type to use. */
+    PtzApiType api = PtzApiType::operational;
+};
+#define PtzViewportMove_Fields (deviceId)(viewportLeft)(viewportTop)(viewportRight)\
+    (viewportBottom)(aspectRatio)(speed)(api)
+QN_FUSION_DECLARE_FUNCTIONS(PtzViewportMove, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzViewportMove, PtzViewportMove_Fields)
+
 struct NX_VMS_API PtzPresetFilter
 {
     /**%apidoc[immutable] */
@@ -213,5 +277,52 @@ struct NX_VMS_API PtzTour: PtzPreset
 #define PtzTour_Fields PtzPreset_Fields (spots)
 QN_FUSION_DECLARE_FUNCTIONS(PtzTour, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PtzTour, PtzTour_Fields)
+
+NX_REFLECTION_ENUM_CLASS(PtzObjectType,
+    preset, //< PTZ preset.
+    tour //< PTZ tour.
+);
+
+struct NX_VMS_API PtzObject
+{
+    /**%apidoc:string
+     * Device id (can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
+    nx::Uuid deviceId;
+
+    /**%apidoc Object type. */
+    PtzObjectType type = PtzObjectType::preset;
+
+    /**%apidoc Preset or tour id. */
+    QString objectId;
+};
+#define PtzObject_Fields (deviceId)(type)(objectId)
+QN_FUSION_DECLARE_FUNCTIONS(PtzObject, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzObject, PtzObject_Fields)
+
+struct NX_VMS_API PtzAuxiliaryCommand
+{
+    /**%apidoc:string
+     * Device id (can be obtained from "id", "physicalId" or "logicalId"
+     * field via `GET /rest/v{1-}/devices`) or MAC address (not supported for certain cameras).
+     */
+    nx::Uuid deviceId;
+
+    /**%apidoc
+     * Auxiliary trait name to execute. One of the traits from
+     * GET /rest/v{4-}/devices/{deviceId}/ptz/aux.
+     */
+    QString trait;
+
+    /**%apidoc[opt] Command data (trait-specific). */
+    QString data;
+
+    /**%apidoc[opt] API type to use. */
+    PtzApiType api = PtzApiType::operational;
+};
+#define PtzAuxiliaryCommand_Fields (deviceId)(trait)(data)(api)
+QN_FUSION_DECLARE_FUNCTIONS(PtzAuxiliaryCommand, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzAuxiliaryCommand, PtzAuxiliaryCommand_Fields)
 
 } // namespace nx::vms::api
