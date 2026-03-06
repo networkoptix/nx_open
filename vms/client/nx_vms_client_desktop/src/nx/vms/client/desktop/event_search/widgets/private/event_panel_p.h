@@ -69,6 +69,7 @@ private:
 
     EventPanel* const q;
     AnimatedCompactTabWidget* m_tabs = nullptr;
+    Tab m_requestedTab = Tab::notifications; //< Used to restore session state.
 
     NotificationListWidget* m_notificationsTab = nullptr;
     NotificationCounterLabel* m_counterLabel = nullptr;
