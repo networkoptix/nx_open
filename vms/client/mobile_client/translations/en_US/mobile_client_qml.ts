@@ -310,6 +310,14 @@
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Shared</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Share</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DeveloperSettingsPage</name>
@@ -385,18 +393,10 @@
     </message>
 </context>
 <context>
-    <name>DownloadMediaButton</name>
+    <name>DownloadMediaAction</name>
     <message>
-        <source>Download next</source>
-        <translation></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minutes</source>
-        <comment>Number of minutes</comment>
-        <translation>
-            <numerusform>%n minute</numerusform>
-            <numerusform>%n minutes</numerusform>
-        </translation>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -658,6 +658,10 @@
     </message>
     <message>
         <source>Server Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows to show server time for the camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
