@@ -59,7 +59,6 @@ struct TreeNode
             QString::fromStdString(org.name),
             OrganizationsModel::Organization)
     {
-        systemCount = org.systemCount;
         state = org.effectiveState;
         orgOwnRoleIds = {org.ownRolesIds.begin(), org.ownRolesIds.end()};
         loading = true;
@@ -396,12 +395,10 @@ struct OrganizationsModel::Private
                 {org.ownRolesIds.begin(), org.ownRolesIds.end()};
 
             if (node->name != QString::fromStdString(org.name)
-                || node->systemCount != org.systemCount
                 || node->state != org.effectiveState
                 || node->orgOwnRoleIds != ownRoleIds)
             {
                 node->name = QString::fromStdString(org.name);
-                node->systemCount = org.systemCount;
                 node->state = org.effectiveState;
                 node->orgOwnRoleIds = ownRoleIds;
                 notifyNodeUpdate(node);
@@ -495,6 +492,18 @@ struct OrganizationsModel::Private
             orgStructureCache.emplace(orgId, data);
     }
 
+    void updateOrganizationSystemCount(TreeNode* orgNode, int count)
+    {
+        if (!NX_ASSERT(orgNode && orgNode->type == OrganizationsModel::Organization))
+            return;
+
+        if (orgNode->systemCount == count)
+            return;
+
+        orgNode->systemCount = count;
+        notifyNodeUpdate(orgNode, {OrganizationsModel::SystemCountRole});
+    }
+
     void gatherSystems(TreeNode* parent, std::unordered_set<nx::Uuid>& systems)
     {
         for (const auto& child: parent->allChildren())
@@ -563,6 +572,7 @@ struct OrganizationsModel::Private
         }
 
         cachedSystems = std::move(newSystems);
+        updateOrganizationSystemCount(orgNode, static_cast<int>(data.size()));
     }
 
     QModelIndex sitesRoot() const
@@ -1194,9 +1204,7 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(OrganizationList 
     std::vector<nx::coro::Task<bool>> loadTasks;
     loadTasks.reserve(orgList.results.size());
 
-    const auto isAccessible = [this](const auto& org) { return accessibleOrgs.contains(org.id); };
-
-    for (const auto& org: orgList.results | std::views::filter(isAccessible))
+    for (const auto& org: orgList.results)
         loadTasks.push_back(loadOrgAsync(org));
 
     auto results = co_await nx::coro::runAll(std::move(loadTasks), kMaxConcurrentRequests);
