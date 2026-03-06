@@ -310,6 +310,14 @@
       <source>Cancel</source>
       <translation>Отменить</translation>
     </message>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Share</source>
+      <translation type="unfinished">Share</translation>
+    </message>
   </context>
   <context>
     <name>DeveloperSettingsPage</name>
@@ -385,20 +393,10 @@
     </message>
   </context>
   <context>
-    <name>DownloadMediaButton</name>
+    <name>DownloadMediaAction</name>
     <message>
-      <source>Download next</source>
-      <translation>Загрузить следующие</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n minutes</source>
-      <comment>Number of minutes</comment>
-      <translation type="unfinished">
-        <numerusform>%n минут(ы)</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
-      </translation>
+      <source>Download</source>
+      <translation type="unfinished">Download</translation>
     </message>
   </context>
   <context>
@@ -663,6 +661,10 @@
     <message>
       <source>Server Time</source>
       <translation>Время сервера</translation>
+    </message>
+    <message>
+      <source>Allows to show server time for the camera</source>
+      <translation type="unfinished">Allows to show server time for the camera</translation>
     </message>
   </context>
   <context>
