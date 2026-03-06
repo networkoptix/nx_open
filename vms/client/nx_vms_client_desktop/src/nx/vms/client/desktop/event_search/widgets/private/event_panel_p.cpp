@@ -320,6 +320,8 @@ EventPanel::Private::Private(EventPanel* q):
                 searchWidget->goToLive();
         });
 
+    rebuildTabs();
+
     using Tabs = std::initializer_list<AbstractSearchWidget*>;
     for (const auto tab: Tabs{
         m_vmsEventsTab->searchWidget(),
@@ -358,8 +360,6 @@ EventPanel::Private::Private(EventPanel* q):
             m_vmsEventsTab->setAppearance(appearance);
         });
 
-    rebuildTabs();
-
     m_connections << connect(m_notificationsTab, &NotificationListWidget::tileHovered,
         this, &EventPanel::Private::at_eventTileHovered);
 
@@ -393,6 +393,7 @@ EventPanel::Tab EventPanel::Private::currentTab() const
 
 bool EventPanel::Private::setCurrentTab(Tab tab)
 {
+    m_requestedTab = tab;
     const int index = m_tabs->indexOf(m_tabIds.key(tab));
     if (index < 0)
         return false;
@@ -463,7 +464,7 @@ void EventPanel::Private::rebuildTabs()
             else //< Hide tab.
             {
                 if (selectedTab == tab) //< If True, selected tab is not visible anymore.
-                    m_tabs->setCurrentIndex(0); //< Show Notifications tab by default.
+                    setCurrentTab(Tab::notifications); //< Show Notifications tab by default.
 
                 if (tabWasVisibleBeforeRebuild)
                 {
@@ -502,6 +503,9 @@ void EventPanel::Private::rebuildTabs()
 
     // Make sure the number of notifications doesn't get obscured by the bell icon.
     m_counterLabel->raise();
+
+    // Update current tab to the one that was explicitly selected early.
+    setCurrentTab(m_requestedTab);
 }
 
 void EventPanel::Private::updateUnreadCounter(int count, QnNotificationLevel::Value importance)
