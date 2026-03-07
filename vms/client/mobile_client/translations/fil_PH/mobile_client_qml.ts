@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
   </context>
   <context>

@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Paylaşıldı</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Paylaş</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Karşıdan Yükle</translation>
     </message>
   </context>
   <context>

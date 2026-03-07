@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Dibagikan</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Bagikan</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
   </context>
   <context>

@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>共享</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>下载</translation>
     </message>
   </context>
   <context>

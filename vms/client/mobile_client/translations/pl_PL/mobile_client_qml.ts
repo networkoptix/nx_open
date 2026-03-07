@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Udostępnione</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Udostępnij</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Pobieranie</translation>
     </message>
   </context>
   <context>
@@ -664,7 +664,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>Pozwala wyświetlić czas serwera dla kamery</translation>
     </message>
   </context>
   <context>

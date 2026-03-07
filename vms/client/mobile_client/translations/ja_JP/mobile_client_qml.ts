@@ -312,11 +312,11 @@
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>共有</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>共有</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>ダウンロード</translation>
     </message>
   </context>
   <context>
@@ -657,11 +657,11 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation>サーバー時間</translation>
+      <translation>サーバー時刻</translation>
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>カメラにサーバー時刻を表示できます</translation>
     </message>
   </context>
   <context>
