@@ -522,7 +522,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation>サーバー時間</translation>
+      <translation>サーバー時刻</translation>
     </message>
     <message>
       <source>Show server time on cameras</source>
