@@ -42,6 +42,9 @@ Page
     property real targetTimestamp: -1
 
     property alias selectedObjectsType: objectsTypeSheet.selectedType
+    property alias customRoiExists: video.roiController.customRoiExists
+
+    onSelectedObjectsTypeChanged: appContext.settings.selectedObjectsType = selectedObjectsType
 
     backgroundColor: "black"
 
@@ -196,6 +199,7 @@ Page
             if (modernVideoScreen.activePage)
                 Workflow.popCurrentScreen()
         }
+        resourceHelper.onResourceChanged: video.roiController.clearCustomRoi()
     }
 
     NxObject
@@ -285,21 +289,25 @@ Page
         }
     }
 
+    property MotionAreaButton motionAreaButton: MotionAreaButton
+    {
+        text: qsTr("Area")
+        icon.source: lp("/images/close.png")
+
+        onClicked: video.roiController.clearCustomRoi()
+    }
+
     title: controller.resourceHelper.qualifiedResourceName
     titleLabelOpacity: d.cameraUiOpacity
     titleControls:
         [
-            MotionAreaButton
+            LayoutItemProxy
             {
-                visible: selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
-                    && video.roiController.customRoiExists
-
                 anchors.verticalCenter: parent.verticalCenter
-
-                text: qsTr("Area")
-                icon.source: lp("/images/close.png")
-
-                onClicked: video.roiController.clearCustomRoi()
+                target: modernVideoScreen.motionAreaButton
+                visible: modernVideoScreen.activePage
+                    && selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                    && video.roiController.customRoiExists
             }
         ]
 

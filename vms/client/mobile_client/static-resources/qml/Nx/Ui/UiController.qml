@@ -53,6 +53,17 @@ NxObject
         }
     }
 
+    Connections
+    {
+        target: LayoutController
+
+        function onIsMobileChanged()
+        {
+            if (LayoutController.isMobile)
+                windowContext.deprecatedUiController.resource = null
+        }
+    }
+
     Binding
     {
         target: windowContext.deprecatedUiController

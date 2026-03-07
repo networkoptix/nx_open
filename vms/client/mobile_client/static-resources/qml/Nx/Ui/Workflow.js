@@ -121,7 +121,8 @@ function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel, selec
         {
             "initialResource": resource,
             "initialScreenshot": screenshotUrl ?? "",
-            "targetTimestamp": targetTimestamp
+            "targetTimestamp": targetTimestamp,
+            "selectedObjectsType": appContext.settings.selectedObjectsType ?? Timeline.ObjectsLoader.ObjectsType.motion
         }
 
     if (camerasModel)

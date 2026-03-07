@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQml
 
 import Nx.Controls
@@ -28,9 +29,20 @@ AdaptiveScreen
 
     property alias filterIds: camerasGrid.filterIds
 
-    contentItem: (!windowContext.deprecatedUiController.resource || resourceHelper.isLayout)
-        ? camerasGrid
-        : videoScreenLoader.item
+    toolBar.controls:
+        [
+            LayoutItemProxy
+            {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: videoScreenLoader.item
+                    && videoScreenLoader.item.selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                    && videoScreenLoader.item.customRoiExists
+
+                target: contentItem === videoScreenLoader.item ? videoScreenLoader.item.motionAreaButton : null
+            }
+        ]
+
+    contentItem: resourceHelper.isCamera ? videoScreenLoader.item : camerasGrid
     overlayItem: overlayItem
     longContent: contentItem === videoScreenLoader.item
 
@@ -57,10 +69,8 @@ AdaptiveScreen
                     {
                         resourcesScreen.filterIds = []
                         videoScreenLoader.item.controller.stop()
+                        windowContext.deprecatedUiController.resource = null
                         resourcesScreen.contentItem = camerasGrid
-
-                        if (resourceHelper.isCamera)
-                            windowContext.deprecatedUiController.resource = null
                     }
                 }
             },
@@ -228,9 +238,6 @@ AdaptiveScreen
                     ? 0
                     : (LayoutController.isTabletLayout ? 20 : 0)
 
-                onSelectedObjectsTypeChanged:
-                    appContext.settings.selectedObjectsType = selectedObjectsType
-
                 Component.onCompleted:
                 {
                     selectedObjectsType = appContext.settings.selectedObjectsType
@@ -256,7 +263,17 @@ AdaptiveScreen
     {
         target: resourcesScreen
         property: "title"
-        value: resourceHelper.resourceName || windowContext.sessionManager.systemName
+        value:
+        {
+            let title = ""
+            if (resourcesScreen.contentItem === camerasGrid)
+                title = camerasGrid.layout?.name
+            else if (resourcesScreen.contentItem === videoScreenLoader.item)
+                title = videoScreenLoader.item.title
+
+            return title || windowContext.sessionManager.systemName
+        }
+
         when: windowContext.sessionManager.hasActiveSession
     }
 

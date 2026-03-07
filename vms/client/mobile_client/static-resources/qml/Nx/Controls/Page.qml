@@ -68,8 +68,12 @@ QuickControls.Page
         Rectangle
         {
             anchors.bottom: parent.bottom
+
             height: 1
-            width: parent.width
+            width: Math.max(
+                toolBar.visible ? toolBar.width : 0,
+                warningPanel.opened ? warningPanel.width : 0)
+
             visible: toolBar.visible || warningPanel.opened
             color: ColorTheme.colors.dark7 //< Keep in sync with main window background color.
         }
