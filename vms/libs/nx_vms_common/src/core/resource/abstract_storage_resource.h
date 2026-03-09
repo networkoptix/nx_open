@@ -83,7 +83,7 @@ public:
     /**
      * \returns                         Storage free space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.
      */
-    virtual qint64 getFreeSpace() = 0;
+    virtual qint64 getFreeSpace() const = 0;
 
     /**
      * \returns                         Storage total space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.

@@ -231,7 +231,7 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
     return d.exists(url);
 }
 
-qint64 QnLayoutFileStorageResource::getFreeSpace()
+qint64 QnLayoutFileStorageResource::getFreeSpace() const
 {
     NX_ASSERT("false", "This is a server-only method");
     return 0;

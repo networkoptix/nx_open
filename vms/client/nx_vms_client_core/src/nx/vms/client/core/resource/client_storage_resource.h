@@ -37,7 +37,7 @@ public:
     virtual bool isDirExists(const QString& url) override;
 
     void setFreeSpace(qint64 value);
-    virtual qint64 getFreeSpace() override;
+    virtual qint64 getFreeSpace() const override;
 
     void setTotalSpace(qint64 value);
     virtual qint64 getTotalSpace() const override;
