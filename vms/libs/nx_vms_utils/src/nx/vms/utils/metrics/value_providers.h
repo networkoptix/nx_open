@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <nx/concepts.h>
 #include <nx/utils/std/cppnx.h>
 
 #include "value_group_monitor.h"
@@ -17,7 +18,7 @@ template<typename ResourceType>
 class ValueProvider
 {
 public:
-    template<typename Getter>
+    template<nx::Callable<api::metrics::Value(const ResourceType&)> Getter>
     ValueProvider(
         Scope scope,
         QString id,
@@ -65,7 +66,7 @@ using ValueGroupProviders = std::vector<std::unique_ptr<ValueGroupProvider<Resou
 // -----------------------------------------------------------------------------------------------
 
 template<typename ResourceType>
-template<typename Getter>
+template<nx::Callable<api::metrics::Value(const ResourceType&)> Getter>
 ValueProvider<ResourceType>::ValueProvider(
     Scope scope,
     QString id,

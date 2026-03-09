@@ -24,7 +24,7 @@ public:
     //!Implementation of QnStorageResource::open
 
     //!Implementation of QnStorageResource::getFreeSpace
-    virtual qint64 getFreeSpace() override { return 0; }
+    virtual qint64 getFreeSpace() const override { return 0; }
     //!Implementation of QnStorageResource::getTotalSpace
     virtual qint64 getTotalSpace() const override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable

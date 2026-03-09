@@ -29,6 +29,22 @@ struct IsSizedSpecializationOf<Template, Template<Deduced, S>>: std::true_type
 {
 };
 
+template<typename T, typename Sig>
+struct CallableImpl: std::false_type
+{
+};
+
+template<typename T, typename R, typename... Args>
+struct CallableImpl<T, R(Args...)>: std::bool_constant<std::is_invocable_r_v<R, T&, Args...>>
+{
+};
+
+template<typename T, typename R, typename... Args>
+struct CallableImpl<T, R(Args...) noexcept>:
+    std::bool_constant<std::is_nothrow_invocable_r_v<R, T&, Args...>>
+{
+};
+
 } // namespace detail
 
 // Matches any specialization of `Template`:
@@ -61,5 +77,38 @@ concept TimePeriodLike = requires(const T& t) {
 
 template<typename T>
 concept ToStringViewConvertible = requires(const T& t) { std::string_view(t.data(), t.size()); };
+
+/*
+    Callable<T, Sig>
+
+    Sig is a function type such as int(double, const Foo&).
+
+    Example: use directly in the template parameter list
+
+        template<Callable<int(double, const Foo&)> F>
+        int invoke(F&& f, double x, const Foo& y)
+        {
+            return f(x, y);
+        }
+
+    Example: use in if constexpr
+
+        template<class F>
+        void dispatch(F&& f, double x, const Foo& y)
+        {
+            if constexpr (Callable<F, int(double, const Foo&)>) {
+                (void)f(x, y);
+            } else {
+                // fallback
+            }
+        }
+
+    Notes:
+    - Uses normal invocability rules, so implicit argument conversions are allowed.
+    - For noexcept callability, use a noexcept function type, e.g.
+      int(double, const Foo&) noexcept.
+*/
+template<typename T, typename Sig>
+concept Callable = detail::CallableImpl<T, Sig>::value;
 
 } // namespace nx

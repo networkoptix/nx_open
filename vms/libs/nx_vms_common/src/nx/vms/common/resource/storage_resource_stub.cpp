@@ -68,7 +68,7 @@ bool StorageResourceStub::isDirExists(const QString&)
     return false;
 }
 
-qint64 StorageResourceStub::getFreeSpace()
+qint64 StorageResourceStub::getFreeSpace() const
 {
     NX_ASSERT(false);
     return 0;

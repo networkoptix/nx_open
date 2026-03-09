@@ -144,7 +144,7 @@ bool QnClientStorageResource::isDirExists(const QString&)
     return false;
 }
 
-qint64 QnClientStorageResource::getFreeSpace() {
+qint64 QnClientStorageResource::getFreeSpace() const {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_freeSpace;
 }

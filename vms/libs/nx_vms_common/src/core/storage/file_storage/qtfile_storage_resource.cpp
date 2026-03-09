@@ -74,7 +74,7 @@ bool QnQtFileStorageResource::isFileExists(const QString& url)
     return QFile::exists(removeProtocolPrefix(url));
 }
 
-qint64 QnQtFileStorageResource::getFreeSpace()
+qint64 QnQtFileStorageResource::getFreeSpace() const
 {
     NX_ASSERT("false", "This is a server-only method");
     return 0;
