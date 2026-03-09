@@ -7,6 +7,8 @@ import Qt5Compat.GraphicalEffects
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Mobile
+import Nx.Ui
 
 Control
 {
@@ -24,9 +26,21 @@ Control
     property bool expanded: false
     property bool selected: false
 
-    readonly property int kTitleRightPadding: 24
+    readonly property bool isTabletLayout:
+    {
+        if (windowContext.deprecatedUiController.currentScreen === Controller.SessionsScreen)
+            return false //< On the SessionsScreen it is always mobile layout for the feed.
+
+        return LayoutController.isTabletLayout
+    }
 
     signal clicked()
+
+    onIsTabletLayoutChanged:
+    {
+        if (isTabletLayout)
+            expanded = false
+    }
 
     implicitWidth: 320
     padding: 20
@@ -38,31 +52,6 @@ Control
 
         border.color: ColorTheme.colors.brand
         border.width: control.selected ? 1 : 0
-
-        Rectangle
-        {
-            id: indicator
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.topMargin: 28
-            anchors.rightMargin: 20
-
-            opacity: viewed ? 0.0 : 1.0
-            width: 8
-            height: 8
-            radius: width / 2
-            color: ColorTheme.colors.brand
-
-            Behavior on opacity
-            {
-                NumberAnimation
-                {
-                    duration: 300
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
 
         MouseArea
         {
@@ -86,8 +75,6 @@ Control
 
         RowLayout
         {
-            Layout.rightMargin: kTitleRightPadding
-
             visible: !!source
             spacing: 8
 
@@ -112,16 +99,102 @@ Control
             }
         }
 
-        ColumnLayout
+        Item
         {
-            spacing: 16
+            Layout.fillWidth: true
+            Layout.preferredHeight: control.isTabletLayout
+                ? landscapeContentLayout.implicitHeight
+                : mobileContentLayout.implicitHeight
+
+            ColumnLayout
+            {
+                id: mobileContentLayout
+
+                anchors.fill: parent
+                visible: !control.isTabletLayout
+                spacing: 16
+
+                LayoutItemProxy
+                {
+                    Layout.fillWidth: true
+
+                    target: title
+                }
+
+                LayoutItemProxy
+                {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 180
+
+                    target: image
+                    visible: image.status != Image.Null
+                }
+
+                LayoutItemProxy
+                {
+                    Layout.fillWidth: true
+
+                    target: description
+                }
+
+                LayoutItemProxy
+                {
+                    Layout.fillWidth: true
+
+                    target: footerLayout
+                }
+            }
+
+            RowLayout
+            {
+                id: landscapeContentLayout
+
+                anchors.fill: parent
+                visible: control.isTabletLayout
+                spacing: 24
+
+                ColumnLayout
+                {
+                    Layout.alignment: Qt.AlignTop
+
+                    spacing: 16
+
+                    LayoutItemProxy
+                    {
+                        Layout.fillWidth: true
+
+                        target: title
+                    }
+
+                    LayoutItemProxy
+                    {
+                        Layout.fillWidth: true
+
+                        target: description
+                    }
+
+                    LayoutItemProxy
+                    {
+                        Layout.fillWidth: true
+
+                        target: footerLayout
+                    }
+                }
+
+                LayoutItemProxy
+                {
+                    Layout.preferredHeight: 116
+                    Layout.preferredWidth: 180
+                    Layout.alignment: Qt.AlignVCenter
+
+                    target: image
+                    visible: image.status != Image.Null
+                }
+            }
 
             Text
             {
                 id: title
-
-                Layout.fillWidth: true
-                Layout.rightMargin: source ? undefined : kTitleRightPadding
 
                 font.pixelSize: 18
                 font.weight: Font.Medium
@@ -137,10 +210,6 @@ Control
             {
                 id: image
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: 180
-
-                visible: status != Image.Null
                 fillMode: Image.PreserveAspectCrop
 
                 layer.enabled: true
@@ -158,7 +227,7 @@ Control
                 {
                     anchors.centerIn: parent
 
-                    visible: !!url
+                    visible: !control.isTabletLayout && !!url
                     sourcePath: "image://skin/48x48/Solid/play.svg"
                     sourceSize: Qt.size(48, 48)
                     primaryColor: ColorTheme.colors.light1
@@ -187,8 +256,6 @@ Control
             {
                 id: description
 
-                Layout.fillWidth: true
-
                 color: ColorTheme.colors.light10
                 font.pixelSize: 16
 
@@ -197,57 +264,59 @@ Control
                 elide: Text.ElideRight
                 textFormat: Text.StyledText
             }
-        }
 
-        RowLayout
-        {
-            spacing: 4
-
-            Text
+            RowLayout
             {
-                id: time
+                id: footerLayout
 
-                Layout.fillWidth: true
+                spacing: 4
 
-                font.pixelSize: 14
-                font.capitalization: Font.AllUppercase
-                font.weight: Font.Medium
-                color: ColorTheme.colors.light16
-            }
-
-            Text
-            {
-                visible: description.truncated
-
-                text: qsTr("Show more")
-                font.pixelSize: 16
-                font.capitalization: Font.AllUppercase
-                font.weight: Font.Medium
-                color: ColorTheme.colors.light16
-
-                MouseArea
+                Text
                 {
-                    anchors.fill: parent
-                    anchors.margins: -20
+                    id: time
 
-                    onClicked: expanded = true
+                    Layout.fillWidth: true
+
+                    font.pixelSize: 14
+                    font.capitalization: Font.AllUppercase
+                    font.weight: Font.Medium
+                    color: ColorTheme.colors.light16
                 }
-            }
 
-            ColoredImage
-            {
-                visible: description.truncated
-
-                sourceSize: Qt.size(24, 24)
-                sourcePath: "image://skin/24x24/Outline/arrow_down_2px.svg"
-                primaryColor: ColorTheme.colors.light16
-
-                MouseArea
+                Text
                 {
-                    anchors.fill: parent
-                    anchors.margins: -20
+                    visible: !control.isTabletLayout && description.truncated
 
-                    onClicked: expanded = true
+                    text: qsTr("Show more")
+                    font.pixelSize: 16
+                    font.capitalization: Font.AllUppercase
+                    font.weight: Font.Medium
+                    color: ColorTheme.colors.light16
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        anchors.margins: -20
+
+                        onClicked: expanded = true
+                    }
+                }
+
+                ColoredImage
+                {
+                    visible: !control.isTabletLayout && description.truncated
+
+                    sourceSize: Qt.size(24, 24)
+                    sourcePath: "image://skin/24x24/Outline/arrow_down_2px.svg"
+                    primaryColor: ColorTheme.colors.light16
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        anchors.margins: -20
+
+                        onClicked: expanded = true
+                    }
                 }
             }
         }

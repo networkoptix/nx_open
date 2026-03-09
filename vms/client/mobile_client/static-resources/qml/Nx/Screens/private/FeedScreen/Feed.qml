@@ -180,6 +180,7 @@ Item
             topMargin: 8
             leftMargin: 20
             rightMargin: 20
+            bottomMargin: 20
         }
 
         spacing: 16
