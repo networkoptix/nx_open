@@ -32,7 +32,6 @@ Page
     {
         id: userNameContainer
 
-        y: 8
         width: parent.width
         height: childrenRect.height + 20
         color: ColorTheme.colors.dark6
