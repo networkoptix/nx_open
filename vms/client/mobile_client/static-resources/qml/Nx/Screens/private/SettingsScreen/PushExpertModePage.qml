@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.6
+import QtQuick
 
 import Nx.Core
 import Nx.Controls
@@ -23,7 +23,7 @@ BaseSettingsPage
     opacity: enabled ? 1.0 : 0.3
     enabled: !appContext.pushManager.userUpdateInProgress
 
-    title: !simpleModeRadioButton.checked && d.selectionModel
+    title: !simpleModeRadioButton.checked
         ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
         : qsTr("Notifications")
 
@@ -84,18 +84,27 @@ BaseSettingsPage
                         text: qsTr("Notifications")
                         manualStateChange: true
                         showIndicator: d.loggedInAndHasPermissions
+                        checkState: appContext.pushManager.enabledCheckState
 
                         onClicked:
                         {
                             if (!appContext.pushManager.loggedIn)
+                            {
                                 Workflow.openCloudLoginScreen()
+                            }
                             else if (!appContext.pushManager.hasOsPermission)
+                            {
                                 appContext.pushManager.showOsPushSettings()
+                            }
                             else
-                                appContext.pushManager.setEnabled(checkState == Qt.Unchecked)
-                        }
+                            {
+                                const notificationsEnabled = checkState == Qt.Checked
 
-                        Binding on checkState { value: appContext.pushManager.enabledCheckState }
+                                appContext.pushManager.setEnabled(!notificationsEnabled)
+                                if (notificationsEnabled)
+                                    d.reset()
+                            }
+                        }
 
                         extraText:
                         {
@@ -167,7 +176,7 @@ BaseSettingsPage
                 text: qsTr("SELECT")
                 opacity: enabled ? 1.0 : 0.3
 
-                visible: expertModeRadioButton.checked
+                visible: expertModeRadioButton.visible && expertModeRadioButton.checked
             }
         }
 
@@ -178,7 +187,7 @@ BaseSettingsPage
             anchors.top: topControlsHolder.bottom
             anchors.bottom: parent.bottom
             width: parent.width
-            visible: expertModeRadioButton.checked
+            visible: expertModeRadioButton.visible && expertModeRadioButton.checked
             model: d.selectionModel
 
             delegate: StyledCheckBox
@@ -190,11 +199,7 @@ BaseSettingsPage
                 text: model.systemName
                 iconSource: lp("images/cloud_item_marker.svg")
 
-                onCheckStateChanged:
-                {
-                    if (d.selectionModel)
-                        d.selectionModel.setCheckedState(index, checkState)
-                }
+                onCheckStateChanged: d.selectionModel.setCheckedState(index, checkState)
 
                 Binding
                 {
@@ -288,8 +293,7 @@ BaseSettingsPage
             if (appContext.pushManager.expertMode != expertModeRadioButton.checked)
                 return true
 
-            return expertModeRadioButton.checked
-                && (d.selectionModel ? d.selectionModel.hasChanges : false)
+            return expertModeRadioButton.checked && d.selectionModel.hasChanges
         }
 
         property PushSystemsSelectionModel selectionModel: PushSystemsSelectionModel {}
@@ -308,9 +312,6 @@ BaseSettingsPage
 
         function tryApplyAndReturn(successCallback)
         {
-            if (!d.selectionModel)
-                return
-
             const expertMode = expertModeRadioButton.checked
             if (expertMode && !d.selectionModel.selectedSystems.length)
             {
@@ -327,13 +328,10 @@ BaseSettingsPage
                         return
                     }
 
-                    if (d.selectionModel)
-                    {
-                        if (!expertMode)
-                            d.selectionModel.selectedSystems = []
+                    if (!expertMode)
+                        d.selectionModel.selectedSystems = []
 
-                        d.selectionModel.resetChangesFlag()
-                    }
+                    d.selectionModel.resetChangesFlag()
 
                     pushExpertModePage.settingsSaved()
                 }
