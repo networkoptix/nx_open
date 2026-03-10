@@ -21,19 +21,20 @@ Drawer
     property real extraBottomPadding: 20
 
     x: (parent.width - width) / 2
-    edge: LayoutController.isTabletLayout ? Qt.RightEdge : Qt.BottomEdge
-    width: LayoutController.isTabletLayout ? 400 : Math.min(parent.width, 640)
+    edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
+    width: LayoutController.isPortrait ? Math.min(parent.width, 640) : 400
     height:
     {
         const availableHeight = parent.height - windowContext.ui.measurements.deviceStatusBarHeight
 
-        if (LayoutController.isTabletLayout)
-            return availableHeight
+        if (LayoutController.isPortrait)
+        {
+            return Math.min(
+                flickable.contentHeight + (content.footer ? content.footer.height + spacing : 0) + control.topPadding + control.bottomPadding,
+                availableHeight)
+        }
 
-
-        return Math.min(
-            flickable.contentHeight + (content.footer ? content.footer.height + spacing : 0) + control.topPadding + control.bottomPadding,
-            availableHeight)
+        return availableHeight
     }
 
     closePolicy: closeAutomatically
@@ -46,7 +47,7 @@ Drawer
     leftPadding: 0
     rightPadding: 0
 
-    topPadding: 22 + (LayoutController.isTabletLayout ? 0 : 8) //< TODO: Sync the given padding with the figma.
+    topPadding: 22 + (LayoutController.isPortrait ? 8 : 0) //< TODO: Sync the given padding with the figma.
     bottomPadding:
     {
         const customPadding = d.keyboardHeight > 0
@@ -72,7 +73,7 @@ Drawer
             height: 2 * radius
             radius: parent.kCornerRadius
             color: parent.kBgColor
-            visible: !LayoutController.isTabletLayout
+            visible: LayoutController.isPortrait
         }
 
         Rectangle
@@ -82,17 +83,17 @@ Drawer
             height: parent.height
             radius: parent.kCornerRadius
             color: parent.kBgColor
-            visible: LayoutController.isTabletLayout
+            visible: !LayoutController.isPortrait
         }
 
         Rectangle
         {
             id: mainAreaBackground
 
-            x: LayoutController.isTabletLayout ? parent.kCornerRadius : 0
-            y: LayoutController.isTabletLayout ? 0 : parent.kCornerRadius
-            width: parent.width - (LayoutController.isTabletLayout ? parent.kCornerRadius : 0)
-            height: parent.height - (LayoutController.isTabletLayout ? 0 : parent.kCornerRadius)
+            x: LayoutController.isPortrait ? 0 : parent.kCornerRadius
+            y: LayoutController.isPortrait ? parent.kCornerRadius : 0
+            width: parent.width - (LayoutController.isPortrait ? 0 : parent.kCornerRadius)
+            height: parent.height - (LayoutController.isPortrait ? parent.kCornerRadius : 0)
             color: parent.kBgColor
         }
 
@@ -104,7 +105,7 @@ Drawer
             width: 42
             height: 3
             y: 8
-            visible: !LayoutController.isTabletLayout
+            visible: LayoutController.isPortrait
 
             color: ColorTheme.colors.dark15
         }
