@@ -166,6 +166,9 @@ bool AudioEncoder::open(
 
 bool AudioEncoder::sendFrame(uint8_t* data, int size)
 {
+    if (!m_encoderContext)
+        return false;
+
     if (!data)
     {
         sendFrame(nullptr);
@@ -184,6 +187,9 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
 
 bool AudioEncoder::sendFrame(AVFrame* inputFrame)
 {
+    if (!m_encoderContext)
+        return false;
+
     if (!inputFrame)
     {
         m_flushMode = true;
@@ -199,15 +205,12 @@ bool AudioEncoder::sendFrame(AVFrame* inputFrame)
 
 bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
 {
+    if (!m_encoderContext)
+        return false;
+
     result.reset();
     while (true)
     {
-        if (!m_encoderContext)
-        {
-            // Happens when we try to open and then close parent stream fast.
-            return false;
-        }
-
         // 1. Try to get media from encoder.
         AvPacket avPacket;
         auto packet = avPacket.get();
