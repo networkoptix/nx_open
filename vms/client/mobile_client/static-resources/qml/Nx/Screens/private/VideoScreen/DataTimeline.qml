@@ -359,7 +359,6 @@ Rectangle
             anchors.left: content.left
             anchors.leftMargin: 12
             anchors.right: timeScale.left
-            height: content.height
 
             chunkProvider: timeline.chunkProvider
             minimumStackDurationMs: timeline.minimumDurationMs / (1.0 - zoomInMarginFraction * 2.0)
@@ -421,6 +420,40 @@ Rectangle
 
                         color: eventChunks.chunkColor
                         backgroundColor: recordingChunks.backgroundColor
+                    }
+                }
+            }
+
+            Connections
+            {
+                target: content
+
+                function onHeightChanged()
+                {
+                    objects.beginBatchUpdate()
+                    try
+                    {
+                        if (content.height <= 0)
+                            return
+
+                        // Zoom to keep approximately the same time-to-pixel ratio.
+                        // Start time and duration are integer, thus we cannot ensure the same
+                        // time-to-pixel ratio by zoom only.
+                        const oldMillisecondsPerPixel = objects.millisecondsPerPixel
+                        timeline.zoom(oldMillisecondsPerPixel / timeScale.millisecondsPerPixel)
+
+                        // Desired height to ensure exactly the same time-to-pixel ratio.
+                        const desiredHeight = timeScale.durationMs / oldMillisecondsPerPixel
+
+                        // Do height adjustment only if it is sub-pixel.
+                        if (Math.abs(desiredHeight - content.height) < 1)
+                            objects.height = desiredHeight
+                        else
+                            objects.height = content.height
+                    }
+                    finally
+                    {
+                        objects.endBatchUpdate()
                     }
                 }
             }

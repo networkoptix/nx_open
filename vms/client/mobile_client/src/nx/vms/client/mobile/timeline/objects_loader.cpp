@@ -100,12 +100,16 @@ struct ObjectsLoader::Private
 
     QTimer pollingTimer;
     nx::utils::PendingOperation loadOp;
+    nx::utils::PendingOperation updateOp;
     bool forceUpdate = false;
 
     using BucketList = std::deque<InternalBucket>;
     BucketList cache;
 
     QnTimePeriodList objectChunks;
+
+    bool batchUpdating = false;
+    milliseconds bucketSizeBeforeUpdate{};
 
     // Visible part of `cache`.
     int firstVisibleBucket = 0;
@@ -117,7 +121,8 @@ struct ObjectsLoader::Private
 
     Private(ObjectsLoader* q):
         q(q),
-        loadOp([this]() { loadData(); }, 200ms)
+        loadOp([this]() { loadData(); }, 200ms),
+        updateOp([this]() { internalUpdate(); }, 1ms)
     {
         loadOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
@@ -185,6 +190,15 @@ struct ObjectsLoader::Private
 
     void handleWindowChanged()
     {
+        if (!batchUpdating)
+            updateOp.requestOperation();
+    }
+
+    void internalUpdate()
+    {
+        if (batchUpdating)
+            return;
+
         // If the visible window is empty, just clear everything.
         if (!window.isValid() || bucketSize == 0ms || !bottomBound)
         {
@@ -286,75 +300,72 @@ struct ObjectsLoader::Private
             firstLoadedBucket = 0;
             firstVisibleBucket = preloadedBuckets;
         }
-        else if (expandedWindow.startTime() < cacheWindow.startTime())
-        {
-            // Insertion at the front.
-            const auto insertedTime = cacheWindow.startTime() - expandedWindow.startTime();
-            const int insertedCount = insertedTime / bucketSize;
-
-            NX_ASSERT(insertedTime % bucketSize == 0ms);
-            NX_ASSERT(insertedCount <= maxCacheSize);
-
-            // Crop back if needed.
-            if ((int) cache.size() + insertedCount > maxCacheSize)
-                cache.erase(cache.begin() + (maxCacheSize - insertedCount), cache.end());
-
-            // Insert empty buckets with initialized timestamps.
-            std::generate_n(std::front_inserter(cache), insertedCount,
-                [this, timeMs = cacheWindow.startTimeMs]() mutable
-                {
-                    timeMs -= bucketSize.count();
-                    return InternalBucket(timeMs);
-                });
-
-            firstLoadedBucket = 0;
-            firstVisibleBucket = preloadedBuckets;
-        }
-        else if (expandedWindow.endTimeMs() > cacheWindow.endTimeMs())
-        {
-            // Insertion at the back.
-            const auto insertedTime = expandedWindow.endTime() - cacheWindow.endTime();
-            const int insertedCount = insertedTime / bucketSize;
-
-            NX_ASSERT(insertedTime % bucketSize == 0ms);
-            NX_ASSERT(insertedCount <= maxCacheSize);
-
-            // Crop front if needed.
-            if ((int) cache.size() + insertedCount > maxCacheSize)
-                cache.erase(cache.begin(), cache.end() - (maxCacheSize + insertedCount));
-
-            // Insert empty buckets with initialized timestamps.
-            std::generate_n(std::back_inserter(cache), insertedCount,
-                [this, timeMs = cacheWindow.endTimeMs()]() mutable
-                {
-                    const auto timestampMs = timeMs;
-                    timeMs += bucketSize.count();
-                    return InternalBucket(timestampMs);
-                });
-
-            firstLoadedBucket = (int) cache.size() - loadedBucketCount;
-            firstVisibleBucket = firstLoadedBucket + preloadedBuckets;
-        }
         else
         {
-            firstLoadedBucket = (expandedWindow.startTime() - cacheWindow.startTime()) / bucketSize;
-            firstVisibleBucket = (roundedWindow.startTime() - cacheWindow.startTime()) / bucketSize;
+            if (expandedWindow.startTime() < cacheWindow.startTime())
+            {
+                // Insertion at the front.
+                const auto insertedTime = cacheWindow.startTime() - expandedWindow.startTime();
+                const int insertedCount = insertedTime / bucketSize;
+
+                NX_ASSERT(insertedTime % bucketSize == 0ms);
+                NX_ASSERT(insertedCount <= maxCacheSize);
+
+                // Crop back if needed.
+                if ((int) cache.size() + insertedCount > maxCacheSize)
+                    cache.erase(cache.begin() + (maxCacheSize - insertedCount), cache.end());
+
+                // Insert empty buckets with initialized timestamps.
+                std::generate_n(std::front_inserter(cache), insertedCount,
+                    [this, timeMs = cacheWindow.startTimeMs]() mutable
+                    {
+                        timeMs -= bucketSize.count();
+                        return InternalBucket(timeMs);
+                    });
+
+                firstLoadedBucket = 0;
+            }
+
+            if (expandedWindow.endTimeMs() > cacheWindow.endTimeMs())
+            {
+                // Insertion at the back.
+                const auto insertedTime = expandedWindow.endTime() - cacheWindow.endTime();
+                const int insertedCount = insertedTime / bucketSize;
+
+                NX_ASSERT(insertedTime % bucketSize == 0ms);
+                NX_ASSERT(insertedCount <= maxCacheSize);
+
+                // Crop front if needed.
+                if ((int) cache.size() + insertedCount > maxCacheSize)
+                    cache.erase(cache.begin(), cache.end() - (maxCacheSize + insertedCount));
+
+                // Insert empty buckets with initialized timestamps.
+                std::generate_n(std::back_inserter(cache), insertedCount,
+                    [this, timeMs = cacheWindow.endTimeMs()]() mutable
+                    {
+                        const auto timestampMs = timeMs;
+                        timeMs += bucketSize.count();
+                        return InternalBucket(timestampMs);
+                    });
+            }
         }
 
-        if (NX_ASSERT(!cache.empty()))
+        if (!NX_ASSERT(!cache.empty()))
         {
-            cacheWindow = QnTimePeriod::fromInterval(
-                cache.front().startTimeMs,
-                cache.back().startTimeMs + bucketSize.count());
-
-            const auto oldSize = objectChunks.size();
-            objectChunks = objectChunks.intersected(cacheWindow);
-
-            if (oldSize != objectChunks.size())
-                emit q->objectChunksChanged();
+            clear();
+            return;
         }
 
-        NX_ASSERT(firstVisibleBucket + visibleBucketCount <= (int) cache.size());
+        cacheWindow = QnTimePeriod::fromInterval(
+            cache.front().startTimeMs,
+            cache.back().startTimeMs + bucketSize.count());
+
+        firstLoadedBucket = (expandedWindow.startTime() - cacheWindow.startTime()) / bucketSize;
+        firstVisibleBucket = (roundedWindow.startTime() - cacheWindow.startTime()) / bucketSize;
+
+        NX_ASSERT(firstLoadedBucket + loadedBucketCount <= (int) cache.size());
+        NX_ASSERT(firstVisibleBucket >= firstLoadedBucket);
+        NX_ASSERT(firstVisibleBucket + visibleBucketCount <= firstLoadedBucket + loadedBucketCount);
 
         if (fullyReset)
         {
@@ -379,6 +390,12 @@ struct ObjectsLoader::Private
                 emit q->scrolledIn(visibleBucketCount - count, count);
             }
         }
+
+        const auto oldSize = objectChunks.size();
+        objectChunks = objectChunks.intersected(cacheWindow);
+
+        if (oldSize != objectChunks.size())
+            emit q->objectChunksChanged();
 
         updateTopBound();
         requestLoad();
@@ -821,7 +838,9 @@ void ObjectsLoader::setBucketSize(milliseconds value)
     if (d->bucketSize == value)
         return;
 
-    d->clear();
+    if (!d->batchUpdating)
+        d->clear();
+
     d->bucketSize = value;
     emit bucketSizeChanged();
 
@@ -954,6 +973,33 @@ int ObjectsLoader::count() const
 ObjectBucket ObjectsLoader::bucket(int index) const
 {
     return d->cache[d->firstVisibleBucket + index];
+}
+
+void ObjectsLoader::beginBatchUpdate()
+{
+    if (!NX_ASSERT(!d->batchUpdating))
+        return;
+
+    d->bucketSizeBeforeUpdate = d->bucketSize;
+    d->batchUpdating = true;
+    d->updateOp.cancel();
+}
+
+void ObjectsLoader::endBatchUpdate()
+{
+    if (!NX_ASSERT(d->batchUpdating))
+        return;
+
+    d->batchUpdating = false;
+
+    if (d->bucketSizeBeforeUpdate != d->bucketSize)
+    {
+        NX_VERBOSE(this, "Bucket size changed from %1 to %2 during a batch update, clearing.",
+            d->bucketSizeBeforeUpdate, d->bucketSize);
+        d->clear();
+    }
+
+    d->handleWindowChanged();
 }
 
 void ObjectsLoader::registerQmlTypes()

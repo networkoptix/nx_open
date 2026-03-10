@@ -53,6 +53,15 @@ Item
         return direction === ObjectsList.Upward ? (height - pos) : pos
     }
 
+    /**
+     * A bracket of functions to temporarily freeze/unfreeze object list updates.
+     * Useful if a complex repositioning is required and it might not require the full reset.
+     * Adjust `startTimeMs`, `durationMs` and `height` between these two calls, and if the final
+     * `bucketSizeMs` doesn't change, no full reset happens.
+     */
+    function beginBatchUpdate() { loader.beginBatchUpdate() }
+    function endBatchUpdate() { loader.endBatchUpdate() }
+
     clip: true
 
     Timeline.ObjectsLoader

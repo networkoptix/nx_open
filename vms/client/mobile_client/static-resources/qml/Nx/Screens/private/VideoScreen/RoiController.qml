@@ -38,9 +38,6 @@ Item
         d.customFirstPoint = undefined
         d.customSecondPoint = undefined
         updateDefaultRoi()
-
-        controller.motionFilter = ""
-        controller.customRoi = Qt.rect(0, 0, 1, 1)
     }
 
     function updateDefaultRoi()
@@ -48,15 +45,7 @@ Item
         if (!controller.motionSearchMode || d.hasFinishedCustomRoi)
             return
 
-        var first = viewport.mapToItem(controller, 0, 0)
-        var second = viewport.mapToItem(controller, viewport.width, viewport.height)
-        var viewportRect = d.getRectangle(first, second);
-        var cameraRect = Qt.rect(0, 0, width, height);
-
-        var rect = d.intersection(viewportRect, cameraRect)
-        d.setRoiPoints(
-            rect ? d.toRelative(Qt.vector2d(rect.left, rect.top)): undefined,
-            rect ? d.toRelative(Qt.vector2d(rect.right, rect.bottom)) : undefined)
+        d.setRoiPoints()
     }
 
     function handlePositionChanged(pos)

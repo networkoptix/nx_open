@@ -210,6 +210,12 @@ public:
     Q_INVOKABLE int count() const;
     Q_INVOKABLE ObjectBucket bucket(int index) const;
 
+    /** Freeze pan/zoom updates temporarily. */
+    Q_INVOKABLE void beginBatchUpdate();
+
+    /** Unfreeze pan/zoom updates. */
+    Q_INVOKABLE void endBatchUpdate();
+
     static void registerQmlTypes();
 
 signals:
