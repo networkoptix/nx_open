@@ -166,6 +166,9 @@ bool AudioEncoder::open(
 
 bool AudioEncoder::sendFrame(uint8_t* data, int size)
 {
+    if (!m_encoderContext)
+        return false;
+
     if (!data)
     {
         sendFrame(nullptr);
@@ -184,6 +187,9 @@ bool AudioEncoder::sendFrame(uint8_t* data, int size)
 
 bool AudioEncoder::sendFrame(AVFrame* inputFrame)
 {
+    if (!m_encoderContext)
+        return false;
+
     if (!inputFrame)
     {
         m_flushMode = true;
@@ -199,6 +205,9 @@ bool AudioEncoder::sendFrame(AVFrame* inputFrame)
 
 bool AudioEncoder::receivePacket(QnWritableCompressedAudioDataPtr& result)
 {
+    if (!m_encoderContext)
+        return false;
+
     result.reset();
     while (true)
     {
