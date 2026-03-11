@@ -1042,9 +1042,9 @@
     </message>
     <message numerus="yes">
       <source>Mute Items</source>
-      <translation type="unfinished">
-        <numerusform>Silenciar elementos</numerusform>
-        <numerusform>Mute Items</numerusform>
+      <translation>
+        <numerusform>Elementos silenciados</numerusform>
+        <numerusform>Elementos silenciados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5632,23 +5632,23 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Está a punto de migrar estas páginas web al servidor &quot;%1&quot;. Estas páginas web representan todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
+        <numerusform>Está a punto de migrar estas páginas web al servidor &quot;%1&quot;. Estas páginas web representan todo el contenido solicitado, y su servidor proxy cambiará al servidor &quot;%1&quot;.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>¿Eliminar diseños %n?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
+        <numerusform>¿Eliminar diseños %n?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n Los elementos no fueron eliminados.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+        <numerusform>%n Los elementos no fueron eliminados.</numerusform>
       </translation>
     </message>
     <message>
@@ -5678,16 +5678,16 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>These layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Estos diseños se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Estos diseños se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts are shared with other users, so they will be deleted for their accounts as well.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Los diseños %n se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
+        <numerusform>Los diseños %n se comparten con otros usuarios, por lo que también se eliminarán de sus cuentas.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5807,9 +5807,9 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Servidor de origen y servidores %n</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+        <numerusform>Servidor de origen y servidores %n</numerusform>
       </translation>
     </message>
     <message>
@@ -5930,37 +5930,37 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n temas más</numerusform>
+        <numerusform>%n temas más</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n dispositivos encontrados</numerusform>
+        <numerusform>%n dispositivos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n cámaras encontradas</numerusform>
+        <numerusform>%n cámaras encontradas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n servidores más</numerusform>
+        <numerusform>%n servidores más</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n diseños más</numerusform>
+        <numerusform>%n diseños más</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7103,7 +7103,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</source>
-      <translation type="unfinished">Device detected with Pan, Tilt and/or Zoom capabilities. Any change to the field of view through the use of presets or movement may cause the hotspot to be no longer relevant.</translation>
+      <translation>Dispositivo detectado con funciones de panorámica, inclinación y/o zoom. Cualquier cambio en el campo de visión mediante el uso de ajustes preestablecidos o el movimiento puede hacer que el hotspot deje de ser relevante.</translation>
     </message>
   </context>
   <context>
@@ -7130,7 +7130,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Utilice este enlace para agregar la cámara a otro sitio</translation>
     </message>
   </context>
   <context>
@@ -8092,9 +8092,9 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Registro de eventos del periodo %1 al %2: Se muestran los primeros %n eventos. Para encontrar eventos específicos, ajuste el rango de fechas o aplique filtros adicionales</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Registro de eventos del periodo %1 al %2: Se muestran los primeros %n eventos. Para encontrar eventos específicos, ajuste el rango de fechas o aplique filtros adicionales</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8637,30 +8637,30 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Los servidores del otro sitio aparecerán en el árbol de recursos.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Conectando al sitio actual...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>El servidor se conectará al sitio en breve</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>No se pudo fusionar %1 a nuestro sitio.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::IntegrationSettingsWatcher</name>
     <message>
       <source>API Integrations approval requests are permitted</source>
-      <translation type="unfinished">API Integrations approval requests are permitted</translation>
+      <translation>Se permiten solicitudes de aprobación de integraciones de API</translation>
     </message>
     <message>
       <source>API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">API Integrations registration requests are enabled. While safeguards exist, prolonged usage is not recommended. Consider disabling this option after all necessary Integrations are installed.</translation>
+      <translation>Las solicitudes de registro de integraciones de API están habilitadas. Si bien existen medidas de seguridad, no se recomienda su uso prolongado. Considere deshabilitar esta opción después de instalar todas las integraciones necesarias.</translation>
     </message>
   </context>
   <context>
@@ -8747,7 +8747,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
-      <translation type="unfinished">This ID is already in use. Use Generate button to find a free ID.</translation>
+      <translation>Esta ID ya está en uso. Usa el botón "Generar" para encontrar una ID disponible.</translation>
     </message>
   </context>
   <context>
@@ -8776,7 +8776,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::LdapSettingsWidget</name>
     <message>
       <source>Disconnect LDAP server?</source>
-      <translation type="unfinished">Disconnect LDAP server?</translation>
+      <translation>¿Desconectar el servidor LDAP?</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -8784,7 +8784,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Reset Settings</source>
-      <translation type="unfinished">Reset Settings</translation>
+      <translation>Restablecer configuración</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -8800,11 +8800,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
-      <translation type="unfinished">Remove existing LDAP users and groups?</translation>
+      <translation>¿Eliminar usuarios y grupos LDAP existentes?</translation>
     </message>
     <message>
       <source>Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</source>
-      <translation type="unfinished">Looks like you have changed LDAP server. It is recommended to remove all existing LDAP users and groups before importing users and groups from a new LDAP server.</translation>
+      <translation>Parece que has cambiado de servidor LDAP. Se recomienda eliminar todos los usuarios y grupos LDAP existentes antes de importarlos desde un nuevo servidor LDAP.</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -8812,7 +8812,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>Aplicar configuración</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -8820,15 +8820,15 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
-      <translation type="unfinished">Synchronize LDAP Users and Groups</translation>
+      <translation>Sincronizar usuarios y grupos LDAP</translation>
     </message>
     <message>
       <source>Synchronize</source>
-      <translation type="unfinished">Synchronize</translation>
+      <translation>Sincronizar</translation>
     </message>
     <message>
       <source>Connection OK</source>
-      <translation type="unfinished">Connection OK</translation>
+      <translation>Conexión establecida</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -8844,7 +8844,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
-      <translation type="unfinished">All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</translation>
+      <translation>Se eliminarán todos los usuarios y grupos LDAP.&lt;br&gt;&lt;br&gt;Las configuraciones LDAP también se eliminarán.</translation>
     </message>
   </context>
   <context>
@@ -8937,27 +8937,27 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
-      <translation type="unfinished">Must be greater than or equal to the value set for Split File by Size</translation>
+      <translation>Debe ser mayor o igual al valor establecido para Dividir archivo por tamaño</translation>
     </message>
     <message>
       <source>Must be less than or equal to the value set for Limit Max Volume</source>
-      <translation type="unfinished">Must be less than or equal to the value set for Limit Max Volume</translation>
+      <translation>Debe ser menor o igual al valor establecido para el límite de volumen máximo</translation>
     </message>
     <message>
       <source>The selected Logging Level may not be collecting enough information.
 The Logging Level &quot;%1&quot; will provide you with more granular information.</source>
-      <translation type="unfinished">The selected Logging Level may not be collecting enough information.
-The Logging Level &quot;%1&quot; will provide you with more granular information.</translation>
+      <translation>Es posible que el nivel de registro seleccionado no esté recopilando suficiente información.
+El nivel de registro &quot;%1&quot; le proporcionará información más granular.</translation>
     </message>
     <message>
       <source>The selected Logging Level may degrade performance.
 Remember to return the Logging Level to its default setting after you have collected enough logs.</source>
-      <translation type="unfinished">The selected Logging Level may degrade performance.
-Remember to return the Logging Level to its default setting after you have collected enough logs.</translation>
+      <translation>El nivel de registro seleccionado puede degradar el rendimiento.
+Recuerde regresar el nivel de registro a su configuración predeterminada después de haber recopilado suficientes registros.</translation>
     </message>
     <message>
       <source>Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</source>
-      <translation type="unfinished">Split File by Size must be greater then 10 MB and less than or equal to the half of a value set for Limit Max Volume</translation>
+      <translation>El archivo dividido por tamaño debe ser mayor a 10 MB y menor o igual a la mitad de un valor establecido para el límite de volumen máximo</translation>
     </message>
   </context>
   <context>
@@ -8972,7 +8972,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>The provided link is not valid or has expired</source>
-      <translation type="unfinished">The provided link is not valid or has expired</translation>
+      <translation>El enlace proporcionado no es válido o ha expirado</translation>
     </message>
   </context>
   <context>
@@ -9011,15 +9011,15 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Default Logging level</source>
-      <translation type="unfinished">Default Logging level</translation>
+      <translation>Nivel de registro predeterminado</translation>
     </message>
     <message>
       <source>Non-default Logging level. We recommend setting it to &quot;info&quot;</source>
-      <translation type="unfinished">Non-default Logging level. We recommend setting it to &quot;info&quot;</translation>
+      <translation>Nivel de registro no predeterminado. Recomendamos configurarlo en &quot;info&quot;</translation>
     </message>
     <message>
       <source>Logging level degrades performance</source>
-      <translation type="unfinished">Logging level degrades performance</translation>
+      <translation>El nivel de registro degrada el rendimiento</translation>
     </message>
     <message>
       <source>&lt;None&gt;</source>
@@ -9030,18 +9030,18 @@ Remember to return the Logging Level to its default setting after you have colle
     <name>nx::vms::client::desktop::LogsManagementWatcher</name>
     <message>
       <source>Logs downloaded</source>
-      <translation type="unfinished">Logs downloaded</translation>
+      <translation>Registros descargados</translation>
     </message>
     <message numerus="yes">
       <source>Debug logging is enabled on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
+      <translation>
+        <numerusform>El registro de depuración está habilitado en los servidores %n</numerusform>
+        <numerusform>El registro de depuración está habilitado en los servidores %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Apply Settings</source>
-      <translation type="unfinished">Apply Settings</translation>
+      <translation>Aplicar configuración</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -9053,23 +9053,23 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
-      <translation type="unfinished">Debug logging is enabled on the client</translation>
+      <translation>El registro de depuración está habilitado en el cliente</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Client performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Client performance is degraded.</translation>
+      <translation>El registro de depuración está habilitado.
+El rendimiento del cliente está degradado.</translation>
     </message>
     <message>
       <source>Debug logging is enabled</source>
-      <translation type="unfinished">Debug logging is enabled</translation>
+      <translation>El registro de depuración está habilitado</translation>
     </message>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>El registro de depuración está habilitado.
+El rendimiento del sitio está degradado.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
@@ -9735,11 +9735,11 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>No se recomienda aplicar actualizaciones al final de la semana</translation>
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Sitio actualizado a</translation>
     </message>
     <message>
       <source>Site update in process</source>
