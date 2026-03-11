@@ -119,8 +119,6 @@ NotificationActionHandler::NotificationActionHandler(
         this, &NotificationActionHandler::clear);
 
     const auto systemContext = system();
-    connect(systemContext->userWatcher(), &nx::vms::client::core::UserWatcher::userChanged,
-        this, &NotificationActionHandler::at_context_userChanged);
 
     const auto messageProcessor = systemContext->clientMessageProcessor();
     connect(messageProcessor, &QnClientMessageProcessor::hardwareIdMappingRemoved, this,
@@ -164,12 +162,6 @@ void NotificationActionHandler::removeNotification(const SiteHealthMessage& mess
     NX_ASSERT(!message.active);
 
     emit systemHealthEventRemoved(message);
-}
-
-void NotificationActionHandler::at_context_userChanged()
-{
-    if (!system()->user())
-        clear();
 }
 
 void NotificationActionHandler::at_serviceDisabled(

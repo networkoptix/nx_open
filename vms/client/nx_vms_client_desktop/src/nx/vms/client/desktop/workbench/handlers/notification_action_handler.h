@@ -40,7 +40,6 @@ signals:
 private:
     void clear();
 
-    void at_context_userChanged();
     void onSystemHealthMessage(const nx::vms::api::SiteHealthMessage& message);
     void at_serviceDisabled(
         nx::vms::api::EventReason reason, const std::set<nx::Uuid>& deviceIds);

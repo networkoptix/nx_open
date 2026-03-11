@@ -24,6 +24,11 @@ nx::Uuid EventListModel::EventData::sourceId() const
     return source ? source->getId() : nx::Uuid();
 }
 
+bool EventListModel::EventData::hasResources() const
+{
+    return previewCamera || source || !cameras.empty();
+}
+
 EventListModel::EventListModel(WindowContext* context, QObject* parent):
     base_type(parent),
     WindowContextAware(context),

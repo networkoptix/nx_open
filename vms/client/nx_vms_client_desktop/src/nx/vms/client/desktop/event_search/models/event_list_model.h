@@ -61,6 +61,7 @@ public:
         core::analytics::AttributeList attributes;
 
         nx::Uuid sourceId() const;
+        bool hasResources() const;
     };
 
 public:
