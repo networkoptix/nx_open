@@ -147,7 +147,12 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     m_soundController(this)
 {
     const auto handler = windowContext()->notificationActionHandler();
-    connect(handler, &NotificationActionHandler::cleared, q, &EventListModel::clear);
+    connect(handler, &NotificationActionHandler::cleared, q,
+        [this]()
+        {
+            m_notificationsCache.clear();
+            this->q->clear();
+        });
 
     connect(q, &EventListModel::modelReset, this,
         [this]()
@@ -239,7 +244,7 @@ void NotificationListModel::Private::onRowsAboutToBeRemoved(
 
         m_soundController.removeLoopedPlay(event.id);
 
-        if (!event.cloudSystemId.isEmpty() && event.previewCamera)
+        if (!event.cloudSystemId.isEmpty() && event.hasResources())
             m_itemsByCloudSystem.remove(event.cloudSystemId, event.id);
     }
 }
@@ -258,7 +263,7 @@ void NotificationListModel::Private::onProcessNotificationsCacheTimeout()
 
     for (const auto& eventData: addedEvents)
     {
-        if (!eventData.cloudSystemId.isEmpty() && eventData.previewCamera)
+        if (!eventData.cloudSystemId.isEmpty() && eventData.hasResources())
             m_itemsByCloudSystem.insert(eventData.cloudSystemId, eventData.id);
     }
 
