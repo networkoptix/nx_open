@@ -54,6 +54,8 @@ PtzAvailabilityWatcher::PtzAvailabilityWatcher(
         this, &PtzAvailabilityWatcher::updateAvailability);
     connect(m_camera.get(), &nx::vms::client::core::CameraResource::propertyChanged,
         this, &PtzAvailabilityWatcher::updateAvailability);
+
+    updateAvailability();
 }
 
 void PtzAvailabilityWatcher::updateAvailability()
