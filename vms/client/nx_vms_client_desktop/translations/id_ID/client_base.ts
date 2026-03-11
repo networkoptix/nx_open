@@ -2030,7 +2030,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>internal</translation>
     </message>
   </context>
   <context>
@@ -2363,7 +2363,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Aksi ini dilakukan oleh sebuah plugin.</translation>
     </message>
   </context>
   <context>

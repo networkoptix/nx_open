@@ -661,7 +661,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>Mengijinkan untuk menampilkan waktu server pada kamera</translation>
     </message>
   </context>
   <context>
