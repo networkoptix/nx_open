@@ -845,6 +845,7 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, Aut
     NX_ASSERT(!authData.credentials.authToken.isPassword());
 
     const bool userChanged = (m_authData.credentials.username != authData.credentials.username);
+    const bool credentialsChanged = (m_authData.credentials != authData.credentials);
 
     // Removing current tokens from cloud.
     m_tokenRemover.removeToken(m_authData.refreshToken, cloudConnection);
@@ -857,6 +858,8 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, Aut
 
     if (userChanged)
         emit q->cloudLoginChanged();
+    if (credentialsChanged)
+        emit q->credentialsChanged();
 
     return true;
 }
