@@ -53,7 +53,10 @@ Storage extractValue(
 
         samePeriod = false;
         if (firstPeriodValueIsNegative != isNegative(cameraPeriod))
+        {
+            result.setBase(kDifferentValueManualMode);
             return result;
+        }
     }
 
     if (samePeriod)
@@ -142,7 +145,7 @@ bool RecordingPeriod::isManualMode() const
 
 bool RecordingPeriod::hasManualPeriodValue() const
 {
-    return isManualMode() && hasPeriodValue(m_value.get());
+    return isManualMode() && m_value.hasValue() && hasPeriodValue(m_value.get());
 }
 
 bool RecordingPeriod::isApplicable() const
