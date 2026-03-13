@@ -110,6 +110,7 @@ struct NX_VMS_COMMON_API Index
     bool load(const QDateTime& time);
     bool load(qint64 timestampMs);
     bool load(AbstractMetadataBinaryFile& indexFile);
+    void removeFile(AbstractMetadataBinaryFile& indexFile, const QString& reason);
 
     qint64 mediaFileSize(bool noGeometryMode) const;
     qint64 dataOffset(int recordNumber, bool noGeometryMode) const;
