@@ -47,6 +47,9 @@ private:
     bool isHardwareDecodingEnabled() const;
     void setHardwareDecodingEnabled(bool value);
 
+    bool isAllowMtDecodingEnabled() const;
+    void setAllowMtDecodingEnabled(bool value);
+
     int maxHardwareDecodingStreams() const;
     void setMaxHardwareDecodingStreams(int value);
 

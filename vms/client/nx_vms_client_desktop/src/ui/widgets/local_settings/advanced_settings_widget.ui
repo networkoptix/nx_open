@@ -154,6 +154,16 @@
       </layout>
      </item>
      <item>
+      <widget class="QCheckBox" name="allowMtDecodingCheckbox">
+       <property name="toolTip">
+        <string>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</string>
+       </property>
+       <property name="text">
+        <string>Allow Multi-Threaded Decoding</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="fpsLimitLayout" stretch="0,0,1">
        <property name="spacing">
         <number>4</number>
