@@ -226,7 +226,7 @@ AbstractSearchWidgetPrivate::AbstractSearchWidgetPrivate(
                 return;
 
             q->setFocus();
-            requestFetchIfNeeded();
+            requestFetchIfNeeded(/*afterShow*/ true);
         });
 
     q->setFocusPolicy(Qt::ClickFocus);
@@ -257,11 +257,10 @@ AbstractSearchWidgetPrivate::~AbstractSearchWidgetPrivate()
 
 void AbstractSearchWidgetPrivate::setupModels()
 {
-    connect(m_mainModel.data(), &core::AbstractSearchListModel::dataNeeded,
-        this, &AbstractSearchWidgetPrivate::requestFetchIfNeeded);
+    connect(m_mainModel.data(), &core::AbstractSearchListModel::dataNeeded, this,
+        [this]() { requestFetchIfNeeded(); });
 
-    connect(m_mainModel.data(), &QAbstractItemModel::modelReset,
-        this,
+    connect(m_mainModel.data(), &QAbstractItemModel::modelReset, this,
         [this]()
         {
             m_dataFetched = false;
@@ -848,12 +847,14 @@ std::optional<FetchDirection> AbstractSearchWidgetPrivate::getFetchDirection()
     return {}; //< Scroll bar is not at the beginning nor the end.
 }
 
-void AbstractSearchWidgetPrivate::requestFetchIfNeeded()
+void AbstractSearchWidgetPrivate::requestFetchIfNeeded(bool afterShow)
 {
     if (!ui->ribbon->isVisible())
         return;
 
-    if (const auto direction = getFetchDirection(); !!direction)
+    m_afterShow = afterShow;
+
+    if (const auto direction = getFetchDirection(); direction.has_value())
         m_fetchDataOperation->requestOperation();
 }
 
@@ -905,12 +906,22 @@ void AbstractSearchWidgetPrivate::updateDeviceDependentActions()
 
 void AbstractSearchWidgetPrivate::tryFetchData()
 {
+    if (!q->isVisible())
+        return;
+
     const auto direction = getFetchDirection();
 
     FetchRequest request = { .direction = FetchDirection::older};
     const int count = m_mainModel->rowCount();
     if (direction.has_value() && count)
     {
+        if (*direction == FetchDirection::newer
+            && m_afterShow
+            && m_mainModel->isLive()
+            && !m_mainModel->livePaused())
+        {
+            request.liveUpdate = true;
+        }
 
         request.direction = *direction;
         const auto index = request.direction == FetchDirection::newer
@@ -931,6 +942,7 @@ void AbstractSearchWidgetPrivate::tryFetchData()
         setIndicatorVisible(request.direction, true); //< All hiding is done when fetch is finished.
     }
 
+    m_afterShow = false;
     updatePlaceholderVisibility();
     m_togglePreviewsButton->setVisible(!isVisibleModelEmpty());
 }

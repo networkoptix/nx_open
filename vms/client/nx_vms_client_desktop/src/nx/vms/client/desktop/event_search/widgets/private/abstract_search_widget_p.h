@@ -71,7 +71,7 @@ public:
 
     /** Returns fetch direction for the update or nothing if there is no need to do it. */
     std::optional<core::EventSearch::FetchDirection> getFetchDirection();
-    void requestFetchIfNeeded();
+    void requestFetchIfNeeded(bool afterShow = false);
     void resetFilters();
 
     void addDeviceDependentAction(
@@ -156,6 +156,7 @@ private:
 
     Controls m_relevantControls = Control::defaults;
     bool m_skipFetchOnScrollChange = false;
+    bool m_afterShow = false;
 };
 
 } // namespace nx::vms::client::desktop
