@@ -476,8 +476,11 @@ nx::network::ssl::AdapterFunc CertificateCache::makeAdapterFunc(
         [ptr = std::weak_ptr<Private>(d), serverId, url](auto chain)
         {
             auto d = ptr.lock();
-            if (!NX_ASSERT(d, "Cannot verify certificate as the cache is already destroyed"))
+            if (!d)
+            {
+                NX_DEBUG(NX_SCOPE_TAG, "Certificate verification skipped: cache is already destroyed");
                 return false;
+            }
 
             NX_MUTEX_LOCKER lock(&d->mutex);
             return d->verifyCertificateByCache(serverId, url, chain) == CertificateVerifier::Status::ok;
