@@ -161,6 +161,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->useHardwareDecodingCheckbox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
+    connect(ui->allowMtDecodingCheckbox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
     connect(ui->maxHardwareDecodingStreamsSpinBox, QnSpinboxIntValueChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
@@ -290,6 +293,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     appContext()->localSettings()->maximumLiveBufferMs = maximumLiveBufferMs();
     appContext()->localSettings()->glBlurEnabled = isBlurEnabled();
     appContext()->localSettings()->hardwareDecodingEnabledProperty = isHardwareDecodingEnabled();
+    appContext()->localSettings()->allowMtDecoding = isAllowMtDecodingEnabled();
     appContext()->localSettings()->maxHardwareDecodingStreams = maxHardwareDecodingStreams();
 
     const auto oldCertificateValidationLevel =
@@ -395,6 +399,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setMaximumLiveBufferMs(appContext()->localSettings()->maximumLiveBufferMs());
     setBlurEnabled(appContext()->localSettings()->glBlurEnabled());
     setHardwareDecodingEnabled(appContext()->localSettings()->hardwareDecodingEnabled());
+    setAllowMtDecodingEnabled(appContext()->localSettings()->allowMtDecoding());
     setMaxHardwareDecodingStreams(appContext()->localSettings()->maxHardwareDecodingStreams());
     setCertificateValidationLevel(appContext()->coreSettings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
@@ -408,6 +413,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
         || appContext()->localSettings()->maximumLiveBufferMs() != maximumLiveBufferMs()
         || appContext()->localSettings()->glBlurEnabled() != isBlurEnabled()
         || appContext()->localSettings()->hardwareDecodingEnabled() != isHardwareDecodingEnabled()
+        || appContext()->localSettings()->allowMtDecoding() != isAllowMtDecodingEnabled()
         || appContext()->localSettings()->maxHardwareDecodingStreams() != maxHardwareDecodingStreams()
         || appContext()->coreSettings()->certificateValidationLevel()
             != certificateValidationLevel();
@@ -523,6 +529,16 @@ void QnAdvancedSettingsWidget::setHardwareDecodingEnabled(bool value)
     // disregarding previously set value, and there is no proper way to implement such behavior for
     // now.
     ui->useHardwareDecodingCheckbox->setChecked(value);
+}
+
+bool QnAdvancedSettingsWidget::isAllowMtDecodingEnabled() const
+{
+    return ui->allowMtDecodingCheckbox->isChecked();
+}
+
+void QnAdvancedSettingsWidget::setAllowMtDecodingEnabled(bool value)
+{
+    ui->allowMtDecodingCheckbox->setChecked(value);
 }
 
 int QnAdvancedSettingsWidget::maxHardwareDecodingStreams() const
