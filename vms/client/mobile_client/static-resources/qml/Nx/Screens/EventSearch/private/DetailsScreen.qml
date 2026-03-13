@@ -877,7 +877,8 @@ Page
             Workflow.openVideoScreen(preview.resource, undefined, slider.from, camerasModel,
                 eventDetailsScreen.isAnalyticsDetails
                     ? Timeline.ObjectsLoader.ObjectsType.analytics
-                    : Timeline.ObjectsLoader.ObjectsType.bookmarks)
+                    : Timeline.ObjectsLoader.ObjectsType.bookmarks,
+                /*isAuxiliary*/ true)
         }
 
         function updateGestureExclusionArea()

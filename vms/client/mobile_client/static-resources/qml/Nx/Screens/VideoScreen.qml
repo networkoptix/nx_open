@@ -44,7 +44,8 @@ Page
     property alias selectedObjectsType: objectsTypeSheet.selectedType
     property alias customRoiExists: video.roiController.customRoiExists
 
-    onSelectedObjectsTypeChanged: appContext.settings.selectedObjectsType = selectedObjectsType
+    // Whether this is an auxiliary video screen or the primary video screen.
+    property bool auxiliary: false
 
     backgroundColor: "black"
 
@@ -1067,6 +1068,12 @@ Page
     Timeline.ObjectsTypeSheet
     {
         id: objectsTypeSheet
+
+        onObjectsTypeClicked:
+        {
+            if (!modernVideoScreen.auxiliary)
+                appContext.settings.selectedObjectsType = objectsTypeSheet.selectedType
+        }
     }
 
     ActionSheet

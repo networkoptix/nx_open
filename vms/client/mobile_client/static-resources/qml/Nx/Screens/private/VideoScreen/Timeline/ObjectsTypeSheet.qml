@@ -13,6 +13,8 @@ AdaptiveSheet
 
     property int selectedType: Timeline.ObjectsLoader.ObjectsType.motion
 
+    signal objectsTypeClicked()
+
     title: qsTr("View")
     contentSpacing: 0
 
@@ -26,6 +28,7 @@ AdaptiveSheet
         onClicked:
         {
             sheet.selectedType = objectsType
+            sheet.objectsTypeClicked()
             sheet.close()
         }
     }

@@ -114,7 +114,8 @@ function openResourcesScreen(systemName, filterIds)
     }
 }
 
-function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel, selectedObjectsType)
+function openVideoScreen(
+    resource, screenshotUrl, timestamp, camerasModel, selectedObjectsType, isAuxiliary)
 {
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =
@@ -122,6 +123,7 @@ function openVideoScreen(resource, screenshotUrl, timestamp, camerasModel, selec
             "initialResource": resource,
             "initialScreenshot": screenshotUrl ?? "",
             "targetTimestamp": targetTimestamp,
+            "auxiliary": isAuxiliary ?? false,
             "selectedObjectsType": appContext.settings.selectedObjectsType ?? Timeline.ObjectsLoader.ObjectsType.motion
         }
 
