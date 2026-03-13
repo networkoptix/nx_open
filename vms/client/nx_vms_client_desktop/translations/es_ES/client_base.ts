@@ -11480,22 +11480,22 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Existen varios grupos con este nombre. Para mantener una estructura clara y organizada, sugerimos asignar nombres únicos a cada grupo.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>JSON no válido</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Solicitud no válida</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Método no encontrado</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -11507,39 +11507,39 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Fallo de conexión</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Codificación no válida</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Conjunto de caracteres de codificación no válido</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Error de aplicación</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Error de transporte</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Código de error del servidor %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Código de error reservado %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Código de error desconocido %1</translation>
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Error del sitio</translation>
     </message>
   </context>
   <context>
@@ -11575,15 +11575,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>El servidor LDAP está fuera de línea. Los usuarios no pueden iniciar sesión.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>El usuario no se encuentra en la base de datos LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Usuario temporal</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11591,15 +11591,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Existe otro usuario con estas credenciales. Para evitar problemas, es necesario que todos los usuarios tengan credenciales únicas.</translation>
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Usuario de la organización</translation>
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Usuario de socio de canal</translation>
     </message>
   </context>
   <context>
@@ -11630,7 +11630,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Guardar usuario</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -11654,7 +11654,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Copiar enlace de acceso</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11678,7 +11678,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>¿Está seguro de que desea cancelar el enlace de acceso?</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -11686,11 +11686,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Finalizar el enlace de acceso</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Crear enlace de acceso</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11702,11 +11702,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>¡El enlace de acceso se ha creado correctamente!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>No se recomienda otorgar permisos amplios al usuario temporal. Es posible que algunas acciones no funcionen.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
