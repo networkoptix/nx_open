@@ -9788,7 +9788,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Actualización del sitio en proceso</translation>
     </message>
   </context>
   <context>
@@ -9802,7 +9802,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Posibles formatos:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -9882,11 +9882,11 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>No tienes permiso para editar la configuración de esta cámara</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
-      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+      <translation>No tienes permiso para editar la configuración de algunas cámaras</translation>
     </message>
   </context>
   <context>
@@ -9909,11 +9909,11 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>El grupo predeterminado LDAP no se puede eliminar mientras el sitio esté conectado al servidor LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>La gestión de usuarios para los usuarios de la organización solo está disponible en el nivel de la organización, no en el nivel del sitio</translation>
     </message>
   </context>
   <context>
@@ -9924,7 +9924,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>No se puede reconocer el evento en la cámara inaccesible.</translation>
     </message>
   </context>
   <context>
@@ -9938,9 +9938,9 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n notificaciones</numerusform>
+        <numerusform>%n notificaciones</numerusform>
       </translation>
     </message>
     <message>
@@ -9949,41 +9949,41 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Sitio actual</translation>
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Cualquier notificación</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Notificaciones de eventos</translation>
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Elija tipos...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Cualquier notificación</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
-      <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
-        <numerusform>%n notification types</numerusform>
+      <translation>
+        <numerusform>%n tipos de notificación</numerusform>
+        <numerusform>%n tipos de notificación</numerusform>
       </translation>
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notificaciones del sitio</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Seleccionar tipos de notificaciones</translation>
     </message>
   </context>
   <context>
@@ -10122,7 +10122,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>el video está en pausa</translation>
     </message>
   </context>
   <context>
@@ -10217,27 +10217,27 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>La página web puede interactuar con el Cliente de Escritorio y solicitar acceso a la sesión del usuario</translation>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>Una integración puede interactuar con el cliente de escritorio y solicitar acceso a la sesión del usuario</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Proxy de esta integración a través del servidor</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Proxy de esta página web a través del servidor</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Permitir abrir esta integración sin verificación del certificado SSL</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Permitir abrir esta página web sin comprobar el certificado SSL</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10249,7 +10249,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Nueva página web proxy</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
@@ -10261,19 +10261,19 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Editar integración</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Nueva integración mediante proxy</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Editar integración con proxy</translation>
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>Para permitir el uso de una API de cliente, cree una integración web en su lugar. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -10281,11 +10281,11 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Integración de actualización automática</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Actualización automática de la página web</translation>
     </message>
   </context>
   <context>
@@ -10412,7 +10412,7 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Se requiere la confirmación de la contraseña para aplicar los cambios</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -10451,9 +10451,9 @@ Puede forzar la detección de movimiento, pero puede generar un aumento sustanci
     </message>
     <message numerus="yes">
       <source>%n notifications</source>
-      <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
+      <translation>
+        <numerusform>%n notificaciones</numerusform>
+        <numerusform>%n notificaciones</numerusform>
       </translation>
     </message>
   </context>
@@ -10623,8 +10623,8 @@ Aún puedes cambiar calidad y FPS directamente en la cámara.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Las configuraciones de calidad y FPS están deshabilitadas debido a la opción &quot;Permitir optimizar la configuración de la cámara&quot; en el cuadro de diálogo &quot;Administración del sitio&quot; 
+Aún puedes cambiar la calidad y los FPS directamente en la cámara.</translation>
     </message>
     <message>
       <source>Mbps</source>
@@ -10715,11 +10715,11 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Las marcas de agua se mostrarán en los videos en vivo, de archivo y exportados solo para usuarios sin autorización. Ni tú ni otros usuarios con autorización las verán.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>El cifrado del tráfico de vídeo puede aumentar significativamente el uso de la CPU</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -10731,21 +10731,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Es posible que se requiera una configuración adicional en el equipo servidor.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Se requerirá la contraseña de cifrado para restaurar el archivo.
+Precaución: Esta contraseña no se puede restablecer. Si la pierde, el archivo será irrecuperable.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Cifra los datos de archivo para evitar que se vean fuera del sitio. No necesitará introducir la contraseña de cifrado para ver el archivo de vídeo en este sitio.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>La duración ilimitada de la sesión de usuario amenaza la seguridad general del sitio y puede provocar una degradación del rendimiento</translation>
     </message>
   </context>
   <context>
@@ -10756,14 +10756,14 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message numerus="yes">
       <source>%n objects selected</source>
-      <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
-        <numerusform>%n objects selected</numerusform>
+      <translation>
+        <numerusform>%n objetos seleccionados</numerusform>
+        <numerusform>%n objetos seleccionados</numerusform>
       </translation>
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Todos los objetos</translation>
     </message>
   </context>
   <context>
@@ -10805,25 +10805,25 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>ID del servidor: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>Alguien podría estar suplantando a %1 para robar su información personal.
+No fije este certificado si no modificó el certificado SSL del servidor %2.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>Certificado personalizado</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>Certificado generado automáticamente</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>Certificado desconocido</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10831,11 +10831,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Comuníquese con un usuario con permisos de administrador para resolver este problema.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>No es parte del certificado</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
@@ -10862,7 +10862,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Detalles del certificado</translation>
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
