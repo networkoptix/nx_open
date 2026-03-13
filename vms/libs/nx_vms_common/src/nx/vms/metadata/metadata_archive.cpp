@@ -198,14 +198,56 @@ bool Index::load(AbstractMetadataBinaryFile& indexFile)
     if (header.version < 4)
         header.wordSize = 0;
 
-    records.resize((indexFile.size() - kMetadataIndexHeaderSize) / kIndexRecordSize);
-    if (records.isEmpty())
+    const qint64 fileSize = indexFile.size();
+    if (fileSize < kMetadataIndexHeaderSize)
+    {
+        removeFile(indexFile, NX_FMT("Index file is too small (%1 bytes)", fileSize));
+        return false;
+    }
+
+    const qint64 dataSize = fileSize - kMetadataIndexHeaderSize;
+    if (dataSize % kIndexRecordSize != 0)
+    {
+        removeFile(indexFile, NX_FMT("Index file has trailing bytes (size %1, remainder %2)",
+                fileSize, dataSize % kIndexRecordSize));
+        return false;
+    }
+
+    const qint64 recordCount = dataSize / kIndexRecordSize;
+    if (recordCount == 0)
         return true;
+
+    const qint64 intervalMs = std::max<qint64>(header.intervalMs, 1000);
+    static constexpr qint64 kMaxMonthMs = 31LL * 24 * 3600 * 1000;
+    static constexpr qint64 kSafetyMultiplier = 2;
+    const qint64 maxRecordsPerMonth = (kMaxMonthMs / intervalMs) * kSafetyMultiplier;
+    if (recordCount > maxRecordsPerMonth)
+    {
+        removeFile(indexFile, NX_FMT("Index file has unreasonable record count %1 (max %2)",
+                recordCount, maxRecordsPerMonth));
+        return false;
+    }
+
+    records.resize(recordCount);
+
     const int sizeInBytes = kIndexRecordSize * records.size();
     read = indexFile.read((char*)records.data(), sizeInBytes);
     if (read != sizeInBytes)
-        NX_VERBOSE(this, "Failed to load index file %1", indexFile.fileName());
-    return read == sizeInBytes;
+    {
+        removeFile(indexFile,
+            NX_FMT("Failed to read whole file (expected %1, got %2)", sizeInBytes, read));
+        return false;
+    }
+    return true;
+}
+
+void Index::removeFile(AbstractMetadataBinaryFile& indexFile, const QString& reason)
+{
+    reset();
+    const QString fileName = indexFile.fileName();
+    indexFile.close();
+    QFile::remove(fileName);
+    NX_WARNING(this, "Removed corrupt index file %1. Reason: %2", fileName, reason);
 }
 
 MetadataArchive::MetadataArchive(
