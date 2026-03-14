@@ -1781,7 +1781,7 @@
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Notificaciones del sitio</translation>
     </message>
   </context>
   <context>

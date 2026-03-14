@@ -11004,11 +11004,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Enlace inválido</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>El enlace proporcionado no es válido</translation>
     </message>
   </context>
   <context>
@@ -11107,27 +11107,27 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Cámara reemplazada descubierta</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>La cámara %1 ha sido reemplazada por %2.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Haz clic en el botón &quot;Deshacer Reemplazar&quot; para seguir usando dos dispositivos.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Deshacer reemplazo</translation>
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Agregue más servicios o solucione el uso excesivo dejando de utilizar servicios para algunos dispositivos.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Si no se toma ninguna medida, el número requerido de servicios se liberará automáticamente en %1.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
@@ -11135,35 +11135,35 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>El sitio excede los límites de su organización&apos;y podría dejar de funcionar pronto. Por favor, ajuste su uso para evitar interrupciones del servicio.</translation>
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Abrir configuración</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Servicios abiertos</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>La grabación en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
+        <numerusform>La grabación en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>La copia de seguridad del almacenamiento en la nube en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
+        <numerusform>La copia de seguridad del almacenamiento en la nube en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Se suspendió el uso del servicio de integración de pago en los canales %n debido al uso excesivo del servicio.</numerusform>
+        <numerusform>Se suspendió el uso del servicio de integración de pago en los canales %n debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
   </context>
@@ -11183,17 +11183,17 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Tu acceso al sitio caduca %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Tu acceso al sitio caduca en %1</translation>
     </message>
   </context>
   <context>
@@ -11262,7 +11262,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Esta acción no es compatible con las notificaciones de otros sitios</translation>
     </message>
   </context>
   <context>
@@ -11384,15 +11384,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Grupo LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Grupo integrado</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Grupo personalizado</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11404,11 +11404,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>El grupo no se encuentra en la base de datos LDAP.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Un grupo tiene a otro grupo como padre y como hijo, o forma parte de una cadena de referencia circular. Esto puede provocar un cálculo incorrecto de los permisos.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11420,22 +11420,22 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Existen varios grupos con este nombre. Para mantener una estructura clara y organizada, sugerimos asignar nombres únicos a cada grupo.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>JSON no válido</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Solicitud no válida</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Método no encontrado</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -11447,39 +11447,39 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Fallo de conexión</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Codificación no válida</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Conjunto de caracteres de codificación no válido</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Error de aplicación</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Error de transporte</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Código de error del servidor %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Código de error reservado %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Código de error desconocido %1</translation>
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Error del sitio</translation>
     </message>
   </context>
   <context>
@@ -11515,15 +11515,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>El servidor LDAP está fuera de línea. Los usuarios no pueden iniciar sesión.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>El usuario no se encuentra en la base de datos LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Usuario temporal</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11531,15 +11531,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Existe otro usuario con estas credenciales. Para evitar problemas, es necesario que todos los usuarios tengan credenciales únicas.</translation>
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Usuario de la organización</translation>
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Usuario de socio de canal</translation>
     </message>
   </context>
   <context>
@@ -11570,7 +11570,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Guardar usuario</translation>
     </message>
     <message>
       <source>Enter your account password</source>
@@ -11594,7 +11594,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Copiar enlace de acceso</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11618,7 +11618,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>¿Está seguro de que desea cancelar el enlace de acceso?</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -11626,11 +11626,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Finalizar el enlace de acceso</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Crear enlace de acceso</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11642,11 +11642,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>¡El enlace de acceso se ha creado correctamente!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>No se recomienda otorgar permisos amplios al usuario temporal. Es posible que algunas acciones no funcionen.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
@@ -11655,7 +11655,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>New User</source>

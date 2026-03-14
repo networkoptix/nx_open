@@ -1013,23 +1013,23 @@
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>La grabación en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
+        <numerusform>La grabación en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>La copia de seguridad del almacenamiento en la nube en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
+        <numerusform>La copia de seguridad del almacenamiento en la nube en los canales %n se detuvo debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Se suspendió el uso del servicio de integración de pago en los canales %n debido al uso excesivo del servicio.</numerusform>
+        <numerusform>Se suspendió el uso del servicio de integración de pago en los canales %n debido al uso excesivo del servicio.</numerusform>
       </translation>
     </message>
     <message>
