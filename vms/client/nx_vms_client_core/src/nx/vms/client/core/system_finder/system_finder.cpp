@@ -5,8 +5,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/discovery/manager.h>
 
 #include "private/cloud_system_finder.h"
 #include "private/direct_system_finder.h"
@@ -70,11 +72,13 @@ void SystemFinder::initializeFinders()
     auto scopeLocalSystemFinder = new ScopeLocalSystemFinder(this);
     addSystemFinder(scopeLocalSystemFinder, Source::saved);
 
-    auto cloudSystemFinder = new CloudSystemFinder(this);
+    auto cloudSystemFinder = new CloudSystemFinder(qnCloudStatusWatcher, this);
     addSystemFinder(cloudSystemFinder, Source::cloud);
 
+    const auto moduleManager = appContext()->moduleDiscoveryManager();
+    NX_ASSERT(moduleManager, "Module finder does not exist");
     auto searchUrlManager = new SearchAddressManager(this);
-    auto directSystemFinder = new DirectSystemFinder(searchUrlManager, this);
+    auto directSystemFinder = new DirectSystemFinder(moduleManager, searchUrlManager, this);
     addSystemFinder(directSystemFinder, Source::direct);
 }
 

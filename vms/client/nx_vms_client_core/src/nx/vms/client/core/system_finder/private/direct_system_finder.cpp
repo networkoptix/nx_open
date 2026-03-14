@@ -9,8 +9,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/vms/client/core/application_context.h>
-#include <nx/vms/discovery/manager.h>
+#include <nx/vms/discovery/abstract_manager.h>
 
 #include "local_system_description.h"
 #include "search_address_manager.h"
@@ -34,14 +33,14 @@ bool isCloudAddress(const nx::network::HostAddress& address)
 } // namespace
 
 DirectSystemFinder::DirectSystemFinder(
+    nx::vms::discovery::AbstractManager* const moduleManager,
     SearchAddressManager* searchAddressManager,
     QObject* parent)
     :
     base_type(parent),
     m_searchAddressManager(searchAddressManager)
 {
-    const auto moduleManager = appContext()->moduleDiscoveryManager();
-    if (!NX_ASSERT(moduleManager, "Module finder does not exist"))
+    if (!NX_ASSERT(moduleManager))
         return;
 
     moduleManager->onSignals(this,
@@ -79,7 +78,7 @@ void DirectSystemFinder::removeSystem(SystemsHash::iterator it)
     if (it == m_systems.end())
         return;
 
-    const auto& system = it.value();
+    const auto system = it.value();
     NX_VERBOSE(this, "Removing %1", system);
 
     for (const auto& server: system->servers())
@@ -97,11 +96,14 @@ void DirectSystemFinder::updateServerData(const nx::vms::discovery::ModuleEndpoi
     NX_VERBOSE(this, "Update server %1 with system id: %2, local id: %3",
         module, systemId, localSystemId);
 
-    m_searchAddressManager->updateServerRemoteAddresses(
-        localSystemId,
-        module.id,
-        module.remoteAddresses
-    );
+    if (m_searchAddressManager)
+    {
+        m_searchAddressManager->updateServerRemoteAddresses(
+            localSystemId,
+            module.id,
+            module.remoteAddresses
+        );
+    }
 
     if (const auto systemIt = getSystemItByServer(module.id); systemIt != m_systems.end())
     {
