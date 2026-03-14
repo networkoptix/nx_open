@@ -12,4 +12,6 @@ nx_add_test(nx_vms_client_core_ut
         ${nx_utils_dir}/src/nx/utils/test_support/custom_gtest_printers.h
     ADDITIONAL_MOCABLES
         src/nx/vms/client/core/qml/enums_as_singletons_ut.cpp
+        src/nx/vms/client/core/system_finder/mock_cloud_status_watcher.h
+        src/nx/vms/client/core/system_finder/mock_module_discovery_manager.h
 )
