@@ -11715,7 +11715,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>New User</source>
