@@ -137,6 +137,14 @@
         <source>Simultaneous Streams</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Multi-Threaded Decoding</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveLengthWidget</name>
