@@ -14,6 +14,8 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
+#include "abstract_cloud_status_watcher.h"
+
 class CloudStatusWatcherPrivate;
 
 namespace nx::vms::api { struct UserSettings; }
@@ -23,15 +25,13 @@ namespace nx::vms::client::core {
 
 struct CloudAuthData;
 
-class NX_VMS_CLIENT_CORE_API CloudStatusWatcher:
-    public QObject
+class NX_VMS_CLIENT_CORE_API CloudStatusWatcher: public AbstractCloudStatusWatcher
 {
     using Credentials = nx::network::http::Credentials;
-    using base_type = QObject;
+    using base_type = AbstractCloudStatusWatcher;
 
     Q_OBJECT
     Q_PROPERTY(Credentials credentials READ credentials NOTIFY credentialsChanged)
-    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
     Q_PROPERTY(QString cloudLogin READ cloudLogin NOTIFY cloudLoginChanged)
@@ -48,15 +48,6 @@ public:
         UnknownError
     };
     Q_ENUM(ErrorCode)
-
-    enum Status
-    {
-        LoggedOut,
-        Online,
-        Offline, //< User is logged in with "stay connected" checked but internet connection is lost
-        UpdatingCredentials, //< User credentials are being updated without requiring logout
-    };
-    Q_ENUM(Status)
 
     explicit CloudStatusWatcher(QObject* parent = nullptr);
     virtual ~CloudStatusWatcher() override;
@@ -106,13 +97,14 @@ public:
      */
     void resumeCloudInteraction();
 
-    Status status() const;
+    Status status() const override;
     ErrorCode error() const;
     bool isCloudEnabled() const;
 
     void updateSystems();
     std::optional<QnCloudSystem> cloudSystem(const QString& systemId) const;
-    QnCloudSystemList cloudSystems() const;
+    QnCloudSystemList cloudSystems() const override;
+
     QnCloudSystemList recentCloudSystems() const;
     void updateRefreshToken(const std::string& refreshToken);
 
@@ -128,12 +120,10 @@ signals:
     void cloudLoginChanged();
     void forcedLogout();
     void loggedOutWithError();
-    void statusChanged(Status status);
     void errorChanged(ErrorCode error);
     void isCloudEnabledChanged();
     void is2FaEnabledForUserChanged();
 
-    void cloudSystemsChanged(const QnCloudSystemList& currentCloudSystems);
     void recentCloudSystemsChanged();
     void refreshTokenChanged(const std::string& refreshToken);
 

@@ -20,7 +20,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/abstract_cloud_status_watcher.h>
 
 using namespace std::chrono;
 using nx::network::http::ClientPool;
@@ -95,6 +95,7 @@ nx::vms::api::ModuleInformationWithAddresses createInitialServer(const QnCloudSy
 struct CloudSystemFinder::Private
 {
     CloudSystemFinder* const q;
+    AbstractCloudStatusWatcher* watcher = nullptr;
     mutable nx::Mutex mutex{nx::Mutex::Recursive};
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
     using SystemsHash = QHash<QString, QnCloudSystemDescriptionPtr>;
@@ -125,7 +126,26 @@ struct CloudSystemFinder::Private
         context->completionFunc = nx::utils::AsyncHandlerExecutor(q).bind(
             [this, cloudSystemId](ClientPool::ContextPtr context)
             {
-                onRequestComplete(cloudSystemId, context);
+                const bool success = context->hasSuccessfulResponse();
+
+                if (success)
+                {
+                     NX_VERBOSE(this, "Cloud system <%1>: ping successful", cloudSystemId);
+                }
+                else
+                {
+                    const nx::network::http::StatusLine status = context->getStatusLine();
+                    const SystemError::ErrorCode errorCode = context->systemError;
+
+                    NX_VERBOSE(this,
+                        "Cloud system <%1>: ping failure: status %2 error %3",
+                        cloudSystemId,
+                        status,
+                        errorCode);
+                }
+
+                const QByteArray messageBody = context->response.messageBody.toRawByteArray();
+                onRequestCompleteImpl(cloudSystemId, success, messageBody);
             });
 
         clientPool->sendRequest(context);
@@ -159,22 +179,11 @@ struct CloudSystemFinder::Private
         return true;
     }
 
-    void onRequestComplete(const QString& cloudSystemId, ClientPool::ContextPtr context)
+    void onRequestCompleteImpl(
+        const QString& cloudSystemId,
+        bool success,
+        const QByteArray& messageBody)
     {
-        const bool success = context->hasSuccessfulResponse();
-        if (success)
-        {
-             NX_VERBOSE(this, "Cloud system <%1>: ping successful", cloudSystemId);
-        }
-        else
-        {
-            NX_VERBOSE(this,
-                "Cloud system <%1>: ping failure: status %2 error %3",
-                cloudSystemId,
-                context->getStatusLine(),
-                context->systemError);
-        }
-
         const NX_MUTEX_LOCKER lock(&mutex);
         const auto it = systems.find(cloudSystemId);
         if (it == systems.end())
@@ -185,7 +194,7 @@ struct CloudSystemFinder::Private
 
         if (!success
             || !parseModuleInformation(
-                context->response.messageBody.toRawByteArray(), &moduleInformation)
+                messageBody, &moduleInformation)
             || cloudSystemId != moduleInformation.cloudSystemId)
         {
             clearServersUnderLock(systemDescription);
@@ -247,10 +256,13 @@ struct CloudSystemFinder::Private
         }
     }
 
-    void onCloudStatusChanged(CloudStatusWatcher::Status status)
+    void onCloudStatusChanged(AbstractCloudStatusWatcher::Status status)
     {
-        setCloudSystems(status == CloudStatusWatcher::Online
-            ? qnCloudStatusWatcher->cloudSystems()
+        if (!watcher)
+            return;
+
+        setCloudSystems(status == AbstractCloudStatusWatcher::Online
+            ? watcher->cloudSystems()
             : QnCloudSystemList());
     }
 
@@ -322,18 +334,19 @@ struct CloudSystemFinder::Private
     }
 };
 
-CloudSystemFinder::CloudSystemFinder(QObject* parent):
+CloudSystemFinder::CloudSystemFinder(AbstractCloudStatusWatcher* watcher, QObject* parent):
     base_type(parent),
-    d(new Private{.q=this})
+    d(new Private{.q=this, .watcher=watcher})
 {
-    NX_ASSERT(qnCloudStatusWatcher, "Cloud watcher is not ready");
+    if (!NX_ASSERT(watcher, "Cloud watcher is not ready"))
+        return;
 
-    connect(qnCloudStatusWatcher,
-        &CloudStatusWatcher::statusChanged,
+    connect(watcher,
+        &AbstractCloudStatusWatcher::statusChanged,
         this,
         [this](auto status) { d->onCloudStatusChanged(status); });
-    connect(qnCloudStatusWatcher,
-        &CloudStatusWatcher::cloudSystemsChanged,
+    connect(watcher,
+        &AbstractCloudStatusWatcher::cloudSystemsChanged,
         this,
         [this](const auto& value) { d->setCloudSystems(value); });
 
@@ -345,7 +358,7 @@ CloudSystemFinder::CloudSystemFinder(QObject* parent):
     updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod);
     updateSystemsTimer->start();
 
-    d->onCloudStatusChanged(qnCloudStatusWatcher->status());
+    d->onCloudStatusChanged(watcher->status());
 }
 
 CloudSystemFinder::~CloudSystemFinder()
@@ -380,6 +393,14 @@ SystemDescriptionPtr CloudSystemFinder::getSystem(const QString &id) const
     return (it == systemDescriptions.end()
         ? SystemDescriptionPtr()
         : (*it).dynamicCast<SystemDescription>());
+}
+
+void CloudSystemFinder::onRequestComplete(
+    const QString& cloudSystemId,
+    bool success,
+    const QByteArray& messageBody)
+{
+    d->onRequestCompleteImpl(cloudSystemId, success, messageBody);
 }
 
 } // namespace nx::vms::client::core

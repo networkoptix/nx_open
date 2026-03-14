@@ -4,29 +4,14 @@
 
 #include <optional>
 
-#include <QtCore/QObject>
-
 #include <core/resource/resource_fwd.h>
 #include <nx/network/retry_timer.h>
-#include <nx/network/socket_common.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/url.h>
-#include <nx/vms/api/data/module_information.h>
+
+#include "abstract_manager.h"
 
 namespace nx::vms::discovery {
-
-struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
-{
-    nx::network::SocketAddress endpoint;
-
-    ModuleEndpoint(
-        api::ModuleInformationWithAddresses old = {},
-        nx::network::SocketAddress endpoint = {});
-
-    bool operator==(const ModuleEndpoint& rhs) const = default;
-};
-
-NX_VMS_COMMON_API QString toString(const nx::vms::discovery::ModuleEndpoint& module);
 
 /**
  * Discovers VMS modules, notifies their module information and availability changes.
@@ -35,11 +20,10 @@ NX_VMS_COMMON_API QString toString(const nx::vms::discovery::ModuleEndpoint& mod
  * - Tries to maintain connection to each module and access up-to-date module information.
  * - Notifies about availability or module information changes (in server mode).
  */
-class NX_VMS_COMMON_API Manager:
-    public QObject
+class NX_VMS_COMMON_API Manager: public AbstractManager
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = AbstractManager;
 
 public:
     struct ServerModeInfo
@@ -87,8 +71,8 @@ public:
 
     void stop();
 
-    std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
-    std::optional<nx::network::SocketAddress> getEndpoint(const nx::Uuid& id) const; //< Reachable endpoint.
+    std::list<ModuleEndpoint> getAll() const override;
+    std::optional<nx::network::SocketAddress> getEndpoint(const nx::Uuid& id) const;
     std::optional<ModuleEndpoint> getModule(const nx::Uuid& id) const;
     void forgetModule(const nx::Uuid& id);
 
@@ -104,27 +88,7 @@ public:
     void checkEndpoint(nx::network::SocketAddress endpoint, nx::Uuid expectedId = nx::Uuid());
     void checkEndpoint(const nx::Url &url, nx::Uuid expectedId = nx::Uuid());
 
-    template<typename Ptr, typename Found, typename Changed, typename Lost>
-    void onSignals(Ptr ptr, Found foundSlot, Changed changedSlot, Lost lostSlot)
-    {
-        connect(this, &Manager::found, ptr, foundSlot);
-        connect(this, &Manager::changed, ptr, changedSlot);
-        connect(this, &Manager::lost, ptr, lostSlot);
-
-        for (const auto& module: getAll())
-            (ptr->*foundSlot)(module);
-    }
-
 signals:
-    /** New reachable module is found. */
-    void found(nx::vms::discovery::ModuleEndpoint module);
-
-    /** Module information or active endpoint of reachable module is changed. */
-    void changed(nx::vms::discovery::ModuleEndpoint module);
-
-    /** Module connection is lost and could not be restored. */
-    void lost(nx::Uuid information);
-
     /** Found the module with the same UUID as we are. */
     void conflict(
         std::chrono::microseconds timestamp,

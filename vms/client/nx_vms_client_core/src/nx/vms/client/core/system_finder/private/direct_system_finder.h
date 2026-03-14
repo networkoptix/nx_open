@@ -2,23 +2,31 @@
 
 #pragma once
 
-#include <nx/vms/discovery/manager.h>
-
 #include "../abstract_system_finder.h"
 #include "local_system_description.h"
+
+namespace nx::vms::discovery {
+
+class AbstractManager;
+struct ModuleEndpoint;
+
+} // namespace nx::vms::discovery
 
 namespace nx::vms::client::core {
 
 class SearchAddressManager;
 
 /* Performs local system auto discovery based on nx::vms::discovery::Manager. */
-class DirectSystemFinder: public AbstractSystemFinder
+class NX_VMS_CLIENT_CORE_API DirectSystemFinder: public AbstractSystemFinder
 {
     Q_OBJECT
     typedef AbstractSystemFinder base_type;
 
 public:
-    DirectSystemFinder(SearchAddressManager* searchAddressManager, QObject* parent = nullptr);
+    DirectSystemFinder(
+        nx::vms::discovery::AbstractManager* const moduleManager,
+        SearchAddressManager* searchAddressManager,
+        QObject* parent = nullptr);
 
     SystemDescriptionList systems() const override;
     SystemDescriptionPtr getSystem(const QString& id) const override;
