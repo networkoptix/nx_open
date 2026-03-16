@@ -81,7 +81,8 @@ struct LocalPushSettings
     LocalPushSettings(
         bool enabled,
         const SystemSet& systems,
-        const TokenData& tokenData);
+        const TokenData& tokenData,
+        int lastUsedFilter = 0);
 
     static LocalPushSettings makeCopyWithTokenData(
         const LocalPushSettings& what,
