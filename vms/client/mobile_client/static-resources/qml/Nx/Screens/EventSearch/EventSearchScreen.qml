@@ -448,6 +448,8 @@ AdaptiveScreen
             y: portraitSearchProxy.visible ? searchField.height + 16 : 16
             height: parent.height - y
             width: parent.width
+            leftMargin: 20
+            rightMargin: 20
 
             clip: true
             spacing: 12
