@@ -118,6 +118,8 @@ Page
         y: filtersPanel.height + spacing
         width: parent.width
         height: parent.height - y - spacing
+        leftMargin: 20
+        rightMargin: 20
 
         clip: true
         spacing: 12
@@ -137,7 +139,6 @@ Page
             trackId: model.trackId?.toString() ?? ""
             previewState: model.previewState
             title: model.display
-            extraText: model.description
             timestampMs: model.timestampMs
             shared: !!model.isSharedBookmark
 

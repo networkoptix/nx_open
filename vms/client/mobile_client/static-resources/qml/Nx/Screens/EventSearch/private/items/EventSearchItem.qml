@@ -1,6 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
 
 import Nx.Core
 import Nx.Core.Items
@@ -10,7 +13,7 @@ import Nx.Ui
 
 import nx.vms.client.core
 
-MouseArea
+Control
 {
     id: control
 
@@ -24,55 +27,75 @@ MouseArea
     property var resource
     property var timestampMs
     property alias title: titleItem.text
-    property alias extraText: extraTextItem.text
     property alias eventTimestampText: eventTimeItem.text
     property bool shared: false
 
-    height: d.kRowHeight
-    width: (parent && parent.width) ?? 0
+    implicitWidth: (parent && parent.width) ?? 0
+    implicitHeight: 122
+    padding: 12
+    clip: true
 
-    onClicked: Workflow.openEventDetailsScreen(
-        camerasModel, eventsModel, currentEventIndex, isAnalyticsItem)
-
-    Preview
+    background: Rectangle
     {
-        id: preview
-
-        x: 12
-        width: parent.height * d.kPreviewAspect
-        height: parent.height
-
-        Rectangle
-        {
-            width: 20
-            height: parent.height
-            color: ColorTheme.colors.green_core
-            visible: control.shared
-
-            Text
-            {
-                rotation: -90
-                font.weight: 700
-                color: ColorTheme.colors.dark1
-                anchors.centerIn: parent
-                width: Math.min(implicitWidth, parent.height - 16)
-                text: qsTr("SHARED")
-            }
-        }
+        radius: 6
+        color: control.selected ? ColorTheme.colors.dark6 : ColorTheme.colors.dark8
+        border.width: 1
+        border.color:control.selected ? ColorTheme.colors.brand : color
     }
 
-    Item
+    contentItem: RowLayout
     {
-        id: infoHolder
+        spacing: 12
 
-        height: parent.height
-        x: preview.x + preview.width + 8
-        width: parent.width - x - 15
+        Preview
+        {
+            id: preview
+
+            Layout.preferredWidth: 120
+            Layout.fillHeight: true
+
+            backgroundColor: ColorTheme.colors.dark6
+            borderColor: backgroundColor
+
+            layer.enabled: true
+            layer.effect: OpacityMask
+            {
+                maskSource: Rectangle
+                {
+                    width: preview.width
+                    height: preview.height
+                    radius: 4
+                }
+            }
+
+            Rectangle
+            {
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.margins: 2
+
+                radius: 4
+                width: 48
+                height: 48
+                color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.6)
+                visible: control.shared
+
+                ColoredImage
+                {
+                    anchors.centerIn: parent
+
+                    sourcePath: "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
+                    sourceSize: Qt.size(24, 24)
+                }
+            }
+        }
 
         Column
         {
-            width: parent.width
-            spacing: 2
+            spacing: 4
+
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
             Text
             {
@@ -87,21 +110,7 @@ MouseArea
                 color: ColorTheme.colors.light4
                 font.pixelSize: 16
                 font.weight: Font.Medium
-            }
-
-            Text
-            {
-                id: extraTextItem
-
-                width: parent.width
-                visible: !!NxGlobals.toPlainText(text)
-                elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
-                maximumLineCount: 2
-
-                color: ColorTheme.colors.light10
-                font.pixelSize: 12
-                font.weight: Font.Normal
+                lineHeight: 1.25
             }
 
             Text
@@ -114,9 +123,10 @@ MouseArea
                 wrapMode: Text.WrapAnywhere
                 maximumLineCount: 1
 
-                color: ColorTheme.colors.dark13
-                font.pixelSize: 10
-                font.weight: Font.Medium
+                color: ColorTheme.colors.light10
+                font.pixelSize: 14
+                font.weight: Font.Normal
+                lineHeight: 1.25
 
                 text: control.resource.name
             }
@@ -131,9 +141,10 @@ MouseArea
                 wrapMode: Text.WrapAnywhere
                 maximumLineCount: 1
 
-                color: ColorTheme.colors.dark14
-                font.pixelSize: 10
-                font.weight: Font.Medium
+                color: ColorTheme.colors.light16
+                font.pixelSize: 14
+                font.weight: Font.Normal
+                lineHeight: 1.25
 
                 text:
                 {
@@ -144,11 +155,10 @@ MouseArea
         }
     }
 
-    NxObject
+    MouseArea
     {
-        id: d
-
-        readonly property real kPreviewAspect: 16/9
-        readonly property int kRowHeight: 100
+        anchors.fill: parent
+        onClicked: Workflow.openEventDetailsScreen(
+            camerasModel, eventsModel, currentEventIndex, isAnalyticsItem)
     }
 }
