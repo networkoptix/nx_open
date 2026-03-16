@@ -26,6 +26,12 @@ Sheet
     property bool isFiltering: false
     readonly property bool isNothingFound: treeView.rows === 0
 
+    function cancelSearch()
+    {
+        searchEdit.clear()
+        treeView.forceActiveFocus()
+    }
+
     ColumnLayout
     {
         anchors.fill: parent
@@ -114,6 +120,7 @@ Sheet
                 // Source model indexes to which the view was expanded on the most recent
                 // saveExpandedState() call.
                 property var storedExpandedState: []
+                property var navigateToIndex
 
                 delegate: ResourceTreeDelegate
                 {
@@ -131,6 +138,14 @@ Sheet
                         gesturePolicy: TapHandler.ReleaseWithinBounds
                         onTapped:
                         {
+                            if (control.isFiltering
+                                && (delegateItem.isFolder || delegateItem.isMultisensorGroup))
+                            {
+                                treeView.navigateToIndex = NxGlobals.toPersistent(
+                                    searchModel.mapToSource(treeView.index(row, 0)))
+                                cancelSearch()
+                            }
+
                             if (hasChildren)
                             {
                                 treeView.toggleExpanded(row)
@@ -163,12 +178,31 @@ Sheet
 
                 function restoreExpandedState()
                 {
-                    if (storedExpandedState.length === 0)
-                        return
-                    collapseRecursively(-1) //< Collapse tree recursively.
-                    storedExpandedState.forEach(index =>
-                        expandToIndex(searchModel.mapFromSource(NxGlobals.fromPersistent(index))))
-                    storedExpandedState.length = 0
+                    if (storedExpandedState.length !== 0)
+                    {
+                        collapseRecursively(-1) //< Collapse tree recursively.
+                        storedExpandedState.forEach(index =>
+                            expandToIndex(searchModel.mapFromSource(NxGlobals.fromPersistent(index))))
+                        storedExpandedState.length = 0
+                    }
+                    if (navigateToIndex)
+                    {
+                        const index = searchModel.mapFromSource(
+                            NxGlobals.fromPersistent(navigateToIndex))
+
+                        expandToIndex(index)
+                        const indexRow = rowAtIndex(index)
+                        if (!isExpanded(indexRow))
+                            toggleExpanded(indexRow)
+
+                        forceLayout()
+
+                        const lastChildIndex = searchModel.index(
+                            searchModel.rowCount(index) - 1, 0, index)
+                        positionViewAtIndex(lastChildIndex, TreeView.Visible)
+
+                        navigateToIndex = undefined
+                    }
                 }
 
                 function expandAll()
