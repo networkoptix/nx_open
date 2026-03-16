@@ -98,16 +98,6 @@ class Engine {
 
     getSettingsOnActiveSettingChange(activeSettingChangedAction)
     {
-        /*
-        struct ActiveSettingChangedAction
-        {
-            std::string activeSettingName;
-            QJsonObject settingsModel;
-            std::map<std::string, std::string> settingsValues;
-            std::map<std::string, std::string> params;
-        };
-        */
-
         const actionResponse = {
             actionUrl: "",
             messageToUser: "",
@@ -182,26 +172,6 @@ class Engine {
 
     executeAction(action)
     {
-        /*
-            struct ObjectTrackInfo
-            {
-                std::string titleText;
-                QByteArray titleImageData;
-                int titleImageDataSize;
-                std::string titleImageDataFormat;
-            };
-
-            struct Action
-            {
-                std::string actionId;
-                Uuid objectTrackId;
-                Uuid deviceId;
-                ObjectTrackInfo objectTrackInfo;
-                int64_t timestampUs;
-                std::map<std::string, std::string> params
-            };
-        */
-
         console.log("Got action: ", action);
 
         const actionResult = {

@@ -253,16 +253,6 @@ class DeviceAgent {
     {
         console.log("DeviceAgent::getSettingsOnActiveSettingChange");
 
-        /*
-        struct ActiveSettingChangedAction
-        {
-            std::string activeSettingName;
-            QJsonObject settingsModel;
-            std::map<std::string, std::string> settingsValues;
-            std::map<std::string, std::string> params;
-        };
-        */
-
         const actionResponse = {
             actionUrl: "",
             messageToUser: "",
