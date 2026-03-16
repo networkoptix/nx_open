@@ -29,8 +29,11 @@ Item
     property var currentSelectedNodeId: null  // Currently selected node in the tree
     property string searchText: ""  // Search text for highlighting
 
-    // Map of expanded nodes: { nodeId(string): true }
-    property var expandedNodeIds: ({ })
+    // Set of expanded node ids.
+    property var expandedNodeIds: new Set()
+
+    // Sorted model index of the selected organization (for OrganizationTreeView header)
+    property var sortedOrganizationIndex: null
 
     // Signals
     signal tabSelected(var selectedTabValue)
@@ -52,9 +55,10 @@ Item
             topRows.push(r)
 
         organizationTreeModel.setExpanded(
-            function(index) {
+            function(index)
+            {
                 const id = accessor.getData(index, "nodeId")
-                return id && leftSidebar.expandedNodeIds[id] === true
+                return id && leftSidebar.expandedNodeIds.has(id)
             },
             topRows
         )
@@ -69,7 +73,7 @@ Item
             const parentId = accessor.getData(parent, "nodeId")
             if (parentId)
             {
-                leftSidebar.expandedNodeIds[parentId] = true
+                leftSidebar.expandedNodeIds.add(parentId)
                 organizationTreeModel.setSourceExpanded(parent, true)
             }
             parent = sortModel.parent(parent)
@@ -117,7 +121,7 @@ Item
     // Expand all folders when searching to show full path to found items
     function expandAllForSearch()
     {
-        if (!organizationsModel || !organizationTreeModel || !searchText || !selectedOrganizationIndex)
+        if (!organizationsModel || !organizationTreeModel || !searchText || selectedOrganizationIndex == null)
             return
 
         searchAndExpandRecursive(selectedOrganizationIndex, searchText.toLowerCase())
@@ -144,7 +148,7 @@ Item
         const nodeType = accessor.getData(sortedIndex, "type")
         if (nodeType === OrganizationsModel.Folder || nodeType === OrganizationsModel.Organization)
         {
-            leftSidebar.expandedNodeIds[nodeId] = true
+            leftSidebar.expandedNodeIds.add(nodeId)
             organizationTreeModel.setSourceExpanded(sortedIndex, true)
         }
 
@@ -153,8 +157,10 @@ Item
     }
 
     // Handle search text changes
-    onSearchTextChanged: {
-        if (searchText) {
+    onSearchTextChanged:
+    {
+        if (searchText)
+        {
             expandAllForSearch()
         }
     }
@@ -164,13 +170,14 @@ Item
     {
         id: navigationList
         anchors.fill: parent
-        visible: !selectedOrganizationIndex
+        visible: selectedOrganizationIndex == null
 
         hasChannelPartners: leftSidebar.hasChannelPartners
         hasOrganizations: leftSidebar.hasOrganizations
         currentTab: leftSidebar.currentTab
 
-        onTabSelected: function(tab) {
+        onTabSelected: (tab) =>
+        {
             leftSidebar.tabSelected(tab)
         }
     }
@@ -180,7 +187,7 @@ Item
     {
         id: organizationTree
         anchors.fill: parent
-        visible: selectedOrganizationIndex
+        visible: selectedOrganizationIndex != null
 
         organizationsModel: leftSidebar.organizationsModel
         sortModel: sortModel
@@ -188,8 +195,10 @@ Item
         accessor: accessor
         currentSelectedNodeId: leftSidebar.currentSelectedNodeId
         searchText: leftSidebar.searchText
+        sortedOrganizationIndex: leftSidebar.sortedOrganizationIndex
 
-        onNodeClicked: function(nodeId) {
+        onNodeClicked: (nodeId) =>
+        {
             const origIndex = leftSidebar.organizationsModel.indexFromNodeId(nodeId)
             if (origIndex === NxGlobals.invalidModelIndex())
                 return
@@ -210,11 +219,12 @@ Item
             }
         }
 
-        onExpandedChanged: function(nodeId, expanded) {
+        onExpandedChanged: (nodeId, expanded) =>
+        {
             if (expanded)
-                leftSidebar.expandedNodeIds[nodeId] = true
+                leftSidebar.expandedNodeIds.add(nodeId)
             else
-                delete leftSidebar.expandedNodeIds[nodeId]
+                leftSidebar.expandedNodeIds.delete(nodeId)
         }
     }
 
@@ -240,14 +250,18 @@ Item
         autoExpandAll: false
 
         Component.onCompleted: {
-            if (leftSidebar.selectedOrganizationIndex) {
+            if (leftSidebar.selectedOrganizationIndex != null)
+            {
                 const sortedIndex = sortModel.mapFromSource(leftSidebar.selectedOrganizationIndex)
-                if (sortedIndex !== NxGlobals.invalidModelIndex()) {
+                if (sortedIndex !== NxGlobals.invalidModelIndex())
+                {
+                    organizationTreeModel.sourceRoot = sortedIndex
+                    leftSidebar.sortedOrganizationIndex = sortedIndex
                     organizationTreeModel.setSourceExpanded(sortedIndex, true)
 
                     const orgId = accessor.getData(sortedIndex, "nodeId")
                     if (orgId)
-                        leftSidebar.expandedNodeIds[orgId] = true
+                        leftSidebar.expandedNodeIds.add(orgId)
 
                     leftSidebar.restoreExpandedState()
                 }
@@ -255,21 +269,33 @@ Item
         }
     }
 
-    onSelectedOrganizationIndexChanged: {
-        if (selectedOrganizationIndex) {
+    onSelectedOrganizationIndexChanged:
+    {
+        if (selectedOrganizationIndex != null)
+        {
             // Map through sort model
             const sortedIndex = sortModel.mapFromSource(selectedOrganizationIndex)
-            if (sortedIndex !== NxGlobals.invalidModelIndex()) {
+            if (sortedIndex !== NxGlobals.invalidModelIndex())
+            {
+                // Restrict tree to selected organization subtree only.
+                organizationTreeModel.sourceRoot = sortedIndex
+                leftSidebar.sortedOrganizationIndex = sortedIndex
+
                 // Expand the root organization.
                 organizationTreeModel.setSourceExpanded(sortedIndex, true)
 
                 const orgId = accessor.getData(sortedIndex, "nodeId")
                 if (orgId)
-                    leftSidebar.expandedNodeIds[orgId] = true
+                    leftSidebar.expandedNodeIds.add(orgId)
 
                 // Try to restore previous state for all nodes.
                 leftSidebar.restoreExpandedState()
             }
+        }
+        else
+        {
+            organizationTreeModel.sourceRoot = NxGlobals.invalidModelIndex()
+            leftSidebar.sortedOrganizationIndex = null
         }
     }
 

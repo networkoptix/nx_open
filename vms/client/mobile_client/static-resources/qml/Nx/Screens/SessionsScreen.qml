@@ -32,8 +32,9 @@ AdaptiveScreen
     property int selectedTab: OrganizationsModel.SitesTab
 
     property var rootType
+    readonly property string inPartnerOrOrgState: "inPartnerOrOrg"
     readonly property bool searching: !!siteList.searchText
-    readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
+    readonly property bool localSitesVisible: state !== inPartnerOrOrgState
         && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
 
     contentItem: sessionsScreenContent
@@ -51,10 +52,10 @@ AdaptiveScreen
 
     leftPanel
     {
-        title: rootIndex === NxGlobals.invalidModelIndex() ? "" : qsTr("Resources")
+        title: navigationPanel.selectedOrganizationIndex != null ? qsTr("Resources") : ""
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
-        interactive: rootIndex !== NxGlobals.invalidModelIndex()
+        interactive: navigationPanel.selectedOrganizationIndex != null
         item:
         {
             if (LayoutController.isTabletLayout
@@ -158,7 +159,7 @@ AdaptiveScreen
     customToolBarClickHandler: () =>
     {
         if (!LayoutController.isTabletLayout
-            && sessionsScreen.state === "inPartnerOrOrg"
+            && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
             && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
             && !breadcrumb.visible)
         {
@@ -459,12 +460,18 @@ AdaptiveScreen
         hasChannelPartners: organizationsModel.hasChannelPartners
         hasOrganizations: organizationsModel.hasOrganizations
         currentTab: sessionsScreen.selectedTab
-        onTabSelected: (selectedTabValue) => sessionsScreen.selectedTab = selectedTabValue
+        onTabSelected: (selectedTabValue) =>
+        {
+            sessionsScreen.selectedTab = selectedTabValue
+            // When inside a partner, tab click means "go back to the top-level tab view".
+            if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState)
+                goBack(NxGlobals.invalidModelIndex())
+        }
 
         organizationsModel: organizationsModel
         searchText: siteList.searchText
         selectedOrganizationIndex: {
-            if (sessionsScreen.state !== "inPartnerOrOrg")
+            if (sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState)
                 return null
 
             var idx = sessionsScreen.rootIndex
@@ -701,6 +708,11 @@ AdaptiveScreen
                     clip: true
                     showOnly:
                     {
+                        // Inside an org or folder the content is already scoped by sourceRoot/
+                        // currentRoot; tab-based type filtering must not apply here.
+                        if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState)
+                            return []
+
                         const onlySites = !organizationsModel.hasChannelPartners
                             && !organizationsModel.hasOrganizations
 
@@ -771,7 +783,7 @@ AdaptiveScreen
                     if ((sessionsScreen.state === "loggedIn"
                             && organizationsTabButton.checked
                             && cloudUserProfileWatcher.isOrgUser)
-                        || (sessionsScreen.state === "inPartnerOrOrg"
+                        || (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
                             && rootType == OrganizationsModel.ChannelPartner))
                     {
                         return {
@@ -781,7 +793,7 @@ AdaptiveScreen
                                 qsTr("Create an organization in the Cloud Portal to access it here")
                         }
                     }
-                    if (sessionsScreen.state === "inPartnerOrOrg"
+                    if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
                         && rootType == OrganizationsModel.Organization)
                     {
                         if (accessor.getData(sessionsScreen.rootIndex, "isAccessDenied") ?? false)
@@ -803,7 +815,7 @@ AdaptiveScreen
                             clickHandler: () => { cloudConnectionHelp.open() }
                         }
                     }
-                    if (sessionsScreen.state === "inPartnerOrOrg"
+                    if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
                         && rootType == OrganizationsModel.Folder)
                     {
                         return {
@@ -896,7 +908,7 @@ AdaptiveScreen
             {
                 id: systemTabsRowSkeleton
 
-                visible: sessionsScreen.state !== "inPartnerOrOrg"
+                visible: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
 
                 x: 20
                 y: 4
@@ -918,7 +930,7 @@ AdaptiveScreen
             Flow
             {
                 anchors.fill: parent
-                topPadding: sessionsScreen.state !== "inPartnerOrOrg" ? 64 : 16
+                topPadding: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState ? 64 : 16
                 leftPadding: 20
                 spacing: siteList.spacing
                 Repeater
@@ -1025,7 +1037,7 @@ AdaptiveScreen
 
         function onSearchTextChanged()
         {
-            if (sessionsScreen.state !== "inPartnerOrOrg")
+            if (sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState)
                 return
 
             const sourceRoot = sessionsScreen.searching
@@ -1138,7 +1150,7 @@ AdaptiveScreen
         if (!searchField.displayText)
             return
 
-        if (state === "inPartnerOrOrg")
+        if (state === inPartnerOrOrgState)
         {
             linearizationListModel.sourceRoot = sessionsScreen.rootIndex
             siteList.currentRoot = sessionsScreen.rootIndex

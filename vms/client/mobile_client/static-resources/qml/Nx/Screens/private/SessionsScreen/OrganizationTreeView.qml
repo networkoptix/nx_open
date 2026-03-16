@@ -22,6 +22,18 @@ Item
     property var currentSelectedNodeId
     property string searchText: ""
 
+    property var sortedOrganizationIndex: null
+    readonly property bool hasOrganization: sortedOrganizationIndex != null
+
+    // Tracks whether the root organization node is expanded in the sidebar.
+    property bool orgExpanded: true
+
+    onSortedOrganizationIndexChanged:
+    {
+        if (sortedOrganizationIndex != null)
+            orgExpanded = true
+    }
+
     signal nodeClicked(var nodeId)
     signal expandedChanged(var nodeId, bool expanded)
 
@@ -44,58 +56,110 @@ Item
         return NxGlobals.toHtmlEscaped(text)
     }
 
+    // Organization root item shown as the collapsible tree header.
+    TreeNodeItem
+    {
+        id: orgHeaderItem
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.topMargin: 20
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
+
+        visible: treeView.hasOrganization
+
+        nodeData: treeView.hasOrganization
+            ? ({
+                nodeId: treeView.accessor.getData(treeView.sortedOrganizationIndex, "nodeId"),
+                display: treeView.accessor.getData(treeView.sortedOrganizationIndex, "display"),
+                type: OrganizationsModel.Organization,
+                hasChildren: true,
+                expanded: treeView.orgExpanded,
+                level: 0
+            })
+            : null
+        isSelected: nodeData && nodeData.nodeId === treeView.currentSelectedNodeId
+
+        organizationsModel: treeView.organizationsModel
+        sortModel: treeView.sortModel
+        organizationTreeModel: treeView.organizationTreeModel
+        accessor: treeView.accessor
+
+        onNodeClicked: function(nodeId) { treeView.nodeClicked(nodeId) }
+        onExpandedToggled: function(nodeId, expanded) { treeView.orgExpanded = expanded }
+    }
+
     ScrollView
     {
-        anchors.fill: parent
-        anchors.topMargin: 20
+        anchors.top: treeView.hasOrganization ? orgHeaderItem.bottom : parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.topMargin: treeView.hasOrganization ? 4 : 20
         anchors.leftMargin: 20
         anchors.rightMargin: 20
         anchors.bottomMargin: 20
         clip: true
+
+        visible: !treeView.hasOrganization || treeView.orgExpanded
 
         ListView
         {
             id: treeListView
 
             model: treeView.organizationTreeModel
-            spacing: 4
+            // Spacing is handled by the wrapper Item below so that hidden nodes
+            // (System, SitesNode) do not contribute any gap.
+            spacing: 0
 
-            delegate: TreeNodeItem
+            delegate: Item
             {
+                id: delegateWrapper
+
                 width: treeListView.width
-                nodeData: model
-                isSelected: nodeData && nodeData.nodeId === treeView.currentSelectedNodeId
+                // Visible nodes get 4 px bottom gap; hidden nodes take no space at all.
+                height: nodeItem.visible ? nodeItem.implicitHeight + 4 : 0
 
-                organizationsModel: treeView.organizationsModel
-                sortModel: treeView.sortModel
-                organizationTreeModel: treeView.organizationTreeModel
-                accessor: treeView.accessor
+                TreeNodeItem
+                {
+                    id: nodeItem
 
-                // Hide SitesNode and Systems in the tree
-                visible: {
-                    if (!nodeData)
+                    width: parent.width
+                    nodeData: model
+                    // Shift level by 1 so folders appear indented under the org header.
+                    nodeLevel: (nodeData ? (nodeData.level || 0) : 0) + 1
+                    isSelected: nodeData && nodeData.nodeId === treeView.currentSelectedNodeId
+
+                    organizationsModel: treeView.organizationsModel
+                    sortModel: treeView.sortModel
+                    organizationTreeModel: treeView.organizationTreeModel
+                    accessor: treeView.accessor
+
+                    // Hide SitesNode and Systems in the tree
+                    visible: {
+                        if (!nodeData)
+                            return true
+
+                        const nodeType = nodeData.type
+
+                        if (nodeType === OrganizationsModel.SitesNode)
+                            return false
+
+                        if (nodeType === OrganizationsModel.System)
+                            return false
+
                         return true
+                    }
 
-                    const nodeType = nodeData.type
+                    onNodeClicked: function(nodeId) {
+                        treeView.nodeClicked(nodeId)
+                    }
 
-                    // Hide SitesNode
-                    if (nodeType === OrganizationsModel.SitesNode)
-                        return false
-
-                    // Hide all System nodes in the tree
-                    if (nodeType === OrganizationsModel.System)
-                        return false
-
-                    return true
-                }
-                height: visible ? implicitHeight : 0
-
-                onNodeClicked: function(nodeId) {
-                    treeView.nodeClicked(nodeId)
-                }
-
-                onExpandedToggled: function(nodeId, expanded) {
-                    treeView.expandedChanged(nodeId, expanded)
+                    onExpandedToggled: function(nodeId, expanded) {
+                        treeView.expandedChanged(nodeId, expanded)
+                    }
                 }
             }
         }
@@ -107,10 +171,10 @@ Item
         id: treeNode
 
         property var nodeData
-        property int nodeType: nodeData ? nodeData.type : OrganizationsModel.None
-        property int nodeLevel: nodeData ? (nodeData.level || 0) : 0
-        property bool hasChildren: nodeData ? (nodeData.hasChildren || false) : false
-        property bool isExpanded: nodeData ? (nodeData.expanded || false) : false
+        property int nodeType: nodeData?.type ?? OrganizationsModel.None
+        property int nodeLevel: nodeData?.level ?? 0
+        property bool hasChildren: nodeData?.hasChildren ?? false
+        property bool isExpanded: nodeData?.expanded ?? false
         property bool isSelected: false
 
         property var organizationsModel
@@ -126,8 +190,9 @@ Item
 
         background: Rectangle
         {
-            color: treeNode.isSelected ? ColorTheme.colors.dark10 :
-                   treeNode.hovered ? ColorTheme.colors.dark8 : "transparent"
+            color: treeNode.isSelected
+                ? ColorTheme.colors.dark10
+                : (treeNode.hovered ? ColorTheme.colors.dark8 : "transparent")
             radius: 4
         }
 
