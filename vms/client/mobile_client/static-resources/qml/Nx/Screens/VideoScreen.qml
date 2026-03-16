@@ -770,6 +770,7 @@ Page
                     implicitWidth: childrenRect.width
                     implicitHeight: childrenRect.height
                     enabled: controller.playingLive
+                    visible: actionSheet.hasActions
                 }
             }
         }

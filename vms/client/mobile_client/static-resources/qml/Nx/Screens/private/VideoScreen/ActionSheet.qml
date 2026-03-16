@@ -18,6 +18,7 @@ AdaptiveSheet
     property var externalVisualizerContainer
     property var externalButtonContainer
     property bool externalMode: actionButtons.count === 1
+    readonly property bool hasActions: actionButtons.count > 0
 
     title: qsTr("Actions")
     spacing: 24
@@ -47,7 +48,7 @@ AdaptiveSheet
         delegate: Button
         {
             id: delegate
-            
+
             readonly property bool prolonged: model.type === CameraButton.Type.prolonged
             readonly property string iconSource: model.iconPath
             readonly property string hintText: model.hint + model.name
