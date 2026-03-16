@@ -26,6 +26,7 @@ TreeViewDelegate
     readonly property bool isLayout: resourceHelper.isLayout
     readonly property bool isAllDevices: model.nodeType === ResourceTree.NodeType.allDevices
     readonly property bool isFolder: model.nodeType === ResourceTree.NodeType.customResourceGroup
+    readonly property bool isMultisensorGroup: model.nodeType === ResourceTree.NodeType.recorder
 
     readonly property int flags: (model && model.resourceExtraStatus) || 0
     readonly property string iconSource:
