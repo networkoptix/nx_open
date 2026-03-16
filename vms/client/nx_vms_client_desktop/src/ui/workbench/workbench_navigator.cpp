@@ -45,6 +45,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/layout_resource_helpers.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <nx/vms/client/desktop/utils/timezone_helper.h>
@@ -639,13 +640,21 @@ bool QnWorkbenchNavigator::setPlaying(bool playing)
 
         if (qFuzzyIsNull(speed()))
         {
-            const auto speed = cachedSpeed(m_currentMediaWidget);
-            setSpeed(qFuzzyIsNull(speed) ? 1.0 : speed);
+            auto speed = 1.0;
+            if (appContext()->localSettings()->savePlaybackSpeed())
+            {
+                if (auto cached = cachedSpeed(m_currentMediaWidget); !qFuzzyIsNull(cached))
+                    speed = cached;
+            }
+
+            setSpeed(speed);
         }
     }
     else
     {
-        cacheSpeed(speed(), m_currentMediaWidget);
+        if (appContext()->localSettings()->savePlaybackSpeed())
+            cacheSpeed(speed(), m_currentMediaWidget);
+
         reader->pauseMedia();
         setSpeed(0.0);
     }
