@@ -24,6 +24,13 @@ WebViewController* WebViewWidget::controller() const
     return d->controller.data();
 }
 
+bool WebViewWidget::focusNextPrevChild(bool /*next*/)
+{
+    // Don't let Tab/Shift+Tab escape from the web view.
+    // The web page should handle Tab navigation internally.
+    return false;
+}
+
 WebViewWidget::~WebViewWidget()
 {
 }

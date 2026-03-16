@@ -26,6 +26,9 @@ public:
 
     WebViewController* controller() const;
 
+protected:
+    virtual bool focusNextPrevChild(bool next) override;
+
 private:
     struct Private;
     QScopedPointer<Private> d;
