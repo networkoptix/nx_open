@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>チェックを外すと、マルチスレッドデコードが無効になります。チェックを入れると、自動選択が有効になります。</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>マルチスレッドデコードを許可する</translation>
     </message>
   </context>
   <context>
