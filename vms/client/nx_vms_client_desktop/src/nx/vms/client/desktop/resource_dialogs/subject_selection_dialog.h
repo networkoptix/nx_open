@@ -22,7 +22,6 @@ class SubjectSelectionDialog;
 } // namespace Ui
 
 namespace nx::vms::client::desktop {
-namespace ui {
 
 namespace subject_selection_dialog_private {
 
@@ -105,5 +104,4 @@ private:
     QnSubjectValidationPolicy* m_policy{nullptr};
 };
 
-} // namespace ui
 } // namespace nx::vms::client::desktop

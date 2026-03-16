@@ -24,12 +24,27 @@
 #include <ui/common/palette.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include "private/subject_selection_dialog_p.h"
+#include "details/subject_selection_dialog_p.h"
 
 using namespace nx::vms::common;
 
 namespace nx::vms::client::desktop {
-namespace ui {
+
+using namespace subject_selection_dialog_private;
+
+namespace {
+
+static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
+    {QnIcon::Normal, {.primary = "light10", .secondary="yellow"}},
+    {QnIcon::Selected, {.primary = "light4", .secondary="yellow"}}
+};
+
+NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
+    colorSubs)
+NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
+    colorSubs)
+
+} //  namespace
 
 SubjectSelectionDialog::CustomizableOptions
     SubjectSelectionDialog::CustomizableOptions::cloudUsers()
@@ -46,22 +61,6 @@ SubjectSelectionDialog::CustomizableOptions
     options.alertColor = core::colorTheme()->color("brand");
     return options;
 }
-
-namespace {
-
-static const core::SvgIconColorer::ThemeSubstitutions colorSubs = {
-    {QnIcon::Normal, {.primary = "light10", .secondary="yellow"}},
-    {QnIcon::Selected, {.primary = "light4", .secondary="yellow"}}
-};
-
-NX_DECLARE_COLORIZED_ICON(kGroupIcon, "20x20/Solid/group.svg",\
-    colorSubs)
-NX_DECLARE_COLORIZED_ICON(kGroupAlertIcon, "20x20/Solid/group_alert.svg",\
-    colorSubs)
-
-} //  namespace
-
-using namespace subject_selection_dialog_private;
 
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
@@ -432,5 +431,4 @@ void SubjectSelectionDialog::showAlert(const QString& text)
     ui->alertBar->setText(text);
 }
 
-} // namespace ui
 } // namespace nx::vms::client::desktop

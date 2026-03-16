@@ -13,13 +13,13 @@
 #include <nx/vms/client/desktop/common/models/natural_string_sort_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
-#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/user_roles_model.h>
 
+#include "../subject_selection_dialog.h"
+
 namespace nx::vms::client::desktop {
-namespace ui {
 namespace subject_selection_dialog_private {
 
 //-------------------------------------------------------------------------------------------------
@@ -162,5 +162,4 @@ protected:
 //-------------------------------------------------------------------------------------------------
 
 } // namespace subject_selection_dialog_private
-} // namespace ui
 } // namespace nx::vms::client::desktop

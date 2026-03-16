@@ -2,15 +2,11 @@
 
 #pragma once
 
-#include <functional>
-
 #include <QtCore/QScopedPointer>
-#include <QtGui/QValidator>
-#include <QtWidgets/QStyledItemDelegate>
 
 #include <core/resource/resource_fwd.h>
-#include <ui/dialogs/common/session_aware_dialog.h>
 #include <nx/utils/uuid.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnResourceListModel;
 

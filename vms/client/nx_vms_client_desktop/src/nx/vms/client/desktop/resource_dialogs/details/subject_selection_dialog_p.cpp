@@ -22,6 +22,9 @@
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <ui/models/user_roles_model.h>
 
+namespace nx::vms::client::desktop {
+namespace subject_selection_dialog_private {
+
 namespace {
 
 int countEnabledUsers(const auto& subjects)
@@ -49,10 +52,6 @@ NX_DECLARE_COLORIZED_ICON(kGroupDefaultIcon, "20x20/Solid/group_default.svg",\
     colorSubs)
 
 } // namespace
-
-namespace nx::vms::client::desktop {
-namespace ui {
-namespace subject_selection_dialog_private {
 
 //-------------------------------------------------------------------------------------------------
 // subject_selection_dialog_private::RoleListModel
@@ -476,8 +475,5 @@ QnResourceItemDelegate::ItemState UserListDelegate::itemState(const QModelIndex&
     return base_type::itemState(index);
 }
 
-//-------------------------------------------------------------------------------------------------
-
 } // namespace subject_selection_dialog_private
-} // namespace ui
 } // namespace nx::vms::client::desktop

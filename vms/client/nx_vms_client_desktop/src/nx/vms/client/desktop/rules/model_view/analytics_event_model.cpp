@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "analytics_sdk_event_model.h"
+#include "analytics_event_model.h"
 
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
@@ -9,10 +9,9 @@
 #include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/system_context.h>
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::rules {
 
-AnalyticsSdkEventModel::AnalyticsSdkEventModel(
+AnalyticsEventModel::AnalyticsEventModel(
     SystemContext* systemContext,
     QObject* parent)
     :
@@ -21,11 +20,11 @@ AnalyticsSdkEventModel::AnalyticsSdkEventModel(
 {
 }
 
-AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
+AnalyticsEventModel::~AnalyticsEventModel()
 {
 }
 
-void AnalyticsSdkEventModel::loadFromCameras(
+void AnalyticsEventModel::loadFromCameras(
         const QnVirtualCameraResourceList& cameras,
         nx::Uuid engineId,
         QString eventTypeId)
@@ -73,7 +72,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
     addItemRecursive(/*parent*/ nullptr, root);
 }
 
-bool AnalyticsSdkEventModel::isValid() const
+bool AnalyticsEventModel::isValid() const
 {
     const auto items = match(
         index(0, 0),
@@ -85,5 +84,4 @@ bool AnalyticsSdkEventModel::isValid() const
     return items.size() > 0;
 }
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::rules

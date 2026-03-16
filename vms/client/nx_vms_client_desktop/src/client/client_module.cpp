@@ -23,7 +23,6 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crash_dump/systemexcept.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager_factory.h>
@@ -73,7 +72,6 @@ struct QnClientModule::Private
     std::unique_ptr<core::AnalyticsSettingsManager> analyticsSettingsManager;
     std::unique_ptr<core::analytics::AnalyticsMetadataProviderFactory> analyticsMetadataProviderFactory;
     std::unique_ptr<LicenseHealthWatcher> licenseHealthWatcher;
-    std::unique_ptr<core::analytics::AttributeHelper> analyticsAttributeHelper;
     std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
     std::unique_ptr<DebugInfoStorage> debugInfoStorage;
 };

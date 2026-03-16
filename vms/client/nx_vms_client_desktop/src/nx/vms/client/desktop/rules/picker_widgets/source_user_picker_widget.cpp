@@ -6,8 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/resource_dialogs/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <ui/widgets/select_resources_button.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -33,15 +33,12 @@ SourceUserPicker::SourceUserPicker(
 
 void SourceUserPicker::onSelectButtonClicked()
 {
-    auto dialog = createSelfDestructingDialog<ui::SubjectSelectionDialog>(this);
+    auto dialog = createSelfDestructingDialog<SubjectSelectionDialog>(this);
     dialog->setCheckedSubjects(m_field->ids());
     dialog->setAllUsers(m_field->acceptAll());
     dialog->setValidationPolicy(m_validationPolicy.get());
 
-    connect(
-        dialog,
-        &ui::SubjectSelectionDialog::finished,
-        this,
+    connect(dialog, &SubjectSelectionDialog::finished, this,
         [this, dialog](int result)
         {
             if (result == QDialog::Accepted)

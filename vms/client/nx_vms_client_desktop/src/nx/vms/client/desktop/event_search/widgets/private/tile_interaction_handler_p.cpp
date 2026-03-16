@@ -44,6 +44,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
+#include <nx/vms/client/desktop/event_search/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/menu/action.h>
@@ -51,7 +52,6 @@
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/utils/context_utils.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>

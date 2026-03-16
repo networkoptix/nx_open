@@ -15,7 +15,7 @@
 #include <nx/vms/client/core/thumbnails/generic_image_store.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
-#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
+#include <nx/vms/client/desktop/event_search/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
 
 namespace nx::vms::client::desktop {

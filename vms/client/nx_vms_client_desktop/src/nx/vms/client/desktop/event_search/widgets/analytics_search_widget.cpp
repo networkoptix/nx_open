@@ -53,12 +53,12 @@
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/qml_helpers.h>
+#include <nx/vms/client/desktop/analytics/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/item_model_menu.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
-#include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -158,7 +158,7 @@ private:
     SelectableTextButton* const m_engineSelectionButton;
     SelectableTextButton* const m_typeSelectionButton;
     AnalyticsFilterModel* const m_filterModel;
-    DetectableObjectTypeModel* const m_objectTypeModel;
+    analytics::DetectableObjectTypeModel* const m_objectTypeModel;
     QMenu* const m_engineMenu;
     ItemModelMenu* const m_objectTypeMenu;
     QCollator m_collator;
@@ -235,7 +235,7 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     m_engineSelectionButton(q->createCustomFilterButton()),
     m_typeSelectionButton(q->createCustomFilterButton()),
     m_filterModel(new AnalyticsFilterModel(taxonomyManager, this)),
-    m_objectTypeModel(new DetectableObjectTypeModel(m_filterModel, this)),
+    m_objectTypeModel(new analytics::DetectableObjectTypeModel(m_filterModel, this)),
     m_engineMenu(q->createDropdownMenu()),
     m_objectTypeMenu(new ItemModelMenu(q))
 {
@@ -466,7 +466,7 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
         [this](const QModelIndex& index)
         {
             QString typeId = index.isValid()
-                ? index.data(DetectableObjectTypeModel::MainIdRole).toString()
+                ? index.data(analytics::DetectableObjectTypeModel::MainIdRole).toString()
                 : QString();
 
             m_analyticsSetup->setObjectType(typeId);

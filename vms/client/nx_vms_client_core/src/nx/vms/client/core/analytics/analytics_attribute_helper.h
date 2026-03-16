@@ -15,6 +15,7 @@ class AbstractStateWatcher;
 
 namespace nx::vms::client::core::analytics {
 
+/** Preprocessed attribute value suitable for UI display. */
 struct NX_VMS_CLIENT_CORE_API Attribute
 {
     QString id;

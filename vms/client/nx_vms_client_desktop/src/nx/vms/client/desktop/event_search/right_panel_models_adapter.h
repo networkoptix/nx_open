@@ -8,14 +8,13 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/event_search/utils/analytics_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/attribute_display_manager.h")
-Q_MOC_INCLUDE("nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h")
+Q_MOC_INCLUDE("nx/vms/client/desktop/analytics/detectable_object_type_model.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/event_search/utils/common_object_search_setup.h")
 Q_MOC_INCLUDE("nx/vms/client/desktop/window_context.h")
 
@@ -27,10 +26,15 @@ namespace nx::vms::client::core::analytics::taxonomy { class AnalyticsFilterMode
 
 namespace nx::vms::client::desktop {
 
+namespace analytics { class DetectableObjectTypeModel; }
+
 class CommonObjectSearchSetup;
-class DetectableObjectTypeModel;
 class WindowContext;
 
+/**
+ * God-class for accessing Analytics models & search setup, primarily used by Advanced object
+ * search QML dialog.
+ */
 class RightPanelModelsAdapter: public QIdentityProxyModel
 {
     Q_OBJECT
@@ -56,7 +60,7 @@ class RightPanelModelsAdapter: public QIdentityProxyModel
     Q_PROPERTY(nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel*
         analyticsFilterModel READ analyticsFilterModel NOTIFY analyticsSetupChanged)
 
-    Q_PROPERTY(nx::vms::client::desktop::DetectableObjectTypeModel*
+    Q_PROPERTY(nx::vms::client::desktop::analytics::DetectableObjectTypeModel*
         objectTypeModel READ objectTypeModel NOTIFY analyticsSetupChanged)
 
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
@@ -110,7 +114,7 @@ public:
     core::AnalyticsSearchSetup* analyticsSetup() const;
 
     nx::vms::client::core::analytics::taxonomy::AnalyticsFilterModel* analyticsFilterModel() const;
-    DetectableObjectTypeModel* objectTypeModel() const;
+    analytics::DetectableObjectTypeModel* objectTypeModel() const;
 
     int itemCount() const;
     QString itemCountText() const;

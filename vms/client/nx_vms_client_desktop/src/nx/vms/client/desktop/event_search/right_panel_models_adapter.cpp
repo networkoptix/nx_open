@@ -24,7 +24,6 @@
 #include <nx/analytics/taxonomy/object_type.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/metatypes.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/scope_guard.h>
@@ -32,7 +31,6 @@
 #include <nx/utils/string.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
-#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
@@ -49,9 +47,9 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/analytics/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
-#include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/bookmark_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/models/notification_tab_model.h>
@@ -81,7 +79,7 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
-#include "analytics_event_model.h"
+#include "models/analytics_event_model.h"
 
 namespace nx::vms::client::desktop {
 
@@ -184,7 +182,7 @@ public:
     CommonObjectSearchSetup* commonSetup() const { return m_commonSetup; }
     core::AnalyticsSearchSetup* analyticsSetup() const { return m_analyticsSetup.get(); }
     QAbstractItemModel* analyticsEvents() const { return m_analyticsEvents.get(); }
-    DetectableObjectTypeModel* objectTypeModel() const { return m_objectTypeModel; }
+    analytics::DetectableObjectTypeModel* objectTypeModel() const { return m_objectTypeModel; }
 
     void setAutoClosePaused(int row, bool value);
 
@@ -283,7 +281,7 @@ private:
     nx::vms::event::Level m_unreadImportance = nx::vms::event::Level::none;
     bool m_unreadTrackingEnabled = false;
 
-    DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
+    analytics::DetectableObjectTypeModel* m_objectTypeModel = nullptr; //< Owned by `m_analyticsSetup`.
 
     std::unique_ptr<AnalyticsEventModel> m_analyticsEvents;
 
@@ -358,7 +356,7 @@ core::AnalyticsSearchSetup* RightPanelModelsAdapter::analyticsSetup() const
     return d->analyticsSetup();
 }
 
-DetectableObjectTypeModel* RightPanelModelsAdapter::objectTypeModel() const
+analytics::DetectableObjectTypeModel* RightPanelModelsAdapter::objectTypeModel() const
 {
     return d->objectTypeModel();
 }
@@ -717,7 +715,8 @@ void RightPanelModelsAdapter::registerQmlTypes()
     qmlRegisterUncreatableType<CommonObjectSearchSetup>("nx.vms.client.desktop", 1, 0,
         "CommonObjectSearchSetup", "Cannot create instance of CommonObjectSearchSetup");
 
-    qmlRegisterUncreatableType<DetectableObjectTypeModel>("nx.vms.client.desktop.analytics", 1, 0,
+    qmlRegisterUncreatableType<analytics::DetectableObjectTypeModel>(
+        "nx.vms.client.desktop.analytics", 1, 0,
         "ObjectTypeModel", "Cannot create instance of ObjectTypeModel");
 }
 
@@ -1036,7 +1035,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
                 m_context->system()->taxonomyManager()->createFilterModel(
                     /*parent*/ m_analyticsSetup.get());
 
-            m_objectTypeModel = new DetectableObjectTypeModel(analyticsFilterModel,
+            m_objectTypeModel = new analytics::DetectableObjectTypeModel(analyticsFilterModel,
                 /*parent*/ m_analyticsSetup.get());
 
             m_modelConnections << connect(

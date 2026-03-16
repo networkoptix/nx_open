@@ -6,8 +6,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource_dialogs/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/rules/action_builder_fields/event_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/flag_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
@@ -62,7 +62,7 @@ TargetUserPicker::TargetUserPicker(
 
 void TargetUserPicker::onSelectButtonClicked()
 {
-    auto dialog = createSelfDestructingDialog<ui::SubjectSelectionDialog>(this);
+    auto dialog = createSelfDestructingDialog<SubjectSelectionDialog>(this);
 
     bool isValidationPolicyRequired = true;
     if (auto acknowledgeField =
@@ -109,10 +109,7 @@ void TargetUserPicker::onSelectButtonClicked()
     dialog->setCheckedSubjects(m_field->ids());
     dialog->setAllUsers(m_field->acceptAll());
 
-    connect(
-        dialog,
-        &ui::SubjectSelectionDialog::finished,
-        this,
+    connect(dialog, &SubjectSelectionDialog::finished, this,
         [this, dialog](int result)
         {
             if (result == QDialog::Accepted)

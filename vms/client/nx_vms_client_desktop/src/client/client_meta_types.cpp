@@ -37,6 +37,7 @@
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
 #include <nx/vms/client/desktop/debug_utils/dialogs/joystick_investigation_wizard/joystick_manager.h>
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
+#include <nx/vms/client/desktop/event_search/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/event_search/utils/call_alarm_manager.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
@@ -84,7 +85,6 @@
 #include <nx/vms/client/desktop/ui/common/item_grabber.h>
 #include <nx/vms/client/desktop/ui/common/keyboard_modifiers.h>
 #include <nx/vms/client/desktop/ui/common/whats_this.h>
-#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/ui/scene/item_model_utils.h>
 #include <nx/vms/client/desktop/ui/scene/models/layout_model.h>

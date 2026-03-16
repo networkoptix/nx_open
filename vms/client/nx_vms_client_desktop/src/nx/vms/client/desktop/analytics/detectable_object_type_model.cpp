@@ -11,7 +11,7 @@
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::analytics {
 
 using namespace nx::analytics::taxonomy;
 using namespace nx::vms::client::core::analytics::taxonomy;
@@ -169,4 +169,4 @@ AnalyticsFilterModel* DetectableObjectTypeModel::sourceModel() const
     return d->filterModel;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::analytics

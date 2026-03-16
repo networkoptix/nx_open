@@ -5,9 +5,9 @@
 #include <nx/analytics/taxonomy/object_type.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
+#include <nx/vms/client/desktop/analytics/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/taxonomy_test_data.h>
 #include <nx/vms/client/desktop/analytics/taxonomy/test_support/test_resource_support_proxy.h>
-#include <nx/vms/client/desktop/event_rules/models/detectable_object_type_model.h>
 #include <nx/vms/client/desktop/test_support/test_context.h>
 
 namespace nx::vms::client::desktop::analytics::taxonomy {

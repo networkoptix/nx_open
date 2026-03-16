@@ -6,8 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-namespace nx::vms::client::desktop::ui {
+namespace nx::vms::client::desktop::rules {
 
+/** List model of Integration diagnostic event types available for selected devices.*/
 class PluginDiagnosticEventModel: public QStandardItemModel
 {
     Q_OBJECT
@@ -26,4 +27,4 @@ public:
     bool isValid() const;
 };
 
-} // namespace nx::vms::client::desktop::ui
+} // namespace nx::vms::client::desktop::rules

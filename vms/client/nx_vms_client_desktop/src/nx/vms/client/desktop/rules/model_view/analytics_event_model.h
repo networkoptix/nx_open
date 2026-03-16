@@ -9,10 +9,10 @@
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/event/event_parameters.h>
 
-namespace nx::vms::client::desktop {
-namespace ui {
+namespace nx::vms::client::desktop::rules {
 
-class AnalyticsSdkEventModel:
+/** Tree model of all Analytics event types available for selected devices.*/
+class AnalyticsEventModel:
     public QStandardItemModel,
     public SystemContextAware
 {
@@ -24,8 +24,8 @@ public:
         ValidEventRole,
     };
 
-    AnalyticsSdkEventModel(SystemContext* systemContext, QObject* parent = nullptr);
-    ~AnalyticsSdkEventModel();
+    AnalyticsEventModel(SystemContext* systemContext, QObject* parent = nullptr);
+    ~AnalyticsEventModel();
 
     void loadFromCameras(
         const QnVirtualCameraResourceList& cameras,
@@ -35,5 +35,4 @@ public:
     bool isValid() const;
 };
 
-} // namespace ui
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::rules

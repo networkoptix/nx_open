@@ -33,7 +33,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
-#include <nx/vms/client/desktop/ui/right_panel/models/right_panel_models_adapter.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/widgets/main_window.h>
 #include <ui/workbench/workbench_context.h>

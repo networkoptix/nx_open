@@ -12,7 +12,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/reflect/enum_instrument.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/descriptors_fwd.h>
 #include <nx/vms/client/core/system_context_aware.h>
 
 namespace nx::vms::client::core {
@@ -46,13 +46,6 @@ public:
         /** Can contain group id, event type id or object type id. */
         EntityTypeId entityId;
         std::vector<NodePtr> children;
-
-        explicit Node(NodeType nodeType, QWeakPointer<Node> parent, const QString& text = QString()):
-            nodeType(nodeType),
-            parent(parent),
-            text(text)
-        {
-        }
     };
 
     struct UnresolvedEntity
@@ -137,29 +130,6 @@ private:
     // This future should be destroyed before the mutex.
     using EventTypesTreeFuture = QFuture<void>;
     EventTypesTreeFuture eventTypesTreeFuture;
-};
-
-class AnalyticsObjectsSearchTreeBuilder:
-    public QObject,
-    public SystemContextAware
-{
-    Q_OBJECT
-    using base_type = QObject;
-
-public:
-    explicit AnalyticsObjectsSearchTreeBuilder(
-        SystemContext* systemContext,
-        QObject* parent = nullptr);
-
-    /**
-     * Tree of the Object type ids. Root nodes are Engines, then Groups and Object types as leaves.
-     * Includes all Object types, which can theoretically be available in the System, so all
-     * compatible Engines are used. Empty Groups and Engines are removed from the output.
-     */
-    AnalyticsEntitiesTreeBuilder::NodePtr objectTypesTree() const;
-
-signals:
-    void objectTypesTreeChanged();
 };
 
 } // namespace nx::vms::client::core

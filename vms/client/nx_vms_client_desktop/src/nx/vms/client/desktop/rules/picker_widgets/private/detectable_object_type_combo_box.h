@@ -5,9 +5,7 @@
 #include <nx/utils/uuid.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
-namespace nx::vms::client::desktop {
-
-class DetectableObjectTypeModel;
+namespace nx::vms::client::desktop::rules {
 
 /**
  * A combo box to select an analytics detectable object type from those available in the system.
@@ -28,4 +26,4 @@ public:
     void setSelectedMainObjectTypeId(const QString& objectTypeId);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::desktop::rules

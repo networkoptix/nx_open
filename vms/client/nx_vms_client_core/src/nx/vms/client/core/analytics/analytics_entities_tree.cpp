@@ -9,15 +9,10 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/helpers.h>
 #include <nx/analytics/taxonomy/state_helper.h>
-#include <nx/analytics/taxonomy/state_watcher.h>
-#include <nx/utils/data_structures/map_helper.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/rule_manager.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_type_field.h>
@@ -115,49 +110,6 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<EventType>>& eventType
                 eventType->engineId = engineId;
                 eventType->entityId = taxonomyEventType->id();
                 parentNode->children.push_back(eventType);
-            }
-        }
-    }
-
-    return AnalyticsEntitiesTreeBuilder::cleanupTree(root);
-}
-
-NodePtr buildObjectTypesTree(const std::vector<EngineScope<ObjectType>>& objectTypeTree)
-{
-    auto root = makeNode(NodeType::root, {});
-
-    for (const EngineScope<ObjectType>& engineScope: objectTypeTree)
-    {
-        const AbstractEngine* taxonomyEngine = engineScope.engine;
-        if (!NX_ASSERT(taxonomyEngine))
-            continue;
-
-        const nx::Uuid engineId = nx::Uuid::fromStringSafe(taxonomyEngine->id());
-        auto engine = makeNode(NodeType::engine, root, taxonomyEngine->name());
-        engine->engineId = engineId;
-        root->children.push_back(engine);
-
-        for (const GroupScope<ObjectType>& groupScope: engineScope.groups)
-        {
-            NodePtr parentNode = engine;
-
-            const AbstractGroup* taxonomyGroup = groupScope.group;
-            if (taxonomyGroup)
-            {
-                auto group = makeNode(NodeType::group, parentNode, taxonomyGroup->name());
-                group->engineId = engineId;
-                group->entityId = taxonomyGroup->id();
-                engine->children.push_back(group);
-                parentNode = group;
-            }
-
-            for (const ObjectType* taxonomyObjectType: groupScope.entities)
-            {
-                auto objectType = makeNode(
-                    NodeType::objectType, parentNode, taxonomyObjectType->name());
-                objectType->engineId = engineId;
-                objectType->entityId = taxonomyObjectType->id();
-                parentNode->children.push_back(objectType);
             }
         }
     }
@@ -441,58 +393,6 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
         {
             return actuallyUsedEventTypes.contains(node->entityId);
         });
-}
-
-//-------------------------------------------------------------------------------------------------
-// AnalyticsObjectsSearchTreeBuilder class
-
-AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(
-    SystemContext* systemContext,
-    QObject* parent)
-    :
-    base_type(parent),
-    SystemContextAware(systemContext)
-{
-    auto notifyAboutResourceListChanges =
-        [this](const QnResourceList& resources)
-        {
-            if (std::ranges::any_of(resources, &isManageableResource))
-                emit objectTypesTreeChanged();
-        };
-
-    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(
-        systemContext,
-        this);
-    genericResourceListener->setOnAddedHandler(notifyAboutResourceListChanges);
-    genericResourceListener->setOnRemovedHandler(notifyAboutResourceListChanges);
-    genericResourceListener->start();
-
-    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(
-        systemContext,
-        this);
-    camerasListener->addOnSignalHandler(
-        &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged,
-        [this](auto /*param*/) { emit objectTypesTreeChanged(); });
-    camerasListener->start();
-
-    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(
-        systemContext,
-        this);
-    serversListener->addOnSignalHandler(
-        &QnMediaServerResource::analyticsDescriptorsChanged,
-        [this](auto /*param*/) { emit objectTypesTreeChanged(); });
-    serversListener->start();
-}
-
-AnalyticsEntitiesTreeBuilder::NodePtr AnalyticsObjectsSearchTreeBuilder::objectTypesTree() const
-{
-    const auto devices = resourcePool()->getAllCameras(nx::Uuid(), /*ignoreDesktopCameras*/ true);
-    const std::shared_ptr<AbstractState> taxonomyState = systemContext()->analyticsTaxonomyState();
-    if (!taxonomyState)
-        return NodePtr();
-
-    StateHelper stateHelper(taxonomyState);
-    return buildObjectTypesTree(stateHelper.compatibleObjectTypeTreeUnion(devices));
 }
 
 } // namespace nx::vms::client::core

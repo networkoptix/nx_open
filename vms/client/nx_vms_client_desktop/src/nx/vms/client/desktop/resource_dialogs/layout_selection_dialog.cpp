@@ -13,15 +13,15 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
 #include <nx/vms/client/desktop/common/models/customizable_sort_filter_proxy_model.h>
 #include <nx/vms/client/desktop/common/utils/item_view_utils.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <ui/common/indents.h>
+#include <ui/models/resource/resource_list_model.h>
 #include <utils/common/scoped_painter_rollback.h>
-
-#include "private/subject_selection_dialog_p.h"
 
 namespace nx::vms::client::desktop {
 

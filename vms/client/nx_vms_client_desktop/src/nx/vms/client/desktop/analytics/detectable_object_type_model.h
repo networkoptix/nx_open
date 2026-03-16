@@ -2,20 +2,16 @@
 
 #pragma once
 
-#include <QtCore/QAbstractListModel>
-
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
 
-Q_MOC_INCLUDE("nx/vms/client/core/analytics/analytics_filter_model.h")
-
 namespace nx::analytics::taxonomy { class AbstractEngine; }
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::desktop::analytics {
 
 /**
- * An item model providing a tree of analytics detectable object types available in the system.
+ * Tree item model of Analytics object types available on Site and visible to user.
  */
 class NX_VMS_CLIENT_DESKTOP_API DetectableObjectTypeModel: public ScopedModelOperations<QAbstractItemModel>
 {
@@ -57,4 +53,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::client::desktop::analytics

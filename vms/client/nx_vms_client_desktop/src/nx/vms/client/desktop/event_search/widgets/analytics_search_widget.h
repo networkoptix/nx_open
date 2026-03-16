@@ -11,7 +11,7 @@ namespace nx::vms::client::core { class AnalyticsSearchSetup; }
 
 namespace nx::vms::client::desktop {
 
-
+/** Filter set for Analytics objects panel. */
 class AnalyticsSearchWidget: public AbstractSearchWidget
 {
     Q_OBJECT

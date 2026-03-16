@@ -8,12 +8,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
-#include <nx/vms/client/desktop/event_rules/widgets/detectable_object_type_combo_box.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/ui/event_rules/models/analytics_sdk_event_model.h>
-#include <nx/vms/client/desktop/ui/event_rules/models/plugin_diagnostic_event_model.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/rules/event_filter_fields/analytics_engine_field.h>
 #include <nx/vms/rules/event_filter_fields/analytics_event_type_field.h>
@@ -22,9 +19,12 @@
 #include <nx/vms/rules/utils/field.h>
 #include <ui/widgets/common/tree_combo_box.h>
 
+#include "../model_view/analytics_event_model.h"
+#include "../model_view/plugin_diagnostic_event_model.h"
 #include "../utils/strings.h"
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
+#include "private/detectable_object_type_combo_box.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -100,7 +100,7 @@ public:
         :
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>(
             field, context, parent),
-        m_pluginDiagnosticEventModel{new ui::PluginDiagnosticEventModel(this)}
+        m_pluginDiagnosticEventModel{new PluginDiagnosticEventModel(this)}
     {
         m_comboBox->setModel(m_pluginDiagnosticEventModel);
     }
@@ -109,7 +109,7 @@ protected:
     void onActivated() override
     {
         m_field->setValue(
-            m_comboBox->currentData(ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
+            m_comboBox->currentData(PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>());
 
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEngineField, QnTreeComboBox>::onActivated();
     }
@@ -129,14 +129,14 @@ protected:
         {
             pluginId = m_comboBox->itemData(
                 0,
-                ui::PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>();
+                PluginDiagnosticEventModel::PluginIdRole).value<nx::Uuid>();
         }
 
         auto pluginListModel = m_comboBox->model();
 
         auto items = pluginListModel->match(
             pluginListModel->index(0, 0),
-            ui::PluginDiagnosticEventModel::PluginIdRole,
+            PluginDiagnosticEventModel::PluginIdRole,
             /*value*/ QVariant::fromValue(pluginId),
             /*hits*/ 1,
             Qt::MatchExactly | Qt::MatchRecursive);
@@ -146,7 +146,7 @@ protected:
     }
 
 private:
-    ui::PluginDiagnosticEventModel* m_pluginDiagnosticEventModel{nullptr};
+    PluginDiagnosticEventModel* m_pluginDiagnosticEventModel{nullptr};
 };
 
 class AnalyticsEventTypePicker: public DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>
@@ -161,7 +161,7 @@ public:
         :
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>(
             field, context, parent),
-        m_analyticsSdkEventModel(new ui::AnalyticsSdkEventModel(systemContext(), this))
+        m_analyticsSdkEventModel(new AnalyticsEventModel(systemContext(), this))
     {
         m_hintButton->addHintLine(tr("Analytics events can be set up on a certain cameras."));
         m_hintButton->addHintLine(
@@ -192,9 +192,9 @@ protected:
     void onActivated() override
     {
         m_engineId =
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>();
+            m_comboBox->currentData(AnalyticsEventModel::EngineIdRole).value<nx::Uuid>();
         m_field->setTypeId(
-            m_comboBox->currentData(ui::AnalyticsSdkEventModel::EventTypeIdRole).value<QString>());
+            m_comboBox->currentData(AnalyticsEventModel::EventTypeIdRole).value<QString>());
 
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>::onActivated();
     }
@@ -209,7 +209,7 @@ protected:
         const auto analyticsModel = m_comboBox->model();
         auto items = analyticsModel->match(
             analyticsModel->index(0, 0),
-            ui::AnalyticsSdkEventModel::EventTypeIdRole,
+            AnalyticsEventModel::EventTypeIdRole,
             /*value*/ QVariant::fromValue(m_field->typeId()),
             /*hits*/ 1,
             Qt::MatchExactly | Qt::MatchRecursive);
@@ -219,7 +219,7 @@ protected:
     }
 
 private:
-    ui::AnalyticsSdkEventModel* m_analyticsSdkEventModel{nullptr};
+    AnalyticsEventModel* m_analyticsSdkEventModel{nullptr};
     nx::Uuid m_engineId;
 
     void onSelectedCamerasChanged()
@@ -238,7 +238,7 @@ private:
             const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(
                 analyticsModel->index(0, 0),
-                ui::AnalyticsSdkEventModel::ValidEventRole,
+                AnalyticsEventModel::ValidEventRole,
                 /*value*/ QVariant::fromValue(true),
                 /*hits*/ 10,
                 Qt::MatchExactly | Qt::MatchRecursive);
@@ -247,9 +247,9 @@ private:
             {
                 const auto firstItem = selectableItems.first();
                 m_field->setTypeId(
-                    firstItem.data(ui::AnalyticsSdkEventModel::EventTypeIdRole).toString());
+                    firstItem.data(AnalyticsEventModel::EventTypeIdRole).toString());
                 m_engineId =
-                    firstItem.data(ui::AnalyticsSdkEventModel::EngineIdRole).value<nx::Uuid>();
+                    firstItem.data(AnalyticsEventModel::EngineIdRole).value<nx::Uuid>();
             }
         }
     }

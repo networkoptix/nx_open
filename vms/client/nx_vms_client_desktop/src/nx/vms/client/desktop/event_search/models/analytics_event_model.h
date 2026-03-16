@@ -12,6 +12,7 @@ namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
 
 namespace nx::vms::client::desktop {
 
+/** Tree model of analytics event types used in current set of VMS Rules. */
 class AnalyticsEventModel: public ScopedModelOperations<QAbstractItemModel>
 {
     Q_OBJECT
