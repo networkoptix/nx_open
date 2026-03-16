@@ -118,11 +118,37 @@ class TextLookupFieldTest: public LookupFieldTestBase
 {
 };
 
+TEST_F(TextLookupFieldTest, disabledLookupList)
+{
+    const auto listId = makeAndRegisterList();
+
+    TextLookupField field{systemContext(), &kDummyDescriptor};
+    field.setValue(listId.toSimpleString());
+
+    // If field is disabled it will always return true
+    field.setCheckType(TextLookupCheckType::inList);
+    ASSERT_TRUE(field.match(QString{}));
+    ASSERT_TRUE(field.match(QString{"foo"}));
+
+    field.setCheckType(TextLookupCheckType::notInList);
+    ASSERT_TRUE(field.match(QString{}));
+    ASSERT_TRUE(field.match(QString{"foo"}));
+
+    field.setCheckType(TextLookupCheckType::containsKeywords);
+    ASSERT_TRUE(field.match(QString{}));
+    ASSERT_TRUE(field.match(QString{"foo"}));
+
+    field.setCheckType(TextLookupCheckType::doesNotContainKeywords);
+    ASSERT_TRUE(field.match(QString{}));
+    ASSERT_TRUE(field.match(QString{"foo"}));
+}
+
 TEST_F(TextLookupFieldTest, emptyLookupList)
 {
     const auto listId = makeAndRegisterList();
 
     TextLookupField field{systemContext(), &kDummyDescriptor};
+    field.setEnabled(true);
     field.setValue(listId.toSimpleString());
 
     field.setCheckType(TextLookupCheckType::inList);
@@ -155,6 +181,7 @@ TEST_F(TextLookupFieldTest, emptyKeywords)
 TEST_F(TextLookupFieldTest, lookupInKeywordsWorksProperly)
 {
     TextLookupField field{systemContext(), &kDummyDescriptor};
+    field.setEnabled(true);
     field.setValue("foo bar");
 
     field.setCheckType(TextLookupCheckType::containsKeywords);
@@ -186,6 +213,7 @@ TEST_F(TextLookupFieldTest, lookupInListWorksProperly)
         });
 
     TextLookupField field{systemContext(), &kDummyDescriptor};
+    field.setEnabled(true);
     field.setValue(listId.toSimpleString());
 
     field.setCheckType(TextLookupCheckType::inList);

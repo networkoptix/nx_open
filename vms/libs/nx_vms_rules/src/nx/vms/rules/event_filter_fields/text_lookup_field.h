@@ -19,6 +19,7 @@ class NX_VMS_RULES_API TextLookupField:
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
     Q_PROPERTY(TextLookupCheckType checkType READ checkType WRITE setCheckType NOTIFY checkTypeChanged)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
 
 public:
     TextLookupField(common::SystemContext* context, const FieldDescriptor* descriptor);
@@ -33,16 +34,21 @@ public:
     TextLookupCheckType checkType() const;
     void setCheckType(TextLookupCheckType type);
 
+    bool isEnabled() const;
+    void setEnabled(bool enabled);
+
     bool match(const QVariant& eventValue) const override;
     static QJsonObject openApiDescriptor(const QVariantMap& properties);
 
 signals:
     void valueChanged();
     void checkTypeChanged();
+    void enabledChanged();
 
 private:
     QString m_value;
     TextLookupCheckType m_checkType{TextLookupCheckType::containsKeywords};
+    bool m_enabled{false};
     mutable std::optional<QStringList> m_list;
 
     void onLookupListChanged(Uuid id);

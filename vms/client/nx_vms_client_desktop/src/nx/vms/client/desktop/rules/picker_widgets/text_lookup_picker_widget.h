@@ -22,6 +22,9 @@ public:
 
     void setValidity(const vms::rules::ValidationResult& validationResult) override;
 
+protected:
+    void onEnabledChanged(bool isEnabled) override;
+
 private:
     QComboBox* m_checkTypeComboBox{nullptr};
     QStackedWidget* m_stackedWidget{nullptr};

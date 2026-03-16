@@ -9,6 +9,8 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/validators.h>
+#include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -41,7 +43,7 @@ TextLookupPicker::TextLookupPicker(
     :
     TitledFieldPickerWidget<vms::rules::TextLookupField>(field, context, parent)
 {
-    setCheckBoxEnabled(false);
+    setCheckBoxEnabled(true);
 
     const auto contentLayout = new QVBoxLayout;
 
@@ -87,7 +89,7 @@ TextLookupPicker::TextLookupPicker(
         keywordsLayout->addWidget(new QWidget);
 
         m_lineEdit = new QLineEdit;
-        m_lineEdit->setPlaceholderText(tr("Keywords separated by space"));
+        m_lineEdit->setPlaceholderText(tr("Enter keywords separated by space"));
         keywordsLayout->addWidget(m_lineEdit);
 
         keywordsLayout->setStretch(0, 1);
@@ -183,6 +185,21 @@ void TextLookupPicker::setValidity(const vms::rules::ValidationResult& validatio
         else
             setErrorStyle(m_lookupListComboBox);
     }
+    else
+    {
+        if (validationResult.isValid())
+            resetErrorStyle(m_lineEdit);
+        else
+            setErrorStyle(m_lineEdit);
+    }
+}
+
+void TextLookupPicker::onEnabledChanged(bool isEnabled)
+{
+    TitledFieldPickerWidget<vms::rules::TextLookupField>::onEnabledChanged(isEnabled);
+    m_field->setEnabled(isEnabled);
+    setEdited();
+    updateUi();
 }
 
 void TextLookupPicker::updateUi()
@@ -191,6 +208,8 @@ void TextLookupPicker::updateUi()
 
     m_checkTypeComboBox->setCurrentIndex(
         m_checkTypeComboBox->findData(QVariant::fromValue(m_field->checkType())));
+
+    m_enabledSwitch->setChecked(m_field->isEnabled());
 
     switch (m_field->checkType())
     {

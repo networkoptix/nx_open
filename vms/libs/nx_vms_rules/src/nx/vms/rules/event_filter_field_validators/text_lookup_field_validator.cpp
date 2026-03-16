@@ -16,6 +16,16 @@ ValidationResult TextLookupFieldValidator::validity(
     if (!NX_ASSERT(textLookupField))
         return {QValidator::State::Invalid, {Strings::invalidFieldType()}};
 
+    if (!textLookupField->isEnabled())
+        return {};
+
+    if ((textLookupField->checkType() == TextLookupCheckType::containsKeywords
+        || textLookupField->checkType() == TextLookupCheckType::doesNotContainKeywords)
+        && textLookupField->value().isEmpty())
+    {
+        return {QValidator::State::Invalid, tr("Enter at least one keyword")};
+    }
+
     if (textLookupField->checkType() == TextLookupCheckType::inList
         || textLookupField->checkType() == TextLookupCheckType::notInList)
     {

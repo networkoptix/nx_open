@@ -73,8 +73,25 @@ void TextLookupField::setCheckType(TextLookupCheckType type)
     emit checkTypeChanged();
 }
 
+bool TextLookupField::isEnabled() const
+{
+    return m_enabled;
+}
+
+void TextLookupField::setEnabled(bool value)
+{
+    if (m_enabled == value)
+        return;
+
+    m_enabled = value;
+    emit enabledChanged();
+}
+
 bool TextLookupField::match(const QVariant& eventValue) const
 {
+    if (!isEnabled())
+        return true;
+
     if (!m_list.has_value())
     {
         if (m_checkType == TextLookupCheckType::containsKeywords
@@ -136,6 +153,9 @@ QJsonObject TextLookupField::openApiDescriptor(const QVariantMap&)
         "(<code>checkType</code>: <b>containsKeywords</b> or <b>doesNotContainKeywords</b>) "
         "or by referencing a <b>lookup list</b> "
         "identified by its ID (<code>checkType</code>: <b>inList</b> or <b>notInList</b>).<br/><br/>"
+
+        "This field has a boolean switch <code>enabled</code>to enable or disable it. "
+        "If the switch value is not set, then the field will accept any event text."
 
         "Set the <b>UUID</b> of the Lookup List as the <code>value</code> "
         "for the <code>checkType</code> <b>inList</b> "
