@@ -26,11 +26,13 @@ LocalPushSettings::LocalPushSettings():
 LocalPushSettings::LocalPushSettings(
     bool enabled,
     const SystemSet& systems,
-    const TokenData& tokenData)
+    const TokenData& tokenData,
+    int lastUsedFilter)
     :
     enabled(enabled),
     systems(systems),
-    tokenData(tokenData)
+    tokenData(tokenData),
+    lastUsedFilter(lastUsedFilter)
 {
 }
 
@@ -38,7 +40,7 @@ LocalPushSettings LocalPushSettings::makeCopyWithTokenData(
     const LocalPushSettings& what,
     const TokenData& data)
 {
-    return LocalPushSettings(what.enabled, what.systems, data);
+    return LocalPushSettings(what.enabled, what.systems, data, what.lastUsedFilter);
 }
 
 LocalPushSettings LocalPushSettings::makeLoggedOut()
