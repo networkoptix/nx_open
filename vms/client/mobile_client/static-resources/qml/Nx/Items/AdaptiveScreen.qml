@@ -332,8 +332,11 @@ Item
         width: Overlay.overlay ? Overlay.overlay.width : 0
         height: Overlay.overlay ? Overlay.overlay.height : 0
         modal: true
-        padding: 0
         visible: false
+        topPadding: SafeArea.margins.top
+        leftPadding: SafeArea.margins.left
+        rightPadding: SafeArea.margins.right
+        bottomPadding: SafeArea.margins.bottom
 
         contentItem: Panel
         {
