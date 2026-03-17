@@ -2097,21 +2097,6 @@ và nhấp vào nút &quot;Tìm kiếm&quot;</translation>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>Thời gian phát lại:</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>tua lại cho</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>Trực tiếp</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>

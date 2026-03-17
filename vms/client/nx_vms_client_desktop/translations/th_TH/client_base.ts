@@ -10997,6 +10997,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SubjectSelectionDialog</name>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation type="unfinished">Users</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -12523,6 +12543,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::rules::PluginDiagnosticEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
@@ -12652,10 +12679,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation type="unfinished">Contains list entries</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>คำที่คั่นด้วยช่องว่าง</translation>
-    </message>
-    <message>
       <source>From</source>
       <translation type="unfinished">From</translation>
     </message>
@@ -12666,6 +12689,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Not contains list entries</source>
       <translation type="unfinished">Not contains list entries</translation>
+    </message>
+    <message>
+      <source>Enter keywords separated by space</source>
+      <translation type="unfinished">Enter keywords separated by space</translation>
     </message>
   </context>
   <context>
@@ -12755,30 +12782,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
-    <message>
-      <source>Any Plugin</source>
-      <translation>ปลั๊กอินใด ๆ</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>All Users</source>
-      <translation>ผู้ใช้ทั้งหมด</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ผู้ใช้งาน</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation>ผู้ใช้ที่กำหนดเอง</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 ผู้ใช้</translation>
+    <name>nx::vms::client::desktop::subject_selection_dialog_private::GroupListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12831,15 +12840,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
         <numerusform>โปรดทราบว่าคีย์ใบอนุญาตแต่ละใบอาจถูกปิดการใช้งานสูงสุด %n ครั้ง</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n ผู้ใช้</numerusform>
       </translation>
     </message>
   </context>

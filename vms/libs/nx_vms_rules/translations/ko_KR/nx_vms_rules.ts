@@ -1284,6 +1284,10 @@
       <source>Invalid UUID string</source>
       <translation>잘못된 UUID 문자열</translation>
     </message>
+    <message>
+      <source>Enter at least one keyword</source>
+      <translation type="unfinished">Enter at least one keyword</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>

@@ -419,13 +419,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchItem</name>
-    <message>
-      <source>SHARED</source>
-      <translation>COMPARTIDO</translation>
-    </message>
-  </context>
-  <context>
     <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>

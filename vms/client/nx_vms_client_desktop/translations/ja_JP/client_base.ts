@@ -4286,11 +4286,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation>このカメラにアクセスできません。詳細については、デスクトップクライアント内でカメラ診断を実行してください。</translation>
+      <translation>このカメラにアクセスできません。
+詳細については、
+デスクトップクライアント内で
+カメラ診断を実行してください。</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation>このカメラへのアクセスには認証情報が必要です。</translation>
+      <translation>このカメラへのアクセスには
+認証情報が必要です。</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
@@ -10998,6 +11002,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SubjectSelectionDialog</name>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation type="unfinished">Users</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -12522,6 +12546,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::rules::PluginDiagnosticEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
@@ -12651,10 +12682,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <translation>リスト項目を含む</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>キーワード (スペース区切り)</translation>
-    </message>
-    <message>
       <source>From</source>
       <translation>開始</translation>
     </message>
@@ -12665,6 +12692,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Not contains list entries</source>
       <translation>リスト項目を含まない</translation>
+    </message>
+    <message>
+      <source>Enter keywords separated by space</source>
+      <translation type="unfinished">Enter keywords separated by space</translation>
     </message>
   </context>
   <context>
@@ -12754,30 +12785,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
-    <message>
-      <source>Any Plugin</source>
-      <translation>任意のプラグイン</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>All Users</source>
-      <translation>すべてのユーザー</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>ユーザー</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation>カスタムユーザー</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 ユーザー</translation>
+    <name>nx::vms::client::desktop::subject_selection_dialog_private::GroupListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -12830,15 +12843,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
         <numerusform>各ライセンスキーの無効化は最大%n回までとなりますのでご注意ください。</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
   </context>

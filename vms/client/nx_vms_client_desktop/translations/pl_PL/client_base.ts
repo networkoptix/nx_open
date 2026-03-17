@@ -11481,6 +11481,26 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SubjectSelectionDialog</name>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation type="unfinished">Users</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -13059,6 +13079,13 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::rules::PluginDiagnosticEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
@@ -13197,10 +13224,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <translation>Zawiera wpisy listy</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>Słowa kluczowe oddzielone spacją</translation>
-    </message>
-    <message>
       <source>From</source>
       <translation>Od</translation>
     </message>
@@ -13211,6 +13234,10 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Not contains list entries</source>
       <translation>Nie zawiera wpisów listy</translation>
+    </message>
+    <message>
+      <source>Enter keywords separated by space</source>
+      <translation type="unfinished">Enter keywords separated by space</translation>
     </message>
   </context>
   <context>
@@ -13306,30 +13333,15 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
-    <message>
-      <source>Any Plugin</source>
-      <translation>Dowolna wtyczka</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>All Users</source>
-      <translation>Wszyscy użytkownicy</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Użytkownicy</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation>Niestandardowi użytkownicy</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>Użytkownicy %1</translation>
+    <name>nx::vms::client::desktop::subject_selection_dialog_private::GroupListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13385,18 +13397,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
         <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
         <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
         <numerusform>Każdy klucz licencyjny można dezaktywować maksymalnie %n razy.</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n użytkowników</numerusform>
-        <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n użytkownik</numerusform>
       </translation>
     </message>
   </context>

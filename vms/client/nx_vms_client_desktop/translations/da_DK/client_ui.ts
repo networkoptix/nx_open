@@ -2097,21 +2097,6 @@ og klik på &quot;Søg&quot; knappen</translation>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>Afspilningstid:</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>spole tilbage for</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>Live</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>

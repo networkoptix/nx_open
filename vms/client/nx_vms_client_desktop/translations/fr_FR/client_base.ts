@@ -11159,6 +11159,26 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::SubjectSelectionDialog</name>
+    <message>
+      <source>%1 users</source>
+      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+      <translation type="unfinished">%1 users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation type="unfinished">Users</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
@@ -12704,6 +12724,13 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::rules::PluginDiagnosticEventModel</name>
+    <message>
+      <source>Any Plugin</source>
+      <translation type="unfinished">Any Plugin</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
@@ -12836,10 +12863,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>Contient les entrées de la liste</translation>
     </message>
     <message>
-      <source>Keywords separated by space</source>
-      <translation>Mots-clés séparés par des espaces</translation>
-    </message>
-    <message>
       <source>From</source>
       <translation>A partir de</translation>
     </message>
@@ -12850,6 +12873,10 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Not contains list entries</source>
       <translation>Ne contient pas d'entrées de liste</translation>
+    </message>
+    <message>
+      <source>Enter keywords separated by space</source>
+      <translation type="unfinished">Enter keywords separated by space</translation>
     </message>
   </context>
   <context>
@@ -12941,30 +12968,13 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
-    <message>
-      <source>Any Plugin</source>
-      <translation>N'importe quel plugin</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>All Users</source>
-      <translation>Tous les utilisateurs</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Utilisateurs</translation>
-    </message>
-    <message>
-      <source>Custom Users</source>
-      <translation>Utilisateurs personnalisés</translation>
-    </message>
-    <message>
-      <source>%1 users</source>
-      <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 utilisateurs</translation>
+    <name>nx::vms::client::desktop::subject_selection_dialog_private::GroupListDelegate</name>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -13018,16 +13028,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <translation>
         <numerusform>Notez que chaque clé de licence peut être désactivée au maximum %n fois.</numerusform>
         <numerusform>Notez que chaque clé de licence peut être désactivée au maximum %n fois.</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n utilisateur</numerusform>
-        <numerusform>%n utilisateurs</numerusform>
       </translation>
     </message>
   </context>

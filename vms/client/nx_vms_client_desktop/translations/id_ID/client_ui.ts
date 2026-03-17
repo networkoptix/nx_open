@@ -2099,21 +2099,6 @@ and click on the &quot;Search&quot; button</source>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>Waktu playback :</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>rewind untuk</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>Live</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>

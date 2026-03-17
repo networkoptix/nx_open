@@ -418,13 +418,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchItem</name>
-    <message>
-      <source>SHARED</source>
-      <translation>공유됨</translation>
-    </message>
-  </context>
-  <context>
     <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>

@@ -2097,21 +2097,6 @@ i kliknij przycisk &quot;Szukaj&quot;</translation>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>Czas odtwarzania :</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>przewiń do</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>Na żywo</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>

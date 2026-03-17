@@ -2097,21 +2097,6 @@ and click on the &quot;Search&quot; button</source>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>재생 시간:</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>되감기</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>라이브</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>

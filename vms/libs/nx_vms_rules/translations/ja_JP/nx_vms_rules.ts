@@ -1284,6 +1284,10 @@
       <source>Invalid UUID string</source>
       <translation>無効な UUID 文字列です。</translation>
     </message>
+    <message>
+      <source>Enter at least one keyword</source>
+      <translation type="unfinished">Enter at least one keyword</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>

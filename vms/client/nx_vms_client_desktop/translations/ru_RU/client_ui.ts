@@ -2097,21 +2097,6 @@ and click on the &quot;Search&quot; button</translation>
     </message>
   </context>
   <context>
-    <name>RewindForWidget</name>
-    <message>
-      <source>Playback time :</source>
-      <translation>Время воспроизведения :</translation>
-    </message>
-    <message>
-      <source>rewind for</source>
-      <translation>перемотать назад на</translation>
-    </message>
-    <message>
-      <source>Live</source>
-      <translation>В режиме реального времени</translation>
-    </message>
-  </context>
-  <context>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
