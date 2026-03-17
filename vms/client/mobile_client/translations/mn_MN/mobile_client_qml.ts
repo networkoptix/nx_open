@@ -129,7 +129,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Сувгийн түнш</translation>
     </message>
   </context>
   <context>
@@ -695,7 +695,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Сайтууд</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -890,11 +890,11 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Байгууллагууд</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Сайтууд</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
