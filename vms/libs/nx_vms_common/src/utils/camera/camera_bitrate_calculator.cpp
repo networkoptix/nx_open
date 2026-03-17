@@ -107,7 +107,7 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
     QSize resolution,
     int fps,
     const QString& codec,
-    nx::vms::api::CameraStreamCapability streamCapability,
+    const nx::vms::api::CameraStreamCapability& streamCapability,
     bool useBitratePerGop)
 {
     if (streamCapability.defaultBitrateKbps > 0 && streamCapability.defaultFps > 0)
