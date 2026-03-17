@@ -12954,7 +12954,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Elke Plugin</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
@@ -12969,12 +12969,12 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Custom Users</source>
-      <translation>Aangepaste gebruikers</translation>
+      <translation type="unfinished">Custom Users</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 gebruikers</translation>
+      <translation type="unfinished">%1 users</translation>
     </message>
   </context>
   <context>
