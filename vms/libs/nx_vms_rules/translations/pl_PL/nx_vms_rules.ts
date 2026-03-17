@@ -1328,7 +1328,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Wprowadź co najmniej jedno słowo kluczowe</translation>
     </message>
   </context>
   <context>

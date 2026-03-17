@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>キーワードをひとつ以上入力してください</translation>
     </message>
   </context>
   <context>

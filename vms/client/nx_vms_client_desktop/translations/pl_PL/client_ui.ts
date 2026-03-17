@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Wyłącz dekodowanie wielowątkowe, jeśli niezaznaczone. Włącz automatyczny wybór, jeśli zaznaczone.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Zezwól na dekodowanie wielowątkowe</translation>
     </message>
   </context>
   <context>

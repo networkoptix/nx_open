@@ -1300,7 +1300,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Angiv mindst et søgeord</translation>
     </message>
   </context>
   <context>
