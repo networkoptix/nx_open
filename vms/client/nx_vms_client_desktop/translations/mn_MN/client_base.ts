@@ -2224,7 +2224,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Огноо</translation>
     </message>
     <message>
       <source>Time</source>
@@ -2974,7 +2974,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Үүсгэх</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3953,7 +3953,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>Байхгүй</translation>
     </message>
   </context>
   <context>
@@ -4763,7 +4763,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>И-мэйл</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6431,7 +6431,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Тохиргоог засах.</translation>
     </message>
     <message>
       <source>Play Audio</source>
@@ -10449,7 +10449,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Түдгэлзүүлсэн</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11309,7 +11309,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Огноо</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -11535,7 +11535,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>И-мэйл</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11666,7 +11666,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Үүсгэх</translation>
     </message>
     <message>
       <source>New Link - %1</source>
@@ -12166,7 +12166,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Гарчиг</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12998,7 +12998,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>И-мэйл</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>

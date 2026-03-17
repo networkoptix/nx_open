@@ -12956,7 +12956,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>N'importe quel plugin</translation>
     </message>
   </context>
   <context>
@@ -12971,12 +12971,12 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Utilisateurs personnalisés</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 utilisateurs</translation>
     </message>
   </context>
   <context>
