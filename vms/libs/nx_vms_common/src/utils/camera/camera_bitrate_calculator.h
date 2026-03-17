@@ -23,7 +23,7 @@ struct NX_VMS_COMMON_API CameraBitrateCalculator
         QSize resolution,
         int fps,
         const QString& codec,
-        nx::vms::api::CameraStreamCapability streamCapability,
+        const nx::vms::api::CameraStreamCapability& streamCapability,
         bool useBitratePerGop);
 
     static float roundKbpsToMbps(float kbps, int decimals = 1);
