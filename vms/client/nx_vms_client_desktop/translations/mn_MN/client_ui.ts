@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Хэл</translation>
     </message>
     <message>
       <source>Time Mode</source>
@@ -2617,11 +2617,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Асаах</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Унтраах</translation>
     </message>
     <message>
       <source>Schedule</source>
