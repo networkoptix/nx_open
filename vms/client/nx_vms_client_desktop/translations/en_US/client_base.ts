@@ -11143,6 +11143,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::SubjectSelectionDialog</name>
+    <message>
+        <source>%1 users</source>
+        <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
         <source>Set Passwords</source>
@@ -12681,6 +12701,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::rules::PluginDiagnosticEventModel</name>
+    <message>
+        <source>Any Plugin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
         <source>Event</source>
@@ -12813,10 +12840,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation></translation>
     </message>
     <message>
-        <source>Keywords separated by space</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>From</source>
         <translation></translation>
     </message>
@@ -12827,6 +12850,10 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Not contains list entries</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Enter keywords separated by space</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -12918,30 +12945,13 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
-    <message>
-        <source>Any Plugin</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-        <source>All Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Custom Users</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 users</source>
-        <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-        <translation></translation>
+    <name>nx::vms::client::desktop::subject_selection_dialog_private::GroupListDelegate</name>
+    <message numerus="yes">
+        <source>%n Users</source>
+        <translation type="unfinished">
+            <numerusform>%n User</numerusform>
+            <numerusform>%n Users</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -12995,16 +13005,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <translation>
             <numerusform>Note that each license key may be deactivated a maximum of %n time.</numerusform>
             <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::GroupListDelegate</name>
-    <message numerus="yes">
-        <source>%n Users</source>
-        <translation>
-            <numerusform>%n User</numerusform>
-            <numerusform>%n Users</numerusform>
         </translation>
     </message>
 </context>

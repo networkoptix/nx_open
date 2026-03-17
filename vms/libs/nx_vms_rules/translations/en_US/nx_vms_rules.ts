@@ -1298,6 +1298,10 @@
         <source>Invalid UUID string</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Enter at least one keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::rules::TextOverlayAction</name>
