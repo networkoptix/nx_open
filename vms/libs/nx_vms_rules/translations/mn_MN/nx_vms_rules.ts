@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Асаах</translation>
     </message>
   </context>
   <context>
