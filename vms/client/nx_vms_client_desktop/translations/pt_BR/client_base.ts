@@ -12915,7 +12915,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Qualquer plugin</translation>
     </message>
   </context>
   <context>
@@ -12930,12 +12930,12 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Usuários personalizados</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 usuários</translation>
     </message>
   </context>
   <context>

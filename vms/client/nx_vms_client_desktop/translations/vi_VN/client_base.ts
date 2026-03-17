@@ -12730,7 +12730,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Tất cả Plugin</translation>
     </message>
   </context>
   <context>
@@ -12745,12 +12745,12 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Người dùng Tuỳ chỉnh</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 người dùng</translation>
     </message>
   </context>
   <context>

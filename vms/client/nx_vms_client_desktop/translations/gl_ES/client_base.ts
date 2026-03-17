@@ -12916,7 +12916,7 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Calquera plugin/complemento</translation>
     </message>
   </context>
   <context>
@@ -12931,12 +12931,12 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Usuarios personalizados</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">%1 users</translation>
+      <translation>%1 usuarios</translation>
     </message>
   </context>
   <context>

@@ -527,7 +527,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Түдгэлзүүлсэн</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -724,7 +724,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Үүсгэх</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1358,7 +1358,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Өмнөх</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1732,7 +1732,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Үүсгэх</translation>
     </message>
   </context>
   <context>
@@ -2874,7 +2874,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>И-мэйл</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2984,7 +2984,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>И-мэйл</translation>
     </message>
     <message>
       <source>Change password</source>
