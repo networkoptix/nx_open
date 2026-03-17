@@ -318,13 +318,6 @@
     </message>
   </context>
   <context>
-    <name>EventSearchItem</name>
-    <message>
-      <source>SHARED</source>
-      <translation>CHIA SẺ</translation>
-    </message>
-  </context>
-  <context>
     <name>EventSearchMenuScreen</name>
     <message>
       <source>Looking for</source>
