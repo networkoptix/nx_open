@@ -4286,11 +4286,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation>このカメラにアクセスできません。詳細については、デスクトップクライアント内でカメラ診断を実行してください。</translation>
+      <translation>このカメラにアクセスできません。
+詳細については、
+デスクトップクライアント内で
+カメラ診断を実行してください。</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation>このカメラへのアクセスには認証情報が必要です。</translation>
+      <translation>このカメラへのアクセスには
+認証情報が必要です。</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
@@ -12787,7 +12791,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>任意のプラグイン</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
@@ -12802,12 +12806,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom Users</source>
-      <translation>カスタムユーザー</translation>
+      <translation type="unfinished">Custom Users</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 ユーザー</translation>
+      <translation type="unfinished">%1 users</translation>
     </message>
   </context>
   <context>

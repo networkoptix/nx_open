@@ -12972,7 +12972,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Någon plugin</translation>
+      <translation type="unfinished">Any Plugin</translation>
     </message>
   </context>
   <context>
@@ -12987,12 +12987,12 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Custom Users</source>
-      <translation>Anpassade användare</translation>
+      <translation type="unfinished">Custom Users</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 användare</translation>
+      <translation type="unfinished">%1 users</translation>
     </message>
   </context>
   <context>
