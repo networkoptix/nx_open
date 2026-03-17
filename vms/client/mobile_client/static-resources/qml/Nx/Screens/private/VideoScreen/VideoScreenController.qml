@@ -63,7 +63,7 @@ NxObject
             && (resource?.flags & ResourceFlag.cross_system)
             && (resource?.flags & ResourceFlag.fake))
     readonly property bool mediaLoading:
-        mediaPlayer.mediaStatus === MediaPlayer.MediaStatus.Loading
+        mediaPlayer.loading && mediaPlayer.playbackState !== MediaPlayer.Previewing
     readonly property bool is2FaDisabled: !appContext.cloudStatusWatcher.is2FaEnabledForUser
         && resourceHelper.is2FaEnabled
 
@@ -105,10 +105,15 @@ NxObject
             return "noLicenses"
         if (tooManyConnections)
             return "tooManyConnections"
+        if (cameraUnauthorized)
+            return "cameraUnauthorized"
         if (mediaLoading)
             return "mediaLoading"
         return ""
     }
+
+    readonly property bool preloaderRequired: dummyState == "mediaLoading"
+        || dummyState == "systemConnecting"
 
     property alias resourceHelper: resourceHelper
     property alias accessRightsHelper: accessRightsHelper

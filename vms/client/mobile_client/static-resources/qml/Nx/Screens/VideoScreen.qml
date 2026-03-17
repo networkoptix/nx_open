@@ -222,9 +222,6 @@ Page
                 || controller.cameraOffline
                 || controller.cameraUnauthorized
                 || controller.needsCloudAuthorization
-                || controller.systemConnecting
-            // TODO: #vkutin Add a wait for media loaded state to Mobile FTs to enable this.
-            //  || controller.mediaLoading
                 || controller.failed
                 || controller.noVideoStreams)
                 && !controller.mediaPlayer.playing)
@@ -465,8 +462,7 @@ Page
         dotRadius: 6
         spacing: 8
 
-        running: controller.mediaPlayer.loading
-            && controller.mediaPlayer.playbackState !== MediaPlayer.Previewing
+        running: controller.preloaderRequired
     }
 
     Item

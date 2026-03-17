@@ -193,37 +193,6 @@ DummyMessage
                 target: dummyMessage
                 title: qsTr("No live stream")
             }
-        },
-        State
-        {
-            name: "systemConnecting"
-            PropertyChanges
-            {
-                target: preloader
-                running: true
-            }
-        },
-        State
-        {
-            name: "mediaLoading"
-            PropertyChanges
-            {
-                target: preloader
-                running: true
-            }
         }
     ]
-
-    NxDotPreloader
-    {
-        id: preloader
-
-        running: false
-        dotRadius: 8
-        spacing: dotRadius * 2
-        color: ColorTheme.colors.light16
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: Math.round((parent.height - height) / 3)
-    }
 }
