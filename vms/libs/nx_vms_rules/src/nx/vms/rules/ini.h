@@ -21,6 +21,9 @@ struct NX_VMS_RULES_API Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(false, integrationActions, "Enable Integration Actions.");
 
+    NX_INI_INT(5000, aggregationLimit,
+        "Maximum number of events in the aggregated event list. When the list reaches twice\n"
+        "this limit, it is truncated to keep the earliest and latest events.");
 };
 
 NX_VMS_RULES_API Ini& ini();

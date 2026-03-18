@@ -29,6 +29,7 @@
 #include "basic_action.h"
 #include "basic_event.h"
 #include "engine.h"
+#include "ini.h"
 #include "router.h"
 #include "rule.h"
 #include "utils/action.h"
@@ -422,7 +423,7 @@ void ActionBuilder::setAggregationInterval(microseconds interval)
 {
     m_interval = interval;
     if (m_interval != microseconds::zero())
-        m_aggregator = QSharedPointer<Aggregator>::create(m_interval);
+        m_aggregator = QSharedPointer<Aggregator>::create(m_interval, ini().aggregationLimit);
 }
 
 microseconds ActionBuilder::aggregationInterval() const

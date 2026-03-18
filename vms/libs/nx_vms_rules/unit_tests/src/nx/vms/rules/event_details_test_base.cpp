@@ -133,9 +133,9 @@ AggregatedEventPtr EventDetailsTestBase::buildEvent()
     {
         ensureAggregationIsValid();
 
-        std::vector<EventPtr> eventList;
-        std::swap(m_events, eventList);
-        m_aggregatedEvent = AggregatedEventPtr::create(std::move(eventList));
+        const auto count = m_events.size();
+        m_aggregatedEvent = AggregatedEventPtr::create(
+            std::exchange(m_events, std::vector<EventPtr>{}), count);
         if (m_eventLimitOverload)
             m_aggregatedEvent->overloadDefaultEventLimit(*m_eventLimitOverload);
     }

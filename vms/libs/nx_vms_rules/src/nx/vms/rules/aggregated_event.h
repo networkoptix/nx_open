@@ -3,6 +3,9 @@
 #pragma once
 
 #include <functional>
+#include <vector>
+
+#include <QtCore/QVariant>
 
 #include <nx/vms/api/rules/aggregated_info.h>
 
@@ -25,7 +28,7 @@ class NX_VMS_RULES_API AggregatedEvent: public QObject
 
 public:
     explicit AggregatedEvent(const EventPtr& event);
-    explicit AggregatedEvent(std::vector<EventPtr>&& eventList);
+    AggregatedEvent(std::vector<EventPtr>&& eventList, size_t totalCount);
 
     /** Constructor from the serialized data. */
     AggregatedEvent(Engine* engine, const EventLogRecord& record);
