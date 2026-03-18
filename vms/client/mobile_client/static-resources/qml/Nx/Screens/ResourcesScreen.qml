@@ -201,17 +201,15 @@ AdaptiveScreen
             id: noCamerasPlaceholder
 
             anchors.fill: parent
-            title: qsTr("No Cameras")
+            title: qsTr("No Devices")
             titleColor: ColorTheme.colors.light4
             description:
             {
-                if (!resourceHelper.isLayout)
-                    return ""
-
                 return windowContext.deprecatedUiController.resource
-                    ? qsTr("We didn't find any cameras on this layout")
-                    : qsTr("We didn't find any cameras on this site. " +
-                        "You can add them in our desktop application")
+                    ? qsTr("No devices were found on this layout")
+                    : qsTr("No devices were found on this site. " +
+                        "Add devices with the desktop client, " +
+                        "or request access to existing devices")
             }
             descriptionColor: ColorTheme.colors.light10
             descriptionFontPixelSize: 15
