@@ -28,6 +28,9 @@ public:
     void cleanupAsync(LongRunnablePtr threadUniquePtr, QObject* context);
     void clearContextAsync(QObject* context);
 
+    /** Stops all pending threads and synchronously deletes all pending contexts. */
+    void flush();
+
 private:
     struct ThreadData
     {

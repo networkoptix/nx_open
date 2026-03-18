@@ -11,6 +11,11 @@ QnLongRunableCleanup::QnLongRunableCleanup()
 
 QnLongRunableCleanup::~QnLongRunableCleanup()
 {
+    flush();
+}
+
+void QnLongRunableCleanup::flush()
+{
     decltype(m_threadsToStop) threads;
     decltype(m_contextsToStop) contexts;
 

@@ -41,6 +41,7 @@
 #include <ui/camera_thumbnail_provider.h>
 #include <ui/window_utils.h>
 #include <utils/common/delayed.h>
+#include <utils/common/long_runable_cleanup.h>
 #include <utils/mobile_app_info.h>
 
 #if defined(Q_OS_ANDROID)
@@ -324,8 +325,14 @@ ApplicationContext::~ApplicationContext()
     destroyCrossSystemModules();
 
     // System contexts destruction is delayed and delegated to QnLongRunableCleanup.
-    // We must enforce it to finish here synchronously.
+    // We must enforce it to finish here synchronously, before WindowContext (a member of this
+    // class's Private) is destroyed. If background threads are running (e.g. camera list loading),
+    // QnLongRunableCleanup defers SystemContext deletion until those threads stop. Without an
+    // explicit flush here, the deletion would happen in
+    // common::ApplicationContext::~ApplicationContext(), by which time WindowContext is already
+    // destroyed, causing an assertion in SystemContext::~SystemContext() -> sessionManager().
     common::ApplicationContext::stopAll();
+    longRunableCleanup()->flush();
 }
 
 core::SystemContext* ApplicationContext::createSystemContext(
