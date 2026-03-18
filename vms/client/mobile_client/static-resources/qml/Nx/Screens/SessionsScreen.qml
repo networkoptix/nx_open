@@ -61,7 +61,9 @@ AdaptiveScreen
             if (LayoutController.isTabletLayout
                 && !organizationsModel.topLevelLoading
                 && cloudUserProfileWatcher.isOrgUser
-                && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations))
+                && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
+                && (navigationPanel.selectedOrganizationIndex == null
+                    || organizationsModel.hasFolders(navigationPanel.selectedOrganizationIndex)))
             {
                 return navigationPanel
             }

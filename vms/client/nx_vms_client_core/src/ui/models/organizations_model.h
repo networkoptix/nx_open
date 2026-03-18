@@ -121,6 +121,7 @@ public:
 
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const;
     Q_INVOKABLE QStringList childSystemIds(const QModelIndex& parent = QModelIndex()) const;
+    Q_INVOKABLE bool hasFolders(const QModelIndex& parent = QModelIndex()) const;
 
     CloudStatusWatcher* statusWatcher() const;
     void setStatusWatcher(CloudStatusWatcher* statusWatcher);

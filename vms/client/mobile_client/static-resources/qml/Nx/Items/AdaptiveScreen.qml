@@ -196,10 +196,11 @@ Item
             id: leftPanel
 
             readonly property bool isHidden: !visible
+            property bool closedByUser: false
 
             Layout.fillHeight: true
-            visible: !!item
-            onCloseButtonClicked: visible = false
+            visible: !!item && !closedByUser
+            onCloseButtonClicked: closedByUser = true
         }
 
         Item
@@ -237,10 +238,11 @@ Item
             id: rightPanel
 
             readonly property bool isHidden: !visible
+            property bool closedByUser: false
 
             Layout.fillHeight: true
-            visible: !!item
-            onCloseButtonClicked: visible = false
+            visible: !!item && !closedByUser
+            onCloseButtonClicked: closedByUser = true
         }
     }
 
@@ -276,7 +278,7 @@ Item
             && root.hasLeftPanel
             && root.leftPanel.interactive
             && leftPanel.isHidden
-        onClicked: leftPanel.visible = true
+        onClicked: leftPanel.closedByUser = false
 
         Indicator
         {
@@ -311,7 +313,7 @@ Item
             && root.hasRightPanel
             && root.rightPanel.interactive
             && rightPanel.isHidden
-        onClicked: rightPanel.visible = true
+        onClicked: rightPanel.closedByUser = false
 
         Indicator
         {

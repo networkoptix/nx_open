@@ -1060,6 +1060,19 @@ QStringList OrganizationsModel::childSystemIds(const QModelIndex& parent) const
     return result;
 }
 
+bool OrganizationsModel::hasFolders(const QModelIndex& parent) const
+{
+    if (!parent.isValid())
+        return false;
+
+    const auto* node = static_cast<const TreeNode*>(parent.internalPointer());
+    if (!node)
+        return false;
+
+    return std::ranges::any_of(node->allChildren(),
+        [](const auto& child) { return child->type == NodeType::Folder; });
+}
+
 QHash<int, QByteArray> OrganizationsModel::roleNames() const
 {
     static const QHash<int, QByteArray> kRoleNames{
