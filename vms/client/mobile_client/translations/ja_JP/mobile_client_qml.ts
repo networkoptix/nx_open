@@ -977,18 +977,6 @@
       <translation>接続中...</translation>
     </message>
     <message>
-      <source>No Cameras</source>
-      <translation>カメラがありません</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this layout</source>
-      <translation>このレイアウト上にはカメラが存在しません。</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation>このサイト上にはカメラが存在しません。デスクトップアプリケーションから追加できます。</translation>
-    </message>
-    <message>
       <source>Stop Connecting</source>
       <translation>接続を停止</translation>
     </message>
@@ -999,6 +987,18 @@
     <message>
       <source>Timeline</source>
       <translation>タイムライン</translation>
+    </message>
+    <message>
+      <source>No Devices</source>
+      <translation type="unfinished">No Devices</translation>
+    </message>
+    <message>
+      <source>No devices were found on this layout</source>
+      <translation type="unfinished">No devices were found on this layout</translation>
+    </message>
+    <message>
+      <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
+      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
     </message>
   </context>
   <context>

@@ -977,18 +977,6 @@
       <translation>Kết nối...</translation>
     </message>
     <message>
-      <source>No Cameras</source>
-      <translation>Không có camera</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this layout</source>
-      <translation>Chúng tôi không tìm thấy bất kỳ camera nào trên bố cục này</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation>Chúng tôi không tìm thấy bất kỳ camera nào trên Chi nhánh này. Bạn có thể thêm chúng vào ứng dụng máy tính để bàn</translation>
-    </message>
-    <message>
       <source>Stop Connecting</source>
       <translation>Dừng kết nối</translation>
     </message>
@@ -999,6 +987,18 @@
     <message>
       <source>Timeline</source>
       <translation type="unfinished">Timeline</translation>
+    </message>
+    <message>
+      <source>No Devices</source>
+      <translation type="unfinished">No Devices</translation>
+    </message>
+    <message>
+      <source>No devices were found on this layout</source>
+      <translation type="unfinished">No devices were found on this layout</translation>
+    </message>
+    <message>
+      <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
+      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
     </message>
   </context>
   <context>

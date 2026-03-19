@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation>%1 にアクセスできません。後でもう一度お試しください。</translation>
+      <translation>%1 にはまだアクセスできません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>

@@ -977,18 +977,6 @@
       <translation>連線中...</translation>
     </message>
     <message>
-      <source>No Cameras</source>
-      <translation>無攝影機</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this layout</source>
-      <translation>我們在這個佈局中沒有找到任何攝影機</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation>我們在這個站點中沒有找到任何攝影機，你可以透過我們的桌面應用程式加入。</translation>
-    </message>
-    <message>
       <source>Stop Connecting</source>
       <translation>停止連線</translation>
     </message>
@@ -999,6 +987,18 @@
     <message>
       <source>Timeline</source>
       <translation>時間軸</translation>
+    </message>
+    <message>
+      <source>No Devices</source>
+      <translation type="unfinished">No Devices</translation>
+    </message>
+    <message>
+      <source>No devices were found on this layout</source>
+      <translation type="unfinished">No devices were found on this layout</translation>
+    </message>
+    <message>
+      <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
+      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
     </message>
   </context>
   <context>

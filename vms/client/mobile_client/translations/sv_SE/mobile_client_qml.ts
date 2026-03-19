@@ -978,18 +978,6 @@
       <translation>Ansluter...</translation>
     </message>
     <message>
-      <source>No Cameras</source>
-      <translation>Inga kameror</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this layout</source>
-      <translation>Vi hittade inga kameror på den här layouten</translation>
-    </message>
-    <message>
-      <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-      <translation>Vi kunde inte hitta några kameror på denna plats. Du kan lägga till dem i vårt stationära program</translation>
-    </message>
-    <message>
       <source>Stop Connecting</source>
       <translation>Sluta ansluta</translation>
     </message>
@@ -1000,6 +988,18 @@
     <message>
       <source>Timeline</source>
       <translation>Tidslinje</translation>
+    </message>
+    <message>
+      <source>No Devices</source>
+      <translation type="unfinished">No Devices</translation>
+    </message>
+    <message>
+      <source>No devices were found on this layout</source>
+      <translation type="unfinished">No devices were found on this layout</translation>
+    </message>
+    <message>
+      <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
+      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
     </message>
   </context>
   <context>

@@ -2350,7 +2350,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Páginas web e integraciones</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2358,7 +2358,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Monitores de salud</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -2837,7 +2837,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nuevo usuario</translation>
     </message>
     <message>
       <source>General</source>
@@ -2864,7 +2864,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Nuevo usuario</translation>
     </message>
     <message>
       <source>Type</source>
@@ -3051,12 +3051,12 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Obteniendo enlace...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Asegúrese de que este ordenador pueda conectarse a %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>

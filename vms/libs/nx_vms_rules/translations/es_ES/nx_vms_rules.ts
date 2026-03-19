@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Encabezados personalizados</translation>
     </message>
   </context>
   <context>
@@ -1277,7 +1277,7 @@
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Seleccione al menos un diseño</translation>
     </message>
   </context>
   <context>
@@ -1300,7 +1300,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Introduce al menos una palabra</translation>
     </message>
   </context>
   <context>
