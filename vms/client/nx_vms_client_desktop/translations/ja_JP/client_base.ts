@@ -1405,7 +1405,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation>後でもう一度お試しください。</translation>
+      <translation>時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -2700,7 +2700,7 @@ License Key: %2</source>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 は一時的に利用できません。後でもう一度やり直してください。</translation>
+      <translation>%1 は一時的に利用できません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -7603,7 +7603,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
+      <translation>内部エラーが発生しました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>None of your Servers has connection to %1.</source>
@@ -8102,7 +8102,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation>アーカイブは現在利用できません。後でもう一度お試しください。</translation>
+      <translation>アーカイブは現在利用できません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
@@ -10439,7 +10439,7 @@ You can still change quality and FPS directly on the camera.</source>
     <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>スクリーンキャプチャのサブシステムはまだ初期化されていません。後ほどお試しください。</translation>
+      <translation>スクリーンキャプチャのサブシステムはまだ初期化されていません。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
