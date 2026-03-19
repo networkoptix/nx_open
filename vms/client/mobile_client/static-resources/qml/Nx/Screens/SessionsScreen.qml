@@ -432,7 +432,7 @@ AdaptiveScreen
             visible: organizationsModel.hasChannelPartners
             ButtonGroup.group: tabGroup
             checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
-            onClicked: sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
+            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
         }
 
         TabButton
@@ -442,7 +442,7 @@ AdaptiveScreen
             visible: organizationsModel.hasOrganizations
             ButtonGroup.group: tabGroup
             checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
-            onClicked: sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
+            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
         }
 
         TabButton
@@ -451,7 +451,7 @@ AdaptiveScreen
             text: qsTr("Sites")
             ButtonGroup.group: tabGroup
             checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
-            onClicked: sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
         }
     }
 
@@ -464,7 +464,7 @@ AdaptiveScreen
         currentTab: sessionsScreen.selectedTab
         onTabSelected: (selectedTabValue) =>
         {
-            sessionsScreen.selectedTab = selectedTabValue
+            sessionsScreen.selectTabByUser(selectedTabValue)
             // When inside a partner, tab click means "go back to the top-level tab view".
             if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState)
                 goBack(NxGlobals.invalidModelIndex())
@@ -624,34 +624,29 @@ AdaptiveScreen
                         }
                     }
 
-                    function updateCheckedState(force)
+                    function updateCheckedState()
                     {
-                        if (organizationsModel.topLevelLoading && !force)
+                        if (organizationsModel.topLevelLoading)
                             return
 
-                        if (!systemTabs.visible && !force)
+                        const savedTab = appGlobalState.lastSelectedOrgTab
+                        if (savedTab !== -1)
                         {
-                            // If no tabs are going to be visible, select the Sites tab.
-                            if (!organizationsModel.hasChannelPartners
-                                && !organizationsModel.hasOrganizations)
-                            {
-                                sessionsScreen.selectedTab = OrganizationsModel.SitesTab
-                            }
+                            const savedAvailable =
+                                (savedTab === OrganizationsModel.ChannelPartnersTab
+                                    && organizationsModel.hasChannelPartners)
+                                || (savedTab === OrganizationsModel.OrganizationsTab
+                                    && organizationsModel.hasOrganizations)
+                                || (savedTab === OrganizationsModel.SitesTab)
 
-                            return
+
+                            if (savedAvailable)
+                            {
+                                sessionsScreen.selectedTab = savedTab
+                                return
+                            }
                         }
 
-                        // Avoid switching tabs when selected tab is already visible.
-                        const currentTabVisible =
-                            (sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab && partnersTabButton.visible) ||
-                            (sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab && organizationsTabButton.visible) ||
-                            (sessionsScreen.selectedTab === OrganizationsModel.SitesTab)
-
-                        // Avoid switching tabs when selected tab is already visible.
-                        if (currentTabVisible && !force)
-                            return
-
-                        // Select appropriate tab based on the current state.
                         if (cloudUserProfileWatcher.isOrgUser)
                         {
                             if (organizationsModel.hasChannelPartners)
@@ -673,20 +668,24 @@ AdaptiveScreen
                     {
                         target: organizationsModel
                         function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
-                        function onHasChannelPartnersChanged()
-                        {
-                            systemTabs.updateCheckedState(/*force*/ organizationsModel.hasChannelPartners)
-                        }
-                        function onHasOrganizationsChanged()
-                        {
-                            systemTabs.updateCheckedState(/*force*/ organizationsModel.hasOrganizations)
-                        }
+                        function onHasChannelPartnersChanged() { systemTabs.updateCheckedState() }
+                        function onHasOrganizationsChanged() { systemTabs.updateCheckedState() }
                     }
 
                     Connections
                     {
                         target: cloudUserProfileWatcher
-                        function onIsOrgUserChanged() { systemTabs.updateCheckedState(/*force*/ true) }
+                        function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
+                    }
+
+                    Connections
+                    {
+                        target: appContext.cloudStatusWatcher
+                        function onStatusChanged()
+                        {
+                            if (appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut)
+                                appGlobalState.lastSelectedOrgTab = -1
+                        }
                     }
 
                     Connections
@@ -962,6 +961,8 @@ AdaptiveScreen
     Component.onCompleted:
     {
         resetSearch()
+        if (appGlobalState.lastSelectedOrgTab !== -1)
+            sessionsScreen.selectedTab = appGlobalState.lastSelectedOrgTab
     }
 
     Connections
@@ -1223,4 +1224,11 @@ AdaptiveScreen
             }
         }
     }
+
+    function selectTabByUser(tab)
+    {
+        selectedTab = tab
+        appGlobalState.lastSelectedOrgTab = tab
+    }
+
 }
