@@ -15,7 +15,10 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API Aggregator
 {
 public:
-    explicit Aggregator(std::chrono::microseconds interval);
+    static constexpr size_t kLimitMultiplier = 2;
+
+public:
+    explicit Aggregator(std::chrono::microseconds interval, size_t maxEventListSize);
 
     /** Returns a key the event will be aggregated by. */
     using AggregationKeyFunction = std::function<QString(const EventPtr&)>;
@@ -39,9 +42,13 @@ private:
         // elapsed. At the moment it is got from the initial event timestamp.
         std::chrono::microseconds firstOccurrenceTimestamp;
         std::vector<EventPtr> eventList;
+        // Total number of events received in the current aggregation window, including those
+        // removed by truncation.
+        size_t totalEventCount = 0;
     };
 
     std::chrono::microseconds m_interval;
+    size_t m_maxEventListSize;
     std::unordered_map<QString, AggregationData> m_aggregatedEvents;
 };
 

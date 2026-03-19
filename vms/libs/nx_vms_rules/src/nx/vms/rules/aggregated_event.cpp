@@ -4,16 +4,11 @@
 
 #include <unordered_map>
 
-#include <QtCore/QDateTime>
-#include <QtCore/QVariant>
-
 #include <nx/utils/log/assert.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/event_log.h>
-#include <nx/vms/time/formatter.h>
 
 #include "engine.h"
-#include "strings.h"
 #include "utils/serialization.h"
 
 namespace nx::vms::rules {
@@ -26,9 +21,9 @@ AggregatedEvent::AggregatedEvent(const EventPtr& event):
 {
 }
 
-AggregatedEvent::AggregatedEvent(std::vector<EventPtr>&& eventList):
+AggregatedEvent::AggregatedEvent(std::vector<EventPtr>&& eventList, size_t totalCount):
     m_aggregatedEvents{std::move(eventList)},
-    m_count(m_aggregatedEvents.size())
+    m_count(totalCount)
 {
 }
 
@@ -116,9 +111,6 @@ const QVariantMap& AggregatedEvent::details(
 
 AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
 {
-    NX_ASSERT(m_aggregatedEvents.size() == m_count,
-        "This function is not allowed for deserialized events as they contain limited info.");
-
     if (m_aggregatedEvents.empty())
         return {};
 
@@ -132,15 +124,12 @@ AggregatedEventPtr AggregatedEvent::filtered(const Filter& filter) const
     if (filteredList.empty())
         return {};
 
-    return AggregatedEventPtr::create(std::move(filteredList));
+    return AggregatedEventPtr::create(std::move(filteredList), m_count);
 }
 
 std::vector<AggregatedEventPtr> AggregatedEvent::split(
     const SplitKeyFunction& splitKeyFunction) const
 {
-    NX_ASSERT(m_aggregatedEvents.size() == m_count,
-        "This function is not allowed for deserialized events as they contain limited info.");
-
     if (m_aggregatedEvents.empty())
         return {};
 
@@ -150,8 +139,16 @@ std::vector<AggregatedEventPtr> AggregatedEvent::split(
 
     std::vector<AggregatedEventPtr> result;
     result.reserve(splitMap.size());
-    for (auto& [_, list]: splitMap)
-        result.push_back(AggregatedEventPtr::create(std::move(list)));
+    for (auto& [_, list] : splitMap)
+    {
+        // Using an approximation for splitted events total count,
+        // if there is no way to calculate it precisely.
+        const auto size = m_aggregatedEvents.size() == m_count
+            ? list.size()
+            : m_count / splitMap.size();
+
+        result.push_back(AggregatedEventPtr::create(std::move(list), size));
+    }
 
     std::sort(
         result.begin(),
@@ -214,7 +211,7 @@ void AggregatedEvent::storeToRecord(EventLogRecord* record, int limit) const
     for (const auto& event: lastEvents)
         aggregatedInfo.lastEventsData.push_back(serializeEvent(event));
 
-    aggregatedInfo.total = m_aggregatedEvents.size();
+    aggregatedInfo.total = m_count;
 }
 
 } // namespace nx::vms::rules

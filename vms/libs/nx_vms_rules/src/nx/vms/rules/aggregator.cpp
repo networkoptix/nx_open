@@ -10,8 +10,34 @@
 
 namespace nx::vms::rules {
 
-Aggregator::Aggregator(std::chrono::microseconds interval):
-    m_interval(interval)
+namespace {
+
+// Truncates the event list in-place when it reaches twice the limit, keeping half of the
+// earliest and half of the latest events. This prevents unbounded memory growth while
+// preserving both the start and the end of high-frequency event bursts.
+void truncateIfNeed(std::vector<EventPtr>& eventList, size_t maxEventListSize)
+{
+    const size_t truncationThreshold = Aggregator::kLimitMultiplier * maxEventListSize;
+
+    if (eventList.size() < truncationThreshold)
+        return;
+
+    const size_t earliestEventsToKeep = maxEventListSize / 2;
+    const size_t latestEventsToKeep = maxEventListSize - earliestEventsToKeep;
+
+    std::move(
+        eventList.end() - latestEventsToKeep,
+        eventList.end(),
+        eventList.begin() + earliestEventsToKeep);
+
+    eventList.resize(maxEventListSize);
+}
+
+} // namespace
+
+Aggregator::Aggregator(std::chrono::microseconds interval, size_t maxEventListSize):
+    m_interval(interval),
+    m_maxEventListSize(maxEventListSize)
 {
 }
 
@@ -46,6 +72,9 @@ bool Aggregator::aggregate(
                 }),
             event);
 
+        ++aggregationInfo.totalEventCount;
+        truncateIfNeed(aggregationInfo.eventList, m_maxEventListSize);
+
         return true;
     }
 
@@ -77,10 +106,12 @@ std::vector<AggregatedEventPtr> Aggregator::popEvents()
                     {
                         return e->timestamp() < timestamp;
                     });
-                result.insert(lb, AggregatedEventPtr::create(std::move(aggregationInfo.eventList)));
+                result.insert(lb, AggregatedEventPtr::create(
+                    std::move(aggregationInfo.eventList), aggregationInfo.totalEventCount));
 
                 // Store the time aggregated event is popped out to conform the logic that
                 // events should be processed not often than once per the installed interval.
+                aggregationInfo.totalEventCount = 0;
                 aggregationInfo.firstOccurrenceTimestamp = now;
             }
             else

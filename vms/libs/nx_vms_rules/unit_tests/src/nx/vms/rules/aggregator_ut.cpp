@@ -20,10 +20,13 @@ namespace nx::vms::rules::test {
 namespace {
 
 constexpr auto kDefaultAggregationInterval = 1ms;
+constexpr size_t kAggregationLimit = 10;
 
-Aggregator makeAggregator(milliseconds aggregationInterval = kDefaultAggregationInterval)
+Aggregator makeAggregator(
+    milliseconds aggregationInterval = kDefaultAggregationInterval,
+    size_t maxEventListSize = kAggregationLimit)
 {
-    return Aggregator{aggregationInterval};
+    return Aggregator{aggregationInterval, maxEventListSize};
 }
 
 EventPtr makeEvent(const QString& text = QString())
@@ -33,7 +36,13 @@ EventPtr makeEvent(const QString& text = QString())
     return event;
 }
 
+std::string name(const EventPtr& event)
+{
+    return event->property("text").toString().toStdString();
+}
+
 const auto aggregationKeyFunction = [](const EventPtr& e) { return e->property("text").toString(); };
+const auto defaultAggregationKey = [](const EventPtr& e) { return e->aggregationKey(); };
 
 } // namespace
 
@@ -242,6 +251,46 @@ TEST_F(AggregatorTest, splitFunctionWorksProperly)
     // Another one aggregated event consists of 4 "b" events.
     ASSERT_EQ(splitResult.back()->initialEvent(), firstAggregatedBEvent);
     ASSERT_EQ(splitResult.back()->count(), 4);
+}
+
+TEST_F(AggregatorTest, truncationKeepsFirstAndLastEvents)
+{
+    constexpr auto kLongInterval = 100ms; // Use long interval to prevent early popping
+    auto aggregator = makeAggregator(kLongInterval);
+
+    // First event is not aggregated.
+    ASSERT_FALSE(aggregator.aggregate(makeEvent("not"), defaultAggregationKey));
+
+    constexpr int kEventCount = kAggregationLimit * Aggregator::kLimitMultiplier;
+    constexpr auto kNameStart = 'a';
+    constexpr auto kNameEnd = kNameStart + kEventCount - 1;
+
+    for (int i = 0; i < kEventCount; ++i)
+    {
+        adjustTime(1ms);
+        auto event = makeEvent(QChar('a' + i));
+        ASSERT_TRUE(aggregator.aggregate(event, defaultAggregationKey)) << i;
+    }
+
+    // Trigger aggregation and pop events.
+    adjustTime(kLongInterval);
+    auto aggregatedEvents = aggregator.popEvents();
+    ASSERT_EQ(aggregatedEvents.size(), 1);
+
+    auto aggregatedEvent = aggregatedEvents.front();
+    EXPECT_EQ(aggregatedEvent->count(), kEventCount);
+
+    auto [first, last] = aggregatedEvent->takeLimitedAmount(kAggregationLimit + 2);
+
+    EXPECT_EQ(first.size(), last.size());
+    EXPECT_EQ(first.size() + last.size(), kAggregationLimit);
+
+    // Make sure we have exact half of first and last events.
+    for (size_t i = 0; i < first.size(); ++i)
+        EXPECT_EQ(name(first[i]), std::string(1, kNameStart + i));
+
+    for (size_t i = 0; i < last.size(); ++i)
+        EXPECT_EQ(name(last[i]), std::string(1, kNameEnd - last.size() + i + 1));
 }
 
 } // namespace nx::vms::rules::test

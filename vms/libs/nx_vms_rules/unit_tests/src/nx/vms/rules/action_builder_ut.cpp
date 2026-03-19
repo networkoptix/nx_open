@@ -430,9 +430,9 @@ TEST_F(ActionBuilderTest, usersReceivedActionsWithAppropriateCameraId)
         makeEventWithPermissions(cameraOfUser1->getId()),
         makeEventWithPermissions(cameraOfUser2->getId())};
 
-    auto eventAggregator = AggregatedEventPtr::create(std::move(aggregationInfoList));
-
-    EXPECT_EQ(eventAggregator->count(), 2);
+    auto size = aggregationInfoList.size();
+    auto eventAggregator = AggregatedEventPtr::create(std::move(aggregationInfoList), size);
+    ASSERT_EQ(eventAggregator->count(), 2);
 
     builder->process(eventAggregator);
 }
