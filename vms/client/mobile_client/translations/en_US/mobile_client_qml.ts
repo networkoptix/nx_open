@@ -978,18 +978,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>No Cameras</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>We didn&apos;t find any cameras on this layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>We didn&apos;t find any cameras on this site. You can add them in our desktop application</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Stop Connecting</source>
         <translation></translation>
     </message>
@@ -999,6 +987,18 @@
     </message>
     <message>
         <source>Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices were found on this layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
