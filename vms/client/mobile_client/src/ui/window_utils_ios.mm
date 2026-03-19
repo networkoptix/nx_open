@@ -85,3 +85,10 @@ void makeShortVibration()
     static constexpr int kShortVibrationId = 1519;
     AudioServicesPlaySystemSound(kShortVibrationId);
 }
+
+@interface QIOSViewController : UIViewController
+@end
+
+@implementation QIOSViewController (NxHideHomeIndicator)
+- (BOOL)prefersHomeIndicatorAutoHidden { return YES; }
+@end
