@@ -37,14 +37,14 @@ Item
                 */
                 {
                     "objectName": "bookmarksSearchMenuButton",
-                    "iconSource": "image://skin/20x20/Solid/bookmark.svg?primary=light4",
+                    "iconSource": "image://skin/20x20/Solid/bookmark.svg?primary=light10",
                     "text": qsTr("Bookmarks"),
                     "visible": windowContext.mainSystemContext?.hasViewBookmarksPermission,
                     "analyticsSearchMode": false
                 },
                 {
                     "objectName": "analyticsSearchMenuButton",
-                    "iconSource": "image://skin/20x20/Solid/object.svg?primary=light4",
+                    "iconSource": "image://skin/20x20/Solid/object.svg?primary=light10",
                     "text": qsTr("Objects"),
                     "visible": windowContext.mainSystemContext?.hasSearchObjectsPermission,
                     "analyticsSearchMode": true
@@ -62,6 +62,7 @@ Item
                 leftPadding: 0
                 rightPadding: 0
                 text: modelData.text
+                textColor: ColorTheme.colors.light10
                 icon.source: modelData.iconSource
                 icon.width: 24
                 icon.height: 24
