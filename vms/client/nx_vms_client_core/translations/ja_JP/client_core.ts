@@ -89,16 +89,16 @@
     </message>
     <message>
       <source>Internal error. Please try again later.</source>
-      <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
+      <translation>内部エラーが発生しました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、後でもう一度お試しください。</translation>
+      <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
-      <translation>サーバーへの接続を確立できませんでした。後でもう一度お試しください。</translation>
+      <translation>サーバーへの接続を確立できませんでした。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Your session has expired</source>
