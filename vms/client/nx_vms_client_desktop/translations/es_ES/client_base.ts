@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Event occurs</source>
-      <translation>Ocurre Evento</translation>
+      <translation>Ocurre un evento</translation>
     </message>
     <message>
       <source>Event starts</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>Seleccionar area</translation>
+      <translation>Seleccionar área</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>In selected area</source>
-      <translation>En area seleccionada</translation>
+      <translation>En el área seleccionada</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -75,7 +75,7 @@
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 se utilizan</numerusform>
+        <numerusform>%1 Se utilizan</numerusform>
         <numerusform>%1 se utilizan</numerusform>
       </translation>
     </message>
@@ -1126,7 +1126,7 @@
       <comment>Numerus form depends on the amount of items</comment>
       <translation>
         <numerusform>Mostrar en artículos</numerusform>
-        <numerusform>Mostrar en Items</numerusform>
+        <numerusform>Mostrar en Ítems</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1140,9 +1140,9 @@
     <message numerus="yes">
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
-      <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+      <translation>
+        <numerusform>Quitar silencio a elementos</numerusform>
+        <numerusform>Quitar el silencio de los elementos</numerusform>
       </translation>
     </message>
     <message>
@@ -12820,30 +12820,30 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>Cuando ocurre el evento</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>Cuando comienza el evento</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>Cuando el evento se detiene</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Seleccione estado</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Contiene palabras clave</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Contiene entradas de lista</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12851,52 +12851,52 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>De</translation>
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>No contiene palabras clave</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>No contiene entradas de lista</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>La solicitud de búsqueda de listas de red falló</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Error en la regla de eliminación: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Error en la regla de guardado: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Error al restablecer las reglas: %1</translation>
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Numerus form depends on the invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Algunas de las reglas no estaban habilitadas</numerusform>
+        <numerusform>Algunas de las reglas no estaban habilitadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Numerus form depends on the invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Algunas de las reglas seleccionadas no se pueden activar porque tienen parámetros incorrectos. Corríjalos y vuelva a activar la regla.</numerusform>
+        <numerusform>Algunas de las reglas seleccionadas no se pueden activar porque tienen parámetros incorrectos. Corríjalos y vuelva a activar la regla.</numerusform>
       </translation>
     </message>
   </context>
@@ -12923,31 +12923,31 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>Usado</translation>
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>El número de dispositivos que utilizan este servicio supera la capacidad disponible. Añada más servicios o desactive los servicios en algunos dispositivos.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>El %1, el sistema deshabilitará automáticamente el servicio en algunos dispositivos.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Limitación</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Permitido</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Actual</translation>
     </message>
   </context>
   <context>
@@ -13216,15 +13216,15 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>¡La opción de deshacer el reemplazo se ha completado con éxito!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Es posible que algunos ajustes no se transfieran desde la cámara de reemplazo debido a problemas de compatibilidad.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>¿Confirmar deshacer el reemplazo?</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -13232,29 +13232,29 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>No hay cámaras adecuadas para reemplazar en el servidor &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>No hay suficientes derechos de acceso</translation>
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>No tienes permisos para abrir esta cámara en el diseño</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>No tienes permisos para abrir algunas de las cámaras seleccionadas en el diseño</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>La base de datos analítica solo debe almacenarse en una unidad local y puede ocupar grandes cantidades de espacio.
+Una vez que se selecciona una ubicación para almacenar los datos analíticos, no se puede cambiar fácilmente sin perder los datos existentes. Recomendamos elegir la ubicación con cuidado y evitar usar la partición del sistema, ya que puede causar un mal funcionamiento grave.
+De forma predeterminada, los datos analíticos se almacenarán en %1.
+Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Administración de almacenamiento&quot; del cuadro de diálogo Configuración del servidor.</translation>
     </message>
   </context>
   <context>
@@ -13397,18 +13397,18 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Cannot check Client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Cannot check Client update availability. Check your internet connection and try again.</translation>
+      <translation>No se puede comprobar la disponibilidad de la actualización del cliente. Compruebe su conexión a internet e inténtelo de nuevo.</translation>
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation type="unfinished">Client auto-updates</translation>
+      <translation>Actualizaciones automáticas del cliente</translation>
     </message>
   </context>
   <context>
     <name>runApplication</name>
     <message>
       <source>Would you like to try switching to DirectX?</source>
-      <translation type="unfinished">Would you like to try switching to DirectX?</translation>
+      <translation>¿Te gustaría probar a cambiar a DirectX?</translation>
     </message>
   </context>
 </TS>
