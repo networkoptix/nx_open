@@ -11,7 +11,7 @@ import Nx.Mobile.Controls
 import Nx.Mobile.Ui
 import Nx.Ui
 
-Item
+FocusScope
 {
     id: root
 

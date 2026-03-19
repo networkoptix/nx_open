@@ -40,6 +40,12 @@ AdaptiveScreen
         visible: state !== ""
         icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
 
+        onClicked:
+        {
+            if (screen.customBackHandler)
+                screen.customBackHandler()
+        }
+
         states:
         [
             State
@@ -49,7 +55,7 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked:
+                    screen.customBackHandler: () =>
                     {
                         screen.contentItem = searchContent
 
@@ -67,7 +73,11 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: { optionSelectorItem.apply(); screen.contentItem = filtersItem }
+                    screen.customBackHandler: () =>
+                    {
+                        optionSelectorItem.apply()
+                        screen.contentItem = filtersItem
+                    }
                 }
             },
             State
@@ -79,7 +89,7 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: Workflow.popCurrentScreen()
+                    screen.customBackHandler: () => Workflow.popCurrentScreen()
                 }
             },
             State
@@ -89,7 +99,7 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked:
+                    screen.customBackHandler: () =>
                     {
                         detailsLoader.setSource("")
                         screen.contentItem = eventSearchMenu

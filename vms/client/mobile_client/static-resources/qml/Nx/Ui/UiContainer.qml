@@ -131,6 +131,10 @@ Item
             mainWindow.color = currentItem.hasOwnProperty("backgroundColor")
                 ? currentItem.backgroundColor
                 : ColorTheme.colors.dark4
+
+            // Defer focus on currentItem to prevent a closing Menu from restoring focus to the
+            // previous screen.
+            Qt.callLater(() => currentItem.forceActiveFocus())
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
