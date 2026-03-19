@@ -2,7 +2,9 @@
 
 #include "webengine_profile_manager.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QHash>
+#include <QtCore/QStandardPaths>
 #include <QtNetwork/QNetworkProxy>
 #include <QtQml/QtQml>
 #include <QtWebEngineQuick/QQuickWebEngineDownloadRequest>
@@ -58,6 +60,14 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
             QQmlEngine::setContextForObject(profile, qmlContext(parent));
 
         profile->setStorageName(name);
+
+        const QString localDataPath =
+            QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+        const QString profilePath =
+            localDataPath + QDir::separator() + "QtWebEngine" + QDir::separator() + name;
+        profile->setPersistentStoragePath(profilePath);
+        profile->setCachePath(profilePath);
+
         profile->setOffTheRecord(offTheRecord);
 
         if (!proxy.isEmpty())
