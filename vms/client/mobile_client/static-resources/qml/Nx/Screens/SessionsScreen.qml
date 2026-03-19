@@ -405,7 +405,7 @@ AdaptiveScreen
 
             background: Rectangle
             {
-                color: tabButton.checked ? ColorTheme.colors.dark10 : "transparent"
+                color: tabButton.checked ? ColorTheme.colors.dark8 : ColorTheme.colors.dark5
                 radius: 8
             }
 
@@ -578,7 +578,7 @@ AdaptiveScreen
                     id: systemTabs
 
                     Layout.fillWidth: true
-                    color: ColorTheme.colors.dark8
+                    color: ColorTheme.colors.dark5
                     implicitHeight: 48
                     z: 1
                     visible: !LayoutController.isTabletLayout
