@@ -434,7 +434,7 @@ bool SoftwareTriggerCameraButtonController::Private::setVmsTriggerState(
 
             updateActiveTrigger(ruleId, state, success);
         },
-        q->thread());
+        q);
 
     return true;
 }
