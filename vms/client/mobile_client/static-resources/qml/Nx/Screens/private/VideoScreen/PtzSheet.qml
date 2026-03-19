@@ -22,20 +22,6 @@ AdaptiveSheet
     interactive: !panel.joystick.active
     extraBottomPadding: 0
 
-    IconButton
-    {
-        parent: titleCustomArea
-
-        width: 32
-        height: 32
-
-        icon.source: "image://skin/32x32/Outline/close.svg?primary=light10"
-        icon.width: 32
-        icon.height: 32
-
-        onClicked: close()
-    }
-
     PtzPanel
     {
         id: panel
