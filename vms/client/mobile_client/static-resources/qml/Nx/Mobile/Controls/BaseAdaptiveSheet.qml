@@ -30,7 +30,7 @@ Drawer
         if (LayoutController.isPortrait)
         {
             return Math.min(
-                flickable.contentHeight + (content.footer ? content.footer.height + spacing : 0) + control.topPadding + control.bottomPadding,
+                flickable.contentHeight + (control.footer ? control.footer.height + spacing : 0) + control.topPadding + control.bottomPadding,
                 availableHeight)
         }
 
@@ -137,7 +137,6 @@ Drawer
             id: flickable
 
             anchors.fill: parent
-            anchors.bottomMargin: content.footer ? control.spacing : 0
             interactive: control.interactive
             clip: true
             contentHeight: contentColumn.height
