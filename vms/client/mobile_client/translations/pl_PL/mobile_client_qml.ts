@@ -993,15 +993,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Brak urządzeń</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Nie znaleziono urządzeń w tym układzie</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Nie znaleziono żadnych urządzeń na tej stronie. Dodaj urządzenia za pomocą klienta stacjonarnego lub poproś o dostęp do istniejących urządzeń</translation>
     </message>
   </context>
   <context>

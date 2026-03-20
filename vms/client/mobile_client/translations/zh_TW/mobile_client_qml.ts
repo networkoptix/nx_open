@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>按屬性搜尋</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -654,7 +654,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>允許攝影機顯示伺服器時間</translation>
     </message>
   </context>
   <context>
@@ -990,15 +990,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>沒有裝置</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>此佈局中未找到任何裝置</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>此站點上未找到任何裝置。請使用桌面用戶端新增裝置，或申請存取現有裝置。</translation>
     </message>
   </context>
   <context>

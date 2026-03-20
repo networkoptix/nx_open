@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>請輸入至少一個關鍵字</translation>
     </message>
   </context>
   <context>

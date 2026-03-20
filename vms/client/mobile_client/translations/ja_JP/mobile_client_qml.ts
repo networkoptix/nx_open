@@ -990,15 +990,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>デバイスがありません</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>このレイアウトにはデバイスが見つかりませんでした。</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>このサイトにはデバイスが見つかりませんでした。デスクトップクライアントを使用してデバイスを追加するか、既存デバイスへのアクセスをリクエストしてください。</translation>
     </message>
   </context>
   <context>

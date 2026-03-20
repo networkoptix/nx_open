@@ -942,7 +942,7 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>De</translation>
     </message>
     <message>
       <source>To</source>

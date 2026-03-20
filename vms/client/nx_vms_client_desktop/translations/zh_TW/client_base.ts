@@ -2030,7 +2030,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>内部的</translation>
     </message>
   </context>
   <context>
@@ -2363,7 +2363,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>此操作由擴充套件執行。</translation>
     </message>
   </context>
   <context>
@@ -12687,7 +12687,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter keywords separated by space</source>
-      <translation type="unfinished">Enter keywords separated by space</translation>
+      <translation>輸入關鍵字，以空格分開</translation>
     </message>
   </context>
   <context>

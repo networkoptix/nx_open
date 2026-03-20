@@ -991,15 +991,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Ingen Enheder</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Der blev ikke fundet nogen enheder på dette layout</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Der blev ikke fundet nogen enheder på dette site. Tilføj enheder med desktop klienten, eller anmod om adgang til eksisterende enheder</translation>
     </message>
   </context>
   <context>
