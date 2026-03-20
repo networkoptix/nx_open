@@ -9,14 +9,7 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
-#include <nx/vms/client/core/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
-#include <nx/vms/client/core/camera/camera_data_manager.h>
-#include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_connection_factory.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
-#include <nx/vms/client/desktop/access/access_controller.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
@@ -24,13 +17,13 @@
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
+#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 #include <nx/vms/client/desktop/showreel/showreel_state_manager.h>
 #include <nx/vms/client/desktop/statistics/statistics_sender.h>
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
-#include <nx/vms/client/desktop/system_logon/logic/connection_delegate_helper.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
@@ -42,7 +35,6 @@
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <storage/server_storage_manager.h>
 
 #include "application_context.h"
 #include "private/system_context_data_p.h"
@@ -50,6 +42,30 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
+class SettingsRadassStorage: public AbstractRadassStorage, public SystemContextAware
+{
+public:
+    SettingsRadassStorage(SystemContext* ctx): SystemContextAware(ctx)
+    {}
+
+    RadassModeByLayoutItemIdHash localModes() const override
+    {
+        return systemContext()->localSettings()->localLayoutItemRadassModes();
+    }
+    void setLocalModes(const RadassModeByLayoutItemIdHash& modes) override
+    {
+        systemContext()->localSettings()->localLayoutItemRadassModes = modes;
+    }
+    RadassModeByLayoutItemIdHash cloudModes() const override
+    {
+        return systemContext()->userSettings()->crossSiteLayoutItemRadassModes();
+    }
+    void setCloudModes(const RadassModeByLayoutItemIdHash& modes) override
+    {
+        systemContext()->userSettings()->crossSiteLayoutItemRadassModes = modes;
+    }
+};
 
 nx::vms::api::RuntimeData createLocalRuntimeInfo(SystemContext* q)
 {
@@ -112,7 +128,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->userNotificationSettingsManager =
                 std::make_unique<UserNotificationSettingsManager>(this);
             d->storageLocationCameraController = std::make_unique<StorageLocationCameraController>(this);
-            d->radassResourceManager = std::make_unique<RadassResourceManager>(this);
+            d->radassResourceManager = std::make_unique<RadassResourceManager>(
+                std::make_unique<SettingsRadassStorage>(this));
             break;
 
         case Mode::crossSystem:

@@ -8,19 +8,12 @@
 
 namespace nx::vms::client::desktop {
 
-// Please note: enum is numeric-serialized, reordering is forbidden.
-enum class RadassMode
-{
-    Auto = 0,
-    High = 1,
-    Low = 2,
-    Custom = 3,
-};
-
-NX_REFLECTION_INSTRUMENT_ENUM(RadassMode,
+NX_REFLECTION_ENUM_CLASS(RadassMode,
     Auto,
     High,
-    Low)
+    Low,
+    Custom
+);
 
 using RadassModeByLayoutItemIdHash = QHash<nx::Uuid, RadassMode>;
 

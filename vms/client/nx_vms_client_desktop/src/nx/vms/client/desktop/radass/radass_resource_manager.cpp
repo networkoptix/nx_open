@@ -5,24 +5,21 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/algorithm/same.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
-#include <nx/vms/client/desktop/settings/user_specific_settings.h>
 
 namespace nx::vms::client::desktop {
 
 static const RadassMode kDefaultResolution = nx::reflect::fromString(ini().defaultResolution,
     RadassMode::Auto);
 
-RadassResourceManager::RadassResourceManager(SystemContext* systemContext, QObject* parent):
+RadassResourceManager::RadassResourceManager(
+    std::unique_ptr<AbstractRadassStorage> storage, QObject* parent):
     base_type(parent),
-    SystemContextAware(systemContext)
+    m_storage(std::move(storage))
 {
 }
 
@@ -84,8 +81,8 @@ RadassMode RadassResourceManager::mode(const LayoutItemIndexList& items) const
             const bool isCloudLayout =
                 (bool) index.layout().dynamicCast<core::CrossSystemLayoutResource>();
             const RadassModeByLayoutItemIdHash modes = isCloudLayout
-                ? systemContext()->userSettings()->crossSiteLayoutItemRadassModes()
-                : systemContext()->localSettings()->localLayoutItemRadassModes();
+                ? m_storage->cloudModes()
+                : m_storage->localModes();
 
             return modes.value(index.uuid(), kDefaultResolution);
         },
@@ -117,21 +114,21 @@ void RadassResourceManager::setMode(const LayoutItemIndexList& items, RadassMode
 
         if (isCloudLayout)
         {
-            auto itemModes = systemContext()->userSettings()->crossSiteLayoutItemRadassModes();
+            auto itemModes = m_storage->cloudModes();
             if (removeIfAuto)
                 itemModes.remove(item.uuid());
             else
                 itemModes[item.uuid()] = value;
-            systemContext()->userSettings()->crossSiteLayoutItemRadassModes = itemModes;
+            m_storage->setCloudModes(itemModes);
         }
         else
         {
-            auto itemModes = systemContext()->localSettings()->localLayoutItemRadassModes();
+            auto itemModes = m_storage->localModes();
             if (removeIfAuto)
                 itemModes.remove(item.uuid());
             else
                 itemModes[item.uuid()] = value;
-            systemContext()->localSettings()->localLayoutItemRadassModes = itemModes;
+            m_storage->setLocalModes(itemModes);
         }
 
         if (oldMode != value)
