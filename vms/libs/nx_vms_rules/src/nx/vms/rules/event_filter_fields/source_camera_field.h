@@ -14,7 +14,7 @@ constexpr auto kCameraMotionValidationPolicy = "cameraMotion";
 class NX_VMS_RULES_API SourceCameraField: public ResourceFilterEventField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "device")
+    Q_CLASSINFO("type", "device")
 
 public:
     using ResourceFilterEventField::ResourceFilterEventField;

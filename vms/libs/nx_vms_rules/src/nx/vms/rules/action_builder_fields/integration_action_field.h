@@ -11,7 +11,7 @@ class NX_VMS_RULES_API IntegrationActionField:
     public SimpleTypeActionField<QString, IntegrationActionField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "integrationActionType")
+    Q_CLASSINFO("type", "integrationActionType")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

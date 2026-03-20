@@ -32,6 +32,8 @@ void initializeMetatypesInternal()
 
     // Register types and serializers in alphabetical order.
 
+    QnJsonSerializer::registerSerializer<bool>();
+
     qRegisterMetaType<email::Message>();
     QnJsonSerializer::registerSerializer<email::Message>();
 
@@ -75,6 +77,8 @@ void initializeMetatypesInternal()
 
     qRegisterMetaType<nx::vms::rules::UuidSelection>();
     QnJsonSerializer::registerSerializer<nx::vms::rules::UuidSelection>();
+
+    QnJsonSerializer::registerSerializer<Qn::ResourceInfoLevel>(); //< For tests.
 
     qRegisterMetaType<UuidList>("UuidList");
     QnJsonSerializer::registerSerializer<UuidList>();

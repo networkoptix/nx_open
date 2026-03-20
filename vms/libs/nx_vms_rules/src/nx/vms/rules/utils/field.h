@@ -13,6 +13,7 @@
 #include "../manifest.h"
 #include "../strings.h"
 #include "field_names.h"
+#include "type.h"
 
 namespace nx::vms::rules {
 
@@ -24,7 +25,7 @@ FieldDescriptor makeFieldDescriptor(
     const QVariantMap& properties = {})
 {
     return FieldDescriptor{
-        .type = fieldMetatype<T>(),
+        .type = utils::type<T>(),
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,

@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API StateField: public SimpleTypeEventField<State, StateField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "state")
+    Q_CLASSINFO("type", "state")
 
     Q_PROPERTY(nx::vms::api::rules::State value READ value WRITE setValue NOTIFY valueChanged)
 

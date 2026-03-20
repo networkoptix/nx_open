@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API ActionFlagField: public SimpleTypeActionField<bool, ActionFlagField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "flag")
+    Q_CLASSINFO("type", "flag")
 
     Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
 

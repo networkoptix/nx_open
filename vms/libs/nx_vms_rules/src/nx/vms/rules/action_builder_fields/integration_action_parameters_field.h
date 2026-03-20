@@ -21,7 +21,7 @@ class NX_VMS_RULES_API IntegrationActionParametersField:
     public common::SystemContextAware
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "integrationActionParameters")
+    Q_CLASSINFO("type", "integrationActionParameters")
 
     Q_PROPERTY(QJsonObject value READ value WRITE setValue NOTIFY valueChanged)
 

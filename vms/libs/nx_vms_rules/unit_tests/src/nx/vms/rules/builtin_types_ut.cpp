@@ -199,12 +199,14 @@ public:
     template<class F>
     void testActionFieldRegistration(auto... args)
     {
-        SCOPED_TRACE(fieldMetatype<F>().toStdString());
+        const auto type = utils::type<F>();
+        SCOPED_TRACE(type.toStdString());
 
-        EXPECT_TRUE(Plugin::registerActionFieldWithEngine<F>(m_engine, args...));
+        ASSERT_TRUE(registerActionField<F>(args...));
 
         const auto& meta = F::staticMetaObject;
 
+        // Check encrypted properties.
         for (const auto& propName: encryptedProperties<F>())
         {
             SCOPED_TRACE(propName.toStdString());
@@ -214,19 +216,24 @@ public:
             const auto prop = meta.property(idx);
             EXPECT_EQ(prop.userType(), qMetaTypeId<QString>());
         }
-    }
-
-    template<class T>
-    void testEventFieldRegistration(auto... args)
-    {
-        SCOPED_TRACE(fieldMetatype<T>().toStdString());
-
-        EXPECT_TRUE(m_engine->registerEventField(
-            fieldMetatype<T>(),
-            [args...](const FieldDescriptor* descriptor){ return new T(args..., descriptor); }));
 
         // Check for serialization assertions.
-        const FieldDescriptor tmpDescriptor{.type = fieldMetatype<T>()};
+        const FieldDescriptor tmpDescriptor{.type = type};
+        const auto field = m_engine->buildActionField(&tmpDescriptor);
+        const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
+        deserializeProperties(data, field.get());
+    }
+
+    template<class F>
+    void testEventFieldRegistration(auto... args)
+    {
+        const auto type = utils::type<F>();
+        SCOPED_TRACE(type.toStdString());
+
+        ASSERT_TRUE(registerEventField<F>(args...));
+
+        // Check for serialization assertions.
+        const FieldDescriptor tmpDescriptor{.type = type};
         const auto field = m_engine->buildEventField(&tmpDescriptor);
         const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
         deserializeProperties(data, field.get());

@@ -26,7 +26,7 @@ class NX_VMS_RULES_API TargetLayoutsField:
     public SimpleTypeActionField<UuidSet, TargetLayoutsField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "layouts")
+    Q_CLASSINFO("type", "layouts")
 
     Q_PROPERTY(UuidSet value READ value WRITE setValue NOTIFY valueChanged)
 

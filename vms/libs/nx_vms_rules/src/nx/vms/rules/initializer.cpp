@@ -105,19 +105,9 @@ void Initializer::registerFields() const
     // Event filter fields.
     registerEventField<AnalyticsEngineField>();
     registerEventField<AnalyticsEventLevelField>();
-    m_engine->registerEventField(
-        fieldMetatype<AnalyticsEventTypeField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new AnalyticsEventTypeField(systemContext(), descriptor);
-        });
+    registerEventField<AnalyticsEventTypeField>(systemContext());
     registerEventField<AnalyticsAttributesField>();
-    m_engine->registerEventField(
-        fieldMetatype<AnalyticsObjectTypeField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new AnalyticsObjectTypeField(systemContext(), descriptor);
-        });
+    registerEventField<AnalyticsObjectTypeField>(systemContext());
     registerEventField<CustomizableFlagField>();
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
@@ -126,27 +116,12 @@ void Initializer::registerFields() const
     registerEventField<ExpectedUuidField>();
     registerEventField<InputPortField>();
     registerEventField<IntField>();
-    m_engine->registerEventField(
-        fieldMetatype<ObjectLookupField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new ObjectLookupField(systemContext(), descriptor);
-        });
+    registerEventField<ObjectLookupField>(systemContext());
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
-    m_engine->registerEventField(
-        fieldMetatype<SourceUserField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new SourceUserField(systemContext(), descriptor);
-        });
+    registerEventField<SourceUserField>(systemContext());
     registerEventField<StateField>();
-    m_engine->registerEventField(
-        fieldMetatype<TextLookupField>(),
-        [this](const FieldDescriptor* descriptor)
-        {
-            return new TextLookupField(systemContext(), descriptor);
-        });
+    registerEventField<TextLookupField>(systemContext());
     registerEventField<UniqueIdField>();
 
     // Action builder fields.

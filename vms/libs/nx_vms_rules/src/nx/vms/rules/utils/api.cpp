@@ -5,6 +5,7 @@
 #include <QtCore/QJsonArray>
 
 #include <nx/network/http/custom_headers.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/qobject.h>
 #include <nx/vms/api/rules/action_info.h>
 #include <nx/vms/api/rules/event_info.h>
@@ -25,6 +26,7 @@
 #include "../utils/field_names.h"
 #include "api_renamer.h"
 #include "serialization.h"
+#include "type.h"
 
 namespace nx::vms::rules {
 
@@ -233,11 +235,11 @@ api::EventFilter serialize(const EventFilter* filter)
     for (const auto& [name, field]: filter->fields().asKeyValueRange())
     {
         // State field must be processed even if it is not visible.
-        if (!field->properties().visible && field->metatype() != fieldMetatype<StateField>())
+        if (!field->properties().visible && field->type() != utils::type<StateField>())
             continue;
 
         api::Field serialized;
-        serialized.type = field->metatype();
+        serialized.type = field->type();
         serialized.props = field->serializedProperties();
 
         result.fields.emplace(name, std::move(serialized));
@@ -261,7 +263,7 @@ api::ActionBuilder serialize(const ActionBuilder* builder)
             continue;
 
         api::Field serialized;
-        serialized.type = field->metatype();
+        serialized.type = field->type();
         serialized.props = field->serializedProperties();
 
         result.fields.emplace(name, std::move(serialized));
