@@ -265,7 +265,7 @@ ValidationResult Rule::validity(
             if (eventFieldFilter && !eventFieldFilter(field))
                 continue;
 
-            auto validator = m_engine->eventFieldValidator(field->metatype());
+            auto validator = m_engine->eventFieldValidator(field->type());
             if (!validator)
                 continue;
 
@@ -276,7 +276,7 @@ ValidationResult Rule::validity(
             {
                 eventFilterAlerts << QString{" - %1(%2): %3"}
                     .arg(fieldName)
-                    .arg(field->metatype())
+                    .arg(field->type())
                     .arg(fieldValidity.description);
             }
         }
@@ -300,7 +300,7 @@ ValidationResult Rule::validity(
             if (actionFieldFilter && !actionFieldFilter(field))
                 continue;
 
-            auto validator = m_engine->actionFieldValidator(field->metatype());
+            auto validator = m_engine->actionFieldValidator(field->type());
             if (!validator)
                 continue;
 
@@ -311,7 +311,7 @@ ValidationResult Rule::validity(
             {
                 actionBuilderAlerts << QString{" - %1(%2): %3"}
                     .arg(fieldName)
-                    .arg(field->metatype())
+                    .arg(field->type())
                     .arg(fieldValidity.description);
             }
         }

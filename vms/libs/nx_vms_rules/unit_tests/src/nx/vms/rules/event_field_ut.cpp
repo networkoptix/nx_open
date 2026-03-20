@@ -36,7 +36,7 @@ void testSimpleTypeField(
         Field field{&kDummyDescriptor};
         SCOPED_TRACE(nx::format(
             "Field type: %1, value: %2",
-            field.metatype(),
+            field.type(),
             value).toStdString());
 
         EXPECT_EQ(field.value(), ValueType());

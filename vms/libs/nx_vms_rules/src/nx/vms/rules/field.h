@@ -48,13 +48,12 @@ class NX_VMS_RULES_API Field: public QObject
     using base_type = QObject;
 
 public:
-    static constexpr auto kMetatype = "metatype";
     static constexpr auto kEncrypt = "encrypt";
 
 public:
     explicit Field(const FieldDescriptor* descriptor);
 
-    QString metatype() const;
+    QString type() const;
 
     /** Full properties representation. */
     QMap<QString, QJsonValue> serializedProperties() const;
@@ -75,15 +74,6 @@ public:
 private:
     const FieldDescriptor* m_descriptor = nullptr;
 };
-
-template <class T>
-QString fieldMetatype()
-{
-    const auto& meta = T::staticMetaObject;
-    int idx = meta.indexOfClassInfo(Field::kMetatype);
-
-    return (idx < 0) ? QString() : meta.classInfo(idx).value();
-}
 
 template <class T>
 QSet<QString> encryptedProperties()

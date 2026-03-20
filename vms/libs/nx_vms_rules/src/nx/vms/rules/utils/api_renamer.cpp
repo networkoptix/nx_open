@@ -4,6 +4,7 @@
 
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/time_field.h>
+#include <nx/vms/rules/utils/type.h>
 
 namespace nx::vms::rules {
 const IdRenamer kIdRenamer;
@@ -66,7 +67,7 @@ const UnitConverterBase* unitConverter(int type)
 bool isTimeField(const QString& fieldId)
 {
     // TODO: #amalov Use field metadata for this detection.
-    return fieldId == fieldMetatype<TimeField>() || fieldId == fieldMetatype<OptionalTimeField>();
+    return fieldId == utils::type<TimeField>() || fieldId == utils::type<OptionalTimeField>();
 }
 
 QString toApiFieldName(const QString& name, int fieldType)

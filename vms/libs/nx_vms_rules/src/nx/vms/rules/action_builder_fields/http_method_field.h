@@ -38,7 +38,7 @@ struct HttpMethodFieldProperties
 class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString, HttpMethodField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "httpMethod")
+    Q_CLASSINFO("type", "httpMethod")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

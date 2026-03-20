@@ -84,11 +84,11 @@ protected:
     {
         if constexpr (std::is_base_of<nx::vms::rules::ActionBuilderField, field_type>())
         {
-            return P::systemContext()->vmsRulesEngine()->actionFieldValidator(m_field->metatype());
+            return P::systemContext()->vmsRulesEngine()->actionFieldValidator(m_field->type());
         }
         else if constexpr (std::is_base_of<nx::vms::rules::EventFilterField, field_type>())
         {
-            return P::systemContext()->vmsRulesEngine()->eventFieldValidator(m_field->metatype());
+            return P::systemContext()->vmsRulesEngine()->eventFieldValidator(m_field->type());
         }
         else
         {

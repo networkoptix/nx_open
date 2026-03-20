@@ -18,7 +18,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API HttpAuthField: public ActionBuilderField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "httpAuth")
+    Q_CLASSINFO("type", "httpAuth")
     Q_CLASSINFO("encrypt", "password, token")
 
     Q_PROPERTY(nx::network::http::AuthType authType READ authType WRITE setAuthType NOTIFY

@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QMetaClassInfo>
-
 #include <nx/utils/log/assert.h>
 
 #include "engine.h"
 #include "field.h"
+#include "utils/type.h"
 
 namespace nx::vms::rules {
 
@@ -27,27 +26,14 @@ public:
     virtual void registerEvents() const;
     virtual void registerActions() const;
 
-public:
-    template <class F>
-    static bool registerActionFieldWithEngine(Engine* engine, auto... args)
-    {
-        const QString id = fieldMetatype<F>();
-        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
-            return false;
-
-        return engine->registerActionField(id, Engine::ActionFieldRecord{
-            [args...](const FieldDescriptor* descriptor){ return new F(args..., descriptor); },
-            encryptedProperties<F>()});
-    }
-
 protected:
     Plugin(); // Should be used as base class only.
 
     template<class F>
     bool registerEventField(auto... args) const
     {
-        const QString id = fieldMetatype<F>();
-        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'metatype' property"))
+        const QString id = utils::type<F>();
+        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'type' property"))
             return false;
 
         return m_engine->registerEventField(
@@ -62,21 +48,27 @@ protected:
     bool registerEventFieldValidator() const
     {
         return m_engine->registerEventFieldValidator(
-            fieldMetatype<Field>(),
+            utils::type<Field>(),
             std::make_unique<Validator>());
     }
 
     template<class F>
     bool registerActionField(auto... args) const
     {
-        return registerActionFieldWithEngine<F>(m_engine, args...);
+        const QString id = utils::type<F>();
+        if (!NX_ASSERT(!id.isEmpty(), "Class does not have required 'type' property"))
+            return false;
+
+        return m_engine->registerActionField(id, Engine::ActionFieldRecord{
+            [args...](const FieldDescriptor* descriptor){ return new F(args..., descriptor); },
+            encryptedProperties<F>()});
     }
 
     template<class Field, class Validator>
     bool registerActionFieldValidator() const
     {
         return m_engine->registerActionFieldValidator(
-            fieldMetatype<Field>(),
+            utils::type<Field>(),
             std::make_unique<Validator>());
     }
 

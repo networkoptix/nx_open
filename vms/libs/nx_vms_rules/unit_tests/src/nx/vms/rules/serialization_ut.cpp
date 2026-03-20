@@ -19,7 +19,14 @@
 
 namespace nx::vms::rules::test {
 
-class VmsRulesSerializationTest: public EngineBasedTest {};
+class VmsRulesSerializationTest: public EngineBasedTest, public Plugin
+{
+public:
+    VmsRulesSerializationTest()
+    {
+        initialize(engine.get());
+    }
+};
 
 TEST_F(VmsRulesSerializationTest, EventField)
 {
@@ -27,9 +34,9 @@ TEST_F(VmsRulesSerializationTest, EventField)
 
     static const auto kEventType = "nx.vms_rules_serialization.event_field.test";
     static const auto kFieldName = "test";
-    engine->registerEventField(
-        fieldMetatype<TestEventField>(),
-        [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; });
+
+    registerEventField<TestEventField>();
+
     engine->registerEvent(
         ItemDescriptor{
             .id = kEventType,
@@ -70,7 +77,7 @@ TEST_F(VmsRulesSerializationTest, EventField)
     auto newField = newFilter->fields()[kFieldName];
     ASSERT_TRUE(newField);
 
-    ASSERT_EQ(sourceField->metatype(), newField->metatype());
+    ASSERT_EQ(sourceField->type(), newField->type());
     auto resultField = dynamic_cast<TestEventField*>(newField);
     ASSERT_TRUE(resultField);
 

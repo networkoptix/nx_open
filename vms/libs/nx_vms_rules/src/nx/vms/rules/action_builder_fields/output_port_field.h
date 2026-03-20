@@ -10,7 +10,7 @@ namespace nx::vms::rules {
 class NX_VMS_RULES_API OutputPortField: public SimpleTypeActionField<QString, OutputPortField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "outputPort")
+    Q_CLASSINFO("type", "outputPort")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

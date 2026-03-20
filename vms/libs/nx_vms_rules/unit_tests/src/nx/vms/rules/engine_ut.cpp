@@ -36,8 +36,8 @@ namespace {
 
 const QString kTestEventId = "testEvent";
 const QString kTestActionId = "testAction";
-const QString kTestEventFieldId = fieldMetatype<TestEventField>();
-const QString kTestActionFieldId = fieldMetatype<TestActionField>();
+const QString kTestEventFieldId = utils::type<TestEventField>();
+const QString kTestActionFieldId = utils::type<TestActionField>();
 
 const FieldDescriptor kTestEventFieldDescriptor{.type = kTestEventFieldId};
 const FieldDescriptor kTestActionFieldDescriptor{.type = kTestActionFieldId};
@@ -53,8 +53,14 @@ api::Rule makeEmptyRuleData()
 
 } // namespace
 
-class EngineTest: public EngineBasedTest
+class EngineTest: public EngineBasedTest, public Plugin
 {
+public:
+    EngineTest()
+    {
+        initialize(engine.get());
+    }
+
 protected:
     Engine::EventConstructor testEventConstructor = [] { return new TestEvent; };
     Engine::ActionConstructor testActionConstructor = [] { return new TestAction; };
@@ -238,10 +244,7 @@ TEST_F(EngineTest, buildEventFilterMustFailIfEventNotRegistered)
 
 TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
 {
-    const QString fieldId = fieldMetatype<TestEventField>();
-    ASSERT_TRUE(engine->registerEventField(
-        fieldId,
-        [](const FieldDescriptor* descriptor){ return new TestEventField{descriptor}; }));
+    ASSERT_TRUE(registerEventField<TestEventField>());
 
     ItemDescriptor eventDescriptor{
         .id = kTestEventId,
@@ -258,7 +261,7 @@ TEST_F(EngineTest, manifestFieldNamesShouldBeUnique)
 
 TEST_F(EngineTest, actionFieldBuiltWithCorrectType)
 {
-    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<TestActionField>(engine.get()));
+    ASSERT_TRUE(registerActionField<TestActionField>());
 
     auto field = engine->buildActionField(&kTestActionFieldDescriptor);
 
@@ -274,7 +277,7 @@ TEST_F(EngineTest, buildActionFieldMustFailIfFieldNotRegistered)
 
 TEST_F(EngineTest, actionBuilderBuiltWithCorrectTypeAndCorrectFields)
 {
-    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<TestActionField>(engine.get()));
+    ASSERT_TRUE(registerActionField<TestActionField>());
 
     const QString fieldName = "testField";
 
@@ -384,10 +387,8 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
 {
     // Suppose there is one event and one action registered. Both have two fields each.
 
-    const QString eventFieldType = fieldMetatype<TestEventField>();
-    engine->registerEventField(
-        eventFieldType,
-        [](const FieldDescriptor* descriptor) { return new TestEventField{descriptor}; });
+    const QString eventFieldType = utils::type<TestEventField>();
+    registerEventField<TestEventField>();
 
     ItemDescriptor eventDescriptor{
         .id = kTestEventId,
@@ -399,8 +400,8 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     };
     engine->registerEvent(eventDescriptor, testEventConstructor);
 
-    const QString actionFieldType = fieldMetatype<TestActionField>();
-    Plugin::registerActionFieldWithEngine<TestActionField>(engine.get());
+    const QString actionFieldType = utils::type<TestActionField>();
+    registerActionField<TestActionField>();
 
     ItemDescriptor actionDescriptor{
         .id = kTestActionId,
@@ -435,21 +436,21 @@ TEST_F(EngineTest, defaultFieldBuiltForAbsentInManifest)
     auto eventFilter = engine->buildEventFilter(serializedEventFilter);
     ASSERT_TRUE(eventFilter);
     ASSERT_TRUE(eventFilter->fields().contains("testField1"));
-    ASSERT_EQ(eventFilter->fields()["testField1"]->metatype(), eventFieldType);
+    ASSERT_EQ(eventFilter->fields()["testField1"]->type(), eventFieldType);
     ASSERT_TRUE(eventFilter->fields().contains("testField2"));
-    ASSERT_EQ(eventFilter->fields()["testField2"]->metatype(), eventFieldType);
+    ASSERT_EQ(eventFilter->fields()["testField2"]->type(), eventFieldType);
 
     auto actionBuilder = engine->buildActionBuilder(serializedActionBuilder);
     ASSERT_TRUE(actionBuilder);
     ASSERT_TRUE(actionBuilder->fields().contains("testField1"));
-    ASSERT_EQ(actionBuilder->fields()["testField1"]->metatype(), actionFieldType);
+    ASSERT_EQ(actionBuilder->fields()["testField1"]->type(), actionFieldType);
     ASSERT_TRUE(actionBuilder->fields().contains("testField2"));
-    ASSERT_EQ(actionBuilder->fields()["testField2"]->metatype(), actionFieldType);
+    ASSERT_EQ(actionBuilder->fields()["testField2"]->type(), actionFieldType);
 }
 
 TEST_F(EngineTest, onlyValidProlongedActionRegistered)
 {
-    ASSERT_TRUE(Plugin::registerActionFieldWithEngine<OptionalTimeField>(engine.get()));
+    ASSERT_TRUE(registerActionField<OptionalTimeField>());
 
     ItemDescriptor withoutFields{
         .id = "withoutFields",
@@ -493,9 +494,7 @@ TEST_F(EngineTest, runningEventState)
 {
    auto plugin = TestPlugin(engine.get());
 
-    engine->registerEventField(
-        fieldMetatype<StateField>(),
-        [](const FieldDescriptor* descriptor) { return new StateField{descriptor}; });
+    registerEventField<StateField>();
 
     auto rule = makeRule<TestEventProlonged, TestAction>();
 

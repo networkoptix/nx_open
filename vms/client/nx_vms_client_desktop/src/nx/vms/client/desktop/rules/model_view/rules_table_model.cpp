@@ -80,9 +80,9 @@ bool isRuleValid(const RulesTableModel::ConstRulePtr& rule)
 bool hasLookupList(const vms::rules::ItemDescriptor& eventDescriptor)
 {
     static const auto kTextLookupFieldType =
-        vms::rules::fieldMetatype<vms::rules::TextLookupField>();
+        vms::rules::utils::type<vms::rules::TextLookupField>();
     static const auto kObjectLookupFieldType =
-        vms::rules::fieldMetatype<vms::rules::ObjectLookupField>();
+        vms::rules::utils::type<vms::rules::ObjectLookupField>();
 
     return std::ranges::any_of(
         eventDescriptor.fields,

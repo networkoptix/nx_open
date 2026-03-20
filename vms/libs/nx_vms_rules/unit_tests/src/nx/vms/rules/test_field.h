@@ -12,7 +12,7 @@ namespace nx::vms::rules::test {
 class TestEventField: public nx::vms::rules::EventFilterField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "test")
+    Q_CLASSINFO("type", "test")
 
     Q_PROPERTY(nx::Uuid id MEMBER id)
     Q_PROPERTY(UuidSet idSet MEMBER idSet)
@@ -46,7 +46,7 @@ public:
 class TestActionField: public nx::vms::rules::ActionBuilderField
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "test")
+    Q_CLASSINFO("type", "test")
 
 public:
     using vms::rules::ActionBuilderField::ActionBuilderField;

@@ -40,7 +40,7 @@ void testSimpleTypeField(const std::initializer_list<T>& values)
         Field field{&fakeDescriptor};
         SCOPED_TRACE(nx::format(
             "Field type: %1, value: %2",
-            field.metatype(),
+            field.type(),
             testValue).toStdString());
 
         EXPECT_EQ(field.value(), ValueType());
@@ -72,6 +72,7 @@ struct FormatResult
 
 class ActionFieldTest:
     public EngineBasedTest,
+    public Plugin,
     public ::testing::WithParamInterface<FormatResult>
 {
 public:
@@ -88,11 +89,10 @@ public:
 
     ActionFieldTest()
     {
-        engine->registerEventField(
-            fieldMetatype<StateField>(),
-            [](const FieldDescriptor* descriptor) { return new StateField(descriptor); });
+        initialize(engine.get());
 
-        engine->registerEvent(TestEvent::manifest(), []{ return new TestEvent(); });
+        registerEventField<StateField>();
+        registerEvent<TestEvent>();
     }
 
     TestEventPtr makeEvent(State state = State::instant)
@@ -107,28 +107,11 @@ public:
 
     EventPtr makeAnalyticsEvent()
     {
-        engine->registerEventField(
-            fieldMetatype<SourceCameraField>(),
-            [](const FieldDescriptor* descriptor) { return new SourceCameraField(descriptor); });
-        engine->registerEventField(
-            fieldMetatype<AnalyticsEventTypeField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new AnalyticsEventTypeField(systemContext(), descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<TextLookupField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new TextLookupField(systemContext(), descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<AnalyticsAttributesField>(),
-            [](const FieldDescriptor* descriptor)
-            {
-                return new AnalyticsAttributesField(descriptor);
-            });
-        engine->registerEvent(AnalyticsEvent::manifest(), [] { return new AnalyticsEvent(); });
+        registerEventField<SourceCameraField>();
+        registerEventField<AnalyticsEventTypeField>(systemContext());
+        registerEventField<TextLookupField>(systemContext());
+        registerEventField<AnalyticsAttributesField>();
+        registerEvent<AnalyticsEvent>();
 
         static const EventData kEventAtributeData = {
             {"type", AnalyticsEvent::manifest().id}
@@ -138,33 +121,12 @@ public:
 
     EventPtr makeSoftTriggerEvent()
     {
-        engine->registerEventField(
-            fieldMetatype<UniqueIdField>(),
-            [](const FieldDescriptor* descriptor) { return new UniqueIdField(descriptor); });
-        engine->registerEventField(
-            fieldMetatype<SourceCameraField>(),
-            [](const FieldDescriptor* descriptor) { return new SourceCameraField(descriptor); });
-        engine->registerEventField(
-            fieldMetatype<SourceUserField>(),
-            [this](const FieldDescriptor* descriptor)
-            {
-                return new SourceUserField(systemContext(), descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<CustomizableTextField>(),
-            [](const FieldDescriptor* descriptor)
-            {
-                return new CustomizableTextField(descriptor);
-            });
-        engine->registerEventField(
-            fieldMetatype<CustomizableIconField>(),
-            [](const FieldDescriptor* descriptor)
-            {
-                return new CustomizableIconField(descriptor);
-            });
-        engine->registerEvent(
-            SoftTriggerEvent::manifest(),
-            [](){ return new SoftTriggerEvent(); });
+        registerEventField<UniqueIdField>();
+        registerEventField<SourceCameraField>();
+        registerEventField<SourceUserField>(systemContext());
+        registerEventField<CustomizableTextField>();
+        registerEventField<CustomizableIconField>();
+        registerEvent<SoftTriggerEvent>();
 
         static const EventData kEventAtributeData = {
             {"type", SoftTriggerEvent::manifest().id},
@@ -223,7 +185,7 @@ TEST_F(ActionFieldTest, EventStartTimeInstantEvent)
 
 TEST_F(ActionFieldTest, EventTimeProlongedEvent)
 {
-    Plugin::registerActionFieldWithEngine<TextWithFields>(engine.get(), systemContext());
+    registerActionField<TextWithFields>(systemContext());
 
     engine->registerAction(
         TestActionWithTextWithFields::manifest(),

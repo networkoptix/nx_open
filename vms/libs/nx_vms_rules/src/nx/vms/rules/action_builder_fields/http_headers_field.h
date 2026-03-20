@@ -11,7 +11,7 @@ class NX_VMS_RULES_API HttpHeadersField:
     public SimpleTypeActionField<QList<KeyValueObject>, HttpHeadersField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "httpHeaders")
+    Q_CLASSINFO("type", "httpHeaders")
 
     Q_PROPERTY(QList<KeyValueObject> value READ value WRITE setValue NOTIFY valueChanged)
 

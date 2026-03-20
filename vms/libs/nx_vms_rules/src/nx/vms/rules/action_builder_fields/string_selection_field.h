@@ -44,7 +44,7 @@ class NX_VMS_RULES_API StringSelectionField:
     public SimpleTypeActionField<QString, StringSelectionField>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "stringSelection")
+    Q_CLASSINFO("type", "stringSelection")
 
     Q_PROPERTY(QString value READ value WRITE setValue NOTIFY valueChanged)
 

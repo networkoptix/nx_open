@@ -26,7 +26,7 @@ FieldDescriptor makeInvisibleFieldDescriptor(const QString& fieldName,
 {
     properties["visible"] = false;
     return FieldDescriptor{
-        .type = fieldMetatype<T>(),
+        .type = utils::type<T>(),
         .fieldName = fieldName,
         .displayName = displayName,
         .description = description,
