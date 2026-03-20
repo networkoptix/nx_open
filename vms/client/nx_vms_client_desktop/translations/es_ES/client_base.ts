@@ -1567,7 +1567,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation>No es válido el URL.</translation>
+      <translation>La URL no es válida.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1598,11 +1598,11 @@ Clave de licencia: %2</translation>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation>Enrutar vía %1</translation>
+      <translation>Ruta vía %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation>Enrutar vía servidor SMTP</translation>
+      <translation>Ruta a través del servidor SMTP</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1623,7 +1623,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation>No se puede localizar el servidor</translation>
+      <translation>No se puede acceder al servidor</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>

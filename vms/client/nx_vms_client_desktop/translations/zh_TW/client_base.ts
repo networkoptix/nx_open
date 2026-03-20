@@ -2030,7 +2030,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>内部的</translation>
     </message>
   </context>
   <context>
@@ -2363,7 +2363,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>此操作由擴充套件執行。</translation>
     </message>
   </context>
   <context>
