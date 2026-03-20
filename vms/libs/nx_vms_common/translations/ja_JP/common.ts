@@ -201,11 +201,11 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
       <source>Any Device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>ファームウェアの更新を行ってください。問題が継続する場合はサポートにお問合せください。</translation>
+      <translation>最後に、ファームウェアの更新をお試しください。問題が解決しない場合は、 サポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -324,7 +324,7 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>サポートにお問合せください。</translation>
+      <translation>サポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>

@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>全てはい</translation>
+      <translation>すべてはい</translation>
     </message>
     <message>
       <source>No</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>No to All</source>
-      <translation>全ていいえ</translation>
+      <translation>すべていいえ</translation>
     </message>
   </context>
   <context>
@@ -913,7 +913,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>全てはい(&amp;A)</translation>
+      <translation>すべてはい (&amp;A)</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -921,7 +921,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>全ていいえ(&amp;O)</translation>
+      <translation>すべていいえ (&amp;O)</translation>
     </message>
     <message>
       <source>Abort</source>

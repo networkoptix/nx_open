@@ -45,7 +45,7 @@
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続を復旧した後、再度お試しください。</translation>
+      <translation>%1 への接続を復旧し、再度お試しください。</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
+      <translation>試行回数が多すぎます。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
+      <translation>ログイン試行回数が多すぎます。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -164,7 +164,7 @@
     </message>
     <message>
       <source>Please contact the site administrator to regain access.</source>
-      <translation>アクセスを回復するには、サイト管理者に連絡してください。</translation>
+      <translation>再度アクセスするには、サイト管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>This might be due to an expired server certificate or an invalid certificate. Contact your site administrator for further investigation.</source>
-      <translation>期限切れまたは無効なサーバー証明書が原因である可能性があります。詳細な調査については、サイト管理者にお問い合わせください。</translation>
+      <translation>無効もしくは期限切れのサーバー証明書が原因である可能性があります。詳細な調査については、サイト管理者にお問い合わせください。</translation>
     </message>
   </context>
   <context>
