@@ -1,5 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+.import QtQuick.Controls as Controls
+
+.import nx.vms.client.mobile.timeline as Timeline
+
 function openDefaultScreen()
 {
     if (windowContext.sessionManager.hasSession)
@@ -39,7 +43,7 @@ function hasScreenInStack(screenName)
 
 function openSessionsScreen()
 {
-    var item = stackView.get(0, StackView.ForceLoad)
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName === "sessionsScreen")
     {
         if (stackView.depth > 1)
@@ -94,7 +98,7 @@ function openConnectToServerScreen(host, user, password, operationId)
 
 function openResourcesScreen(systemName, filterIds)
 {
-    var item = stackView.get(0, StackView.ForceLoad)
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
     {
         item.filterIds = filterIds
