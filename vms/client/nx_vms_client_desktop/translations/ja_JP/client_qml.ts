@@ -449,11 +449,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -2442,19 +2442,19 @@ Alt + クリックを使用してください。</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはサスペンドしています。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはサスペンド状態です。現在のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはサスペンドしています。サイト内のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはサスペンド状態です。サイト内のデバイスに対してインテグレーションの使用を有効化/無効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはシャットダウンされました。現在のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブ状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはシャットダウン状態です。このインテグレーションを現在のデバイスで有効化するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>サイトはシャットダウンされました。サイト内のデバイスに対してこのインテグレーションの使用を有効化するには、サイトがアクティブ状態である必要があります。詳細についてはチャネルパートナーにお問い合わせください。</translation>
+      <translation>サイトはシャットダウン状態です。このインテグレーションをデバイスに適用するには、サイトがアクティブ状態である必要があります。詳細については、チャネルパートナーにお問い合わせください。</translation>
     </message>
   </context>
   <context>
@@ -2981,7 +2981,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation>安全でない認証を有効にするにはパスワードを設定してください</translation>
+      <translation>安全でない認証を有効にするには、パスワードを再設定してください。</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>

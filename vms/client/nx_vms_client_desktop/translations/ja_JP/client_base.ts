@@ -36,7 +36,7 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation>任意のタイプ</translation>
+      <translation>すべてのタイプ</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -1448,7 +1448,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation>%1 に連絡してください。</translation>
+      <translation>%1 までお問い合わせください。</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
@@ -2691,7 +2691,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>ネットワーク エラーです。インターネット接続を確認してやり直してください。</translation>
+      <translation>ネットワークエラー。インターネット接続をご確認のうえ、再度お試し下さい。</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -3992,7 +3992,7 @@ License Key: %2</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>任意のユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -4378,8 +4378,8 @@ License Key: %2</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。データを維持して後ほど手動で移動させる、もしくはここで完全に削除することができます。
-分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。手動で移動させるためにデータを維持することも、完全に削除することもできます。
+分析データを別の保存先に移動する場合は、作業を進める前にサポートにお問い合わせください。</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
@@ -4464,7 +4464,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンド状態です。バックアップ設定の変更やクラウドストレージの有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
@@ -4996,11 +4996,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation>クラウドストレージが利用可能です</translation>
+      <translation>クラウドストレージが利用可能</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation>クラウドストレージが有効です</translation>
+      <translation>クラウドストレージが有効</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
@@ -5046,7 +5046,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation>このファイルを使用する可能性のあるプログラムをすべて閉じて、再度お試しください</translation>
+      <translation>このファイルを使用する可能性のあるプログラムをすべて閉じ、再度お試しください。</translation>
     </message>
     <message>
       <source>File used by another process</source>
@@ -5741,19 +5741,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any Device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>任意のサーバー</translation>
+      <translation>すべてのサーバー</translation>
     </message>
     <message>
       <source>Any User</source>
-      <translation>任意のユーザー</translation>
+      <translation>すべてのユーザー</translation>
     </message>
     <message>
       <source>Error</source>
@@ -6241,11 +6241,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -6379,7 +6379,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>フィルターを変更するか、カメラプラグイン設定でオブジェクト検出を設定してください</translation>
+      <translation>フィルターを変更するか、カメラプラグイン設定でオブジェクト検出を設定してください。</translation>
     </message>
   </context>
   <context>
@@ -6599,7 +6599,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation>サイトは現在サスペンドされています。</translation>
+      <translation>サイトは現在サスペンド状態です。</translation>
     </message>
   </context>
   <context>
@@ -6701,7 +6701,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンドされています。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブ状態である必要があります。無効化することは可能です。%1</translation>
+      <translation>クラウドバックアップは継続されますが、サイトは現在サスペンド状態です。&quot;バックアップ対象&quot; および &quot;ストリーム品質&quot; 設定の変更や、クラウドバックアップの有効化を行う場合は、サイトがアクティブ状態である必要があります。無効化することは可能です。%1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
@@ -7173,7 +7173,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation>録画は継続していますが、サイトは現在サスペンドされています。デバイス録画設定の変更や録画の有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
+      <translation>録画は継続していますが、サイトは現在サスペンド状態です。デバイス録画設定の変更や録画の有効化を行うには、サイトがアクティブ状態である必要があります。サポートについては、チャネルパートナーにお問い合わせください。</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
@@ -7196,7 +7196,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラを選択してください</translation>
+      <translation>カメラ選択</translation>
     </message>
     <message>
       <source>Select Device</source>
@@ -7204,7 +7204,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Camera</source>
-      <translation>カメラを選択してください</translation>
+      <translation>カメラ選択</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -7380,7 +7380,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation>音声ストリームの送信先として音声を再生するデバイスを選択する必要があります。</translation>
+      <translation>音声ストリームの送信先として、音声を再生するデバイスを選択する必要があります。</translation>
     </message>
   </context>
   <context>
@@ -7937,7 +7937,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any Action</source>
-      <translation>全てのアクション</translation>
+      <translation>すべてのアクション</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
@@ -9138,7 +9138,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation>続行する前に %1 に連絡することをお勧めします。</translation>
+      <translation>作業を進める前に、%1 までお問い合わせいただくことをお勧めします。</translation>
     </message>
     <message>
       <source>Merge Sites</source>
@@ -10365,7 +10365,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation>選択したカメラの一部は、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+      <translation>選択されたカメラの中には、ストリームが1つしかないものが存在します。モーションの有無によらず、同じ解像度および画質で録画されます。</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
@@ -11890,7 +11890,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation>レイアウトからすべてのローカルファイルを削除して、もう一度やり直してください。</translation>
+      <translation>レイアウトからすべてのローカルファイルを削除し、再度お試し下さい。</translation>
     </message>
     <message>
       <source>Starting export...</source>
@@ -12560,15 +12560,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Any Device</source>
-      <translation>全デバイス</translation>
+      <translation>すべてのデバイス</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>任意のサーバー</translation>
+      <translation>すべてのサーバー</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
@@ -13013,7 +13013,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation>選択したカメラをレイアウト上で開く権限がありません</translation>
+      <translation>選択したカメラをレイアウト上で開く権限がありません。</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.

@@ -47,7 +47,7 @@
     </message>
     <message>
       <source>Any event</source>
-      <translation>全イベント</translation>
+      <translation>すべてのイベント</translation>
     </message>
     <message>
       <source>Analytics events</source>
@@ -71,7 +71,7 @@
     </message>
     <message>
       <source>Any device issue</source>
-      <translation>すべてのデバイス障害</translation>
+      <translation>全デバイス障害</translation>
     </message>
     <message>
       <source>Server events</source>
