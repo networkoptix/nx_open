@@ -81,6 +81,8 @@ public:
 
     menu::Parameters currentParameters() const;
 
+    void acquireClientStateIfNeeded();
+
 signals:
     void resourceSelectionChanged();
 
