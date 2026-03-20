@@ -527,23 +527,6 @@ Page
         }
     }
 
-    component ControlButton: Button
-    {
-        property bool suppressDisabledState: false
-
-        readonly property string effectiveState: suppressDisabledState && !enabled
-            ? (checked ? "default_checked" : "default_unchecked")
-            : state
-
-        backgroundColor: parameters.colors[effectiveState]
-        foregroundColor: parameters.textColors[effectiveState]
-
-        leftPadding: 10
-        rightPadding: 10
-        icon.width: 24
-        icon.height: 24
-    }
-
     Rectangle
     {
         id: navigationBar
@@ -641,89 +624,31 @@ Page
                             }
                         }
 
-                        Rectangle
+                        SpeedControl
                         {
                             id: speedControl
 
-                            readonly property real speed: speedSlider.value < 0
-                                ? -Math.pow(2.0, -speedSlider.value - 1.0)
-                                : Math.pow(2.0, speedSlider.value)
+                            expandedWidth: navigationBarContent.availableWidth
+                                - playPauseButton.width
+                                - playBar.spacing
 
-                            property bool expanded: false
-
-                            readonly property real expandedWidth:
-                                navigationBarContent.availableWidth
-                                    - playPauseButton.width
-                                    - playBar.spacing
+                            forced1x: controller.playingLive
+                            paused: !controller.playing
 
                             color: playBar.backgroundColor
                             radius: playBar.roundingRadius
-                            height: speedButton.height
-                            clip: true
 
-                            width: expanded ? expandedWidth : speedButton.width
-                            Behavior on width { ExpandCollapseAnimation {}}
-
-                            ControlButton
+                            onMoved:
                             {
-                                id: speedButton
-
-                                enabled: !speedControl.expanded
-                                suppressDisabledState: !playBar.enabled || speedControl.expanded
-                                width: 60
-
-                                text: `${speedControl.speed}x`
-
-                                onClicked:
-                                    speedControl.expanded = true
-                            }
-
-                            RowLayout
-                            {
-                                anchors.left: speedButton.right
-                                spacing: 0
-
-                                height: speedControl.height
-                                width: speedControl.expandedWidth - speedButton.width
-
-                                opacity: speedControl.expanded ? 1.0 : 0.0
-                                Behavior on opacity { NumberAnimation { duration: 250 }}
-
-                                visible: opacity > 0.0
-
-                                Slider
+                                if (pausable)
                                 {
-                                    id: speedSlider
-
-                                    enabled: !controller.playingLive
-                                    opacity: (playBar.enabled && !enabled) ? 0.3 : 1.0
-
-                                    Layout.alignment: Qt.AlignVCenter
-                                    Layout.fillWidth: true
-
-                                    from: 0 //< TODO: Fix reverse in the player and make this "-5".
-                                    to: 4
-                                    stepSize: 1
-                                    snapMode: Slider.SnapOnRelease
+                                    if (speed == 0)
+                                        controller.pause()
+                                    else
+                                        controller.play()
                                 }
 
-                                ControlButton
-                                {
-                                    id: speedControlCollapseButton
-
-                                    leftPadding: 18
-                                    rightPadding: 18
-                                    icon.source: "image://skin/24x24/Solid/cancel.svg"
-                                    Layout.alignment: Qt.AlignVCenter
-
-                                    onClicked:
-                                        speedControl.expanded = false
-                                }
-                            }
-
-                            Binding
-                            {
-                                controller.speed: speedControl.speed
+                                controller.speed = speedControl.speed
                             }
                         }
 
@@ -731,17 +656,6 @@ Page
                         {
                             if (!enabled)
                                 speedControl.expanded = false
-                        }
-
-                        Connections
-                        {
-                            target: controller
-
-                            function onPlayingLiveChanged()
-                            {
-                                if (controller.playingLive)
-                                    speedSlider.value = 0
-                            }
                         }
                     }
 
