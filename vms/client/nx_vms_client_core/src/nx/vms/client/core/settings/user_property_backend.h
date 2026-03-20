@@ -7,7 +7,6 @@
 #include <QtCore/QJsonObject>
 
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/property_storage/abstract_backend.h>
 #include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -28,7 +27,7 @@ public:
         const SessionTokenHelperGetter& tokenHelperGetter);
 
     virtual bool isWritable() const override;
-    virtual QString readValue(const QString& name, bool* success = nullptr) override;
+    virtual QString readValue(const QString& name) const override;
     virtual bool writeValue(const QString& name, const QString& value) override;
     virtual bool removeValue(const QString& name) override;
     virtual bool exists(const QString& name) const override;

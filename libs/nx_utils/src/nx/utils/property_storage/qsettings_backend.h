@@ -20,7 +20,7 @@ public:
     virtual ~QSettingsBackend() override;
 
     virtual bool isWritable() const override;
-    virtual QString readValue(const QString& name, bool* success = nullptr) override;
+    virtual QString readValue(const QString& name) const override;
     virtual bool writeValue(const QString& name, const QString& value) override;
     virtual bool removeValue(const QString& name) override;
     virtual bool exists(const QString& name) const override;

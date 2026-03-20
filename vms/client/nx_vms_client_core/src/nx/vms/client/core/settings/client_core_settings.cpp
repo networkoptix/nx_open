@@ -21,9 +21,11 @@
     #include <nx/vms/client/core/settings/keychain_property_storage_backend.h>
 #endif
 
+namespace nx::vms::client::core {
+
 using namespace std::chrono;
 
-namespace nx::vms::client::core {
+using Backend = nx::utils::property_storage::AbstractBackend;
 
 namespace {
 
@@ -65,6 +67,55 @@ struct SystemAuthenticationData_v42
 };
 NX_REFLECTION_INSTRUMENT(SystemAuthenticationData_v42, (key)(value));
 
+// TODO: #amalov Remove all keyV1 and UTF-8 validity related code when 6.0 is no longer supported.
+
+// Previous versions of the client used incorrect string handling like QString::fromUtf8(randomBytes)
+// so the compatible key should be valid UTF-8 string.
+QByteArray genKeyV1()
+{
+    auto result = nx::crypt::generateAesExtraKey();
+    for (char& c: result)
+    {
+        if (c < 0)
+            c += 128;
+    }
+
+    return result;
+}
+
+bool isValidKeyV1(const QByteArray& key)
+{
+    return !key.isEmpty() && key.isValidUtf8();
+}
+
+QByteArray readKeyV1(const Backend& backend)
+{
+    return backend.readValue(kSecureKeyPropertyName).toUtf8();
+}
+
+bool writeKeyV1(Backend& backend, const QByteArray& key)
+{
+    NX_ASSERT(isValidKeyV1(key));
+
+    return backend.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key));
+}
+
+QByteArray rewriteKeys(Backend& backend, const QByteArray& oldKey)
+{
+    auto newKey = isValidKeyV1(oldKey) ? oldKey : genKeyV1();
+
+    if (backend.writeValue(kSecureKeyV2PropertyName, QString::fromUtf8(newKey.toBase64()))
+        && writeKeyV1(backend, newKey))
+    {
+        return newKey;
+    }
+    else
+    {
+        NX_WARNING(typeid(Settings), "Keychain is not available, using predefined key");
+        return oldKey;
+    }
+}
+
 } // namespace
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LocalConnectionData, (json), (systemName)(urls))
@@ -80,36 +131,29 @@ Settings::Settings(const InitializationOptions& options):
 {
     qRegisterMetaType<QSet<QString>>("QnStringSet");
 
+    std::unique_ptr<Backend> keychain;
+    bool writeKey = false;
+
     if (options.useKeychain)
     {
+        NX_ASSERT(options.securityKey.isEmpty());
+
         #if defined(USE_QT_KEYCHAIN)
             const QString serviceName = nx::branding::company() + " " + nx::branding::vmsName();
-            KeychainBackend keychain(serviceName);
+            keychain = std::make_unique<KeychainBackend>(serviceName);
 
-            // We store base64-encoded key as v2 because the Windows backend does not allow to
-            // store non-latin1 symbols reliably - what we read significantly differs from what
-            // we have written before.
             QByteArray key = QByteArray::fromBase64(
-                keychain.readValue(kSecureKeyV2PropertyName).toUtf8());
-            if (key.isEmpty())
-                key = keychain.readValue(kSecureKeyPropertyName).toUtf8();
+                keychain->readValue(kSecureKeyV2PropertyName).toUtf8());
+
+            writeKey |= !isValidKeyV1(key);
 
             if (key.isEmpty())
             {
-                key = nx::crypt::generateAesExtraKey();
-                if (!keychain.writeValue(
-                        kSecureKeyV2PropertyName, QString::fromUtf8(key.toBase64())))
-                {
-                    NX_WARNING(this, "Keychain is not available, using predefined key");
-                    key = {};
-                }
-                else
-                {
-                    // Written for compatibility purposes with previous clients versions.
-                    keychain.writeValue(kSecureKeyPropertyName, QString::fromUtf8(key));
-                }
+                key = readKeyV1(*keychain);
+                writeKey |= !isValidKeyV1(key);
             }
 
+            // Try empty key if nothing was stored.
             setSecurityKey(key);
         #endif
     }
@@ -128,6 +172,9 @@ Settings::Settings(const InitializationOptions& options):
         migrateOldSettings();
         clearInvalidKnownConnections();
     }
+
+    if (keychain && writeKey)
+        setSecurityKey(rewriteKeys(*keychain, securityKey()));
 
     save();
     generateDocumentation("Core Settings",

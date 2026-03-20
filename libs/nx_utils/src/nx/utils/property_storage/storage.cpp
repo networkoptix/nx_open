@@ -5,11 +5,17 @@
 #include <nx/utils/crypt/symmetrical.h>
 #include <nx/utils/log/assert.h>
 
+#include "abstract_backend.h"
+
 namespace nx::utils::property_storage {
 
 Storage::Storage(AbstractBackend* backend, QObject* parent):
     QObject(parent),
     m_backend(backend)
+{
+}
+
+Storage::~Storage()
 {
 }
 

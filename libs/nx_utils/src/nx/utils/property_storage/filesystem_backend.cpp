@@ -19,20 +19,13 @@ bool FileSystemBackend::isWritable() const
     return tempFile.open();
 }
 
-QString FileSystemBackend::readValue(const QString& name, bool* success)
+QString FileSystemBackend::readValue(const QString& name) const
 {
-    if (success)
-        *success = true;
-
     QFile f(m_path.absoluteFilePath(name));
     if (f.exists())
     {
         if (!f.open(QIODevice::ReadOnly))
-        {
-            if (success)
-                *success = false;
             return {};
-        }
 
         return QString::fromUtf8(f.readAll());
     }

@@ -28,7 +28,7 @@ bool KeychainBackend::isWritable() const
     return true;
 }
 
-QString KeychainBackend::readValue(const QString& name, bool* success)
+QString KeychainBackend::readValue(const QString& name) const
 {
     NX_VERBOSE(this, "Reading \"%1\" from keychain...", name);
 
@@ -45,9 +45,6 @@ QString KeychainBackend::readValue(const QString& name, bool* success)
     eventLoop.exec();
 
     const bool ok = job.error() == QKeychain::NoError;
-    if (success)
-        *success = ok;
-
     if (!ok)
     {
         NX_WARNING(this, "Error while reading \"%1\" from keychain: %2", job.errorString(), name);
