@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation>予期しない理由でダウンロードの安全性を確認できませんでした</translation>
+      <translation>予期せぬ理由により、ダウンロードの安全性の確認に失敗しました。</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>

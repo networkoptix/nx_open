@@ -701,7 +701,7 @@
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation>カメラを選択してください</translation>
+      <translation>カメラ選択</translation>
     </message>
   </context>
   <context>
@@ -1769,7 +1769,7 @@ and click on the &quot;Search&quot; button</source>
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation>すべての通知を表示する</translation>
+      <translation>すべての通知を表示</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2397,7 +2397,7 @@ and click on the &quot;Search&quot; button</source>
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Show all users</source>
-      <translation>すべてのユーザーを表示</translation>
+      <translation>全ユーザーを表示</translation>
     </message>
     <message>
       <source>Select Users</source>
