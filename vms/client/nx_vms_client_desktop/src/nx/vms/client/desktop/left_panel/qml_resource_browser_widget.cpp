@@ -31,7 +31,7 @@ struct QmlResourceBrowserWidget::Private
 {
     QmlResourceBrowserWidget* const q;
     const QmlProperty<qreal> opacity{q, "opacity"};
-    const ResourceBrowserWrapper resourceBrowser{q->windowContext(), {q, "resourceBrowser"}, q};
+    ResourceBrowserWrapper resourceBrowser{q->windowContext(), {q, "resourceBrowser"}, q};
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -58,7 +58,16 @@ QmlResourceBrowserWidget::QmlResourceBrowserWidget(WindowContext* context, QWidg
     installEventHandler(this, QEvent::Move, this, &QmlResourceBrowserWidget::positionChanged);
 
     connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
-        [this]() { setSource({}); }); //< Cleanup internal stuff.
+        [this]()
+        {
+            // VMS-61234: Cache the expanded node state before setSource({}) destroys the QML tree.
+            // storeSystemSpecificState() is called earlier in doCloseApplication(), at which point
+            // the QML items are already gone, so saveState() can only serialize the previously
+            // cached value stored in expandedNodeIds.
+            d->resourceBrowser.acquireClientStateIfNeeded();
+
+            setSource({}); //< Cleanup internal stuff.
+        });
 }
 
 QmlResourceBrowserWidget::~QmlResourceBrowserWidget()

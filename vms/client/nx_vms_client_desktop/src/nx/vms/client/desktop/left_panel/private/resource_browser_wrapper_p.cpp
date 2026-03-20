@@ -115,11 +115,7 @@ public:
         (*state)[kShowServersInTreeKey] = q->workbenchContext()->resourceTreeSettings()
             ->showServersInTree();
 
-        if (!NX_ASSERT(q->resourceBrowser))
-            return;
-
-        if (q->tree && q->tree.model && !q->tree.model()->isFiltering())
-            q->acquireClientState();
+        q->acquireClientStateIfNeeded();
 
         QJsonArray expandedNodes;
         for (const auto& nodeId: q->expandedNodeIds)
@@ -434,6 +430,12 @@ void ResourceBrowserWrapper::restoreGroupExpandedState(const QModelIndex& under)
 
     processIndexRecursively(under);
     invokeQmlMethod<void>(tree, "ensureVisible", indexesToEnsureVisibility);
+}
+
+void ResourceBrowserWrapper::acquireClientStateIfNeeded()
+{
+    if (tree && tree.model && !tree.model()->isFiltering())
+        acquireClientState();
 }
 
 void ResourceBrowserWrapper::acquireClientState()
