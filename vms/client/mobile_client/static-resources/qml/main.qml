@@ -24,7 +24,7 @@ Controls.ApplicationWindow
     property alias uiContainer: uiContainer
 
     visible: true
-    background: Rectangle { color: ColorTheme.colors.dark7 }
+    background: Rectangle { color: ColorTheme.colors.dark4 }
 
     function lp(path)
     {
@@ -54,11 +54,17 @@ Controls.ApplicationWindow
     Binding { target: mainWindow; property: "leftPadding"; value: windowParams.leftMargin }
     Binding { target: mainWindow; property: "rightPadding"; value: windowParams.rightMargin }
 
-    UiContainer
+    Rectangle
     {
-        id: uiContainer
-
+        color: ColorTheme.colors.dark7
         anchors.fill: parent
+
+        UiContainer
+        {
+            id: uiContainer
+
+            anchors.fill: parent
+        }
     }
 
     SnackBar
