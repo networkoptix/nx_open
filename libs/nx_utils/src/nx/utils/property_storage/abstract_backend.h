@@ -12,7 +12,7 @@ public:
     virtual ~AbstractBackend() = default;
 
     virtual bool isWritable() const = 0;
-    virtual QString readValue(const QString& name, bool* success = nullptr) = 0;
+    virtual QString readValue(const QString& name) const = 0;
     virtual bool writeValue(const QString& name, const QString& data) = 0;
     virtual bool removeValue(const QString& name) = 0;
     virtual bool exists(const QString& name) const = 0;

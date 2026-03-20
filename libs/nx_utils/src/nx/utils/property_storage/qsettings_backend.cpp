@@ -21,10 +21,8 @@ bool QSettingsBackend::isWritable() const
     return m_settings->isWritable();
 }
 
-QString QSettingsBackend::readValue(const QString& name, bool* success)
+QString QSettingsBackend::readValue(const QString& name) const
 {
-    if (success)
-        *success = true;
     return m_settings->value(m_group + "/" + name).toString();
 }
 

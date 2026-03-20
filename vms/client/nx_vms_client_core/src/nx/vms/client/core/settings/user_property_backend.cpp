@@ -29,32 +29,18 @@ bool UserPropertyBackend::isWritable() const
     return !systemContext()->user().isNull();
 }
 
-QString UserPropertyBackend::readValue(const QString& name, bool* success)
+QString UserPropertyBackend::readValue(const QString& name) const
 {
-    const auto setSuccess =
-        [&success](bool ok)
-        {
-            if (success)
-                *success = ok;
-        };
-
     if (m_deletedValues.contains(name))
-    {
-        setSuccess(false);
         return {};
-    }
 
     if (m_newValues.contains(name))
-    {
-        setSuccess(true);
         return m_newValues.value(name);
-    }
 
     const auto value = m_originalValues.value(name);
     switch (value.type())
     {
         case QJsonValue::String:
-            setSuccess(true);
             return value.toString();
 
         case QJsonValue::Null:
@@ -66,7 +52,6 @@ QString UserPropertyBackend::readValue(const QString& name, bool* success)
             break;
     }
 
-    setSuccess(false);
     return {};
 }
 

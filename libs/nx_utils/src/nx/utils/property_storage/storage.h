@@ -5,10 +5,11 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
-#include "abstract_backend.h"
 #include "property.h"
 
 namespace nx::utils::property_storage {
+
+class AbstractBackend;
 
 class NX_UTILS_API Storage: public QObject
 {
@@ -24,7 +25,7 @@ public:
     using SecureProperty = nx::utils::property_storage::SecureProperty<T>;
 
     explicit Storage(AbstractBackend* backend, QObject* parent = nullptr);
-    virtual ~Storage() = default;
+    virtual ~Storage() override;
 
     bool isWritable() const;
     void setReadOnly(bool readOnly);

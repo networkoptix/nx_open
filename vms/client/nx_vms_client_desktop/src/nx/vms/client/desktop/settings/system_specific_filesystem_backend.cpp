@@ -62,12 +62,12 @@ bool SystemSpecificFileSystemBackend::SystemSpecificFileSystemBackend::isWritabl
     return m_valid && base_type::isWritable();
 }
 
-QString SystemSpecificFileSystemBackend::readValue(const QString& name, bool* success)
+QString SystemSpecificFileSystemBackend::readValue(const QString& name) const
 {
     if (!NX_ASSERT(m_valid))
         return QString();
 
-    return base_type::readValue(name, success);
+    return base_type::readValue(name);
 }
 
 bool SystemSpecificFileSystemBackend::writeValue(const QString& name, const QString& value)
