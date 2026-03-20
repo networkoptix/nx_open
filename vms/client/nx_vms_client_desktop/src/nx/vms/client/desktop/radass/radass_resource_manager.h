@@ -6,9 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
+#include <nx/vms/client/desktop/radass/radass_storage.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
@@ -16,15 +16,13 @@ namespace nx::vms::client::desktop {
  * Manages radass state for resources (layout items), saves it locally. Connection entries are
  * saved by system id to make sure we will clean all non-existent layout items sometimes.
  */
-class NX_VMS_CLIENT_DESKTOP_API RadassResourceManager:
-    public QObject,
-    public SystemContextAware
+class NX_VMS_CLIENT_DESKTOP_API RadassResourceManager: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    RadassResourceManager(SystemContext* systemContext, QObject* parent = nullptr);
+    RadassResourceManager(std::unique_ptr<AbstractRadassStorage> storage, QObject* parent = nullptr);
     virtual ~RadassResourceManager() override;
 
     RadassMode mode(const core::LayoutResourcePtr& layout) const;
@@ -38,6 +36,9 @@ public:
 
 signals:
     void modeChanged(const LayoutItemIndex& item, RadassMode value);
+
+private:
+    std::unique_ptr<AbstractRadassStorage> m_storage;
 };
 
 } // namespace nx::vms::client::desktop
