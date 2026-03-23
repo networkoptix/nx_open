@@ -159,7 +159,7 @@ void PushNotificationManager::Private::handleConfirmedSettingsChanged()
     emit q->selectedSystemsChanged();
     emitSystemsMetricsChanges();
 
-    const auto settings = remotePushController.confirmedSettings();
+    auto settings = remotePushController.confirmedSettings();
     if (!settings)
     {
         PushIpcData::clear();
@@ -167,6 +167,7 @@ void PushNotificationManager::Private::handleConfirmedSettingsChanged()
     }
 
     const auto userName = remotePushController.credentials().username;
+    settings->lastUsedFilter = q->lastUsedFilter(); //< Update from locally saved settings.
     updateUserSettings(q, QString::fromStdString(userName), settings);
     if (!settings->enabled)
     {
