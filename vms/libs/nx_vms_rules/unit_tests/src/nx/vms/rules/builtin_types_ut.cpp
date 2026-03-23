@@ -38,6 +38,13 @@ static const QStringList kRequiredDetails{{
     kSourceTextDetailName,
 }};
 
+// Make sure all property types are registered for serialization and no assertions fired.
+void ensureSerialization(QObject* object)
+{
+    const auto data = serializeProperties(object, nx::utils::propertyNames(object));
+    deserializeProperties(data, object);
+}
+
 } // namespace
 
 class BuiltinTypesTest:
@@ -220,8 +227,7 @@ public:
         // Check for serialization assertions.
         const FieldDescriptor tmpDescriptor{.type = type};
         const auto field = m_engine->buildActionField(&tmpDescriptor);
-        const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
-        deserializeProperties(data, field.get());
+        ensureSerialization(field.get());
     }
 
     template<class F>
@@ -235,8 +241,7 @@ public:
         // Check for serialization assertions.
         const FieldDescriptor tmpDescriptor{.type = type};
         const auto field = m_engine->buildEventField(&tmpDescriptor);
-        const auto data = serializeProperties(field.get(), nx::utils::propertyNames(field.get()));
-        deserializeProperties(data, field.get());
+        ensureSerialization(field.get());
     }
 
     template<class T>
@@ -271,8 +276,7 @@ public:
         const auto event = QSharedPointer<T>::create();
         event->setState(State::instant);
 
-        const auto data = serializeProperties(event.get(), nx::utils::propertyNames(event.get()));
-        deserializeProperties(data, event.get());
+        ensureSerialization(event.get());
 
         const QVariantMap details = event->details(engine->systemContext(), Qn::RI_NameOnly);
         for (auto detailName: kRequiredDetails)
@@ -304,6 +308,12 @@ public:
         }
 
         ASSERT_TRUE(registerAction<T>());
+
+        // Check for serialization assertions.
+        const auto action = QSharedPointer<T>::create();
+        action->setState(State::instant);
+        action->setOriginPeerId(nx::Uuid::createUuid());
+        ensureSerialization(action.get());
 
         const auto builder = engine->buildActionBuilder(manifest.id);
         ASSERT_TRUE(builder);

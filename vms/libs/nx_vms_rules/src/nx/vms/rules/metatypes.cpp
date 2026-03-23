@@ -32,8 +32,6 @@ void initializeMetatypesInternal()
 
     // Register types and serializers in alphabetical order.
 
-    QnJsonSerializer::registerSerializer<bool>();
-
     qRegisterMetaType<email::Message>();
     QnJsonSerializer::registerSerializer<email::Message>();
 
