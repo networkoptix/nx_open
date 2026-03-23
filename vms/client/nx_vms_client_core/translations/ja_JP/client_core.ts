@@ -90,7 +90,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。時間をおいて再度お試しください。</translation>
+      <translation>試行回数が上限に達しました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -103,7 +103,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、時間をおいて再度お試しください。</translation>
+      <translation>%1 への接続はまだ準備ができていません。インターネット接続をご確認ください。改善されない場合は、時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Connection to the server could not be established. Try again later.</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>
-      <translation>ログイン試行回数が多すぎます。時間をおいて再度お試しください。</translation>
+      <translation>ログイン試行回数が上限に達しました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
@@ -138,7 +138,7 @@
     <message>
       <source>Connection to %1 is not ready yet. Check the server&apos;s internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、時間をおいて再度お試しください。</translation>
+      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続をご確認ください。改善されない場合は、時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>The server&apos;s certificate was rejected.</source>

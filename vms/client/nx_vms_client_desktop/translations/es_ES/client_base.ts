@@ -1382,7 +1382,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation>ID de hardware</translation>
+      <translation>Hardware ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1412,11 +1412,11 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation>Si su sitio no tiene acceso a Internet, por favor envíe la clave de licencia y el ID de hardware proporcionados a %1 para recibir el archivo de activación.</translation>
+      <translation>Si su sitio no tiene acceso a Internet, por favor envíe la clave de licencia y el Hardware ID proporcionados a %1 para recibir el archivo de activación.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Si su sitio no tiene acceso a Internet, envíe la clave de licencia y el ID de hardware proporcionados a su equipo de soporte regional/de licencias para recibir el archivo de activación:</translation>
+      <translation>Si su sitio no tiene acceso a Internet, envíe la clave de licencia y el Hardware ID proporcionados a su equipo de soporte regional/de licencias para recibir el archivo de activación:</translation>
     </message>
   </context>
   <context>
@@ -1731,7 +1731,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed</source>
-      <translation>Se permiten sólo letras, números y símbolos de teclado</translation>
+      <translation>Se permiten solo letras, números y símbolos de teclado</translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together</source>
@@ -1801,7 +1801,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation>Acercándo...</translation>
+      <translation>Acercando...</translation>
     </message>
     <message>
       <source>Focusing...</source>
@@ -2714,7 +2714,7 @@ Clave de licencia: %2</translation>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation>¿Desconectar el sitio de %1?</translation>
+      <translation>¿Desconectar el sitio dé %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
