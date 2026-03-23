@@ -12875,7 +12875,7 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     </message>
     <message>
       <source>Enter keywords separated by space</source>
-      <translation type="unfinished">Enter keywords separated by space</translation>
+      <translation>Introduce palabras clave separadas por espazo</translation>
     </message>
   </context>
   <context>

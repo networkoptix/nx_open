@@ -655,7 +655,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>Permite mostrar a hora do servidor para a cámara</translation>
     </message>
   </context>
   <context>
@@ -991,15 +991,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Sen dispositivos</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Non se atoparon dispositivos neste deseño</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Non se atoparon dispositivos neste sitio. Engade dispositivos co cliente de escritorio ou solicita acceso aos dispositivos existentes</translation>
     </message>
   </context>
   <context>

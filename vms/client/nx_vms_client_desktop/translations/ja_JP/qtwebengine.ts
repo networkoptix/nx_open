@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Checking the safety of the download failed due to unexpected reasons</source>
-      <translation>予期せぬ理由により、ダウンロードの安全性の確認に失敗しました。</translation>
+      <translation>予期しない理由により、ダウンロードの安全性の確認に失敗しました。</translation>
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
@@ -413,7 +413,7 @@
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation>行った変更は保存されない場合があります。</translation>
+      <translation>変更内容が保存されない場合があります。</translation>
     </message>
   </context>
   <context>

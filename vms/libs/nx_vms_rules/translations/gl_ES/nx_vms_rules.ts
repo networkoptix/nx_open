@@ -1300,7 +1300,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Introduce polo menos unha palabra clave</translation>
     </message>
   </context>
   <context>
