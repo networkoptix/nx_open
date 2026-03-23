@@ -2687,7 +2687,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
+      <translation>試行回数が上限に達しました。時間をおいて再度お試しください。</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2733,7 +2733,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
+      <translation>試行回数が上限に達しました。時間をおいて再度お試しください。</translation>
     </message>
   </context>
   <context>
@@ -9275,7 +9275,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>同じ Server GUID を持つサーバーが1つ以上存在するため、サイトを統合できません。このサーバーを削除してやり直してください。</translation>
+      <translation>両サイト内に同一の GUID を持つサーバーが存在するため、サイトを統合できません。このサーバーを削除して再度お試し下さい。</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
@@ -9579,7 +9579,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation>クライアント用更新ファイルのダウンロードに必要な空き領域が不足しています。ハードドライブの空き領域を確保して、再度お試しください。</translation>
+      <translation>このPCの空き領域が不足しているため、クライアント用更新ファイルをダウンロードできません。ハードドライブの空き領域を確保し、再度お試しください。</translation>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>

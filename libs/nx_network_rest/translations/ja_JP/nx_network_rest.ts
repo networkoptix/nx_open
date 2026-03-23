@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation>サービス利用不可。</translation>
+      <translation>サービスが利用できません。</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
