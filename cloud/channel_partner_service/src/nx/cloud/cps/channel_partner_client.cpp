@@ -124,12 +124,17 @@ void ChannelPartnerClient::getSystemUsers(
 
 void ChannelPartnerClient::getUserSystems(
     const std::string& email,
+    const std::optional<std::string>& organizationId,
     nx::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler)
 {
+    UrlQuery query;
+    if (organizationId)
+        query.addQueryItem("ssoOrganizationId", *organizationId);
+
     base_type::template makeAsyncCall<std::vector<api::SystemAllowance>>(
         nx::network::http::Method::get,
         nx::network::http::rest::substituteParameters(api::kInternalUserSystemsPath, {email}),
-        {}, // query
+        query,
         std::move(handler));
 }
 

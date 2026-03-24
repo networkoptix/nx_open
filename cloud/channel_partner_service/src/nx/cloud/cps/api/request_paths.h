@@ -16,7 +16,7 @@ static constexpr char kInternalSystemUserPath[] =
     "/partners/api/v2/internal/systems/{systemId}/users/{email}/";
 
 static constexpr char kInternalUserSystemsPath[] =
-    "/partners/api/v2/internal/users/{email}/systems/";
+    "/partners/api/v3/internal/users/{email}/systems/";
 
 static constexpr char kOrganizationPath[] = "/partners/api/v2/organizations/{organizationId}/";
 

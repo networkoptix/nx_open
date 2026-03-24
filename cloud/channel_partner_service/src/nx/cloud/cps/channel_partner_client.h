@@ -100,6 +100,7 @@ public:
      */
     void getUserSystems(
         const std::string& email,
+        const std::optional<std::string>& organizationId,
         nx::MoveOnlyFunc<void(api::Result, std::vector<api::SystemAllowance>)> handler);
 
     /**
