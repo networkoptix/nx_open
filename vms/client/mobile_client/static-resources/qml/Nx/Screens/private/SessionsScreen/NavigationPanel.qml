@@ -23,6 +23,10 @@ Item
     // Public properties
     property bool hasChannelPartners: false
     property bool hasOrganizations: false
+    property alias partnerCount: navigationList.partnerCount
+    property alias organizationCount: navigationList.organizationCount
+    property alias siteCount: navigationList.siteCount
+
     property int currentTab: OrganizationsModel.SitesTab
     property var organizationsModel: null
     property var selectedOrganizationIndex: null
@@ -174,6 +178,7 @@ Item
 
         hasChannelPartners: leftSidebar.hasChannelPartners
         hasOrganizations: leftSidebar.hasOrganizations
+        showCount: leftSidebar.searchText
         currentTab: leftSidebar.currentTab
 
         onTabSelected: (tab) =>

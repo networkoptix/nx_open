@@ -196,6 +196,10 @@ class NX_VMS_CLIENT_CORE_API OrganizationsFilterModel: public QSortFilterProxyMo
         WRITE setCurrentTab
         NOTIFY currentTabChanged);
 
+    Q_PROPERTY(int partnerCount READ partnerCount NOTIFY partnerCountChanged)
+    Q_PROPERTY(int organizationCount READ organizationCount NOTIFY organizationCountChanged)
+    Q_PROPERTY(int siteCount READ siteCount NOTIFY siteCountChanged)
+
 public:
     OrganizationsFilterModel(QObject* parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
@@ -215,15 +219,23 @@ public:
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+    int partnerCount() const { return m_partnerCount; }
+    int organizationCount() const { return m_organizationCount; }
+    int siteCount() const { return m_siteCount; }
+
 signals:
     void hideOrgSystemsFromSitesChanged();
     void showOnlyChanged();
     void currentRootChanged();
     void currentTabChanged();
+    void partnerCountChanged();
+    void organizationCountChanged();
+    void siteCountChanged();
 
 private:
     bool isInCurrentRoot(const QModelIndex& index) const;
     void sectionInfo(const QModelIndex& index, bool& otherResults, bool& addPlaceholder) const;
+    void updateSummary();
 
 private:
     bool m_hideOrgSystemsFromSites = false;
@@ -231,6 +243,9 @@ private:
     QPersistentModelIndex m_currentRoot;
     OrganizationsModel::TabSection m_currentTab = OrganizationsModel::SitesTab;
     std::unique_ptr<PersistentIndexWatcher> m_currentRootWatcher;
+    int m_partnerCount{};
+    int m_organizationCount{};
+    int m_siteCount{};
 };
 
 } // namespace nx::vms::client::core

@@ -19,6 +19,9 @@ ListView
     property alias siteModel: filterModel.sourceModel
     property alias hideOrgSystemsFromSites: filterModel.hideOrgSystemsFromSites
     property alias showOnly: filterModel.showOnly
+    readonly property alias partnerCount: filterModel.partnerCount
+    readonly property alias organizationCount: filterModel.organizationCount
+    readonly property alias siteCount: filterModel.siteCount
 
     property alias currentRoot: filterModel.currentRoot
     property alias currentTab: filterModel.currentTab

@@ -16,6 +16,10 @@ Item
 
     property bool hasChannelPartners: false
     property bool hasOrganizations: false
+    property int partnerCount: 0
+    property int organizationCount: 0
+    property int siteCount: 0
+    property bool showCount: false
     property int currentTab: OrganizationsModel.SitesTab
 
     signal tabSelected(var tab)
@@ -29,62 +33,30 @@ Item
         anchors.bottomMargin: 20
         spacing: 0
 
-        // Partners
-        NavigationItem
+        NavigationButton
         {
             width: parent.width
-            text: qsTr("Partners")
+            text: qsTr("Partners") + (navList.showCount ? " (%1)".arg(navList.partnerCount) : "")
             visible: navList.hasChannelPartners
             checked: navList.currentTab === OrganizationsModel.ChannelPartnersTab
             onClicked: navList.tabSelected(OrganizationsModel.ChannelPartnersTab)
         }
 
-        // Organizations
-        NavigationItem
+        NavigationButton
         {
             width: parent.width
-            text: qsTr("Organizations")
+            text: qsTr("Organizations") + (navList.showCount ? " (%1)".arg(navList.organizationCount) : "")
             visible: navList.hasOrganizations
             checked: navList.currentTab === OrganizationsModel.OrganizationsTab
             onClicked: navList.tabSelected(OrganizationsModel.OrganizationsTab)
         }
 
-        // Sites
-        NavigationItem
+        NavigationButton
         {
             width: parent.width
-            text: qsTr("Sites")
+            text: qsTr("Sites") + (navList.showCount ? " (%1)".arg(navList.siteCount) : "")
             checked: navList.currentTab === OrganizationsModel.SitesTab
             onClicked: navList.tabSelected(OrganizationsModel.SitesTab)
-        }
-    }
-
-    // Navigation item component
-    component NavigationItem: AbstractButton
-    {
-        id: navItem
-
-        implicitHeight: 40
-        focusPolicy: Qt.StrongFocus
-
-        background: Rectangle
-        {
-            color: navItem.checked ? ColorTheme.colors.dark10 :
-                   navItem.hovered ? ColorTheme.colors.dark8 : "transparent"
-            radius: 8
-        }
-
-        contentItem: Text
-        {
-            text: navItem.text
-            color: navItem.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
-            font.pixelSize: 14
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-            leftPadding: 16
-            rightPadding: 16
-            topPadding: 9.5
-            bottomPadding: 9.5
         }
     }
 }

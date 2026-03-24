@@ -1700,6 +1700,11 @@ bool OrganizationsSortModel::lessThan(const QModelIndex& left, const QModelIndex
 OrganizationsFilterModel::OrganizationsFilterModel(QObject* parent): base_type(parent)
 {
     sort(0);
+
+    connect(this, &OrganizationsFilterModel::rowsInserted, this, &OrganizationsFilterModel::updateSummary);
+    connect(this, &OrganizationsFilterModel::rowsRemoved, this, &OrganizationsFilterModel::updateSummary);
+    connect(this, &OrganizationsFilterModel::modelReset, this, &OrganizationsFilterModel::updateSummary);
+    connect(this, &OrganizationsFilterModel::layoutChanged, this, &OrganizationsFilterModel::updateSummary);
 }
 
 bool OrganizationsFilterModel::filterAcceptsRow(
@@ -1959,4 +1964,50 @@ QVariant OrganizationsFilterModel::data(const QModelIndex& index, int role) cons
     return prefix + index.data(OrganizationsModel::PathFromRootRole).toString() + suffix;
 }
 
-} // nx::vms::client::core
+void OrganizationsFilterModel::updateSummary()
+{
+    int partners{};
+    int organizations{};
+    int sites{};
+
+    for (int i = 0; i < rowCount(); ++i)
+    {
+        const auto tabSection = data(
+            index(i, 0),
+            OrganizationsModel::TabSectionRole).value<OrganizationsModel::TabSection>();
+        switch (tabSection)
+        {
+            case OrganizationsModel::TabSection::ChannelPartnersTab:
+                ++partners;
+                break;
+            case OrganizationsModel::TabSection::OrganizationsTab:
+                ++organizations;
+                break;
+            case OrganizationsModel::TabSection::SitesTab:
+                ++sites;
+                break;
+            default:
+                NX_ASSERT(false, "Unexpected tab section");
+        }
+    }
+
+    if (m_partnerCount != partners)
+    {
+        m_partnerCount = partners;
+        emit partnerCountChanged();
+    }
+
+    if (m_organizationCount != organizations)
+    {
+        m_organizationCount = organizations;
+        emit organizationCountChanged();
+    }
+
+    if (m_siteCount != sites)
+    {
+        m_siteCount = sites;
+        emit siteCountChanged();
+    }
+}
+
+} // namespace nx::vms::client::core

@@ -243,7 +243,6 @@ AdaptiveScreen
                     onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
                 systemTabs.visible: !LayoutController.isTabletLayout
-                    && !sessionsScreen.searching
                     && !loadingIndicator.visible
                     && cloudUserProfileWatcher.isOrgUser
                     && (organizationsModel.hasChannelPartners
@@ -388,81 +387,15 @@ AdaptiveScreen
         }
     }
 
-    Item
-    {
-        visible: false
-
-        component TabButton: AbstractButton
-        {
-            id: tabButton
-
-            implicitHeight: 40
-            implicitWidth: tabText.implicitWidth + leftPadding + rightPadding
-            topPadding: 10
-            leftPadding: 16
-            rightPadding: 16
-            bottomPadding: 10
-            checkable: true
-            focusPolicy: Qt.StrongFocus
-
-            background: Rectangle
-            {
-                color: tabButton.checked ? ColorTheme.colors.dark8 : ColorTheme.colors.dark5
-                radius: 8
-            }
-
-            contentItem: Text
-            {
-                id: tabText
-                text: tabButton.text
-                color: tabButton.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
-                font.pixelSize: 14
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: LayoutController.isTabletLayout ? Text.AlignLeft : Text.AlignHCenter
-            }
-        }
-
-        ButtonGroup
-        {
-            id: tabGroup
-        }
-
-        TabButton
-        {
-            id: partnersTabButton
-            text: qsTr("Partners")
-            visible: organizationsModel.hasChannelPartners
-            ButtonGroup.group: tabGroup
-            checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
-            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
-        }
-
-        TabButton
-        {
-            id: organizationsTabButton
-            text: qsTr("Organizations")
-            visible: organizationsModel.hasOrganizations
-            ButtonGroup.group: tabGroup
-            checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
-            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
-        }
-
-        TabButton
-        {
-            id: sitesTabButton
-            text: qsTr("Sites")
-            ButtonGroup.group: tabGroup
-            checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
-            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
-        }
-    }
-
     NavigationPanel
     {
         id: navigationPanel
 
         hasChannelPartners: organizationsModel.hasChannelPartners
         hasOrganizations: organizationsModel.hasOrganizations
+        partnerCount: siteList.partnerCount
+        organizationCount: siteList.organizationCount
+        siteCount: siteList.siteCount
         currentTab: sessionsScreen.selectedTab
         onTabSelected: (selectedTabValue) =>
         {
@@ -591,12 +524,11 @@ AdaptiveScreen
 
                     readonly property var selectedTab:
                     {
-                        if (tabGroup.checkedButton === partnersTabButton)
+                        if (partnersTabButton.checked)
                             return OrganizationsModel.ChannelPartnersTab
-                        if (tabGroup.checkedButton === organizationsTabButton)
+
+                        if (organizationsTabButton.checked)
                             return OrganizationsModel.OrganizationsTab
-                        if (tabGroup.checkedButton === sitesTabButton)
-                            return OrganizationsModel.SitesTab
 
                         return OrganizationsModel.SitesTab
                     }
@@ -604,25 +536,40 @@ AdaptiveScreen
                     Row
                     {
                         id: systemTabsRow
+
                         spacing: 0
                         x: 20
                         y: 4
 
                         height: visible ? implicitHeight : 0
 
-                        LayoutItemProxy
+                        NavigationButton
                         {
-                            target: partnersTabButton
+                            id: partnersTabButton
+
+                            text: qsTr("Partners") + (sessionsScreen.searching ? " (%1)".arg(siteList.partnerCount) : "")
                             visible: organizationsModel.hasChannelPartners
+                            checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
+                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                         }
-                        LayoutItemProxy
+
+                        NavigationButton
                         {
-                            target: organizationsTabButton
+                            id: organizationsTabButton
+
+                            text: qsTr("Organizations") + (sessionsScreen.searching ? " (%1)".arg(siteList.organizationCount) : "")
                             visible: organizationsModel.hasOrganizations
+                            checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
+                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
                         }
-                        LayoutItemProxy
+
+                        NavigationButton
                         {
-                            target: sitesTabButton
+                            id: sitesTabButton
+
+                            text: qsTr("Sites") + (sessionsScreen.searching ? " (%1)".arg(siteList.siteCount) : "")
+                            checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
+                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
                         }
                     }
 
