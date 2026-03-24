@@ -315,10 +315,11 @@ int CloudStorageServiceUsageHelper::licenseDeficit() const
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
     auto& cache = *m_cache;
-    const auto saasData = saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
+        if (parameters.totalChannelNumber == 0)
+            continue;
         auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
         cacheData.available += parameters.totalChannelNumber;

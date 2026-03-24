@@ -526,6 +526,78 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
 }
 
+// VMS-61807: When cloud storage services are removed (quantity becomes 0), cameras should not
+// be reported as using a service that was never purchased. Previously, cameras were incorrectly
+// assigned to the lowest-resolution service available from the channel partner (e.g. 2 MP) instead
+// of not being assigned to any service.
+TEST_F(SaasServiceUsageHelperTest, CloudStorageNoPhantomUsageAfterServicesRemoved)
+{
+    using namespace nx::vms::api;
+
+    auto cameras = addCameras(/*size*/ 2, /*megapixels*/ 2, /*useBackup*/ true);
+
+    // Initially, all cloud storage services have quantity > 0.
+    // The 2 MP cameras should be assigned to the 5 MP service (lowest sufficient resolution)
+    // through borrowing.
+    auto serviceInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(3, serviceInfo.size());
+    ASSERT_EQ(2, serviceInfo[kServiceFiveMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceTenMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceUnlimitedMegapixels].inUse);
+
+    // Simulate removing all cloud storage services (set all quantities to 0).
+    static const std::string kSaasDataNoCloudStorageJson = R"json(
+    {
+      "cloudSystemId": "2df6b2f1-df31-451d-aac9-6bcb663e210b",
+      "state" : "active",
+      "services" : {
+        "{8A07D17E-73FD-4B21-A716-B02CA36281FF}": {
+          "quantity": 10
+        },
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0de": {
+          "quantity": 0
+        },
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0dd": {
+          "quantity": 0
+        },
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0dc": {
+          "quantity": 0
+        },
+        "46fd4533-16dd-4e07-b285-ef059b4ecb31": {
+          "quantity": 10
+        },
+        "94ca45f8-4859-457a-bc17-f2f9394524fe": {
+          "quantity": 2
+        }
+      },
+      "security" : {
+        "lastCheck": "2023-06-05 18:10:52",
+        "tmpExpirationDate" : "2023-06-05 20:40:52",
+        "issue" : "No issues"
+      },
+      "signature" : ""
+    }
+    )json";
+
+    auto manager = systemContext()->saasServiceManager();
+    manager->loadSaasDataAsync(kSaasDataNoCloudStorageJson);
+    m_cloudeStorageHelper->invalidateCache();
+
+    // After removal, no cloud storage services should have usage reported.
+    // Cameras should not be attributed to any service (including ones never purchased).
+    serviceInfo = m_cloudeStorageHelper->allInfoByService();
+    for (const auto& [serviceId, data]: serviceInfo)
+    {
+        ASSERT_TRUE(serviceId.isNull())
+            << "Cameras should not be assigned to service " << serviceId.toString().toStdString()
+            << " which has no purchased channels";
+    }
+
+    // Overflow should still be detected.
+    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
+    ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
+}
+
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasAccumulateLicenseUsage)
 {
     using namespace nx::vms::api;
