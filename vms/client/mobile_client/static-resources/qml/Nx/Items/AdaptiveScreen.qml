@@ -196,11 +196,19 @@ FocusScope
             id: leftPanel
 
             readonly property bool isHidden: !visible
-            property bool closedByUser: false
 
             Layout.fillHeight: true
-            visible: !!item && !closedByUser
-            onCloseButtonClicked: closedByUser = true
+            visible: false
+
+            onCloseButtonClicked: visible = false
+
+            Binding
+            {
+                when: !leftPanel.item
+                restoreMode: Binding.RestoreBindingOrValue
+
+                leftPanel.visible: false
+            }
         }
 
         Item
@@ -238,11 +246,19 @@ FocusScope
             id: rightPanel
 
             readonly property bool isHidden: !visible
-            property bool closedByUser: false
 
             Layout.fillHeight: true
-            visible: !!item && !closedByUser
-            onCloseButtonClicked: closedByUser = true
+            visible: false
+
+            onCloseButtonClicked: visible = false
+
+            Binding
+            {
+                when: !rightPanel.item
+                restoreMode: Binding.RestoreBindingOrValue
+
+                rightPanel.visible: false
+            }
         }
     }
 
@@ -278,7 +294,7 @@ FocusScope
             && root.hasLeftPanel
             && root.leftPanel.interactive
             && leftPanel.isHidden
-        onClicked: leftPanel.closedByUser = false
+        onClicked: leftPanel.visible = true
 
         Indicator
         {
@@ -313,7 +329,7 @@ FocusScope
             && root.hasRightPanel
             && root.rightPanel.interactive
             && rightPanel.isHidden
-        onClicked: rightPanel.closedByUser = false
+        onClicked: rightPanel.visible = true
 
         Indicator
         {

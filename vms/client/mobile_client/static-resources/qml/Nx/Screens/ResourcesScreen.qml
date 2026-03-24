@@ -108,6 +108,7 @@ AdaptiveScreen
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
         interactive: true
+        visible: true
         item: resourceTreeSheet
     }
 
@@ -117,8 +118,9 @@ AdaptiveScreen
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
         interactive: true
-        visible: false
-        item: resourcesScreen.contentItem === videoScreenLoader.item ? videoScreenLoader.item.navigatorItem : null
+        item: resourcesScreen.contentItem === videoScreenLoader.item
+            ? videoScreenLoader.item.navigatorItem
+            : null
     }
 
     ResourceTreeItem
@@ -131,7 +133,6 @@ AdaptiveScreen
             videoScreenLoader.item?.controller.stop()
             windowContext.deprecatedUiController.resource = layoutResource
             resourcesScreen.contentItem = camerasGrid
-            rightPanel.visible = false
 
             if (!LayoutController.isTabletLayout)
                 splash.close()

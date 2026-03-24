@@ -272,6 +272,7 @@ AdaptiveScreen
                 sessionsScreen
                 {
                     title: ""
+                    leftPanel.visible: false
                 }
                 rightButton
                 {
@@ -302,6 +303,7 @@ AdaptiveScreen
                     title: searchField.displayText
                         ? ""
                         : accessor.getData(sessionsScreen.rootIndex, "display")
+                    leftPanel.visible: true
                 }
 
                 rightButton

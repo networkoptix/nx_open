@@ -147,6 +147,7 @@ AdaptiveScreen
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/filter_list.svg?primary=dark1"
         interactive: true
+        visible: true
         item: contentItem === searchContent ? leftPanelContainer : null
     }
 

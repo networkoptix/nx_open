@@ -145,6 +145,7 @@ AdaptiveScreen
         interactive: false
         title: qsTr("Settings")
         item: settingsNavigation
+        visible: true
     }
 
     Flickable
