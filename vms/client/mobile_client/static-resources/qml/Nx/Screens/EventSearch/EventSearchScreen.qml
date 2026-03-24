@@ -131,7 +131,8 @@ AdaptiveScreen
 
         parent: LayoutController.isTabletLayout ? leftPanel.availableHeaderArea : screen.toolBar
         anchors.right: parent.right
-        anchors.rightMargin: 20
+        anchors.topMargin: LayoutController.isTabletLayout ? 20 : 0
+        anchors.rightMargin: LayoutController.isTabletLayout ? 0 : 20
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Clear All")
         visible: LayoutController.isTabletLayout || screen.contentItem === filtersItem
@@ -382,7 +383,8 @@ AdaptiveScreen
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: 24
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
             target: LayoutController.isTabletLayout ? searchField : null
         }
 

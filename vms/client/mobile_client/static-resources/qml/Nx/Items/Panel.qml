@@ -29,7 +29,7 @@ Page
 
     header: Item
     {
-        implicitHeight: 56
+        implicitHeight: 64
         implicitWidth: root.width
 
         visible: root.title || root.interactive
@@ -43,11 +43,14 @@ Page
         RowLayout
         {
             anchors.fill: parent
+            spacing: 0
 
             TitleLabel
             {
+                Layout.alignment: Qt.AlignTop
                 Layout.leftMargin: 20
-                horizontalAlignment: Text.AlignLeft
+                Layout.topMargin: 20
+
                 text: root.title
             }
 
@@ -63,6 +66,10 @@ Page
             {
                 id: menuButton
 
+                // Align button with the panel content by the icon boundaries.
+                Layout.alignment: Qt.AlignTop
+                Layout.topMargin: 8
+
                 icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
                 icon.width: 24
                 icon.height: 24
@@ -73,13 +80,18 @@ Page
 
             NxControls.IconButton
             {
-                id: closePanelButton
+                // Align button with the panel content by the icon boundaries.
+                Layout.alignment: Qt.AlignTop
+                Layout.topMargin: 8
+                Layout.rightMargin: 8
 
-                padding: 0
                 icon.source: "image://skin/24x24/Outline/close.svg?primary=light4"
                 icon.width: 24
                 icon.height: 24
+
+                padding: 0
                 visible: root.interactive
+
                 onClicked: root.closeButtonClicked()
             }
         }

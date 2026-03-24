@@ -64,7 +64,6 @@ Item
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.topMargin: 20
         anchors.leftMargin: 20
         anchors.rightMargin: 20
 

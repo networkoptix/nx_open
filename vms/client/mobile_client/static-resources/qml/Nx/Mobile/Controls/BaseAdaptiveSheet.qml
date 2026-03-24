@@ -5,6 +5,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import Nx.Core
+import Nx.Controls
+import Nx.Items
 import Nx.Ui
 
 import "private"
@@ -13,28 +15,36 @@ Drawer
 {
     id: control
 
+    readonly property int headerHeight: 64
+    property alias header: headerProxy.target
     property alias footer: footerProxy.target
     default property alias data: contentColumn.data
 
     property bool closeAutomatically: true
-
-    property real extraBottomPadding: 20
+    property real extraBottomPadding: 0
 
     x: (parent.width - width) / 2
     edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
     width: LayoutController.isPortrait ? Math.min(parent.width, 640) : 400
     height:
     {
-        const availableHeight = parent.height - windowContext.ui.measurements.deviceStatusBarHeight
+        if (!LayoutController.isPortrait)
+            return parent.height
 
-        if (LayoutController.isPortrait)
-        {
-            return Math.min(
-                flickable.contentHeight + (control.footer ? control.footer.height + spacing : 0) + control.topPadding + control.bottomPadding,
-                availableHeight)
-        }
+        const availableHeight = parent.height
+            - parent.SafeArea.margins.top //< OS status bar.
+            - parent.SafeArea.margins.bottom //< OS navigation bar.
 
-        return availableHeight
+        return Math.min(
+            bottomPadding
+                + content.anchors.topMargin
+                + (control.header ? control.headerHeight : 0)
+                + flickable.anchors.topMargin
+                + flickable.contentHeight
+                + flickable.anchors.bottomMargin
+                + (control.footer ? control.footer.height : 0)
+                + content.anchors.bottomMargin,
+            availableHeight)
     }
 
     closePolicy: closeAutomatically
@@ -43,18 +53,9 @@ Drawer
 
     modal: true
     focus: true
-
-    leftPadding: 0
-    rightPadding: 0
-
-    topPadding: 22 + (LayoutController.isPortrait ? 8 : 0) //< TODO: Sync the given padding with the figma.
-    bottomPadding:
-    {
-        const customPadding = d.keyboardHeight > 0
-            ? 0
-            : windowParams.bottomMargin
-        return extraBottomPadding + customPadding + d.keyboardHeight
-    }
+    padding: 0
+    topPadding: SafeArea.margins.top
+    bottomPadding: d.keyboardHeight > 0 ? d.keyboardHeight : SafeArea.margins.bottom
 
     Overlay.modal: OverlayBackground
     {
@@ -111,95 +112,165 @@ Drawer
         }
     }
 
-    contentItem: Page
+    contentItem: Item
     {
-        id: content
-
-        padding: 0
-        background: Item{}
-
-        footer: Item
+        Page
         {
-            implicitHeight: footerProxy.height + control.spacing
-            visible: footerProxy.target
-
-            LayoutItemProxy
-            {
-                id: footerProxy
-                y: control.spacing
-                x: contentColumn.leftPadding
-                width: parent.width - contentColumn.leftPadding - contentColumn.rightPadding
-            }
-        }
-
-        Flickable
-        {
-            id: flickable
+            id: content
 
             anchors.fill: parent
-            interactive: control.interactive
-            clip: true
-            contentHeight: contentColumn.height
+            anchors.topMargin: LayoutController.isPortrait ? 15 : 0
+            anchors.bottomMargin: 24 + extraBottomPadding
 
-            Item
+            padding: 0
+            background: Item {}
+
+            header: Item
             {
-                id: scrollableContent
+                implicitHeight: control.headerHeight
+                visible: headerProxy.target
 
-                height: contentColumn.height
-                width: parent.width
-
-                Column
+                LayoutItemProxy
                 {
-                    id: contentColumn
+                    id: headerProxy
 
-                    readonly property int leftPadding: 20 + windowParams.leftMargin
-                    readonly property int rightPadding: 20 + windowParams.rightMargin
-
-                    spacing: control.spacing
-                    x: leftPadding
-                    width: parent.width - leftPadding - rightPadding
+                    x: contentColumn.leftPadding
+                    y: 24
+                    width: parent.width - contentColumn.leftPadding - contentColumn.rightPadding
                 }
             }
 
-            readonly property Item focusedItem:
+            footer: Item
             {
-                let item = ApplicationWindow.activeFocusControl
-                while (item && item.parent !== contentColumn)
-                    item = item.parent
+                implicitHeight: footerProxy.height
+                visible: footerProxy.target
 
-                return item
-                    ? ApplicationWindow.activeFocusControl
-                    : null
+                LayoutItemProxy
+                {
+                    id: footerProxy
+
+                    x: contentColumn.leftPadding
+                    width: parent.width - contentColumn.leftPadding - contentColumn.rightPadding
+                }
             }
 
-            onFocusedItemChanged: ensureVisible(focusedItem)
-
-            function ensureVisible(item)
+            Flickable
             {
-                // If for some reason user drags content or it jumps up or down (like with keyboard),
-                // and we have this information with delay - we try to ensure that focused field is
-                // visible after some reasonable delay.
-                const ensureItemVisible =
-                    () =>
+                id: flickable
+
+                property bool needScroll: contentHeight > height
+
+                anchors.fill: parent
+                anchors.topMargin: headerProxy.target ? control.spacing : 24
+                anchors.bottomMargin: footerProxy.target ? control.spacing : 0
+
+                interactive: control.interactive
+                clip: true
+                contentHeight: contentColumn.height
+
+                Item
+                {
+                    id: scrollableContent
+
+                    height: contentColumn.height
+                    width: parent.width
+
+                    Column
                     {
-                        if (!item || moving || dragging)
-                            return
+                        id: contentColumn
 
-                        const ypos = item.mapToItem(contentItem, 0, 0).y
-                        const ext = item.height + ypos
-                        if (ypos < contentY
-                            || ypos > contentY + height
-                            || ext < contentY
-                            || ext > contentY + height)
-                        {
-                            contentY = Math.max(0,
-                                Math.min(ypos - height + item.height, contentHeight - height))
-                        }
+                        readonly property int leftPadding: 24
+                        readonly property int rightPadding: 24
+
+                        spacing: control.spacing
+                        x: leftPadding
+                        width: parent.width - leftPadding - rightPadding
                     }
+                }
 
-                const kReasonableDelayMs = 500
-                CoreUtils.executeDelayed(ensureItemVisible, kReasonableDelayMs, flickable)
+                readonly property Item focusedItem:
+                {
+                    let item = ApplicationWindow.activeFocusControl
+                    while (item && item.parent !== contentColumn)
+                        item = item.parent
+
+                    return item
+                        ? ApplicationWindow.activeFocusControl
+                        : null
+                }
+
+                onFocusedItemChanged: ensureVisible(focusedItem)
+
+                function ensureVisible(item)
+                {
+                    // If for some reason user drags content or it jumps up or down (like with keyboard),
+                    // and we have this information with delay - we try to ensure that focused field is
+                    // visible after some reasonable delay.
+                    const ensureItemVisible =
+                        () =>
+                        {
+                            if (!item || moving || dragging)
+                                return
+
+                            const ypos = item.mapToItem(contentItem, 0, 0).y
+                            const ext = item.height + ypos
+                            if (ypos < contentY
+                                || ypos > contentY + height
+                                || ext < contentY
+                                || ext > contentY + height)
+                            {
+                                contentY = Math.max(0,
+                                    Math.min(ypos - height + item.height, contentHeight - height))
+                            }
+                        }
+
+                    const kReasonableDelayMs = 500
+                    CoreUtils.executeDelayed(ensureItemVisible, kReasonableDelayMs, flickable)
+                }
             }
+
+            GradientShadow
+            {
+                id: topShadow
+
+                x: flickable.x
+                y: flickable.y
+                width: flickable.width
+                visible: flickable.needScroll && !flickable.atYBeginning
+                from: ColorTheme.colors.dark9
+            }
+
+            GradientShadow
+            {
+                id: bottomShadow
+
+                x: flickable.x
+                y: flickable.height - height
+                width: flickable.width
+                rotation: 180
+                visible: flickable.needScroll && !flickable.atYEnd
+                from: ColorTheme.colors.dark9
+            }
+        }
+
+        IconButton
+        {
+            id: closeButton
+
+            // Align button with the sheet content or header by the icon boundaries.
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 8
+            anchors.topMargin: control.header ? 12 : 8
+
+            visible: LayoutController.isTabletLayout
+            padding: 0
+
+            icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
+            icon.width: 24
+            icon.height: 24
+
+            onClicked: control.close()
         }
     }
 

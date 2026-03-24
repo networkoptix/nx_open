@@ -13,7 +13,6 @@ BaseAdaptiveSheet
     id: sheet
 
     spacing: 24
-    topPadding: 40
 
     component Header: Text
     {

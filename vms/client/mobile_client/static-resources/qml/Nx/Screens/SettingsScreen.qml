@@ -143,7 +143,7 @@ AdaptiveScreen
     leftPanel
     {
         interactive: false
-        title: qsTr("Settings")
+        title: LayoutController.isTabletLayout ? "" : qsTr("Settings")
         item: settingsNavigation
         visible: true
     }

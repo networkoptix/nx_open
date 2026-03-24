@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.Ui
+import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Controls
 import Nx.Items
@@ -179,7 +180,13 @@ Item
         anchors
         {
             fill: parent
-            topMargin: 8
+            topMargin:
+            {
+                if (windowContext.deprecatedUiController.currentScreen === Controller.SessionsScreen)
+                    return 0 //< On the SessionsScreen it is always mobile layout for the feed.
+
+                return LayoutController.isTabletLayout ? 20 : 0
+            }
             leftMargin: 20
             rightMargin: 20
             bottomMargin: 20

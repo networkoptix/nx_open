@@ -36,7 +36,9 @@ Item
     ColumnLayout
     {
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.topMargin: LayoutController.isTabletLayout ? 0 : 20
+        anchors.leftMargin: 20
+        anchors.rightMargin: 20
         spacing: 4
 
         SearchEdit
@@ -45,8 +47,6 @@ Item
 
             Layout.fillWidth: true
             Layout.preferredHeight: 36
-            Layout.leftMargin: 16
-            Layout.rightMargin: 16
 
             readonly property string text: searchEdit.displayText.trim()
 
@@ -104,8 +104,6 @@ Item
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            leftPadding: 16
-            rightPadding: 16
             topPadding: 8
 
             visible: !isNothingFound

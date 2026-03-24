@@ -6,6 +6,7 @@ BookmarkList 1.0 BookmarkList.qml
 Breadcrumb 1.0 Breadcrumb.qml
 DownloadMediaAction 1.0 DownloadMediaAction.qml
 DummyMessage 1.0 DummyMessage.qml
+GradientShadow 1.0 GradientShadow.qml
 HorizontalSlide 1.0 HorizontalSlide.qml
 IssueLabel 1.0 IssueLabel.qml
 LoginButton 1.0 LoginButton.qml
