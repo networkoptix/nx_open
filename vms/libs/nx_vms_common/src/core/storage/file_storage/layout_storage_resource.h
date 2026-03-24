@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-
-#ifndef _LAYOUT_STORAGE_PROTOCOL_H__
-#define _LAYOUT_STORAGE_PROTOCOL_H__
+#pragma once
 
 #include <QtCore/QFile>
 
@@ -25,7 +23,6 @@ class NX_VMS_COMMON_API QnLayoutFileStorageResource: public QnStorageResource
 {
     using base_type = QnStorageResource;
     using StreamIndexEntry = nx::core::layout::StreamIndexEntry;
-    using StreamIndex = nx::core::layout::StreamIndex;
     using CryptoInfo = nx::core::layout::CryptoInfo;
 
 public:
@@ -118,8 +115,6 @@ private:
     void unlockOpenings();
 
 private:
-    StreamIndex m_index;
-    CryptoInfo m_cryptoInfo;
     QString m_password;
 
     QSet<QnLayoutStreamSupport*> m_openedFiles;
@@ -127,9 +122,9 @@ private:
     nx::Mutex m_fileSync;
 
     nx::core::layout::FileInfo m_info;
+    uint64_t m_indexOffset = 0;
+    bool m_isOpened = false;
     bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file.
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
-
-#endif // _LAYOUT_STORAGE_PROTOCOL_H__

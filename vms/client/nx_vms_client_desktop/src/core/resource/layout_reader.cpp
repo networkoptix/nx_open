@@ -64,7 +64,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     QnFileLayoutResourcePtr layout(new QnFileLayoutResource(metadata));
 
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
-    if (!fileInfo.isValid)
+    if (!fileInfo)
         return QnFileLayoutResourcePtr();
 
     nx::vms::api::LayoutData apiLayout;
@@ -79,7 +79,8 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     // Layout is not accessible if it is Encrypted and we do not know the password.
     bool layoutIsAccessible =
-        !fileInfo.isCrypted || (!password.isEmpty() && checkPassword(password, fileInfo));
+        !fileInfo->cryptoInfo
+        || (!password.isEmpty() && checkPassword(password, *fileInfo->cryptoInfo));
     if (!layoutIsAccessible && !password.isEmpty())
         NX_WARNING(NX_SCOPE_TAG, "Loading encrypted layout file with wrong password.");
 
@@ -95,9 +96,9 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     auto layoutBase = layout.staticCast<QnLayoutResource>();
     ec2::fromApiToResource(apiLayout, layoutBase);
 
-    if (fileInfo.isCrypted)
+    if (fileInfo->cryptoInfo)
         layout->setIsEncrypted(true);
-    if (fileInfo.isCrypted && layoutIsAccessible)
+    if (fileInfo->cryptoInfo && layoutIsAccessible)
         layout->usePasswordToRead(password);
 
     // At this point we have enough info for layout node itself.

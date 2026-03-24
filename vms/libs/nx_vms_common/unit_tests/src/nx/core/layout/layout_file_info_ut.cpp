@@ -51,7 +51,7 @@ TEST(LayoutFileInfo, Basic)
 
     FileInfo fileInfo = identifyFile(fileName);
 
-    ASSERT_TRUE(fileInfo.isValid);
-    ASSERT_TRUE(fileInfo.isCrypted);
-    ASSERT_TRUE(fileInfo.offset == 10000 * sizeof(quint64));
+    ASSERT_TRUE(fileInfo);
+    ASSERT_TRUE(fileInfo->cryptoInfo);
+    ASSERT_TRUE(fileInfo->offset == 10000 * sizeof(quint64));
 }

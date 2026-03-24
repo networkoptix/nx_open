@@ -258,7 +258,7 @@ QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(
 
     // Check the file still seems to be valid.
     const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
-    if (!fileInfo.isValid)
+    if (!fileInfo)
         return QnFileLayoutResourcePtr();
 
     // Check that the layout does not exist yet.
