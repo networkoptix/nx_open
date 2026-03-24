@@ -17,9 +17,6 @@
 #include "layout_storage_filestream.h"
 
 namespace {
-    /* Max future nov file version that should be opened by the current client version. */
-    const qint32 kMaxVersion = 1024;
-
     /* Protocol for items on the exported layouts. */
     static const QString kLayoutProtocol("layout://");
 } // namespace
@@ -66,12 +63,12 @@ QnStorageResource* QnLayoutFileStorageResource::instance(const QString& url)
 
 bool QnLayoutFileStorageResource::isEncrypted() const
 {
-    return m_info.isCrypted;
+    return m_info.cryptoInfo.has_value();
 }
 
 bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
 {
-    if (m_info.isCrypted && checkPassword(password, m_info))
+    if (m_info.cryptoInfo && checkPassword(password, *m_info.cryptoInfo))
     {
         m_password = password;
         return true;
@@ -82,14 +79,13 @@ bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
 void QnLayoutFileStorageResource::setPasswordToWrite(const QString& password)
 {
     NX_ASSERT(!password.isEmpty());
-    NX_ASSERT(m_index.entryCount == 0, "Set password _before_ export");
-    m_info.isCrypted = true;
-    m_index.magic = kIndexCryptedMagic;
+    NX_ASSERT(m_info.entries.empty(), "Set password _before_ export");
+    m_info.cryptoInfo = std::make_optional<CryptoInfo>();
     m_password = password;
-
     // Create new salt and salted password hash.
-    m_cryptoInfo.passwordSalt = getRandomSalt();
-    m_cryptoInfo.passwordHash = getSaltedPasswordHash(m_password, m_cryptoInfo.passwordSalt);
+    m_info.cryptoInfo->passwordSalt = getRandomSalt();
+    m_info.cryptoInfo->passwordHash = getSaltedPasswordHash(
+        m_password, m_info.cryptoInfo->passwordSalt);
 }
 
 void QnLayoutFileStorageResource::forgetPassword()
@@ -141,7 +137,7 @@ QIODevice* QnLayoutFileStorageResource::openInternal(const QString& url, QIODevi
 #endif
 
     // Can only open valid file for reading.
-    if (!(openMode & QIODevice::WriteOnly) && !m_info.isValid)
+    if (!(openMode & QIODevice::WriteOnly) && !m_isOpened)
         return nullptr;
 
     const auto fileName = stripName(url);
@@ -341,7 +337,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
 {
     NX_MUTEX_LOCKER lock(&m_fileSync);
 
-    if (m_index.entryCount == 0)
+    if (m_info.entries.empty())
         return Stream();
 
     QFile file(getUrl());
@@ -351,21 +347,20 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
     const QString fileName = stripName(name);
     quint32 hash = qt4Hash(fileName);
     QByteArray utf8FileName = fileName.toUtf8();
-    for (uint i = 0; i < m_index.entryCount; ++i)
+    for (uint i = 0; i < m_info.entries.size(); ++i)
     {
-        if (m_index.entries[i].fileNameCrc == hash)
+        if (m_info.entries[i].fileNameCrc == hash)
         {
-            file.seek(m_index.entries[i].offset + m_info.offset);
+            file.seek(m_info.entries[i].offset);
             char tmpBuffer[1024]; // buffer size is max file len
             int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
             QByteArray actualFileName(tmpBuffer, qMin(readBytes, utf8FileName.length()));
             if (utf8FileName == actualFileName)
             {
                 Stream stream;
-                stream.position = m_index.entries[i].offset + m_info.offset
-                    + fileName.toUtf8().length() + 1;
-                if (i < m_index.entryCount-1)
-                    stream.size = m_index.entries[i + 1].offset + m_info.offset - stream.position;
+                stream.position = m_info.entries[i].offset + fileName.toUtf8().length() + 1;
+                if (i < m_info.entries.size() - 1)
+                    stream.size = m_info.entries[i + 1].offset - stream.position;
                 else
                 {
                     qint64 endPos = file.size() - getTailSize();
@@ -384,37 +379,41 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream
     NX_MUTEX_LOCKER lock(&m_fileSync);
 
     QString fileName = stripName(name);
-
     const auto stream = findStream(name);
     if (stream)
         return stream;
 
-    // At this point m_info and m_index are read in findStream if existed.
+    // At this point m_info and m_info are read in findStream if existed.
     // Exe: the file is not valid (m_info.isValid) at this point. Will write a new index a few lines later.
-
-    if (m_index.entryCount >= kMaxStreams)
+    if (m_info.entries.size() >= kMaxStreams)
         return Stream();
 
-    if (!m_info.isValid) //< Could not access the file or it is empty.
+    if (!m_isOpened) //< Could not access the file or it is empty.
         if (!writeIndexHeader())
             return Stream();
 
     QFile file(getUrl());
     const qint64 fileSize = file.size() -  getTailSize();
-
-    m_index.entries[m_index.entryCount++] =
-        StreamIndexEntry{fileSize - m_info.offset, qt4Hash(fileName)};
+    m_info.entries.emplace_back(StreamIndexEntry{fileSize, qt4Hash(fileName)});
 
     if (!file.open(QIODevice::ReadWrite))
         return Stream();
+
     // Write new or updated index.
-    file.seek(m_info.offset);
-    file.write((const char*) &m_index, sizeof(m_index));
-    file.seek(fileSize);
+    file.seek(m_indexOffset);
+    StreamIndex1 index;
+    if (m_info.cryptoInfo)
+        index.magic = StreamIndex1::kIndexCryptedMagic;
+    index.entryCount = m_info.entries.size();
+    std::copy(m_info.entries.begin(), m_info.entries.end(), index.entries.begin());
+    file.write((const char*)&index, sizeof(index));
+    if (m_info.cryptoInfo)
+        file.write((const char*)&m_info.cryptoInfo, sizeof(m_info.cryptoInfo));
 
     // Write new stream name.
     QByteArray utf8FileName = fileName.toUtf8();
     utf8FileName.append('\0');
+    file.seek(fileSize);
     file.write(utf8FileName);
 
     // Add ending magic string.
@@ -425,7 +424,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream
 
 void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
 {
-    if (m_info.offset > 0)
+    if (m_indexOffset > 0)
     {
         QFile file(getUrl());
         file.open(QIODevice::Append);
@@ -455,36 +454,14 @@ void QnLayoutFileStorageResource::removeFileCompletely(QnLayoutStreamSupport* fi
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
-    m_info = identifyFile(getUrl(), true);
-    if (!m_info.isValid)
+    auto info = identifyFile(getUrl(), true);
+    if (!info)
     {
         qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
         return false;
     }
-
-    QFile file(getUrl());
-    if (!file.open(QIODevice::ReadOnly))
-        return false;
-
-    file.seek(m_info.offset);
-    file.read((char*)&m_index, sizeof(m_index));
-
-    if (m_info.isCrypted)
-        file.read((char*) &m_cryptoInfo, sizeof(m_cryptoInfo));
-    if (m_index.entryCount > kMaxStreams) //< There was kMaxFiles == 1024, but StreamIndex has only 256 entries.
-    {
-        qWarning() << "Corrupted nov file. Ignoring.";
-        m_index = StreamIndex();
-        return false;
-    }
-
-    if (m_info.version > kMaxVersion)
-    {
-        qWarning() << "Unsupported file from the future version. Ignoring.";
-        m_index = StreamIndex();
-        return false;
-    }
-
+    m_info = *info;
+    m_isOpened = true;
     return true;
 }
 
@@ -495,31 +472,34 @@ bool QnLayoutFileStorageResource::writeIndexHeader()
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return false;
 
-    m_info.offset = file.pos();
-
-    file.write((const char*)&m_index, sizeof(m_index));
-    if (m_info.isCrypted)
-        file.write((const char*)&m_cryptoInfo, sizeof(CryptoInfo));
+    m_indexOffset = file.pos();
+    StreamIndex1 index;
+    if (m_info.cryptoInfo)
+        index.magic = StreamIndex1::kIndexCryptedMagic;
+    index.entryCount = m_info.entries.size();
+    std::copy(m_info.entries.begin(), m_info.entries.end(), index.entries.begin());
+    file.write((const char*)&index, sizeof(index));
+    if (m_info.cryptoInfo)
+        file.write((const char*)&m_info.cryptoInfo, sizeof(m_info.cryptoInfo));
 
     if (file.error() != QFile::NoError)
         return false;
 
     writeFileTail(file);
-
-    m_info.isValid = true;
+    m_isOpened = true;
     return true;
 }
 
 int QnLayoutFileStorageResource::getTailSize() const
 {
-    return m_info.offset == 0 ? 0 : sizeof(qint64) * 2;
+    return m_indexOffset == 0 ? 0 : sizeof(qint64) * 2;
 }
 
 void QnLayoutFileStorageResource::writeFileTail(QFile& file)
 {
-    if (m_info.offset > 0)
+    if (m_indexOffset > 0)
     {
-        file.write((char*)&m_info.offset, sizeof(qint64));
+        file.write((char*)&m_indexOffset, sizeof(qint64));
         const quint64 magic = nx::core::layout::kFileMagic;
         file.write((char*)&magic, sizeof(qint64));
     }
@@ -583,18 +563,18 @@ void QnLayoutFileStorageResource::dumpStructure()
     QFile file(getUrl());
     file.open(QIODevice::ReadOnly);
 
-    if (m_index.entryCount == 0)
+    if (m_info.entries.size() == 0)
         return;
 
-    for(quint32 i = 0; i < m_index.entryCount - 1; i++)
+    for(uint32_t i = 0; i < m_info.entries.size(); i++)
     {
         char tmpBuffer[1024]; // buffer size is max file len
-        file.seek(m_index.entries[i].offset + m_info.offset);
+        file.seek(m_info.entries[i].offset);
         const int readBytes = file.read(tmpBuffer, sizeof(tmpBuffer));
         QByteArray actualFileName(tmpBuffer, readBytes);
         qDebug() << "Entry" << i << QString(actualFileName)
-            << "size:" << Qt::hex << m_index.entries[i + 1].offset - m_index.entries[i].offset
-            << "adjusted:" << Qt::hex << m_index.entries[i + 1].offset - m_index.entries[i].offset -
+            << "size:" << Qt::hex << m_info.entries[i + 1].offset - m_info.entries[i].offset
+            << "adjusted:" << Qt::hex << m_info.entries[i + 1].offset - m_info.entries[i].offset -
             strlen(actualFileName.data()) - 1;
     }
 }

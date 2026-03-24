@@ -8,6 +8,7 @@
 #include <QtCore/QFileInfo>
 
 #include <nx/utils/crypt/crypted_file_stream.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::core::layout {
 
@@ -17,26 +18,25 @@ bool isLayoutExtension(const QString& fileName)
     return extension == "nov" || extension == "exe";
 }
 
-FileInfo identifyFile(const QString& fileName, bool allowTemp)
+std::optional<FileInfo> identifyFile(const QString& fileName, bool allowTemp)
 {
-    FileInfo info;
-
     const QString extension = QFileInfo(fileName).suffix().toLower();
-
     if (!(extension == "nov" || extension == "exe"
         || (allowTemp && (fileName.endsWith(".exe.tmp") || fileName.endsWith(".nov.tmp")))))
     {
-        return info;
+        NX_WARNING(NX_SCOPE_TAG, "Invlaid NOV file extension: %1", extension);
+        return std::nullopt;
     }
 
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly))
-        return info;
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to open NOV file: %1", fileName);
+        return std::nullopt;
+    }
 
-    StreamIndex index;
-    CryptoInfo crypto;
-
+    FileInfo info;
     if (extension == "exe")
     {
         file.seek(file.size() - 2 * sizeof(qint64));
@@ -45,38 +45,54 @@ FileInfo identifyFile(const QString& fileName, bool allowTemp)
         file.read((char*)&offset, sizeof(qint64));
         file.read((char*)&magic, sizeof(qint64));
         if (magic != kFileMagic)
-            return info;
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Corrupted NOV file, invalid magic: %1", magic);
+            return std::nullopt;
+        }
 
-        info.offset = offset;
-        file.seek(info.offset);
+        file.seek(offset);
     }
 
+    StreamIndex1 index;
     if (file.read((char *)&index, sizeof(index)) != sizeof(index))
-        return info;
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to read NOV file: %1", fileName);
+        return std::nullopt;
+    }
 
+    info.entries.resize(index.entryCount);
+    std::copy(index.entries.begin(), index.entries.begin() + index.entryCount, info.entries.begin());
     info.version = index.version;
 
-    if (index.magic == kIndexCryptedMagic)
+    if (index.magic == StreamIndex1::kIndexCryptedMagic)
     {
+        CryptoInfo crypto;
         if (file.read((char*)&crypto, sizeof(crypto)) != sizeof(crypto))
-            return info;
-
-        info.isCrypted = true;
-        info.passwordSalt = crypto.passwordSalt;
-        info.passwordHash = crypto.passwordHash;
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Failed to read NOV file: %1", fileName);
+            return std::nullopt;
+        }
+        info.cryptoInfo = crypto;
     }
-    else if (index.magic != kIndexMagic)
-        return info;
+    else if (index.magic != StreamIndex1::kIndexMagic1)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Corrupted NOV file, invalid index magic: %1", index.magic);
+        return std::nullopt;
+    }
 
-    info.isValid = true;
-
+    if (info.version > kMaxVersion)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Unsupported file from the future version: %1", info.version);
+        return std::nullopt;
+    }
+    NX_DEBUG(NX_SCOPE_TAG, "Parsed NOV file: %1", fileName);
     return info;
 }
 
-bool checkPassword(const QString& password, const FileInfo& fileInfo)
+bool checkPassword(const QString& password, const CryptoInfo& cryptoInfo)
 {
     return nx::crypt::checkSaltedPassword(password,
-        fileInfo.passwordSalt, fileInfo.passwordHash);
+        cryptoInfo.passwordSalt, cryptoInfo.passwordHash);
 }
 
 } // namespace nx::core::layout

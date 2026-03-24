@@ -258,12 +258,6 @@ void ExportStorageStreamRecorder::setTranscoderQuality(Qn::StreamQuality quality
 void ExportStorageStreamRecorder::addRecordingContext(
     const QString& fileName, const QnStorageResourcePtr& storage)
 {
-    if (storage.dynamicCast<QnLayoutFileStorageResource>())
-    {
-        NX_DEBUG(this, "Disable timestamp stitcher, as the NX media format is used");
-        m_stitchTimestampGaps = false;
-    }
-
     m_recordingContext = StorageContext(fileName, storage);
 }
 

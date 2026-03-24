@@ -31,10 +31,16 @@ auto passwordValidator(const QnLayoutResourcePtr& layout)
     return
         [fileInfo](const QString& value) -> ValidationResult
         {
+            if (!fileInfo)
+                return ValidationResult(EncryptedLayoutStrings::tr("Corrupted input file."));
+
+            if (!fileInfo->cryptoInfo)
+                return ValidationResult(QValidator::Acceptable);
+
             if (value.isEmpty())
                 return ValidationResult(EncryptedLayoutStrings::tr("Please enter a valid password"));
 
-            if (!checkPassword(value.trimmed(), fileInfo)) //< Trimming password!
+            if (!checkPassword(value.trimmed(), *fileInfo->cryptoInfo)) //< Trimming password!
                 return ValidationResult(EncryptedLayoutStrings::tr("The password is not valid."));
 
             return ValidationResult(QValidator::Acceptable);
