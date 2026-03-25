@@ -75,7 +75,7 @@ AdaptiveScreen
     rightPanel
     {
         visible: false
-        title: qsTr("Feed")
+        title: feed.title
         color: ColorTheme.colors.dark5
         iconSource: feedStateProvider.buttonIconSource
         item:

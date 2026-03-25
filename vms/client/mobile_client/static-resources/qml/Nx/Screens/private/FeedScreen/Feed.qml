@@ -21,6 +21,8 @@ Item
 
     objectName: "feed"
 
+    readonly property string title: qsTr("Feed")
+
     required property FeedStateProvider feedState
 
     property color highlightColor: ColorTheme.colors.yellow_d1

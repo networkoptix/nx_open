@@ -21,7 +21,7 @@ AdaptiveScreen
 
     required property FeedStateProvider feedState
 
-    title: qsTr("Feed")
+    title: feed.title
 
     contentItem: Feed
     {
