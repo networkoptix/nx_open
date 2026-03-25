@@ -12692,7 +12692,7 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Enter keywords separated by space</source>
-      <translation type="unfinished">Enter keywords separated by space</translation>
+      <translation>Masukkan kata kunci yang dipisahkan oleh spasi</translation>
     </message>
   </context>
   <context>

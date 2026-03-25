@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Masukkan paling tidak satu kata kunci</translation>
     </message>
   </context>
   <context>

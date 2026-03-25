@@ -990,15 +990,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Tidak ada perangkat</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Tidak ada perangkat yang ditemukan pada layout ini</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Tidak ada perangkat yang ditemukan di site ini. Tambahkan perangkat menggunakan klien desktop, atau minta akses ke perangkat yang sudah ada</translation>
     </message>
   </context>
   <context>
