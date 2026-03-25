@@ -6,8 +6,8 @@
     <message numerus="yes">
       <source>%n Object Types</source>
       <comment>%n is number of types</comment>
-      <translation type="unfinished">
-        <numerusform>%n Object Types</numerusform>
+      <translation>
+        <numerusform>%n Object Type</numerusform>
         <numerusform>%n Object Types</numerusform>
       </translation>
     </message>
