@@ -13,7 +13,8 @@ CheckBox
     id: control
 
     property alias backgroundRadius: backgroundItem.radius
-    property alias backgroundColor: backgroundItem.color
+    property color backgroundColor: ColorTheme.colors.dark6
+    property color checkedBackgroundColor: ColorTheme.colors.dark8
     property alias iconSource: icon.source
 
     implicitWidth: leftPadding + rightPadding + indicator.implicitwidth + contentItem.implicitWidth
@@ -32,7 +33,9 @@ CheckBox
     background: Rectangle
     {
         id: backgroundItem
-        color: ColorTheme.colors.dark6
+        color: control.checked
+            ? control.checkedBackgroundColor
+            : control.backgroundColor
 
         MaterialEffect
         {
@@ -81,9 +84,10 @@ CheckBox
         {
             id: textItem
 
+            anchors.verticalCenter: parent.verticalCenter
             text: control.text
             font: control.font
-            color: ColorTheme.colors.light1
+            color: control.checked ? ColorTheme.colors.brand_core : ColorTheme.colors.light10
             width: parent.width - (icon.x + icon.width + indicator.width + 2 * control.spacing)
             wrapMode: Text.Wrap
         }

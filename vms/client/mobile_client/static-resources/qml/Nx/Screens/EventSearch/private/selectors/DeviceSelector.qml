@@ -73,6 +73,15 @@ OptionSelector
                 height: 56
                 width: (parent && parent.width) ?? 0
                 text: model.resourceName
+                iconSource:
+                {
+                    if (model.iconKey === 0)
+                        return ""
+
+                    return "image://resource/%1?primary=%2"
+                        .arg(model.iconKey)
+                        .arg(checked ? "brand_core" : "light10")
+                }
                 checked: model.checkState === Qt.Checked
                 onCheckedChanged: camerasRepeater.model.setSelected(index, checked)
             }
