@@ -130,4 +130,21 @@ ItemDescriptor DeviceIpConflictEvent::manifest(common::SystemContext* context)
     return kDescriptor;
 }
 
+void DeviceIpConflictEvent::setDeviceIds(const UuidList& value)
+{
+    // Adjusting mac address list in case the devices are filtered by permissions.
+    if (m_macAddresses.size() == m_deviceIds.size() && !m_macAddresses.isEmpty()
+        && value.size() < m_deviceIds.size())
+    {
+        QStringList filteredMacs;
+        for (int i = 0; i < m_deviceIds.size(); ++i)
+        {
+            if (value.contains(m_deviceIds[i]))
+                filteredMacs.push_back(m_macAddresses[i]);
+        }
+        m_macAddresses = std::move(filteredMacs);
+    }
+    m_deviceIds = value;
+}
+
 } // namespace nx::vms::rules
