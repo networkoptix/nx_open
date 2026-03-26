@@ -14,9 +14,9 @@ class NX_VMS_RULES_API DeviceIpConflictEvent: public BasicEvent
     Q_OBJECT
     Q_CLASSINFO("type", "deviceIpConflict")
     FIELD(nx::Uuid, serverId, setServerId)
-    FIELD(UuidList, deviceIds, setDeviceIds)
     FIELD(QString, ipAddress, setIpAddress)
     FIELD(QStringList, macAddresses, setMacAddresses)
+    Q_PROPERTY(UuidList deviceIds READ deviceIds WRITE setDeviceIds)
 
 public:
     DeviceIpConflictEvent() = default;
@@ -48,6 +48,9 @@ public:
 
     static ItemDescriptor manifest(common::SystemContext* context);
 
+    UuidList deviceIds() const { return m_deviceIds; }
+    void setDeviceIds(const UuidList& val);
+
 protected:
     virtual QString extendedCaption(
         common::SystemContext* context,
@@ -57,6 +60,9 @@ private:
     QString caption(common::SystemContext* context) const;
     QStringList detailing(common::SystemContext* context) const;
     virtual QString name(common::SystemContext* context) const override;
+
+private:
+    UuidList m_deviceIds;
 };
 
 } // namespace nx::vms::rules
