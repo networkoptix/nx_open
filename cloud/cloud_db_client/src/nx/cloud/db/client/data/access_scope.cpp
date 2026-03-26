@@ -2,6 +2,7 @@
 
 #include "access_scope.h"
 
+#include <algorithm>
 #include <unordered_set>
 
 #include <nx/network/http/rest/http_rest_client.h>
@@ -11,6 +12,31 @@
 #include <nx/cloud/db/client/cdb_request_path.h>
 
 namespace {
+
+static std::string_view cutScheme(std::string_view url)
+{
+    auto pos = url.find("://");
+    if (pos != std::string_view::npos)
+        url = url.substr(pos + 3);
+    return url;
+}
+
+// Recognizing the following formats here:
+// - example.com/some/path
+// - /some/path
+// Nothing else doesn't make it through here.
+// @return string views referencing the original string.
+static std::tuple<std::string_view, std::string_view> splitUrl(std::string_view url)
+{
+    if (url.starts_with('/'))
+        return {std::string_view(), url}; //< url contains only path.
+
+    auto pos = url.find('/');
+    if (pos == std::string_view::npos)
+        return {url, std::string_view("/")}; //< url contains only host.
+
+    return {url.substr(0, pos), url.substr(pos)};
+}
 
 static bool isUrl(std::string_view str)
 {
@@ -100,16 +126,21 @@ AccessScope::AccessScope(std::vector<std::string> urls, Attributes attributes):
 {
 }
 
-bool AccessScope::isSuitableForSystem(const std::optional<std::string>& clientId) const
+bool AccessScope::isSuitableForSystem(const std::optional<std::string>& /*clientId*/) const
 {
     if (!m_attributes.count(kCloudSystemId))
         return false;
 
+    auto isAllowedUrl = [](const std::string& url) {
+        const auto noScheme = cutScheme(url);
+        const auto [host, path] = splitUrl(noScheme);
+        return path.starts_with("/cdb/oauth2")
+            || path.starts_with("/oauth2/v1")
+            || path.starts_with("/cdb/systems");
+    };
+
     bool notContainUrls = m_urls.empty()
-        || (clientId
-            && m_urls.size() == 1
-            && m_urls[0].ends_with(nx::network::http::rest::substituteParameters(
-                kOauthTokensDeletePath, {*clientId})));
+        || std::all_of(m_urls.cbegin(), m_urls.cend(), isAllowedUrl);
 
     return notContainUrls && (m_attributes.size() == 1)
         && (m_attributes.begin()->first == kCloudSystemId)
@@ -152,31 +183,6 @@ bool AccessScope::isUrlAllowed(const std::string& url) const
     };
 
     return std::count_if(m_urls.cbegin(), m_urls.cend(), isPrefix);
-}
-
-static std::string_view cutScheme(std::string_view url)
-{
-    auto pos = url.find("://");
-    if (pos != std::string_view::npos)
-        url = url.substr(pos + 3);
-    return url;
-}
-
-// Recognizing the following formats here:
-// - example.com/some/path
-// - /some/path
-// Nothing else doesn't make it through here.
-// @return string views referencing the original string.
-static std::tuple<std::string_view, std::string_view> splitUrl(std::string_view url)
-{
-    if (url.starts_with('/'))
-        return {std::string_view(), url}; //< url contains only path.
-
-    auto pos = url.find('/');
-    if (pos == std::string_view::npos)
-        return {url, std::string_view("/")}; //< url contains only host.
-
-    return {url.substr(0, pos), url.substr(pos)};
 }
 
 // Calculates intersection of two URLs according to the rules described for
