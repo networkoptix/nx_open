@@ -63,7 +63,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     QnFileLayoutResourcePtr layout(new QnFileLayoutResource(metadata));
 
-    const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
+    const auto fileInfo = nx::core::layout::readNovFileIndex(layoutUrl);
     if (!fileInfo)
         return QnFileLayoutResourcePtr();
 

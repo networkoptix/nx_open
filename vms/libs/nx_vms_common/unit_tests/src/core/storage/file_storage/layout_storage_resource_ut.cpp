@@ -37,6 +37,7 @@ TEST(QnLayoutFileStorageResource, Basic)
             stream->write(buffer, streamSizes[i]);
             delete stream;
         }
+        storage->finalize();
     }
 
     {   // Read nov.
@@ -50,6 +51,7 @@ TEST(QnLayoutFileStorageResource, Basic)
         for (int i = kStreamCount - 1; i >= 0; i--) // Reverse order (for fun).
         {
             auto stream = storage->open(streamNames[i], QIODevice::ReadOnly);
+            ASSERT_TRUE(stream);
             stream->read(readBuffer, streamSizes[i]);
             for (int j = 0; j < streamSizes[i]; j++)
                 ASSERT_EQ(buffer[j], readBuffer[j]);

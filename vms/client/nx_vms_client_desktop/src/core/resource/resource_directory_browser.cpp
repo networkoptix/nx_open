@@ -257,7 +257,7 @@ QnFileLayoutResourcePtr ResourceDirectoryBrowser::layoutFromFile(
     NX_ASSERT(layoutUrl == filename);
 
     // Check the file still seems to be valid.
-    const auto fileInfo = nx::core::layout::identifyFile(layoutUrl);
+    const auto fileInfo = nx::core::layout::readNovFileIndex(layoutUrl);
     if (!fileInfo)
         return QnFileLayoutResourcePtr();
 

@@ -1,4 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <QtCore/QFile>
@@ -84,12 +85,13 @@ public:
     Stream findStream(const QString& name);
     // Opens or adds new stream to the layout storage.
     Stream findOrAddStream(const QString& name);
-    // Called from a output stream when it is closed.
-    void finalizeWrittenStream(qint64 pos);
     void registerFile(QnLayoutStreamSupport* file);
     void unregisterFile(QnLayoutStreamSupport* file);
     // This functions also removes file from rename cache.
     void removeFileCompletely(QnLayoutStreamSupport* file);
+
+    // Save file index and header to file and finish writing.
+    bool finalize();
 
     void dumpStructure();
 
@@ -99,9 +101,6 @@ protected:
 private:
     bool readIndexHeader();
     bool writeIndexHeader();
-
-    int getTailSize() const;
-    void writeFileTail(QFile& file);
 
     void closeOpenedFiles();
     void restoreOpenedFiles();
@@ -122,7 +121,7 @@ private:
     nx::Mutex m_fileSync;
 
     nx::core::layout::FileInfo m_info;
-    uint64_t m_indexOffset = 0;
+    uint64_t m_indexSize = 0;
     bool m_isOpened = false;
     bool m_lockedOpenings = false; //< Used to prevent stream openings when moving file.
 };
