@@ -166,44 +166,6 @@ TimerId TimerManager::addNonStopTimer(
     return timerId;
 }
 
-bool TimerManager::modifyTimerDelay(
-    TimerId timerId,
-    std::chrono::milliseconds newDelay)
-{
-    NX_VERBOSE(this, nx::format("Modifying timer %1, new delay %2 ms")
-        .arg(timerId).arg(newDelay.count()));
-
-    NX_MUTEX_LOCKER lk(&m_mutex);
-    if (m_runningTaskID == timerId)
-        return false; //< Timer being executed at the moment.
-
-    // Fetching handler.
-    auto taskIter = m_taskToTime.find(timerId);
-    if (taskIter == m_taskToTime.end())
-        return false; //< No timer with requested id.
-    auto handlerIter = m_timeToTask.find(std::make_pair(taskIter->second, timerId));
-    if (!NX_ASSERT(handlerIter != m_timeToTask.end()))
-        return false;
-    NX_CRITICAL(handlerIter->second.func);
-
-    auto taskContext = std::move(handlerIter->second);
-    if (!taskContext.singleShot)
-        taskContext.repeatPeriod = newDelay;
-
-    m_taskToTime.erase(taskIter);
-    m_timeToTask.erase(handlerIter);
-
-    NX_VERBOSE(this, nx::format("Modified timer %1, new delay %2 ms")
-        .arg(timerId).arg(newDelay.count()));
-
-    addTaskNonSafe(
-        lk,
-        timerId,
-        std::move(taskContext),
-        newDelay);
-    return true;
-}
-
 bool TimerManager::hasPendingTasks() const
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
@@ -256,9 +218,7 @@ void TimerManager::run()
 
     while (!m_terminated)
     {
-        std::optional<std::chrono::milliseconds> timeToWait(
-            std::chrono::milliseconds::zero());
-        timeToWait.reset();
+        std::optional<std::chrono::milliseconds> timeToWait;
 
         try
         {
@@ -277,38 +237,28 @@ void TimerManager::run()
                 auto taskContext = std::move(taskIter->second);
                 NX_CRITICAL(taskContext.func);
 
+                m_timeToTask.erase(taskIter);
                 m_runningTaskID = timerId;
 
-                auto recycler = nx::utils::makeScopeGuard(
-                    [&]
+                {
+                    nx::Unlocker<nx::Mutex> unlocker(&lk);
+                    NX_VERBOSE(this, "Executing task %1", timerId);
+                    taskContext.func(timerId);
+                    NX_VERBOSE(this, "Done task %1", timerId);
+                }
+
+                if (const auto it = m_taskToTime.find(timerId); it != m_taskToTime.end())
+                {
+                    m_taskToTime.erase(it);
+                    if (!taskContext.singleShot)
                     {
-                        if (m_taskToTime.find(timerId) != m_taskToTime.cend())
-                        {
-                            m_taskToTime.erase(timerId);
-                            m_timeToTask.erase(taskIter);
+                        auto period = taskContext.repeatPeriod;
+                        addTaskNonSafe(lk, timerId, std::move(taskContext), period);
+                    }
+                }
 
-                            if (!taskContext.singleShot)
-                                addTaskNonSafe(
-                                    lk,
-                                    timerId,
-                                    std::move(taskContext),
-                                    taskContext.repeatPeriod);
-                        }
-
-                        m_runningTaskID = 0;
-                        m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
-
-                        //giving chance to another thread to remove task
-                        nx::Unlocker<nx::Mutex> unlocker(&lk);
-                    });
-
-                // Using unlocker to ensure exception-safety.
-                nx::Unlocker<nx::Mutex> unlocker(&lk);
-
-                NX_CRITICAL(taskContext.func);
-                NX_VERBOSE(this, "Executing task %1", timerId);
-                taskContext.func(timerId);
-                NX_VERBOSE(this, "Done task %1", timerId);
+                m_runningTaskID = 0;
+                m_cond.wakeAll();
             }
 
             if (m_terminated)
@@ -367,7 +317,7 @@ void TimerManager::deleteTaskNonSafe(
     if (it == m_taskToTime.end())
         return;
 
-    NX_CRITICAL(m_timeToTask.erase(std::pair(it->second, it->first)) == 1);
+    m_timeToTask.erase(std::pair(it->second, it->first));
     m_taskToTime.erase(it);
 }
 
