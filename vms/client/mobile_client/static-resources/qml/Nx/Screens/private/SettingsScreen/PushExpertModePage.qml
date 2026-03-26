@@ -20,9 +20,6 @@ BaseSettingsPage
         d.handleBackClicked()
     }
 
-    opacity: enabled ? 1.0 : 0.3
-    enabled: !appContext.pushManager.userUpdateInProgress
-
     title: !simpleModeRadioButton.checked
         ? "%1: %2".arg(qsTr("Sites")).arg(d.selectionModel.selectedSystems.length)
         : qsTr("Notifications")
@@ -53,7 +50,6 @@ BaseSettingsPage
 
         width: parent.width
         height: pushExpertModePage.availableHeight
-        enabled: !appContext.pushManager.userUpdateInProgress
 
         Column
         {
@@ -146,6 +142,8 @@ BaseSettingsPage
 
                         visible: d.loggedInAndHasPermissions
                             && notificationsSwitch.checkState === Qt.Checked
+
+                        enabled: !appContext.pushManager.userUpdateInProgress
                         width: parent.width
                         text: qsTr("All Sites")
                     }
@@ -157,6 +155,8 @@ BaseSettingsPage
                         visible: d.loggedInAndHasPermissions
                             && notificationsSwitch.checkState === Qt.Checked
                         width: parent.width
+
+                        enabled: !appContext.pushManager.userUpdateInProgress
                         text: qsTr("Selected Sites")
                         backgroundRadius: 8
                     }
@@ -174,6 +174,7 @@ BaseSettingsPage
                 font.pixelSize: 14
                 color: ColorTheme.colors.light12
                 text: qsTr("SELECT")
+                enabled: !appContext.pushManager.userUpdateInProgress
                 opacity: enabled ? 1.0 : 0.3
 
                 visible: expertModeRadioButton.visible && expertModeRadioButton.checked
@@ -188,6 +189,7 @@ BaseSettingsPage
             anchors.bottom: parent.bottom
             width: parent.width
             visible: expertModeRadioButton.visible && expertModeRadioButton.checked
+            enabled: !appContext.pushManager.userUpdateInProgress
             model: d.selectionModel
 
             delegate: StyledCheckBox
