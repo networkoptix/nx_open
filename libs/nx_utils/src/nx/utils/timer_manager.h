@@ -107,13 +107,6 @@ public:
         std::chrono::milliseconds repeatPeriod,
         std::chrono::milliseconds firstShotDelay);
     /**
-     * Modifies delay on existing timer.
-     * If the timer is being executed currently, nothing is done.
-     * Otherwise, timer will be called in newDelayMillis from now
-     * @return true, if timer delay has been changed.
-     */
-    bool modifyTimerDelay(TimerId timerId, std::chrono::milliseconds delay);
-    /**
      * If the task is already running, it can be still running after method return.
      * If the timer handler is being executed at the moment,
      *   it can still be executed after return of this method.
