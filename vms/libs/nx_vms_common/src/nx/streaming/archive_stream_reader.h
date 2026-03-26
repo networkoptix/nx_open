@@ -271,6 +271,18 @@ private:
     bool m_outOfPlaybackMask;
     qint64 m_latPacketTime;
 
+    // This is only needed to drain the Android or iOS hardware video decoder, since
+    // they buffer video frames and cannot work in a simple one-in, one-out manner.
+    // Instead, they operate more like four-in, four-out. Therefore, when the
+    // player is paused, we may need more frames than just the one needed to
+    // display the frame at a specified position. After refactoring, this code
+    // should be removed.
+    int m_extraFrames = 0;
+    int m_extraFramesAfterSeek = 0;
+public:
+    void setExtraFramesAfterSeek(int value) { m_extraFramesAfterSeek = value; }
+
+private:
     bool m_stopCond;
     mutable nx::Mutex m_stopMutex;
     nx::WaitCondition m_stopWaitCond;

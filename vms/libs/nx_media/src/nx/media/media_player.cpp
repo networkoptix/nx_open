@@ -866,6 +866,11 @@ bool Player::Private::createArchiveReader()
     if (!periods.isEmpty())
         archiveReader->setPlaybackMask(periods);
 
+    if (allowHardwareAcceleration)
+    {
+        constexpr int kHwVideoDecoderBufferSize = 4;
+        archiveReader->setExtraFramesAfterSeek(kHwVideoDecoderBufferSize);
+    }
     configureMetadataForReader();
 
     return true;

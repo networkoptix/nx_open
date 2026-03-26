@@ -464,6 +464,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
         NX_MUTEX_LOCKER mutex( &m_jumpMtx );
         while (m_singleShot
             && m_skipFramesToTime == 0
+            && m_extraFrames == 0
             && m_singleQuantProcessed
             && m_requiredJumpTime == qint64(AV_NOPTS_VALUE)
             && !needToStop()
@@ -875,6 +876,9 @@ begin_label:
                     else
                         videoData->flags &= ~(QnAbstractMediaData::MediaFlags_Ignore);
                     setSkipFramesToTime(0, true);
+
+                    if (m_extraFramesAfterSeek)
+                        m_extraFrames = m_extraFramesAfterSeek;
                 }
             }
         }
@@ -998,6 +1002,10 @@ begin_label:
 
     if (m_currentData)
         m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
+
+    if (m_currentData && m_currentData->dataType == QnAbstractMediaData::VIDEO && m_extraFrames > 0)
+        --m_extraFrames;
+
     return m_currentData;
 }
 
@@ -1023,6 +1031,7 @@ void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters
 
 void QnArchiveStreamReader::internalJumpTo(qint64 usec)
 {
+    m_extraFrames = 0;
     m_skippedMetadata.clear();
     m_nextData.reset();
     m_afterMotionData.reset();
