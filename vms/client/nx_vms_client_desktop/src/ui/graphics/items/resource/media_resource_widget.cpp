@@ -2489,10 +2489,7 @@ void QnMediaResourceWidget::setPosition(qint64 timestampMs)
         ? timestampMs //< Special time value.
         : timestampMs * 1000;
 
-    if (reader->isPaused())
-        reader->jumpTo(timestampUs, timestampUs); //< Precise jump to avoid timeline blinks.
-    else
-        reader->jumpTo(timestampUs, 0);
+    reader->jumpTo(timestampUs, timestampUs); //< Precise jump to avoid timeline blinks.
 }
 
 std::chrono::milliseconds QnMediaResourceWidget::position() const
