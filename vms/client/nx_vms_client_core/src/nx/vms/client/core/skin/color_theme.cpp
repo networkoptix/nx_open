@@ -26,7 +26,8 @@ QStringList kThemeSpecificColors = {
     "red", "pink", "purple", "deep_purple",
     "indigo", "blue", "light_blue", "cyan",
     "teal", "green", "light_green", "lime",
-    "yellow", "lemon", "orange", "deep_orange"
+    "yellow", "lemon", "orange", "deep_orange",
+    "amber"
 };
 
 QString legacyColorsFileName()

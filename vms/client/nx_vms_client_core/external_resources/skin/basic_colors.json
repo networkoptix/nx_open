@@ -15,7 +15,8 @@
         "lemon":        "#FFEE58",
         "yellow":       "#FFCA28",
         "orange":       "#FFA726",
-        "deep_orange":  "#FF7043"
+        "deep_orange":  "#FF7043",
+        "amber":        "#FFCA28"
     },
 
     "light_theme": {
@@ -34,7 +35,8 @@
         "lemon":        "#F9A825",
         "yellow":       "#FF8F00",
         "orange":       "#EF6C00",
-        "deep_orange":  "#D84315"
+        "deep_orange":  "#D84315",
+        "amber":        "#FF8F00"
     },
 
     "contrast": {
