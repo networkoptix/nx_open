@@ -1955,7 +1955,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Ajuste al valor más pequeño que no degrade la vista en vivo. Un buffer más grande hace que la reproducción sea más fluida, pero aumenta la demora entre el tiempo real y la visualización en vivo; un buffer más pequeño disminuye la demora pero puede causar el video entrecotado.</translation>
+      <translation>Ajuste al valor más pequeño que no degrade la vista en vivo. Un buffer más grande hace que la reproducción sea más fluida, pero aumenta la demora entre el tiempo real y la visualización en vivo; un buffer más pequeño disminuye la demora pero puede causar el video entrecortado.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
@@ -2007,11 +2007,11 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation>Seleccione el Folder</translation>
+      <translation>Seleccionar carpeta...</translation>
     </message>
     <message>
       <source>Failed to save logs to the selected folder</source>
-      <translation>Fallo salvar los logs en el folder seleccionado</translation>
+      <translation>Fallo salvar los logs en las carpetas seleccionado</translation>
     </message>
     <message>
       <source>Download complete!</source>
@@ -2284,8 +2284,8 @@ Clave de licencia: %2</translation>
     <message numerus="yes">
       <source>%n actions</source>
       <translation>
-        <numerusform>%n acciones</numerusform>
-        <numerusform>%n acciones</numerusform>
+        <numerusform>%n Acciones</numerusform>
+        <numerusform>%n Acciones</numerusform>
       </translation>
     </message>
     <message>
@@ -2364,7 +2364,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation>Usuaria IP</translation>
+      <translation>Usuario IP</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2388,7 +2388,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation>Esta acción fue realizada por un plugin.</translation>
+      <translation>Esta acción fue realizada por un plug-in.</translation>
     </message>
   </context>
   <context>

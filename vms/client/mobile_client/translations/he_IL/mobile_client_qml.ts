@@ -532,13 +532,13 @@
       <source>All</source>
       <translation>הכל</translation>
     </message>
-  </context>
-  <context>
-    <name>FeedScreen</name>
     <message>
       <source>Feed</source>
       <translation type="unfinished">Feed</translation>
     </message>
+  </context>
+  <context>
+    <name>FeedScreen</name>
     <message>
       <source>Unviewed</source>
       <translation type="unfinished">Unviewed</translation>
@@ -1161,10 +1161,6 @@
     <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
-    </message>
-    <message>
-      <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
     </message>
     <message>
       <source>Resources</source>

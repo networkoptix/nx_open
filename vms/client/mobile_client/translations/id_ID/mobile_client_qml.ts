@@ -529,13 +529,13 @@
       <source>All</source>
       <translation>Semua</translation>
     </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
   </context>
   <context>
     <name>FeedScreen</name>
-    <message>
-      <source>Feed</source>
-      <translation>Feed</translation>
-    </message>
     <message>
       <source>Unviewed</source>
       <translation>Belum dilihat</translation>
@@ -1158,10 +1158,6 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>Selamat datang, %1!</translation>
-    </message>
-    <message>
-      <source>Feed</source>
-      <translation>Feed</translation>
     </message>
     <message>
       <source>Resources</source>

@@ -530,13 +530,13 @@
       <source>All</source>
       <translation>Todo</translation>
     </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
   </context>
   <context>
     <name>FeedScreen</name>
-    <message>
-      <source>Feed</source>
-      <translation>Pantalla de noticias</translation>
-    </message>
     <message>
       <source>Unviewed</source>
       <translation>No Visto</translation>
@@ -1159,10 +1159,6 @@
     <message>
       <source>Welcome, %1!</source>
       <translation type="unfinished">Welcome, %1!</translation>
-    </message>
-    <message>
-      <source>Feed</source>
-      <translation>Pantalla de noticias</translation>
     </message>
     <message>
       <source>Resources</source>

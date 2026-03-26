@@ -529,13 +529,13 @@
       <source>All</source>
       <translation>すべて</translation>
     </message>
+    <message>
+      <source>Feed</source>
+      <translation type="unfinished">Feed</translation>
+    </message>
   </context>
   <context>
     <name>FeedScreen</name>
-    <message>
-      <source>Feed</source>
-      <translation>フィード</translation>
-    </message>
     <message>
       <source>Unviewed</source>
       <translation>未読</translation>
@@ -1158,10 +1158,6 @@
     <message>
       <source>Welcome, %1!</source>
       <translation>ようこそ、%1様!</translation>
-    </message>
-    <message>
-      <source>Feed</source>
-      <translation>フィード</translation>
     </message>
     <message>
       <source>Resources</source>
