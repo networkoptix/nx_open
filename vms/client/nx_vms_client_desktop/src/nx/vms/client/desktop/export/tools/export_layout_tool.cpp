@@ -77,7 +77,7 @@ struct ExportLayoutTool::Private
     QString actualFilename;
 
     // External file storage.
-    QnStorageResourcePtr storage;
+    QnLayoutFileStorageResourcePtr storage;
 
     // Whether any archive has been exported.
     bool exportedAnyData = false;
@@ -134,6 +134,12 @@ struct ExportLayoutTool::Private
                     (int)status, (int)lastError);
                 return; //< Do nothing.
         }
+        if (!storage->finalize())
+        {
+            NX_DEBUG(this, "Failed to finalize storage");
+            status = ExportProcessStatus::failure;
+        }
+
         if (status != ExportProcessStatus::success)
         {
             NX_VERBOSE(this,
@@ -200,11 +206,10 @@ bool ExportLayoutTool::prepareStorage()
             NX_VERBOSE(this, "Temp file is removed");
     }
 
-    auto fileStorage = new QnLayoutFileStorageResource(d->actualFilename);
+    d->storage.reset(new QnLayoutFileStorageResource(d->actualFilename));
 
     if (d->settings.encryption.on)
-        fileStorage->setPasswordToWrite(d->settings.encryption.password);
-    d->storage = QnStorageResourcePtr(fileStorage);
+        d->storage->setPasswordToWrite(d->settings.encryption.password);
     return true;
 }
 
@@ -533,7 +538,7 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 
     m_currentCamera->exportMediaPeriodToFile(d->settings.period,
         uniqId,
-        d->storage,
+        QnStorageResourcePtr(d->storage),
         timeZone(resource),
         playbackMask);
 

@@ -94,11 +94,7 @@ void QnLayoutPlainStream::close()
         QIODevice::close();
         m_file.close();
 
-        if (m_openMode & QIODevice::WriteOnly)
-            m_storageResource.finalizeWrittenStream(m_fileOffset + m_fileSize);
-
         m_openMode = NotOpen;
-
         m_storageResource.unregisterFile(this);
     }
 }

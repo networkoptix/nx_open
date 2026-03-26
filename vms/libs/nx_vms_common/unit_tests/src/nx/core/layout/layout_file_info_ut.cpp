@@ -10,22 +10,22 @@ using namespace nx::core::layout;
 using nx::TestOptions;
 
 static const char* dummyName = "DeleteMe.exe";
-
 static const char* thePassword = "helloworld";
+static constexpr int kCountOfIntegers = 100;
 
-static void writeTestFile(const QString& name)
+static void writeTestFileVersion1(const QString& name)
 {
     QFile file(name);
     ASSERT_TRUE(file.open(QFile::WriteOnly));
 
-    quint64 x = 0x1eaddeaddeaddead;
+    uint64_t x = 0x1eaddeaddeaddead;
 
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < kCountOfIntegers; i++)
         file.write((char *) &x, sizeof(quint64));
 
-    StreamIndex index;
-    index.magic = kIndexCryptedMagic;
-    file.write((char *) &index, sizeof(StreamIndex));
+    StreamIndex1 index;
+    index.magic = StreamIndex1::kIndexCryptedMagic;
+    file.write((char *) &index, sizeof(StreamIndex1));
 
     CryptoInfo crypto;
     crypto.passwordSalt = nx::crypt::getRandomSalt();
@@ -33,25 +33,83 @@ static void writeTestFile(const QString& name)
         nx::crypt::getSaltedPasswordHash(thePassword, crypto.passwordSalt);
     file.write((char *) &crypto, sizeof(CryptoInfo));
 
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < kCountOfIntegers; i++)
         file.write((char *) &x, sizeof(quint64));
 
-    quint64 offset = 10000 * sizeof(quint64);
+    quint64 offset = kCountOfIntegers * sizeof(quint64);
     quint64 magic = kFileMagic;
 
     file.write((char *) &offset, sizeof(quint64));
     file.write((char *) &magic, sizeof(quint64));
 }
 
-TEST(LayoutFileInfo, Basic)
+static void writeTestFileVersion2(const QString& name)
 {
-    const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
+    QFile file(name);
+    ASSERT_TRUE(file.open(QFile::WriteOnly));
 
-    writeTestFile(fileName);
+    uint64_t x = 0x1eaddeaddeaddead;
 
-    FileInfo fileInfo = identifyFile(fileName);
+    for (int i = 0; i < kCountOfIntegers; i++)
+        file.write((char *) &x, sizeof(quint64));
+
+    Footer footer;
+    footer.offset = file.size();
+
+    Header header;
+    header.hasCryptoData = 0;
+    header.entryCount = 2;
+    file.write((char *)&header, sizeof(header));
+
+    StreamIndexEntry entry;
+    entry.offset = 1;
+    file.write((const char*)&entry, sizeof(entry));
+    entry.offset = 234;
+    file.write((const char*)&entry, sizeof(entry));
+    file.write((char *)&footer, sizeof(footer));
+}
+
+TEST(LayoutFileInfo, BasicParsing)
+{
+    const auto fileName = TestOptions::temporaryDirectoryPath(true) + dummyName;
+
+    writeTestFileVersion2(fileName);
+
+    auto fileInfo = readNovFileIndex(fileName);
+
+    ASSERT_TRUE(fileInfo);
+    ASSERT_TRUE(!fileInfo->cryptoInfo);
+    ASSERT_EQ(fileInfo->entries.size(), 2);
+    ASSERT_EQ(fileInfo->entries[0].offset, 1);
+    ASSERT_EQ(fileInfo->entries[1].offset, 234);
+    QFile::remove(fileName);
+}
+
+TEST(LayoutFileInfo, BackwardCompatibility)
+{
+    const auto fileName = TestOptions::temporaryDirectoryPath(true) + dummyName;
+
+    writeTestFileVersion1(fileName);
+
+    auto fileInfo = readNovFileIndex(fileName);
 
     ASSERT_TRUE(fileInfo);
     ASSERT_TRUE(fileInfo->cryptoInfo);
-    ASSERT_TRUE(fileInfo->offset == 10000 * sizeof(quint64));
+    QFile::remove(fileName);
+}
+
+TEST(LayoutFileInfo, TestIndexSize)
+{
+    FileInfo info;
+    info.cryptoInfo = CryptoInfo();
+    info.entries.push_back(StreamIndexEntry{});
+    info.entries.push_back(StreamIndexEntry{});
+
+    // 8        /sizeof(Header)/
+    // + 256    /sizeof(CryptoInfo)/
+    // + 16 * 2 /sizeof(StreamIndexEntry) * 2/
+    // + 20     /sizeof(Footer)/
+    // = 316.
+    ASSERT_EQ(sizeof(CryptoInfo), 256);
+    ASSERT_EQ(info.totalIndexHeaderSize(), 316);
 }

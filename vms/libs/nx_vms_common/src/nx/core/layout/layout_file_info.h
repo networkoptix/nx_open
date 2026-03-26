@@ -2,6 +2,7 @@
 
 #pragma once
 #include <array>
+#include <vector>
 
 #include <QtCore/QtGlobal>
 
@@ -21,18 +22,15 @@ struct CryptoInfo;
 NX_VMS_COMMON_API bool isLayoutExtension(const QString& fileName);
 
 // Reads basic info for layout file. Allows .exe.tmp extension if allowTemp is set.
-NX_VMS_COMMON_API std::optional<FileInfo> identifyFile(
+NX_VMS_COMMON_API std::optional<FileInfo> readNovFileIndex(
     const QString& fileName, bool allowTemp = false);
+
+// Append basic info for layout file to end of file.
+NX_VMS_COMMON_API bool writeNovFileIndex(const QString& fileName, const FileInfo& info);
 
 // Checks a layout password against pre-loaded the hash.
 NX_VMS_COMMON_API bool checkPassword(const QString& password, const CryptoInfo& cryptoInfo);
 
-
-// TODO Increase this value to some suitable value, as we now use a new file after each codec change.
-constexpr int kMaxStreams = 256;
-
-// TODO: Sync with nov_launcher_win.cpp and nov_file_launcher project.
-constexpr quint64 kFileMagic = 0x73a0b934820d4055ull;
 constexpr int kHashSize = 32;
 
 using Key = std::array<unsigned char, kHashSize>;
@@ -46,22 +44,16 @@ struct StreamIndexEntry
 };
 
 // This is the outdated version of file header and index.
+constexpr quint64 kFileMagic = 0x73a0b934820d4055ull;
 struct StreamIndex1
 {
     static constexpr quint64 kIndexMagic1 = 0xfed8260da9eebc04ll;
     static constexpr quint64 kIndexCryptedMagic = 0xfed8260da9eebc03ll;
+    static constexpr int kMaxStreams = 256;
     quint64 magic = kIndexMagic1;
     quint32 version = 1;
     quint32 entryCount = 0;
     std::array<StreamIndexEntry, kMaxStreams> entries = {};
-};
-
-struct Header
-{
-    static constexpr quint64 kIndexMagic = 0xdea5489c3f44ca16ll;
-    uint64_t magic = kIndexMagic;
-    uint32_t version = 2; //< File structure version.
-    uint64_t offset = 0; //< Offest to index data;
 };
 
 struct CryptoInfo
@@ -70,11 +62,31 @@ struct CryptoInfo
     Key passwordHash = {};
     std::array<unsigned char, 256 - 2 * kHashSize> reserved = {};
 };
+
+struct Header
+{
+    uint32_t hasCryptoData = 0; //< 0 - no crypto data, 1 - crypto data present before index.
+    uint32_t entryCount = 0; //< Number of index elements.
+};
+
+struct Footer
+{
+    static constexpr quint64 kIndexMagic = 0xdea5489c3f44ca16ll;
+    static constexpr quint64 kCurrentVersion = 2;
+    uint64_t magic = kIndexMagic;
+    uint32_t version = 2; //< File structure version.
+    uint64_t offset = 0; //< Offest to header data.
+};
+
 #pragma pack(pop)
 
-struct FileInfo
+/*
+ * Current NOV file storage structure:
+ * | exe(optional) | filename | data | filename | data | ... | Header | CryptoInfo(optional) | StreamIndexEntry | ... | Footer |
+ */
+struct NX_VMS_COMMON_API FileInfo
 {
-    int version = 2;
+    int totalIndexHeaderSize();
     std::optional<CryptoInfo> cryptoInfo;
     std::vector<StreamIndexEntry> entries;
 };

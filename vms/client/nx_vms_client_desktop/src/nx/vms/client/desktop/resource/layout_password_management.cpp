@@ -27,7 +27,7 @@ namespace {
 // Returns lambda to validate a password based on checksum.
 auto passwordValidator(const QnLayoutResourcePtr& layout)
 {
-    const auto fileInfo = nx::core::layout::identifyFile(layout->getUrl());
+    const auto fileInfo = nx::core::layout::readNovFileIndex(layout->getUrl());
     return
         [fileInfo](const QString& value) -> ValidationResult
         {

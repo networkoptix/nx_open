@@ -9,6 +9,7 @@
 #include <nx/core/layout/layout_file_info.h>
 #include <nx/utils/crypt/crypto_functions.h>
 #include <nx/utils/fs/file.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <recording/time_period_list.h>
 #include <utils/common/util.h>
@@ -106,7 +107,8 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
     setIdUnsafe(nx::Uuid::createUuid());
     QnStorageResource::setUrl(value);
 
-    readIndexHeader();
+    if (isFileExists(value))
+        readIndexHeader();
 }
 
 QIODevice* QnLayoutFileStorageResource::openInternal(const QString& url, QIODevice::OpenMode openMode)
@@ -363,7 +365,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
                     stream.size = m_info.entries[i + 1].offset - stream.position;
                 else
                 {
-                    qint64 endPos = file.size() - getTailSize();
+                    qint64 endPos = file.size() - m_indexSize;
                     stream.size = endPos - stream.position;
                 }
                 return stream;
@@ -371,6 +373,15 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
         }
     }
     return Stream();
+}
+
+bool QnLayoutFileStorageResource::finalize()
+{
+    if (!writeNovFileIndex(getUrl(), m_info))
+        return false;
+
+    m_isOpened = true;
+    return true;
 }
 
 // This function may create a new .nov file.
@@ -383,54 +394,19 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findOrAddStream
     if (stream)
         return stream;
 
-    // At this point m_info and m_info are read in findStream if existed.
-    // Exe: the file is not valid (m_info.isValid) at this point. Will write a new index a few lines later.
-    if (m_info.entries.size() >= kMaxStreams)
-        return Stream();
-
-    if (!m_isOpened) //< Could not access the file or it is empty.
-        if (!writeIndexHeader())
-            return Stream();
-
     QFile file(getUrl());
-    const qint64 fileSize = file.size() -  getTailSize();
+    const qint64 fileSize = file.size();
     m_info.entries.emplace_back(StreamIndexEntry{fileSize, qt4Hash(fileName)});
 
     if (!file.open(QIODevice::ReadWrite))
         return Stream();
-
-    // Write new or updated index.
-    file.seek(m_indexOffset);
-    StreamIndex1 index;
-    if (m_info.cryptoInfo)
-        index.magic = StreamIndex1::kIndexCryptedMagic;
-    index.entryCount = m_info.entries.size();
-    std::copy(m_info.entries.begin(), m_info.entries.end(), index.entries.begin());
-    file.write((const char*)&index, sizeof(index));
-    if (m_info.cryptoInfo)
-        file.write((const char*)&m_info.cryptoInfo, sizeof(m_info.cryptoInfo));
 
     // Write new stream name.
     QByteArray utf8FileName = fileName.toUtf8();
     utf8FileName.append('\0');
     file.seek(fileSize);
     file.write(utf8FileName);
-
-    // Add ending magic string.
-    writeFileTail(file);
-
-    return Stream{fileSize + utf8FileName.size() + 1, 0};
-}
-
-void QnLayoutFileStorageResource::finalizeWrittenStream(qint64 pos)
-{
-    if (m_indexOffset > 0)
-    {
-        QFile file(getUrl());
-        file.open(QIODevice::Append);
-        file.seek(pos);
-        writeFileTail(file);
-    }
+    return Stream{fileSize + utf8FileName.size(), 0};
 }
 
 void QnLayoutFileStorageResource::registerFile(QnLayoutStreamSupport* file)
@@ -454,55 +430,16 @@ void QnLayoutFileStorageResource::removeFileCompletely(QnLayoutStreamSupport* fi
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
-    auto info = identifyFile(getUrl(), true);
+    auto info = readNovFileIndex(getUrl(), true);
     if (!info)
     {
-        qWarning() << "Nonexistent or corrupted nov file. Ignoring.";
+        NX_WARNING(this, "Nonexistent or corrupted nov file. Ignoring.");
         return false;
     }
     m_info = *info;
     m_isOpened = true;
+    m_indexSize = m_info.totalIndexHeaderSize();
     return true;
-}
-
-bool QnLayoutFileStorageResource::writeIndexHeader()
-{
-    QFile file(getUrl());
-    // This function _appends_ header if we write to exe file.
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
-        return false;
-
-    m_indexOffset = file.pos();
-    StreamIndex1 index;
-    if (m_info.cryptoInfo)
-        index.magic = StreamIndex1::kIndexCryptedMagic;
-    index.entryCount = m_info.entries.size();
-    std::copy(m_info.entries.begin(), m_info.entries.end(), index.entries.begin());
-    file.write((const char*)&index, sizeof(index));
-    if (m_info.cryptoInfo)
-        file.write((const char*)&m_info.cryptoInfo, sizeof(m_info.cryptoInfo));
-
-    if (file.error() != QFile::NoError)
-        return false;
-
-    writeFileTail(file);
-    m_isOpened = true;
-    return true;
-}
-
-int QnLayoutFileStorageResource::getTailSize() const
-{
-    return m_indexOffset == 0 ? 0 : sizeof(qint64) * 2;
-}
-
-void QnLayoutFileStorageResource::writeFileTail(QFile& file)
-{
-    if (m_indexOffset > 0)
-    {
-        file.write((char*)&m_indexOffset, sizeof(qint64));
-        const quint64 magic = nx::core::layout::kFileMagic;
-        file.write((char*)&magic, sizeof(qint64));
-    }
 }
 
 void QnLayoutFileStorageResource::closeOpenedFiles()

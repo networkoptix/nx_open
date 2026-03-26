@@ -55,16 +55,10 @@ void QnLayoutCryptoStream::close()
         NX_MUTEX_LOCKER lock(&m_mutex);
 
         const auto openMode = m_openMode;
-        const bool wasWriting = isWriting();
-        const qint64 totalSize = grossSize();
 
         CryptedFileStream::close(); //< Will change m_openMode. Unconditionally closes underlying file.
-
         if (openMode == NotOpen)
             return;
-
-        if (wasWriting) // This definitely requires refactoring (VMS-11578).
-            m_storageResource.finalizeWrittenStream(m_enclosure.position + totalSize);
 
         m_storageResource.unregisterFile(this);
     }

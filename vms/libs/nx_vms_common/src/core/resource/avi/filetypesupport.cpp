@@ -42,7 +42,7 @@ bool FileTypeSupport::isImageFileExt(const QString &filename)
 
 bool FileTypeSupport::isValidLayoutFile(const QString &filename)
 {
-    return nx::core::layout::identifyFile(filename).has_value();
+    return !filename.isEmpty() && nx::core::layout::readNovFileIndex(filename).has_value();
 }
 
 bool FileTypeSupport::isFileSupported(const QString &filename)
