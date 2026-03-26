@@ -390,13 +390,14 @@ ComboBox
             }
 
             const controlGlobalY = Math.abs(control.mapToItem(null, 0, 0).y)
-            control.maxItemsPopupHeight = window.height - controlGlobalY - control.implicitHeight - control.itemHeight
+            const spaceAbove = controlGlobalY
+            const spaceBelow = window.height - controlGlobalY - control.implicitHeight
+            control.maxItemsPopupHeight = Math.max(spaceAbove, spaceBelow)
         }
 
-        onOpened:
-        {
-            updateMaxItemsPopupHeight()
-        }
+        // Above/below location of popup will be chosen based on available space later in QML
+        // base ComboBox implementation.
+        onAboutToShow: updateMaxItemsPopupHeight()
 
         background: Rectangle
         {
