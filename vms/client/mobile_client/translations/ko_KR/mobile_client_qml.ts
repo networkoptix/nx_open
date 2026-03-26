@@ -363,7 +363,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation>피드</translation>
+      <translation type="unfinished">Feed</translation>
     </message>
     <message>
       <source>Notifications Off</source>

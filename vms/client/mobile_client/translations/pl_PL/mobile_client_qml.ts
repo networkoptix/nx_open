@@ -366,7 +366,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation>Strumień</translation>
+      <translation type="unfinished">Feed</translation>
     </message>
     <message>
       <source>Notifications Off</source>

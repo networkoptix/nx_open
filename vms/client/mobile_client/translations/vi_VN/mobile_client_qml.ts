@@ -363,7 +363,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation>Nguồn cấp dữ liệu</translation>
+      <translation type="unfinished">Feed</translation>
     </message>
     <message>
       <source>Notifications Off</source>
