@@ -266,7 +266,7 @@ AdaptiveScreen
         {
             let title = ""
             if (resourcesScreen.contentItem === camerasGrid)
-                title = camerasGrid.layout?.name
+                title = camerasGrid.layout?.name ?? qsTr("All Devices")
             else if (resourcesScreen.contentItem === videoScreenLoader.item)
                 title = videoScreenLoader.item.title
 
