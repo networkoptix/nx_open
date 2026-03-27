@@ -216,20 +216,9 @@ executeAndroiddeployqt()
 
     source "$AAB_BUILD_CONF_FILE"
 
-    local CODE_SIGNING_ARGS=()
-    if [ ! -z "$KEYSTORE_FILE" ]
-    then
-        CODE_SIGNING_ARGS=(
-            --sign "$KEYSTORE_FILE" "$KEYSTORE_ALIAS"
-            --storepass "$KEYSTORE_PASSWORD"
-            --keypass "$KEYSTORE_KEY_PASSWORD"
-        )
-    fi
-
     # androiddeployqt creates APK in AAB mode too and needlessly tries to verify its contents. The
     # verification fails on zipalign tool. `|| true` in the end is a simple workaround.
     JAVA_HOME="$JAVA_HOME" "$QT_HOST_DIR/bin/androiddeployqt" --aab --release --gradle --verbose \
-        "${CODE_SIGNING_ARGS[@]}" \
         --input "$CURRENT_DEPLOYMENT_SETTINGS_FILE" \
         --output "$APK_DIR" \
         || true
@@ -239,9 +228,9 @@ executeAndroiddeployqt()
 # [in] AAB_BUILD_CONF_FILE
 # [in] APK_DIR_NAME
 # [in] AAB_FILE
-copyFinalAab()
+copyAndSignFinalAab()
 {
-    echo "Copying the final AAb file."
+    echo "Copying the final AAB file."
 
     source "$AAB_BUILD_CONF_FILE"
 
@@ -250,7 +239,18 @@ copyFinalAab()
     SRC_AAB_FILE="$APK_DIR/build/outputs/bundle/release/$APK_DIR_NAME-release.aab"
     if [ -f "$SRC_AAB_FILE" ]
     then
-        cp "$SRC_AAB_FILE" "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.aab"
+        if [[ ${CODE_SIGNING} = true ]]
+        then
+            echo "Signing the final AAb file."
+
+            "$PYTHON" "${PROPRIETARY_BUILD_UTILS_DIR}"/sign_over_http/android_client.py \
+            --url "$SIGNING_SERVER" \
+            --customization "$CUSTOMIZATION" \
+            --file "$SRC_AAB_FILE" \
+            --output "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.aab"
+        else
+            cp "$SRC_AAB_FILE" "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.aab"
+        fi
     else
         echo "error: AAB file is not found: $SRC_AAB_FILE"
         echo "Probably build has failed."
@@ -279,7 +279,7 @@ buildDistribution()
     prepareDeploymentSettings
 
     executeAndroiddeployqt
-    copyFinalAab
+    copyAndSignFinalAab
     copyApks
 }
 

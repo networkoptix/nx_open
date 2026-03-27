@@ -313,17 +313,6 @@ if(ANDROID)
 
     set(apk_file_name "${distribution_output_dir}/${mobile_client_distribution_name}.apk")
 
-    if(codeSigning)
-        set(code_signing_parameters
-            KEYSTORE_FILE "${mobile_client_customization_dir}/key.store"
-            KEYSTORE_ALIAS "${customization.mobile.android.alias}"
-            KEYSTORE_PASSWORD "${customization.mobile.android.storepass}"
-            KEYSTORE_KEY_PASSWORD "${customization.mobile.android.keypass}"
-        )
-    else()
-        set(code_signing_parameters)
-    endif()
-
     target_link_libraries(mobile_client PUBLIC
         GLESv2 z log mediandk android push_notification_storage)
 
@@ -350,7 +339,6 @@ if(ANDROID)
         EXTRA_JAVA_LIBS ${android_push_dependencies}
         GRADLE_DEPENDENCIES ${gradle_dep_lines}
         MIN_SDK_VERSION ${ANDROID_NATIVE_API_LEVEL}
-        ${code_signing_parameters}
     )
 
     prepare_qtcreator_android_target(mobile_client

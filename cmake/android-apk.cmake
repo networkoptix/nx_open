@@ -21,7 +21,6 @@ endfunction()
 function(add_android_apk target)
     set(options)
     set(oneValueArgs TARGET FILE_NAME QML_ROOT_PATH VERSION TEMPLATE
-        KEYSTORE_FILE KEYSTORE_ALIAS KEYSTORE_PASSWORD KEYSTORE_KEY_PASSWORD
         MIN_SDK_VERSION TARGET_SDK_VERSION GRADLE_DEPENDENCIES DEPENDS)
     set(multiValueArgs QML_IMPORT_PATHS EXTRA_LIBS EXTRA_JAVA_LIBS)
 
@@ -97,20 +96,7 @@ function(add_android_apk target)
     if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo" AND NOT developerBuild)
         set(build_type "release")
         set(build_type_arg "--release")
-        set(apk_suffix "release")
-
-        if(APK_KEYSTORE_FILE AND APK_KEYSTORE_ALIAS
-            AND APK_KEYSTORE_PASSWORD AND APK_KEYSTORE_KEY_PASSWORD)
-
-            set(sign_parameters
-                --sign "${APK_KEYSTORE_FILE}" "${APK_KEYSTORE_ALIAS}"
-                --storepass "${APK_KEYSTORE_PASSWORD}"
-                --keypass "${APK_KEYSTORE_KEY_PASSWORD}")
-            set(apk_suffix "${apk_suffix}-signed")
-        else()
-            set(sign_parameters)
-            set(apk_suffix "${apk_suffix}-unsigned")
-        endif()
+        set(apk_suffix "release-unsigned")
     else()
         set(build_type "debug")
         set(build_type_arg)
@@ -169,8 +155,11 @@ function(add_android_apk target)
         set(copy_java_libs_command)
     endif()
 
+    set(apk_unsigned_file_name ${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk-${apk_suffix}.apk)
+
     add_custom_command(
-        OUTPUT ${APK_FILE_NAME}
+        COMMENT "Generating ${apk_unsigned_file_name}"
+        OUTPUT ${apk_unsigned_file_name}
         DEPENDS ${APK_TARGET} ${APK_DEPENDS}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE} ${apk_dir}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_TEMPLATE} ${PACKAGE_SOURCE}
@@ -185,11 +174,11 @@ function(add_android_apk target)
         COMMAND ${CMAKE_COMMAND} -E env
             JAVA_HOME=${CONAN_OPENJDK_ROOT}
             --modify PATH=path_list_prepend:${CONAN_OPENJDK_ROOT}/bin
-            $<TARGET_FILE:Qt6::androiddeployqt> ${build_type_arg} ${sign_parameters}
+            $<TARGET_FILE:Qt6::androiddeployqt> ${build_type_arg}
             --input ${settings_file} --output ${apk_dir} --gradle --verbose
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${apk_dir}/build/outputs/apk/${build_type}/${APK_TARGET}_apk-${apk_suffix}.apk"
-            ${APK_FILE_NAME}
+            ${apk_unsigned_file_name}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${apk_dir}
     )
     # The contents of PACKAGE_SOURCE will be used by AAB build build script. We need to keep it.
@@ -199,6 +188,28 @@ function(add_android_apk target)
         set(target_args ALL)
     endif()
 
+    add_custom_target(${target}-unsigned ${target_args} DEPENDS ${apk_unsigned_file_name})
+    if(codeSigning)
+        include(android_signing)
+
+        set(sign_apk_command)
+        nx_get_android_sign_command(sign_apk_command ${apk_unsigned_file_name} ${APK_FILE_NAME})
+        add_custom_command(
+            COMMENT "Signing ${APK_FILE_NAME}"
+            DEPENDS ${apk_unsigned_file_name}
+            ${sign_apk_command}
+            OUTPUT ${APK_FILE_NAME}
+            VERBATIM
+        )
+    else()
+        add_custom_command(
+            COMMENT "Copying ${APK_FILE_NAME}"
+            DEPENDS ${apk_unsigned_file_name}
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${apk_unsigned_file_name} ${APK_FILE_NAME}
+            OUTPUT ${APK_FILE_NAME}
+            VERBATIM
+        )
+    endif()
     add_custom_target(${target} ${target_args} DEPENDS ${APK_FILE_NAME})
 
     string(REPLACE ";" " " extra_libs "${APK_EXTRA_LIBS}")
