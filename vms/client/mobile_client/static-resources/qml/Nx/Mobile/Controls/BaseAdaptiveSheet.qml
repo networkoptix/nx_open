@@ -233,9 +233,10 @@ Drawer
             {
                 id: topShadow
 
-                x: flickable.x
-                y: flickable.y
-                width: flickable.width
+                anchors.left: flickable.left
+                anchors.right: flickable.right
+                anchors.top: flickable.top
+
                 visible: flickable.needScroll && !flickable.atYBeginning
                 from: ColorTheme.colors.dark9
             }
@@ -244,9 +245,10 @@ Drawer
             {
                 id: bottomShadow
 
-                x: flickable.x
-                y: flickable.height - height
-                width: flickable.width
+                anchors.left: flickable.left
+                anchors.right: flickable.right
+                anchors.bottom: flickable.bottom
+
                 rotation: 180
                 visible: flickable.needScroll && !flickable.atYEnd
                 from: ColorTheme.colors.dark9
