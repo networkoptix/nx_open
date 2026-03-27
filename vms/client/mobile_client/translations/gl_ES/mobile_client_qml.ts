@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Alimentación</translation>
     </message>
   </context>
   <context>
@@ -1000,6 +1000,10 @@
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
       <translation>Non se atoparon dispositivos neste sitio. Engade dispositivos co cliente de escritorio ou solicita acceso aos dispositivos existentes</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>

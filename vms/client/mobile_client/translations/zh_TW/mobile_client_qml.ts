@@ -531,7 +531,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>新聞</translation>
     </message>
   </context>
   <context>
@@ -999,6 +999,10 @@
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
       <translation>此站點上未找到任何裝置。請使用桌面用戶端新增裝置，或申請存取現有裝置。</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>

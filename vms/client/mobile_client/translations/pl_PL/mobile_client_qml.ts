@@ -534,7 +534,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Źródło</translation>
     </message>
   </context>
   <context>
@@ -1002,6 +1002,10 @@
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
       <translation>Nie znaleziono żadnych urządzeń na tej stronie. Dodaj urządzenia za pomocą klienta stacjonarnego lub poproś o dostęp do istniejących urządzeń</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>

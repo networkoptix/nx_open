@@ -531,7 +531,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Nguồn cấp dữ liệu</translation>
     </message>
   </context>
   <context>
@@ -999,6 +999,10 @@
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
       <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+    </message>
+    <message>
+      <source>All Devices</source>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>
