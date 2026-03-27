@@ -364,7 +364,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation type="unfinished">Feed</translation>
+      <translation>Flux</translation>
     </message>
     <message>
       <source>Notifications Off</source>
