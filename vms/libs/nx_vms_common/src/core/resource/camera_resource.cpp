@@ -306,8 +306,6 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         }),
     m_cachedIsIOModule(
         [this] { return getProperty(nx::vms::api::device_properties::kIoConfigCapability).toInt() > 0; }),
-    m_cachedCanConfigureRemoteRecording(
-        [this]{ return getProperty(nx::vms::api::device_properties::kCanConfigureRemoteRecording).toInt() > 0; }),
     m_cachedCameraMediaCapabilities(
         [this]
         {
@@ -604,7 +602,6 @@ nx::vms::api::DeviceType QnVirtualCameraResource::calculateDeviceType(
 
 nx::vms::api::DeviceType QnVirtualCameraResource::deviceType() const
 {
-    // TODO: remove all setters (setIoModule, setIsDtsBased e.t.c) and keep setDeviceType only
     if (enforcedDeviceType() != nx::vms::api::DeviceType::unknown)
         return enforcedDeviceType();
 
@@ -1142,7 +1139,7 @@ bool QnVirtualCameraResource::supportsSchedule() const
     if (!hasVideo() && !isAudioSupported())
         return false;
 
-    return !isDtsBased() || m_cachedCanConfigureRemoteRecording.get();
+    return !isDtsBased();
 }
 
 bool QnVirtualCameraResource::isAnalog() const
@@ -2330,7 +2327,6 @@ void QnVirtualCameraResource::resetCachedValues()
     m_cachedIsDtsBased.reset();
     m_motionType.reset();
     m_cachedIsIOModule.reset();
-    m_cachedCanConfigureRemoteRecording.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
     m_cachedExplicitDeviceType.reset();

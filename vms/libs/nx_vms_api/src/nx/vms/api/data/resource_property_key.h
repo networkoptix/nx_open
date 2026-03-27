@@ -175,9 +175,6 @@ inline const QString kCameraHotspotsData = "cameraHotspotsData";
 /// Only used via `QnVirtualCameraResource`
 inline const QString kCameraSerialNumber = "serialNumber";
 
-/// Only used via `QnVirtualCameraResource`
-inline const QString kCanConfigureRemoteRecording = "canConfigureRemoteRecording";
-
 /// This key already has a mapping to `DeviceModelV1Base`, but it is not directly fetched/removed from `parameters`
 inline const QString kDeviceType = "deviceType";
 
