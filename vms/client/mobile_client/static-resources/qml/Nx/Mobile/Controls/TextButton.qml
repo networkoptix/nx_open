@@ -9,6 +9,8 @@ AbstractButton
 {
     id: control
 
+    property color textColor: ColorTheme.colors.brand_core
+
     font.pixelSize: 16
     font.weight: Font.Medium
 
@@ -25,7 +27,7 @@ AbstractButton
 
         text: control.text
         font: control.font
-        color: ColorTheme.colors.brand_core
+        color: control.textColor
 
         verticalAlignment: Text.AlignVCenter
     }
