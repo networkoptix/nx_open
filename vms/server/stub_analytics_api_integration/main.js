@@ -12,6 +12,7 @@ const JsonRpcClient = require("./json_rpc_client").JsonRpcClient;
 const Engine = require("./engine.js").Engine;
 const Integration = require("./integration.js").Integration;
 const constants = require("./constants.js");
+const { createLogger } = require("./utils.js");
 const { readFileSync } = require("node:fs");
 const axios = require('axios');
 
@@ -20,6 +21,83 @@ const axiosInstance = axios.create({
     rejectUnauthorized: false
   })
 })
+
+const kUpdateTimestampStatsIntervalMs = 5000;
+const kUpdateTimestampGapWarningMs = 2000;
+
+const logger = createLogger("MAIN");
+const webContentsConsoleLevelToText = (level) => {
+    switch (level)
+    {
+        case 0: return "verbose";
+        case 1: return "info";
+        case 2: return "warning";
+        case 3: return "error";
+        default: return `unknown(${level})`;
+    }
+};
+
+const summarizeIceServersForLog = (iceServers) => {
+    if (!Array.isArray(iceServers))
+    {
+        return [];
+    }
+
+    return iceServers.map((entry) => {
+        const urls = Array.isArray(entry && entry.urls)
+            ? entry.urls
+            : (entry && typeof entry.urls === "string" ? [entry.urls] : []);
+        return {
+            urls: urls,
+            hasUsername: !!(entry && entry.username),
+            hasCredential: !!(entry && entry.credential)
+        };
+    });
+};
+
+const formatLogValue = (value) => {
+    if (value === null)
+        return "null";
+
+    if (typeof value === "undefined")
+        return "undefined";
+
+    if (value instanceof Error)
+        return `${value.name}: ${value.message}`;
+
+    if (Array.isArray(value))
+        return value.map((entry) => formatLogValue(entry)).join("|");
+
+    if (typeof value === "object")
+    {
+        const entries = Object.entries(value);
+        if (entries.length === 0)
+            return "{}";
+
+        return entries
+            .map(([key, entryValue]) => `${key}=${formatLogValue(entryValue)}`)
+            .join(", ");
+    }
+
+    return String(value);
+};
+
+const pushDataContextToLogText = (pushDataContext) => {
+    if (!pushDataContext)
+        return "exists=false";
+
+    const timestampMs = pushDataContext.pushDataInfo ? pushDataContext.pushDataInfo.timestampMs : null;
+    const targetEngineId = pushDataContext.deviceAgent && pushDataContext.deviceAgent.target
+        ? pushDataContext.deviceAgent.target.id
+        : null;
+    const targetDeviceId = pushDataContext.deviceAgent && pushDataContext.deviceAgent.target
+        ? pushDataContext.deviceAgent.target.deviceId
+        : null;
+
+    return `exists=true, connected=${pushDataContext.connected}, frameCount=${pushDataContext.frameCount}, `
+        + `pdeFromEngine=${pushDataContext.pdeFromEngine}, timestampMs=${timestampMs}, `
+        + `targetEngineId=${targetEngineId}, targetDeviceId=${targetDeviceId}`;
+};
 
 class IntegrationContext {
     integration = null;
@@ -79,7 +157,7 @@ class AppContext  {
     };
 
     constructor(config, manifests, rpcClient) {
-        console.log("Initializing AppContext.");
+        logger.log("Initializing AppContext.");
 
         this.manifests = manifests;
         this.config = config;
@@ -90,23 +168,36 @@ class AppContext  {
         this.rpcClient = rpcClient;
         this.adminSessionToken = null;
         this.integrationUserSessionToken = null;
+        this.updateTimestampDiagnostics = {
+            windowStartMs: Date.now(),
+            eventCountInWindow: 0,
+            lastTimestampMs: null,
+            lastUpdateWallclockMs: null
+        };
     }
 };
 
 let appContext = null;
 
 app.on('ready', () => {
+    logger.log("Electron app ready.");
+
     // Ignore SSL certificate errors
     app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+        logger.log(
+            `certificate-error intercepted. Allowing connection. url=${url}, error=${formatLogValue(error)}`
+        );
         event.preventDefault();
         callback(true); // Bypass the error
     });
 });
 
 const initializeWebRtc = (appContext, deviceId) => {
+    logger.log(`initializeWebRtc requested. deviceId=${deviceId} hasWindow=${!!(appContext && appContext.window)}`);
+
     if (appContext.adminSessionToken === null)
     {
-        console.log("initializeWebRtc: Admin session token is null");
+        logger.warn("initializeWebRtc skipped: Admin session token is null.");
         return;
     }
 
@@ -114,10 +205,22 @@ const initializeWebRtc = (appContext, deviceId) => {
     config.adminSessionToken = appContext.adminSessionToken;
     config.deviceId = deviceId;
 
+    const iceServersSummary = summarizeIceServersForLog(config.iceServers)
+        .map((server, index) =>
+            `#${index} urls=${formatLogValue(server.urls)} hasUsername=${server.hasUsername} hasCredential=${server.hasCredential}`)
+        .join("; ");
+
+    logger.log(
+        `Sending initialize-webrtc to renderer. deviceId=${deviceId}, host=${config.vmsHost}, `
+        + `port=${config.vmsPort}, iceTransportPolicy=${config.iceTransportPolicy || "all"}, `
+        + `iceServers=${iceServersSummary}`
+    );
     appContext.window.webContents.send("initialize-webrtc", config);
 }
 
 const createWindow = () => {
+    logger.log("Creating browser window.");
+
     const window = new BrowserWindow({
         width: 800,
         height: 600,
@@ -130,10 +233,22 @@ const createWindow = () => {
     });
 
     window.once('ready-to-show', () => {
+        logger.log("Window ready-to-show.");
     });
 
+    window.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+        logger.log(
+            `Renderer console message. level=${webContentsConsoleLevelToText(level)}, `
+            + `source=${sourceId}, line=${line}, message=${message}`
+        );
+    });
+
+    logger.log("Loading index.html.");
     window.loadFile("index.html");
+    logger.log("Opening dev tools.");
     window.webContents.openDevTools();
+
+    logger.log("Browser window created.");
     return window;
 }
 
@@ -143,9 +258,14 @@ function findOrCreateEngineContextById(engineId)
 
     if (!engineContexts.hasOwnProperty(engineId))
     {
+        logger.log(`Creating EngineContext. engineId=${engineId}`);
         engineContexts[engineId] =
             new EngineContext(engineId, appContext.mouseMovableObjectMetadata, appContext,
                 appContext.manifests);
+    }
+    else
+    {
+        logger.log(`Reusing EngineContext. engineId=${engineId}`);
     }
 
     return engineContexts[engineId];
@@ -166,16 +286,20 @@ function findDeviceAgentByIdOrThrow(engineId, deviceId)
 
     if (!deviceAgents.hasOwnProperty(deviceId))
     {
+        logger.error(
+            `Device Agent not found in cache. engineId=${engineId}, deviceId=${deviceId}, `
+            + `knownDeviceIds=${Object.keys(deviceAgents).join("|")}`
+        );
         throw new Error('Device Agent not found');
     }
 
+    logger.log(`Resolved Device Agent from cache. engineId=${engineId}, deviceId=${deviceId}`);
     return deviceAgents[deviceId];
 }
 
 const initialize = async () => {
-    console.log("Initializing application.");
-
     let config = JSON.parse(readFileSync("config.json"));
+    logger.log("Initializing application.");
 
     let manifests = {
         integrationManifest: JSON.parse(readFileSync("integration_manifest.json", "utf8")),
@@ -183,8 +307,12 @@ const initialize = async () => {
         deviceAgentManifest: JSON.parse(readFileSync("device_agent_manifest.json", "utf8"))
     };
 
-    console.log("Read config:", config);
-    console.log("Read manifests:", manifests);
+    logger.log("Read config. " + formatLogValue(config));
+    logger.log(
+        `Read manifests. hasIntegrationManifest=${!!manifests.integrationManifest}, `
+        + `hasEngineManifest=${!!manifests.engineManifest}, `
+        + `hasDeviceAgentManifest=${!!manifests.deviceAgentManifest}`
+    );
 
     appContext = new AppContext(
         config,
@@ -192,13 +320,18 @@ const initialize = async () => {
         await initializeRpcClient()
         );
 
-    if (fs.existsSync("integration_credentials.json"))
+    const hasIntegrationCredentials = fs.existsSync("integration_credentials.json");
+    logger.log("integration_credentials.json exists: " + formatLogValue(hasIntegrationCredentials));
+    if (hasIntegrationCredentials)
     {
-        console.log('integration_credentials.json exists, reading data from it');
+        logger.log("Reading integration_credentials.json.");
 
         let data = JSON.parse(readFileSync("integration_credentials.json"));
 
-        console.log("Read data:", data);
+        logger.log(
+            `Read integration credentials. integrationUserName=${data.integrationUserName}, `
+            + `integrationUserId=${data.integrationUserId}`
+        );
 
         appContext.integrationContext.integrationUserName = data.integrationUserName;
         appContext.integrationContext.integrationPassword = data.integrationPassword;
@@ -206,16 +339,18 @@ const initialize = async () => {
     }
     else
     {
-        console.log("integration_credentials.json doesn't exist, make integration request and approve it first");
+        logger.warn("integration_credentials.json doesn't exist, make integration request and approve it first.");
     }
 
-    if (fs.existsSync("integration_state.json"))
+    const hasIntegrationState = fs.existsSync("integration_state.json");
+    logger.log("integration_state.json exists: " + formatLogValue(hasIntegrationState));
+    if (hasIntegrationState)
     {
-        console.log('integration_state.json exists, reading data from it');
+        logger.log("Reading integration_state.json.");
 
         let integration_state = JSON.parse(readFileSync("integration_state.json"));
 
-        console.log("Read data:", integration_state);
+        logger.log(`Read integration state. deviceCount=${Object.keys(integration_state).length}`);
 
         for (const [deviceId, data] of Object.entries(integration_state))
         {
@@ -230,11 +365,14 @@ const initialize = async () => {
                 const engine = engineContext.engine;
                 const deviceAgent = engine.obtainDeviceAgent(deviceInfo);
                 deviceAgents[deviceId] = deviceAgent;
+                logger.log(
+                    `Restored device agent from integration_state. engineId=${engineId}, deviceId=${deviceId}`
+                );
             }
         }
     }
 
-    console.log("Logging in as Admin and trying to get admin token.");
+    logger.log("Logging in as admin and requesting admin token.");
 
     appContext.adminSessionToken = await getSessionToken(
         appContext.config.vmsUser,
@@ -242,7 +380,7 @@ const initialize = async () => {
 }
 
 const getSessionToken = async (user, password) => {
-    console.log("Getting session token.");
+    logger.log(`Getting session token. user=${user}`);
 
     const path = "rest/v1/login/sessions";
     const route = `https://${appContext.config.vmsHost}:${appContext.config.vmsPort}/${path}`;
@@ -261,25 +399,28 @@ const getSessionToken = async (user, password) => {
         })
     };
 
-    console.log("Request route: ", route);
-    console.log("Config: ", config);
-    console.log("Data: ", data);
+    logger.log("getSessionToken request route: " + formatLogValue(route));
+    logger.log("getSessionToken config: " + formatLogValue(config));
+    logger.log(
+        `getSessionToken payload: username=${data.username}, `
+        + `passwordLength=${data.password ? data.password.length : 0}`
+    );
 
     try
     {
         const response = await axiosInstance.post(route, data, config);
-        console.log('Response:', response.data);
+        logger.log(`Session token response received. user=${user}, hasToken=${!!response.data.token}`);
         return response.data.token;
     }
     catch (error)
     {
-        console.error('Error:', error);
+        logger.error(`getSessionToken failed. user=${user}, error=${formatLogValue(error)}`);
         return null;
     }
 }
 
 const authorizeIntegrationAndConnect = async () => {
-    console.log("Authorizing integration and connecting.");
+    logger.log("Authorizing integration and connecting.");
     const url =
         "wss://"
         + appContext.config.vmsHost
@@ -293,10 +434,14 @@ const authorizeIntegrationAndConnect = async () => {
 
     if (!appContext.integrationUserSessionToken)
     {
-        console.log("Failed to get integration user session token.");
+        logger.error("Failed to get integration user session token.");
         return false;
     }
 
+    logger.log(
+        `Connecting RPC client websocket. url=${url}, `
+        + `integrationUserName=${appContext.integrationContext.integrationUserName}`
+    );
     appContext.rpcClient.connect(url.toString(), {
         rejectUnauthorized: false,
         headers: {
@@ -304,19 +449,25 @@ const authorizeIntegrationAndConnect = async () => {
         }
     });
 
+    logger.log("RPC websocket connect() called.");
     return true;
 }
 
 const initializeRpcClient = async () => {
-    console.log("Initializing RPC client.");
+    logger.log("Initializing RPC client.");
     let rpcClient = new JsonRpcClient();
 
     rpcClient.on(constants.CREATE_DEVICE_AGENT_METHOD, async (data) => {
-        console.log("Device Agent requested, Device Agent info:", JSON.stringify(data, null, 4));
+        logger.log(
+            `RPC request received: CREATE_DEVICE_AGENT_METHOD. method=${constants.CREATE_DEVICE_AGENT_METHOD}`
+        );
+        logger.log("Device Agent requested payload= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceInfo = data.params.parameters;
         const deviceId = deviceInfo.id;
+
+        logger.log(`CREATE_DEVICE_AGENT_METHOD target parsed. engineId=${engineId}, deviceId=${deviceId}`);
 
         const engineContext = findOrCreateEngineContextById(engineId);
         const deviceAgents = engineContext.deviceAgentsByDeviceId;
@@ -334,6 +485,17 @@ const initializeRpcClient = async () => {
                     pushDataInfo: { timestampMs: 1 },
                     connected: true
                 };
+                logger.log(
+                    `Initialized deviceAgentPushDataContext. ${pushDataContextToLogText(
+                        appContext.integrationContext.deviceAgentPushDataContext
+                    )}`);
+            }
+            else
+            {
+                logger.log(
+                    `deviceAgentPushDataContext already exists. ${pushDataContextToLogText(
+                        appContext.integrationContext.deviceAgentPushDataContext
+                    )}`);
             }
         }
 
@@ -342,6 +504,11 @@ const initializeRpcClient = async () => {
             const engine = engineContext.engine;
             const deviceAgent = engine.obtainDeviceAgent(deviceInfo);
             deviceAgents[deviceId] = deviceAgent;
+            logger.log(`Created new device agent for device. engineId=${engineId}, deviceId=${deviceId}`);
+        }
+        else
+        {
+            logger.log(`Device agent already exists for device. engineId=${engineId}, deviceId=${deviceId}`);
         }
 
         initializePushData(engineContext.engine, deviceAgents[deviceId]);
@@ -358,7 +525,12 @@ const initializeRpcClient = async () => {
         };
 
         fs.writeFileSync("integration_state.json", JSON.stringify(integration_state));
+        logger.log(
+            `Persisted integration_state.json for device. engineId=${engineId}, `
+            + `deviceId=${deviceId}, totalDeviceCount=${Object.keys(integration_state).length}`
+        );
 
+        logger.log(`CREATE_DEVICE_AGENT_METHOD completed successfully. engineId=${engineId}, deviceId=${deviceId}`);
         return {
             type: "ok",
             data: {
@@ -368,7 +540,10 @@ const initializeRpcClient = async () => {
     });
 
     rpcClient.on(constants.DELETE_DEVICE_AGENT_METHOD, async (data) => {
-        console.log("Delete Device Agent", data);
+        logger.log(
+            `RPC notification received: DELETE_DEVICE_AGENT_METHOD. method=${constants.DELETE_DEVICE_AGENT_METHOD}`
+        );
+        logger.log("Delete Device Agent payload= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceId = data.params.target.deviceId;
@@ -383,22 +558,33 @@ const initializeRpcClient = async () => {
                 let integration_state = JSON.parse(readFileSync("integration_state.json"));
                 delete integration_state[deviceId];
                 fs.writeFileSync("integration_state.json", JSON.stringify(integration_state));
+                logger.log(
+                    `Removed device from integration_state.json. engineId=${engineId}, `
+                    + `deviceId=${deviceId}, totalDeviceCount=${Object.keys(integration_state).length}`
+                );
             }
 
             if (appContext.integrationContext.deviceAgentPushDataContext)
             {
-                console.log("Stopping push data loop.");
+                logger.log("Stopping push data loop.");
                 appContext.integrationContext.deviceAgentPushDataContext = null;
             }
             else
             {
-                console.log("Push data loop is already stopped.");
+                logger.warn("Push data loop is already stopped.");
             }
+        }
+        else
+        {
+            logger.warn(
+                `DELETE_DEVICE_AGENT_METHOD ignored: device agent does not exist. `
+                + `engineId=${engineId}, deviceId=${deviceId}`
+            );
         }
     });
 
     rpcClient.on(constants.SET_ENGINE_SETTINGS_METHOD, async (data) => {
-        console.log("Engine setSettings: ", JSON.stringify(data, null, 4));
+        logger.log("Engine setSettings request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const settingsRequest = data.params.parameters;
@@ -408,13 +594,13 @@ const initializeRpcClient = async () => {
 
         const settingsResponse = engine.setSettings(settingsValues);
 
-        console.log("Response: ", JSON.stringify(settingsResponse, null, 4));
+        logger.log("Response= " + formatLogValue(settingsResponse));
 
         return settingsResponse;
     });
 
     rpcClient.on(constants.SET_DEVICE_AGENT_SETTINGS_METHOD, async (data) => {
-        console.log("Device Agent setSettings: ", JSON.stringify(data, null, 4));
+        logger.log("Device Agent setSettings request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceId = data.params.target.deviceId;
@@ -425,13 +611,13 @@ const initializeRpcClient = async () => {
 
         let settingsResponse = deviceAgent.setSettings(settingsValues);
 
-        console.log("Response: ", JSON.stringify(settingsResponse, null, 4));
+        logger.log("Response= " + formatLogValue(settingsResponse));
 
         return settingsResponse;
     });
 
     rpcClient.on(constants.GET_ENGINE_SETTINGS_ON_ACTIVE_SETTING_CHANGE, async (data) => {
-        console.log("Engine getSettingsOnActiveSettingChange: ", JSON.stringify(data, null, 4));
+        logger.log("Engine getSettingsOnActiveSettingChange request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const activeSettingChangedAction = data.params.parameters;
@@ -441,13 +627,13 @@ const initializeRpcClient = async () => {
         const activeSettingChangedResponse =
             engine.getSettingsOnActiveSettingChange(activeSettingChangedAction);
 
-        console.log("Response: ", JSON.stringify(activeSettingChangedResponse, null, 4));
+        logger.log("Response= " + formatLogValue(activeSettingChangedResponse));
 
         return activeSettingChangedResponse;
     });
 
     rpcClient.on(constants.GET_DEVICE_AGENT_SETTINGS_ON_ACTIVE_SETTING_CHANGE, async (data) => {
-        console.log("Device Agent getSettingsOnActiveSettingChange: ", JSON.stringify(data, null, 4));
+        logger.log("Device Agent getSettingsOnActiveSettingChange request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceId = data.params.target.deviceId;
@@ -458,13 +644,13 @@ const initializeRpcClient = async () => {
         const activeSettingChangedResponse =
             deviceAgent.getSettingsOnActiveSettingChange(activeSettingChangedAction);
 
-        console.log("Response: ", JSON.stringify(activeSettingChangedResponse, null, 4));
+        logger.log("Response= " + formatLogValue(activeSettingChangedResponse));
 
         return activeSettingChangedResponse;
     });
 
     rpcClient.on(constants.EXECUTE_ENGINE_ACTION, async (data) => {
-        console.log("Engine executeEngineAction: ", JSON.stringify(data, null, 4));
+        logger.log("Engine executeEngineAction request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const action = data.params.parameters;
@@ -473,13 +659,13 @@ const initializeRpcClient = async () => {
 
         const actionResult = engine.executeAction(action);
 
-        console.log("Result: ", JSON.stringify(actionResult, null, 4));
+        logger.log("Result= " + formatLogValue(actionResult));
 
         return actionResult;
     });
 
     rpcClient.on(constants.GET_ENGINE_COMPATIBILITY_INFO_METHOD, async (data) => {
-        console.log("Engine compatibility info: ", JSON.stringify(data, null, 4));
+        logger.log("Engine compatibility info request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceInfo = data.params.parameters;
@@ -488,13 +674,13 @@ const initializeRpcClient = async () => {
 
         const result = engine.compatibilityInfo(deviceInfo);
 
-        console.log("Result: ", JSON.stringify(result, null, 4));
+        logger.log("Result= " + formatLogValue(result));
 
         return result;
     });
 
     rpcClient.on(constants.GET_ENGINE_SIDE_SETTINGS_METHOD, async (data) => {
-        console.log("Engine side settings: ", JSON.stringify(data, null, 4));
+        logger.log("Engine side settings request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
 
@@ -502,13 +688,13 @@ const initializeRpcClient = async () => {
 
         const result = engine.getIntegrationSideSettings();
 
-        console.log("Result: ", JSON.stringify(result, null, 4));
+        logger.log("Result= " + formatLogValue(result));
 
         return result;
     });
 
     rpcClient.on(constants.GET_DEVICE_AGENT_SIDE_SETTINGS_METHOD, async (data) => {
-        console.log("Device Agent side settings: ", JSON.stringify(data, null, 4));
+        logger.log("Device Agent side settings request= " + formatLogValue(data));
 
         const engineId = data.params.target.engineId;
         const deviceId = data.params.target.deviceId;
@@ -517,29 +703,33 @@ const initializeRpcClient = async () => {
 
         const result = deviceAgent.getIntegrationSideSettings();
 
-        console.log("Result: ", JSON.stringify(result, null, 4));
+        logger.log("Result= " + formatLogValue(result));
 
         return result;
     });
 
     rpcClient.onClose(async () => {
         // This handler will be called only when the server closes the websocket connection.
-        console.log("Executing onClose handler.");
+        logger.log(`RPC onClose handler invoked. connectionState=${appContext.viewModel.connectionState}`);
 
         // In case the session is expired, try to refresh the session and reconnect.
         if (await authorizeIntegrationAndConnect())
+        {
+            logger.log("RPC reconnect attempt from onClose succeeded.");
             return;
+        }
 
         appContext.viewModel.connectionState = "disconnected";
+        logger.warn("RPC reconnect attempt from onClose failed. Sending disconnected state.");
         appContext.window.webContents.send("state-changed", appContext.viewModel);
     });
 
     rpcClient.onOpen(() => {
-        console.log("Executing onOpen handler.");
+        logger.log("RPC onOpen handler invoked.");
 
         if (!appContext.integrationContext.integrationUserId)
         {
-            console.log("Make integration request and approve it first.");
+            logger.warn("RPC onOpen: integrationUserId missing. Make integration request and approve it first.");
             return;
         }
 
@@ -549,28 +739,28 @@ const initializeRpcClient = async () => {
 
         rpcClient.call(constants.GET_USER_METHOD, userId)
         .then((result) => {
-            console.log("Getting user info: ", JSON.stringify(result, null, 4));
+            logger.log("GET_USER response= " + formatLogValue(result));
 
             if (result.result.parameters.integrationRequestData.isApproved)
             {
-                console.log("Integration request is approved, subscribing.");
+                logger.log("Integration request is approved, subscribing.");
 
                 rpcClient.call(constants.SUBSCRIBE)
                 .then((result) => {
-                    console.log("Result:", result);
+                    logger.log("SUBSCRIBE call succeeded. " + formatLogValue(result));
                     appContext.viewModel.connectionState = "connected";
-                    console.log("Sending 'state-changed' event");
+                    logger.log("Sending state-changed event: connected.");
                     appContext.window.webContents.send("state-changed", appContext.viewModel);
                 }).catch((error) => {
-                    console.log(error);
+                    logger.error(`SUBSCRIBE call failed. error=${formatLogValue(error)}`);
                 });
             }
             else
             {
-                console.log("Integration request is not approved. Approve it first.");
+                logger.warn("Integration request is not approved. Approve it first.");
             }
         }).catch((error) => {
-            console.log(error);
+            logger.error(`GET_USER call failed. error=${formatLogValue(error)}`);
         });
 
     });
@@ -579,23 +769,32 @@ const initializeRpcClient = async () => {
 }
 
 const initializeNotifications = () => {
+    logger.log("Registering IPC notifications.");
+
     ipcMain.on("object-move", (event, object) => {
-        console.log(object);
+        logger.log("IPC event: object-move. " + formatLogValue(object));
         const boundingBox = appContext.mouseMovableObjectMetadata.boundingBox;
 
         boundingBox.x = object.x;
         boundingBox.y = object.y;
         boundingBox.width = object.width;
         boundingBox.height = object.height;
+        logger.log("Updated mouseMovableObjectMetadata boundingBox. " + formatLogValue(boundingBox));
     });
 
     ipcMain.on("connect-disconnect", async () => {
+        logger.log(`IPC event: connect-disconnect. currentState=${appContext.viewModel.connectionState}`);
+
         if (appContext.viewModel.connectionState == "connected")
         {
-            console.log("Disconnecting.");
+            logger.log("Disconnecting integration RPC client.");
             if (appContext.integrationContext.deviceAgentPushDataContext)
             {
                 appContext.integrationContext.deviceAgentPushDataContext.connected = false;
+                logger.log(
+                    `Marked push data context as disconnected. ${pushDataContextToLogText(
+                        appContext.integrationContext.deviceAgentPushDataContext
+                    )}`);
             }
             // Disconnect without executing the onClose handler.
             // When the onClose handler is executed, it will try to reconnect, but we don't need
@@ -603,41 +802,47 @@ const initializeNotifications = () => {
             // need to reconnect when the websocket connection is closed by the server.
             appContext.rpcClient.disconnect();
             appContext.viewModel.connectionState = "disconnected";
+            logger.log("Sending state-changed event: disconnected.");
             appContext.window.webContents.send("state-changed", appContext.viewModel);
         }
         else
         {
-            console.log("Connecting.");
+            logger.log("Connecting integration RPC client.");
 
             if (!appContext.adminSessionToken)
             {
-                console.log("Not logged in as admin");
+                logger.warn("connect-disconnect aborted: not logged in as admin.");
                 return;
             }
 
             if (!appContext.integrationContext.integrationUserName)
             {
-                console.log("Make integration request first.");
+                logger.warn("connect-disconnect aborted: integration user credentials missing.");
                 return;
             }
 
             appContext.rpcClient = await initializeRpcClient();
 
-            await authorizeIntegrationAndConnect();
+            const connected = await authorizeIntegrationAndConnect();
+            logger.log(`authorizeIntegrationAndConnect() finished. connected=${connected}`);
 
             if (appContext.integrationContext.deviceAgentPushDataContext)
             {
                 appContext.integrationContext.deviceAgentPushDataContext.connected = true;
+                logger.log(
+                    `Marked push data context as connected. ${pushDataContextToLogText(
+                        appContext.integrationContext.deviceAgentPushDataContext
+                    )}`);
             }
         }
     });
 
     ipcMain.on("make-integration-request", async () => {
-        console.log("Making integration request.");
+        logger.log("IPC event: make-integration-request.");
 
         if (!appContext.adminSessionToken)
         {
-            console.log("Not logged in as admin");
+            logger.warn("make-integration-request aborted: not logged in as admin.");
             return;
         }
 
@@ -659,14 +864,14 @@ const initializeNotifications = () => {
             })
         };
 
-        console.log("Request route: ", route);
-        console.log("Request data: ", data);
-        console.log("Config: ", config);
+        logger.log("Request route= " + formatLogValue(route));
+        logger.log("Request data= " + formatLogValue(data));
+        logger.log("Request config= " + formatLogValue(config));
 
         try
         {
             const response = await axiosInstance.post(route, data, config);
-            console.log('Response:', response.data);
+            logger.log("Response= " + formatLogValue(response.data));
             appContext.integrationContext.integrationUserName = response.data.username;
             appContext.integrationContext.integrationPassword = response.data.password;
             appContext.integrationContext.integrationUserId = response.data.requestId;
@@ -677,28 +882,33 @@ const initializeNotifications = () => {
                 integrationUserId: appContext.integrationContext.integrationUserId
             }
 
-            console.log("Writing integration_credentials.json, data:", integration_credentials);
+            logger.log("Writing integration_credentials.json data= " + formatLogValue(integration_credentials));
             fs.writeFileSync("integration_credentials.json", JSON.stringify(integration_credentials));
             fs.writeFileSync("integration_state.json", JSON.stringify({}));
+            logger.log(
+                `Integration request completed and credentials persisted. `
+                + `integrationUserId=${appContext.integrationContext.integrationUserId}, `
+                + `integrationUserName=${appContext.integrationContext.integrationUserName}`
+            );
         }
         catch (error)
         {
-            console.error('Error:', error);
+            logger.error(`make-integration-request failed. error=${formatLogValue(error)}`);
         }
     });
 
     ipcMain.on("approve-integration-request", async () => {
-        console.log("Approving integration request.");
+        logger.log("IPC event: approve-integration-request.");
 
         if (!appContext.adminSessionToken)
         {
-            console.log("Not logged in as admin");
+            logger.warn("approve-integration-request aborted: not logged in as admin.");
             return;
         }
 
         if (!appContext.integrationContext.integrationUserId)
         {
-            console.log("Make integration request first.");
+            logger.warn("approve-integration-request aborted: integration request does not exist.");
             return;
         }
 
@@ -720,33 +930,34 @@ const initializeNotifications = () => {
             })
         };
 
-        console.log("Request route: ", route);
-        console.log("Config: ", config);
-        console.log("Data: ", data);
+        logger.log("Request route= " + formatLogValue(route));
+        logger.log("Request config= " + formatLogValue(config));
+        logger.log("Request data= " + formatLogValue(data));
 
         try
         {
             const response = await axiosInstance.post(route, data, config);
-            console.log('Response:', response.data);
+            logger.log("Response= " + formatLogValue(response.data));
+            logger.log(`Integration request approved. integrationUserId=${integrationUserId}`);
         }
         catch (error)
         {
-            console.error('Error:', error);
+            logger.error(`approve-integration-request failed. error=${formatLogValue(error)}`);
         }
     });
 
     ipcMain.on("remove-integration", async () => {
-        console.log("Removing integration.");
+        logger.log("IPC event: remove-integration.");
 
         if (!appContext.adminSessionToken)
         {
-            console.log("Not logged in as admin");
+            logger.warn("remove-integration aborted: not logged in as admin.");
             return;
         }
 
         if (!appContext.integrationContext.integrationUserId)
         {
-            console.log("Make integration request and approve it first.");
+            logger.warn("remove-integration aborted: integration request id missing.");
             return;
         }
 
@@ -773,17 +984,17 @@ const initializeNotifications = () => {
 
         try
         {
-            console.log("Request route: ", usersRoute);
-            console.log("Config: ", usersConfig);
+            logger.log("Request route= " + formatLogValue(usersRoute));
+            logger.log("Request config= " + formatLogValue(usersConfig));
 
             const response = await axiosInstance.get(usersRoute, usersConfig);
-            console.log('Response:', response.data);
+            logger.log("Response= " + formatLogValue(response.data));
 
             integrationId = response.data.parameters.integrationRequestData.integrationId;
         }
         catch (error)
         {
-            console.error('Error:', error);
+            logger.error(`remove-integration failed while fetching user. error=${formatLogValue(error)}`);
             return;
         }
 
@@ -807,12 +1018,12 @@ const initializeNotifications = () => {
 
         try
         {
-            console.log("Request route: ", route);
-            console.log("Request data: ", data);
-            console.log("Config: ", config);
+            logger.log("Request route= " + formatLogValue(route));
+            logger.log("Request data= " + formatLogValue(data));
+            logger.log("Request config= " + formatLogValue(config));
 
             const response = await axiosInstance.delete(route, config);
-            console.log('Response:', response.data);
+            logger.log("Response= " + formatLogValue(response.data));
 
             appContext.integrationContext.integrationUserName = null;
             appContext.integrationContext.integrationPassword = null;
@@ -820,59 +1031,96 @@ const initializeNotifications = () => {
         }
         catch (error)
         {
-            console.error('Error:', error);
+            logger.error(`remove-integration failed while deleting integration. error=${formatLogValue(error)}`);
             return
         }
 
-        console.log("Removing integration_credentials.json");
+        logger.log("Removing integration_credentials.json");
 
         fs.stat('./integration_credentials.json', function (err, stats)
         {
-            console.log(stats);
+            logger.log("fs.stat result= " + formatLogValue(stats));
 
-            if (err) return console.error(err);
+            if (err) return logger.error(`fs.stat failed error=${formatLogValue(err)}`);
 
             fs.unlink('./integration_credentials.json', function(err)
             {
-                if (err) return console.log(err);
+                if (err) return logger.error(`fs.unlink failed error=${formatLogValue(err)}`);
 
-                console.log('File deleted successfully');
+                logger.log("integration_credentials.json deleted successfully.");
             });
         });
 
-        console.log("Removing integration_state.json");
+        logger.log("Removing integration_state.json");
 
         fs.stat('./integration_state.json', function (err, stats)
         {
-            console.log(stats);
+            logger.log("fs.stat result= " + formatLogValue(stats));
 
-            if (err) return console.error(err);
+            if (err) return logger.error(`fs.stat failed error=${formatLogValue(err)}`);
 
             fs.unlink('./integration_state.json', function(err)
             {
-                if (err) return console.log(err);
+                if (err) return logger.error(`fs.unlink failed error=${formatLogValue(err)}`);
 
-                console.log('File deleted successfully');
+                logger.log("integration_state.json deleted successfully.");
             });
         });
     });
 
     ipcMain.on("update-timestamp", (event, timestampMs) => {
-        console.log("Update timestamp: ", timestampMs);
+        logger.log(`IPC event: update-timestamp. timestampMs=${timestampMs}`);
+
+        const nowMs = Date.now();
+        const diagnostics = appContext.updateTimestampDiagnostics;
+        if (diagnostics.lastUpdateWallclockMs != null)
+        {
+            const gapMs = nowMs - diagnostics.lastUpdateWallclockMs;
+            if (gapMs >= kUpdateTimestampGapWarningMs)
+            {
+                logger.warn(
+                    `update-timestamp gap detected. gapMs=${gapMs}, `
+                    + `previousTimestampMs=${diagnostics.lastTimestampMs}, currentTimestampMs=${timestampMs}`
+                );
+            }
+        }
+
+        diagnostics.lastUpdateWallclockMs = nowMs;
+        diagnostics.lastTimestampMs = timestampMs;
+        diagnostics.eventCountInWindow += 1;
+
+        const windowDurationMs = nowMs - diagnostics.windowStartMs;
+        if (windowDurationMs >= kUpdateTimestampStatsIntervalMs)
+        {
+            const ratePerSec = (diagnostics.eventCountInWindow * 1000) / windowDurationMs;
+            logger.log(
+                `update-timestamp throughput. events=${diagnostics.eventCountInWindow}, `
+                + `windowDurationMs=${windowDurationMs}, `
+                + `ratePerSec=${Number(ratePerSec.toFixed(2))}, `
+                + `lastTimestampMs=${diagnostics.lastTimestampMs}`
+            );
+
+            diagnostics.windowStartMs = nowMs;
+            diagnostics.eventCountInWindow = 0;
+        }
 
         let pushDataContext = appContext.integrationContext.deviceAgentPushDataContext;
+
         if (pushDataContext && pushDataContext.connected)
         {
             pushDataContext.pushDataInfo.timestampMs = timestampMs;
-
             pushDataContext.deviceAgent.pushData(pushDataContext.pushDataInfo);
 
             if (pushDataContext.frameCount > 50)
             {
                 if (!pushDataContext.pdeFromEngine)
+                {
                     pushDataContext.deviceAgent.pushPluginDiagnosticEvent("error", "Caption", "PDE from Device Agent");
+                }
                 else
+                {
                     pushDataContext.engine.pushPluginDiagnosticEvent("error", "Caption", "PDE from Engine");
+                }
 
                 pushDataContext.pdeFromEngine = !pushDataContext.pdeFromEngine;
                 pushDataContext.frameCount = 0;
@@ -884,11 +1132,14 @@ const initializeNotifications = () => {
 }
 
 app.whenReady().then(() => {
+    logger.log("app.whenReady resolved.");
     initialize().then(() => {
+        logger.log("Initialization completed. Registering notifications and creating window.");
         initializeNotifications();
         appContext.window = createWindow();
+        logger.log("Main window assigned to appContext.");
     });
 
 }).catch((exception) => {
-    console.log(exception);
+    logger.error(`app.whenReady failed. error=${formatLogValue(exception)}`);
 });

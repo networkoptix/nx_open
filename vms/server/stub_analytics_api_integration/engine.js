@@ -3,7 +3,8 @@
 "use strict"
 
 const constants = require("./constants");
-const { mergeMaps } = require("./utils.js");
+const { mergeMaps, createLogger } = require("./utils.js");
+const logger = createLogger("ENGINE");
 
 const DeviceAgent = require("./device_agent.js").DeviceAgent;
 
@@ -153,7 +154,7 @@ class Engine {
     // `level` is one of "info", "warning", "error".
     pushPluginDiagnosticEvent(level, caption, description)
     {
-        console.log("Engine::pushPluginDiagnosticEvent");
+        logger.log("Engine::pushPluginDiagnosticEvent");
 
         let method = constants.PUSH_ENGINE_PLUGIN_DIAGNOSTIC_EVENT_METHOD;
 
@@ -165,14 +166,14 @@ class Engine {
 
         let parameters = mergeMaps(this.target, notificationObject);
 
-        console.log(method, JSON.stringify(parameters, null, 4));
+        logger.log("notify method=", method, "params=", parameters);
 
         this.appContext.rpcClient.notify(method, parameters);
     }
 
     executeAction(action)
     {
-        console.log("Got action: ", action);
+        logger.log("Got action=", action);
 
         const actionResult = {
             actionUrl: "",
@@ -199,7 +200,7 @@ class Engine {
 
         let parameters = mergeMaps(this.target, notificationObject);
 
-        console.log(method, JSON.stringify(parameters, null, 4));
+        logger.log("notify method=", method, "params=", parameters);
 
         this.appContext.rpcClient.notify(method, parameters);
     }

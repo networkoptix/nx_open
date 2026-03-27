@@ -24,6 +24,7 @@ npm install
 # Install the 'ws' package
 npm install ws
 ```
+
 # Enable Integration Request creation
 
 To create Integration Requests, the system setting `allowRegisteringIntegrations` must be set
@@ -38,6 +39,40 @@ Advanced settings can be set in the Server Admin panel at `/settings/advanced`.
 - Edit the Stub Analytics API Integration config file `config.json`. It's located in the
     application root directory. Fill in the Server address, port, admin username and admin
     password.
+
+- WebRTC ICE configuration.
+
+    The stub now reads optional ICE settings from `config.json` and forwards them to
+    `RTCPeerConnection`.
+
+    - `iceServers`: array of STUN/TURN servers (`urls`, optional `username`, optional
+      `credential`).
+    - `iceTransportPolicy`: optional, `all` (default) or `relay`.
+    - `iceCandidatePoolSize`: optional integer.
+
+    Example TURN config:
+```
+{
+    "iceServers": [
+        {
+            "urls": ["turn:turn.example.com:3478"],
+            "username": "turn-user",
+            "credential": "turn-password"
+        }
+    ],
+    "iceTransportPolicy": "all"
+}
+```
+
+    If `iceServers` are not provided, built-in public STUN defaults are used.
+
+- ICE diagnostics.
+
+    Detailed ICE logs are emitted from the renderer and mirrored into main-process logs with
+    `[MAIN] Renderer console message ...`.
+    On connection timeout, the logs now print candidate-type summaries and explicit warnings
+    when both sides are host-only (no `srflx`/`relay`), which is the common cause of
+    ICE staying in `checking`.
 ```
 electron .
 ```
