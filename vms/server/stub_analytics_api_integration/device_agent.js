@@ -3,8 +3,13 @@
 "use strict"
 
 const constants = require("./constants");
-const { mergeMaps, boundingBoxToString } = require("./utils.js");
+const {
+    mergeMaps,
+    boundingBoxToString,
+    createLogger
+} = require("./utils.js");
 const { randomUUID } = require("node:crypto");
+const logger = createLogger("DEVICE_AGENT");
 
 const makeObjectMetadataPackets = (mouseMovableObjectMetadata, objectActionMetadata, timestampMs) => {
     if (!objectActionMetadata.trackId ||
@@ -128,7 +133,7 @@ class DeviceAgent {
 
     pushData(data)
     {
-        console.log("DeviceAgent::pushData");
+        logger.log("DeviceAgent::pushData");
 
         this.frameCounter = this.frameCounter + 1;
 
@@ -186,7 +191,7 @@ class DeviceAgent {
 
     pushManifest()
     {
-        console.log("DeviceAgent::pushManifest");
+        logger.log("DeviceAgent::pushManifest");
 
         let method = constants.PUSH_DEVICE_AGENT_MANIFEST_METHOD;
 
@@ -196,7 +201,7 @@ class DeviceAgent {
 
         let parameters = mergeMaps(this.target, notificationObject);
 
-        console.log(method, JSON.stringify(parameters, null, 4));
+        logger.log("notify method=", method, "params=", parameters);
 
         this.appContext.rpcClient.notify(
             method,
@@ -205,7 +210,7 @@ class DeviceAgent {
 
     setSettings(settingsValues)
     {
-        console.log("DeviceAgent::setSettings");
+        logger.log("DeviceAgent::setSettings");
 
         const settingsResponse = {
             settingsModel: {},
@@ -250,7 +255,7 @@ class DeviceAgent {
 
     getSettingsOnActiveSettingChange(activeSettingChangedAction)
     {
-        console.log("DeviceAgent::getSettingsOnActiveSettingChange");
+        logger.log("DeviceAgent::getSettingsOnActiveSettingChange");
 
         /*
         struct ActiveSettingChangedAction
@@ -317,7 +322,7 @@ class DeviceAgent {
     // `level` is one of "info", "warning", "error".
     pushPluginDiagnosticEvent(level, caption, description)
     {
-        console.log("DeviceAgent::pushPluginDiagnosticEvent");
+        logger.log("DeviceAgent::pushPluginDiagnosticEvent");
 
         let method = constants.PUSH_DEVICE_AGENT_PLUGIN_DIAGNOSTIC_EVENT_METHOD;
 
@@ -329,7 +334,7 @@ class DeviceAgent {
 
         let parameters = mergeMaps(this.target, notificationObject);
 
-        console.log(method, JSON.stringify(parameters, null, 4));
+        logger.log("notify method=", method, "params=", parameters);
 
         this.appContext.rpcClient.notify(method, parameters);
     }
