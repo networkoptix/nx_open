@@ -6,12 +6,12 @@
 #include <nx/utils/metatypes.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
 #include <nx/vms/client/desktop/common/utils/check_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/spin_box_utils.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/read_only.h>
@@ -229,7 +229,7 @@ void ArchiveLengthWidget::Private::setPeriodDataToControls(
 
     valueSpinBox->setEnabled(periodData.isManualMode());
     unitComboBox->setEnabled(periodData.hasManualPeriodValue());
-    autoCheckBox->setEnabled(periodData.forcedMaxValue().count() == 0);
+    autoCheckBox->setEnabled(true);
 
     const bool doNotChangeDurationUnit =
         stateHasChanges

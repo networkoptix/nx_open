@@ -125,9 +125,6 @@ RecordingPeriod RecordingPeriod::maxPeriod(const QnVirtualCameraResourceList& ca
 
 Qt::CheckState RecordingPeriod::autoCheckState() const
 {
-    if (m_forcedMaxValue.count() > 0)
-        return Qt::Unchecked;
-
     if (!m_value.hasValue())
         return Qt::PartiallyChecked;
 
@@ -138,8 +135,6 @@ Qt::CheckState RecordingPeriod::autoCheckState() const
 
 bool RecordingPeriod::isManualMode() const
 {
-    if (m_forcedMaxValue.count() > 0)
-        return true;
     return m_value.hasValue() && !isNegative(m_value.get());
 }
 
