@@ -15,12 +15,12 @@ Drawer
 {
     id: control
 
-    readonly property int headerHeight: 64
     property alias header: headerProxy.target
     property alias footer: footerProxy.target
     default property alias data: contentColumn.data
 
     property bool closeAutomatically: true
+    property bool alwaysShowCloseButton: false
     property real extraBottomPadding: 0
 
     x: (parent.width - width) / 2
@@ -38,7 +38,7 @@ Drawer
         return Math.min(
             bottomPadding
                 + content.anchors.topMargin
-                + (control.header ? control.headerHeight : 0)
+                + (control.header ? d.headerHeight : 0)
                 + flickable.anchors.topMargin
                 + flickable.contentHeight
                 + flickable.anchors.bottomMargin
@@ -119,7 +119,7 @@ Drawer
             id: content
 
             anchors.fill: parent
-            anchors.topMargin: LayoutController.isPortrait ? 15 : 0
+            anchors.topMargin: d.extraTopMargin
             anchors.bottomMargin: 24 + extraBottomPadding
 
             padding: 0
@@ -127,7 +127,7 @@ Drawer
 
             header: Item
             {
-                implicitHeight: control.headerHeight
+                implicitHeight: d.headerHeight
                 visible: headerProxy.target
 
                 LayoutItemProxy
@@ -261,9 +261,9 @@ Drawer
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.rightMargin: 8
-            anchors.topMargin: control.header ? 12 : 8
+            anchors.topMargin: control.header ? 12 + d.extraTopMargin : 8
 
-            visible: LayoutController.isTabletLayout
+            visible: LayoutController.isTabletLayout || control.alwaysShowCloseButton
             padding: 0
 
             icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
@@ -279,6 +279,9 @@ Drawer
     NxObject
     {
         id: d
+
+        readonly property int headerHeight: 64
+        readonly property int extraTopMargin: LayoutController.isPortrait ? 15 : 0
 
         // Temporary solution. Will be fixed properly after UI refactor.
         readonly property real keyboardHeight: Qt.platform.os === "android"

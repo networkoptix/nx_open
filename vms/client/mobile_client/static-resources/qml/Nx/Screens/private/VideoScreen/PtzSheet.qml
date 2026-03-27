@@ -17,6 +17,7 @@ AdaptiveSheet
     readonly property bool available: controller.available ?? false
 
     title: qsTr("PTZ")
+    alwaysShowCloseButton: true
     spacing: 24
     contentSpacing: 20
     interactive: !panel.joystick.active
