@@ -387,6 +387,10 @@ bool calcDigestResponse(
         outputParams->emplace("nc", std::move(nonceCount));
         outputParams->emplace("cnonce", clientNonce);
     }
+
+    if (std::string opaque = fieldOrDefault(inputParams, "opaque"); !opaque.empty())
+        outputParams->emplace("opaque", std::move(opaque));
+
     outputParams->emplace("response", digestResponse);
     return true;
 }
