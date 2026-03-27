@@ -35,7 +35,8 @@ AdaptiveScreen
             {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: videoScreenLoader.item
-                    && videoScreenLoader.item.selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                    && (videoScreenLoader.item.selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                        || videoScreenLoader.item.selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.analytics)
                     && videoScreenLoader.item.customRoiExists
 
                 target: contentItem === videoScreenLoader.item ? videoScreenLoader.item.motionAreaButton : null

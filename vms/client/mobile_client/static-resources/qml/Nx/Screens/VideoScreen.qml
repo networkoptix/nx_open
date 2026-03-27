@@ -304,7 +304,8 @@ Page
                 anchors.verticalCenter: parent.verticalCenter
                 target: modernVideoScreen.motionAreaButton
                 visible: modernVideoScreen.activePage
-                    && selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                    && (selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
+                        || selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.analytics)
                     && video.roiController.customRoiExists
             }
         ]
