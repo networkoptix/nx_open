@@ -2764,7 +2764,7 @@ Clave de licencia: %2</translation>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 está disponible temporalmente. Por favor, inténtelo de nuevo más tarde.</translation>
+      <translation>%1 Está disponible temporalmente. Por favor, inténtelo de nuevo más tarde.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -2793,7 +2793,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation>Invalid password</translation>
+      <translation>Contraseña no válida</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2813,7 +2813,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation>Conectar a Servidor</translation>
+      <translation>Conectar al Servidor</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -2899,7 +2899,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Descargar &amp; Instalar</translation>
+      <translation>Descargar e Instalar</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
@@ -3039,7 +3039,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation>Seleccione el Folder</translation>
+      <translation>Seleccione la carpeta...</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
@@ -3223,7 +3223,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>Enlazado al ID de Hardware</translation>
+      <translation>Enlazado al Hardware ID</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -3243,7 +3243,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>Secuencias de archivo permitidos</translation>
+      <translation>Secuencias de archivos permitidos</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -3348,7 +3348,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>Envíe la clave de licencia y la identificación de hardware proporcionadas a su soporte regional / de licencia para obtener un archivo de clave de activación.</translation>
+      <translation>Envíe la clave de licencia proporcionada y el Hardware ID a su soporte regional / de licencia para obtener un archivo de clave de activación.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
