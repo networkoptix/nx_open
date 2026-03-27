@@ -137,9 +137,16 @@ ScalableContentHolder
     {
         id: shader
 
-        visible: control.fisheyeMode
+        readonly property bool sourceReady:
+            control.fisheyeMode
+            && videoContent.videoOutput.channelSize.width > 0
+            && videoContent.videoOutput.channelSize.height > 0
+            && videoContent.videoOutput.width > 0
+            && videoContent.videoOutput.height > 0
+
+        visible: sourceReady
         // If sourceItem size is 0, shader item may show rendering artifacts,
-        sourceItem: visible && videoContent.videoOutput.channelSize.width > 0
+        sourceItem: sourceReady
             ? videoContent.videoOutput
             : null
         helper: control.resourceHelper
