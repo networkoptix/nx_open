@@ -1165,7 +1165,7 @@ bool QnArchiveStreamReader::isSingleShotMode() const
 
 void QnArchiveStreamReader::pleaseStop()
 {
-    QnAbstractArchiveStreamReader::pleaseStop();
+    base_type::pleaseStop();
     if (m_delegate)
         m_delegate->beforeClose();
     m_singleShowWaitCond.wakeAll();
