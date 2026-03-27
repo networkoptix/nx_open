@@ -1120,7 +1120,7 @@ void QnWorkbenchDisplay::fitInView(bool animate)
 {
     QRectF targetGeometry;
 
-    QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
+    QnResourceWidget* zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
     if (zoomedWidget)
     {
         targetGeometry = itemGeometry(zoomedWidget->item());
@@ -1141,6 +1141,14 @@ void QnWorkbenchDisplay::fitInView(bool animate)
         m_boundingInstrument->recursiveDisable();
         m_viewportAnimator->moveTo(targetGeometry, false);
         m_boundingInstrument->recursiveEnable(); /* So that caches are updated. */
+
+        // VMS-61796: Resizing scene with zoomed-in webpage affects item geometry.
+        if (zoomedWidget)
+        {
+            const auto resource = zoomedWidget->item()->resource();
+            if (resource && resource->hasFlags(Qn::web_page))
+                synchronizeGeometry(zoomedWidget->item(), false);
+        }
         synchronizeSceneBounds();
     }
 }
@@ -1578,6 +1586,23 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const
         return QRectF();
 
     QRectF result = workbench()->mapper()->mapFromGrid(item->geometry());
+
+    // VMS-61796: The enclosing geometry for a zoomed-in web page is adjusted so that the page
+    // occupies the entire viewport.
+    const auto resource = item->resource();
+    if (resource && resource->hasFlags(Qn::web_page))
+    {
+        const auto zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
+        if (zoomedWidget && zoomedWidget->item() == item)
+        {
+            const auto viewportRect = viewportGeometry();
+            if (viewportRect.isValid())
+            {
+                const double viewportAspectRatio = viewportRect.width() / viewportRect.height();
+                result.setWidth(result.height() * viewportAspectRatio);
+            }
+        }
+    }
 
     QSizeF step = workbench()->mapper()->step();
     QRectF delta = item->geometryDelta();
