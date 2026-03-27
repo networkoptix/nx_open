@@ -7,4 +7,9 @@ LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
 DISTRIBUTION_OUTPUT_DIR="@CMAKE_BINARY_DIR@/distrib"
 PYTHON="@PYTHON_EXECUTABLE@"
 
+CODE_SIGNING=@codeSigning@
+PROPRIETARY_BUILD_UTILS_DIR=@proprietary_build_utils_dir@
+SIGNING_SERVER=@signingServer@
+CUSTOMIZATION=@customization@
+
 ANDROID_ABIS=(@android_abis@)

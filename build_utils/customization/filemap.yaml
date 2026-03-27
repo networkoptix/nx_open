@@ -54,7 +54,6 @@ desktop: {
 mobile: {
 
   android: {
-    key.store: 'mobile_client/key.store',
     google-services.json: 'mobile_client/google-services.json',
 
     # Logos are transparent, square.

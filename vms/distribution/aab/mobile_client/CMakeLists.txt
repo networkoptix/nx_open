@@ -26,6 +26,7 @@ macro(build_client_for_abi abi)
         enablePrecompiledHeaders
         customMobileClientVersion
         breakpadSymbolsOutputDir
+        signingServer
     )
 
     # If CMake configuration of the root project was cleared, we need to clear the child
