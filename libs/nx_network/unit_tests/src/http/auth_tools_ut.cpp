@@ -167,6 +167,25 @@ TEST(HttpAuthDigest, cnonce_is_supported_properly)
     ASSERT_TRUE(validateAuthorization("GET", kUsername, kPassword, std::nullopt, authz));
 }
 
+TEST(HttpAuthDigest, OpaqueParameterPresent)
+{
+    header::WWWAuthenticate authHeader(header::AuthScheme::digest);
+    authHeader.params.emplace("realm", "test@example.com");
+    authHeader.params.emplace("nonce", "dcd98b7102dd2f0e8b11d0f600bfb0c093");
+    authHeader.params.emplace("opaque", "OpaqueString");
+
+    header::DigestAuthorization digestHeader;
+    ASSERT_TRUE(calcDigestResponse(
+        Method::get, "user", "password", std::nullopt, "/some/uri", authHeader, &digestHeader));
+
+    ASSERT_TRUE(validateAuthorization(
+        Method::get, "user", "password", std::nullopt, digestHeader));
+
+    const auto opaque = digestHeader.digest->params.find("opaque");
+    ASSERT_TRUE(opaque != digestHeader.digest->params.end());
+    ASSERT_EQ(opaque->second, "OpaqueString");
+}
+
 namespace {
 
 static const std::string kUser("user");
