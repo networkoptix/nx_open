@@ -15,6 +15,13 @@ ShaderEffect
         ? Qt.size(sourceItem.implicitWidth, sourceItem.implicitHeight)
         : Qt.size(0.0, 0.0)
 
+    readonly property bool hasValidSource:
+        !!sourceItem
+        && sourceSize.width > 0
+        && sourceSize.height > 0
+        && width > 0
+        && height > 0
+
     /* Equidistant projection is the most common among lenses, but it requires 32-bit float
      * precision support on fragment shader to work well (due to low precision trigonometry).
      * Therefore we choose somewhat similar equisolid projection as default. */
@@ -25,7 +32,9 @@ ShaderEffect
 
     /* Fisheye parameters: */
 
-    property real fieldRadius: Math.min(sourceSize.width, sourceSize.height) / (sourceSize.width * 2.0)
+    property real fieldRadius: hasValidSource
+        ? Math.min(sourceSize.width, sourceSize.height) / (sourceSize.width * 2.0)
+        : 0.0
     property vector2d fieldOffset: Qt.vector2d(0.0, 0.0)
     property real fieldStretch: 1.0
     property real fieldRotation: 0.0
@@ -48,12 +57,15 @@ ShaderEffect
         id: shaderSource
         hideSource: true
         visible: false
-        textureSize: Qt.size(
-            Math.min(parent.sourceSize.width, textureSizeHelper.maxTextureSize),
-            Math.min(parent.sourceSize.height, textureSizeHelper.maxTextureSize))
+        live: parent.hasValidSource
+        textureSize: parent.hasValidSource
+            ? Qt.size(
+                Math.max(1, Math.min(parent.sourceSize.width, textureSizeHelper.maxTextureSize)),
+                Math.max(1, Math.min(parent.sourceSize.height, textureSizeHelper.maxTextureSize)))
+            : Qt.size(1, 1)
     }
 
-    readonly property var sourceTexture: shaderSource
+    readonly property var sourceTexture: hasValidSource ? shaderSource : null
 
     readonly property vector2d projectionCoordsScale: calculateProjectionScale(viewScale)
 

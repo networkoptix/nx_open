@@ -756,6 +756,10 @@ void QnTimeline::releaseResources()
         if (texture)
             delete texture;
     }
+
+    d->stripesDarkTexture = nullptr;
+    d->stripesLightTexture = nullptr;
+    d->textTexture = nullptr;
 }
 
 QSGNode* QnTimeline::updatePaintNode(
@@ -1260,7 +1264,7 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
         geometry = chunksNode->geometry();
 
         stripesOpacityNode = static_cast<QSGOpacityNode*>(chunksNode->childAtIndex(0));
-        stripesNode = static_cast<QSGGeometryNode*>(stripesOpacityNode->childAtIndex(0));
+        stripesNode = static_cast<QSGNode*>(stripesOpacityNode->childAtIndex(0));
 
         darkStripesOpacityNode = static_cast<QSGOpacityNode*>(stripesNode->childAtIndex(0));
         darkStripesNode = static_cast<QSGGeometryNode*>(darkStripesOpacityNode->childAtIndex(0));
