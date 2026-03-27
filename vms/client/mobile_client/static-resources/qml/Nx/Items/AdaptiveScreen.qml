@@ -355,6 +355,7 @@ FocusScope
         leftPadding: SafeArea.margins.left
         rightPadding: SafeArea.margins.right
         bottomPadding: SafeArea.margins.bottom
+        background: Rectangle { color: splashPanel.color }
 
         contentItem: Panel
         {
