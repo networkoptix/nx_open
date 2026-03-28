@@ -20,6 +20,7 @@
 #include "timeline_chunk_painter.h"
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/animation/kinetic_helper.h>
 #include <nx/vms/client/core/timeline/data/timeline_zoom_level.h>
@@ -182,6 +183,9 @@ public:
     nx::vms::client::core::ChunkProvider* chunkProvider = nullptr;
     qint64 rightChunksOffsetMs = 0;
 
+    QObject guard;
+    nx::utils::ScopedConnections windowConnections;
+
 public:
     QnTimelinePrivate(QnTimeline* parent):
         parent(parent),
@@ -228,8 +232,21 @@ public:
         zoomKineticHelper.setMinimum(0);
 
         animationTimer.start();
-    }
 
+        QObject::connect(parent, &QQuickItem::windowChanged, &guard,
+            [this]()
+            {
+                windowConnections.reset();
+                const auto window = this->parent->window();
+                if (!window)
+                    return;
+
+                NX_ASSERT(this->parent->thread() == window->thread());
+
+                windowConnections << QObject::connect(window, &QQuickWindow::afterAnimating, &guard,
+                    [this]() { animateProperties(); });
+            });
+    }
 
     void setWindow(qint64 start, qint64 end);
     void updateZoomLevel()
@@ -773,8 +790,6 @@ QSGNode* QnTimeline::updatePaintNode(
 
     if (!d->textTexture)
         d->updateTextHelper();
-
-    d->animateProperties();
 
     if (!node)
     {
