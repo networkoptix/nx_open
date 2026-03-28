@@ -7774,7 +7774,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>Set Password</source>
-      <translation>パスワードの設定</translation>
+      <translation>パスワード設定</translation>
     </message>
     <message>
       <source>This camera requires password to be set up</source>
@@ -9855,7 +9855,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation>オブジェクトトラッキング有効</translation>
+      <translation>オブジェクト追跡有効</translation>
     </message>
   </context>
   <context>
@@ -10993,7 +10993,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
-      <translation>パスワードの設定</translation>
+      <translation>パスワード設定</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>

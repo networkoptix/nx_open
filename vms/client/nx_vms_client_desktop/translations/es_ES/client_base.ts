@@ -3505,7 +3505,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation>Zoom de área</translation>
+      <translation>Área de zoom</translation>
     </message>
     <message>
       <source>Motion Search</source>
