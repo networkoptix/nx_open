@@ -771,7 +771,7 @@ Page
                 {
                     id: liveButton
 
-                    text: qsTr("LIVE")
+                    text: "LIVE" //< Intentionally not translatable.
                     checked: controller.playingLive
 
                     font.pixelSize: 14
