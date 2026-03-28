@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>อุปกรณ์ทั้งหมด</translation>
     </message>
   </context>
   <context>

@@ -1003,7 +1003,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Tots els dispositius</translation>
     </message>
   </context>
   <context>

@@ -1002,7 +1002,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>모든 장치</translation>
     </message>
   </context>
   <context>

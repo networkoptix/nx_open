@@ -1004,7 +1004,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>All Devices</translation>
     </message>
   </context>
   <context>
