@@ -352,9 +352,7 @@ struct OrganizationsModel::Private
         }
     }
 
-    void setOrganizations(
-        const std::vector<nx::vms::client::core::Organization> orgs,
-        nx::Uuid parentId)
+    void setOrganizations(const std::vector<struct Organization>& orgs, nx::Uuid parentId)
     {
         auto runAtScopeExit = nx::utils::ScopeGuard(
             [this, parentId, empty = orgs.empty()]()
@@ -636,21 +634,9 @@ struct OrganizationsModel::Private
 
     coro::FireAndForget startPolling();
     coro::Task<bool> loadOrgAsync(struct Organization org);
-    coro::Task<bool> loadOrgListAsync(OrganizationList orgList);
-    coro::Task<bool> loadChannelPartnerOrgsAsync(ChannelPartnerList cpList);
+    coro::Task<bool> loadOrgListAsync(std::vector<struct Organization> orgList);
 
-    static void fillOrgInfo(
-        std::vector<nx::vms::client::core::Organization>& organizations,
-        const QHash<nx::Uuid, nx::vms::client::core::Organization>& organizationsCache)
-    {
-        for (auto& org: organizations)
-        {
-            if (auto it = organizationsCache.find(org.id); it != organizationsCache.end())
-                org = it.value();
-        }
-    }
-
-    void removeInactiveSystems(std::vector<nx::vms::client::core::SystemInOrganization>& systems)
+    void removeInactiveSystems(std::vector<struct SystemInOrganization>& systems)
     {
         const auto isActivatedOrPending =
             [this](const auto& system) -> bool
@@ -1185,12 +1171,13 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization o
     co_return true;
 }
 
-coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(OrganizationList orgList)
+coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(
+    std::vector<struct Organization> orgList)
 {
     std::vector<nx::coro::Task<bool>> loadTasks;
-    loadTasks.reserve(orgList.results.size());
+    loadTasks.reserve(orgList.size());
 
-    for (const auto& org: orgList.results)
+    for (const auto& org: orgList)
         loadTasks.push_back(loadOrgAsync(org));
 
     auto results = co_await nx::coro::runAll(std::move(loadTasks), kMaxConcurrentRequests);
@@ -1199,52 +1186,6 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgListAsync(OrganizationList 
         NX_WARNING(this, "Organizations are not fully loaded");
         co_return false;
     }
-
-    co_return true;
-}
-
-coro::Task<bool> OrganizationsModel::Private::loadChannelPartnerOrgsAsync(ChannelPartnerList cpList)
-{
-    std::vector<nx::coro::Task<bool>> loadOrgTasks;
-
-    for (const auto& cp: cpList.results)
-    {
-        loadOrgTasks.push_back(
-            [](auto self, const auto& cp) -> coro::Task<bool>
-            {
-                auto cpOrgList = co_await cloudGet<OrganizationList>(
-                    self->statusWatcher,
-                    nx::format(
-                        "/partners/api/v3/channel_partners/%1/organizations/",
-                        cp.id.toSimpleStdString()).toStdString());
-
-                if (!cpOrgList)
-                {
-                    NX_WARNING(self,
-                        "Error getting organizations of %1: %2",
-                        cp.id,
-                        cloud::db::api::toString(cpOrgList.error()));
-                    co_return false;
-                }
-
-                self->setOrganizations(cpOrgList->results, cp.id);
-
-                // Show inaccessible organizations but don't load them.
-                self->removeInaccessibleItems(&cpOrgList->results, cp);
-
-                const bool result = co_await self->loadOrgListAsync(std::move(*cpOrgList));
-
-                if (auto node = self->nodes.find(cp.id); node && node->loading)
-                {
-                    node->loading = false;
-                    self->notifyNodeUpdate(node, {OrganizationsModel::IsLoadingRole});
-                }
-
-                co_return result;
-            }(this, cp));
-    }
-
-    auto results = co_await nx::coro::runAll(std::move(loadOrgTasks), kMaxConcurrentRequests);
 
     co_return true;
 }
@@ -1285,11 +1226,7 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
             [](auto value) { return value == CloudStatusWatcher::Online; });
 
         // Load Partners/Organizations.
-        // TODO: Channel structure should return groups and permissions.
-        auto [channelPartnerStruct, channelPartnerList, orgList] = co_await coro::whenAll(
-            cloudGet<ChannelStruct>(
-                statusWatcher,
-                "/partners/api/v3/channel_partners/channel_structure/"),
+        auto [channelPartnerList, orgList] = co_await coro::whenAll(
             cloudGet<ChannelPartnerList>(
                 statusWatcher,
                 "/partners/api/v3/channel_partners/"),
@@ -1299,15 +1236,6 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
                 nx::UrlQuery()
                     .addQueryItem("includeChildOrgs", "true"))
         );
-
-        if (!channelPartnerStruct)
-        {
-            NX_WARNING(this,
-                "Error getting channel structure: %1",
-                cloud::db::api::toString(channelPartnerStruct.error()));
-            co_await coro::qtTimer(kErrorRetryDelay);
-            continue;
-        }
 
         if (!channelPartnerList)
         {
@@ -1328,51 +1256,21 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         }
 
         // Fill caches with structs containing ownRolesIds/channelPartnerAccessLevel.
-        QHash<nx::Uuid, nx::vms::client::core::ChannelPartner> channelPartnersCache;
-        QHash<nx::Uuid, nx::vms::client::core::Organization> organizationsCache;
-
-        for (const auto &partner: channelPartnerList->results)
-            channelPartnersCache.insert(partner.id, partner);
-
-        for (const auto &org: orgList->results)
-            organizationsCache.insert(org.id, org);
+        QHash<nx::Uuid, struct ChannelPartner> channelPartnersCache;
+        QHash<nx::Uuid, std::vector<struct Organization>> organizationsByPartner;
+        std::vector<struct Organization> organizationsForLoad;
+        organizationsForLoad.reserve(orgList->results.size());
 
         // Hide inaccessible channel partners.
         removeInaccessibleItems(&channelPartnerList->results);
         setChannelPartners(*channelPartnerList);
 
-        // Fill in ownRolesIds/channelPartnerAccessLevel from the above cache as those fields are
-        // missing from API response.
-        fillOrgInfo(channelPartnerStruct->organizations, organizationsCache);
-
-        // /v3/channel_partners/channel_structure/ does not privide a flat list of partners,
-        // but contains organizations information. So make a list from /v3/channel_partners/
-        // and fill partners organization lists.
-        QHash<nx::Uuid, ChannelPartnerInStruct> visiblePartners;
-        for (const auto &partner: channelPartnerList->results)
-            visiblePartners[partner.id] = {};
-
-        const auto fillOrgsRecursive =
-            nx::utils::y_combinator([&organizationsCache, &visiblePartners](
-                const auto fillOrgsRecursive,
-                const ChannelPartnerInStruct& partner) -> void
-            {
-                if (auto it = visiblePartners.find(partner.id); it != visiblePartners.end())
-                {
-                    *it = partner;
-                    fillOrgInfo(it->organizations, organizationsCache);
-                }
-
-                for (auto& subPartner: partner.subChannels)
-                    fillOrgsRecursive(subPartner);
-            });
-
-        for (auto& partner: channelPartnerStruct->channelPartners)
-            fillOrgsRecursive(partner);
+        for (const auto& partner: channelPartnerList->results)
+            channelPartnersCache.insert(partner.id, partner);
 
         // Fill in organizations access cache.
         const auto isAccessible =
-            [&channelPartnersCache](const nx::vms::client::core::Organization& org)
+            [&channelPartnersCache](const struct Organization& org)
             {
                 auto it = channelPartnersCache.find(org.channelPartner);
                 return it != channelPartnersCache.end()
@@ -1380,45 +1278,64 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
                     : canAccess(org);
             };
 
+        const auto fillOrganizationsByPartner =
+            [&organizationsByPartner, &channelPartnersCache, rootId = root->id](
+                const struct Organization& org) -> void
+            {
+                const auto it = channelPartnersCache.find(org.channelPartner);
+
+                if (it != channelPartnersCache.end())
+                    organizationsByPartner[org.channelPartner].push_back(org);
+                else
+                    organizationsByPartner[rootId].push_back(org);
+            };
+
         accessibleOrgs.clear();
-        for (const auto& org: orgList->results | std::views::filter(isAccessible))
-            accessibleOrgs.insert(org.id);
+        for (const auto& org: orgList->results)
+        {
+            if (isAccessible(org))
+            {
+                accessibleOrgs.insert(org.id);
+                organizationsForLoad.push_back(org);
+            }
+
+            // Show inaccessible organizations but don't load them.
+            fillOrganizationsByPartner(org);
+        }
 
         notifyNodeUpdate(
             root.get(),
             {OrganizationsModel::IsAccessibleThroughOrgRole},
             /*recursively*/ true);
 
-        // Show inaccessible organizations but don't load them.
-        setOrganizations(channelPartnerStruct->organizations, root->id);
-        updateItemsAccess(channelPartnerStruct->organizations);
+        setOrganizations(organizationsByPartner[root->id], root->id);
+        updateItemsAccess(organizationsByPartner[root->id]);
 
         // At this point we know all accessible channel partners and organizations and can show the
         // tab bar.
         setTopLevelLoading(false);
 
         // Set organizations for each channel partner.
-        for (const auto& [partnerId, partner]: visiblePartners.asKeyValueRange())
+        for (const auto& partner: channelPartnerList->results)
         {
             if (partner.id.isNull())
                 continue;
 
-            setOrganizations(partner.organizations, partnerId);
+            setOrganizations(organizationsByPartner[partner.id], partner.id);
 
-            auto it = channelPartnersCache.find(partnerId);
+            auto it = channelPartnersCache.find(partner.id);
 
-            // Show inaccessible organizations but don't load them.
             if (it != channelPartnersCache.end())
-                updateItemsAccess(partner.organizations, it.value());
+                updateItemsAccess(organizationsByPartner[partner.id], it.value());
 
-            if (auto node = nodes.find(partnerId); node && node->loading)
+            if (auto node = nodes.find(partner.id); node && node->loading)
             {
                 node->loading = false;
                 notifyNodeUpdate(node, {OrganizationsModel::IsLoadingRole});
             }
         }
 
-        co_await loadOrgListAsync(std::move(*orgList));
+        co_await loadOrgListAsync(std::move(organizationsForLoad));
 
         setFirstLoadAttemptFinished(true);
         emit q->fullTreeLoaded();
