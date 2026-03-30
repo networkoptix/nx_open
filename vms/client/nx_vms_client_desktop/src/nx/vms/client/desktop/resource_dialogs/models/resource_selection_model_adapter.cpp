@@ -102,7 +102,8 @@ struct ResourceSelectionModelAdapter::Private
         if (isExtraInfoRequired)
         {
             const auto extraInfo = sourceIndex.data(Qn::ExtraInfoRole).toString();
-            return extraInfo.contains(filterText, Qt::CaseInsensitive);
+            if (extraInfo.contains(filterText, Qt::CaseInsensitive))
+                return true;
         }
 
         return checkParents ? isIndexAccepted(sourceIndex.parent(), true) : false;
