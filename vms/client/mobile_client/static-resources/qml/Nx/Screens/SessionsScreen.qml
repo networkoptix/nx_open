@@ -309,7 +309,11 @@ AdaptiveScreen
                 {
                     visible: !emptyListPlaceholder.visible && !LayoutController.isTabletLayout
                     icon.source: feedStateProvider.buttonIconSource
-                    onClicked: sessionsScreen.contentItem = feed
+                    onClicked:
+                    {
+                        sessionsScreen.contentItem = feed
+                        Qt.callLater(() => feed.update()) //< Update after the feed is opened.
+                    }
                 }
 
                 rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText

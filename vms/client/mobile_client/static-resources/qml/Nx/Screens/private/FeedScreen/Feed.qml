@@ -41,8 +41,23 @@ Item
         filterMenu.open()
     }
 
+    function update()
+    {
+        sourceModel.update()
+    }
+
     states:
     [
+        State
+        {
+            name: "" //< Default state is required to reset visible properties.
+
+            PropertyChanges
+            {
+                search.visible: true
+                notifications.visible: true
+            }
+        },
         State
         {
             when: !feedState.hasOsPermission
@@ -88,6 +103,7 @@ Item
             PropertyChanges
             {
                 search.visible: false
+                notifications.visible: false
 
                 placeholder.text: qsTr("No Notifications")
                 placeholder.description: qsTr("No push notifications were found.")
@@ -101,6 +117,9 @@ Item
 
             PropertyChanges
             {
+                search.visible: true
+                notifications.visible: true //< Preserve layout.
+
                 placeholder.text: qsTr("Nothing found")
                 placeholder.description: qsTr("Try changing the search parameters")
                 placeholder.imageSource: ""
@@ -113,6 +132,7 @@ Item
             PropertyChanges
             {
                 search.visible: false
+                notifications.visible: false
 
                 placeholder.text: qsTr("No New Notifications")
                 placeholder.description: qsTr("No new push notifications were found, but you can "
