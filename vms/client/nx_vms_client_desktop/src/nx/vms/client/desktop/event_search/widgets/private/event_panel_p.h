@@ -41,7 +41,7 @@ public:
     virtual ~Private() override;
 
     Tab currentTab() const;
-    bool setCurrentTab(Tab tab);
+    bool setCurrentTab(Tab tab, bool updateRequestedTab = true);
 
     AbstractSearchWidget* currentSearchWidget() const;
 
@@ -70,6 +70,7 @@ private:
     EventPanel* const q;
     AnimatedCompactTabWidget* m_tabs = nullptr;
     Tab m_requestedTab = Tab::notifications; //< Used to restore session state.
+    bool m_suppressRequestedTabUpdate = false;
 
     NotificationListWidget* m_notificationsTab = nullptr;
     NotificationCounterLabel* m_counterLabel = nullptr;
