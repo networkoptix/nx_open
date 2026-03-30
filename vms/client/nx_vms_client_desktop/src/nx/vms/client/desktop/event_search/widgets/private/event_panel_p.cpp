@@ -158,7 +158,7 @@ public:
                 m_panel->m_analyticsTab->searchWidget()->previewToggled();
             result[kObjectsInformation] =
                 m_panel->m_analyticsTab->searchWidget()->footerToggled();
-            result[kTabIndexKey] = static_cast<int>(m_panel->currentTab());
+            result[kTabIndexKey] = static_cast<int>(m_panel->m_requestedTab);
             *state = result;
         }
     }
@@ -244,7 +244,7 @@ EventPanel::Private::Private(EventPanel* q):
                 if (isActive)
                     m_tabs->setCurrentWidget(data.tab);
                 else if (m_tabs->currentWidget() == data.tab)
-                    setCurrentTab(Tab::notifications);
+                    setCurrentTab(Tab::notifications, /*updateRequestedTab=*/false);
             });
     }
 
@@ -252,6 +252,11 @@ EventPanel::Private::Private(EventPanel* q):
         [this]
         {
             const auto currentTab = m_tabs->currentWidget();
+
+            // Track user-driven tab selections. System-driven changes (e.g., hiding an
+            // unavailable tab) suppress this update via m_suppressRequestedTabUpdate.
+            if (!m_suppressRequestedTabUpdate)
+                m_requestedTab = m_tabIds.value(currentTab, Tab::notifications);
 
             for (const auto& data: m_synchronizers)
                 data.synchronizer->setActive(m_tabs->currentWidget() == data.tab);
@@ -391,9 +396,18 @@ EventPanel::Tab EventPanel::Private::currentTab() const
     return m_tabIds.value(m_tabs->currentWidget());
 }
 
-bool EventPanel::Private::setCurrentTab(Tab tab)
+bool EventPanel::Private::setCurrentTab(Tab tab, bool updateRequestedTab)
 {
-    m_requestedTab = tab;
+    // m_requestedTab is updated unconditionally before checking tab availability. This is
+    // intentional: if the tab is not yet visible (e.g., the server is not yet connected),
+    // we still record the user's intent so rebuildTabs() can restore it once the tab appears.
+    if (updateRequestedTab)
+        m_requestedTab = tab;
+
+    // Suppress currentChanged from overwriting m_requestedTab while we change the index.
+    // Nested rollbacks (e.g., when called from rebuildTabs which holds its own rollback) are
+    // harmless: the nested guard saves/restores true->true with no net effect.
+    QScopedValueRollback guard(m_suppressRequestedTabUpdate, true);
     const int index = m_tabs->indexOf(m_tabIds.key(tab));
     if (index < 0)
         return false;
@@ -416,6 +430,12 @@ AbstractSearchWidget* EventPanel::Private::currentSearchWidget() const
 
 void EventPanel::Private::rebuildTabs()
 {
+    // Suppress m_requestedTab updates for the duration of the rebuild. Tab insertions and
+    // removals can trigger QTabWidget::currentChanged, which must not silently overwrite the
+    // user's requested tab. The explicit setCurrentTab(m_requestedTab) call at the end of this
+    // function is responsible for applying the correct tab after the rebuild completes.
+    QScopedValueRollback suppressGuard(m_suppressRequestedTabUpdate, true);
+
     const auto selectedTab = m_tabs->currentWidget();
     int updatingVisibleTabIndex = 0;
 
@@ -464,7 +484,7 @@ void EventPanel::Private::rebuildTabs()
             else //< Hide tab.
             {
                 if (selectedTab == tab) //< If True, selected tab is not visible anymore.
-                    setCurrentTab(Tab::notifications); //< Show Notifications tab by default.
+                    setCurrentTab(Tab::notifications, /*updateRequestedTab=*/false); //< Show Notifications tab by default.
 
                 if (tabWasVisibleBeforeRebuild)
                 {
