@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/export/settings/export_layout_persistent_settings.h>
 #include <nx/vms/client/desktop/export/settings/export_media_persistent_settings.h>
 #include <nx/vms/client/desktop/jsapi/auth_allowed_urls.h>
+#include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/webpage/web_page_settings.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
@@ -88,6 +89,8 @@ public:
         "'Info' mode will be enabled by default on newly opened cameras."};
     Property<bool> showRoiByDefault{this, "showRoiByDefault", true,
         "'Regions of Interest' mode will be enabled by default on newly opened cameras."};
+    Property<RadassMode> defaultResolution{this, "defaultResolution", RadassMode::Auto,
+        "Default behavior of the layout resolution in client."};
 
     Property<Qn::TimeMode> timeMode{this, "timeMode", Qn::ClientTimeMode};
 
