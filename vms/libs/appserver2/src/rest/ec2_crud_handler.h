@@ -188,10 +188,7 @@ public:
 
         auto d = static_cast<Derived*>(this);
         if (nx::Uuid::isUuidString(*it))
-        {
-            const auto id = nx::Uuid::fromStringSafe(*it);
-            return id.isNull() ? QString("*") : d->subscriptionId(id);
-        }
+            return d->subscriptionId(nx::Uuid::fromStringSafe(*it));
 
         if constexpr (requires { d->flexibleIdToId(*it); })
         {
@@ -259,7 +256,8 @@ protected:
                 || request.jsonRpcContext()->subs == nx::network::rest::json_rpc::Subs::subscribe);
         nx::network::rest::CollectionHash::Value etag;
         auto d = static_cast<Derived*>(this);
-        if (id == Id{})
+        const auto subId = d->subscriptionId(id);
+        if (subId == QString('*'))
         {
             auto etags = calculateEtags(&result);
             etag = etags.combinedHash();
@@ -284,7 +282,7 @@ protected:
         else if (!result.empty())
         {
             nx::network::rest::CollectionHash::Item item{
-                d->subscriptionId(id), nx::reflect::json::serialize(result.front())};
+                subId, nx::reflect::json::serialize(result.front())};
             if (processJsonRpcEtag)
             {
                 auto lock = m_subscriptions.lock();
@@ -395,8 +393,11 @@ protected:
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
     }
 
-    static QString subscriptionId(QString id) { return id; }
-    static QString subscriptionId(const nx::Uuid& id) { return id.toSimpleString(); }
+    static QString subscriptionId(QString id)  { return id.isEmpty() ? QString('*') : id; }
+    static QString subscriptionId(nx::Uuid id)
+    {
+        return id.isNull() ? QString('*') : id.toSimpleString();
+    }
 
     void notify(
         const QString& id,

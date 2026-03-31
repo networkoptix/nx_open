@@ -81,7 +81,7 @@ namespace transaction_descriptor {
 
 struct CanModifyStorageData
 {
-    ErrorCode modifyResourceResult = ErrorCode::failure;
+    Result modifyResourceResult = ErrorCode::failure;
     bool hasExistingStorage;
     nx::vms::api::StorageData request;
     std::function<void(const QString&)> logErrorFunc;
