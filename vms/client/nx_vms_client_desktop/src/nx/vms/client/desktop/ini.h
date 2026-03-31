@@ -302,14 +302,6 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, pluginInformationInServerSettings,
         "[Feature] Show information about installed plugin libraries in Server Settings.");
 
-    // VMS-21806
-    NX_INI_STRING("auto", defaultResolution,
-        "[Feature] Default behavior of the layout resolution in client.\n"
-        "Possible values:\n"
-        " * \"auto\" - default\n"
-        " * \"high\" - all new layouts are opened with forced high resolution\n"
-        " * \"low\" - all new layouts are opened with forced low resolution");
-
     // VMS-30701
     NX_INI_FLAG(true, enableCameraReplacementFeature,
         "[Feature] Makes Camera Replacement feature available in the client.");

@@ -7,14 +7,12 @@
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource/layout_item_index.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
 
 namespace nx::vms::client::desktop {
-
-static const RadassMode kDefaultResolution = nx::reflect::fromString(ini().defaultResolution,
-    RadassMode::Auto);
 
 RadassResourceManager::RadassResourceManager(
     std::unique_ptr<AbstractRadassStorage> storage, QObject* parent):
@@ -84,7 +82,7 @@ RadassMode RadassResourceManager::mode(const LayoutItemIndexList& items) const
                 ? m_storage->cloudModes()
                 : m_storage->localModes();
 
-            return modes.value(index.uuid(), kDefaultResolution);
+            return modes.value(index.uuid(), appContext()->localSettings()->defaultResolution());
         },
         &value))
     {
@@ -110,7 +108,8 @@ void RadassResourceManager::setMode(const LayoutItemIndexList& items, RadassMode
         const bool isCloudLayout =
             (bool) item.layout().dynamicCast<core::CrossSystemLayoutResource>();
         const bool removeIfAuto =
-            value == RadassMode::Auto && kDefaultResolution == RadassMode::Auto;
+            value == RadassMode::Auto
+                && appContext()->localSettings()->defaultResolution() == RadassMode::Auto;
 
         if (isCloudLayout)
         {
