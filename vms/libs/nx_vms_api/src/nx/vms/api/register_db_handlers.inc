@@ -198,7 +198,7 @@ void registerRestHandlers(
      * %struct StorageModel
      * %param:string serverId Server id. Can be obtained from "id" field via
      *     `GET /rest/v{1-}/servers` or be `this` to refer to the current Server.
-      *     %example this
+     *     %example this
      * %param[unused] id
      * %param[ref] _strict,_ticket
      * %permissions Power User.
@@ -226,7 +226,8 @@ void registerRestHandlers(
      * %struct StorageModel
      * %param:string serverId Server id. Can be obtained from "id" field via
      *     `GET /rest/v{1-}/servers` or be `this` to refer to the current Server.
-      *     %example this
+     *     If modification of Cloud Storage is required `serverId` must be `*` or nil UUID.
+     *     %example this
      * %param:uuid id Storage id (can be obtained from "id" field via
      *     `GET /rest/v{1-}/servers/{serverId}/storages`).
      * %param[ref] _strict,_ticket
@@ -240,7 +241,8 @@ void registerRestHandlers(
      * %struct[opt] StorageModel
      * %param:string serverId Server id. Can be obtained from "id" field via
      *     `GET /rest/v{1-}/servers` or be `this` to refer to the current Server.
-      *     %example this
+     *     If modification of Cloud Storage is required `serverId` must be `*` or nil UUID.
+     *     %example this
      * %param:uuid id Storage id (can be obtained from "id" field via
      *     `GET /rest/v{1-}/servers/{serverId}/storages`).
      * %param[ref] _strict,_ticket

@@ -1034,9 +1034,16 @@ struct ModifyStorageAccess
         }
 
         const auto resourcePool = systemContext->resourcePool();
-        const auto existingResource = resourcePool->getResourceById(param.id);
+        const auto existingResource = resourcePool->getResourceById<QnStorageResource>(param.id);
         if (!validateResourceNameOrEmpty(param, existingResource))
             return invalidParameterError("name");
+
+        if (existingResource
+            && existingResource->getStorageType() == nx::vms::api::kCloudStorageType
+            && !param.parentId.isNull())
+        {
+            return {ErrorCode::badRequest, ServerApiErrors::tr("`serverId` must be `*` or nil UUID")};
+        }
 
         transaction_descriptor::CanModifyStorageData data;
 
