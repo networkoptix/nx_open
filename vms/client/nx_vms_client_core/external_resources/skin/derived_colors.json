@@ -231,7 +231,7 @@
         "statistics": {
             "cpu": "blue",
             "ram": "purple",
-            "hdds": ["light_blue", "green", "teal", "cyan", "indigo", "pink", "deep_purple"],
+            "hdds": ["green", "cyan", "teal", "light_blue", "indigo", "pink", "deep_purple"],
             "network": ["red", "orange", "amber", "lime"]
         }
     },
