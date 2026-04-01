@@ -77,9 +77,9 @@ QSize placeholderSize(const QSize& requestedSize)
 SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {{QnIcon::Normal, {.primary = "dark8"}}};
 
 NX_DECLARE_COLORIZED_ICON(
-    kServerIcon, "400x400/Outline/videowall_server_placeholder.svg", kPlaceholderTheme)
+    kServerIcon, "other/400x400/Outline/videowall_server_placeholder.svg", kPlaceholderTheme)
 NX_DECLARE_COLORIZED_ICON(
-    kWebpageIcon, "400x400/Outline/videowall_webpage_placeholder.svg", kPlaceholderTheme)
+    kWebpageIcon, "other/400x400/Outline/videowall_webpage_placeholder.svg", kPlaceholderTheme)
 
 } // namespace
 

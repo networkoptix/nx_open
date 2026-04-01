@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <g class="24x24/Solid/st_elevator_doors_close">
-    <path fill="#ffffff" d="M23 2H1c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h22c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1ZM2 16V8l4 4-4 4Zm15 4H7V4h10v16Zm5-12v8l-4-4 4-4Z" class="Primary"/>
+    <path fill="#ffffff" d="M3 21v-6h2v4h4v2H3Zm12 0v-2h4v-4h2v6h-6Zm-7.825-5.175-1.425-1.4L7.175 13H2v-2h5.175L5.75 9.575l1.425-1.4L11 12l-3.825 3.825Zm9.65 0L13 12l3.825-3.825 1.425 1.4L16.825 11H22v2h-5.175l1.425 1.425-1.425 1.4ZM3 9V3h6v2H5v4H3Zm16 0V5h-4V3h6v6h-2Z" class="Primary"/>
   </g>
 </svg>

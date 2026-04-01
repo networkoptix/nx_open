@@ -82,7 +82,7 @@ static const LayoutNavigationStyle kCollapsedLayoutNavigationStyle{
 
 static const nx::vms::client::core::SvgIconColorer::ThemeSubstitutions kMainMenuTheme = {
     {QnIcon::Normal, {.primary = "light4"}}};
-NX_DECLARE_COLORIZED_ICON(kMainMenuIcon, "40x32/Solid/main_menu_2.svg", kMainMenuTheme);
+NX_DECLARE_COLORIZED_ICON(kMainMenuIcon, "other/40x32/Solid/main_menu_no_bg.svg", kMainMenuTheme);
 
 QFrame* newVLine(const QString& lightColorName, const QString& shadowColorName)
 {

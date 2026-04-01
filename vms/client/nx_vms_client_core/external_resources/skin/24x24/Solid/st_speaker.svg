@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <g class="24x24/Solid/st_speaker">
-    <path fill="#ffffff" fill-rule="evenodd" d="M20 8.8c.6.5 1 1.3 1 2.2 0 .9-.4 1.7-1 2.2V17l-9-3V8l9-3v3.8ZM5 14H4V8h5v6H8l1 5H6l-1-5Z" class="Primary" clip-rule="evenodd"/>
+    <path fill="#ffffff" d="M18 13v-2h4v2h-4Zm1.2 7L16 17.6l1.2-1.6 3.2 2.4-1.2 1.6Zm-2-12L16 6.4 19.2 4l1.2 1.6L17.2 8ZM5 19v-4H4c-.55 0-1.02-.196-1.413-.588A1.926 1.926 0 0 1 2 13v-2c0-.55.196-1.02.587-1.412A1.926 1.926 0 0 1 4 9h4l5-3v12l-5-3H7v4H5Zm9-3.65v-6.7c.45.4.813.887 1.088 1.463.275.575.412 1.204.412 1.887s-.137 1.313-.412 1.887A4.567 4.567 0 0 1 14 15.35Z" class="Primary"/>
   </g>
 </svg>

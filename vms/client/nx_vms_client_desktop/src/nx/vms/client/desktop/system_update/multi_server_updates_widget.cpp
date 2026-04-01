@@ -115,7 +115,7 @@ NX_DECLARE_COLORIZED_ICON(kDownloadIcon, "20x20/Outline/download.svg", kLight16T
 NX_DECLARE_COLORIZED_ICON(kSuccessIcon, "20x20/Outline/check.svg", kLight10Theme)
 NX_DECLARE_COLORIZED_ICON(kReloadIcon, "20x20/Outline/reload.svg", kLight16Theme)
 NX_DECLARE_COLORIZED_ICON(kSettingsIcon, "20x20/Outline/settings.svg", kLight16Theme)
-NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "40x40/Outline/update_checkmark.svg", kLight4Theme)
+NX_DECLARE_COLORIZED_ICON(kCheckmarkIcon, "other/40x40/Outline/update_checkmark.svg", kLight4Theme)
 
 // Adds resource list to message box
 QTableView* injectResourceList(

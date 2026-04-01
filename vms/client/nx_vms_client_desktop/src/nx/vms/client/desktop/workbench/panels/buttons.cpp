@@ -34,10 +34,10 @@ const core::SvgIconColorer::ThemeSubstitutions kSlideIconSubstitutions = {
     {QnIcon::Active, //< Hovered.
         {.primary = "light17", .secondary = "dark9"}}};
 
-NX_DECLARE_COLORIZED_ICON(kPinIcon, "12x32/Solid/panel_pin.svg", kSlideIconSubstitutions)
+NX_DECLARE_COLORIZED_ICON(kPinIcon, "other/12x32/Solid/panel_pin.svg", kSlideIconSubstitutions)
 NX_DECLARE_COLORIZED_ICON(kSlideIcon,
-    "12x32/Solid/panel_right.svg", kSlideIconSubstitutions,
-    "12x32/Solid/panel_left.svg", kSlideIconSubstitutions)
+    "other/12x32/Solid/panel_right.svg", kSlideIconSubstitutions,
+    "other/12x32/Solid/panel_left.svg", kSlideIconSubstitutions)
 } //namespace
 
 QnImageButtonWidget* newActionButton(

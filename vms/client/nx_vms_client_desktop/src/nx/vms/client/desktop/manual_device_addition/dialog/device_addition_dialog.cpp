@@ -59,7 +59,7 @@ core::SvgIconColorer::ThemeSubstitutions kPlaceholderTheme = {
 };
 
 NX_DECLARE_COLORIZED_ICON(kAddingDevicesPlaceholderIcon,
-    "256x256/Outline/adding_devices_placeholder.svg", kPlaceholderTheme)
+    "other/256x256/Outline/adding_devices_placeholder.svg", kPlaceholderTheme)
 
 } // namespace
 

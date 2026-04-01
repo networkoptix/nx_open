@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
   <g class="24x24/Outline/arrow_up_2px">
-    <path stroke="#B0B9C4" stroke-width="2" d="M18 14.5 12.5 9 7 14.5" class="Primary"/>
+    <path fill="#B0B9C4" d="M7.707 15.207a1 1 0 1 1-1.414-1.414L12.5 7.586l6.207 6.207a1 1 0 1 1-1.414 1.414L12.5 10.414l-4.793 4.793Z" class="Primary"/>
   </g>
 </svg>
