@@ -3555,7 +3555,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation>Camara Virtual %1</translation>
+      <translation>Cámara Virtual %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3717,7 +3717,7 @@ Clave de licencia: %2</translation>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation>
-        <numerusform>cerca de %n minutos</numerusform>
+        <numerusform>unos %n minutos</numerusform>
         <numerusform>unos %n minutos</numerusform>
       </translation>
     </message>
@@ -4180,7 +4180,7 @@ Clave de licencia: %2</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation>Para acceder a los detalles del certificado, habilite la función Audit Trail.</translation>
+      <translation>Para acceder a los detalles del certificado, habilite la función Registro de auditoria.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
