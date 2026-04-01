@@ -1533,10 +1533,6 @@
       <translation>オブジェクト</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>ライブ</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>該当なし</translation>
     </message>

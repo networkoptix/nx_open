@@ -1534,10 +1534,6 @@
       <translation>Objektumok</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>ÉLŐ</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

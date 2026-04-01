@@ -1533,10 +1533,6 @@
       <translation>วัตถุ</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>สด</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

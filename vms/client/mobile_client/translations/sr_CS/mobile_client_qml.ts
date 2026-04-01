@@ -1535,10 +1535,6 @@
       <translation type="unfinished">Objects</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

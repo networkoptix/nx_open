@@ -1534,10 +1534,6 @@
       <translation>Obxectos</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>EN DIRECTO</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>Sen resultados</translation>
     </message>

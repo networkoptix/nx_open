@@ -1534,10 +1534,6 @@
       <translation>Objekter</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>Ingen resultater</translation>
     </message>

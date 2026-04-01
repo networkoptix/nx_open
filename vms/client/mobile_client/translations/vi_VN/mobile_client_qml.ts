@@ -1533,10 +1533,6 @@
       <translation>Đối tượng</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>Trực tiếp</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

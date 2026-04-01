@@ -1533,10 +1533,6 @@
       <translation>物件</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>实时</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

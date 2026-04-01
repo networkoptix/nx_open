@@ -1534,10 +1534,6 @@
       <translation>Objectes</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>EN DIRECTE</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

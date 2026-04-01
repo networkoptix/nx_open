@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation>Połącz witryny...</translation>
+      <translation>Połącz serwery...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -1576,7 +1576,7 @@ Klucz licencyjny: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation>Połącz z witryną</translation>
+      <translation>Połącz z serwerem</translation>
     </message>
   </context>
   <context>
@@ -2752,7 +2752,7 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Obecnie nie ma połączenia pomiędzy Twoją witryną i %1.</translation>
+      <translation>Obecnie nie ma połączenia pomiędzy Twoim serwerem i %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
@@ -5117,7 +5117,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation>Połącz się ze swoją witryną z dowolnego miejsca!</translation>
+      <translation>Połącz się ze swoim serwerem z dowolnego miejsca!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
@@ -8025,27 +8025,27 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Witryna połączona z %1</translation>
+      <translation>Serwer połączono z %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Nie udało się połączyć witryny z %1</translation>
+      <translation>Nie udało się połączyć serwera z %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Połącz witrynę z %1</translation>
+      <translation>Połącz serwer z %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Połącz witrynę z %1?</translation>
+      <translation>Połącz serwer z %1?</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Wprowadź hasło do swojego konta, aby połączyć witrynę z %1</translation>
+      <translation>Wprowadź hasło do swojego konta, aby połączyć serwer z %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -8948,7 +8948,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation>Witryny zostaną wkrótce połączone</translation>
+      <translation>Serwery zostaną wkrótce połączone</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
@@ -8960,11 +8960,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation>Serwer zostanie wkrótce połączony z witryną</translation>
+      <translation>Serwer zostanie wkrótce połączony z systemem</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation>Nie udało się połączyć %1 z naszą witryną.</translation>
+      <translation>Nie udało się połączyć %1 z naszym systemem.</translation>
     </message>
   </context>
   <context>
@@ -9624,7 +9624,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation>Wprowadź hasło do swojego konta, aby połączyć witryny</translation>
+      <translation>Wprowadź hasło do swojego konta, aby połączyć systemy</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -9645,11 +9645,11 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation>Witryny zostaną wkrótce połączone</translation>
+      <translation>Systemy zostaną wkrótce połączone</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation>Nie udało się połączyć witryn</translation>
+      <translation>Nie udało się połączyć systemów</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9713,7 +9713,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>Wybrana witryna ma starszą wersję oprogramowania, która jest niezgodna z bieżącą witryną. Zaktualizuj wybraną witrynę do najnowszej kompilacji, aby połączyć ją z bieżącą.</translation>
+      <translation>Wybrany serwer ma starszą wersję oprogramowania, która jest niezgodna z bieżącym systemem. Zaktualizuj wybrany serwer do najnowszej kompilacji, aby połączyć go z bieżącym.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -9725,7 +9725,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation>Zamierzasz połączyć witryny z licencjami NVR.</translation>
+      <translation>Zamierzasz połączyć systemy z licencjami NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
@@ -9739,12 +9739,12 @@ Wydajność witryny jest obniżona.</translation>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Witrynę można połączyć tylko z witrynami innymi niż%1. Nazwa witryny i hasło pochodzą z witryny %1.</translation>
+      <translation>%1 Serwer można połączyć tylko z serwerami innymi niż%1. Nazwa serwera i hasło pochodzą z systemu %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Obie witryny są połączone z %1. Łączenie nie jest dozwolone.</translation>
+      <translation>Oba serwery są połączone z %1. Łączenie nie jest dozwolone.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
@@ -9753,7 +9753,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>Nie można połączyć witryn, ponieważ mają co najmniej jeden serwer o tym samym ID. Usuń ten serwer i spróbuj ponownie.</translation>
+      <translation>Nie można połączyć systemów, ponieważ mają co najmniej jeden serwer o tym samym ID. Usuń ten serwer i spróbuj ponownie.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
@@ -10212,7 +10212,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation>Domyślnej grupy LDAP nie można usunąć, dopóki witryna jest połączona z serwerem LDAP</translation>
+      <translation>Domyślnej grupy LDAP nie można usunąć, dopóki system jest połączony z serwerem LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>

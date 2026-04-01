@@ -1533,10 +1533,6 @@
       <translation>객체</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>실시간 뷰</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>결과가 없습니다</translation>
     </message>

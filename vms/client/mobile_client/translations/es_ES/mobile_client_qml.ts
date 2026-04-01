@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Feed</source>
-      <translation>Pantalla de noticias</translation>
+      <translation>Pantalla de monitoreo</translation>
     </message>
   </context>
   <context>
@@ -991,15 +991,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Sin dispositivos</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>No se encontraron dispositivos en este diseño</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>No se encontraron dispositivos en este sitio. Agregue dispositivos con el cliente de escritorio o solicite acceso a los dispositivos existentes</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -1532,10 +1532,6 @@
     <message>
       <source>Objects</source>
       <translation>Objetos</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>EN VIVO</translation>
     </message>
     <message>
       <source>No results</source>

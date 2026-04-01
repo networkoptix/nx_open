@@ -1534,10 +1534,6 @@
       <translation>Nesneler</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>CANLI</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation type="unfinished">No results</translation>
     </message>

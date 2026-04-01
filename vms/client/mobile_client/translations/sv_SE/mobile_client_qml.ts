@@ -1534,10 +1534,6 @@
       <translation>Objekt</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>Inga resultat</translation>
     </message>

@@ -1533,10 +1533,6 @@
       <translation>Objek</translation>
     </message>
     <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-    <message>
       <source>No results</source>
       <translation>Tidak ada hasil</translation>
     </message>
