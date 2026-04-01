@@ -364,7 +364,7 @@
     <name>FeedScreen</name>
     <message>
       <source>Feed</source>
-      <translation>Pantalla de noticias</translation>
+      <translation>Pantalla de monitoreo</translation>
     </message>
     <message>
       <source>Notifications Off</source>
