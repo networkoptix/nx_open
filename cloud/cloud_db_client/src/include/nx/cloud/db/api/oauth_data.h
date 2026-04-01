@@ -70,10 +70,17 @@ struct IssueTokenRequest
      * <pre>grant_type=sso_tokens</pre>
      */
     std::optional<std::string> access_token;
+
+    /**%apidoc If true, the refresh token used in the request will be revoked and a new refresh
+     * token will be issued. Can only be set to true with <pre>grant_type=refresh_token</pre>.
+     * Default value is false.
+     */
+    bool update_refresh_token = false;
 };
 
 NX_REFLECTION_INSTRUMENT(IssueTokenRequest, (grant_type)(response_type)(client_id)(scope) \
-    (password)(username)(refresh_token)(code)(refresh_token_lifetime)(access_token))
+    (password)(username)(refresh_token)(code)(refresh_token_lifetime)(access_token) \
+    (update_refresh_token))
 
 struct IssuePasswordResetCodeRequest
 {
