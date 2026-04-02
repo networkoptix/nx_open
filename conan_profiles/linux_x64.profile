@@ -12,7 +12,7 @@ qt/*:mysql=True
 qt/*:psql=True
 
 [tool_requires]
-opencv-static/*:cuda-toolkit/12.5.1
+opencv-static/*:cuda-toolkit/12.8.1
 
 [conf]
 icu/*:tools.build:exelinkflags=["-static-libstdc++", "-static-libgcc"]

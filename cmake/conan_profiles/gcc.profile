@@ -4,5 +4,5 @@
 # same dependency with revision, the revision is ignored by Conan. However another profile can
 # request a certain revision for a dependency. This is a profile to work-around the issue for
 # gcc-toolchain dependency.
-[build_requires]
-gcc-toolchain/13.3#4934f8197fb3e1d7812bd951b1cbae85
+[tool_requires]
+gcc-toolchain/13.3#54cc3c576f5d9f324caaf23152b4074e

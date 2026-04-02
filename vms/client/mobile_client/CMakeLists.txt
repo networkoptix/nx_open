@@ -9,19 +9,23 @@ set(artifacts_dir ${CMAKE_CURRENT_SOURCE_DIR}/../../../artifacts)
 include(push_notification_settings.cmake)
 
 function(get_android_extra_libs result)
-    list(GET OpenSSL_LIB_DIRS 0 openssl_lib_dir)
+    # Conan v2 CMakeDeps generates per-config variables (e.g. openssl_LIB_DIRS_RELWITHDEBINFO).
+    # Use the current cmake build type to pick the right variant.
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" _config)
+
+    set(openssl_lib_dir "${openssl_LIB_DIRS_${_config}}")
     set(openssl_libs
         ${openssl_lib_dir}/libcrypto.so
         ${openssl_lib_dir}/libssl.so
     )
 
-    list(GET ffmpeg_LIB_DIRS 0 ffmpeg_lib_dir)
+    set(ffmpeg_lib_dir "${ffmpeg_LIB_DIRS_${_config}}")
     set(ffmpeg_libs "")
-    foreach(lib ${ffmpeg_LIBRARY_LIST})
+    foreach(lib ${ffmpeg_LIBS_${_config}})
         list(APPEND ffmpeg_libs "${ffmpeg_lib_dir}/lib${lib}.so")
     endforeach()
 
-    list(GET openal_LIB_DIRS 0 openal_lib_dir)
+    set(openal_lib_dir "${openal_LIB_DIRS_${_config}}")
     set(openal_libs ${openal_lib_dir}/libopenal.so)
 
     set(quazip_libs "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/libquazip.so")

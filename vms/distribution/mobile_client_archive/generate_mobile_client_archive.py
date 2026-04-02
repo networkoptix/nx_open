@@ -146,7 +146,6 @@ def create_mobile_client_archive(config, output_file):
         zip.write(distribution_output_dir / 'build_info.txt', 'metadata/build_info.txt')
         zip.write(distribution_output_dir / 'build_info.json', 'metadata/build_info.json')
         zip.write(distribution_output_dir / 'conan_refs.txt', 'metadata/conan_refs.txt')
-        zip.write(distribution_output_dir / 'conan.lock', 'metadata/conan.lock')
 
 
 def main():

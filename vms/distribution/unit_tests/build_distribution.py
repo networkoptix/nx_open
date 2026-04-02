@@ -208,7 +208,7 @@ def main():
             a,
             target_dir=join(bin_dir, "metadata"),
             source_dir=distrib_dir,
-            file_list=["build_info.txt", "build_info.json", "conan_refs.txt", "conan.lock"])
+            file_list=["build_info.txt", "build_info.json", "conan_refs.txt"])
 
 
         if not isMac:

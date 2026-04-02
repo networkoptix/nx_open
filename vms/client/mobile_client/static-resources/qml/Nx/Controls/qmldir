@@ -14,7 +14,6 @@ LabeledSwitch 1.0 LabeledSwitch.qml
 StackView 1.0 StackView.qml
 ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml
-PageTitleLabel 1.0 PageTitleLabel.qml
 Page 1.0 Page.qml
 Menu 1.0 Menu.qml
 MenuItem 1.0 MenuItem.qml

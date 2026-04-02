@@ -2,6 +2,7 @@
 
 from conan.errors import ConanException
 from conan.tools.build import cross_building
+from conan.tools.cmake import CMakeDeps
 from conan.tools.files import save
 from conan.tools.system.package_manager import Apt
 from conan import ConanFile
@@ -44,7 +45,7 @@ def generate_conan_package_paths(conanfile):
 
 
 def generate_conan_package_refs(conanfile):
-    refs = [package.pref.full_str() \
+    refs = [package.pref.repr_notime() \
         for _, package in chain(
                 conanfile.dependencies.build.items(),
                 conanfile.dependencies.host.items())]
@@ -55,14 +56,14 @@ def generate_conan_package_refs(conanfile):
 class NxOpenConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
-    generators = "cmake_find_package", "virtualrunenv"
+    generators = "VirtualRunEnv"
 
     options = {
-        "targetDevice": "ANY",
-        "useClang": (True, False),
-        "customization": "ANY",
-        "installRuntimeDependencies": (True, False),
-        "withAnalyticsServer": (True, False),
+        "targetDevice": ["ANY"],
+        "useClang": [True, False],
+        "customization": ["ANY"],
+        "installRuntimeDependencies": [True, False],
+        "withAnalyticsServer": [True, False],
     }
     default_options = {
         "targetDevice": None,
@@ -70,8 +71,8 @@ class NxOpenConan(ConanFile):
         "customization": "metavms",
         "installRuntimeDependencies": True,
         "withAnalyticsServer": True,
-        "quick_start_guide:format": "pdf",
-        "mobile_user_manual:format": "pdf",
+        "quick_start_guide/*:format": "pdf",
+        "mobile_user_manual/*:format": "pdf",
     }
 
     ffmpeg_version_and_revision = "7.0.1#4ee6d2767776b078b672f2e7dade8aa3"
@@ -82,13 +83,42 @@ class NxOpenConan(ConanFile):
     )
 
     def configure(self):
-        self.options["vms_help"].customization = "metavms"
-        self.options["quick_start_guide"].customization = "metavms"
-        self.options["mobile_user_manual"].customization = "metavms"
+        self.options["vms_help"].customization = self.options.customization
+        self.options["quick_start_guide"].customization = self.options.customization
+        self.options["mobile_user_manual"].customization = self.options.customization
 
     def generate(self):
+        deps = CMakeDeps(self)
+        # Override cmake_file_name for packages whose Conan name doesn't match
+        # what the codebase uses in find_package() calls.
+        deps.set_property("ffmpeg", "cmake_file_name", "ffmpeg")
+        deps.set_property("cpptrace", "cmake_file_name", "CPPTRACE")
+        deps.set_property("cpptrace", "cmake_target_name", "CPPTRACE::CPPTRACE")
+        deps.set_property("libdatachannel", "cmake_file_name", "libdatachannel")
+        deps.set_property("rapidjson", "cmake_target_name", "RapidJSON::RapidJSON")
+        deps.set_property("jinja2cpp", "cmake_target_name", "jinja2cpp::jinja2cpp")
+        deps.set_property("openssl", "cmake_target_name", "OpenSSL::OpenSSL")
+        deps.set_property("openssl", "cmake_file_name", "OpenSSL")
+        deps.set_property("cudnn", "cmake_target_name", "cuDNN::cuDNN")
+        deps.set_property("opencv-static", "cmake_target_name", "opencv-static::opencv-static")
+        # Map opencv component names: opencv_X -> opencv-static::X
+        for comp in ("imgcodecs", "video", "core", "cudev", "flann", "imgproc", "ml",
+                      "dnn", "features2d", "photo", "cudawarping", "calib3d",
+                      "videoio", "highgui", "objdetect", "stitching"):
+            deps.set_property(f"opencv-static::opencv_{comp}",
+                              "cmake_target_name", f"opencv-static::{comp}")
+        # Conan packages may be built with a different build_type than the CMake project
+        # (e.g. Release on Linux, RelWithDebInfo on Windows/Android). Generate cmake
+        # integration for all configurations so that targets are not restricted to a single
+        # configuration via generator expressions.
+        for config in ("Debug", "Release", "RelWithDebInfo"):
+            deps.configuration = config
+            deps.generate()
+
         generate_conan_package_paths(self)
         generate_conan_package_refs(self)
+
+        self.imports()
 
     @staticmethod
     def read_deb_dependencies(dependencies_list_file):
@@ -112,7 +142,7 @@ class NxOpenConan(ConanFile):
         if cross_building(self):
             # System requirements installation does not work properly in Conan 1.x for cross
             # builds.
-            self.output.warn("-DinstallSystemRequirements=ON is ignored for cross builds.")
+            self.output.warning("-DinstallSystemRequirements=ON is ignored for cross builds.")
             return
 
         plain_deps = [dep for dep in packages if isinstance(dep, str)]
@@ -146,31 +176,38 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.build_requires("apidoctool/3.0" "#483c5073667ee722756e0ca31e18972a")
-        self.build_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
-        self.build_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
+        self.tool_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
+        self.tool_requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
+        self.tool_requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
+        self.tool_requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
+        self.tool_requires("openssl/1.1.1q" "#389fdbabc290c55ab79fee03761f20dd")
+
+        if not self.isEmscripten:
+            self.tool_requires("apidoctool/3.0" "#02ae3ddf972d89e3bcff43e0f35926d9")
+            self.tool_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
+            self.tool_requires("breakpad-tools/2024.02.16" "#0327f836a8727dc7bd456fee67f78645")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.build_requires("clang/20.1.2" "#bc083c5c0eedbdf254af2744d261f9c8")
-                self.build_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
+                self.tool_requires("clang/20.1.2" "#bc083c5c0eedbdf254af2744d261f9c8")
+                self.tool_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
             if self.isLinux:
-                self.build_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
+                self.tool_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
 
         if self.isWindows:
-            self.build_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
+            self.tool_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            self.build_requires("doxygen/1.8.14" "#e4d349d41cd2ea37812b3f284bd88784")
+            self.tool_requires("doxygen/1.8.14" "#e4d349d41cd2ea37812b3f284bd88784")
 
         if self.isAndroid:
-            self.build_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
+            self.tool_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
             if "ANDROID_HOME" not in os.environ:
-                self.build_requires("AndroidSDK/34" "#eea6103b2dcc6cd808d0e8c2ee512bf9")
+                self.tool_requires("android-sdk/34" "#e304daf9254e7af886b5e153714c5a79")
             if "ANDROID_NDK" not in os.environ:
-                self.build_requires("AndroidNDK/r26d" "#0ae8a952a8b231f98f2f7f2d61fd249a")
-        else:
+                self.tool_requires("android-ndk/r29" "#8b725cb46c0e050cf2e168084e7b99fa")
+        elif not self.isEmscripten:
             # Java runtime for apidoctool.
             self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
 
@@ -259,18 +296,24 @@ class NxOpenConan(ConanFile):
             self.requires("quick_start_guide/" + QUICK_START_GUIDE_VERSION)
             self.requires("mobile_user_manual/" + MOBILE_USER_MANUAL_VERSION)
 
+    def _dep_names(self):
+        """Return set of dependency package names (Conan v2 API)."""
+        return {dep.ref.name for _, dep in chain(
+            self.dependencies.host.items(),
+            self.dependencies.build.items())}
+
     def prepare_pkg_config_files(self):
         if self.isLinux:
-            pc_files_dir = Path(self.install_folder) / "os_deps_pkg_config"
+            pc_files_dir = Path(self.generators_folder) / "os_deps_pkg_config"
             self.python_requires["os_deps_activator"].module.activate_pkg_config(
                 self, pc_files_dir=pc_files_dir)
 
     def import_files_from_package(self, package, src, dst, glob):
-        if package not in self.deps_cpp_info.deps:
+        if package not in self._dep_names():
             return
 
-        src_dir = Path(self.deps_cpp_info[package].rootpath) / src
-        dst_dir = Path(self.install_folder) / dst
+        src_dir = Path(self.dependencies[package].package_folder) / src
+        dst_dir = Path(self.generators_folder) / dst
 
         for file in src_dir.glob(glob):
             if not file.is_dir():
@@ -300,7 +343,7 @@ class NxOpenConan(ConanFile):
 
         self.fixLibraryPermissions()
 
-        with open(Path(self.install_folder) / "conan_imported_files.txt", "w") as file:
+        with open(Path(self.generators_folder) / "conan_imported_files.txt", "w") as file:
             for dst, src in self.__imported_files.items():
                 file.write(f"{dst}: {src}\n")
 
@@ -317,7 +360,7 @@ class NxOpenConan(ConanFile):
 
         self.import_files_from_package("roboto-fonts", ".", "bin/fonts", "*.ttf")
 
-        if "vms_help" in list(self.requires):
+        if "vms_help" in self._dep_names():
             self.import_files_from_package("vms_help", "help", "bin/help", "**/*")
 
         self.import_package("openssl")
@@ -401,8 +444,12 @@ class NxOpenConan(ConanFile):
         return self.settings.os == "iOS"
 
     @property
+    def isEmscripten(self):
+        return self.settings.os == "Emscripten"
+
+    @property
     def haveMediaserver(self):
-        return not (self.isAndroid or self.isIos)
+        return not (self.isAndroid or self.isIos or self.isEmscripten)
 
     @property
     def haveDesktopClient(self):
@@ -419,4 +466,4 @@ class NxOpenConan(ConanFile):
 
     @property
     def _lib_path(self):
-        return Path(self.install_folder) / "lib"
+        return Path(self.generators_folder) / "lib"

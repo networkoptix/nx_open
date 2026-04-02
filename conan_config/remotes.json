@@ -1,0 +1,9 @@
+{
+    "remotes": [
+        {
+            "name": "nx",
+            "url": "@conanNxRemote@",
+            "verify_ssl": true
+        }
+    ]
+}

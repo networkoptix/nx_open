@@ -69,7 +69,7 @@ nx_load_customization_package()
 include(cmake/distribution/flavors.cmake)
 nx_init_distribution_flavor_list()
 
-set(conanNxRemote "${artifactoryUrl}/api/conan/conan"
+set(conanNxRemote "${artifactoryUrl}/api/conan/conan2-open"
     CACHE INTERNAL "The URL of Conan remote containing packages needed for the build.")
 include(cmake/conan_dependencies.cmake)
 
