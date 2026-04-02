@@ -11,10 +11,8 @@
 
 #include "merge_system_requests.h"
 
-namespace nx::vms::client::core {
-class AbstractRemoteConnectionUserInteractionDelegate;
-class CertificateVerifier;
-} // namespace nx::vms::client::core
+namespace nx::vms::client::core { class AbstractRemoteConnectionUserInteractionDelegate; }
+namespace nx::vms::common { class AbstractCertificateVerifier; }
 
 namespace nx::vms::client::desktop {
 
@@ -38,7 +36,7 @@ class MergeSystemsTool: public QObject
     Q_OBJECT
 
 public:
-    using CertificateVerifier = nx::vms::client::core::CertificateVerifier;
+    using CertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
     using Delegate = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;
 
 public:

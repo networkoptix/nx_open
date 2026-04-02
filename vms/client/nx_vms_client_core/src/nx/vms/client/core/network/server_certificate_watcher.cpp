@@ -7,8 +7,10 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
 
+#include "certificate_cache.h"
 #include "certificate_verifier.h"
 
 namespace {
@@ -28,7 +30,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
     SystemContextAware(systemContext)
 {
     auto pinCertificates =
-        [certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
+        [this, certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
             const QnMediaServerResourcePtr& server)
         {
             if (!NX_ASSERT(certificateVerifier))
@@ -41,7 +43,7 @@ ServerCertificateWatcher::ServerCertificateWatcher(
             using namespace nx::network::ssl;
 
             auto updateKey =
-                [certificateVerifier, serverId = server->getId()](
+                [this, certificateVerifier, serverId = server->getId()](
                     const std::string& pem,
                     CertificateVerifier::CertificateType certType)
                 {
@@ -52,10 +54,20 @@ ServerCertificateWatcher::ServerCertificateWatcher(
                     if (certificates.empty())
                         return;
 
-                    const auto key = certificates[0].publicKey();
+                    const auto publicKey = certificates[0].publicKey();
 
                     // Update cached certificate and pin it if possible.
-                    certificateVerifier->updateCertificate(serverId, key, certType);
+                    auto cache = this->cache();
+                    if (!NX_ASSERT(cache))
+                        return;
+
+                    auto cached = cache->certificate(serverId, certType);
+                    auto pinned = certificateVerifier->pinnedCertificate(serverId, certType);
+
+                    if (cached == pinned)
+                        certificateVerifier->pinCertificate(serverId, publicKey, certType);
+
+                    cache->addCertificate(serverId, publicKey, certType);
                 };
             updateKey(
                 server->certificate(),
@@ -63,16 +75,6 @@ ServerCertificateWatcher::ServerCertificateWatcher(
             updateKey(
                 server->userProvidedCertificate(),
                 CertificateVerifier::CertificateType::connection);
-        };
-
-    auto removeCertificatesFromCache =
-        [certificateVerifier = QPointer<CertificateVerifier>(certificateVerifier)](
-            const QnMediaServerResourcePtr& server)
-        {
-            if (!NX_ASSERT(certificateVerifier))
-                return;
-
-            certificateVerifier->removeCertificatesFromCache(server->getId());
         };
 
     auto serverListener = new SessionResourcesSignalListener<QnMediaServerResource>(
@@ -91,13 +93,24 @@ ServerCertificateWatcher::ServerCertificateWatcher(
         pinCertificates);
 
     serverListener->setOnRemovedHandler(
-        [removeCertificatesFromCache](const QnMediaServerResourceList& servers)
+        [this](const QnMediaServerResourceList& servers)
         {
-            for (const auto& server: servers)
-                removeCertificatesFromCache(server);
+            if (auto cache = this->cache())
+            {
+                for (const auto& server: servers)
+                    cache->removeCertificates(server->getId());
+            }
         });
 
     serverListener->start();
+}
+
+std::shared_ptr<CertificateCache> ServerCertificateWatcher::cache() const
+{
+    if (auto connection = this->connection())
+        return connection->certificateCache();
+
+    return {};
 }
 
 } // namespace nx::vms::client::core

@@ -35,7 +35,6 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/data_loaders/caching_camera_data_loader.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
@@ -56,6 +55,7 @@
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_state.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -1707,7 +1707,7 @@ ActionVisibility ReachableServerCondition::check(
     if (!server)
         return InvisibleAction;
 
-    const auto currentSession = appContext()->networkModule()->session();
+    const auto currentSession = context->system()->session();
 
     if (!currentSession || server->getId() == currentSession->connection()->moduleInformation().id)
         return InvisibleAction;

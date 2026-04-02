@@ -13,8 +13,6 @@
 
 namespace nx::vms::client::core {
 
-class CloudConnectionFactory;
-
  /**
   * Encapsulates connection, timer and time constants for refreshing cloud access tokens.
   *
@@ -49,7 +47,6 @@ signals:
     void sessionTokenExpiring();
 
 private:
-    std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
     QTimer* m_timer = nullptr;
     nx::utils::DeadlineTimer m_expirationTimer; //< Countdown timer to the token update request.

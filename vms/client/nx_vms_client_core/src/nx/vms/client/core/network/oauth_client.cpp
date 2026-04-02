@@ -11,12 +11,13 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/reflect/to_string.h>
-#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 
 namespace nx::vms::client::core {
@@ -38,7 +39,6 @@ struct OauthClient::Private: public QObject
     CloudTokens cloudTokens;
     QString systemName;
     std::unique_ptr<Connection> m_connection;
-    std::unique_ptr<CloudConnectionFactory> m_cloudConnectionFactory;
 
     Private(
         OauthClient* q,
@@ -63,14 +63,13 @@ OauthClient::Private::Private(
     clientType(clientType),
     viewType(viewType),
     cloudSystem(cloudSystem),
-    refreshTokenLifetime(refreshTokenLifetime),
-    m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>())
+    refreshTokenLifetime(refreshTokenLifetime)
 {
 }
 
 void OauthClient::Private::issueAccessToken()
 {
-    m_connection = m_cloudConnectionFactory->createConnection();
+    m_connection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
     if (!NX_ASSERT(m_connection))
     {
         emit q->cancelled();
@@ -117,7 +116,7 @@ void OauthClient::Private::issueAccessToken()
 
 void OauthClient::Private::issueTokensWithoutScope()
 {
-    m_connection = m_cloudConnectionFactory->createConnection();
+    m_connection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
     if (!NX_ASSERT(m_connection))
     {
         emit q->cancelled();

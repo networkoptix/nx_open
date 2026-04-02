@@ -15,7 +15,7 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/thread_affinity_deleter.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/certificate_cache.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/common/system_context.h>

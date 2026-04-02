@@ -301,6 +301,8 @@ SystemContext::SystemContext(WindowContext* context,
 
 SystemContext::~SystemContext()
 {
+    appContext()->networkModule()->connectionFactory()->setUserInteractionDelegate({});
+
     if (d->thumbnailProvider)
         d->thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
 

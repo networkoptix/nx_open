@@ -9,6 +9,7 @@
 
 namespace nx::vms::client::core {
 
+class CertificateCache;
 class CertificateVerifier;
 
 /**
@@ -26,6 +27,9 @@ public:
         SystemContext* systemContext,
         CertificateVerifier* certificateVerifier,
         QObject* parent = nullptr);
+
+private:
+    std::shared_ptr<CertificateCache> cache() const;
 };
 
 } // namespace nx::vms::client::core

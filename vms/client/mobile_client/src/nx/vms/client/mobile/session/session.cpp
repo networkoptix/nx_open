@@ -393,7 +393,6 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
             executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
         });
 
-    core::appContext()->networkModule()->setSession(session);
     q->systemContext()->setSession(session);
 
     const auto userName = QString::fromStdString(connection->credentials().username);
@@ -427,7 +426,6 @@ void Session::Private::resetCurrentConnection()
 {
     core::RemoteConnectionFactory::destroyAsync(std::move(m_connectionProcess));
     q->systemContext()->setSession({});
-    core::appContext()->networkModule()->setSession({});
 
     updateConnectionState();
 }
@@ -861,7 +859,7 @@ Session::~Session()
 {
     NX_DEBUG(this, "~Session(): start: destroying session");
 
-    if (const auto remoteSession = core::appContext()->networkModule()->session())
+    if (const auto remoteSession = systemContext()->session())
     {
         const auto& localSystemId = d->localSystemId();
         const auto& userName = d->logonData().credentials.username;

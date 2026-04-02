@@ -171,6 +171,8 @@ public:
     /** Message processor, cast to actual class. */
     QnClientMessageProcessor* clientMessageProcessor() const;
 
+    virtual nx::vms::common::AbstractCertificateVerifier* certificateVerifier() const override;
+
     QnPtzControllerPool* ptzControllerPool() const;
 
     UserWatcher* userWatcher() const;

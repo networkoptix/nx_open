@@ -19,6 +19,7 @@ using AdapterFunc = std::function<std::unique_ptr<nx::network::AbstractEncrypted
 
 NX_NETWORK_API extern const AdapterFunc kDefaultCertificateCheck;
 NX_NETWORK_API extern const AdapterFunc kAcceptAnyCertificate;
+NX_NETWORK_API extern const AdapterFunc kRejectAnyCertificate;
 
 } // namespace ssl
 

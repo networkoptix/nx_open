@@ -118,18 +118,9 @@ public:
     virtual nx::Uuid auditId() const;
 
     /**
-     * Enable network-related functionality. Can be disabled in unit tests.
-     */
-    void enableNetworking(AbstractCertificateVerifier* certificateVerifier);
-
-    /**
      * Interface to create SSL certificate validation functors.
      */
-    template<typename CertificateVerifierType = AbstractCertificateVerifier>
-    CertificateVerifierType* certificateVerifier() const
-    {
-        return dynamic_cast<CertificateVerifierType*>(verifier());
-    }
+    virtual AbstractCertificateVerifier* certificateVerifier() const;
 
     /**
      * Start checking what VMS Server network interfaces are accessible.
@@ -285,9 +276,6 @@ protected:
 
 signals:
     void credentialsChanged();
-
-private:
-    AbstractCertificateVerifier* verifier() const;
 
 private:
     struct Private;

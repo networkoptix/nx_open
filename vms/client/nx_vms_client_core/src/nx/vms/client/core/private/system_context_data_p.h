@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
+#include <nx/vms/client/core/network/server_certificate_watcher.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
@@ -45,6 +46,7 @@ struct SystemContext::Private
     mutable std::unique_ptr<QnPtzControllerPool> ptzControllerPool;
     std::unique_ptr<UserWatcher> userWatcher;
     std::unique_ptr<WatermarkWatcher> watermarkWatcher;
+    std::unique_ptr<ServerCertificateWatcher> serverCertificateWatcher;
     std::unique_ptr<ServerTimeWatcher> serverTimeWatcher;
     std::unique_ptr<QnServerStorageManager> serverStorageManager;
     std::unique_ptr<ServerRuntimeEventConnector> serverRuntimeEventConnector;

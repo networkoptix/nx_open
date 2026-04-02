@@ -12,7 +12,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/certificate_cache.h>
 #include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>

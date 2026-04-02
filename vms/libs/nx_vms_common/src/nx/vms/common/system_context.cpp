@@ -104,21 +104,9 @@ nx::Uuid SystemContext::auditId() const
     return {};
 }
 
-void SystemContext::enableNetworking(AbstractCertificateVerifier* certificateVerifier)
+AbstractCertificateVerifier* SystemContext::certificateVerifier() const
 {
-    d->certificateVerifier = certificateVerifier;
-    // TODO: #sivanov Uncomment this code when destruction order will be fixed in both desktop and
-    // mobile clients and a server (most probably when NetworkModule class will be cleaned up).
-    //if (certificateVerifier)
-    //{
-    //    connect(certificateVerifier, &QObject::destroyed, this,
-    //        [this]() { NX_ASSERT(false, "Invalid destruction order"); });
-    //}
-}
-
-AbstractCertificateVerifier* SystemContext::verifier() const
-{
-    return d->certificateVerifier;
+    return nullptr;
 }
 
 void SystemContext::startModuleDiscovery(nx::vms::discovery::Manager* moduleDiscoveryManager)

@@ -26,6 +26,7 @@
 #include <nx/vms/api/data/global_permission_deprecated.h>
 #include <nx/vms/api/data/server_model.h>
 #include <nx/vms/api/data/user_data_deprecated.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
@@ -34,6 +35,7 @@
 #include "../certificate_verifier.h"
 #include "../cloud_connection_factory.h"
 #include "../network_manager.h"
+#include "../network_module.h"
 
 using namespace ec2;
 using namespace nx::network::http;
@@ -180,8 +182,6 @@ using Request = std::unique_ptr<AsyncClient>;
 struct RemoteConnectionFactoryRequestsManager::Private
 {
     QPointer<CertificateVerifier> certificateVerifier;
-    std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory
-        = std::make_unique<CloudConnectionFactory>();
     mutable std::unique_ptr<nx::cloud::db::api::Connection> cloudConnection;
     mutable nx::Mutex cloudConnectionMutex;
     std::unique_ptr<NetworkManager> networkManager = std::make_unique<NetworkManager>();
@@ -192,7 +192,7 @@ struct RemoteConnectionFactoryRequestsManager::Private
         if (cloudConnection)
             return true;
 
-        cloudConnection = cloudConnectionFactory->createConnection();
+        cloudConnection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
         return (bool) cloudConnection;
     }
 

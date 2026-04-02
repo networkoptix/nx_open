@@ -23,11 +23,10 @@ class RemoteSession;
  * Ensures certificate can be used to establish connection. User interaction requested if needed,
  * confirmed certificates are pinned.
  */
-class NX_VMS_CLIENT_CORE_API CertificateVerifier:
-    public nx::vms::common::AbstractCertificateVerifier
+class NX_VMS_CLIENT_CORE_API CertificateVerifier: public QObject
 {
     Q_OBJECT
-    using base_type = nx::vms::common::AbstractCertificateVerifier;
+    using base_type = QObject;
 
 public:
     enum class CertificateType
@@ -61,7 +60,7 @@ public:
      * Create AdapterFunc that accepts only certificates with matching public key. This function
      * is intended to be used when establishing a connection.
      */
-    nx::network::ssl::AdapterFunc makeRestrictedAdapterFunc(const std::string& expectedKey);
+    static nx::network::ssl::AdapterFunc makeRestrictedAdapterFunc(const std::string& expectedKey);
 
     /**
      * Create AdapterFunc that first attempts to perform a system certificate check and if it fails,
@@ -70,12 +69,6 @@ public:
      */
     nx::network::ssl::AdapterFunc makeGeneralAdapterFunc(
         const std::string& expectedKey, const std::string& expectedHost);
-
-    /**
-     * Create AdapterFunc that uses the active connection certificate cache.
-     */
-    virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const nx::Uuid& serverId, const nx::Url& url = {}) override;
 
     /**
      * Check certificate chain using certificate keys in persistent storage.
@@ -99,53 +92,9 @@ public:
         const nx::Uuid& serverId,
         CertificateType certType);
 
-    /**
-     * Updates cached certificate in memory. If the cached certificate matched a pinned certificate
-     * of the server before the call, updates the pinned certificate too.
-     */
-    void updateCertificate(
-        const nx::Uuid& serverId,
-        const std::string& publicKey,
-        CertificateType certType);
-
-    void removeCertificatesFromCache(const nx::Uuid& serverId);
-
-    void setSession(std::weak_ptr<RemoteSession> session);
-
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
-};
-
-/**
- * Per-session certificate cache.
- */
-class CertificateCache: public nx::vms::common::AbstractCertificateVerifier
-{
-    Q_OBJECT
-    using base_type = nx::vms::common::AbstractCertificateVerifier;
-
-public:
-    CertificateCache(QObject* parent = nullptr);
-    virtual ~CertificateCache() override;
-
-    void addCertificate(
-        const nx::Uuid& serverId,
-        const std::string& publicKey,
-        CertificateVerifier::CertificateType certType);
-
-    std::optional<std::string> certificate(
-        const nx::Uuid& serverId,
-        CertificateVerifier::CertificateType certType) const;
-
-    void removeCertificates(const nx::Uuid& serverId);
-
-    virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
-        const nx::Uuid& serverId, const nx::Url& url = {}) override;
-
-private:
-    struct Private;
-    std::shared_ptr<Private> d;
 };
 
 } // namespace nx::vms::client::core

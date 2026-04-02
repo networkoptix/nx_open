@@ -22,7 +22,7 @@ class NX_VMS_COMMON_API AbstractCertificateVerifier: public QObject
 {
 public:
     AbstractCertificateVerifier(QObject* parent = nullptr);
-    virtual ~AbstractCertificateVerifier();
+    virtual ~AbstractCertificateVerifier() override;
 
     virtual nx::network::ssl::AdapterFunc makeAdapterFunc(
         const nx::Uuid& serverId, const nx::Url& url) = 0;
@@ -41,8 +41,7 @@ public:
         return makeAdapterFunc(route.gatewayId.isNull() ? route.id : route.gatewayId, route.addr);
     }
 
-protected:
-    void loadTrustedCertificate(const QByteArray& data, const QString& name);
+    static void loadTrustedCertificate(const QByteArray& data, const QString& name);
 };
 
 } // nx::vms::common

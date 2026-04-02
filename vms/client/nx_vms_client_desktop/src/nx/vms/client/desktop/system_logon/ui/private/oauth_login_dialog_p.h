@@ -17,7 +17,6 @@ namespace nx::cloud::db::api { class Connection; }
 
 namespace nx::vms::client::core {
 
-class CloudConnectionFactory;
 class OauthClient;
 
 } // namespace nx::vms::client::core

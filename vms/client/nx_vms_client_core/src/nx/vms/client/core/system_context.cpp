@@ -16,7 +16,7 @@
 #include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/certificate_cache.h>
 #include <nx/vms/client/core/rules/client_router.h>
 #include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/utils/video_cache.h>
@@ -58,6 +58,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->cameraDataManager = std::make_unique<CameraDataManager>(this);
             d->userWatcher = std::make_unique<UserWatcher>(this);
             d->watermarkWatcher = std::make_unique<WatermarkWatcher>(this);
+            d->serverCertificateWatcher = std::make_unique<ServerCertificateWatcher>(
+                this, appContext()->networkModule()->certificateVerifier());
             d->serverStorageManager = std::make_unique<QnServerStorageManager>(this);
             d->vmsRulesEngineHolder = std::make_unique<nx::vms::rules::EngineHolder>(
                 this,
@@ -151,6 +153,10 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
         // Make sure existing session will be terminated outside of the mutex.
         std::swap(d->session, session);
     }
+
+    if (session)
+        session->close();
+
     if (d->session && d->sessionTimeoutWatcher)
         d->sessionTimeoutWatcher->sessionStarted(d->session);
 
@@ -246,6 +252,14 @@ ec2::AbstractECConnectionPtr SystemContext::messageBusConnection() const
 QnClientMessageProcessor* SystemContext::clientMessageProcessor() const
 {
     return static_cast<QnClientMessageProcessor*>(this->messageProcessor());
+}
+
+nx::vms::common::AbstractCertificateVerifier* SystemContext::certificateVerifier() const
+{
+    if (auto connection = this->connection())
+        return connection->certificateCache().get();
+
+    return nullptr;
 }
 
 QnPtzControllerPool* SystemContext::ptzControllerPool() const

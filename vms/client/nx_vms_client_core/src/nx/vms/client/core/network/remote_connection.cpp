@@ -11,12 +11,11 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/ec2/base_ec2_connection.h>
-#include <nx_ec/abstract_ec_connection_factory.h>
 #include <transaction/json_transaction_serializer.h>
 #include <transaction/threadsafe_message_bus_adapter.h>
 #include <transaction/ubjson_transaction_serializer.h>
 
-#include "certificate_verifier.h"
+#include "certificate_cache.h"
 #include "query_processor.h"
 #include "time_sync_manager.h"
 

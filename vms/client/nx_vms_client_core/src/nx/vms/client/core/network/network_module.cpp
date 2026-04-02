@@ -15,13 +15,10 @@
 
 #include "certificate_storage.h"
 #include "certificate_verifier.h"
+#include "cloud_connection_factory.h"
 #include "cloud_status_watcher.h"
 #include "private/remote_connection_factory_requests.h"
-#include "remote_connection.h"
 #include "remote_connection_factory.h"
-#include "remote_session.h"
-#include "remote_session_timeout_watcher.h"
-#include "server_certificate_watcher.h"
 
 namespace nx::vms::client::core {
 
@@ -35,10 +32,7 @@ struct NetworkModule::Private
 
     std::unique_ptr<CertificateVerifier> certificateVerifier;
     std::unique_ptr<RemoteConnectionFactory> connectionFactory;
-    std::unique_ptr<ServerCertificateWatcher> serverCertificateWatcher;
-    std::shared_ptr<RemoteSession> session;
-
-    QPointer<SystemContext> mainSystemContext;
+    std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory;
 
     mutable nx::Mutex mutex;
 };
@@ -85,87 +79,26 @@ NetworkModule::NetworkModule(
         appContext()->localPeerType(),
         appContext()->serializationFormat());
 
-    connect(appContext(),
-        &ApplicationContext::systemContextAdded,
-        [this](SystemContext* systemContext)
-        {
-            if ((systemContext->mode() != SystemContext::Mode::client
-                && systemContext->mode() != SystemContext::Mode::unitTests)
-                    || !NX_ASSERT(!d->mainSystemContext))
-            {
-                return;
-            }
-
-            d->mainSystemContext = systemContext;
-
-            systemContext->enableNetworking(d->certificateVerifier.get());
-            d->serverCertificateWatcher = std::make_unique<ServerCertificateWatcher>(
-                systemContext, d->certificateVerifier.get());
-        });
-
-    connect(appContext(),
-        &ApplicationContext::systemContextRemoved,
-        [this](SystemContext* systemContext)
-        {
-            if (d->mainSystemContext != systemContext)
-                return;
-
-            d->mainSystemContext.clear();
-
-            d->connectionFactory->setUserInteractionDelegate(nullptr);
-            setSession(nullptr);
-            d->serverCertificateWatcher.reset();
-            systemContext->enableNetworking(nullptr);
-        });
+    d->cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
 }
 
 NetworkModule::~NetworkModule()
 {
-    // Stop running session before network module is completely destroyed.
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    d->session.reset();
-}
-
-std::shared_ptr<RemoteSession> NetworkModule::session() const
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    return d->session;
-}
-
-void NetworkModule::setSession(std::shared_ptr<RemoteSession> session)
-{
-    // This is necessary to prolong the life of the old session, otherwise a deadlock happen.
-    // This is due to the connectionClose signal in the messageProcessor, which is emitted
-    // by ~RemoteSession.
-    auto tmpSession = d->session;
-
-    // Stop the old session's threads (including TimeSyncManager) before nullifying sessionPtr
-    // in the certificate verifier. Otherwise a race condition occurs: TimeSyncManager runs on
-    // its own thread and calls makeAdapterFunc() which needs a valid sessionPtr. close() calls
-    // TimeSyncManager::stop() which waits for the thread to finish, guaranteeing it will no
-    // longer access sessionPtr by the time we clear it.
-    if (tmpSession)
-        tmpSession->close();
-
-    d->certificateVerifier->setSession(session);
-    {
-        NX_MUTEX_LOCKER lock(&d->mutex);
-        d->session = session;
-    }
-}
-
-nx::Uuid NetworkModule::currentServerId() const
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    if (d->session && d->session->connection())
-        return d->session->connection()->moduleInformation().id;
-
-    return nx::Uuid();
 }
 
 RemoteConnectionFactory* NetworkModule::connectionFactory() const
 {
     return d->connectionFactory.get();
+}
+
+CertificateVerifier* NetworkModule::certificateVerifier() const
+{
+    return d->certificateVerifier.get();
+}
+
+CloudConnectionFactory* NetworkModule::cloudConnectionFactory() const
+{
+    return d->cloudConnectionFactory.get();
 }
 
 void NetworkModule::reinitializeCertificateStorage()

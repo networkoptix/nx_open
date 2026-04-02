@@ -63,7 +63,7 @@ MergeSystemsDialog::MergeSystemsDialog(QWidget* parent, std::unique_ptr<Delegate
     m_delegate(std::move(delegate)),
     m_mergeTool(new MergeSystemsTool(
         this,
-        certificateVerifier<core::CertificateVerifier>(),
+        certificateVerifier(),
         m_delegate.get(),
         appContext()->coreSettings()->locale().toStdString()))
 {

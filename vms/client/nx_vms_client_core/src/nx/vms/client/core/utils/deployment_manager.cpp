@@ -5,14 +5,15 @@
 #include <QtGui/QDesktopServices>
 
 #include <nx/cloud/db/api/oauth_data.h>
-#include <nx/network/socket_global.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
 
 namespace nx::vms::client::core {
@@ -44,8 +45,7 @@ DeploymentManager::DeploymentManager(SystemContext* context, QObject* parent):
     SystemContextAware(context),
     d{new Private{}}
 {
-    auto factory = std::make_unique<core::CloudConnectionFactory>();
-    d->connection = factory->createConnection();
+    d->connection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
 }
 
 DeploymentManager::~DeploymentManager()

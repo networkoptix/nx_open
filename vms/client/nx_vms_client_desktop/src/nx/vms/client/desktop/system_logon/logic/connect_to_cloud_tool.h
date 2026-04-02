@@ -15,7 +15,6 @@ class Connection;
 
 } // namespace nx::cloud::db::api
 
-namespace nx::vms::client::core { class CloudConnectionFactory; }
 namespace nx::vms::common { class SystemSettings; }
 
 namespace nx::vms::client::desktop {
@@ -69,7 +68,6 @@ private:
     QPointer<OauthLoginDialog> m_oauthLoginDialog;
     QPointer<SessionRefreshDialog> m_localLoginDialog;
 
-    std::unique_ptr<core::CloudConnectionFactory> m_cloudConnectionFactory;
     std::unique_ptr<nx::cloud::db::api::Connection> m_cloudConnection;
     nx::vms::client::core::CloudAuthData m_cloudAuthData;
     nx::cloud::db::api::SystemData m_systemData;

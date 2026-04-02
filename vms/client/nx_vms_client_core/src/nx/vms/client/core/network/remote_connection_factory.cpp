@@ -28,6 +28,7 @@
 #include <utils/email/email.h>
 
 #include "abstract_remote_connection_factory_requests.h"
+#include "certificate_cache.h"
 #include "certificate_verifier.h"
 #include "network_manager.h"
 #include "private/remote_connection_factory_cache.h"
@@ -148,7 +149,6 @@ struct RemoteConnectionFactory::Private
 {
     using RequestsManager = AbstractRemoteConnectionFactoryRequestsManager;
 
-    ec2::AbstractECConnectionFactory* q;
     const nx::vms::api::PeerType peerType;
     const Qn::SerializationFormat serializationFormat;
     QPointer<CertificateVerifier> certificateVerifier;
@@ -157,14 +157,12 @@ struct RemoteConnectionFactory::Private
     std::unique_ptr<AbstractRemoteConnectionUserInteractionDelegate> userInteractionDelegate;
 
     Private(
-        ec2::AbstractECConnectionFactory* q,
         nx::vms::api::PeerType peerType,
         Qn::SerializationFormat serializationFormat,
         CertificateVerifier* certificateVerifier,
         CloudCredentialsProvider cloudCredentialsProvider,
         std::shared_ptr<RequestsManager> requestsManager)
         :
-        q(q),
         peerType(peerType),
         serializationFormat(serializationFormat),
         certificateVerifier(certificateVerifier),
@@ -1211,9 +1209,7 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     nx::vms::api::PeerType peerType,
     Qn::SerializationFormat serializationFormat)
     :
-    AbstractECConnectionFactory(),
     d(new Private(
-        this,
         peerType,
         serializationFormat,
         certificateVerifier,
@@ -1225,7 +1221,7 @@ RemoteConnectionFactory::RemoteConnectionFactory(
 
 RemoteConnectionFactory::~RemoteConnectionFactory()
 {
-    shutdown();
+    pleaseStop();
 }
 
 void RemoteConnectionFactory::setUserInteractionDelegate(
@@ -1240,7 +1236,7 @@ AbstractRemoteConnectionUserInteractionDelegate*
     return d->userInteractionDelegate.get();
 }
 
-void RemoteConnectionFactory::shutdown()
+void RemoteConnectionFactory::pleaseStop()
 {
     d->requestsManager.reset();
 }

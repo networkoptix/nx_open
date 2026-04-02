@@ -9,8 +9,8 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/serialization/format.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/vms/api/types/connection_types.h>
-#include <nx_ec/abstract_ec_connection_factory.h>
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/ec_api_fwd.h>
 
@@ -19,7 +19,6 @@
 #include "remote_connection_factory_context.h"
 #include "remote_connection_fwd.h"
 
-class QObject;
 struct QnPingReply;
 
 namespace nx::vms::client::core {
@@ -33,7 +32,7 @@ class SystemContext;
  * (de)serializers, etc. Creates instances of RemoteConnection and provides an access to the
  * mentioned classes.
  */
-class NX_VMS_CLIENT_CORE_API RemoteConnectionFactory: public ec2::AbstractECConnectionFactory
+class NX_VMS_CLIENT_CORE_API RemoteConnectionFactory: public QObject, public QnStoppable
 {
 public:
     using Context = RemoteConnectionFactoryContext;
@@ -96,7 +95,7 @@ public:
             customUserInteractionDelegate = {},
         bool ignoreCachedData = false);
 
-    virtual void shutdown() override;
+    virtual void pleaseStop() override;
 
     /**
      * Destroys a connection process asynchronously.

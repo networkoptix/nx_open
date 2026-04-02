@@ -5,7 +5,7 @@
 #include <api/server_rest_connection.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/certificate_cache.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
 

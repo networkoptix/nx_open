@@ -20,7 +20,6 @@
 #include <nx/metric/metrics_storage.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
 #include <nx/vms/common/lookup_lists/lookup_list_manager.h>
-#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
@@ -66,7 +65,6 @@ struct SystemContext::Private
     std::unique_ptr<VideoWallLicenseUsageWatcher> videoWallLicenseUsageWatcher;
     std::unique_ptr<PixelationSettings> pixelationSettings;
 
-    QPointer<AbstractCertificateVerifier> certificateVerifier;
     QPointer<nx::vms::discovery::Manager> moduleDiscoveryManager;
     nx::vms::rules::Engine* vmsRulesEngine = {};
     std::unique_ptr<QnCameraNamesWatcher> cameraNamesWatcher;

@@ -183,7 +183,7 @@ void ConnectToCurrentSystemTool::mergeServer(const QString& adminPassword)
 
     m_mergeTool = new MergeSystemsTool(
         this,
-        system()->certificateVerifier<core::CertificateVerifier>(),
+        system()->certificateVerifier(),
         m_delegate.get(),
         appContext()->coreSettings()->locale().toStdString());
 

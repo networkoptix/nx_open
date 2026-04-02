@@ -41,7 +41,6 @@ ConnectToCloudTool::ConnectToCloudTool(QWidget* parent, nx::vms::common::SystemS
     base_type(parent),
     QnSessionAwareDelegate(parent),
     m_parent(parent),
-    m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>()),
     m_systemSettings(settings)
 {
     NX_ASSERT(m_parent);
@@ -199,7 +198,7 @@ void ConnectToCloudTool::onCloudAuthDataReady()
             onBindFinished(result, std::move(data));
         });
 
-    m_cloudConnection = m_cloudConnectionFactory->createConnection();
+    m_cloudConnection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
     m_cloudConnection->setCredentials(m_cloudAuthData.credentials);
     m_cloudConnection->systemManager()->bindSystem(request, std::move(handler));
 }

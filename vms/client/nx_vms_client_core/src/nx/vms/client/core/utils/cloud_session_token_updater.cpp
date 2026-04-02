@@ -6,9 +6,11 @@
 #include <QtGui/QGuiApplication>
 
 #include <nx/cloud/db/api/connection.h>
+#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <utils/common/synctime.h>
 
@@ -138,8 +140,8 @@ void CloudSessionTokenUpdater::issueToken(
 {
     if (!m_cloudConnection)
     {
-        m_cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
-        m_cloudConnection = m_cloudConnectionFactory->createConnection();
+        m_cloudConnection =
+            appContext()->networkModule()->cloudConnectionFactory()->createConnection();
     }
 
     // Initialize timed "request in progress" flag.

@@ -11,6 +11,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -22,6 +23,8 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/widgets/main_window.h>
 #include <ui/widgets/main_window_title_bar_state.h>
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -52,8 +55,6 @@ nx::network::ssl::CertificateChain parseCertificateChainSafe(const std::string& 
 }
 
 } // namespace
-
-namespace nx::vms::client::desktop {
 
 struct MergeSystemsTool::Context
 {
@@ -328,7 +329,8 @@ void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
             ctx.proxy,
             m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
             ctx.target,
-            m_certificateVerifier->makeRestrictedAdapterFunc(ctx.targetPublicKey()),
+            nx::vms::client::core::CertificateVerifier::makeRestrictedAdapterFunc(
+                ctx.targetPublicKey()),
             request,
             nx::utils::guarded(this, std::move(onSessionCreated)));
     }
@@ -390,7 +392,8 @@ void MergeSystemsTool::at_sessionCreated(
             m_certificateVerifier->makeAdapterFunc(ctx.proxy->getId(), ctx.proxy->getApiUrl()),
             ctx.target,
             ctx.mergeData.remoteSessionToken,
-            m_certificateVerifier->makeRestrictedAdapterFunc(ctx.targetPublicKey()),
+            nx::vms::client::core::CertificateVerifier::makeRestrictedAdapterFunc(
+                ctx.targetPublicKey()),
             std::move(onLicenseReceived)
         );
 
@@ -498,13 +501,14 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
 
     const auto serverName = ctx.target.address.toString();
     std::string errorMessage;
+    auto certificateVerifier = appContext()->networkModule()->certificateVerifier();
 
     NX_VERBOSE(this, "Try to verify target cert from %1 by system CA certificates.", serverName);
     if (nx::network::ssl::verifyBySystemCertificates(
             ctx.targetHandshakeChain, serverName, &errorMessage))
     {
         NX_VERBOSE(this, "Certificate verification for %1 is successful.", serverName);
-        m_certificateVerifier->pinCertificate(
+        certificateVerifier->pinCertificate(
             ctx.targetInfo.id,
             ctx.targetHandshakeChain[0].publicKey());
 
@@ -518,21 +522,21 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
         return MergeSystemsStatus::certificateInvalid;
 
     // At this point target handshake chain equals user provided chain.
-
-    const CertificateVerifier::Status status = m_certificateVerifier->verifyCertificate(
+    using Status = nx::vms::client::core::CertificateVerifier::Status;
+    const auto status = certificateVerifier->verifyCertificate(
         ctx.targetInfo.id,
         ctx.targetHandshakeChain);
 
-    if (status == CertificateVerifier::Status::ok)
+    if (status == Status::ok)
         return MergeSystemsStatus::ok;
 
     bool accepted = false;
-    if (status == CertificateVerifier::Status::notFound)
+    if (status == Status::notFound)
     {
         accepted = m_delegate->acceptNewCertificate(
             {ctx.targetInfo.getModuleInformation(), ctx.target, ctx.targetHandshakeChain});
     }
-    else if (status == CertificateVerifier::Status::mismatch)
+    else if (status == Status::mismatch)
     {
         accepted = m_delegate->acceptCertificateAfterMismatch(
             {ctx.targetInfo.getModuleInformation(), ctx.target, ctx.targetHandshakeChain});
@@ -541,7 +545,7 @@ MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
     if (!accepted)
         return MergeSystemsStatus::certificateRejected;
 
-    m_certificateVerifier->pinCertificate(
+    certificateVerifier->pinCertificate(
             ctx.targetInfo.id, ctx.targetHandshakeChain[0].publicKey());
     return MergeSystemsStatus::ok;
 }

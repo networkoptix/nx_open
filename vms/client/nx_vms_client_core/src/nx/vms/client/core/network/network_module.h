@@ -5,14 +5,12 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/utils/uuid.h>
-
-namespace nx::vms::api { enum class PeerType; }
 
 namespace nx::vms::client::core {
 
-class RemoteSession;
 class RemoteConnectionFactory;
+class CertificateVerifier;
+class CloudConnectionFactory;
 
 /**
  * Single storage place for all network-related classes instances in the client core.
@@ -27,13 +25,13 @@ public:
     NetworkModule(QObject* parent = nullptr);
     virtual ~NetworkModule();
 
+    void reinitializeCertificateStorage();
+
     RemoteConnectionFactory* connectionFactory() const;
 
-    std::shared_ptr<RemoteSession> session() const;
-    void setSession(std::shared_ptr<RemoteSession> session);
-    nx::Uuid currentServerId() const;
+    CertificateVerifier* certificateVerifier() const;
 
-    void reinitializeCertificateStorage();
+    CloudConnectionFactory* cloudConnectionFactory() const;
 
 private:
     struct Private;

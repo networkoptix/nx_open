@@ -4,11 +4,9 @@
 
 #include <api/runtime_info_manager.h>
 #include <licensing/license.h>
-#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <utils/common/synctime.h>
 
 using namespace nx::vms::client::desktop::license;
@@ -19,7 +17,7 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (license->type() != Qn::LC_VideoWall)
         return false;
 
-    const auto currentSession = appContext()->networkModule()->session();
+    const auto currentSession = systemContext()->as<core::SystemContext>()->session();
     if (!currentSession)
         return false;
 

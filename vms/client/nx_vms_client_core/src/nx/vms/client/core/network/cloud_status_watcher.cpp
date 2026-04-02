@@ -25,6 +25,7 @@
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_token_remover.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/utils/cloud_session_token_updater.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
@@ -96,7 +97,6 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
 struct CloudStatusWatcher::Private: public QObject
 {
     CloudStatusWatcher* const q;
-    std::unique_ptr<CloudConnectionFactory> cloudConnectionFactory;
     std::shared_ptr<Connection> cloudConnection;
     std::unique_ptr<Connection> resendActivationConnection;
 
@@ -293,11 +293,11 @@ void CloudStatusWatcher::updateSystems()
 
 void CloudStatusWatcher::resendActivationEmail(const QString& email)
 {
-    if (!d->cloudConnectionFactory)
-        d->cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
-
     if (!d->resendActivationConnection)
-        d->resendActivationConnection = d->cloudConnectionFactory->createConnection();
+    {
+        d->resendActivationConnection =
+            appContext()->networkModule()->cloudConnectionFactory()->createConnection();
+    }
 
     const auto callback = [this](ResultCode result, AccountConfirmationCode /*code*/)
     {
@@ -704,9 +704,7 @@ void CloudStatusWatcher::Private::ensureCloudConnection()
     if (cloudConnection)
         return;
 
-    if (!cloudConnectionFactory)
-        cloudConnectionFactory = std::make_unique<CloudConnectionFactory>();
-    cloudConnection = cloudConnectionFactory->createConnection();
+    cloudConnection = appContext()->networkModule()->cloudConnectionFactory()->createConnection();
     NX_ASSERT(cloudConnection);
 }
 

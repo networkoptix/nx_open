@@ -846,6 +846,9 @@ ApplicationContext::~ApplicationContext()
     // Main system context does not exist in self-update mode.
     if (d->mainSystemContext)
     {
+        if (auto networkModule = this->networkModule()) //< May absent in tests.
+            networkModule->connectionFactory()->setUserInteractionDelegate({});
+
         // Terminate running session if it sill exists. Session depends on common module, so we
         // must clean all shared pointers before destroying ClientCoreModule.
         d->mainSystemContext->setSession({});

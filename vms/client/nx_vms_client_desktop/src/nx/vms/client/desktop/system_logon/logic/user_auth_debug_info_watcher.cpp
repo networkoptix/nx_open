@@ -16,12 +16,15 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/components/debug_info_storage.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/workbench/workbench_context.h>
+
+namespace nx::vms::client::desktop {
 
 namespace {
 
@@ -30,10 +33,6 @@ static const QString kTokenDebugInfoKey = "userToken";
 static const QString kCloudAccessTokenDebugInfoKey = "cloudAccessToken";
 static const QString kElideString = "...";
 static constexpr int kMaxTokenLength = 50;
-
-} // namespace
-
-namespace nx::vms::client::desktop {
 
 QStringList getFormatJWTInfo(const nx::network::jws::Token<nx::cloud::db::api::ClaimSet>& token)
 {
@@ -128,6 +127,8 @@ void processToken(
     }
 }
 
+} // namespace
+
 class UserAuthDebugInfoWatcher::Private
 {
     UserAuthDebugInfoWatcher* q;
@@ -144,15 +145,15 @@ public:
             return;
 
         const auto updateTokenInfoForDebugInfo =
-            []()
+            [this]()
             {
-                const auto session = appContext()->networkModule()->session();
+                const auto session = q->session();
                 const auto token = session->connection()->credentials().authToken;
                 processToken(token, "Token: ", kTokenDebugInfoKey);
             };
 
         // When a new session appears, this old connection will be destroyed.
-        connect(appContext()->networkModule()->session().get(),
+        connect(q->session().get(),
             &RemoteSession::credentialsChanged,
             q,
             updateTokenInfoForDebugInfo);

@@ -83,7 +83,7 @@ void AbstractCertificateVerifier::loadTrustedCertificate(
     const auto chain = nx::network::ssl::Certificate::parse(data.toStdString());
     if (chain.size() != 1)
     {
-        NX_WARNING(this,
+        NX_WARNING(NX_SCOPE_TAG,
             "Ignore built-in certificate file %1 with more that one certificate", name);
         return;
     }
@@ -91,19 +91,19 @@ void AbstractCertificateVerifier::loadTrustedCertificate(
     const auto& cert = chain[0];
     if (securityIni().ignoreNonSelfSignedCertificates && cert.issuer() != cert.subject())
     {
-        NX_WARNING(this, "Ignore not self-signed built-in certificate %1", name);
+        NX_WARNING(NX_SCOPE_TAG, "Ignore not self-signed built-in certificate %1", name);
         return;
     }
 
     const auto now = nx::utils::utcTime();
     if (now >= cert.notBefore() && now <= cert.notAfter())
     {
-        NX_INFO(this, "Adding trusted certificate %1 into the CA list", name);
+        NX_INFO(NX_SCOPE_TAG, "Adding trusted certificate %1 into the CA list", name);
         nx::network::ssl::addTrustedRootCertificate(cert);
     }
     else
     {
-        NX_WARNING(this, "Ignore expired built-in certificate %1", name);
+        NX_WARNING(NX_SCOPE_TAG, "Ignore expired built-in certificate %1", name);
     }
 }
 
