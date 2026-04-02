@@ -29,7 +29,7 @@ boost/*:header_only=True
 emsdk/3.1.72
 nodejs/20.16.0
 
-[env]
+[buildenv]
 CFLAGS=-sUSE_PTHREADS=1
 CXXFLAGS=-sUSE_PTHREADS=1
 LDFLAGS=-sUSE_PTHREADS=1

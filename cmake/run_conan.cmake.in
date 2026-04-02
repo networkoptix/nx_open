@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.20)
 
 include(CMakeParseArguments)
 
-set(ENV{CONAN_USER_HOME} "@CONAN_USER_HOME@")
+set(ENV{CONAN_HOME} "@CONAN_HOME@")
 set(CONAN_EXECUTABLE "@CONAN_EXECUTABLE@")
 set(CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@")
 set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
@@ -14,7 +14,6 @@ set(CMAKE_BINARY_DIR "@CMAKE_BINARY_DIR@")
 set(installSystemRequirements "OFF" CACHE INTERNAL "")
 
 set(conanNxRemote "@conanNxRemote@")
-set(conanLockExportDir "@distribution_output_dir@")
 set(conanFlags @flags@)
 
 if(installSystemRequirements)
@@ -33,12 +32,38 @@ else()
     set(ENV{CONAN_SYSREQUIRES_MODE} "verify")
 endif()
 
+# TODO VMS-39555: NX_CONAN_USERNAME/NX_CONAN_PASSWORD are a temporary workaround for the
+# open-source build where the conan remote (us.nxteam.dev) differs from the general Artifactory
+# (nxvms.dev). Once a dedicated conan2-open repo is set up on nxvms.dev, both remotes will be on
+# the same server and NX_ARTIFACTORY_USERNAME/PASSWORD can be used for both again.
+# NX_CONAN_USERNAME/NX_CONAN_PASSWORD take precedence over NX_ARTIFACTORY_USERNAME/PASSWORD.
+if(DEFINED ENV{NX_CONAN_USERNAME} AND DEFINED ENV{NX_CONAN_PASSWORD})
+    set(conan_username "$ENV{NX_CONAN_USERNAME}")
+    set(conan_password "$ENV{NX_CONAN_PASSWORD}")
+elseif(DEFINED ENV{NX_ARTIFACTORY_USERNAME} AND DEFINED ENV{NX_ARTIFACTORY_PASSWORD})
+    set(conan_username "$ENV{NX_ARTIFACTORY_USERNAME}")
+    set(conan_password "$ENV{NX_ARTIFACTORY_PASSWORD}")
+endif()
+
+if(DEFINED conan_username)
+    message(STATUS "Authenticating with Conan remote as ${conan_username}...")
+    execute_process(
+        COMMAND ${CONAN_EXECUTABLE} remote login nx
+            ${conan_username} -p ${conan_password}
+        RESULT_VARIABLE login_result
+    )
+    if(NOT login_result EQUAL 0)
+        message(WARNING "Conan remote login failed with code ${login_result}")
+    endif()
+endif()
+
 function(run_conan)
     execute_process(
         COMMAND
             ${CONAN_EXECUTABLE} install ${CMAKE_SOURCE_DIR}
             ${conanFlags}
-            --install-folder ${CMAKE_BINARY_DIR}
+            --output-folder ${CMAKE_BINARY_DIR}
+            -vv
             ${ARGV}
         COMMAND_ECHO STDERR
         RESULT_VARIABLE result
@@ -53,16 +78,6 @@ endfunction()
 
 run_conan()
 
-# TODO: Remove the second attempt with `--update` flag when the project is switched to Conan 2.
-# Conan 2 can hold multiple revisions in the local cache, thus it does not need this workaround to
-# replace downloaded recipe revisions.
-if(CONAN_FAILED)
-    message(WARNING "Conan failed to install dependencies. Retrying with `--update`.")
-    run_conan(--update)
-endif()
-
 if(CONAN_FAILED)
     message(FATAL_ERROR "Conan failed to install dependencies.")
 endif()
-
-file(COPY "${CMAKE_BINARY_DIR}/conan.lock" DESTINATION "${conanLockExportDir}/")

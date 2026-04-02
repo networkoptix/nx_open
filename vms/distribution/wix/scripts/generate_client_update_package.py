@@ -182,7 +182,6 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(config['distribution_output_dir'], 'build_info.txt'), 'metadata/build_info.txt')
         zip.write(os.path.join(config['distribution_output_dir'], 'build_info.json'), 'metadata/build_info.json')
         zip.write(os.path.join(config['distribution_output_dir'], 'conan_refs.txt'), 'metadata/conan_refs.txt')
-        zip.write(os.path.join(config['distribution_output_dir'], 'conan.lock'), 'metadata/conan.lock')
 
 
 def main():

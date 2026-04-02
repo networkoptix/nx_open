@@ -2,7 +2,6 @@ module Nx.Items
 
 AdaptiveScreen 1.0 AdaptiveScreen.qml
 ArchiveCalendar 1.0 ArchiveCalendar.qml
-BookmarkList 1.0 BookmarkList.qml
 Breadcrumb 1.0 Breadcrumb.qml
 DownloadMediaAction 1.0 DownloadMediaAction.qml
 DummyMessage 1.0 DummyMessage.qml

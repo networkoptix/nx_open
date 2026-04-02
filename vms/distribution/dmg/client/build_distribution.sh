@@ -95,7 +95,6 @@ copyMetadata()
     cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.txt" "${metadataDir}"
     cp "${DISTRIBUTION_OUTPUT_DIR}/build_info.json" "${metadataDir}"
     cp "${DISTRIBUTION_OUTPUT_DIR}/conan_refs.txt" "${metadataDir}"
-    cp "${DISTRIBUTION_OUTPUT_DIR}/conan.lock" "${metadataDir}"
 }
 
 

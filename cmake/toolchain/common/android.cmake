@@ -15,4 +15,9 @@ set(ANDROID_PLATFORM ${ANDROID_NATIVE_API_LEVEL})
 set(ANDROID_STL c++_shared)
 set(ANDROID_TOOLCHAIN clang)
 
+# Allow find_package() to find Conan-generated package configs in CMAKE_BINARY_DIR.
+# The NDK legacy toolchain sets CMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY which prevents
+# finding packages outside CMAKE_FIND_ROOT_PATH. Setting BOTH first prevents that.
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+
 include(${CMAKE_ANDROID_NDK}/build/cmake/android.toolchain.cmake)
