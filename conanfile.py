@@ -19,9 +19,9 @@ required_conan_version = ">=1.53.0"
 
 
 # Help packages are not required to be built from the same commit.
-VMS_HELP_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
-QUICK_START_GUIDE_VERSION = "6.0.0-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
-MOBILE_USER_MANUAL_VERSION = "21.2-bfdf1ce0a6f533e97993e3b2e088696549d94f62"
+VMS_HELP_VERSION = "6.1.1-ba655f5c497face7eeaa4c4b7024f61c6ece1bb2"
+QUICK_START_GUIDE_VERSION = "6.1.1-ba655f5c497face7eeaa4c4b7024f61c6ece1bb2"
+MOBILE_USER_MANUAL_VERSION = "25.2-ba655f5c497face7eeaa4c4b7024f61c6ece1bb2"
 
 
 # Conan does not provide a generator which makes it possible to easily access package folders for
@@ -80,11 +80,11 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual/*:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#b00ddd83d08cc4ed6c25bbef9527994b"
+    ffmpeg_version_and_revision = "7.0.1#67a29b60d290a9da6f3b044517beffe1"
 
     python_requires = (
-        "os_deps_from_deb_based_distro/0.5" "#43dce86a813993ad9acb644d3941e399",
-        "os_deps_activator/0.1" "#f401fca7dbd657d5be3c91e621ed94a3",
+        "os_deps_from_deb_based_distro/0.5" "#4a34b16b3f888ea7239c055feeabb838",
+        "os_deps_activator/0.1" "#02d7ab4ef4de01a22b7b4f36acb13361",
     )
 
     def configure(self):
@@ -181,24 +181,24 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.tool_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
+        self.tool_requires("qt-host/6.9.1" "#bf20d28d23fbad4c7190648fa3dae37b")
         self.tool_requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
         self.tool_requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
         self.tool_requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
-        self.tool_requires("openssl/1.1.1q" "#389fdbabc290c55ab79fee03761f20dd")
+        self.tool_requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
 
         if not self.isEmscripten:
             self.tool_requires("apidoctool/3.0" "#02ae3ddf972d89e3bcff43e0f35926d9")
             self.tool_requires("swagger-codegen/3.0.21" "#82967d62d27833281bd87e044d6e50f9")
-            self.tool_requires("breakpad-tools/2024.02.16" "#0327f836a8727dc7bd456fee67f78645")
+            self.tool_requires("breakpad-tools/2024.02.16" "#66de8f604ffe19a09a20f2a587624ef1")
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.tool_requires("clang/20.1.2" "#bc083c5c0eedbdf254af2744d261f9c8")
+                self.tool_requires("clang/20.1.2" "#3d16a819a0610ab5b0fe416c2c2e73aa")
                 self.tool_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
             if self.isLinux:
-                self.tool_requires("sdk-gcc/9.5" "#4934f8197fb3e1d7812bd951b1cbae85")
+                self.tool_requires("sdk-gcc/9.5" "#54cc3c576f5d9f324caaf23152b4074e")
 
         if self.isWindows:
             self.tool_requires("wix/3.14.1" "#51b4f9f9375a35447d8b88b5e832f831")
@@ -207,41 +207,41 @@ class NxOpenConan(ConanFile):
             self.tool_requires("doxygen/1.8.14" "#e4d349d41cd2ea37812b3f284bd88784")
 
         if self.isAndroid:
-            self.tool_requires("openjdk/18.0.1" "#a8a02e50d3ff18df2248cae06ed5a13c")
+            self.tool_requires("openjdk/18.0.1" "#d7cdae72f654bff4968cebe42d6530da")
             if "ANDROID_HOME" not in os.environ:
                 self.tool_requires("android-sdk/34" "#e304daf9254e7af886b5e153714c5a79")
             if "ANDROID_NDK" not in os.environ:
                 self.tool_requires("android-ndk/r29" "#8b725cb46c0e050cf2e168084e7b99fa")
         elif not self.isEmscripten:
             # Java runtime for apidoctool.
-            self.tool_requires("openjdk-jre/17.0.12" "#ceed4d8b4fdfbd3f680688f67488dc27")
+            self.tool_requires("openjdk-jre/17.0.12" "#34638acda4638c46a55a6475de444e7e")
 
     def requirements(self):
         if not self.isEmscripten:
             self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
 
-            self.requires("opentelemetry-cpp/1.17.0" "#421936f14bc8f86e2117effa55fbd715")
+            self.requires("opentelemetry-cpp/1.17.0" "#183f60506ee6fae5b404f14ecd9d52b8")
             # OpenTelemetry dependencies.
             self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")
             self.requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
             self.requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
-            self.requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
+            self.requires("abseil/20240116.2" "#daa8cf35bf7547e3f64ad99a2cbbc02f")
             self.requires("re2/20230301" "#5504bfc6731b5c7a12ff524a6b2205c1")
             self.requires("opentelemetry-proto/1.3.2" "#14665af6359f2a239e81925285e5b654")
 
-        self.requires("boost/1.83.0" "#d150c9edc8081c98965b05ea9c2df318")
+        self.requires("boost/1.89.0" "#130a884f1529433238f4f2dc98d94ac8")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
-        self.requires("openssl/1.1.1q" "#389fdbabc290c55ab79fee03761f20dd")
-        self.requires("qt/6.9.1" "#a8c6be0c5e7387082e776e79b8d85c32")
+        self.requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
+        self.requires("qt/6.9.1" "#c4d4348e1423f513bece44d0df8f7553")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
-        self.requires("zlib/1.3.1" "#99d6f9ea0a1dd63d973392c24ce0aa9b")
+        self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
 
         if not self.isEmscripten:
             self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
             self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
             self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
-            self.requires("crashpad/cci.20250729" "#7c4f947fc506eb2a07720af501bc5255")
+            self.requires("crashpad/cci.20250729" "#b49360b710de1716da8e0b886704adbc")
 
         if self.settings.os not in ("Android", "iOS", "Emscripten"):
             # Qt dependency.
@@ -250,14 +250,14 @@ class NxOpenConan(ConanFile):
             self.requires("ogg/1.3.5" "#00fb0bd978d034d12af5efd5d6921364")
             self.requires("vorbis/1.3.7" "#0400cbb550b491521361a41c889d5c48")
             self.requires("libvpx/1.14.1" "#fb51b8d71add5751343a0d06ed3bb44e")
-            self.requires("openh264/2.4.1" "#e7846aa3511316c230721ca13fc9a127")
-            self.requires("freetype/2.12.1" "#cd63b23b3aa630a38fa870a267e95782")
+            self.requires("openh264/2.6.0" "#d87623b0e02a383eaf37ad97594ebcc8")
+            self.requires("freetype/2.13.2" "#7c23baf248eac45b16b362b8288d11e9")
 
         if self.isWindows or self.isLinux:
             self.requires("vulkan-headers/1.3.290.0" "#6a0d12455e50dca266c79b88fda818b3")
             if self.settings.arch == "x86_64":
-                self.requires("cuda-toolkit/12.5.1" "#34ae878d0b2f4df2297bac67d026a307")
-                self.requires("libpq/15.5" "#fa107fbe709db74faa6e2cb3cf18a5ae")
+                self.requires("cuda-toolkit/12.5.1" "#d3a6ce515fbfdb0e5487ea4ca7a471de")
+                self.requires("libpq/15.5" "#21f4f264e8a3e8627735414ba856999b")
 
         if self.isLinux:
             if self.settings.arch == "x86_64":
@@ -270,11 +270,11 @@ class NxOpenConan(ConanFile):
 
         if self.haveDesktopClient:
             if self.isMacos:
-                self.requires("hidapi/0.14.0" "#67b81bb0b1ef84cedc49b2e3671a48e6")
-            self.requires("pathkit/m134" "#0d764b6df74bb96dbd27b40e38bd7f0a")
+                self.requires("hidapi/0.14.0" "#0effb18f67e2e098b013e0bc9983496e")
+            self.requires("pathkit/m134" "#de17b62844ca3085dbeeb8c8fdea90c5")
 
         if self.isWindows or self.isMacos or self.isAndroid or self.isIos or (self.isLinux and not self.isArm32):
-            self.requires("openal/1.24.3" "#3afa0b8f1d99632132864d64579370e2")
+            self.requires("openal/1.24.3" "#bec0ba1235fbfba9af1eaf14d814e4b0")
 
         if self.isWindows:
             self.requires("directx/june2010" "#a0cbbd6a9cfef629fae6d2cf5a18bcdd")
@@ -286,10 +286,10 @@ class NxOpenConan(ConanFile):
             self.requires("sse2neon/1.7.0" "#188c824e380c1a5ad666d1229226b7c8")
 
         if self.settings.os in ("Android", "iOS") or self.haveAnalyticsServer:
-            self.requires("libjpeg-turbo/3.0.3" "#1e534ce92aac40555ae9fd1184428b04")
+            self.requires("libjpeg-turbo/3.0.3" "#79ebbd04ba41032d43a11f47c19de3b5")
 
         if self.haveDesktopClient or self.haveMediaserver:
-            self.requires("flite/2.2" "#52b50c815dd81e40a21aaabb87d38b50")
+            self.requires("flite/2.2" "#02b4c56a91ab5131673f3a79fc38b58c")
 
         if self.haveDesktopClient:
             self.requires("vms_help/" + VMS_HELP_VERSION)
