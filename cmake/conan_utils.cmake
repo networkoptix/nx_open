@@ -5,7 +5,6 @@ include_guard(GLOBAL)
 include(${CMAKE_CURRENT_LIST_DIR}/output_directories.cmake)
 
 option(runConanAutomatically "Run Conan automatically when configuring the project." ON)
-set(conanLockFile "" CACHE STRING "Install Conan packages using specified lock file.")
 set(extraConanArgs "" CACHE STRING "Extra command line arguments for Conan.")
 set(customConanHome "" CACHE STRING "Custom Conan home directory.")
 
@@ -26,17 +25,11 @@ function(nx_init_conan)
     endif()
 
     if(customConanHome)
-        message(STATUS "Using custom CONAN_USER_HOME: ${customConanHome}")
-        set(ENV{CONAN_USER_HOME} ${customConanHome})
+        message(STATUS "Using custom CONAN_HOME: ${customConanHome}")
+        set(ENV{CONAN_HOME} ${customConanHome})
     else()
-        message(STATUS "Using local CONAN_USER_HOME: ${CMAKE_BINARY_DIR}")
-        set(ENV{CONAN_USER_HOME} ${CMAKE_BINARY_DIR})
-    endif()
-
-    if(NOT customConanHome)
-        # Sometimes Conan cannot update this file even if it was not modified. A simple solution is
-        # just to delete it and let Conan regenerate it.
-        file(REMOVE ${CMAKE_BINARY_DIR}/.conan/settings.yml)
+        message(STATUS "Using local CONAN_HOME: ${CMAKE_BINARY_DIR}/.conan2")
+        set(ENV{CONAN_HOME} ${CMAKE_BINARY_DIR}/.conan2)
     endif()
 
     _configure_conan()
@@ -44,16 +37,8 @@ endfunction()
 
 function(_configure_conan)
     if(NOT customConanHome)
-        set(conan_installed_config_list_file "$ENV{CONAN_USER_HOME}/.conan/config_install.json")
+        set(conan_installed_config_list_file "$ENV{CONAN_HOME}/config_install.json")
         file(REMOVE ${conan_installed_config_list_file})
-
-        set(download_cache_parameter_string "")
-        if(DEFINED ENV{NX_CONAN_DOWNLOAD_CACHE})
-            message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
-            set(download_cache_parameter_string "download_cache = $ENV{NX_CONAN_DOWNLOAD_CACHE}")
-        endif()
-
-        cmake_path(SET conan_user_home_short "$ENV{CONAN_USER_HOME}/.conan_short")
 
         set(conan_config_dir_src "${open_source_root}/conan_config")
         set(conan_config_dir "${CMAKE_BINARY_DIR}/conan_config")
@@ -63,9 +48,17 @@ function(_configure_conan)
             COMMAND ${CONAN_EXECUTABLE} config install ${conan_config_dir}
             ERROR_MESSAGE "Can not apply Conan configuration from ${conan_config_dir}"
         )
+
+        # Create default profile if it doesn't exist
+        if(NOT EXISTS "$ENV{CONAN_HOME}/profiles/default")
+            nx_execute_process_or_fail(
+                COMMAND ${CONAN_EXECUTABLE} profile detect
+                ERROR_MESSAGE "Can not detect default Conan profile"
+            )
+        endif()
     else()
         # Check if "nx" remote is already added.
-        set(conan_remotes_file "$ENV{CONAN_USER_HOME}/.conan/remotes.json")
+        set(conan_remotes_file "$ENV{CONAN_HOME}/remotes.json")
         if(EXISTS ${conan_remotes_file})
             file(READ ${conan_remotes_file} conan_remotes)
             string(JSON conan_remotes_count LENGTH ${conan_remotes} "remotes")
@@ -80,15 +73,18 @@ function(_configure_conan)
         endif()
 
         nx_execute_process_or_fail(
-            COMMAND ${CONAN_EXECUTABLE} remote add nx ${conanNxRemote} True --force
+            COMMAND ${CONAN_EXECUTABLE} remote add nx ${conanNxRemote} --force
             ERROR_MESSAGE "Can not add Nx Conan remote."
         )
     endif()
 
     if(DEFINED ENV{NX_ARTIFACTORY_USERNAME} AND DEFINED ENV{NX_ARTIFACTORY_PASSWORD})
         message(STATUS "Using custom conan credentials $ENV{NX_ARTIFACTORY_USERNAME}:******")
-        set(ENV{CONAN_LOGIN_USERNAME_NX} $ENV{NX_ARTIFACTORY_USERNAME})
-        set(ENV{CONAN_PASSWORD_NX} $ENV{NX_ARTIFACTORY_PASSWORD})
+        nx_execute_process_or_fail(
+            COMMAND ${CONAN_EXECUTABLE} remote login nx
+                $ENV{NX_ARTIFACTORY_USERNAME} -p $ENV{NX_ARTIFACTORY_PASSWORD}
+            ERROR_MESSAGE "Can not authenticate with Conan remote."
+        )
     endif()
 endfunction()
 
@@ -97,27 +93,25 @@ function(nx_run_conan)
 
     set(flags)
 
-    if("${conanLockFile}" STREQUAL "")
-        if(CONAN_BUILD_TYPE)
-            list(APPEND flags "-s build_type=${CONAN_BUILD_TYPE}")
-        endif()
+    if(CONAN_BUILD_TYPE)
+        list(APPEND flags "-s build_type=${CONAN_BUILD_TYPE}")
+    endif()
 
-        if(CONAN_PROFILE)
-            list(APPEND flags "--profile:build=default" "--profile:host=${CONAN_PROFILE}")
-        endif()
+    if(CONAN_PROFILE)
+        list(APPEND flags "--profile:host=${CONAN_PROFILE}")
+    endif()
 
-        list(APPEND flags ${CONAN_FLAGS})
-    else()
-        if(NOT EXISTS ${conanLockFile})
-            message(FATAL_ERROR "Custom Conan lock file \"${conanLockFile}\" does not exist.")
-        endif()
-        list(APPEND flags "--lockfile \"${conanLockFile}\"")
-        list(APPEND flags "--lockfile-out \"${CMAKE_BINARY_DIR}/conan.lock\"")
+    list(APPEND flags ${CONAN_FLAGS})
+
+    if(DEFINED ENV{NX_CONAN_DOWNLOAD_CACHE})
+        message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
+        list(APPEND flags
+            "--core-conf core.download:download_cache=$ENV{NX_CONAN_DOWNLOAD_CACHE}")
     endif()
 
     list(APPEND flags ${extraConanArgs})
 
-    set(CONAN_USER_HOME $ENV{CONAN_USER_HOME})
+    set(CONAN_HOME $ENV{CONAN_HOME})
 
     set(run_conan_script ${CMAKE_BINARY_DIR}/run_conan.cmake)
     nx_configure_file(${open_source_root}/cmake/run_conan.cmake.in ${run_conan_script} @ONLY)

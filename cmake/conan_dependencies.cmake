@@ -62,13 +62,13 @@ endif()
 set(conan_build_profile)
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND _additional_conan_parameters
-        "--profile:build ${open_source_root}/cmake/conan_profiles/build-linux.profile")
+        "--profile:build ${open_source_root}/conan_profiles/build/linux.profile")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     list(APPEND _additional_conan_parameters
-        "--profile:build ${open_source_root}/cmake/conan_profiles/build-windows.profile")
+        "--profile:build ${open_source_root}/conan_profiles/build/windows.profile")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
     list(APPEND _additional_conan_parameters
-        "--profile:build ${open_source_root}/cmake/conan_profiles/build-macos.profile")
+        "--profile:build ${open_source_root}/conan_profiles/build/macos.profile")
 endif()
 
 nx_run_conan(
@@ -80,6 +80,10 @@ nx_run_conan(
 set(CONAN_DISABLE_CHECK_COMPILER ON)
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+
+# CMakeDeps generates *-config.cmake files in the output folder. CMake needs CMAKE_PREFIX_PATH
+# to find them in config mode.
+list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 nx_check_package_paths_changes(conan ${CONAN_DEPENDENCIES})
 
@@ -93,16 +97,12 @@ if(CONAN_CLANG_ROOT AND NOT DEFINED ENV{CLANG_DIR})
     set(ENV{CLANG_DIR} ${CONAN_CLANG_ROOT})
 endif()
 
-if(CONAN_ANDROIDSDK_ROOT)
-    set(ENV{ANDROID_HOME} ${CONAN_ANDROIDSDK_ROOT})
+if(CONAN_ANDROID-SDK_ROOT)
+    set(ENV{ANDROID_HOME} ${CONAN_ANDROID-SDK_ROOT})
 endif()
 
-if(CONAN_ANDROIDNDK_ROOT)
-    set(ENV{ANDROID_NDK} ${CONAN_ANDROIDNDK_ROOT})
-endif()
-
-if(CONAN_ANDROIDSDK_ROOT)
-    set(ENV{ANDROID_HOME} ${CONAN_ANDROIDSDK_ROOT})
+if(CONAN_ANDROID-NDK_ROOT)
+    set(ENV{ANDROID_NDK} ${CONAN_ANDROID-NDK_ROOT})
 endif()
 
 if(CONAN_QT_ROOT)

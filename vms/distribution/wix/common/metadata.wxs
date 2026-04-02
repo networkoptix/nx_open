@@ -11,7 +11,6 @@
             <Component><File Name="build_info.txt" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="build_info.json" KeyPath="yes" DiskId="2"/></Component>
             <Component><File Name="conan_refs.txt" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="conan.lock" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

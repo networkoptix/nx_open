@@ -21,7 +21,7 @@ ffmpeg/*:av1=False
 boost/*:header_only = True
 
 [tool_requires]
-AndroidNDK/r29
-ffmpeg/*:AndroidStandaloneToolchain/r29
-libmp3lame/*:AndroidStandaloneToolchain/r29
-qt/*:AndroidSDK/34, openjdk/18.0.1
+*:android-ndk/r29
+ffmpeg/*:android-standalone-toolchain/r29
+libmp3lame/*:android-standalone-toolchain/r29
+qt/*:android-sdk/34, openjdk/18.0.1
