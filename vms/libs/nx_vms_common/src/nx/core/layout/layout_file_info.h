@@ -12,9 +12,6 @@
 
 namespace nx::core::layout {
 
-/* Max future nov file version that should be opened by the current client version. */
-const qint32 kMaxVersion = 1024;
-
 struct FileInfo;
 struct CryptoInfo;
 
@@ -41,19 +38,6 @@ struct StreamIndexEntry
     qint64 offset = 0;
     quint32 fileNameCrc = 0;
     quint32 reserved = 0;
-};
-
-// This is the outdated version of file header and index.
-constexpr quint64 kFileMagic = 0x73a0b934820d4055ull;
-struct StreamIndex1
-{
-    static constexpr quint64 kIndexMagic1 = 0xfed8260da9eebc04ll;
-    static constexpr quint64 kIndexCryptedMagic = 0xfed8260da9eebc03ll;
-    static constexpr int kMaxStreams = 256;
-    quint64 magic = kIndexMagic1;
-    quint32 version = 1;
-    quint32 entryCount = 0;
-    std::array<StreamIndexEntry, kMaxStreams> entries = {};
 };
 
 struct CryptoInfo

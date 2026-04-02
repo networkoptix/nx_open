@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "layout_file_info.h"
+#include "layout_file_info_v1.h"
 
 #include <exception>
 
@@ -18,112 +19,47 @@ bool isLayoutExtension(const QString& fileName)
     return extension == "nov" || extension == "exe";
 }
 
-std::optional<FileInfo> parseVerson1(QFile& file, const QString& fileName, const QString extension)
-{
-    FileInfo info;
-    if (extension == "exe")
-    {
-        file.seek(file.size() - 2 * sizeof(qint64));
-        quint64 magic;
-        quint64 offset;
-        file.read((char*)&offset, sizeof(qint64));
-        file.read((char*)&magic, sizeof(qint64));
-        if (magic != kFileMagic)
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Corrupted NOV file, invalid magic: %1", magic);
-            return std::nullopt;
-        }
-
-        file.seek(offset);
-    }
-
-    StreamIndex1 index;
-    if (file.read((char *)&index, sizeof(index)) != sizeof(index))
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to read NOV file: %1", fileName);
-        return std::nullopt;
-    }
-    if (index.version != 1)
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Unsupported file version: %1(%2)", index.version, fileName);
-        return std::nullopt;
-    }
-
-    if (index.entryCount > StreamIndex1::kMaxStreams)
-    {
-        NX_WARNING(NX_SCOPE_TAG,
-            "Failed to read NOV file: %1, invalid entry count: %1", fileName, index.entryCount);
-        return std::nullopt;
-    }
-
-    info.entries.resize(index.entryCount);
-    std::copy(index.entries.begin(), index.entries.begin() + index.entryCount, info.entries.begin());
-
-    if (index.magic == StreamIndex1::kIndexCryptedMagic)
-    {
-        CryptoInfo crypto;
-        if (file.read((char*)&crypto, sizeof(crypto)) != sizeof(crypto))
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Failed to read NOV file: %1", fileName);
-            return std::nullopt;
-        }
-        info.cryptoInfo = crypto;
-    }
-    else if (index.magic != StreamIndex1::kIndexMagic1)
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Corrupted NOV file, invalid index magic: %1", index.magic);
-        return std::nullopt;
-    }
-
-    if (index.version > kMaxVersion)
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Unsupported file from the future version: %1", index.version);
-        return std::nullopt;
-    }
-    return info;
-}
-
-std::optional<FileInfo> parseVerson2(QFile& file, const QString& fileName)
+std::optional<FileInfo> parseVerson2(QFile&& file)
 {
     FileInfo info;
     Footer footer;
     if (!file.seek(file.size() - sizeof(footer)))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, too small size", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, too small size", file.fileName());
         return std::nullopt;
     }
 
     if (file.read((char*)&footer, sizeof(footer)) != sizeof(footer))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read footer", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read footer", file.fileName());
         return std::nullopt;
     }
 
     if (footer.magic != Footer::kIndexMagic)
     {
         NX_WARNING(NX_SCOPE_TAG, "Corrupted NOV file: %1, invalid header magic: %2",
-            fileName, footer.magic);
+            file.fileName(), footer.magic);
         return std::nullopt;
     }
 
     if (footer.version != Footer::kCurrentVersion)
     {
         NX_WARNING(NX_SCOPE_TAG, "Unsupported NOV version, file: %1, verison: %2",
-            fileName, footer.version);
+            file.fileName(), footer.version);
         return std::nullopt;
     }
 
     if (!file.seek(footer.offset))
     {
-        NX_WARNING(NX_SCOPE_TAG,
-            "Invalid nov file: %1, failed to read index, offset: %2", fileName, footer.offset);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read index, offset: %2",
+            file.fileName(), footer.offset);
         return std::nullopt;
     }
 
     Header header;
     if (file.read((char*)&header, sizeof(header)) != sizeof(header))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read header", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read header", file.fileName());
         return std::nullopt;
     }
 
@@ -132,7 +68,8 @@ std::optional<FileInfo> parseVerson2(QFile& file, const QString& fileName)
         CryptoInfo crypto;
         if (file.read((char*)&crypto, sizeof(crypto)) != sizeof(crypto))
         {
-            NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read crypto info", fileName);
+            NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read crypto info",
+                file.fileName());
             return std::nullopt;
         }
         info.cryptoInfo = crypto;
@@ -143,7 +80,8 @@ std::optional<FileInfo> parseVerson2(QFile& file, const QString& fileName)
         StreamIndexEntry entry;
         if (file.read((char*)&entry, sizeof(entry)) != sizeof(entry))
         {
-            NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read index: %2", fileName, i);
+            NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read index: %2",
+                file.fileName(), i);
             return std::nullopt;
         }
         info.entries.push_back(entry);
@@ -212,8 +150,8 @@ std::optional<FileInfo> readNovFileIndex(const QString& fileName, bool allowTemp
     file.seek(0);
 
     std::optional<FileInfo> info = (footer.magic == Footer::kIndexMagic)
-        ? parseVerson2(file, fileName)
-        : parseVerson1(file, fileName, extension);
+        ? parseVerson2(std::move(file))
+        : parseVerson1(std::move(file), extension == "exe");
 
     if (info)
         NX_DEBUG(NX_SCOPE_TAG, "Parsed NOV file: %1", fileName);

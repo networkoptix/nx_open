@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/core/layout/layout_file_info.h>
+#include <nx/core/layout/layout_file_info_v1.h>
 #include <nx/utils/crypt/crypted_file_stream.h>
 #include <nx/utils/test_support/test_options.h>
 
@@ -23,9 +24,9 @@ static void writeTestFileVersion1(const QString& name)
     for (int i = 0; i < kCountOfIntegers; i++)
         file.write((char *) &x, sizeof(quint64));
 
-    StreamIndex1 index;
-    index.magic = StreamIndex1::kIndexCryptedMagic;
-    file.write((char *) &index, sizeof(StreamIndex1));
+    StreamIndexV1 index;
+    index.magic = StreamIndexV1::kIndexCryptedMagic;
+    file.write((char *) &index, sizeof(StreamIndexV1));
 
     CryptoInfo crypto;
     crypto.passwordSalt = nx::crypt::getRandomSalt();
@@ -37,7 +38,7 @@ static void writeTestFileVersion1(const QString& name)
         file.write((char *) &x, sizeof(quint64));
 
     quint64 offset = kCountOfIntegers * sizeof(quint64);
-    quint64 magic = kFileMagic;
+    quint64 magic = StreamIndexV1::kFileMagic;
 
     file.write((char *) &offset, sizeof(quint64));
     file.write((char *) &magic, sizeof(quint64));
