@@ -4514,11 +4514,11 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation>Exclusivo - El servidor lee de todas las carpetas pero sólo escribe en su propia carpeta. Elimina los datos antiguos de todas las carpetas.</translation>
+      <translation>Exclusivo - El servidor lee de todas las carpetas pero solo escribe en su propia carpeta. Elimina los datos antiguos de todas las carpetas.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation>Compartido - el servidor lee de todas las carpetas pero sólo escribe en su propia carpeta. Elimina los datos antiguos de su propia carpeta.</translation>
+      <translation>Compartido - el servidor lee de todas las carpetas pero solo escribe en su propia carpeta. Elimina los datos antiguos de su propia carpeta.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
