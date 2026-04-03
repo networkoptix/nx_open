@@ -178,9 +178,49 @@ function _processItemsRecursively(item, func, postFunc)
         postFunc(item)
 }
 
-function getValues(rootItem)
+function getValue(item)
+{
+    if (item.getValue !== undefined)
+    {
+        try
+        {
+            return item.getValue()
+        }
+        catch (error)
+        {
+            console.warn("getValue() failed for item %1:".arg(item.name), error)
+        }
+    }
+    else if (item.hasOwnProperty("value"))
+    {
+        return item.value
+    }
+}
+
+function getInvalidValue(item)
+{
+    if (!item.hasOwnProperty("validationRegex"))
+        return
+
+    try
+    {
+        const regex = new RegExp(item.validationRegex)
+        const value = getValue(item)
+        if (value !== undefined && !regex.test(value))
+            return value
+    }
+    catch (error)
+    {
+        console.warn("Invalid regexp pattern for item %1:".arg(item.name), error)
+    }
+}
+
+function getValues(rootItem, getValueFunc = getValue)
 {
     let result = {}
+
+    if (!getValueFunc)
+        return result
 
     _processItemsRecursively(rootItem,
         function(item)
@@ -188,21 +228,9 @@ function getValues(rootItem)
             if (!item.name)
                 return
 
-            if (item.getValue !== undefined)
-            {
-                try
-                {
-                    result[item.name] = item.getValue()
-                }
-                catch (error)
-                {
-                    console.warn("getValue() failed for item %1:".arg(item.name), error)
-                }
-            }
-            else if (item.hasOwnProperty("value"))
-            {
-                result[item.name] = item.value
-            }
+            const value = getValueFunc(item)
+            if (value !== undefined)
+                result[item.name] = value
         })
 
     return result

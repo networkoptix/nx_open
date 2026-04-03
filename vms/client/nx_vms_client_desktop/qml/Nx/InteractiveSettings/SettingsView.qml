@@ -102,6 +102,11 @@ Item
         return contentItem && Settings.getValues(contentItem)
     }
 
+    function getInvalidValues()
+    {
+        return contentItem && Settings.getValues(contentItem, Settings.getInvalidValue)
+    }
+
     function setValues(values, isInitial)
     {
         if (!contentItem)

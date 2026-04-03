@@ -589,7 +589,7 @@ void CameraSettingsDialog::discardChanges()
 
 bool CameraSettingsDialog::canApplyChanges() const
 {
-    return !d->store->state().readOnly;
+    return !d->store->state().readOnly && !d->store->state().hasInvalidAnalyticsSettingsValues();
 }
 
 bool CameraSettingsDialog::isNetworkRequestRunning() const

@@ -185,7 +185,8 @@ public:
         const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
-        const QJsonObject& paramValues);
+        const QJsonObject& paramValues,
+        const QJsonObject& invalidValues = QJsonObject());
 
     static State refreshDeviceAgentSettings(State state, const nx::Uuid& engineId);
 

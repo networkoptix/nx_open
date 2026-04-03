@@ -156,7 +156,8 @@ Item
                     currentEngineId,
                     activeItem ? activeItem.name : "",
                     analyticsSettingsView.settingsView.getValues(),
-                    parameters)
+                    parameters,
+                    analyticsSettingsView.settingsView.getInvalidValues())
             }
         }
 

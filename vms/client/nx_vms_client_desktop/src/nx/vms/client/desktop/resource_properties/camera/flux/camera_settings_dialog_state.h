@@ -452,6 +452,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
             UserEditable<QJsonObject> values;
             QJsonObject errors;
             bool loading = false;
+            bool hasInvalidUserValues = false;
         };
         QHash<nx::Uuid /*engineId*/, EngineSettings> settingsByEngineId;
 
@@ -508,6 +509,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     bool canAdjustPtzSensitivity() const;
     bool cameraControlEnabled() const;
     bool canShowHotspotsPage() const;
+    bool hasInvalidAnalyticsSettingsValues() const;
 
     /**
      * Advanced settings should be displayed for a single camera when manifest is already loaded and

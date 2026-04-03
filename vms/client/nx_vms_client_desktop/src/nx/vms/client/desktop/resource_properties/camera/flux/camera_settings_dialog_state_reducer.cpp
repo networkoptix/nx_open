@@ -3021,7 +3021,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
     const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
-    const QJsonObject& paramValues)
+    const QJsonObject& paramValues,
+    const QJsonObject& invalidValues)
 {
     if (!std::ranges::any_of(
         state.analytics.engines,
@@ -3030,11 +3031,26 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
         return {false, std::move(state)};
     }
 
-    auto& storedValues = state.analytics.settingsByEngineId[engineId].values;
+    auto& engineSettings = state.analytics.settingsByEngineId[engineId];
+    auto& storedValues = engineSettings.values;
     if (storedValues.get() == values && activeElement.isEmpty())
         return {false, std::move(state)};
 
+    const auto checkInvalidValues =
+        [&storedValues, &invalidValues]()
+        {
+            for (auto it = invalidValues.constBegin(); it != invalidValues.constEnd(); ++it)
+            {
+                const auto key = it.key();
+                const auto baseStoredValues = storedValues.getBase();
+                if (baseStoredValues.contains(key) && baseStoredValues.value(key) != it.value())
+                    return true;
+            }
+            return false;
+        };
+
     storedValues.setUser(values);
+    engineSettings.hasInvalidUserValues = checkInvalidValues();
     state.hasChanges = true;
 
     if (!activeElement.isEmpty())
@@ -3089,6 +3105,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
 
     settings.errors = data.errors;
     settings.loading = data.status != core::DeviceAgentData::Status::ok;
+    settings.hasInvalidUserValues = false;
 
     NX_TRACE(NX_SCOPE_TAG, "Device agent settings reset for %1, status is %2, loading: %3",
         engineId, (int)data.status, settings.loading);

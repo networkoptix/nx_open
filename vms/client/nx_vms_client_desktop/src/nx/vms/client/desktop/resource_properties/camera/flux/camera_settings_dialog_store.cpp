@@ -816,13 +816,14 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
     const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
-    const QJsonObject& paramValues)
+    const QJsonObject& paramValues,
+    const QJsonObject& invalidValues)
 {
     d->executeAction(
         [&](State state)
         {
             return Reducer::setDeviceAgentSettingsValues(
-                std::move(state), engineId, activeElement, values, paramValues);
+                std::move(state), engineId, activeElement, values, paramValues, invalidValues);
         });
 }
 void CameraSettingsDialogStore::handleOverusedEngines(const std::set<nx::Uuid>& overusedEngines)

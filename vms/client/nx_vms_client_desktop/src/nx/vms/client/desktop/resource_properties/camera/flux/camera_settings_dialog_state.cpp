@@ -145,6 +145,12 @@ bool CameraSettingsDialogState::canShowHotspotsPage() const
         && ini().enableCameraHotspotsFeature;
 }
 
+bool CameraSettingsDialogState::hasInvalidAnalyticsSettingsValues() const
+{
+    return std::ranges::any_of(analytics.settingsByEngineId,
+        [](auto& settings){ return settings.hasInvalidUserValues; });
+}
+
 bool CameraSettingsDialogState::canShowAdvancedPage() const
 {
     const auto& manifest = singleCameraProperties.advancedSettingsManifest;

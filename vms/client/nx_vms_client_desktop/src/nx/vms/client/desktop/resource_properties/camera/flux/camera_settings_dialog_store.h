@@ -208,8 +208,9 @@ public:
     Q_INVOKABLE void setDeviceAgentSettingsValues(
         const nx::Uuid& engineId,
         const QString& activeElement,
-        const QJsonObject& paramsModel,
-        const QJsonObject& values);
+        const QJsonObject& values,
+        const QJsonObject& paramValues,
+        const QJsonObject& invalidValues = QJsonObject());
     void handleOverusedEngines(const std::set<nx::Uuid>& overusedEngines);
 
     Q_INVOKABLE void refreshDeviceAgentSettings(const nx::Uuid& engineId);
