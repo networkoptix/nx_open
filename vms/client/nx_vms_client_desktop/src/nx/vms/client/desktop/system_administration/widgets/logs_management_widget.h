@@ -14,6 +14,8 @@ namespace Ui { class LogsManagementWidget; }
 
 namespace nx::vms::client::desktop {
 
+class MetricsReportFetcher;
+
 class LogsManagementWidget:
     public QnAbstractPreferencesWidget,
     public SystemContextAware
@@ -47,6 +49,7 @@ private:
 private:
     QScopedPointer<Ui::LogsManagementWidget> ui;
     QPointer<LogsManagementWatcher> m_watcher;
+    QPointer<MetricsReportFetcher> m_metricsReportFetcher;
     bool needUpdateBeforeClosing = false;
     LoadingIndicatorPtr m_loadingIndicator;
 
