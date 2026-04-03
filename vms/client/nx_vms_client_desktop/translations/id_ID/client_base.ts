@@ -1240,6 +1240,10 @@
       <source>Please re-enter password for layout %1:</source>
       <translation>Silakan masukkan kembali kata sandi untuk layout %1:</translation>
     </message>
+    <message>
+      <source>Corrupted input file.</source>
+      <translation type="unfinished">Corrupted input file.</translation>
+    </message>
   </context>
   <context>
     <name>FileExtensions</name>

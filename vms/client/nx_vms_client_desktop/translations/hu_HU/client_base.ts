@@ -1246,6 +1246,10 @@
       <source>Please re-enter password for layout %1:</source>
       <translation>Írja be újra %1 elrendezés jelszavát:</translation>
     </message>
+    <message>
+      <source>Corrupted input file.</source>
+      <translation type="unfinished">Corrupted input file.</translation>
+    </message>
   </context>
   <context>
     <name>FileExtensions</name>
