@@ -339,5 +339,9 @@
         <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>`serverId` must be `*` or nil UUID</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
