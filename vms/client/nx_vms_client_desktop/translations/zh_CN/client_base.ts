@@ -1240,6 +1240,10 @@
       <source>Please re-enter password for layout %1:</source>
       <translation>请重新输入布局 %1密码：</translation>
     </message>
+    <message>
+      <source>Corrupted input file.</source>
+      <translation type="unfinished">Corrupted input file.</translation>
+    </message>
   </context>
   <context>
     <name>FileExtensions</name>

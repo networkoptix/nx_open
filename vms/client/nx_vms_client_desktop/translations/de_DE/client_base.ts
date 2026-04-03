@@ -1246,6 +1246,10 @@
       <source>Please re-enter password for layout %1:</source>
       <translation>Bitte geben Sie das Passwort für das Layout %1 erneut ein:</translation>
     </message>
+    <message>
+      <source>Corrupted input file.</source>
+      <translation type="unfinished">Corrupted input file.</translation>
+    </message>
   </context>
   <context>
     <name>FileExtensions</name>

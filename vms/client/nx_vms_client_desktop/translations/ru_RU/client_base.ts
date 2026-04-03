@@ -1258,6 +1258,10 @@
       <source>Please re-enter password for layout %1:</source>
       <translation>Пожалуйста, введите пароль для раскладки %1 еще раз:</translation>
     </message>
+    <message>
+      <source>Corrupted input file.</source>
+      <translation type="unfinished">Corrupted input file.</translation>
+    </message>
   </context>
   <context>
     <name>FileExtensions</name>
