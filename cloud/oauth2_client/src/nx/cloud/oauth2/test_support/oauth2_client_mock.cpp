@@ -169,6 +169,58 @@ void Oauth2ClientMock::issueServiceToken(
         path, request, std::move(completionHandler));
 }
 
+void Oauth2ClientMock::createServiceAccount(
+    const api::CreateServiceAccountRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, api::CreateServiceAccountResponse{});
+
+    Oauth2ClientMockManager::RequestPath path = {
+        api::kServiceAccountsPath, nx::network::http::Method::post};
+    processRequest<api::CreateServiceAccountRequest, api::CreateServiceAccountResponse>(
+        path, request, std::move(completionHandler));
+}
+
+void Oauth2ClientMock::listServiceAccounts(
+    nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<api::ServiceAccount>)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, std::vector<api::ServiceAccount>{});
+
+    Oauth2ClientMockManager::RequestPath path = {
+        api::kServiceAccountsPath, nx::network::http::Method::get};
+    processRequest<std::vector<api::ServiceAccount>>(
+        path, std::move(completionHandler), Oauth2MockResult{});
+}
+
+void Oauth2ClientMock::deleteServiceAccount(
+    const std::string& id,
+    nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok);
+
+    Oauth2ClientMockManager::RequestPath path = {
+        nx::network::http::rest::substituteParameters(api::kServiceAccountByIdPath, {id}),
+        nx::network::http::Method::delete_};
+    processRequest<std::string, void>(path, id, std::move(completionHandler));
+}
+
+void Oauth2ClientMock::updateServiceAccountKey(
+    const std::string& id,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::UpdateServiceAccountKeyResponse)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, api::UpdateServiceAccountKeyResponse{});
+
+    Oauth2ClientMockManager::RequestPath path = {
+        nx::network::http::rest::substituteParameters(api::kServiceAccountUpdateKeyPath, {id}),
+        nx::network::http::Method::post};
+    processRequest<std::string, api::UpdateServiceAccountKeyResponse>(
+        path, id, std::move(completionHandler));
+}
+
 void Oauth2ClientMock::setCredentials(network::http::Credentials)
 {
 }

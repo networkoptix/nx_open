@@ -27,4 +27,10 @@ static constexpr char kApiDocPrefix[] = "/oauth2/docs/api";
 
 static constexpr char kOauthServiceToken[] = "/oauth2/v1/internal/serviceToken";
 
+static constexpr char kServiceAccountsPath[]    = "/oauth2/v1/serviceAccounts";
+static constexpr char kServiceAccountByIdPath[] = "/oauth2/v1/serviceAccounts/{serviceAccountId}";
+static constexpr char kServiceAccountUpdateKeyPath[] =
+    "/oauth2/v1/serviceAccounts/{serviceAccountId}/updateKey";
+static constexpr char kServiceAccountIdParam[]  = "serviceAccountId";
+
 } // namespace nx::cloud::oauth2::api

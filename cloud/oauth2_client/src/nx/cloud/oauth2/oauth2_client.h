@@ -80,6 +80,24 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) = 0;
 
+    virtual void createServiceAccount(
+        const api::CreateServiceAccountRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)>
+            completionHandler) = 0;
+
+    virtual void listServiceAccounts(
+        nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<api::ServiceAccount>)>
+            completionHandler) = 0;
+
+    virtual void deleteServiceAccount(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) = 0;
+
+    virtual void updateServiceAccountKey(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::UpdateServiceAccountKeyResponse)>
+            completionHandler) = 0;
+
     virtual void setCredentials(network::http::Credentials credentials) = 0;
 
     // It shouldn't be here.
@@ -153,6 +171,24 @@ public:
     virtual void issueServiceToken(
         const api::IssueServiceTokenRequest& request,
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
+    void createServiceAccount(
+        const api::CreateServiceAccountRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)>
+            completionHandler) override;
+
+    void listServiceAccounts(
+        nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<api::ServiceAccount>)>
+            completionHandler) override;
+
+    void deleteServiceAccount(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+    void updateServiceAccountKey(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::UpdateServiceAccountKeyResponse)>
             completionHandler) override;
 
     void setCredentials(network::http::Credentials credentials) override;

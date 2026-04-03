@@ -156,6 +156,50 @@ void Oauth2Client::issueServiceToken(
         std::move(completionHandler));
 }
 
+void Oauth2Client::createServiceAccount(
+    const api::CreateServiceAccountRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)> handler)
+{
+    base_type::template makeAsyncCall<api::CreateServiceAccountResponse>(
+        nx::network::http::Method::post,
+        api::kServiceAccountsPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
+}
+
+void Oauth2Client::listServiceAccounts(
+    nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<api::ServiceAccount>)> handler)
+{
+    base_type::template makeAsyncCall<std::vector<api::ServiceAccount>>(
+        nx::network::http::Method::get,
+        api::kServiceAccountsPath,
+        {}, // query
+        std::move(handler));
+}
+
+void Oauth2Client::deleteServiceAccount(
+    const std::string& id,
+    nx::MoveOnlyFunc<void(db::api::ResultCode)> handler)
+{
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::delete_,
+        nx::network::http::rest::substituteParameters(api::kServiceAccountByIdPath, {id}),
+        {}, // query
+        std::move(handler));
+}
+
+void Oauth2Client::updateServiceAccountKey(
+    const std::string& id,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::UpdateServiceAccountKeyResponse)> handler)
+{
+    base_type::template makeAsyncCall<api::UpdateServiceAccountKeyResponse>(
+        nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(api::kServiceAccountUpdateKeyPath, {id}),
+        {}, // query
+        std::move(handler));
+}
+
 nx::network::http::ClientOptions& Oauth2Client::httpClientOptions()
 {
     return base_type::httpClientOptions();

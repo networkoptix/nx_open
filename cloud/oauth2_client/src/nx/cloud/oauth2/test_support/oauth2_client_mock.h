@@ -112,6 +112,24 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) override;
 
+    void createServiceAccount(
+        const api::CreateServiceAccountRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)>
+            completionHandler) override;
+
+    void listServiceAccounts(
+        nx::MoveOnlyFunc<void(db::api::ResultCode, std::vector<api::ServiceAccount>)>
+            completionHandler) override;
+
+    void deleteServiceAccount(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode)> completionHandler) override;
+
+    void updateServiceAccountKey(
+        const std::string& id,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::UpdateServiceAccountKeyResponse)>
+            completionHandler) override;
+
     void setCredentials(network::http::Credentials credentials) override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;

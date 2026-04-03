@@ -58,4 +58,43 @@ struct IssueServiceTokenRequest
 
 NX_REFLECTION_INSTRUMENT(IssueServiceTokenRequest, (scope))
 
+
+struct ServiceAccount
+{
+    std::string id;
+    std::string name;
+    std::string email;
+    std::string scopes;
+    std::chrono::seconds createdAt{0};
+    std::string publicKey;
+    bool disabled = false;
+};
+
+NX_REFLECTION_INSTRUMENT(ServiceAccount, (id)(name)(email)(scopes)(createdAt)(publicKey)(disabled))
+
+struct CreateServiceAccountRequest
+{
+    std::string name;
+    std::string scopes;
+};
+
+NX_REFLECTION_INSTRUMENT(CreateServiceAccountRequest, (name)(scopes))
+
+// The privateKey field is returned only once.
+struct CreateServiceAccountResponse
+{
+    ServiceAccount account;
+    std::string privateKey;
+};
+
+NX_REFLECTION_INSTRUMENT(CreateServiceAccountResponse, (account)(privateKey))
+
+// The privateKey field is returned only once, after key rotation.
+struct UpdateServiceAccountKeyResponse
+{
+    std::string privateKey;
+};
+
+NX_REFLECTION_INSTRUMENT(UpdateServiceAccountKeyResponse, (privateKey))
+
 } // namespace nx::cloud::oauth2::api
