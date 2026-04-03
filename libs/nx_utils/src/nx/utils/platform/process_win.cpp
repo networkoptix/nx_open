@@ -6,6 +6,23 @@
 
 #include <QtCore/QProcess>
 
+namespace {
+
+std::unique_ptr<QProcess> createProcess(
+    const QString& executablePath,
+    const QStringList& arguments,
+    const QString& workingDirectory)
+{
+    auto process = std::make_unique<QProcess>();
+    process->setProgram(executablePath);
+    process->setArguments(arguments);
+    if (!workingDirectory.isNull())
+        process->setWorkingDirectory(workingDirectory);
+    return process;
+}
+
+} // anonymous namespace
+
 namespace nx::utils {
 
 SystemError::ErrorCode killProcessByPid(qint64 pid)
@@ -26,11 +43,8 @@ bool startProcessDetached(
     const QString& workingDirectory,
     qint64* pid)
 {
-    QProcess p;
-    p.setProgram(executablePath);
-    p.setWorkingDirectory(workingDirectory);
-    p.setArguments(arguments);
-    p.setCreateProcessArgumentsModifier(
+    auto p = createProcess(executablePath, arguments, workingDirectory);
+    p->setCreateProcessArgumentsModifier(
         [](QProcess::CreateProcessArguments* args)
         {
             args->startupInfo->dwFlags &= ~DWORD(STARTF_USESTDHANDLES);
@@ -38,7 +52,7 @@ bool startProcessDetached(
             args->inheritHandles = false;
         });
 
-    return p.startDetached(pid);
+    return p->startDetached(pid);
 }
 
 bool checkProcessExists(qint64 pid)
@@ -55,6 +69,21 @@ bool checkProcessExists(qint64 pid)
     }
 
     return exists;
+}
+
+std::unique_ptr<QProcess> startProcess(
+    const QString& executablePath,
+    const QStringList& arguments,
+    const QString& workingDirectory)
+{
+    auto p = createProcess(executablePath, arguments, workingDirectory);
+    p->setCreateProcessArgumentsModifier(
+        [](QProcess::CreateProcessArguments* args)
+        {
+            args->inheritHandles = false;
+        });
+    p->start();
+    return p;
 }
 
 } // namespace nx::utils
