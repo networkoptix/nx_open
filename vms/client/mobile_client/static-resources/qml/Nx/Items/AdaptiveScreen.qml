@@ -66,6 +66,8 @@ FocusScope
     readonly property bool hasLeftPanel: leftPanel.item
     readonly property bool hasRightPanel: rightPanel.item
 
+    readonly property int spacing: 1
+
     Item
     {
         // All the children mush be hidden by default to prevent occasion placing on the background.
@@ -161,7 +163,7 @@ FocusScope
         id: portraitLayout
 
         anchors.fill: parent
-        spacing: 1
+        spacing: root.spacing
         visible: !LayoutController.isTabletLayout
 
         ProxyItem
@@ -188,7 +190,7 @@ FocusScope
         id: landscapeLayout
 
         anchors.fill: parent
-        spacing: 1
+        spacing: root.spacing
         visible: LayoutController.isTabletLayout
 
         Panel
@@ -219,7 +221,7 @@ FocusScope
             ColumnLayout
             {
                 anchors.fill: parent
-                spacing: landscapeLayout.spacing
+                spacing: root.spacing
 
                 ProxyItem
                 {

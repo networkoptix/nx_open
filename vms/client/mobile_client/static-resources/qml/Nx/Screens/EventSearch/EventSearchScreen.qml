@@ -405,11 +405,13 @@ AdaptiveScreen
     {
         id: leftPanelPopup
 
-        x: screen.leftPanel.width
+        parent: screen.leftPanel
+        x: screen.leftPanel.width + screen.spacing
         height: screen.leftPanel.height
         width: 330
+        closePolicy: Controls.Popup.CloseOnPressOutsideParent | Controls.Popup.CloseOnEscape
         visible: false
-        modal: true
+        modal: false
         padding: 0
         contentItem: Panel
         {
@@ -429,6 +431,18 @@ AdaptiveScreen
         {
             optionSelectorItem.apply()
             screenController.updateIfRequired()
+        }
+
+        Connections
+        {
+            target: screen.leftPanel
+            enabled: leftPanelPopup.visible
+
+            function onVisibleChanged()
+            {
+                if (!screen.leftPanel.visible)
+                    leftPanelPopup.close()
+            }
         }
     }
 
