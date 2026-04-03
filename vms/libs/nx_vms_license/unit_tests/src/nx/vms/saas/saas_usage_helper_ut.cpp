@@ -529,7 +529,8 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
 // VMS-61807: When cloud storage services are removed (quantity becomes 0), cameras should not
 // be reported as using a service that was never purchased. Previously, cameras were incorrectly
 // assigned to the lowest-resolution service available from the channel partner (e.g. 2 MP) instead
-// of not being assigned to any service.
+// of the purchased service (e.g. 10 MP). This happened because calculateAvailableUnsafe() included
+// all services from the channel partner catalog, not just purchased ones.
 TEST_F(SaasServiceUsageHelperTest, CloudStorageNoPhantomUsageAfterServicesRemoved)
 {
     using namespace nx::vms::api;
@@ -583,17 +584,61 @@ TEST_F(SaasServiceUsageHelperTest, CloudStorageNoPhantomUsageAfterServicesRemove
     manager->loadSaasDataAsync(kSaasDataNoCloudStorageJson);
     m_cloudeStorageHelper->invalidateCache();
 
-    // After removal, no cloud storage services should have usage reported.
-    // Cameras should not be attributed to any service (including ones never purchased).
+    // After removal, cameras should still be assigned to purchased services (now with 0 capacity),
+    // so that CPS can detect overuse. The 2 MP cameras should be assigned to the 5 MP service
+    // (lowest resolution among purchased services that fits).
     serviceInfo = m_cloudeStorageHelper->allInfoByService();
-    for (const auto& [serviceId, data]: serviceInfo)
-    {
-        ASSERT_TRUE(serviceId.isNull())
-            << "Cameras should not be assigned to service " << serviceId.toString().toStdString()
-            << " which has no purchased channels";
-    }
+    ASSERT_EQ(3, serviceInfo.size());
+    ASSERT_EQ(2, serviceInfo[kServiceFiveMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceTenMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceUnlimitedMegapixels].inUse);
 
-    // Overflow should still be detected.
+    // Overflow should be detected (cameras have backup but service has 0 capacity).
+    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
+    ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
+}
+
+// VMS-61807: Verify that services only present in the channel partner catalog (never purchased)
+// do not appear in usage reports, even when their resolution matches a camera.
+TEST_F(SaasServiceUsageHelperTest, CloudStorageNeverPurchasedServiceExcluded)
+{
+    using namespace nx::vms::api;
+
+    // Simulate a site where only the 10 MP service was ever purchased (now removed).
+    // The 5 MP and unlimited services were never purchased (not in SaasData.services).
+    static const std::string kSaasDataOnly10MpJson = R"json(
+    {
+      "cloudSystemId": "2df6b2f1-df31-451d-aac9-6bcb663e210b",
+      "state" : "active",
+      "services" : {
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0dd": {
+          "quantity": 0
+        },
+        "46fd4533-16dd-4e07-b285-ef059b4ecb31": {
+          "quantity": 10
+        }
+      },
+      "security" : {
+        "lastCheck": "2023-06-05 18:10:52",
+        "tmpExpirationDate" : "2023-06-05 20:40:52",
+        "issue" : "No issues"
+      },
+      "signature" : ""
+    }
+    )json";
+
+    auto manager = systemContext()->saasServiceManager();
+    manager->loadSaasDataAsync(kSaasDataOnly10MpJson);
+
+    // Add 2 cameras with 2 MP resolution and backup enabled.
+    auto cameras = addCameras(/*size*/ 2, /*megapixels*/ 2, /*useBackup*/ true);
+
+    // Only the 10 MP service (the only purchased one) should be in the cache.
+    // The 2 MP cameras should be assigned to it (lowest purchased service >= 2 MP).
+    auto serviceInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(1, serviceInfo.size());
+    ASSERT_EQ(2, serviceInfo[kServiceTenMegapixels].inUse);
+
     ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
     ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
 }

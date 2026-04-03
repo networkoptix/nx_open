@@ -315,10 +315,13 @@ int CloudStorageServiceUsageHelper::licenseDeficit() const
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
     auto& cache = *m_cache;
+    const auto saasData = saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
-        if (parameters.totalChannelNumber == 0)
+        // Skip services that have no purchased channels and were never purchased for this site.
+        // Services in saasData.services were purchased (even if quantity is now 0 after removal).
+        if (parameters.totalChannelNumber == 0 && !saasData.services.contains(id))
             continue;
         auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
