@@ -331,7 +331,7 @@ void QnAvailableCameraListModelPrivate::removeCamera(
         NX_ASSERT(systemContext))
     {
         if (systemContexts.remove(systemContext))
-            emit q->systemContextAdded(systemContext);
+            emit q->systemContextRemoved(systemContext);
     }
 
     if (!silent)

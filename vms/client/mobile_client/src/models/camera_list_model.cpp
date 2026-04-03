@@ -170,7 +170,8 @@ void QnCameraListModel::setRawLayout(QnLayoutResource* value)
         : QnLayoutResourcePtr{};
 
     const auto currentLayout = d->model->layout();
-    if (currentLayout == layout)
+    // We cannot check "all cameras" layout, because it is the same (nullptr) for any system.
+    if (layout && (currentLayout == layout))
         return;
 
     d->model->setLayout(layout);

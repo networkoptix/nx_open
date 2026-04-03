@@ -201,6 +201,7 @@ Item
                         Qt.callLater(
                             function()
                             {
+                                flickable.updateSizesCalculatorAvailableGeometry()
                                 d.loadTargetColumnsCount()
                                 d.loadLayoutPosition()
                             })
@@ -740,6 +741,16 @@ Item
     CamerasGridHelper
     {
         id: camerasGridHelper
+    }
+
+    Connections
+    {
+        target: windowContext.sessionManager
+
+        function onSessionRestored()
+        {
+            camerasModel.updateControlState()
+        }
     }
 
     NxObject
