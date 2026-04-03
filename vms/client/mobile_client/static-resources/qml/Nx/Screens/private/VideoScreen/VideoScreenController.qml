@@ -304,9 +304,11 @@ NxObject
     {
         if (d.playing && mediaPlayer.playing)
             return
-        d.playing = true
+
         if (mediaPlayer.liveMode)
             mediaPlayer.position = d.lastPosition //< Force out of the live mode.
+
+        d.playing = true
         mediaPlayer.play()
         d.savePosition()
     }
