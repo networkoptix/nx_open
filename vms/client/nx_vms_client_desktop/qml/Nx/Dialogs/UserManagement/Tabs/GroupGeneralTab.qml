@@ -154,16 +154,13 @@ Item
                 {
                     text: qsTr("Description")
 
-                    TextAreaWithScroll
+                    DescriptionTextArea
                     {
                         id: descriptionTextArea
 
                         width: parent.width
-                        height: 64
                         readOnly: !control.descriptionEditable
-                        wrapMode: TextEdit.Wrap
 
-                        textArea.KeyNavigation.priority: KeyNavigation.BeforeItem
                         textArea.KeyNavigation.tab: groupsComboBox
                         textArea.KeyNavigation.backtab: groupsComboBox
                     }
