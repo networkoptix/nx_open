@@ -326,7 +326,7 @@ public:
         // TODO: #vkutin Refactor this class to operate with "recording" and "extra" content types.
         const bool analytics = m_slider->selectedExtraContent() == Qn::AnalyticsContent;
 
-        m_colors[Qn::RecordingContent] = core::colorTheme()->color("green_d", 128);
+        m_colors[Qn::RecordingContent] = core::colorTheme()->color("green_d", 140);
         m_colors[Qn::MotionContent] = analytics
             ? core::colorTheme()->color("yellow")
             : core::colorTheme()->color("red");
