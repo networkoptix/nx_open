@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/system_administration/delegates/logs_management_table_delegate.h>
 #include <nx/vms/client/desktop/system_administration/models/logs_management_model.h>
+#include <nx/vms/client/desktop/system_administration/watchers/metrics_report_fetcher.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
@@ -78,6 +79,7 @@ LogsManagementWidget::LogsManagementWidget(
     SystemContextAware(context),
     ui(new Ui::LogsManagementWidget),
     m_watcher(context->logsManagementWatcher()),
+    m_metricsReportFetcher(new MetricsReportFetcher(context, this)),
     m_loadingIndicator(new LoadingIndicator())
 {
     setupUi();
@@ -97,13 +99,17 @@ LogsManagementWidget::~LogsManagementWidget()
 
 bool LogsManagementWidget::isNetworkRequestRunning() const
 {
-    return m_watcher->state() == LogsManagementWatcher::State::loading;
+    return m_watcher->state() == LogsManagementWatcher::State::loading
+        || m_metricsReportFetcher->isRunning();
 }
 
 void LogsManagementWidget::discardChanges()
 {
-    if (isNetworkRequestRunning())
+    if (m_watcher->state() == LogsManagementWatcher::State::loading)
         m_watcher->cancelDownload();
+
+    if (m_metricsReportFetcher->isRunning())
+        m_metricsReportFetcher->cancelRequest();
 }
 
 void LogsManagementWidget::showEvent(QShowEvent* event)
@@ -203,13 +209,19 @@ void LogsManagementWidget::setupUi()
     QFont font = ui->downloadButton->font();
     font.setBold(false);
     ui->downloadButton->setFont(font);
+    ui->downloadFullReportButton->setFont(font);
     ui->settingsButton->setFont(font);
     ui->resetButton->setFont(font);
 
     ui->downloadButton->setIcon(qnSkin->icon(kDownloadIcon));
     ui->downloadButton->setFlat(true);
+
+    ui->downloadFullReportButton->setIcon(qnSkin->icon(kDownloadIcon));
+    ui->downloadFullReportButton->setFlat(true);
+
     ui->settingsButton->setIcon(qnSkin->icon(kSettingsIcon));
     ui->settingsButton->setFlat(true);
+
     ui->resetButton->setIcon(qnSkin->icon(kResetIcon));
     ui->openFolderButton->setIcon(qnSkin->icon(kFolderIcon));
 
@@ -272,6 +284,40 @@ void LogsManagementWidget::setupUi()
             updateWidgets(m_watcher->state());
         });
 
+    connect(m_metricsReportFetcher, &MetricsReportFetcher::reportReady, this,
+        [this](const QJsonDocument& report)
+        {
+            const QStringList fileNameParts {
+                "report",
+                report.object().value("system").toString()
+            };
+
+            const auto defaultFilePath =
+                QDir(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation))
+                    .filePath(fileNameParts.join("-") + ".json");
+
+            const auto filePath = QFileDialog::getSaveFileName(
+                this,
+                tr("Save Report"),
+                defaultFilePath);
+
+            if (filePath.isEmpty())
+                return;
+
+            QFile file(filePath);
+            if (!file.open(QIODevice::WriteOnly))
+                return;
+
+            file.write(report.toJson(QJsonDocument::Indented));
+            file.close();
+        });
+
+    connect(m_metricsReportFetcher, &MetricsReportFetcher::isRunningChanged, this,
+        [this]()
+        {
+            ui->downloadFullReportButton->setEnabled(!m_metricsReportFetcher->isRunning());
+        });
+
     connect(ui->settingsButton, &QPushButton::clicked, this,
         [this]
         {
@@ -321,6 +367,9 @@ void LogsManagementWidget::setupUi()
             if (!dir.isEmpty())
                 m_watcher->startDownload(dir);
         });
+
+    connect(ui->downloadFullReportButton, &QPushButton::clicked,
+        m_metricsReportFetcher, &MetricsReportFetcher::requestMetricsReport);
 
     connect(ui->openFolderButton, &QPushButton::clicked, this,
         [this]
@@ -437,6 +486,7 @@ void LogsManagementWidget::updateWidgets(LogsManagementWatcher::State state)
     ui->unitsTable->setColumnHidden(LogsManagementModel::Columns::StatusColumn, /*downloadStarted*/ false);
 
     ui->downloadButton->setVisible(selectionCount);
+    ui->downloadFullReportButton->setVisible(!selectionCount);
     ui->settingsButton->setVisible(selectionCount);
     ui->resetButton->setVisible(!selectionCount);
     ui->selectedButton->setVisible(selectionCount);
