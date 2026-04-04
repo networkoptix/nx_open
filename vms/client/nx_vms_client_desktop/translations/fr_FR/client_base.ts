@@ -9159,6 +9159,10 @@ Les performances du client sont dégradées.</translation>
         <numerusform>%n sélectionnés :</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Save Report</source>
+      <translation type="unfinished">Save Report</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>

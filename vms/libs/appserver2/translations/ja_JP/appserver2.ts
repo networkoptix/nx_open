@@ -341,7 +341,7 @@
     </message>
     <message>
       <source>`serverId` must be `*` or nil UUID</source>
-      <translation type="unfinished">`serverId` must be `*` or nil UUID</translation>
+      <translation>`serverId` は、 `*` または nil UUID でなければなりません。</translation>
     </message>
   </context>
 </TS>

@@ -9017,6 +9017,10 @@ Site performance is degraded.</source>
         <numerusform>%n 선택됨:</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Save Report</source>
+      <translation type="unfinished">Save Report</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>

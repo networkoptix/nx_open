@@ -1499,6 +1499,10 @@
       <source>Open files folder</source>
       <translation>Abra a pasta de arquivos</translation>
     </message>
+    <message>
+      <source>Download Full Report</source>
+      <translation type="unfinished">Download Full Report</translation>
+    </message>
   </context>
   <context>
     <name>LookAndFeelPreferencesWidget</name>
