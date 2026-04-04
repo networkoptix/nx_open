@@ -1260,7 +1260,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Uszkodzony plik wejściowy.</translation>
     </message>
   </context>
   <context>
@@ -9453,6 +9453,10 @@ Wydajność witryny jest obniżona.</translation>
         <numerusform>%n wybrano:</numerusform>
         <numerusform>%n wybrano:</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Save Report</source>
+      <translation type="unfinished">Save Report</translation>
     </message>
   </context>
   <context>

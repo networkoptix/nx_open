@@ -31,7 +31,7 @@
   <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">キャンセル</String>
   <String Id="ProgressHeader">セットアップの進行状況</String>
-  <String Id="ProgressLabel">処理しています...</String>
+  <String Id="ProgressLabel">処理中…</String>
   <String Id="OverallProgressPackageText">初期化中...</String>
   <String Id="ProgressCancelButton">キャンセル</String>
   <String Id="ModifyHeader">セットアップの変更</String>

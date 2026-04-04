@@ -1538,6 +1538,10 @@
       <source>Open files folder</source>
       <translation>Abrir cartafol de ficheiros</translation>
     </message>
+    <message>
+      <source>Download Full Report</source>
+      <translation type="unfinished">Download Full Report</translation>
+    </message>
   </context>
   <context>
     <name>LookAndFeelPreferencesWidget</name>

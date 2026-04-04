@@ -9029,6 +9029,10 @@ Hiệu suất Chi nhánh bị giảm.</translation>
         <numerusform>%n đã chọn:</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Save Report</source>
+      <translation type="unfinished">Save Report</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>

@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>入力ファイルが破損しています。</translation>
     </message>
   </context>
   <context>
@@ -9034,6 +9034,10 @@ Site performance is degraded.</source>
         <numerusform>%n 選択中:</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Save Report</source>
+      <translation type="unfinished">Save Report</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
@@ -9904,7 +9908,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Downloading update</source>
-      <translation>更新プログラムダウンロード中</translation>
+      <translation>更新ファイルをダウンロードしています</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
@@ -12935,7 +12939,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
       <translation>
-        <numerusform>%n ファイルを削除しますか?</numerusform>
+        <numerusform>これらの %n ファイルを完全に削除してもよろしいですか?</numerusform>
       </translation>
     </message>
     <message>
