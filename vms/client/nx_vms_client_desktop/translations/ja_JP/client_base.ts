@@ -9872,7 +9872,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Downloading update</source>
-      <translation>更新プログラムダウンロード中</translation>
+      <translation>更新ファイルをダウンロードしています</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
@@ -12943,7 +12943,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
       <translation>
-        <numerusform>%n ファイルを削除しますか?</numerusform>
+        <numerusform>これらの %n ファイルを完全に削除してもよろしいですか?</numerusform>
       </translation>
     </message>
     <message>
