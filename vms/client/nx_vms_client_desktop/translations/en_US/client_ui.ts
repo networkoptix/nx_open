@@ -1538,6 +1538,10 @@
         <source>Open files folder</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Download Full Report</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>

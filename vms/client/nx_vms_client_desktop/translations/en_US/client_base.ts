@@ -9165,6 +9165,10 @@ Site performance is degraded.</source>
             <numerusform>%n selected:</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Save Report</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::LookupListActionHandler</name>
