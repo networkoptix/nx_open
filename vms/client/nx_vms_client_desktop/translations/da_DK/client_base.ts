@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Beskadiget inputfil.</translation>
     </message>
   </context>
   <context>
@@ -9161,7 +9161,7 @@ Webstedets ydeevne er forringet.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Gem Rapport</translation>
     </message>
   </context>
   <context>

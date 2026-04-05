@@ -1501,7 +1501,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>Télécharger le rapport complet</translation>
     </message>
   </context>
   <context>
