@@ -1540,7 +1540,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>下載完整報告</translation>
     </message>
   </context>
   <context>

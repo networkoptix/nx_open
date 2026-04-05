@@ -1540,7 +1540,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>Ladda ner hela rapporten</translation>
     </message>
   </context>
   <context>
