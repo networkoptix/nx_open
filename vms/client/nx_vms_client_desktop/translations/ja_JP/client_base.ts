@@ -9036,7 +9036,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>レポートを保存</translation>
     </message>
   </context>
   <context>
