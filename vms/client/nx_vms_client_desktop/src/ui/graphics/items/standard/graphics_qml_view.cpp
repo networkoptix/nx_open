@@ -28,17 +28,17 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <QtWidgets/QGraphicsView>
+
 #if QT_CONFIG(vulkan)
     #include <QtGui/private/qvulkandefaultinstance_p.h>
 #endif
 
 #include <qt_graphics_items/graphics_utils.h>
 
-#include <nx/utils/log/log.h>
 #include <nx/pathkit/rhi_paint_engine.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
-#include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 #include <ui/graphics/view/quick_widget_container.h>
@@ -46,8 +46,8 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/graphics/view/quick_widget_container.h>
 #include <utils/common/delayed.h>
+
 namespace {
 
 constexpr auto kQuadVertexCount = 4;
@@ -174,8 +174,17 @@ protected:
                 break;
             }
             case QEvent::WindowStateChange:
-                m_graphicsQmlView->quickWindow()->setWindowState(resolveWindowState(m_monitoredWidget->windowState()));
+                m_graphicsQmlView->quickWindow()->setWindowState(
+                    resolveWindowState(m_monitoredWidget->windowState()));
                 break;
+
+            case QEvent::DevicePixelRatioChange:
+                // Change the associated screen in case the scene was moved to another monitor.
+                // This may be removed when offscreen QQuickWindow will stop connecting to default
+                // screen. See QWindowPrivate::init for the details.
+                m_graphicsQmlView->quickWindow()->setScreen(m_monitoredWidget->screen());
+                break;
+
             default:
                 break;
         }
@@ -479,6 +488,18 @@ bool GraphicsQmlView::event(QEvent* event)
     }
 
     return base_type::event(event);
+}
+
+QVariant GraphicsQmlView::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+    // Override primary screen in case the scene is already on the secondary.
+    if (change == ItemSceneHasChanged)
+    {
+        if (auto renderWindow = d->renderControl->renderWindow(nullptr))
+            d->quickWindow->setScreen(renderWindow->screen());
+    }
+
+    return base_type::itemChange(change, value);
 }
 
 QVariant GraphicsQmlView::inputMethodQuery(Qt::InputMethodQuery query) const
