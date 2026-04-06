@@ -288,7 +288,7 @@ struct WebViewController::Private: public QObject
         return nullptr;
     }
 
-    QQuickWebEngineView* webEngineView()
+    QQuickWebEngineView* webEngineView() const
     {
         if (const auto root = rootObject())
             return root->findChild<QQuickWebEngineView*>(kWebViewId);
@@ -649,6 +649,14 @@ bool WebViewController::canGoBack() const
     const auto webView = root->findChild<QQuickWebEngineView*>(kWebViewId);
 
     return webView && webView->canGoBack();
+}
+
+qreal WebViewController::zoomFactor() const
+{
+    if (const auto webView = d->webEngineView())
+        return webView->zoomFactor();
+
+    return 0.0;
 }
 
 void WebViewController::reload()

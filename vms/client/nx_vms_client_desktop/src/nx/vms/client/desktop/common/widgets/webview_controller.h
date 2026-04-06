@@ -136,6 +136,8 @@ public:
     /** Returns true if there are prior session history entries, false otherwise. */
     bool canGoBack() const;
 
+    qreal zoomFactor() const;
+
     /**
      * Add a script to the web page current profile. If the script with the same name already
      * exists, it is replaced with the new one.

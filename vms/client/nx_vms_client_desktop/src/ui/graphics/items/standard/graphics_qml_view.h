@@ -51,6 +51,7 @@ protected:
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 
     virtual bool event(QEvent* event) override;
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;

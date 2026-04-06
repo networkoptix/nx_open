@@ -328,12 +328,32 @@ Qn::RenderStatus QnWebResourceWidget::paintChannelBackground(QPainter* painter, 
 
 QString QnWebResourceWidget::calculateDetailsText() const
 {
-    NX_ASSERT(m_webEngineView);
+    using namespace nx::vms::common::html;
+
+    QString result;
+    const auto addDetailString =
+        [&result](const QString& value)
+        {
+            if (!value.isEmpty())
+                result.append(paragraph(value));
+        };
+
     static constexpr int kMaxUrlDisplayLength = 96;
     // Truncating URL if it is too long to display properly
     // I could strip query part from URL, but some sites, like youtube will be stripped too much
-    QString details = m_webEngineView->url().toString();
-    return nx::utils::elideString(details, kMaxUrlDisplayLength);
+    const auto url = nx::utils::elideString(
+        m_webEngineView->url().toString(), kMaxUrlDisplayLength);
+
+    // Info text is used in FT and should be modified carefully.
+    if (!ini().developerMode)
+        return url;
+
+    addDetailString(url);
+    addDetailString(NX_FMT("Zoom: %1%", m_webEngineView->controller()->zoomFactor() * 100));
+    addDetailString(NX_FMT(
+        "Scale: %1%", m_webEngineView->quickWindow()->effectiveDevicePixelRatio() * 100));
+
+    return result;
 }
 
 QPixmap QnWebResourceWidget::calculateDetailsIcon() const
