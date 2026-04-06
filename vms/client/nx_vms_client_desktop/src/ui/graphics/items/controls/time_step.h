@@ -9,7 +9,7 @@
 #include <QtCore/QTimeZone>
 #include <QtCore/QtGlobal>
 
-class QnTimeStep
+class NX_VMS_CLIENT_DESKTOP_API QnTimeStep
 {
     using milliseconds = std::chrono::milliseconds;
 
@@ -67,23 +67,26 @@ public:
 // We do not want chrono::milliseconds propagate to hashes etc., so we leave qint64..
 typedef QPair<qint64, qint64> QnTimeStepLongCacheKey;
 
-// These function are used in low-level drawings, so we return qint64 instead of time.
-qint64 roundUp(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
-qint64 add(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
-qint64 sub(std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
+// These function are used in low-level drawings, so we return milliseconds instead of datetime.
+NX_VMS_CLIENT_DESKTOP_API std::chrono::milliseconds roundUp(
+    std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
+NX_VMS_CLIENT_DESKTOP_API std::chrono::milliseconds add(
+    std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
+NX_VMS_CLIENT_DESKTOP_API std::chrono::milliseconds sub(
+    std::chrono::milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone);
 
-qint64 absoluteNumber(
+NX_VMS_CLIENT_DESKTOP_API qint64 absoluteNumber(
     std::chrono::milliseconds msecs,
     const QnTimeStep& step,
     const QTimeZone& timeZone);
 
-qint32 shortCacheKey(
+NX_VMS_CLIENT_DESKTOP_API qint32 shortCacheKey(
     std::chrono::milliseconds msecs,
     int height,
     const QnTimeStep& step,
     const QTimeZone& timeZone);
 
-QnTimeStepLongCacheKey longCacheKey(
+NX_VMS_CLIENT_DESKTOP_API QnTimeStepLongCacheKey longCacheKey(
     std::chrono::milliseconds msecs,
     int height,
     const QnTimeStep& step);
@@ -91,15 +94,15 @@ QnTimeStepLongCacheKey longCacheKey(
 // TODO: #sivanov What to do with locale-translation inconsistencies?
 
 // Used for time label below ticks (both smaller and bigger).
-QString toShortString(
+NX_VMS_CLIENT_DESKTOP_API QString toShortString(
     std::chrono::milliseconds msecs,
     const QnTimeStep& step,
     const QTimeZone& timeZone);
 
-QString toLongestShortString(const QnTimeStep& step);
+NX_VMS_CLIENT_DESKTOP_API QString toLongestShortString(const QnTimeStep& step);
 
 // Used for upper time labels in rectangles.
-QString toLongString(
+NX_VMS_CLIENT_DESKTOP_API QString toLongString(
     std::chrono::milliseconds msecs,
     const QnTimeStep& step,
     const QTimeZone& timeZone);

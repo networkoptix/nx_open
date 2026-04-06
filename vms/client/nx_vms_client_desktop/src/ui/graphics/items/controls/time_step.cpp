@@ -9,14 +9,14 @@
 
 using std::chrono::milliseconds;
 
-namespace
-{
+namespace {
+
 inline milliseconds timeToMSecs(const QTime& time)
 {
     return milliseconds(QTime(0, 0, 0, 0).msecsTo(time));
 }
 
-QDateTime addHours(const QDateTime& dateTime, int hours, const QTimeZone& timeZone)
+QDateTime addHours(const QDateTime& dateTime, int hours)
 {
     if (!NX_ASSERT(dateTime.isValid()))
         return dateTime;
@@ -42,7 +42,7 @@ QDateTime addHours(const QDateTime& dateTime, int hours, const QTimeZone& timeZo
             dateTime.time().minute(),
             dateTime.time().second(),
             dateTime.time().msec()),
-        timeZone);
+        dateTime.timeZone());
 
     if (result.isValid())
         return result;
@@ -52,8 +52,9 @@ QDateTime addHours(const QDateTime& dateTime, int hours, const QTimeZone& timeZo
     // 1h forward in the US, the interval 2:00 - 3:00 will not exist. After 1:59 it's be 3:00.
     // If we try to construct QDateTime for 2:00, it'll become invalid and will have a timestamp of
     // 1:00. To overcome this issue, we need to try to add 1 hour more.
-    return addHours(dateTime, hours + 1, timeZone);
+    return addHours(dateTime, hours + 1);
 }
+
 } // namespace
 
 QnTimeStep::QnTimeStep(
@@ -77,10 +78,10 @@ QnTimeStep::QnTimeStep(
 {
 }
 
-qint64 roundUp(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
+milliseconds roundUp(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
-        return qCeil(msecs.count(), step.stepMSecs.count());
+        return milliseconds(qCeil(msecs.count(), step.stepMSecs.count()));
 
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone);
     switch(step.type)
@@ -91,19 +92,18 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step, const QTimeZone& time
         {
             milliseconds oldMSecs = timeToMSecs(dateTime.time());
             milliseconds newMSecs = milliseconds(qCeil(oldMSecs.count(), step.stepMSecs.count()));
-            return (msecs + (newMSecs - oldMSecs)).count();
+            return msecs + (newMSecs - oldMSecs);
         }
 
         case QnTimeStep::Hours:
-            if (dateTime.time().msec() != 0 || dateTime.time().second() != 0
+            while (dateTime.time().msec() != 0 || dateTime.time().second() != 0
                 || dateTime.time().minute() != 0 || dateTime.time().hour() % step.stepUnits != 0)
             {
                 int oldHour = dateTime.time().hour();
                 int newHour = qCeil(oldHour + 1, step.stepUnits);
                 dateTime = addHours(
                     QDateTime(dateTime.date(), QTime(oldHour, 0, 0, 0), timeZone),
-                    newHour - oldHour,
-                    timeZone);
+                    newHour - oldHour);
             }
             break;
 
@@ -155,77 +155,61 @@ qint64 roundUp(milliseconds msecs, const QnTimeStep& step, const QTimeZone& time
             break;
     }
 
-    return dateTime.toMSecsSinceEpoch();
+    return milliseconds(dateTime.toMSecsSinceEpoch());
 }
 
-qint64 add(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
+milliseconds add(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
     if (step.isRelative)
-        return (msecs + step.stepMSecs).count();
+        return msecs + step.stepMSecs;
 
     switch (step.type)
     {
         case QnTimeStep::Minutes:
         case QnTimeStep::Seconds:
         case QnTimeStep::Milliseconds:
-            return (msecs + step.stepMSecs).count();
+            return msecs + step.stepMSecs;
 
         case QnTimeStep::Hours:
-            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone),
-                step.stepUnits,
-                timeZone).toMSecsSinceEpoch();
+        {
+            const auto source = QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone);
+            const auto sourceTime = source.time();
+            const bool wasRounded = (sourceTime.hour() % step.stepUnits) == 0
+                && sourceTime.minute() == 0 && sourceTime.second() == 0 && sourceTime.msec() == 0;
+
+            const auto afterAdd = addHours(source, step.stepUnits);
+            const auto result = milliseconds(afterAdd.toMSecsSinceEpoch());
+
+            // If the source hour was rounded, keep the result rounded.
+            return wasRounded && (afterAdd.time().hour() % step.stepUnits) != 0
+                ? roundUp(result, step, timeZone)
+                : result;
+        }
 
         case QnTimeStep::Days:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addDays(step.stepUnits).toMSecsSinceEpoch();
+            return milliseconds(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
+                addDays(step.stepUnits).toMSecsSinceEpoch());
 
         case QnTimeStep::Months:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addMonths(step.stepUnits).toMSecsSinceEpoch();
+            return milliseconds(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
+                addMonths(step.stepUnits).toMSecsSinceEpoch());
 
         case QnTimeStep::Years:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addYears(step.stepUnits).toMSecsSinceEpoch();
+            return milliseconds(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
+                addYears(step.stepUnits).toMSecsSinceEpoch());
 
         default:
             NX_ASSERT(false, "Invalid time step type '%1'.", static_cast<int>(step.type));
-            return msecs.count();
+            return msecs;
     }
 }
 
-qint64 sub(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
+milliseconds sub(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
 {
-    if (step.isRelative)
-        return (msecs - step.stepMSecs).count();
+    const QnTimeStep negativeStep(step.type, step.unitMSecs, -step.stepUnits, step.wrapUnits,
+        step.format, step.longFormat, step.isRelative);
 
-    switch(step.type)
-    {
-        case QnTimeStep::Minutes:
-        case QnTimeStep::Seconds:
-        case QnTimeStep::Milliseconds:
-            return (msecs - step.stepMSecs).count();
-
-        case QnTimeStep::Hours:
-            return addHours(QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone),
-                -step.stepUnits,
-                timeZone).toMSecsSinceEpoch();
-
-        case QnTimeStep::Days:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addDays(-step.stepUnits).toMSecsSinceEpoch();
-
-        case QnTimeStep::Months:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addMonths(-step.stepUnits).toMSecsSinceEpoch();
-
-        case QnTimeStep::Years:
-            return QDateTime::fromMSecsSinceEpoch(msecs.count(), timeZone).
-                addYears(-step.stepUnits).toMSecsSinceEpoch();
-
-        default:
-            NX_ASSERT(false, "Invalid time step type '%1'.", static_cast<int>(step.type));
-            return msecs.count();
-    }
+    return add(msecs, negativeStep, timeZone);
 }
 
 qint64 absoluteNumber(milliseconds msecs, const QnTimeStep& step, const QTimeZone& timeZone)
