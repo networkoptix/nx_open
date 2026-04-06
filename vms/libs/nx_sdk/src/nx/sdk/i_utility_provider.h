@@ -140,7 +140,13 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider5"); }
 
     /**
-     * Always returns a valid string. In case if the token is not available, this string will be
+     * The source of cloud token is the response to the request authenticated by system credentials
+     * (cloudSysId + authKey) to the https://<cloud-host>/oauth2/v1/token
+     * Token is retrieved asynchronously by the VMS server. It means that the moment when this
+     * function starts returning a valid token is not specified. Plugin must also subscribe to
+     * token update notification using `subscribeForCloudTokenUpdate()` if it wants to use
+     * current cloud token.
+     * Always returns a valid string. If the token is not available, this string will be
      * empty but still valid ("").
      */
     virtual const char* cloudToken() const = 0;
