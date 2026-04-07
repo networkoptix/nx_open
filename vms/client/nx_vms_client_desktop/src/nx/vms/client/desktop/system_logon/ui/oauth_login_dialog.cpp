@@ -78,11 +78,11 @@ OauthLoginDialog::~OauthLoginDialog()
 {
 }
 
-nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
+nx::vms::client::core::CloudAuthDataOrError OauthLoginDialog::login(
     QWidget* parent, const QString& title, const LoginParams& params)
 {
     if (kCloudLoginDialogIsDisplayed)
-        return {};
+        return std::unexpected{core::OauthDataRequestError::alreadyOpenedDialog};
 
     const bool sessionAware = params.flags.testFlag(SessionRefreshFlag::sessionAware);
 
@@ -130,13 +130,15 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
                 loop.quit();
             });
         loop.exec();
+        if (authData.empty())
+            return std::unexpected{core::OauthDataRequestError::dialogRejected};
         return authData;
     }
 
     if (dialog->exec() == QDialog::Accepted)
         return dialog->authData();
 
-    return {};
+    return std::unexpected{core::OauthDataRequestError::dialogRejected};
 }
 
 bool OauthLoginDialog::validateToken(

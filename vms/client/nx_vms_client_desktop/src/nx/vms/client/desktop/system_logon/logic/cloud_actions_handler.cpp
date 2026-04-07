@@ -104,8 +104,10 @@ void CloudActionsHandler::at_loginToCloudAction_triggered()
         ? core::CloudStatusWatcher::AuthMode::forced
         : core::CloudStatusWatcher::AuthMode::login;
 
-    if (!authData.empty())
-        qnCloudStatusWatcher->setAuthData(authData, authMode);
+    if (authData)
+        qnCloudStatusWatcher->setAuthData(*authData, authMode);
+    else
+        NX_WARNING(this, "Cloud login failed due to %1", authData.error());
 }
 
 void CloudActionsHandler::at_logoutFromCloudAction_triggered()

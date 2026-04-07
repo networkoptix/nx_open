@@ -211,14 +211,27 @@ struct ConnectActionsHandler::Private
             FreshSessionTokenHelper::ActionType::issueRefreshToken);
 
         const auto newCloudAuthData = cloudAuthDataHelper->requestAuthData(
-            [this] { return !needReconnectToLastCloudSystem; });
+            /*closeCondition*/ [this] { return !needReconnectToLastCloudSystem; });
 
-        needReconnectToLastCloudSystem = false;
-        if (newCloudAuthData.empty())
+        // If dialog was not opened, then another dialog is already open.
+        //  Changing needReconnectToLastCloudSystem to false leads to undesired closure of opened
+        //  dialog.
+        if (newCloudAuthData
+            || newCloudAuthData.error() != OauthDataRequestError::alreadyOpenedDialog)
+        {
+            needReconnectToLastCloudSystem = false;
+        }
+
+        if (!newCloudAuthData)
+        {
+            NX_WARNING(this, "Failed to receive cloud auth data due to %1",
+                newCloudAuthData.error());
+            q->updatePreloaderVisibility();
             return;
+        }
 
         qnCloudStatusWatcher->setAuthData(
-            newCloudAuthData,
+            *newCloudAuthData,
             core::CloudStatusWatcher::AuthMode::update);
 
         if (auto session = q->system()->session(); session && session->connection())
