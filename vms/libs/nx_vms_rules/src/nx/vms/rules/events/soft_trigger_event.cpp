@@ -49,14 +49,14 @@ QVariantMap SoftTriggerEvent::details(
     utils::insertIfNotEmpty(result, utils::kCustomIconDetailName, triggerIcon());
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
-    result[utils::kAggregationKeyDetailName] = Strings::softTriggerName(m_triggerName);
+    result[utils::kAggregationKeyDetailName] = displayedTriggerName();
     result[utils::kAggregationKeyIconDetailName] = "soft_trigger";
 
     result[utils::kSourceTextDetailName] = Strings::resource(context, deviceId(), detailLevel);
     result[utils::kSourceResourcesTypeDetailName] = QVariant::fromValue(ResourceType::device);
     result[utils::kSourceResourcesIdsDetailName] = QVariant::fromValue(UuidList{deviceId()});
 
-    result[utils::kCaptionDetailName] = m_triggerName;
+    result[utils::kCaptionDetailName] = displayedTriggerName();
 
     const QString user = Strings::resource(context, m_userId);
     const QString userItem = tr("User: %1").arg(user);
@@ -74,7 +74,7 @@ QVariantMap SoftTriggerEvent::details(
 QString SoftTriggerEvent::extendedCaption(common::SystemContext* /*context*/,
     Qn::ResourceInfoLevel /*detailLevel*/) const
 {
-    return nx::format("%1 %2", manifest().displayName, m_triggerName);
+    return nx::format("%1 %2", manifest().displayName, displayedTriggerName());
 }
 
 const ItemDescriptor& SoftTriggerEvent::manifest()
@@ -121,6 +121,11 @@ const ItemDescriptor& SoftTriggerEvent::manifest()
         .createPermissions = nx::vms::api::GlobalPermission::none
     };
     return kDescriptor;
+}
+
+QString SoftTriggerEvent::displayedTriggerName() const
+{
+    return Strings::softTriggerName(m_triggerName);
 }
 
 } // namespace nx::vms::rules
