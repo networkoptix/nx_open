@@ -67,7 +67,7 @@ Item
 
             visible: !stackView.fullscreen
                 && !stackView.longContent
-                && windowContext.sessionManager.hasConnectedSession
+                && windowContext.sessionManager.hasActiveSession
                 && [Controller.ResourcesScreen,
                     Controller.EventSearchScreen,
                     Controller.FeedScreen,
@@ -93,7 +93,7 @@ Item
             target: screenNavigationBar
 
             visible: !stackView.fullscreen
-                && windowContext.sessionManager.hasConnectedSession
+                && windowContext.sessionManager.hasActiveSession
                 && [Controller.ResourcesScreen,
                     Controller.EventSearchScreen,
                     Controller.FeedScreen,
