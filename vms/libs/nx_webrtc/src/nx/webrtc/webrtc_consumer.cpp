@@ -18,7 +18,8 @@ const int kMediaQueueSize = 512;
 
 Consumer::Consumer(Session* session):
     m_mediaQueue(kMediaQueueSize),
-    m_session(session)
+    m_session(session),
+    m_sessionId(session->id())
 {}
 
 Consumer::~Consumer()
@@ -419,6 +420,11 @@ void Consumer::setSendTimestampInterval(std::chrono::milliseconds interval)
 void Consumer::setEnableMetadata(bool enableMetadata)
 {
     m_enableMetadata = enableMetadata;
+}
+
+std::string Consumer::idForToStringFromPtr() const
+{
+    return m_sessionId;
 }
 
 } // namespace nx::webrtc

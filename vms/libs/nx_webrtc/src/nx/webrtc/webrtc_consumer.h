@@ -59,6 +59,8 @@ public:
 
     bool canAcceptData() const;
 
+    std::string idForToStringFromPtr() const;
+
 private:
     friend class Ice;
 
@@ -80,6 +82,7 @@ private:
     std::chrono::milliseconds m_sendTimestampInterval {1000};
     bool m_enableMetadata = false;
     bool m_sendInProgress = false;
+    const std::string m_sessionId;
 };
 
 } // namespace nx::webrtc
