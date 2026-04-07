@@ -165,19 +165,22 @@ private:
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
         ConnectionEvents connectionEvents;
         time_point requestReceivedTime;
+        nx::telemetry::Span telemetrySpan;
 
         ResponseMessageContext(
             RequestLine requestLine,
             nx::network::http::Message msg,
             std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody,
             ConnectionEvents connectionEvents,
-            time_point requestReceivedTime)
+            time_point requestReceivedTime,
+            nx::telemetry::Span span = nx::telemetry::Span{})
             :
             requestLine(std::move(requestLine)),
             msg(std::move(msg)),
             msgBody(std::move(msgBody)),
             connectionEvents(std::move(connectionEvents)),
-            requestReceivedTime(requestReceivedTime)
+            requestReceivedTime(requestReceivedTime),
+            telemetrySpan(span.isValid() ? span : nx::telemetry::Span::activeSpan())
         {
         }
     };
@@ -202,7 +205,7 @@ private:
     std::optional<SystemError::ErrorCode> m_markedForClosure;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     nx::utils::InterruptionFlag m_destructionFlag;
-    nx::telemetry::HttpSpan m_telemetrySpan;
+    nx::telemetry::HttpSpan m_currentMessageSpan;
 
     void extractClientEndpoint(const HttpHeaders& headers);
     void extractClientEndpointFromXForwardedHeader(const HttpHeaders& headers);

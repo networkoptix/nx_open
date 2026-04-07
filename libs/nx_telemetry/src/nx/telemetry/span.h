@@ -46,6 +46,7 @@ public:
 
     bool isValid() const;
     std::string traceId() const;
+    std::string spanId() const;
 
     void updateName(std::string_view newName);
 

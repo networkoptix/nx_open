@@ -17,6 +17,7 @@ struct SpanData
     Span::Kind kind = Span::Kind::internal;
     std::string name;
     std::string parentId;
+    bool ended = false; //< To avoid double finalization by a delayed destructor.
 
     SpanData()
     {
@@ -33,8 +34,16 @@ struct SpanData
 
     ~SpanData()
     {
-        if (span && !reference)
+        end();
+    }
+
+    void end()
+    {
+        if (span && !reference && !ended)
+        {
+            ended = true;
             span->End();
+        }
     }
 };
 

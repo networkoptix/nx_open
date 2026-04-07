@@ -69,6 +69,14 @@ std::string Span::traceId() const
     return helpers::traceIdString(m_data->span->GetContext().trace_id());
 }
 
+std::string Span::spanId() const
+{
+    if (!isValid())
+        return {};
+
+    return helpers::spanIdString(m_data->span->GetContext().span_id());
+}
+
 void Span::updateName(std::string_view newName)
 {
     if (!isValid())
@@ -103,13 +111,8 @@ void Span::setStatus(Status status, std::string_view description)
 
 void Span::end()
 {
-    if (!isValid())
-        return;
-
-    if (m_data->reference)
-        return;
-
-    m_data->span->End();
+    if (isValid())
+        m_data->end();
 }
 
 Span::Scope Span::activate() const

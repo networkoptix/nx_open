@@ -362,6 +362,11 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::stopWhileInAioThread()
 
     base_type::stopWhileInAioThread();
 
+    // BasicPollable-derived objects do not necessarily stop correctly in their
+    // destructor, so we must stop them explicitly before destroying them.
+    for (auto& [key, ctx]: m_activeRequests)
+        ctx.client->pleaseStopSync();
+
     m_activeRequests.clear();
 }
 

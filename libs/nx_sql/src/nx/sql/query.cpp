@@ -109,7 +109,12 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
 
     bool ok;
 
-    nx::telemetry::Span telemetrySpan("query");
+    nx::telemetry::Span telemetrySpan;
+
+    // Avoid dumping queries not related to HTTP requests.
+    if (nx::telemetry::Span::activeSpan().isValid())
+        telemetrySpan = nx::telemetry::Span("query");
+
     nx::telemetry::Span::Scope scope = telemetrySpan.activate();
 
     if (query)
