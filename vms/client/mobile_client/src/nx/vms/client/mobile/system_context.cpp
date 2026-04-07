@@ -301,13 +301,14 @@ SystemContext::SystemContext(WindowContext* context,
 
 SystemContext::~SystemContext()
 {
-    appContext()->networkModule()->connectionFactory()->setUserInteractionDelegate({});
-
     if (d->thumbnailProvider)
         d->thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
 
     if (mode() == Mode::client)
+    {
         sessionManager()->resetSession();
+        appContext()->networkModule()->connectionFactory()->setUserInteractionDelegate({});
+    }
 
     if (messageProcessor())
         deleteMessageProcessor();
