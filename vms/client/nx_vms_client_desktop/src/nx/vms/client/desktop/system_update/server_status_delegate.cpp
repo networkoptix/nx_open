@@ -41,6 +41,8 @@ using StatusCode = nx::vms::common::update::Status::Code;
 
 class ServerStatusItemDelegate::ServerStatusWidget: public QWidget
 {
+    Q_DECLARE_TR_FUNCTIONS(ServerStatusItemDelegate::ServerStatusWidget)
+
 public:
     ServerStatusWidget(const ServerStatusItemDelegate* owner, QWidget* parent):
         QWidget(parent),
