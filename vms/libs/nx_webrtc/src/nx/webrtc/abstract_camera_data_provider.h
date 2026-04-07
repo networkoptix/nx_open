@@ -71,6 +71,7 @@ using createDataProviderFactory = nx::MoveOnlyFunc<AbstractCameraDataProviderPtr
     nx::Uuid /*deviceId*/,
     std::optional<std::chrono::milliseconds> /*positionMs*/,
     nx::vms::api::StreamIndex /*stream*/,
-    std::optional<float> /*speedOpt*/)>;
+    std::optional<float> /*speedOpt*/,
+    std::string_view /*sessionId*/)>;
 
 } // namespace nx::webrtc

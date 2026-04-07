@@ -215,7 +215,7 @@ AbstractCameraDataProviderPtr Session::createProvider(
     nx::vms::api::StreamIndex stream,
     std::optional<float> speedOpt)
 {
-    auto provider = m_providerFactory(deviceId, positionMs, stream, speedOpt);
+    auto provider = m_providerFactory(deviceId, positionMs, stream, speedOpt, m_localUfrag);
     addProvider(provider);
 
     if (!initializeMuxersInternal())
