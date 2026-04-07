@@ -8,7 +8,7 @@
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter.h>
 #include <opentelemetry/sdk/resource/resource.h>
 #include <opentelemetry/sdk/resource/resource_detector.h>
-#include <opentelemetry/sdk/trace/simple_processor.h>
+#include <opentelemetry/sdk/trace/batch_span_processor.h>
 #include <opentelemetry/sdk/trace/tracer_provider.h>
 #include <opentelemetry/trace/propagation/http_trace_context.h>
 #include <opentelemetry/trace/provider.h>
@@ -41,7 +41,14 @@ void init(const InitAttributes& attributes, const Settings& settings)
     otlpOptions.endpoint = settings.endpoint;
 
     auto exporter = std::make_unique<exporter::otlp::OtlpGrpcExporter>(otlpOptions);
-    auto processor = std::make_unique<sdk::trace::SimpleSpanProcessor>(std::move(exporter));
+    auto processor = std::make_unique<sdk::trace::BatchSpanProcessor>(
+        std::move(exporter),
+        sdk::trace::BatchSpanProcessorOptions{
+            .max_queue_size = settings.maxQueueSize,
+            .schedule_delay_millis = settings.scheduleDelay,
+            .max_export_batch_size = settings.maxExportBatchSize,
+        }
+    );
 
     auto resource = sdk::resource::OTELResourceDetector().Detect();
     resource = resource.Merge(sdk::resource::Resource::Create({
