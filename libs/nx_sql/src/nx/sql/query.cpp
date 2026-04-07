@@ -6,6 +6,7 @@
 
 #include <QtSql/QSqlError>
 
+#include <nx/telemetry/span.h>
 #include <nx/utils/log/log.h>
 
 #include "abstract_db_connection.h"
@@ -108,6 +109,9 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
 
     bool ok;
 
+    nx::telemetry::Span telemetrySpan("query");
+    nx::telemetry::Span::Scope scope = telemetrySpan.activate();
+
     if (query)
     {
         ok = m_sqlQuery.exec(QString::fromUtf8(query->data(), query->size()));
@@ -121,6 +125,10 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
         ok = m_sqlQuery.exec();
     }
 
+    scope.exit();
+
+    telemetrySpan.updateName(m_sqlQuery.executedQuery().toStdString());
+
     auto executionTime = floor<milliseconds>(steady_clock::now() - t0);
 
     if (m_statisticsCollector)
@@ -129,11 +137,16 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
     if (ok)
     {
         NX_TRACE(this, "Query %1 completed in %2", m_sqlQuery.lastQuery(), executionTime);
+
+        telemetrySpan.setStatus(nx::telemetry::Span::Status::ok);
     }
     else
     {
-        NX_TRACE(this, "Query %1 failed. %2", m_sqlQuery.lastQuery(),
-            m_sqlQuery.lastError().text());
+        NX_TRACE(this, "Query %1 failed. %2",
+            m_sqlQuery.lastQuery(), m_sqlQuery.lastError().text());
+
+        telemetrySpan.setStatus(nx::telemetry::Span::Status::error);
+        telemetrySpan.setAttribute("error", m_sqlQuery.lastError().text().toStdString());
 
         throw Exception(getLastError());
     }

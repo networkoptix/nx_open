@@ -50,6 +50,9 @@ DBResult BaseExecutor::execute(AbstractDbConnection* const connection)
 {
     using namespace std::chrono;
 
+    m_telemetrySpan.updateName(std::string("db:") + nx::sql::toString(connection->driverType()));
+    nx::telemetry::Span::Scope scope = m_telemetrySpan.activate();
+
     const auto executionStartTime = nx::utils::monotonicTime();
 
     m_queryStatistics.waitForExecutionDuration =
