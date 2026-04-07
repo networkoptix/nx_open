@@ -16,6 +16,7 @@ Flow
     readonly property bool hasTags: repeater.count > 0
     property alias model: repeater.model
     property color color: ColorTheme.colors.dark11
+    property int preferredTagHeight: 28
 
     Repeater
     {
@@ -23,55 +24,32 @@ Flow
 
         delegate: Rectangle
         {
-            height: 28
-            width: dataRow.width
+            height: control.preferredTagHeight
+            width: tagText.width
 
             color: control.color
             radius: 4
 
-            Row
+            Text
             {
-                id: dataRow
-
-                spacing: 4
+                id: tagText
 
                 anchors.centerIn: parent
 
                 leftPadding: 12
                 rightPadding: 12
 
-                ColoredImage
+                width:
                 {
-                    id: objectBasedIcon
-
-                    visible: tagText.text === BookmarkConstants.objectBasedTagName
-                    anchors.verticalCenter: parent.verticalCenter
-                    sourcePath: "image://skin/20x20/Solid/camera.svg?primary=light4"
-                    sourceSize: Qt.size(20, 20)
+                    const maxWidth = control.parent.width - leftPadding - rightPadding
+                    return Math.min(implicitWidth, maxWidth)
                 }
+                text: model.modelData
+                color: ColorTheme.colors.light10
+                elide: Text.ElideRight
 
-                Text
-                {
-                    id: tagText
-
-                    width:
-                    {
-                        const iconWidth = objectBasedIcon.visible
-                            ? objectBasedIcon.width + dataRow.spacing
-                            : 0
-                        const maxWidth = control.parent.width
-                            - dataRow.leftPadding
-                            - dataRow.rightPadding
-                            - iconWidth
-                        return  Math.min(implicitWidth, maxWidth)
-                    }
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: model.modelData
-                    font.pixelSize: 14
-                    font.weight: 400
-                    color: ColorTheme.colors.light10
-                    elide: Text.ElideRight
-                }
+                font.pixelSize: 14
+                font.weight: 400
             }
         }
     }

@@ -49,8 +49,8 @@ Control
 
     padding: 6
 
-    implicitWidth: Math.max(48, contentItem.implicitWidth)
-    implicitHeight: Math.max(48, contentItem.implicitHeight)
+    implicitWidth: Math.max(40, contentItem.implicitWidth)
+    implicitHeight: Math.max(40, contentItem.implicitHeight)
 
     icon.color: checkable && checked
         ? checkedIconColor

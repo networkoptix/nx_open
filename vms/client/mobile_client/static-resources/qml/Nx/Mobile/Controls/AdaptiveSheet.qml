@@ -35,6 +35,8 @@ BaseAdaptiveSheet
         Row
         {
             id: customArea
+
+            Layout.preferredHeight: titleTextItem.implicitHeight
         }
     }
 

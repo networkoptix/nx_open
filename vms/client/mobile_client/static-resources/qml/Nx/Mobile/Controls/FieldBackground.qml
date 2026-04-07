@@ -21,7 +21,7 @@ Rectangle
     property alias labelText: label.text
     property string supportText
     property string errorText
-    property alias bottomTextHeight: bottomText.height
+    readonly property int bottomTextHeight: bottomText.text ? bottomText.height : 0
 
     property int mode: FieldBackground.Mode.Dark
     property bool compactLabelMode: owner.activeFocus || !!owner.text

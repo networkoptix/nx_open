@@ -17,6 +17,8 @@ AdaptiveSheet
 
     signal showHowItWorks()
 
+    contentSpacing: 24
+
     title: isAnalyticsItemMode
         ? qsTr("New Bookmark")
         : qsTr("Sharing")
@@ -76,14 +78,12 @@ AdaptiveSheet
 
         visible: sheet.isAnalyticsItemMode
         parent: sheet.titleCustomArea
+        anchors.verticalCenter: parent.verticalCenter
         padding: 0
-        icon.source: "image://skin/20x20/Solid/info.svg?primary=light10"
+
+        icon.source: "image://skin/20x20/Solid/info.svg?primary=light4"
         icon.width: 20
         icon.height: icon.width
-        transform: Translate
-        {
-            x: (infoButton.width - infoButton.icon.width) / 2
-        }
 
         onClicked:
         {
@@ -99,7 +99,6 @@ AdaptiveSheet
         backgroundMode: FieldBackground.Mode.Light
 
         width: parent.width
-
         visible: sheet.isAnalyticsItemMode
 
         labelText: qsTr("Name")
@@ -127,6 +126,7 @@ AdaptiveSheet
         width: parent.width
 
         visible: sheet.isAnalyticsItemMode
+        preferredTagHeight: 36
 
         model: [BookmarkConstants.objectBasedTagName]
     }
@@ -135,7 +135,7 @@ AdaptiveSheet
     {
         id: shareLinkOptionsText
 
-        visible: sheet.isAnalyticsItemMode
+        visible: sheet.isAnalyticsItemMode && text
         width: parent.width
 
         color: ColorTheme.colors.light4

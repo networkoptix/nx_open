@@ -136,7 +136,10 @@ Drawer
 
                     x: contentColumn.leftPadding
                     y: 24
-                    width: parent.width - contentColumn.leftPadding - contentColumn.rightPadding
+
+                    width: parent.width
+                        - contentColumn.leftPadding
+                        - (closeButton.visible ? (content.width - closeButton.x) : contentColumn.rightPadding)
                 }
             }
 
@@ -262,8 +265,8 @@ Drawer
             // Align button with the sheet content or header by the icon boundaries.
             anchors.right: parent.right
             anchors.top: parent.top
-            anchors.rightMargin: 8
-            anchors.topMargin: control.header ? 12 + d.extraTopMargin : 8
+            anchors.rightMargin: 12
+            anchors.topMargin: control.header ? 19 + d.extraTopMargin : 8
 
             visible: LayoutController.isTabletLayout || control.alwaysShowCloseButton
             padding: 0
