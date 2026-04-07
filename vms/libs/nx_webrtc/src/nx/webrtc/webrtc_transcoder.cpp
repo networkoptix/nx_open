@@ -300,9 +300,12 @@ QnUniversalRtpEncoder* Transcoder::getRtpEncoder(
     nx::Uuid deviceId,
     QnAbstractMediaData::DataType type) const
 {
-    auto& encoders = type == QnAbstractMediaData::VIDEO ? m_videoEncoders : m_audioEncoders;
-    auto it = encoders.find(deviceId);
-    return it != encoders.end() ? it->second.get() : nullptr;
+    if (type == QnAbstractMediaData::VIDEO)
+        return videoEncoder(deviceId);
+    if (type == QnAbstractMediaData::AUDIO)
+        return audioEncoder(deviceId);
+
+    return nullptr;
 }
 
 bool Transcoder::checkForMseEof(QnConstAbstractMediaDataPtr media)
