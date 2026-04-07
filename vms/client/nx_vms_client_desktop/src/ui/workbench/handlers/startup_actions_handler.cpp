@@ -671,10 +671,15 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
         && uri.userAuthType != nx::vms::utils::SystemUri::UserAuthType::temporary)
     {
         // Cloud system id is provided without auth data.
-        authData = OauthLoginDialog::login(
+        const auto authDataOrError = OauthLoginDialog::login(
             mainWindowWidget(),
-            tr("Login to %1", "%1 is the cloud name (like Nx Cloud)").arg(nx::branding::cloudName()),
+            tr("Login to %1", "%1 is the cloud name (like Nx Cloud)")
+                .arg(nx::branding::cloudName()),
             OauthLoginDialog::LoginParams{.clientType = core::OauthClientType::loginCloud});
+        if (authDataOrError)
+            authData = *authDataOrError;
+        else
+            NX_WARNING(this, "Login to cloud failed due to %1", authDataOrError.error());
     }
 
     if (authData.empty())

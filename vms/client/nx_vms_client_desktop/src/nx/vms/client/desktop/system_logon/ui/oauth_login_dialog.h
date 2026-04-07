@@ -3,6 +3,7 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_data.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
@@ -37,8 +38,10 @@ public:
 
 public:
     /** Helper method for requesting fresh cloud auth data. */
-    static nx::vms::client::core::CloudAuthData login(
-        QWidget* parent, const QString& title, const LoginParams& params);
+    static nx::vms::client::core::CloudAuthDataOrError login(
+        QWidget* parent,
+        const QString& title,
+        const LoginParams& params);
 
     /** Helper method for access token 2FA validation. */
     static bool validateToken(

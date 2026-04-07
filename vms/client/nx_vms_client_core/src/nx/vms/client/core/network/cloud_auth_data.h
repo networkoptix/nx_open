@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <expected>
 #include <string>
 
 #include <nx/network/http/auth_tools.h>
@@ -52,5 +53,16 @@ struct CloudTokens
 
 /** Decode username from cloud bearer token value. Returns empty string in case of error. */
 NX_VMS_CLIENT_CORE_API std::string usernameFromToken(const std::string& value);
+
+NX_REFLECTION_ENUM_CLASS(OauthDataRequestError,
+    alreadyOpenedDialog,
+    dialogRejected,
+    tokenValidationFailed,
+    wrongThread,
+    noParent,
+    cloudLoginEmpty
+);
+
+using CloudAuthDataOrError = std::expected<CloudAuthData, OauthDataRequestError>;
 
 } // namespace nx::vms::client::core

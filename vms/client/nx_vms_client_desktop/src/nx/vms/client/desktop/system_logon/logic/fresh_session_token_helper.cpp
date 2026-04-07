@@ -106,19 +106,25 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
 
         auto cloudAuthData = OauthLoginDialog::login(m_parent, m_title, params);
 
-        if (cloudAuthData.empty() || (cloudAuthData.needValidateToken
-            && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials)))
+        if (!cloudAuthData)
+        {
+            NX_WARNING(this, "Cloud login failed due to %1", cloudAuthData.error());
+            return {};
+        }
+
+        if (cloudAuthData->needValidateToken && !OauthLoginDialog::validateToken(
+                m_parent, m_title, cloudAuthData->credentials))
         {
             return {};
         }
 
-        cloudAuthData.credentials.username = qnCloudStatusWatcher->credentials().username;
-        qnCloudStatusWatcher->setAuthData(cloudAuthData,
+        cloudAuthData->credentials.username = qnCloudStatusWatcher->credentials().username;
+        qnCloudStatusWatcher->setAuthData(*cloudAuthData,
             core::CloudStatusWatcher::AuthMode::update);
         if (auto session = context->session(); session && session->connection())
             session->updateCloudSessionToken();
 
-        token = cloudAuthData.credentials.authToken;
+        token = cloudAuthData->credentials.authToken;
     }
     else
     {
@@ -145,17 +151,18 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
     return token;
 }
 
-core::CloudAuthData FreshSessionTokenHelper::requestAuthData(std::function<bool()> closeCondition)
+core::CloudAuthDataOrError
+    FreshSessionTokenHelper::requestAuthData(std::function<bool()> closeCondition) const
 {
     if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
-        return {};
+        return std::unexpected{core::OauthDataRequestError::wrongThread};
 
     if (!m_parent)
-        return {};
+        return std::unexpected{core::OauthDataRequestError::noParent};
 
     const auto login = qnCloudStatusWatcher->cloudLogin();
     if (login.isEmpty())
-        return {};
+        return std::unexpected{core::OauthDataRequestError::cloudLoginEmpty};
 
     const auto params = OauthLoginDialog::LoginParams{
         .clientType = info(m_actionType).clientType,
@@ -166,10 +173,13 @@ core::CloudAuthData FreshSessionTokenHelper::requestAuthData(std::function<bool(
 
     const auto cloudAuthData = OauthLoginDialog::login(m_parent, m_title, params);
 
-    if (cloudAuthData.needValidateToken
-        && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData.credentials))
+    if (!cloudAuthData)
+        NX_WARNING(this, "Cloud login failed due to %1", cloudAuthData.error());
+
+    if (cloudAuthData && cloudAuthData->needValidateToken
+        && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData->credentials))
     {
-        return {};
+        return std::unexpected{core::OauthDataRequestError::tokenValidationFailed};
     }
 
     return cloudAuthData;

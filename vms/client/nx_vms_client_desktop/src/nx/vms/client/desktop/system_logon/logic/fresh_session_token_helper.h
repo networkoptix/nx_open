@@ -46,7 +46,8 @@ public:
 
     std::optional<nx::network::http::AuthToken> refreshSession() override;
 
-    core::CloudAuthData requestAuthData(std::function<bool()> closeCondition = {});
+    core::CloudAuthDataOrError requestAuthData(
+        std::function<bool()> closeCondition = {}) const;
 
     virtual QString password() const override;
 
