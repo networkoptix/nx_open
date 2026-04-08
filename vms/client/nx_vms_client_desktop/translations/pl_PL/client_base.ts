@@ -11274,7 +11274,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>Pominięto</translation>
+      <translation type="unfinished">Skipped</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -11282,15 +11282,15 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>Installing...</source>
-      <translation>Instalowanie...</translation>
+      <translation type="unfinished">Installing...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation>Pobrano</translation>
+      <translation type="unfinished">Downloaded</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation>Oczekiwanie na odpowiedź serwera...</translation>
+      <translation type="unfinished">Waiting for server to respond...</translation>
     </message>
   </context>
   <context>

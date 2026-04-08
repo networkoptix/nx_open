@@ -10953,7 +10953,7 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>Omitido</translation>
+      <translation type="unfinished">Skipped</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -10961,15 +10961,15 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation>Instalando...</translation>
+      <translation type="unfinished">Installing...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation>Descargada</translation>
+      <translation type="unfinished">Downloaded</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation>Esperando a que el servidor responda...</translation>
+      <translation type="unfinished">Waiting for server to respond...</translation>
     </message>
   </context>
   <context>
