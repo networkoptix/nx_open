@@ -460,7 +460,7 @@ FfmpegMuxer::PacketTimestamp Transcoder::getLastTimestamps() const
         if (!m_videoEncoders.empty())
             rtpEncoder = m_videoEncoders.begin()->second.get();
         else if (!m_audioEncoders.empty())
-            rtpEncoder = m_videoEncoders.begin()->second.get();
+            rtpEncoder = m_audioEncoders.begin()->second.get();
 
         if (!rtpEncoder)
             return FfmpegMuxer::PacketTimestamp(); //< Skip not supported data.
