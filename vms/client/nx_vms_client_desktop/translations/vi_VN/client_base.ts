@@ -5688,6 +5688,29 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -10811,29 +10834,6 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     <message>
       <source>unknown status</source>
       <translation>Trạng thái Không xác định</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Bỏ qua</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Đã cài đặt</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Đang cài đặt...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Tải xuống</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Chờ đợi phản hồi của máy chủ...</translation>
     </message>
   </context>
   <context>

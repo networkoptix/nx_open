@@ -5764,6 +5764,29 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -10971,29 +10994,6 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     <message>
       <source>unknown status</source>
       <translation>estado desconocido</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Omitido</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Instalado</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Instalando...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Descargada</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Esperando a que el servidor responda...</translation>
     </message>
   </context>
   <context>

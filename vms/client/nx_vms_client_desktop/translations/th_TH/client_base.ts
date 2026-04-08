@@ -5688,6 +5688,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -10811,29 +10834,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>unknown status</source>
       <translation type="unfinished">unknown status</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>ข้าม</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>การติดตั้ง</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>การติดตั้ง...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>ดาวน์โหลดแล้ว</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>กำลังรอการตอบรับจากเซิร์ฟเวอร์...</translation>
     </message>
   </context>
   <context>

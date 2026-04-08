@@ -5764,6 +5764,29 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -10971,29 +10994,6 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
     <message>
       <source>unknown status</source>
       <translation>okänd status</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Hoppades över</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Installerad</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Installerar...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Nerladdat</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Väntar på svar från servern...</translation>
     </message>
   </context>
   <context>
