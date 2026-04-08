@@ -15,6 +15,41 @@
 
 namespace {
 
+nx::vms::time::Format detectFullMonthDateFormat(const QString& shortDateFormat)
+{
+    using namespace nx::vms::time;
+
+    int dayPos = -1;
+    int monthPos = -1;
+    int yearPos = -1;
+
+    for (int i = 0; i < shortDateFormat.size(); ++i)
+    {
+        const QChar c = shortDateFormat[i];
+        if (c == 'd' && dayPos < 0)
+            dayPos = i;
+        else if (c == 'M' && monthPos < 0)
+            monthPos = i;
+        else if (c == 'y' && yearPos < 0)
+            yearPos = i;
+    }
+
+    if (!NX_ASSERT(dayPos >= 0 && monthPos >= 0 && yearPos >= 0,
+        "Unexpected short date format: %1", shortDateFormat))
+    {
+        return Format::dd_MMMM_yyyy;
+    }
+
+    if (yearPos < monthPos && yearPos < dayPos)
+        return Format::yyyy_MMMM_dd;
+
+    if (monthPos < dayPos)
+        return Format::MMMM_dd_yyyy;
+
+    // YDM order is not known to exist in any real locale.
+    return Format::dd_MMMM_yyyy;
+}
+
 void removeTimezone(QString& source)
 {
     source.remove("t");
@@ -64,11 +99,19 @@ FormatsHash DateTimeFormats::getFormats(const QLocale& locale, bool is24HoursTim
     result[Format::hh_mm] = locale.timeFormat(QLocale::ShortFormat);
     result[Format::hh_mm_ss] = locale.timeFormat(QLocale::LongFormat);
 
+    const Format fullMonthDateFormat =
+        detectFullMonthDateFormat(locale.dateFormat(QLocale::ShortFormat));
+
+    result[Format::locale_full_month_year] = fullMonthDateFormat == Format::yyyy_MMMM_dd
+        ? result[Format::yyyy_MMMM]
+        : result[Format::MMMM_yyyy];
+
+    result[Format::locale_day_full_month_year] = result[fullMonthDateFormat];
+
     // This is fix - we never want timezone in time string.
     removeTimezone(result[Format::hh_mm_ss]);
 
     result[Format::hh_mm_ss_zzz] = is24HoursTimeFormat ? "hh:mm:ss.zzz" : "h:mm:ss.zzz AP";
-    result[Format::MMMM_yyyy] = "MMMM yyyy";
 
     auto shortDate = locale.dateFormat(QLocale::ShortFormat);
     result[Format::dd_MM_yyyy] = shortDate;
@@ -113,12 +156,21 @@ const FormatsHash& DateTimeFormats::defaultFormats()
         {Format::MMM, "MMM"},
         {Format::yyyy, "yyyy"},
 
+        {Format::locale_full_month_year, "MMMM yyyy"},
+
         {Format::MMMM_yyyy, "MMMM yyyy"},
+        {Format::yyyy_MMMM, "yyyy MMMM"},
+
+        {Format::locale_day_full_month_year, "dd MMMM yyyy"},
+
         {Format::dd_MM_yyyy, "dd-MM-yyyy"},
-        {Format::dd_MM_yyyy, "dd-MM-yy"},
+        {Format::dd_MM_yy, "dd-MM-yy"},
         {Format::d_MMMM_yyyy, "d MMMM yyyy"},
         {Format::dd_MMMM_yyyy, "dd MMMM yyyy"},
         {Format::MMMM_d_yyyy, "MMMM d, yyyy"},
+        {Format::MMMM_dd_yyyy, "MMMM dd, yyyy"},
+        {Format::yyyy_MMMM_d, "yyyy MMMM d"},
+        {Format::yyyy_MMMM_dd, "yyyy MMMM dd"},
         {Format::dd_MM_yyyy_hh_mm_ss, "dd-MM-yyyy hh:mm:ss"},
         {Format::dd_MM_yy_hh_mm_ss, "dd-MM-yy hh:mm:ss"},
         {Format::dddd_d_MMMM_yyyy_hh_mm_ss, "dddd, d MMMM yyyy hh:mm:ss"},
@@ -155,6 +207,18 @@ static FormatterPtr sSystemFormatter = Formatter::custom(systemLocale(), is24Hou
 //--------------------------------------------------------------------------------------------------
 
 namespace nx::vms::time {
+
+struct Formatter::Private
+{
+    Private(const QLocale& locale, bool is24Hoursformat);
+
+    QString getLocalizedHours(const QTime& value);
+    QString getHoursTimeFormatMark(const QTime& value);
+
+    const QLocale locale;
+    const bool is24HoursFormat;
+    const FormatsHash formatStrings;
+};
 
 Formatter::Private::Private(const QLocale& locale, bool is24HoursFormat):
     locale(locale),
@@ -220,6 +284,9 @@ Formatter::Formatter(const QLocale& locale, bool is24HoursFormat):
     d(new Private(locale, is24HoursFormat))
 {
 }
+
+Formatter::~Formatter()
+{}
 
 QLocale Formatter::locale() const
 {
@@ -339,14 +406,14 @@ qint64 systemDisplayOffset()
     return result;
 }
 
-QString getFormatString(Format format, FormatterPtr formatter)
+QString getFormatString(Format format)
 {
-    return formatter->getFormatString(format);
+    return Formatter::system()->getFormatString(format);
 }
 
-bool is24HoursTimeFormat(FormatterPtr formatter)
+bool is24HoursTimeFormat()
 {
-    return formatter->is24HoursTimeFormat();
+    return Formatter::system()->is24HoursTimeFormat();
 }
 
 QString fromNow(std::chrono::seconds duration)
