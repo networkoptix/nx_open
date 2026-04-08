@@ -25,12 +25,25 @@ enum class Format
     MMM,
     yyyy,
 
+    // Contains `MMMM` and `yyyy` components in the order defined by locale settings.
+    // For example, "MMMM yyyy" for en_US and "yyyy MMMM" for zh_CN.
+    locale_full_month_year,
+
     MMMM_yyyy,
+    yyyy_MMMM,
+
+    // Contains `dd`, `MMMM` and `yyyy` components in the order defined by locale settings.
+    // For example, "MMMM dd, yyyy" for en_US and "dd MMMM yyyy" for ru_RU.
+    locale_day_full_month_year,
+
     dd_MM_yyyy, // ~=QLocale::Date::ShortFormat
     dd_MM_yy,
     d_MMMM_yyyy,
     dd_MMMM_yyyy,
     MMMM_d_yyyy,
+    MMMM_dd_yyyy,
+    yyyy_MMMM_d,
+    yyyy_MMMM_dd,
     dd_MM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::ShortFormat
     dd_MM_yy_hh_mm_ss,
     dddd_d_MMMM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::LongFormat
@@ -48,6 +61,7 @@ class NX_VMS_COMMON_API Formatter
 {
 public:
     Formatter(const QLocale& locale, bool is24HoursFormat);
+    ~Formatter();
 
     static FormatterPtr system();
     static FormatterPtr custom(const QLocale& locale, bool is24HoursTimeFormat);
@@ -73,26 +87,15 @@ public:
 
     QString getFormatString(Format format) const;
 
-    struct NX_VMS_COMMON_API Private
-    {
-        Private(const QLocale& locale, bool is24Hoursformat);
-
-        QString getLocalizedHours(const QTime& value);
-        QString getHoursTimeFormatMark(const QTime& value);
-
-        const QLocale locale;
-        const bool is24HoursFormat;
-        const FormatsHash formatStrings;
-    };
+private:
+    struct Private;
     QScopedPointer<Private> d;
 };
 
 template<typename ValueType>
-QString toString(
-    const ValueType& value,
-    FormatterPtr formatter = Formatter::system())
+QString toString(const ValueType& value)
 {
-    return formatter->toString(value);
+    return Formatter::system()->toString(value);
 }
 
 template<typename ValueType>
@@ -106,11 +109,9 @@ QString toString(
 
 NX_VMS_COMMON_API qint64 systemDisplayOffset();
 
-NX_VMS_COMMON_API QString getFormatString(
-    Format format,
-    FormatterPtr formatter = Formatter::system());
+NX_VMS_COMMON_API QString getFormatString(Format format);
 
-NX_VMS_COMMON_API bool is24HoursTimeFormat(FormatterPtr formatter = Formatter::system());
+NX_VMS_COMMON_API bool is24HoursTimeFormat();
 
 // Formats relative time in the past in human readable form like "just now", "3 minutes ago" etc.
 NX_VMS_COMMON_API QString fromNow(std::chrono::seconds duration);
