@@ -5916,6 +5916,29 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -11306,29 +11329,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>unknown status</source>
       <translation type="unfinished">unknown status</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Přeskočeno</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Nainstalováno</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Probíhá instalace...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Staženo</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Čekání na odpověď serveru...</translation>
     </message>
   </context>
   <context>

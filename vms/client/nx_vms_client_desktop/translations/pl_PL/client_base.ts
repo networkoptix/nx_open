@@ -5915,6 +5915,29 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>ServerStatusItemDelegate::ServerStatusWidget</name>
+    <message>
+      <source>Skipped</source>
+      <translation type="unfinished">Skipped</translation>
+    </message>
+    <message>
+      <source>Waiting for server to respond...</source>
+      <translation type="unfinished">Waiting for server to respond...</translation>
+    </message>
+    <message>
+      <source>Installed</source>
+      <translation type="unfinished">Installed</translation>
+    </message>
+    <message>
+      <source>Installing...</source>
+      <translation type="unfinished">Installing...</translation>
+    </message>
+    <message>
+      <source>Downloaded</source>
+      <translation type="unfinished">Downloaded</translation>
+    </message>
+  </context>
+  <context>
     <name>ShowreelTextFactory</name>
     <message>
       <source>Start Showreel</source>
@@ -9456,7 +9479,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Zapisz raport</translation>
     </message>
   </context>
   <context>
@@ -11304,29 +11327,6 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     <message>
       <source>unknown status</source>
       <translation>status nieznany</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
-    <message>
-      <source>Skipped</source>
-      <translation>Pominięto</translation>
-    </message>
-    <message>
-      <source>Installed</source>
-      <translation>Zainstalowano</translation>
-    </message>
-    <message>
-      <source>Installing...</source>
-      <translation>Instalowanie...</translation>
-    </message>
-    <message>
-      <source>Downloaded</source>
-      <translation>Pobrano</translation>
-    </message>
-    <message>
-      <source>Waiting for server to respond...</source>
-      <translation>Oczekiwanie na odpowiedź serwera...</translation>
     </message>
   </context>
   <context>
