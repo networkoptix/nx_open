@@ -3199,7 +3199,9 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 }
 
 static void registerMiscRestHandlers(
-    nx::network::rest::HandlerPool* processorPool, QnMediaServerModule* serverModule)
+    auth::Authenticator* authenticator,
+    nx::network::rest::HandlerPool* processorPool,
+    QnMediaServerModule* serverModule)
 {
     const auto reg = processorPool->createRegisterHandlerFunctor();
     const auto* systemContext = serverModule->systemContext();
@@ -3280,7 +3282,7 @@ static void registerMiscRestHandlers(
      * %return Response with the "switching protocols" HTTP status code.
      */
     reg("jsonrpc", GlobalPermission::none,
-        std::make_unique<JsonRpcHandler>(systemContext, processorPool),
+        std::make_unique<JsonRpcHandler>(authenticator, processorPool),
         nx::network::http::Method::post);
 
     /**%apidoc GET /rest/v{3-}/users/{id}/permissions
