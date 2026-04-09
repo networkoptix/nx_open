@@ -80,15 +80,19 @@ public:
             "Downcast to TransactionDescriptor<TransactionParams>* failed for %1", tran.command))
         {
             td->triggerNotificationFunc(tran, notificationParams);
-            callbackMonitors(tran);
+            callbackMonitors(tran, td->name);
         }
     }
 
     using MonitorCallback = nx::MoveOnlyFunc<void(const QnAbstractTransaction&)>;
     nx::utils::Guard addMonitor(MonitorCallback callback, std::vector<ApiCommand::Value> commands);
 
+    using MetricsCallback = nx::MoveOnlyFunc<void(const QString&)>;
+    void addMetrics(std::vector<ApiCommand::Value> commands);
+    void setMetricsCallback(MetricsCallback callback);
+
 private:
-    void callbackMonitors(const QnAbstractTransaction& transaction);
+    void callbackMonitors(const QnAbstractTransaction& transaction, const QString& tranName);
 
 private:
     AbstractECConnection* m_ecConnection;
@@ -114,6 +118,8 @@ private:
     std::unordered_map<ApiCommand::Value, std::set<std::shared_ptr<MonitorCallback>>> m_monitoredCommands;
     std::unordered_map<std::shared_ptr<MonitorCallback>, std::vector<ApiCommand::Value>>
         m_monitors;
+    std::unordered_set<ApiCommand::Value> m_metricsFilter;
+    MetricsCallback m_metricsCallback;
 };
 
 } // namespace ec2

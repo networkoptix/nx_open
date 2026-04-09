@@ -75,9 +75,29 @@ nx::utils::Guard ECConnectionNotificationManager::addMonitor(
     return guard;
 }
 
-void ECConnectionNotificationManager::callbackMonitors(const QnAbstractTransaction& transaction)
+void ECConnectionNotificationManager::addMetrics(std::vector<ApiCommand::Value> commands)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    for (auto cmd: commands)
+    {
+        m_metricsFilter.insert(cmd);
+    }
+}
+
+void ECConnectionNotificationManager::setMetricsCallback(MetricsCallback callback)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_metricsCallback = std::move(callback);
+}
+
+void ECConnectionNotificationManager::callbackMonitors(
+    const QnAbstractTransaction& transaction, const QString& tranName)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_metricsCallback && m_metricsFilter.contains(transaction.command))
+    {
+        m_metricsCallback(tranName);
+    }
     if (auto monitors = m_monitoredCommands.find(transaction.command);
         monitors != m_monitoredCommands.end())
     {

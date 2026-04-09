@@ -50,6 +50,7 @@ public:
             }),
         m_queryProcessor(queryProcessor)
     {
+        m_queryProcessor->addMetrics(details::commands<Model>(DeleteCommand));
     }
 
     [[nodiscard]]
