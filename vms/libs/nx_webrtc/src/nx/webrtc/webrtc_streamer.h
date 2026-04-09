@@ -23,9 +23,7 @@ public:
     // Interface for Consumer.
     Ice* ice();
     void sendTimestamp(int64_t timestampUs, uint32_t rtpTimestamp);
-    void handleStreamStatus(
-        nx::Uuid deviceId,
-        Consumer::StreamStatus result);
+    void handleStreamStatus(nx::Uuid deviceId, Consumer::StreamStatus result);
 
     std::string idForToStringFromPtr() const;
 
