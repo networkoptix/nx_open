@@ -5767,23 +5767,23 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>ServerStatusItemDelegate::ServerStatusWidget</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Ignoré</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>En attente de réponse du serveur...</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Installée</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Installation...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Téléchargé</translation>
     </message>
   </context>
   <context>

@@ -5767,23 +5767,23 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <name>ServerStatusItemDelegate::ServerStatusWidget</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Ohitetaan</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Odotetaan vastausta palvelimelta...</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Asennettu</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Asennetaan...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Ladattu</translation>
     </message>
   </context>
   <context>

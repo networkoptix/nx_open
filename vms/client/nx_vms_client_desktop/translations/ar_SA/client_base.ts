@@ -6083,7 +6083,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>جاري التنزيل...</translation>
     </message>
     <message>
       <source>Downloaded</source>
