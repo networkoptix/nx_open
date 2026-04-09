@@ -328,7 +328,7 @@ void Consumer::processNextData()
         if (metadata && metadata->metadataType == MetadataType::ObjectDetection && m_enableMetadata)
         {
             sendMetadata(metadata);
-            continue;
+            return;
         }
 
         const auto deviceId = media->deviceId;
@@ -336,7 +336,7 @@ void Consumer::processNextData()
         if (!rtpEncoder)
         {
             NX_VERBOSE(this, "Skip data: %1", media);
-            return;
+            continue;
         }
 
         nx::utils::ByteArray buffer;
