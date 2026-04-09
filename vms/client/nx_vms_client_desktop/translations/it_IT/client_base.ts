@@ -10954,7 +10954,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation>Ignorato</translation>
+      <translation>Saltato</translation>
     </message>
     <message>
       <source>Installed</source>
