@@ -352,6 +352,11 @@ public:
      */
     void setForceUsingLocalProperties(bool value = true);
 
+    // Functions are used only for statistics purposes and can be inaccurate.
+    int64_t statusChangeCounter() const { return m_statusChangeCounter; }
+
+    int64_t propertyChangeCounter() const { return m_propertyChangeCounter; }
+
 signals:
     void statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr& resource);
@@ -436,6 +441,9 @@ protected:
 
     /** Flags of this Resource that determine its type. */
     Qn::ResourceFlags m_flags;
+
+    std::atomic<int64_t> m_statusChangeCounter = 0;
+    std::atomic<int64_t> m_propertyChangeCounter = 0;
 
 private:
     /** Identifier of this Resource. */

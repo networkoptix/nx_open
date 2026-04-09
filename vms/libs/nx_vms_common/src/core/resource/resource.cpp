@@ -294,6 +294,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
         return;
     }
 
+    ++m_statusChangeCounter;
     NX_DEBUG(this,
         "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
         oldStatus,
@@ -413,6 +414,7 @@ void QnResource::emitPropertyChanged(
     if (key == nx::vms::api::device_properties::kVideoLayout)
         emit videoLayoutChanged(::toSharedPointer(this));
 
+    ++m_propertyChangeCounter;
     NX_VERBOSE(this,
         "Changed property '%1' = '%2'",
         key,
