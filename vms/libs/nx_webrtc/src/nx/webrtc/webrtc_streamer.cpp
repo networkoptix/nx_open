@@ -274,9 +274,7 @@ void Streamer::sendTimestamp(int64_t timestampUs, uint32_t rtpTimestamp)
     ice()->writeDataChannelString(data);
 }
 
-void Streamer::handleStreamStatus(
-    nx::Uuid deviceId,
-    Consumer::StreamStatus result)
+void Streamer::handleStreamStatus(nx::Uuid deviceId, Consumer::StreamStatus result)
 {
     auto provider = m_session->provider(deviceId);
     if (!provider)
