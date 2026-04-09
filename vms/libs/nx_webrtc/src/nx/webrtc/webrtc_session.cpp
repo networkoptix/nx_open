@@ -120,6 +120,7 @@ Session::Session(
 Session::~Session()
 {
     m_sessionPool->turnInfoFetcher().removeOauthInfoHandler(id());
+    m_transceiver->stop();
     m_reader.reset();
     releaseTracker(); //< Should be guarded.
 }

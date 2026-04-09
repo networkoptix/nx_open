@@ -50,9 +50,6 @@ void Consumer::stopUnsafe()
 {
     NX_ASSERT(m_pollable.isInSelfAioThread());
 
-    if (m_streamer)
-        m_streamer->stop();
-
     m_needStop = true;
     m_pollable.pleaseStopSync();
 }
