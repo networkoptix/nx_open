@@ -112,6 +112,10 @@ public:
 
     void getAllOrganizationsUsers(
         nx::MoveOnlyFunc<void(api::Result, api::GetUsersResponse)> handler);
+
+    void getSsoOrganizationsInfo(
+        api::SsoOrganizationInfoRequest request,
+        nx::MoveOnlyFunc<void(api::Result, api::SsoOrganizationInfoResponse)> handler);
 };
 
 } // namespace nx::cloud::cps

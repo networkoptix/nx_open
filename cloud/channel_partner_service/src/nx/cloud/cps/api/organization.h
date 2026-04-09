@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -26,5 +27,29 @@ struct Organization
 };
 
 NX_REFLECTION_INSTRUMENT(Organization, (id)(name)(ownPermissions))
+
+struct SsoOrganizationInfoRequest
+{
+    std::vector<std::string> organizationIds;
+};
+
+NX_REFLECTION_INSTRUMENT(SsoOrganizationInfoRequest, (organizationIds))
+
+struct SsoOrganizationInfoItem
+{
+    std::string id;
+    bool ssoRequired = false;
+    bool ssoAvailable = false;
+};
+
+NX_REFLECTION_INSTRUMENT(SsoOrganizationInfoItem, (id)(ssoRequired)(ssoAvailable))
+
+struct SsoOrganizationInfoResponse
+{
+    std::vector<SsoOrganizationInfoItem> organizations;
+    std::optional<std::vector<std::string>> missingIds;
+};
+
+NX_REFLECTION_INSTRUMENT(SsoOrganizationInfoResponse, (organizations)(missingIds))
 
 } // namespace nx::cloud::cps::api

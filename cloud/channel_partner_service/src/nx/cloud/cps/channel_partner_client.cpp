@@ -160,4 +160,16 @@ void ChannelPartnerClient::getAllOrganizationsUsers(
         std::move(handler));
 }
 
+void ChannelPartnerClient::getSsoOrganizationsInfo(
+    api::SsoOrganizationInfoRequest request,
+    nx::MoveOnlyFunc<void(api::Result, api::SsoOrganizationInfoResponse)> handler)
+{
+    base_type::template makeAsyncCall<api::SsoOrganizationInfoResponse>(
+        nx::network::http::Method::post,
+        api::kInternalSsoOrganizationsInfoPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
+}
+
 } // namespace nx::cloud::cps
