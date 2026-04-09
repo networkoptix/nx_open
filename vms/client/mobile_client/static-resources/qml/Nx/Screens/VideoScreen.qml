@@ -593,6 +593,8 @@ Page
                             && navigationBar.hasChunkNavigation
                             && NxGlobals.isValidTime(controller.prevChunkMs)
 
+                        opacity: navigationBar.hasChunkNavigation ? 1 : 0
+
                         onClicked:
                             controller.jumpBackward()
                     }
@@ -668,6 +670,8 @@ Page
 
                         enabled: d.hasArchive && navigationBar.hasChunkNavigation
                             && !controller.playingLive
+
+                        opacity: navigationBar.hasChunkNavigation ? 1 : 0
 
                         onClicked:
                             controller.jumpForward()
