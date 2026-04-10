@@ -1,8 +1,9 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+import QtQuick.Controls
+
 import Nx.Core
 import Nx.Controls
-
 import Nx.Mobile.Controls
 
 AdaptiveSheet
@@ -22,6 +23,9 @@ AdaptiveSheet
     contentSpacing: 20
     interactive: !panel.joystick.active
     extraBottomPadding: 0
+
+    modal: false
+    closePolicy: Popup.NoAutoClose
 
     PtzPanel
     {
