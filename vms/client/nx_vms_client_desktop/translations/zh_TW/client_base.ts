@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>輸入檔損毀。</translation>
     </message>
   </context>
   <context>
@@ -2111,11 +2111,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>此伺服器已從站點中移除</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>此使用者已從站點中移除</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -9042,7 +9042,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>儲存報告</translation>
     </message>
   </context>
   <context>

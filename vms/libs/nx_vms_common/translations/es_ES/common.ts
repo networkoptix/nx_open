@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation>su Regional / Soporte de Licencias</translation>
+      <translation>soporte regional / de licencia</translation>
     </message>
   </context>
   <context>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation>Los miembros de este grupo pueden ver la información de Monitor de Salud del Sitio y la carga del procesador en tiempo real (Servidor de Monitoreo).</translation>
+      <translation>Los miembros de este grupo pueden ver la información de Monitoreo del estado del sitio y la carga del procesador del servidor en tiempo real (Monitoreo del servidor).</translation>
     </message>
   </context>
   <context>
@@ -254,7 +254,7 @@
     <name>QnCameraAnalyticsEventsPolicy</name>
     <message>
       <source>Analytics events are not available for %1</source>
-      <translation>Eventos de Analíticos no están disponibles por %1</translation>
+      <translation>Los eventos analíticos no están disponibles para %1</translation>
     </message>
   </context>
   <context>

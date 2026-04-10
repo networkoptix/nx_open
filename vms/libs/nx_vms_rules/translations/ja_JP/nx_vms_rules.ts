@@ -281,7 +281,7 @@
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation>削除されたサブジェクト</translation>
+      <translation>削除済み対象</translation>
     </message>
     <message>
       <source>Removed device</source>

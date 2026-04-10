@@ -2174,11 +2174,11 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Ten serwer usunięto z witryny</translation>
+      <translation type="unfinished">This server is removed from Site</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Ten użytkownik został usunięty z witryny</translation>
+      <translation type="unfinished">This user is removed from Site</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
@@ -8418,11 +8418,11 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
+        <numerusform>Rejestr zdarzeń dla okresu od %1 do %2 – Wyświetlane jest pierwsze %n zdarzeń. Aby znaleźć konkretne zdarzenia, dostosuj zakres dat lub zastosuj dodatkowe filtry</numerusform>
       </translation>
     </message>
     <message numerus="yes">
