@@ -637,8 +637,9 @@ Page
                 {
                     id: actionButtonContainer
 
-                    implicitWidth: childrenRect.width
-                    implicitHeight: childrenRect.height
+                    Layout.preferredWidth: childrenRect.width
+                    Layout.preferredHeight: childrenRect.height
+
                     enabled: controller.playingLive
                     visible: actionSheet.hasActions
                 }
