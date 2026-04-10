@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QSet>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
@@ -37,7 +38,7 @@ public:
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role);
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
     static void registerQmlType();
@@ -49,6 +50,16 @@ private:
     QVector<PushNotification> m_notifications;
 };
 
+/**
+ * Proxy model that filters notifications by viewed status and text search.
+ *
+ * Text filter (regex) is always active and matches against the notification title and description
+ * regardless of the current viewed-status filter.
+ *
+ * Viewed-status filter has three modes: All, Viewed, and Unviewed. When a notification is marked
+ * as read while the Unviewed filter is active, it stays visible in the list until the filter is
+ * switched, so it doesn't unexpectedly disappear from the user's view.
+ */
 class PushNotificationFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -67,6 +78,9 @@ public:
     PushNotificationFilterModel(QObject* parent = nullptr);
     static void registerQmlType();
 
+    virtual bool setData(
+        const QModelIndex& index, const QVariant& value, int role) override;
+
 protected:
     virtual bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
 
@@ -74,7 +88,8 @@ signals:
     void filterChanged();
 
 private:
-    Filter m_filter;
+    Filter m_filter = Filter::All;
+    QSet<QString> m_recentlyEditedIds;
 };
 
 } // namespace nx::vms::client::mobile
