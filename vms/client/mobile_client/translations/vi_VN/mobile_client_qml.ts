@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>gần</translation>
+      <translation>Đóng</translation>
     </message>
   </context>
   <context>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
+      <translation>Tìm kiếm theo thuộc tính</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -572,7 +572,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -654,7 +654,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>Cho phép hiển thị thời gian máy chủ cho camera</translation>
     </message>
   </context>
   <context>
@@ -986,19 +986,19 @@
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Dòng thời gian</translation>
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Không có thiết bị</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Không tìm thấy thiết bị nào trên bố cục này</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Không tìm thấy thiết bị nào trong Chi nhánh này. Thêm thiết bị bằng ứng dụng dành cho máy tính để bàn hoặc yêu cầu quyền truy cập vào các thiết bị hiện có</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -1161,7 +1161,7 @@
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Chào mừng, %1!</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1301,7 +1301,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Đăng nhập vào Cloud</translation>
     </message>
   </context>
   <context>
@@ -1534,24 +1534,24 @@
     </message>
     <message>
       <source>No results</source>
-      <translation type="unfinished">No results</translation>
+      <translation>Không có kết quả</translation>
     </message>
     <message>
       <source>Not available</source>
-      <translation type="unfinished">Not available</translation>
+      <translation>Không khả dụng</translation>
     </message>
     <message>
       <source>You do not have permission&lt;br&gt;to view the archive</source>
       <comment>&lt;br&gt; is a line break</comment>
-      <translation type="unfinished">You do not have permission&lt;br&gt;to view the archive</translation>
+      <translation>Bạn không có quyền&lt;br&gt;xem kho lưu trữ</translation>
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Chế độ PTZ</translation>
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>Xuất...</translation>
     </message>
   </context>
   <context>

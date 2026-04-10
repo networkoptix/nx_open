@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Nếu tùy chọn này không được chọn, hãy tắt chế độ giải mã đa luồng; nếu tùy chọn này được chọn, hãy bật chế độ tự động.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Cho phép giải mã đa luồng</translation>
     </message>
   </context>
   <context>
@@ -996,7 +996,7 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Siêu dữ liệu</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>Loại đối tượng</translation>
     </message>
     <message>
       <source>Has attributes</source>
@@ -1016,7 +1016,7 @@
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>Thuộc tính hiển thị</translation>
     </message>
     <message>
       <source>Delete</source>
