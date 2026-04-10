@@ -5889,7 +5889,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n subjects more</source>
       <translation>
-        <numerusform>ほか %n サブジェクト</numerusform>
+        <numerusform>ほか %n 対象</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5920,7 +5920,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
       <translation>
-        <numerusform>削除された %n サブジェクト</numerusform>
+        <numerusform>%n 削除済み対象</numerusform>
       </translation>
     </message>
   </context>

@@ -10809,7 +10809,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation>Chờ đợi phản hồi của máy chủ...</translation>
+      <translation>Chờ phản hồi của máy chủ...</translation>
     </message>
   </context>
   <context>
