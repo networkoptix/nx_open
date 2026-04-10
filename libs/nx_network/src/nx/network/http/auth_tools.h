@@ -210,6 +210,8 @@ bool NX_NETWORK_API calcDigestResponse(
     header::DigestAuthorization* const digestAuthorizationHeader,
     int nonceCount = 1);
 
+NX_NETWORK_API bool isDigestAlgorithmSupported(std::string_view algorithm);
+
 /**
  * To be used by server to validate received Authorization against known credentials.
  */

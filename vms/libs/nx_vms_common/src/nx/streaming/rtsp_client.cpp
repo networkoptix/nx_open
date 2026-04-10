@@ -9,6 +9,7 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <nx/branding.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/nettools.h>
@@ -1841,21 +1842,34 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
             response.statusLine.statusCode == nx::network::http::StatusCode::proxyAuthenticationRequired;
         const auto authenticateHeaderName =
             m_isProxyAuthorizationRequired ? "Proxy-Authenticate" : "WWW-Authenticate";
-        const auto& authenticateHeaderValue =
-            nx::network::http::getHeaderValue(response.headers, authenticateHeaderName);
-        if (!authenticateHeaderValue.empty())
+        m_responseAuthenticate.reset();
+        const auto range = response.headers.equal_range(authenticateHeaderName);
+        for (auto it = range.first; it != range.second; ++it)
         {
             nx::network::http::header::WWWAuthenticate authenticate;
-            if (!authenticate.parse(authenticateHeaderValue))
+            if (!authenticate.parse(it->second))
             {
                 NX_DEBUG(this,
                     "Authentication to %1 failed with wrong %2 header value \"%3\" in response.",
-                    m_url, authenticateHeaderName, authenticateHeaderValue);
-                return CameraDiagnostics::NotAuthorisedResult(m_url);
+                    m_url, authenticateHeaderName, it->second);
+                continue;
             }
             if (m_ignoreQopInDigest)
                 authenticate.params.erase("qop");
+            if (authenticate.authScheme == nx::network::http::header::AuthScheme::digest)
+            {
+                const auto algorithmIt = authenticate.params.find("algorithm");
+                const auto algorithm = algorithmIt != authenticate.params.end()
+                    ? algorithmIt->second : std::string();
+                if (!nx::network::http::isDigestAlgorithmSupported(algorithm))
+                {
+                    NX_DEBUG(this, "Skipping unsupported digest algorithm \"%1\" from %2",
+                        algorithm, m_url);
+                    continue;
+                }
+            }
             m_responseAuthenticate = std::move(authenticate);
+            break;
         }
     }
 

@@ -228,6 +228,11 @@ std::optional<nx::utils::QnCryptographicHash::Algorithm> parseAlgorithm(
     return std::nullopt;
 }
 
+bool isDigestAlgorithmSupported(std::string_view algorithm)
+{
+    return parseAlgorithm(algorithm).has_value();
+}
+
 std::string calcHa1(
     const std::string_view& userName,
     const std::string_view& realm,
