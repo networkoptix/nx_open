@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Nếu tùy chọn này không được chọn, hãy tắt chế độ giải mã đa luồng; nếu tùy chọn này được chọn, hãy bật chế độ tự động.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Cho phép giải mã đa luồng</translation>
     </message>
   </context>
   <context>

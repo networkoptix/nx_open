@@ -1875,7 +1875,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Lỗi hết thời gian chờ gửi dữ liệu khi máy chủ truyền phát dữ liệu đa phương tiện (giây).</translation>
     </message>
   </context>
 </TS>

@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>輸入檔損毀。</translation>
     </message>
   </context>
   <context>
@@ -9042,7 +9042,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>儲存報告</translation>
     </message>
   </context>
   <context>

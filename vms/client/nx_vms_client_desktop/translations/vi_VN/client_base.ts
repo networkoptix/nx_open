@@ -1242,7 +1242,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Tệp đầu vào bị lỗi.</translation>
     </message>
   </context>
   <context>
@@ -2034,7 +2034,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>nội bộ</translation>
     </message>
   </context>
   <context>
@@ -2367,7 +2367,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Thao tác này được thực hiện bởi một plugin.</translation>
     </message>
   </context>
   <context>
@@ -5695,7 +5695,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation>Chờ đợi phản hồi của máy chủ...</translation>
+      <translation>Chờ phản hồi của máy chủ...</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -9042,7 +9042,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Lưu báo cáo</translation>
     </message>
   </context>
   <context>
