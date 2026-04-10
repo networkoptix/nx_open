@@ -25,6 +25,10 @@ Control
     property bool checked: false
     property alias indicator: indicator
 
+    // In compact mode the button shrinks to the icon size while the background
+    // touch area remains equal to minimal touch size.
+    property bool compact: false
+
     readonly property alias down: d.down
 
     signal pressed()
@@ -47,10 +51,14 @@ Control
             checked = false
     }
 
-    padding: 6
+    padding: compact ? 0 : 6
 
-    implicitWidth: Math.max(40, contentItem.implicitWidth)
-    implicitHeight: Math.max(40, contentItem.implicitHeight)
+    implicitWidth: compact
+        ? contentItem.implicitWidth
+        : Math.max(d.minTouchSize, contentItem.implicitWidth)
+    implicitHeight: compact
+        ? contentItem.implicitHeight
+        : Math.max(d.minTouchSize, contentItem.implicitHeight)
 
     icon.color: checkable && checked
         ? checkedIconColor
@@ -100,13 +108,19 @@ Control
         id: background
 
         anchors.centerIn: parent
-        width: control.width - control.padding * 2
-        height: control.height - control.padding * 2
+        width: control.compact
+            ? d.minTouchSize
+            : control.width - control.padding * 2
+        height: control.compact
+            ? d.minTouchSize
+            : control.height - control.padding * 2
 
         function mouseOutsideButton(mouse)
         {
+            const w = control.compact ? width : control.width
+            const h = control.compact ? height : control.height
             return mouse.x < 0 || mouse.y < 0
-                || mouse.x >= control.width || mouse.y >= control.height
+                || mouse.x >= w || mouse.y >= h
         }
 
         onPressed: (mouse) =>
@@ -181,5 +195,7 @@ Control
 
         property bool pressedAndHeld: false
         property bool down: false
+
+        readonly property int minTouchSize: 40
     }
 }

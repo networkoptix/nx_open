@@ -83,6 +83,7 @@ FocusScope
     {
         id: toolBar
 
+        implicitHeight: StyleHints.headerHeight
         titleUnderlineVisible: false
         leftControl: root.customLeftControl ?? defaultLeftControl
         rightControl: root.customRightControl

@@ -38,7 +38,7 @@ Drawer
         return Math.min(
             bottomPadding
                 + content.anchors.topMargin
-                + (control.header ? d.headerHeight : 0)
+                + (control.header ? StyleHints.headerHeight : 0)
                 + flickable.anchors.topMargin
                 + flickable.contentHeight
                 + flickable.anchors.bottomMargin
@@ -127,19 +127,28 @@ Drawer
 
             header: Item
             {
-                implicitHeight: d.headerHeight
+                implicitHeight: StyleHints.headerHeight
                 visible: headerProxy.target
 
-                LayoutItemProxy
+                RowLayout
                 {
-                    id: headerProxy
+                    anchors.fill: parent
+                    anchors.leftMargin: contentColumn.leftPadding
+                    anchors.rightMargin: contentColumn.rightPadding
 
-                    x: contentColumn.leftPadding
-                    y: 24
+                    LayoutItemProxy
+                    {
+                        id: headerProxy
 
-                    width: parent.width
-                        - contentColumn.leftPadding
-                        - (closeButton.visible ? (content.width - closeButton.x) : contentColumn.rightPadding)
+                        Layout.fillWidth: true
+                    }
+
+                    LayoutItemProxy
+                    {
+                        target: closeButton
+                        visible: headerProxy.target
+                            && (LayoutController.isTabletLayout || control.alwaysShowCloseButton)
+                    }
                 }
             }
 
@@ -256,20 +265,24 @@ Drawer
                 visible: flickable.needScroll && !flickable.atYEnd
                 from: ColorTheme.colors.dark9
             }
+
+            LayoutItemProxy
+            {
+                anchors.right: parent.right
+                anchors.top: flickable.top
+                anchors.rightMargin: contentColumn.rightPadding
+
+                target: closeButton
+                visible: !headerProxy.target
+                    && (LayoutController.isTabletLayout || control.alwaysShowCloseButton)
+            }
         }
 
         IconButton
         {
             id: closeButton
 
-            // Align button with the sheet content or header by the icon boundaries.
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.rightMargin: 12
-            anchors.topMargin: control.header ? 19 + d.extraTopMargin : 8
-
-            visible: LayoutController.isTabletLayout || control.alwaysShowCloseButton
-            padding: 0
+            compact: true
 
             icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
             icon.width: 24
@@ -285,7 +298,6 @@ Drawer
     {
         id: d
 
-        readonly property int headerHeight: 64
         readonly property int extraTopMargin: LayoutController.isPortrait ? 15 : 0
 
         // Temporary solution. Will be fixed properly after UI refactor.
