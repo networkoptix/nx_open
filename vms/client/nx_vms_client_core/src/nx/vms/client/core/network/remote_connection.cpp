@@ -247,7 +247,7 @@ void RemoteConnection::initializeMessageBusConnection()
     NX_CRITICAL(systemContext());
 
     d->timeSynchronizationManager =
-        std::make_shared<TimeSyncManager>(systemContext(), d->moduleInformation.id);
+        std::make_shared<TimeSyncManager>(systemContext(), d->moduleInformation.id, d->certificateCache.get());
     d->messageBus = std::make_unique<ThreadsafeMessageBusAdapter>(
         systemContext(),
         d->jsonTranSerializer.get(),

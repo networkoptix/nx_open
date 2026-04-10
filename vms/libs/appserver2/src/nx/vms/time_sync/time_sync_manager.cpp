@@ -27,9 +27,11 @@ namespace nx::vms::time {
 const QString TimeSyncManager::kTimeSyncUrlPath("/api/synchronizedTime");
 
 TimeSyncManager::TimeSyncManager(
-    SystemContext* systemContext)
+    SystemContext* systemContext,
+    AbstractCertificateVerifier* certificateVerifier)
     :
     SystemContextAware(systemContext),
+    m_certificateVerifier(certificateVerifier),
     m_systemClock(std::make_shared<SystemClock>()),
     m_steadyClock(std::make_shared<SteadyClock>()),
     m_thread(new QThread())
@@ -86,7 +88,7 @@ std::unique_ptr<nx::network::AbstractStreamSocket> TimeSyncManager::connectToRem
     bool sslRequired)
 {
     auto socket = nx::network::SocketFactory::createStreamSocket(
-        systemContext()->certificateVerifier()->makeAdapterFunc(route), sslRequired);
+        m_certificateVerifier->makeAdapterFunc(route), sslRequired);
     if (socket->connect(route.addr, nx::network::deprecated::kDefaultConnectTimeout))
         return socket;
     return std::unique_ptr<nx::network::AbstractStreamSocket>();
@@ -132,7 +134,7 @@ TimeSyncManager::Result TimeSyncManager::loadTimeFromServer(const QnRoute& route
 
     auto httpClient = std::make_unique<nx::network::http::HttpClient>(
         std::move(socket),
-        systemContext()->certificateVerifier()->makeAdapterFunc(
+        m_certificateVerifier->makeAdapterFunc(
             route.gatewayId.isNull() ? route.id : route.gatewayId, url));
     httpClient->setResponseReadTimeout(std::chrono::milliseconds(maxRtt));
     httpClient->addAdditionalHeader(Qn::SERVER_GUID_HEADER_NAME, route.id.toSimpleStdString());

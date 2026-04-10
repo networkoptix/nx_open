@@ -15,7 +15,10 @@ class TimeSyncManager: public nx::vms::time::TimeSyncManager
     Q_OBJECT
     using base_type = nx::vms::time::TimeSyncManager;
 public:
-    TimeSyncManager(SystemContext* systemContext, const nx::Uuid& serverId);
+    TimeSyncManager(
+        SystemContext* systemContext,
+        const nx::Uuid& serverId,
+        nx::vms::common::AbstractCertificateVerifier* certificateVerifier);
     virtual ~TimeSyncManager() override;
 
     virtual void resync() override;
