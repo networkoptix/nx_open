@@ -33,11 +33,10 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
-#include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
-#include <nx/vms/client/mobile/window_context.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 
@@ -878,6 +877,7 @@ Session::~Session()
 
     const auto pool = resourcePool();
     const auto remoteResources = pool->getResourcesWithFlag(Qn::remote);
+    systemContext()->pixelationSettings()->resetPixelationSettings();
     pool->removeResources(remoteResources);
 
     NX_DEBUG(this, "~Session(): end");
