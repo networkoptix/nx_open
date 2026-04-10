@@ -71,7 +71,9 @@ public:
     /**
      * TimeSynchronizationManager::start MUST be called before using class instance.
      */
-    TimeSyncManager(common::SystemContext* systemContext);
+    TimeSyncManager(
+        common::SystemContext* systemContext,
+        common::AbstractCertificateVerifier* certificateVerifier);
     virtual ~TimeSyncManager();
 
     virtual void stop() override;
@@ -113,6 +115,7 @@ private:
     void doPeriodicTasks();
 
 protected:
+    QPointer<common::AbstractCertificateVerifier> m_certificateVerifier;
     std::shared_ptr<AbstractSystemClock> m_systemClock;
     std::shared_ptr<AbstractSteadyClock> m_steadyClock;
     std::atomic<bool> m_isTimeTakenFromInternet{false};
