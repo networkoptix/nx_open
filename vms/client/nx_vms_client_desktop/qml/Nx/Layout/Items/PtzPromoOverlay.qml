@@ -43,33 +43,33 @@ Control
             pagesModel.append({
                 "title": "",
                 "text": qsTr("Drag over any part of the video\nto activate PTZ"),
-                "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_drag.svg",
+                "imageUrl": "image://skin/other/200x75/ptz_promo_drag.svg",
             })
 
             pagesModel.append({
                 "title": "",
                 "text": qsTr("Press arrow keys to move around. Use plus and minus keys to zoom."),
-                "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_keys.svg",
+                "imageUrl": "image://skin/other/200x75/ptz_promo_keys.svg",
             })
 
             pagesModel.append({
                 "title": "",
                 "text": qsTr("Use mouse wheel to zoom"),
-                "imageUrl": "image://skin/Illustrations/200x78/ptz_promo_scroll.svg",
+                "imageUrl": "image://skin/other/200x78/ptz_promo_scroll.svg",
             })
 
             pagesModel.append({
                 "title": "",
                 "text": qsTr("Click, double-click, or drag\nmouse pointer while pressing\nShift "
                     + "key to use Advanced PTZ"),
-                "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_advanced.svg",
+                "imageUrl": "image://skin/other/200x75/ptz_promo_advanced.svg",
             })
 
             pagesModel.append({
                 "title": "",
                 "text": qsTr("Go to Local Settings to enable a drag marker over "
                     + "the center of the video"),
-                "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_old.svg",
+                "imageUrl": "image://skin/other/200x75/ptz_promo_old.svg",
             })
         }
 
@@ -78,7 +78,7 @@ Control
             pagesModel.append({
                 "title": "",
                 "text": qsTr("To use Target Lock Tracking,\nPress Alt + Click to follow object"),
-                "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_tracking.svg",
+                "imageUrl": "image://skin/other/200x75/ptz_promo_tracking.svg",
             })
         }
 
@@ -86,7 +86,7 @@ Control
             "title": "",
             "text": qsTr("You can enable this guide again by going to "
                 + "Local Settings > Advanced > Reset All Warnings"),
-            "imageUrl": "image://skin/Illustrations/200x75/ptz_promo_show_again.svg",
+            "imageUrl": "image://skin/other/200x75/ptz_promo_show_again.svg",
         })
 
         pagesRepeater.model = pagesModel
