@@ -448,7 +448,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Interfaz</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Interfaz</translation>
     </message>
     <message>
       <source>Performance</source>
@@ -951,7 +951,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Compartiendo</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1048,11 +1048,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>SUSPENDIDO</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>APAGADO</translation>
     </message>
     <message>
       <source>PENDING</source>
