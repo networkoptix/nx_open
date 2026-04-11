@@ -1144,7 +1144,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Configuración del sitio</translation>
     </message>
   </context>
   <context>
