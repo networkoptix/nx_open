@@ -449,7 +449,7 @@ buildDistribution()
     local -r DEB="$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.deb"
 
     echo "Creating $DEB"
-    fakeroot dpkg-deb -z $DEB_COMPRESSION_LEVEL -b "$STAGE" "$DEB"
+    fakeroot dpkg-deb -Zxz -z $DEB_COMPRESSION_LEVEL -b "$STAGE" "$DEB"
 
     createUpdateZip
 
