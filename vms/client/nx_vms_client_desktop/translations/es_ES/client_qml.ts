@@ -1060,7 +1060,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
   </context>
   <context>
@@ -1118,7 +1118,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
@@ -2904,7 +2904,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>Access</source>
@@ -3014,7 +3014,7 @@ Presione Alt + Clic para seguir el objeto</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Grupos de permisos</translation>
     </message>
     <message>
       <source>Access expires</source>
