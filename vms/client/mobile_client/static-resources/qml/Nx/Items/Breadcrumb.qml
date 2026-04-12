@@ -21,7 +21,7 @@ Popup
     bottomPadding: 0
     leftPadding: 0
     rightPadding: 0
-    
+
     popupType: Popup.Item
 
     onAboutToShow:
@@ -60,6 +60,8 @@ Popup
 
         delegate: Item
         {
+            id: breadcrumbDelegateItem
+
             readonly property bool lastItem: index == breadcrumbList.model.length - 1
             width: breadcrumbButtonBackground.width + (lastItem ? 0 : (20 + 4 * 2))
             height: parent.height
@@ -145,7 +147,7 @@ Popup
         {
             id: leftFadeBehavior
             NumberAnimation
-            { 
+            {
                 duration: 100
                 easing.type: Easing.InOutQuad
             }
@@ -171,7 +173,7 @@ Popup
         {
             id: rightFadeBehavior
             NumberAnimation
-            { 
+            {
                 duration: 100
                 easing.type: Easing.InOutQuad
             }
