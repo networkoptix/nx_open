@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Sigue los pasos del asistente</translation>
     </message>
     <message>
       <source>OK</source>
@@ -825,7 +825,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>La carpeta está vacía</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
