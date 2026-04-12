@@ -387,7 +387,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Carpetas</translation>
     </message>
     <message>
       <source>Sites</source>
