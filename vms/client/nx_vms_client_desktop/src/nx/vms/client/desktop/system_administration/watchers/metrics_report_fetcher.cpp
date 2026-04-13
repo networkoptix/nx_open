@@ -10,9 +10,13 @@
 
 namespace {
 
-static constexpr auto kManifestEndpoint = "/rest/v4/metrics/manifest";
-static constexpr auto kValuesEndpoint = "/rest/v4/metrics/values";
-static constexpr auto kAlarmsEndpoint = "/rest/v4/metrics/alarms";
+// The structure of the generated report must match the structure of the report available via
+// the "Download Full Report" button in the webadmin so that it can be successfully imported into
+// the Health Report Viewer on the cloud portal. The legacy ec2 API is intentionally used here.
+
+static constexpr auto kManifestEndpoint = "/ec2/metrics/manifest";
+static constexpr auto kValuesEndpoint = "/ec2/metrics/values";
+static constexpr auto kAlarmsEndpoint = "/ec2/metrics/alarms";
 
 QVector<QString> endpoints()
 {
