@@ -10,6 +10,7 @@ import Nx.Core.Controls
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls
+import Nx.Models
 import Nx.Screens
 import Nx.Ui
 
@@ -31,6 +32,18 @@ AdaptiveScreen
     fullscreenToolBar: detailsLoader.item?.showControls ?? false
     title: contentItem.title
     longContent: contentItem !== eventSearchMenu
+
+    function closeDetailsPanel()
+    {
+        if (!detailsLoader.item)
+            return
+
+        if (screen.contentItem === detailsLoader.item)
+            screen.contentItem = searchContent
+
+        detailsLoader.setSource("")
+        screen.fullscreen = false
+    }
 
     customLeftControl: ToolBarButton
     {
@@ -336,6 +349,12 @@ AdaptiveScreen
         }
     }
 
+    ModelDataAccessor
+    {
+        id: searchModelAccessor
+        model: screenController.searchModel
+    }
+
     FiltersItem
     {
         id: filtersItem
@@ -502,6 +521,7 @@ AdaptiveScreen
 
             delegate: EventSearchItem
             {
+                uuid: model.uuid
                 isAnalyticsItem: screenController.analyticsSearchMode
                 camerasModel: screen.camerasModel
                 eventsModel: view.model
@@ -514,8 +534,7 @@ AdaptiveScreen
                 extraText: model.description
                 timestampMs: model.timestampMs
                 shared: !!model.isSharedBookmark
-                selected: LayoutController.isTabletLayout
-                    && detailsLoader.item?.currentEventIndex === currentEventIndex
+                selected: LayoutController.isTabletLayout && detailsLoader.item?.uuid === uuid
 
                 onVisibleChanged: model.visible = visible
 
@@ -524,6 +543,7 @@ AdaptiveScreen
                     detailsLoader.setSource(
                         Qt.resolvedUrl("private/DetailsScreen.qml"),
                         {
+                            "uuid": uuid,
                             "isAnalyticsDetails": isAnalyticsItem,
                             "camerasModel": camerasModel,
                             "eventSearchModel": eventsModel,
@@ -603,6 +623,43 @@ AdaptiveScreen
             progress: screenController.refreshWatcher.refreshProgress
             y: view.y + screenController.refreshWatcher.overshoot * progress - height - view.spacing * 2
             z: -1
+        }
+    }
+
+    Connections
+    {
+        target: screenController.searchModel
+        enabled: !!detailsLoader.item
+
+        function onRowsRemoved()
+        {
+            validateSelectedItem()
+        }
+
+        function validateSelectedItem()
+        {
+            const selectedUuid = detailsLoader.item?.uuid
+            if (!selectedUuid)
+                return
+
+            for (let i = 0; i < searchModelAccessor.count; ++i)
+            {
+                if (searchModelAccessor.getData(i, "uuid") == selectedUuid)
+                    return
+            }
+
+            screen.closeDetailsPanel()
+        }
+
+        function onFetchFinished(result, centralItemIndex, request)
+        {
+            if (result === EventSearch.FetchResult.failed
+                || result === EventSearch.FetchResult.cancelled)
+            {
+                return
+            }
+
+            validateSelectedItem()
         }
     }
 

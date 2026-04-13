@@ -32,6 +32,7 @@ Page
 
     objectName: "eventDetailsScreen"
 
+    property var uuid
     property bool isAnalyticsDetails: true
     property QnCameraListModel camerasModel: null
     property alias eventSearchModel: d.accessor.model

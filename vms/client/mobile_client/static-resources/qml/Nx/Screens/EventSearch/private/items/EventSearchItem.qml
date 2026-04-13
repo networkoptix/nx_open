@@ -17,6 +17,7 @@ Control
 {
     id: control
 
+    property var uuid
     property bool isAnalyticsItem: true
     property QnCameraListModel camerasModel: null
     property EventSearchModel eventsModel: null

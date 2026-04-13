@@ -1611,6 +1611,9 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
         case TimestampRole:
             return QVariant::fromValue(microseconds(track.firstAppearanceTimeUs));
 
+        case UuidRole:
+            return QVariant::fromValue(track.id);
+
         case PreviewTimeRole:
             return QVariant::fromValue(previewParams(track).timestamp);
 
