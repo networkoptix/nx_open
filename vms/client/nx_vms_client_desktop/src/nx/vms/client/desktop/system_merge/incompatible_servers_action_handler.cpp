@@ -74,7 +74,7 @@ void IncompatibleServersActionHandler::connectToCurrentSystem(const nx::Uuid& se
         otherServersManager->getModuleInformationWithAddresses(serverId);
 
     auto delegate = createConnectionUserInteractionDelegate(
-        systemContext(), [this]() { return mainWindowWidget(); });
+        [this]() { return mainWindowWidget(); });
     m_connectTool = new ConnectToCurrentSystemTool(this, std::move(delegate));
 
     auto progressDialog = new ProgressDialog(mainWindowWidget());
@@ -125,7 +125,7 @@ void IncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
             QnCertificateStatisticsModule::Scenario::mergeFromDialog);
 
     auto delegate = createConnectionUserInteractionDelegate(
-        systemContext(), [this]() { return mainWindowWidget(); });
+        [this]() { return mainWindowWidget(); });
     m_mergeDialog = new MergeSystemsDialog(mainWindowWidget(), std::move(delegate));
 
     connect(m_mergeDialog.data(), &QDialog::finished, this,

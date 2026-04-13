@@ -7,7 +7,6 @@
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_error.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_warning.h>
@@ -15,7 +14,7 @@
 namespace nx::vms::client::desktop {
 
 std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
-    createConnectionUserInteractionDelegate(SystemContext* systemContext,
+    createConnectionUserInteractionDelegate(
     std::function<QWidget*()> parentWidget)
 {
     const auto validateToken =
@@ -57,7 +56,7 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     return std::make_unique<core::RemoteConnectionUserInteractionDelegate>(
-        systemContext, validateToken, askToAcceptCertificates, showCertificateError);
+        validateToken, askToAcceptCertificates, showCertificateError);
 }
 
 } // namespace nx::vms::client::desktop

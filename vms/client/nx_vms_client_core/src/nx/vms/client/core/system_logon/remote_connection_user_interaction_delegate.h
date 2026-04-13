@@ -3,7 +3,6 @@
 #pragma once
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/system_context_aware.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 #include <nx/vms/client/core/system_logon/certificate_warning.h>
@@ -11,8 +10,7 @@
 namespace nx::vms::client::core {
 
 class NX_VMS_CLIENT_CORE_API RemoteConnectionUserInteractionDelegate:
-    public AbstractRemoteConnectionUserInteractionDelegate,
-    public SystemContextAware
+    public AbstractRemoteConnectionUserInteractionDelegate
 {
     Q_OBJECT
     using base_type = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;
@@ -27,7 +25,6 @@ public:
         const TargetCertificateInfo& certificateInfo)>;
 
     RemoteConnectionUserInteractionDelegate(
-        SystemContext* context,
         TokenValidator validateToken,
         AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError,

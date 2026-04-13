@@ -25,7 +25,6 @@ using CertificateValidationLevel = network::server_certificate::ValidationLevel;
 
 struct RemoteConnectionUserInteractionDelegate::Private
 {
-    RemoteConnectionUserInteractionDelegate* const q;
     const TokenValidator validateToken;
     const AskUserToAcceptCertificates askToAcceptCertificates;
     const ShowCertificateError showCertificateError;
@@ -36,7 +35,6 @@ struct RemoteConnectionUserInteractionDelegate::Private
     }
 
     Private(
-        RemoteConnectionUserInteractionDelegate* q,
         TokenValidator validateToken,
         AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError);
@@ -46,12 +44,10 @@ struct RemoteConnectionUserInteractionDelegate::Private
 };
 
 RemoteConnectionUserInteractionDelegate::Private::Private(
-    RemoteConnectionUserInteractionDelegate* q,
     TokenValidator validateToken,
     AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError)
     :
-    q(q),
     validateToken(validateToken),
     askToAcceptCertificates(askToAcceptCertificates),
     showCertificateError(showCertificateError)
@@ -61,9 +57,14 @@ RemoteConnectionUserInteractionDelegate::Private::Private(
 void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
     const TargetCertificateInfo& certificateInfo)
 {
-    const auto session = q->session();
-    if (session && session->state() == nx::vms::client::core::RemoteSession::State::reconnecting)
-        return;
+    // Using main system context is a temporary solution while we don't have real multi-window
+    // and multi-system-context implemented.
+    if (const auto systemContext = appContext()->currentSystemContext())
+    {
+        const auto session = systemContext->session();
+        if (session && session->state() == RemoteSession::State::reconnecting)
+            return;
+    }
 
     showCertificateError(certificateInfo);
 }
@@ -72,15 +73,13 @@ void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
 // RemoteConnectionUserInteractionDelegate
 
 RemoteConnectionUserInteractionDelegate::RemoteConnectionUserInteractionDelegate(
-    SystemContext* context,
     TokenValidator validateToken,
     AskUserToAcceptCertificates askToAcceptCertificates,
     ShowCertificateError showCertificateError,
     QObject* parent)
     :
     base_type(parent),
-    SystemContextAware(context),
-    d(new Private(this, validateToken, askToAcceptCertificates, showCertificateError))
+    d(new Private(validateToken, askToAcceptCertificates, showCertificateError))
 {
     NX_ASSERT(validateToken, "Validate token handler should be specified!");
     NX_ASSERT(askToAcceptCertificates, "Ask to accept certificates handler should be specified!");

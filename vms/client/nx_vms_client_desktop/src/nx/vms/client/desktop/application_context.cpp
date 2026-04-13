@@ -611,7 +611,7 @@ struct ApplicationContext::Private
         if (auto networkModule = q->networkModule())
         {
             networkModule->connectionFactory()->setUserInteractionDelegate(
-                createConnectionUserInteractionDelegate(mainSystemContext.get(),
+                createConnectionUserInteractionDelegate(
                     []() { return appContext()->mainWindowContext()->mainWindowWidget(); }));
         }
     }

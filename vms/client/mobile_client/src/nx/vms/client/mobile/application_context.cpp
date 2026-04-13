@@ -18,10 +18,15 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/media/watermark_image_provider.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/network/helpers.h>
+#include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
+#include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
+#include <nx/vms/client/core/system_logon/certificate_warning.h>
+#include <nx/vms/client/core/system_logon/remote_connection_user_interaction_delegate.h>
 #include <nx/vms/client/core/ui/image_providers/resource_icon_provider.h>
 #include <nx/vms/client/mobile/mobile_client_meta_types.h>
 #include <nx/vms/client/mobile/push_notification/details/abstract_secure_storage.h>
@@ -33,6 +38,7 @@
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
 #include <nx/vms/client/mobile/ui/detail/screens.h>
+#include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/discovery/manager.h>
@@ -100,6 +106,7 @@ struct ApplicationContext::Private
     void initializeEngine(const QnMobileClientStartupParameters& params);
     void initializeMainWindowContext();
     void initializeMainSystemContext();
+    void initializeConnectionUserInteractionDelegate();
     void initializeTrafficLogginOptionHandling();
     void initOsSpecificStuff();
     void initializePushNotificationStorage();
@@ -225,6 +232,71 @@ void ApplicationContext::Private::initializeMainSystemContext()
                             error.shortText, error.longText);
                     }, q);
             }));
+
+    initializeConnectionUserInteractionDelegate();
+}
+
+void ApplicationContext::Private::initializeConnectionUserInteractionDelegate()
+{
+    using namespace nx::vms::client::core;
+    using Delegate = core::RemoteConnectionUserInteractionDelegate;
+
+    const QPointer<WindowContext> wc = windowContext.get();
+
+    const auto validateToken =
+        [wc](const nx::network::http::Credentials& credentials)
+        {
+            return wc && wc->uiController()->screens()->show2faValidationScreen(credentials);
+        };
+
+    const auto askToAcceptCertificates =
+        [wc](const QList<core::TargetCertificateInfo>& certificatesInfo,
+            CertificateWarning::Reason reason)
+        {
+            if (!NX_ASSERT(!certificatesInfo.isEmpty()) || !wc)
+                return false;
+
+            const auto& info = certificatesInfo.first();
+
+            const auto url = QUrl(reason == CertificateWarning::Reason::unknownServer
+                ? "Nx/Web/UnknownSslCertificateDialog.qml"
+                : "Nx/Web/InvalidOrChangedCertificateDialog.qml");
+            QVariantMap props;
+            props["title"] = CertificateWarning::header(
+                reason, info.target, certificatesInfo.size());
+            props["messageText"] = CertificateWarning::details(reason, certificatesInfo.size());
+            props["adviceText"] = CertificateWarning::advice(
+                reason, CertificateWarning::ClientType::mobile);
+
+            // TODO: Show all certificates.
+            if (const auto& chain = info.chain;
+                !chain.empty())
+            {
+                const auto& certificate = *chain.begin();
+                const auto& expiresAt = duration_cast<std::chrono::seconds>(
+                    certificate.notAfter().time_since_epoch());
+                props["certificateExpires"] =
+                    QDateTime::fromSecsSinceEpoch(expiresAt.count()).toString();
+                props["certificateCommonName"] = QString::fromStdString(
+                    certificateName(certificate.subject()).value_or(std::string()));
+                props["certificateIssuedBy"] = QString::fromStdString(
+                    certificateName(certificate.issuer()).value_or(std::string()));
+                props["certificateSHA256"] = formattedFingerprint(certificate.sha256());
+                props["certificateSHA1"] = formattedFingerprint(certificate.sha1());
+            }
+
+            return QmlWrapperHelper::showPopup(wc, url, props) == "connect";
+        };
+
+    const auto showCertificateError =
+        [](const core::TargetCertificateInfo& /*certificateInfo*/)
+        {
+            // Mobile client shows connection error itself.
+        };
+
+    auto delegate = std::make_unique<Delegate>(
+        validateToken, askToAcceptCertificates, showCertificateError);
+    q->networkModule()->connectionFactory()->setUserInteractionDelegate(std::move(delegate));
 }
 
 void ApplicationContext::Private::initializeTrafficLogginOptionHandling()
@@ -307,6 +379,9 @@ ApplicationContext::ApplicationContext(
 
 ApplicationContext::~ApplicationContext()
 {
+    if (auto networkModule = this->networkModule())
+        networkModule->connectionFactory()->setUserInteractionDelegate({});
+
     // Main system context does not exist in self-update mode.
     if (d->mainSystemContext)
     {

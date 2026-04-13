@@ -124,7 +124,6 @@ struct ConnectionTestingDialog::Private
         ConnectionUserInteractionDelegate(ConnectionTestingDialog* owner):
             m_owner(owner),
             m_baseDelegate(createConnectionUserInteractionDelegate(
-                appContext()->currentSystemContext(),
                 [this]() {return m_owner;}))
         {
 
