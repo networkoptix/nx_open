@@ -127,14 +127,14 @@ AdaptiveScreen
 
     TextButton // TODO: Should be right control, but tool bar does not work well with wide buttons. Need to refactor tool bar.
     {
-        id: clearAllButton
+        id: resetAllButton
 
         parent: LayoutController.isTabletLayout ? leftPanel.availableHeaderArea : screen.toolBar
         anchors.right: parent.right
         anchors.topMargin: LayoutController.isTabletLayout ? 20 : 0
         anchors.rightMargin: LayoutController.isTabletLayout ? 0 : 20
         anchors.verticalCenter: parent.verticalCenter
-        text: qsTr("Clear All")
+        text: qsTr("Reset All")
         visible: LayoutController.isTabletLayout || screen.contentItem === filtersItem
         onClicked: screenController.clearFilters()
     }
@@ -415,9 +415,24 @@ AdaptiveScreen
         padding: 0
         contentItem: Panel
         {
+            id: leftPanelPopupPanel
+
             color: ColorTheme.colors.dark5
             title: leftPanelPopupProxy.target?.title ?? ""
             onCloseButtonClicked: leftPanelPopup.close()
+
+            TextButton
+            {
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.verticalCenter: parent.verticalCenter
+
+                parent: leftPanelPopupPanel.availableHeaderArea
+                padding: 0
+                text: qsTr("Reset")
+                visible: optionSelectorItem.selector && !optionSelectorItem.selector.isDefaultValue
+                onClicked: optionSelectorItem.clear()
+            }
 
             LayoutItemProxy
             {
