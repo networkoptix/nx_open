@@ -459,16 +459,20 @@
       <translation>결과를 표시하려면 필터를 변경해 보세요.</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>모두 삭제</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>필터</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>상세</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

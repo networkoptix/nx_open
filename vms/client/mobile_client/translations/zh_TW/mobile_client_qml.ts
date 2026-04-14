@@ -459,16 +459,20 @@
       <translation>請嘗試更改篩選條件來顯示結果</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>清除全部</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>篩選</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>細節</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

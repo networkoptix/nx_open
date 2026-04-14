@@ -459,16 +459,20 @@
       <translation>Thử thay đổi bộ lọc để hiển thị kết quả</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>Xóa tất cả</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>Bộ lọc</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>Chi tiết</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

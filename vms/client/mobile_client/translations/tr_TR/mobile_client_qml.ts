@@ -460,16 +460,20 @@
       <translation>Sonuçları görüntülemek için filtreleri değiştirmeyi deneyin</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>Tümünü Temizle</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>Filtreler</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>Detaylar</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

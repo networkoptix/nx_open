@@ -459,16 +459,20 @@
       <translation>Coba ubah filter untuk menampilkan hasilnya</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>Hapus Semua</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>Filter</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>Detail</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

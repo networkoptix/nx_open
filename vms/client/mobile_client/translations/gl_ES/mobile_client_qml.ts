@@ -460,16 +460,20 @@
       <translation>Proba a cambiar os filtros para mostrar os resultados</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>Borrar todo</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>Filtros</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>Detalles</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>

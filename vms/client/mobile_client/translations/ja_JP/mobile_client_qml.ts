@@ -459,16 +459,20 @@
       <translation>結果を表示するには、フィルターの変更をお試しください</translation>
     </message>
     <message>
-      <source>Clear All</source>
-      <translation>すべてクリア</translation>
-    </message>
-    <message>
       <source>Filters</source>
       <translation>フィルター</translation>
     </message>
     <message>
       <source>Details</source>
       <translation>詳細</translation>
+    </message>
+    <message>
+      <source>Reset All</source>
+      <translation type="unfinished">Reset All</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>
