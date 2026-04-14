@@ -460,15 +460,19 @@
         <translation></translation>
     </message>
     <message>
-        <source>Clear All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
