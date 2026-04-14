@@ -17,9 +17,13 @@ AbstractTimelineController
 
     property bool updating: false
 
+    // TODO: #vkutin After the old timeline removal name these functions properly.
+    // Maybe merge this component with VideoScreenController.
+
     function setTimelinePosition(positionMs, immediate)
     {
         timelineJump(positionMs)
+        timeline.followPosition()
     }
 
     function timelineJump(positionMs)

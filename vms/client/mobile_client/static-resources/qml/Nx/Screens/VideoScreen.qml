@@ -785,9 +785,14 @@ Page
                     onClicked:
                     {
                         if (controller.playingLive)
+                        {
                             controller.pause()
+                        }
                         else
+                        {
                             controller.playLive()
+                            timeline.followPosition()
+                        }
                     }
                 }
 
