@@ -319,9 +319,9 @@ void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
-        // Skip services that have no purchased channels and were never purchased for this site.
-        // Services in saasData.services were purchased (even if quantity is now 0 after removal).
-        if (parameters.totalChannelNumber == 0 && !saasData.services.contains(id))
+        // Only include services that were purchased for this site (even if quantity is now 0
+        // after removal). Skip services that only exist in the channel partner catalog.
+        if (!saasData.services.contains(id))
             continue;
         auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
@@ -518,10 +518,13 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
     std::multimap<int, Data> availableChannels;
     if (saasServiceManager()->saasServiceOperational())
     {
+        const auto saasData = saasServiceManager()->data();
         auto cloudStorageData = saasServiceManager()->cloudStorageData();
         for (const auto& [id, parameters]: cloudStorageData)
         {
-            if (parameters.totalChannelNumber > 0)
+            // Only include services that were purchased for this site (even if quantity is now 0
+            // after removal). Skip services that only exist in the channel partner catalog.
+            if (saasData.services.contains(id))
             {
                 availableChannels.emplace(
                     parameters.maxResolutionMp, Data{id, parameters.totalChannelNumber});
