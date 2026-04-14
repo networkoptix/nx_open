@@ -125,7 +125,6 @@ function openVideoScreen(
     var properties =
         {
             "initialResource": resource,
-            "initialScreenshot": screenshotUrl ?? "",
             "targetTimestamp": targetTimestamp,
             "auxiliary": isAuxiliary ?? false,
             "selectedObjectsType": appContext.settings.selectedObjectsType ?? Timeline.ObjectsLoader.ObjectsType.motion
@@ -133,6 +132,9 @@ function openVideoScreen(
 
     if (camerasModel)
         properties["camerasModel"] = camerasModel
+
+    if (!appContext.settings.newTimelinePrototype)
+        properties["initialScreenshot"] = screenshotUrl ?? ""
 
     if (selectedObjectsType && appContext.settings.newTimelinePrototype)
         properties["selectedObjectsType"] = selectedObjectsType

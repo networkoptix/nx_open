@@ -32,7 +32,7 @@ Page
     objectName: "videoScreen"
 
     property Resource initialResource
-    property alias initialScreenshot: screenshot.source
+
     property alias controller: controller
     property alias menu: menu
 
@@ -74,7 +74,7 @@ Page
 
             PropertyChanges
             {
-                video.y: (navigationBar.y - video.height) / 2
+                cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
 
                 bottomBar.color: ColorTheme.colors.dark6
             }
@@ -112,8 +112,8 @@ Page
 
                 modernVideoScreen.toolBar.width: modernVideoScreen.width - navigatorProxyItem.width
 
-                video.y: (navigationBar.y - video.height) / 2
-                video.width: modernVideoScreen.width - navigatorProxyItem.width
+                cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
+                cameraSwitcher.width: modernVideoScreen.width - navigatorProxyItem.width
 
                 bottomBar.color: ColorTheme.colors.dark6
             }
@@ -128,7 +128,7 @@ Page
             {
                 target: navigationBar
 
-                anchors.top: video.bottom
+                anchors.top: cameraSwitcher.bottom
                 anchors.left: modernVideoScreen.contentItem.left
                 anchors.right: modernVideoScreen.contentItem.right
             }
@@ -174,12 +174,6 @@ Page
         }
 
         mediaPlayer.videoQuality: appContext.settings.lastUsedQuality
-
-        mediaPlayer.onPlayingChanged:
-        {
-            if (mediaPlayer.playing)
-                screenshot.source = ""
-        }
 
         onOfflineChanged:
         {
@@ -254,8 +248,6 @@ Page
             NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
-        property real cameraUiOpacity: 1.0
-
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
         readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
 
@@ -295,8 +287,8 @@ Page
         onClicked: video.roiController.clearCustomRoi()
     }
 
-    title: controller.resourceHelper.qualifiedResourceName
-    titleLabelOpacity: d.cameraUiOpacity
+    title: cameraSwitcher.resourceName
+    titleLabelOpacity: Math.abs(cameraSwitcher.transitionFraction * 2 - 1)
     titleControls:
         [
             LayoutItemProxy
@@ -398,7 +390,7 @@ Page
     {
         id: video
 
-        readonly property bool shown: dummyLoader.status != Loader.Ready && !screenshot.visible
+        readonly property bool shown: dummyLoader.status != Loader.Ready
 
         readonly property bool supportsRoi:
         {
@@ -409,11 +401,10 @@ Page
                     || type === Timeline.ObjectsLoader.ObjectsType.motion)
         }
 
-        width: parent.width
+        width: parent?.width ?? 800
         height: width / (16.0 / 9.0)
 
         visible: video.shown
-        opacity: d.cameraUiOpacity
 
         resourceHelper: controller.resourceHelper
         mediaPlayer: controller.mediaPlayer
@@ -456,6 +447,32 @@ Page
         }
     }
 
+    CameraSwitcher
+    {
+        id: cameraSwitcher
+
+        width: parent.width
+        height: width / (16.0 / 9.0)
+
+        videoItem: video
+        camerasModel: modernVideoScreen.camerasModel
+        controller: controller
+
+        interactive: !video.roiController.drawingRoi && Math.abs(video.scale - 1.0) < 0.01
+    }
+
+    Item
+    {
+        id: actionVisualizerContainer
+
+        anchors.top: cameraSwitcher.top
+        anchors.horizontalCenter: cameraSwitcher.horizontalCenter
+        anchors.margins: 8
+
+        implicitWidth: childrenRect.width
+        implicitHeight: childrenRect.height
+    }
+
     NxDotPreloader
     {
         anchors.centerIn: video
@@ -464,68 +481,6 @@ Page
         spacing: 8
 
         running: controller.preloaderRequired
-    }
-
-    Item
-    {
-        id: actionVisualizerContainer
-
-        anchors.top: video.top
-        anchors.horizontalCenter: video.horizontalCenter
-        anchors.margins: 8
-
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
-    }
-
-    Item
-    {
-        id: screenshotPlaceholder
-
-        anchors.fill: video
-
-        Image
-        {
-            id: screenshot
-
-            function getAspect(value)
-            {
-                return value.width > 0 && value.height > 0 ? value.width / value.height : 1
-            }
-
-            function fitToBounds(value, bounds)
-            {
-                var aspect = getAspect(value)
-                return aspect < bounds.width / bounds.height
-                    ? Qt.size(bounds.height * aspect, bounds.height)
-                    : Qt.size(bounds.width, bounds.width / aspect)
-            }
-
-            function fillBounds(value, bounds)
-            {
-                var aspect = getAspect(value)
-                var minimalSize = Math.min(bounds.width, bounds.height)
-                return value.width < value.height
-                    ? Qt.size(minimalSize, minimalSize / aspect)
-                    : Qt.size(minimalSize * aspect, minimalSize)
-            }
-
-            readonly property size boundingSize:
-            {
-                var windowSize = Qt.size(parent.width, parent.height)
-                return video.fisheyeMode
-                    ? fillBounds(sourceSize, windowSize)
-                    : fitToBounds(sourceSize, windowSize)
-            }
-
-            width: boundingSize.width
-            height: boundingSize.height
-
-            y: (parent.height - height) / 3
-            x: (parent.width - width) / 2 - windowParams.leftMargin
-            visible: false//status == Image.Ready && !dummyLoader.visible && source != ""
-            opacity: d.cameraUiOpacity
-        }
     }
 
     Rectangle
@@ -1027,6 +982,7 @@ Page
         id: content
 
         anchors.fill: video
+        parent: video.parent
 
         Rectangle
         {
@@ -1072,8 +1028,7 @@ Page
             anchors.right: parent.right
             anchors.rightMargin: 8
 
-            opacity: d.cameraUiOpacity
-            active: appContext.settings.showCameraInfo
+            active: appContext.settings.showCameraInfo && !d.cameraWarningVisible
 
             sourceComponent: InformationLabel
             {
@@ -1085,8 +1040,6 @@ Page
         {
             id: dummyLoader
 
-            readonly property bool needOffset: item && item.onlyCompactTitleIsVisible
-
             anchors.fill: parent
 
             visible: active
@@ -1096,12 +1049,10 @@ Page
             {
                 VideoDummy
                 {
-                    readonly property bool onlyCompactTitleIsVisible:
-                        compact && title != "" && description == "" && buttonText == ""
-
                     rightPadding: 8 + windowParams.rightMargin
                     leftPadding: 8 + windowParams.leftMargin
-                    compact: video.height < 500
+                    compact: cameraSwitcher.height < 200
+                    centered: true
                     state: controller.dummyState
 
                     onButtonClicked:
@@ -1116,8 +1067,8 @@ Page
 
             preloaders.parent: video
             preloaders.height: video.fitSize ? video.fitSize.height : 0
-            preloaders.x: (video.width - preloaders.width) / 2
-            preloaders.y: (video.height - preloaders.height) / 3
+            preloaders.x: (cameraSwitcher.width - preloaders.width) / 2
+            preloaders.y: (cameraSwitcher.height - preloaders.height) / 3
 
             controller.resource: controller.resource
             customRotation: controller.resourceHelper.customRotation
@@ -1181,47 +1132,6 @@ Page
                 ptzSheet.ptz.moveOnTapMode = false
             }
         }
-    }
-
-    SequentialAnimation
-    {
-        id: cameraSwitchAnimation
-
-        property Resource newResource
-        property string thumbnail
-
-        NumberAnimation
-        {
-            target: d
-            property: "cameraUiOpacity"
-            to: 0.0
-            duration: 200
-        }
-
-        ScriptAction
-        {
-            script:
-            {
-                d.animatePlaybackControls = false
-                controller.setResource(cameraSwitchAnimation.newResource)
-                initialScreenshot = cameraSwitchAnimation.thumbnail
-                d.animatePlaybackControls = true
-            }
-        }
-
-        NumberAnimation
-        {
-            target: d
-            property: "cameraUiOpacity"
-            to: 1.0
-            duration: 200
-        }
-    }
-
-    ModelDataAccessor
-    {
-        id: camerasModelAccessor
-        model: camerasModel
     }
 
     onActivePageChanged:

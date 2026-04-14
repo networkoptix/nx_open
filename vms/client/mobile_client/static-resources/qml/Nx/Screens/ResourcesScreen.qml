@@ -189,7 +189,6 @@ AdaptiveScreen
             }
             else
             {
-                videoScreenLoader.item.initialScreenshot = thumbnailUrl ?? ""
                 videoScreenLoader.item.camerasModel = camerasModel
                 videoScreenLoader.item.controller.start(resource, -1)
 
