@@ -109,7 +109,7 @@ AdaptiveScreen
         menuButton
         {
             icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-            visible: feedState.notifications.length !== 0
+            visible: feedStateProvider.notifications.length !== 0
             indicator.visible: feed.filtered
 
             onClicked: feed.openFilterMenu()
@@ -119,6 +119,12 @@ AdaptiveScreen
         {
             if (!rightPanel.item)
                 rightPanel.visible = false
+        }
+
+        onVisibleChanged:
+        {
+            if (visible)
+                Qt.callLater(() => feed.update()) //< Update after the feed is opened.
         }
     }
 
@@ -250,7 +256,7 @@ AdaptiveScreen
                 rightButton
                 {
                     icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-                    visible: feedState.notifications.length !== 0
+                    visible: feedStateProvider.notifications.length !== 0
                     onClicked: feed.openFilterMenu()
                 }
 
