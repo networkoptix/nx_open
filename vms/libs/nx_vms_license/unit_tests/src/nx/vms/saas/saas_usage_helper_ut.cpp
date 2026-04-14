@@ -641,6 +641,12 @@ TEST_F(SaasServiceUsageHelperTest, CloudStorageNeverPurchasedServiceExcluded)
 
     ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
     ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
+
+    // servicesByCameras() should also assign cameras to the purchased 10 MP service,
+    // not to null UUID. This prevents the watcher from treating them as unknown.
+    auto mapping = m_cloudeStorageHelper->servicesByCameras();
+    for (const auto& [cameraId, serviceId]: mapping)
+        ASSERT_EQ(kServiceTenMegapixels, serviceId);
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasAccumulateLicenseUsage)
