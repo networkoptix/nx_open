@@ -5,6 +5,7 @@ import QtQuick
 import Nx.Core
 import Nx.Controls
 import Nx.Mobile.Controls
+import Nx.Ui
 
 // TODO: update comment below.
 /**
@@ -41,12 +42,36 @@ Item
     {
         anchors.fill: parent
 
+        SearchEdit
+        {
+            id: searchEdit
+
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.leftMargin: 20
+            anchors.topMargin: LayoutController.isTabletLayout ? 0 : 20
+            anchors.rightMargin: 20
+
+            height: 36
+            visible: false
+        }
+
         Flickable
         {
             id: flickable
 
-            anchors.fill: parent
-            anchors.margins: 20
+            anchors
+            {
+                left: parent.left
+                top: searchEdit.visible ? searchEdit.bottom : parent.top
+                right: parent.right
+                bottom: parent.bottom
+
+                topMargin: (searchEdit.visible || !LayoutController.isTabletLayout) ? 20 : 0
+                leftMargin: 20
+                rightMargin: 20
+            }
 
             contentHeight: delegateLoader.height
 
@@ -60,13 +85,20 @@ Item
 
                 onItemChanged:
                 {
+                    searchEdit.clear()
+
                     if (!item)
                         return
 
+                    if (item.hasOwnProperty("searchEdit"))
+                        item.searchEdit = searchEdit
+
                     if (item.hasOwnProperty("selector"))
                         item.selector = optionSelectorItem.selector
+
                     if (item.hasOwnProperty("setValue"))
                         item.setValue(selector.value)
+
                     if (item.hasOwnProperty("applyRequested"))
                         item.applyRequested.connect(optionSelectorItem.applyRequested)
                 }

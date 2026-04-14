@@ -34,6 +34,9 @@ class QnCameraListModel: public QSortFilterProxyModel,
     Q_PROPERTY(int count
         READ count
         NOTIFY countChanged)
+    Q_PROPERTY(int totalCount
+        READ totalCount
+        NOTIFY totalCountChanged)
     Q_PROPERTY(UuidList selectedIds
         READ selectedIds
         WRITE setSelectedIds
@@ -58,6 +61,7 @@ public:
     void setSelectedIds(const UuidList& value);
 
     int count() const;
+    int totalCount() const;
 
     Q_INVOKABLE void setSelected(int row, bool selected);
     Q_INVOKABLE int rowByResource(QnResource* resource) const;
@@ -73,6 +77,7 @@ public slots:
 signals:
     void layoutChanged();
     void countChanged();
+    void totalCountChanged();
     void filterIdsChanged();
     void selectedIdsChagned();
     void systemContextsSetChanged();

@@ -12,14 +12,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <models/available_camera_list_model.h>
-#include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/application_context.h>
-#include <nx/vms/client/mobile/system_context_accessor.h>
-#include <nx/vms/client/mobile/window_context.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
-#include <nx/utils/qt_helpers.h>
+#include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/mobile/application_context.h>
+#include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/system_context_accessor.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 namespace {
 
@@ -115,6 +115,28 @@ QnCameraListModel::QnCameraListModel(QObject* parent):
     connect(this, &QnCameraListModel::rowsInserted, this, &QnCameraListModel::countChanged);
     connect(this, &QnCameraListModel::rowsRemoved, this, &QnCameraListModel::countChanged);
     connect(this, &QnCameraListModel::modelReset, this, &QnCameraListModel::countChanged);
+    connect(this, &QnCameraListModel::layoutChanged, this, &QnCameraListModel::countChanged);
+
+    connect(
+        d->model.get(),
+        &QnAvailableCameraListModel::rowsInserted,
+        this,
+        &QnCameraListModel::totalCountChanged);
+    connect(
+        d->model.get(),
+        &QnAvailableCameraListModel::rowsRemoved,
+        this,
+        &QnCameraListModel::totalCountChanged);
+    connect(
+        d->model.get(),
+        &QnAvailableCameraListModel::modelReset,
+        this,
+        &QnCameraListModel::totalCountChanged);
+    connect(
+        d->model.get(),
+        &QnAvailableCameraListModel::layoutChanged,
+        this,
+        &QnCameraListModel::totalCountChanged);
 }
 
 QnCameraListModel::~QnCameraListModel()
@@ -193,6 +215,11 @@ void QnCameraListModel::setFilterIds(const QVariant &ids)
 int QnCameraListModel::count() const
 {
     return rowCount();
+}
+
+int QnCameraListModel::totalCount() const
+{
+    return d->model->rowCount();
 }
 
 UuidList QnCameraListModel::selectedIds() const

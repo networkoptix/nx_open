@@ -365,7 +365,7 @@ AdaptiveScreen
             optionSelectorItem.selector = selector
             if (LayoutController.isTabletLayout)
             {
-                leftPanelPopupProxy.target = optionSelectorItem
+                leftPanelPopupContent.item = optionSelectorItem
                 leftPanelPopup.open()
             }
             else
@@ -434,10 +434,10 @@ AdaptiveScreen
         padding: 0
         contentItem: Panel
         {
-            id: leftPanelPopupPanel
+            id: leftPanelPopupContent
 
             color: ColorTheme.colors.dark5
-            title: leftPanelPopupProxy.target?.title ?? ""
+            title: item?.title ?? ""
             onCloseButtonClicked: leftPanelPopup.close()
 
             TextButton
@@ -446,18 +446,11 @@ AdaptiveScreen
                 anchors.top: parent.top
                 anchors.verticalCenter: parent.verticalCenter
 
-                parent: leftPanelPopupPanel.availableHeaderArea
+                parent: leftPanelPopupContent.availableHeaderArea
                 padding: 0
                 text: qsTr("Reset")
                 visible: optionSelectorItem.selector && !optionSelectorItem.selector.isDefaultValue
                 onClicked: optionSelectorItem.clear()
-            }
-
-            LayoutItemProxy
-            {
-                id: leftPanelPopupProxy
-
-                anchors.fill: parent
             }
         }
 

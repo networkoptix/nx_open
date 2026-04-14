@@ -43,6 +43,16 @@ OptionSelector
     {
         id: content
 
+        property SearchEdit searchEdit
+
+        Binding
+        {
+            target: content.searchEdit
+
+            property: "visible"
+            value: camerasModel.totalCount >= 10
+        }
+
         spacing: 4
 
         function apply()
@@ -64,6 +74,13 @@ OptionSelector
                 id: camerasModel
 
                 selectedIds: d.camerasFromValue(control.value)
+                filterRegularExpression:
+                {
+                    const filterText = content.searchEdit?.displayText.trim() ?? ""
+                    return filterText.length > 0
+                        ? new RegExp(NxGlobals.makeSearchRegExpNoAnchors(filterText), "i")
+                        : new RegExp()
+                }
             }
 
             delegate: StyledCheckBox
@@ -72,7 +89,9 @@ OptionSelector
                 rightPadding: 18
                 height: 56
                 width: (parent && parent.width) ?? 0
-                text: model.resourceName
+                text: NxGlobals.highlightMatch(model.resourceName,
+                    camerasModel.filterRegularExpression,
+                    ColorTheme.colors.yellow_l)
                 iconSource:
                 {
                     if (model.iconKey === 0)
