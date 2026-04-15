@@ -930,4 +930,36 @@ TEST_F(Json, DerivedFromJsonObject)
     testSerialization("{\"foo\":123}", value);
 }
 
+TEST_F(Json, DepthLimit)
+{
+    constexpr int kDepth = 1024;
+    std::string message;
+    for (int i = 0; i < kDepth; ++i)
+        message += i % 2 == 0 ? "{\"a\":" : "[";
+    message += "{\"x\":1}";
+    for (int i = 0; i < kDepth; ++i)
+        message += i % 2 == 0 ? "]" : "}";
+
+    const auto [_, result] = json::deserialize<json::Object>(message);
+    ASSERT_FALSE(result);
+    ASSERT_EQ(result.errorDescription, "Parse error \"DepthLimitExceeded\" at position 3072");
+    ASSERT_EQ(message[3072 + 2], 'x');
+
+    {
+        rapidjson::Document document;
+        document.Parse<rapidjson::kParseIterativeFlag>(message.data(), message.size());
+        ASSERT_TRUE(document.HasParseError());
+        ASSERT_EQ(document.GetParseError(), rapidjson::kParseErrorDepthLimitExceeded);
+        ASSERT_EQ(document.GetErrorOffset(), 3072);
+    }
+
+    {
+        rapidjson::Document document(/*depthLimit*/ (size_t) kDepth + 1);
+        document.Parse(message.data(), message.size());
+        ASSERT_FALSE(document.HasParseError());
+        document.Parse<rapidjson::kParseIterativeFlag>(message.data(), message.size());
+        ASSERT_FALSE(document.HasParseError());
+    }
+}
+
 } // namespace nx::reflect::test
