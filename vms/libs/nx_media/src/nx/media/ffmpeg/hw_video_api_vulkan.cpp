@@ -53,12 +53,13 @@ class VulkanMemoryBuffer: public QHwVideoBuffer
 public:
     VulkanMemoryBuffer(const AVFrame* frame):
         base_type(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~VulkanMemoryBuffer()
     {
+        av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode /*mode*/) override
@@ -140,7 +141,7 @@ public:
     }
 
 private:
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 int selectQueueFamily(

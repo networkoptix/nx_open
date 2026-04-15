@@ -5,6 +5,10 @@
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
+#if defined(Q_OS_APPLE)
+    #include <utils/apple_utils.h>
+#endif
+
 namespace {
     static constexpr std::chrono::milliseconds kWaitTimeoutMs(200);
 } // namespace
@@ -56,8 +60,6 @@ void QnAbstractDataConsumer::resumeDataQueue()
 
 void QnAbstractDataConsumer::run()
 {
-//    const int timeoutMs = 100;
-
     initSystemThreadId();
     beforeRun();
     resumeDataQueue();
@@ -65,7 +67,11 @@ void QnAbstractDataConsumer::run()
     while(!needToStop())
     {
         pauseDelay();
-        runCycle();
+        #if defined(Q_OS_APPLE)
+            drainAutoreleasePoolAndCall([this]() { runCycle(); });
+        #else
+            runCycle();
+        #endif
     }
 
     endOfRun();

@@ -18,9 +18,14 @@ if(MACOSX)
     set(mac_sources src/utils/mac_utils.mm)
 endif()
 
+if(APPLE)
+    set(apple_sources src/utils/apple_utils.mm)
+endif()
+
 nx_add_target(nx_vms_common LIBRARY
     ADDITIONAL_SOURCES
         ${mac_sources}
+        ${apple_sources}
         ${date_time_formatter_sources}
         ${device_vendor_names_sources}
     ADDITIONAL_RESOURCES

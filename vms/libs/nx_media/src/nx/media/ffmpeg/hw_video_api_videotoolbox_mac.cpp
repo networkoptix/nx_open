@@ -44,12 +44,13 @@ class MacMemoryBuffer: public QHwVideoBuffer
 public:
     MacMemoryBuffer(const AVFrame* frame):
         QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~MacMemoryBuffer()
     {
+        av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode mode) override
@@ -115,7 +116,7 @@ public:
 
 private:
     std::unique_ptr<MacTextureMapper> m_textureSet;
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 } // namespace

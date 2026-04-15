@@ -360,12 +360,13 @@ class VaapiMemoryBuffer: public QHwVideoBuffer
 public:
     VaapiMemoryBuffer(const AVFrame* frame):
         QHwVideoBuffer(QVideoFrame::NoHandle),
-        m_frame(frame)
+        m_frame(av_frame_clone(frame))
     {
     }
 
     ~VaapiMemoryBuffer()
     {
+        av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode) override
@@ -582,7 +583,7 @@ public:
     }
 
 private:
-    const AVFrame* m_frame = nullptr;
+    AVFrame* m_frame = nullptr;
 };
 
 } // namespace

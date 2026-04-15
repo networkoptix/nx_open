@@ -14,6 +14,10 @@
 
 #include "abstract_archive_integrity_watcher.h"
 
+#if defined(Q_OS_APPLE)
+    #include <utils/apple_utils.h>
+#endif
+
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr& resource):
     QnAbstractMediaStreamDataProvider(resource)
 {
@@ -126,6 +130,110 @@ std::chrono::milliseconds QnAbstractArchiveStreamReader::getDelay(int64_t timest
     return std::chrono::milliseconds();
 }
 
+void QnAbstractArchiveStreamReader::runCycleImpl()
+{
+    pauseDelay(); // pause if needed;
+    if (needToStop()) // extra check after pause
+        return;
+
+    // check queue sizes
+    if (!dataCanBeAccepted())
+    {
+        emit waitForDataCanBeAccepted();
+        QnSleep::msleep(10);
+        return;
+    }
+
+    QnAbstractMediaDataPtr data = getNextData();
+
+    if (data && m_realTimeSpeed.has_value())
+    {
+        auto mediaRes = resource().dynamicCast<QnMediaResource>();
+        if (mediaRes && !mediaRes->hasVideo(this) && data->dataType == QnAbstractMediaData::AUDIO)
+            std::this_thread::sleep_for(getDelay(data->timestamp));
+        else if (data->dataType == QnAbstractMediaData::VIDEO)
+        {
+            auto d = getDelay(data->timestamp);
+            std::this_thread::sleep_for(d);
+        }
+    }
+
+    if (data)
+    {
+        NX_VERBOSE(this, "New data, timestamp: %1, type: %2, flags: %3, channel: %4",
+            data->timestamp, data->dataType, data->flags, data->channelNumber);
+    }
+    else
+    {
+        NX_VERBOSE(this, "Null data");
+    }
+
+    for (const auto& filter: m_filters)
+    {
+        data = std::const_pointer_cast<QnAbstractMediaData>(
+            std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(data)));
+    }
+
+
+    if (m_noDataHandler && (!data || data->dataType == QnAbstractMediaData::EMPTY_DATA))
+        m_noDataHandler();
+
+    if (!data && !needToStop())
+    {
+        setNeedKeyData();
+        onEvent(CameraDiagnostics::BadMediaStreamResult());
+
+        QnSleep::msleep(30);
+        return;
+    }
+
+    checkAndFixTimeFromCamera(data);
+
+    QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+
+    if (videoData && videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
+    {
+        NX_ASSERT(false);
+        return;
+    }
+
+    if (videoData && needKeyData(videoData->channelNumber))
+    {
+        if (videoData->flags & AV_PKT_FLAG_KEY)
+        {
+            m_gotKeyFrame.at(videoData->channelNumber)++;
+        }
+        else
+        {
+            NX_VERBOSE(this, "Skip non-key frame: %1, type: %2", data->timestamp, data->dataType);
+            return; // need key data but got not key data
+        }
+    }
+
+    if(data)
+    {
+        data->dataProvider = this;
+        if (data->flags &
+            (QnAbstractMediaData::MediaFlags_AfterEOF | QnAbstractMediaData::MediaFlags_BOF))
+        {
+            m_stat[data->channelNumber].reset();
+        }
+    }
+
+    auto mediaRes = resource().dynamicCast<QnMediaResource>();
+    if (mediaRes && !mediaRes->hasVideo(this))
+    {
+        if (data)
+            m_stat[data->channelNumber].onData(data);
+    }
+    else {
+        if (videoData)
+            m_stat[data->channelNumber].onData(data);
+    }
+
+    putData(std::move(data));
+}
+
 void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
@@ -135,106 +243,11 @@ void QnAbstractArchiveStreamReader::run()
 
     while(!needToStop())
     {
-        pauseDelay(); // pause if needed;
-        if (needToStop()) // extra check after pause
-            break;
-
-        // check queue sizes
-        if (!dataCanBeAccepted())
-        {
-            emit waitForDataCanBeAccepted();
-            QnSleep::msleep(10);
-            continue;
-        }
-
-        QnAbstractMediaDataPtr data = getNextData();
-
-        if (data && m_realTimeSpeed.has_value())
-        {
-            auto mediaRes = resource().dynamicCast<QnMediaResource>();
-            if (mediaRes && !mediaRes->hasVideo(this) && data->dataType == QnAbstractMediaData::AUDIO)
-                std::this_thread::sleep_for(getDelay(data->timestamp));
-            else if (data->dataType == QnAbstractMediaData::VIDEO)
-            {
-                auto d = getDelay(data->timestamp);
-                std::this_thread::sleep_for(d);
-            }
-        }
-
-        if (data)
-        {
-            NX_VERBOSE(this, "New data, timestamp: %1, type: %2, flags: %3, channel: %4",
-                data->timestamp, data->dataType, data->flags, data->channelNumber);
-        }
-        else
-        {
-            NX_VERBOSE(this, "Null data");
-        }
-
-        for (const auto& filter: m_filters)
-        {
-            data = std::const_pointer_cast<QnAbstractMediaData>(
-                std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(data)));
-        }
-
-
-        if (m_noDataHandler && (!data || data->dataType == QnAbstractMediaData::EMPTY_DATA))
-            m_noDataHandler();
-
-        if (!data && !needToStop())
-        {
-            setNeedKeyData();
-            onEvent(CameraDiagnostics::BadMediaStreamResult());
-
-            QnSleep::msleep(30);
-            continue;
-        }
-
-        checkAndFixTimeFromCamera(data);
-
-        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
-
-        if (videoData && videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
-        {
-            NX_ASSERT(false);
-            continue;
-        }
-
-        if (videoData && needKeyData(videoData->channelNumber))
-        {
-            if (videoData->flags & AV_PKT_FLAG_KEY)
-            {
-                m_gotKeyFrame.at(videoData->channelNumber)++;
-            }
-            else
-            {
-                NX_VERBOSE(this, "Skip non-key frame: %1, type: %2", data->timestamp, data->dataType);
-                continue; // need key data but got not key data
-            }
-        }
-
-        if(data)
-        {
-            data->dataProvider = this;
-            if (data->flags &
-                (QnAbstractMediaData::MediaFlags_AfterEOF | QnAbstractMediaData::MediaFlags_BOF))
-            {
-                m_stat[data->channelNumber].reset();
-            }
-        }
-
-        auto mediaRes = resource().dynamicCast<QnMediaResource>();
-        if (mediaRes && !mediaRes->hasVideo(this))
-        {
-            if (data)
-                m_stat[data->channelNumber].onData(data);
-        }
-        else {
-            if (videoData)
-                m_stat[data->channelNumber].onData(data);
-        }
-
-        putData(std::move(data));
+        #if defined(Q_OS_APPLE)
+            drainAutoreleasePoolAndCall([this]() { runCycleImpl(); });
+        #else
+            runCycleImpl();
+        #endif
     }
 
     afterRun();
