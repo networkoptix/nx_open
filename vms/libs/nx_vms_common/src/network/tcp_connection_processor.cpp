@@ -468,6 +468,7 @@ nx::String QnTCPConnectionProcessor::createResponse(
             d->request.requestLine.method,
             nx::network::http::getHeaderValue(d->request.headers, "Origin"),
             d->owner->globalSettings()->supportedOrigins().toStdString(),
+            d->owner->globalSettings()->supportedOriginCredentials(),
             /*methods*/ "GET");
     }
 

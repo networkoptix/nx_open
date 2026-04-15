@@ -179,6 +179,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .statisticsReportTimeCycle = QString{"30d"},
     .statisticsReportUpdateDelay = QString{"3h"},
     .supportedOrigins = QString{"*"},
+    .supportedOriginCredentials = false,
     .syncTimeEpsilon = 200,
     .syncTimeExchangePeriod = 600'000,
     .targetPersistentUpdateStorage = PersistentUpdateStorage{},

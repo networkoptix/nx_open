@@ -30,6 +30,7 @@ Response::Response(const Result& restResult, Qn::SerializationFormat format)
 void Response::insertOrReplaceCorsHeaders(
     const nx::network::http::Request& request,
     const QString& supportedOrigins,
+    bool supportedOriginCredentials,
     std::string_view methods)
 {
     nx::network::http::insertOrReplaceCorsHeaders(
@@ -37,6 +38,7 @@ void Response::insertOrReplaceCorsHeaders(
         request.requestLine.method,
         nx::network::http::getHeaderValue(request.headers, "Origin"),
         supportedOrigins.toStdString(),
+        supportedOriginCredentials,
         std::move(methods));
 }
 
