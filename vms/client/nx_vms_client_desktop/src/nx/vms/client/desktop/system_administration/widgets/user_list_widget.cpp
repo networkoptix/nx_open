@@ -251,7 +251,10 @@ public:
     SortedUserListModel* const sortModel{new SortedUserListModel(q)};
     UserListHeaderView* const header{
         new UserListHeaderView(UserListModel::CheckBoxColumn, UserListModel::IsCustomColumn, q)};
-    QAction* filterDigestAction = nullptr;
+
+    QPointer<QAction> noFilterAction;
+    QPointer<QAction> filterDigestAction;
+    QPointer<QAction> filterLdapAction;
 
     CommonMessageBar* const notFoundUsersWarning{
         new CommonMessageBar(q, {.level = BarDescription::BarLevel::Error, .isClosable = true})};
@@ -441,13 +444,41 @@ void UserListWidget::Private::setupUi()
     alertsLayout->addWidget(nonUniqueUsersWarning);
     q->layout()->addItem(alertsLayout);
 
-    ui->filterButton->menu()->addAction(
+    const auto hasLdapConfig =
+        [](const nx::vms::api::LdapSettings& ldapSettings)
+        {
+            return !ldapSettings.uri.isEmpty()
+                || !ldapSettings.adminDn.isEmpty()
+                || !ldapSettings.filters.empty();
+        };
+
+    noFilterAction = ui->filterButton->menu()->addAction(
         tr("All Users"),
-        [this] { sortModel->setDigestFilter(std::nullopt); });
+        [this] { sortModel->setFilterMode(SortedUserListModel::FilterMode::noFilter); });
 
     filterDigestAction = ui->filterButton->menu()->addAction(
         tr("Users with Digest Authentication"),
-        [this] { sortModel->setDigestFilter(true); });
+        [this] { sortModel->setFilterMode(SortedUserListModel::FilterMode::withDigestAuthentication); });
+
+    filterLdapAction = ui->filterButton->menu()->addAction(
+        tr("LDAP Users"),
+        [this] { sortModel->setFilterMode(SortedUserListModel::FilterMode::ldapUsers); });
+
+    const auto ldapSettings = q->systemContext()->globalSettings()->ldap();
+    filterLdapAction->setVisible(hasLdapConfig(ldapSettings));
+
+    connect(q->systemContext()->globalSettings(), &common::SystemSettings::ldapSettingsChanged, this,
+        [this, hasLdapConfig]()
+        {
+            if (!filterLdapAction)
+                return;
+
+            const auto ldapConfigured = hasLdapConfig(q->systemContext()->globalSettings()->ldap());
+            if (ui->filterButton->currentAction() == filterLdapAction && !ldapConfigured)
+                ui->filterButton->setCurrentAction(noFilterAction);
+
+            filterLdapAction->setVisible(ldapConfigured);
+        });
 
     ui->filterButton->setAdjustSize(true);
     ui->filterButton->setCurrentIndex(0);
