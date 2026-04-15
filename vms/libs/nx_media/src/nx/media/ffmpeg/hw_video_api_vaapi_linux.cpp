@@ -310,7 +310,7 @@ public:
 
     ~VaapiMemoryBuffer()
     {
-        av_frame_unref(m_frame);
+        av_frame_free(&m_frame);
     }
 
     virtual MapData map(QVideoFrame::MapMode) override

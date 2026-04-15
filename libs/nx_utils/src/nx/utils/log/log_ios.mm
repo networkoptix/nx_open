@@ -8,7 +8,9 @@ namespace nx::log {
 
 void StdOut::writeImpl(Level /*level*/, const QString& message)
 {
-    NSLog(@"%@", message.toNSString());
+    @autoreleasepool {
+        NSLog(@"%@", message.toNSString());
+    }
 }
 
 } // namespace nx::log

@@ -116,6 +116,10 @@ protected:
     void resetRealtimeDelay();
 
     virtual QnAbstractMediaDataPtr getNextData() = 0;
+
+private:
+    void runCycleImpl();
+
 signals:
     void beforeJump(qint64 usec);
     void jumpOccurred(qint64 usec, int sequence);
