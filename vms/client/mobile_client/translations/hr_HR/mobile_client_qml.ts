@@ -474,7 +474,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Reset</translation>
     </message>
   </context>
   <context>

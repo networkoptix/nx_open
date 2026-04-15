@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Дахин тохируулах</translation>
     </message>
   </context>
   <context>

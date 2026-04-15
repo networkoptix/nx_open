@@ -468,11 +468,11 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>すべてリセット</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>リセット</translation>
     </message>
   </context>
   <context>

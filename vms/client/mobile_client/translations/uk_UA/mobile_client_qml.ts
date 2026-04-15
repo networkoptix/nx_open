@@ -475,7 +475,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Скинути</translation>
     </message>
   </context>
   <context>

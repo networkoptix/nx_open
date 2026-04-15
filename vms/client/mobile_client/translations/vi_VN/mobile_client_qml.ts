@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Thiết lập lại</translation>
     </message>
   </context>
   <context>

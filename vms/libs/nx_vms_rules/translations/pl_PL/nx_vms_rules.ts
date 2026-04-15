@@ -1143,7 +1143,7 @@
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Lokalna baza danych została uszkodzona i nie można jej odzyskać. Zainicjowano nową, pustą bazę danych. Zapisano kopię zapasową uszkodzonej bazy danych do wglądu.</translation>
     </message>
   </context>
   <context>

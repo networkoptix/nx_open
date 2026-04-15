@@ -471,11 +471,11 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>Zresetuj wszystko</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Zresetuj</translation>
     </message>
   </context>
   <context>

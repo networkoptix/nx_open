@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Sıfırla</translation>
     </message>
   </context>
   <context>

@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>重置</translation>
     </message>
   </context>
   <context>

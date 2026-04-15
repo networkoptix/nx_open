@@ -469,11 +469,11 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>Återställ allt</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Återställ</translation>
     </message>
   </context>
   <context>

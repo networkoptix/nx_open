@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>초기화</translation>
     </message>
   </context>
   <context>
