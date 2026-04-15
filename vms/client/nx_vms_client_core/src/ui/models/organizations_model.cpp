@@ -1335,6 +1335,18 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
             {OrganizationsModel::IsAccessibleThroughOrgRole},
             /*recursively*/ true);
 
+        // Sites node items are not tree nodes, so notifyNodeUpdate doesn't cover them.
+        // Explicitly notify the filter model so it re-evaluates IsAccessibleThroughOrgRole
+        // for sites model items and correctly hides org-accessible systems from the Sites tab.
+        if (sitesModelRowCount > 0)
+        {
+            const auto sitesRootIdx = sitesRoot();
+            emit q->dataChanged(
+                q->index(0, 0, sitesRootIdx),
+                q->index(sitesModelRowCount - 1, 0, sitesRootIdx),
+                {OrganizationsModel::IsAccessibleThroughOrgRole});
+        }
+
         setOrganizations(organizationsByPartner[root->id], root->id);
         updateItemsAccess(organizationsByPartner[root->id]);
 
