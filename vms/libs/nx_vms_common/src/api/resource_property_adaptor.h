@@ -275,10 +275,12 @@ public:
 
     virtual void setJsonValue(const QJsonValue& value) override
     {
-        if (const auto typedValue = QJson::deserializeOrThrow<T>(value); isValueValid(typedValue))
-            return setValue(typedValue);
+        const bool allowStrings = true; //< Work around unknown types on web interfaces.
+        const auto typedValue = QJson::deserializeOrThrow<T>(value, allowStrings);
+        if (!isValueValid(typedValue))
+            throw nx::json::InvalidParameterException({key(), "Invalid value"});
+        return setValue(typedValue);
 
-        throw nx::json::InvalidParameterException{{key(), QString{QJson::serialized(value)}}};
     }
 
     void setValue(const T& value)

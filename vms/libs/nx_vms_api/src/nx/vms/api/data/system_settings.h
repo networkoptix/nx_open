@@ -119,6 +119,7 @@ struct SaveableSettingsBase
     std::optional<QString> statisticsReportTimeCycle;
     std::optional<QString> statisticsReportUpdateDelay;
     std::optional<QString> supportedOrigins;
+    std::optional<bool> supportedOriginCredentials;
     std::optional<int> syncTimeEpsilon; //< TODO: Make std::chrono.
     std::optional<int> syncTimeExchangePeriod; //< TODO: Make std::chrono.
     std::optional<PersistentUpdateStorage> targetPersistentUpdateStorage;
@@ -203,6 +204,7 @@ struct SaveableSettingsBase
     (statisticsReportTimeCycle) \
     (statisticsReportUpdateDelay) \
     (supportedOrigins) \
+    (supportedOriginCredentials) \
     (syncTimeEpsilon) \
     (syncTimeExchangePeriod) \
     (targetPersistentUpdateStorage) \
