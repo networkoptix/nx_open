@@ -1018,9 +1018,9 @@ SortedUserListModel::SortedUserListModel(QObject* parent): base_type(parent)
 {
 }
 
-void SortedUserListModel::setDigestFilter(std::optional<bool> value)
+void SortedUserListModel::setFilterMode(FilterMode filterMode)
 {
-    m_digestFilter = value;
+    m_filterMode = filterMode;
     invalidateFilter();
 }
 
@@ -1034,8 +1034,13 @@ bool SortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sou
     QModelIndex sourceIndex = sourceModel()->index(sourceRow, 0, sourceParent);
     const auto user = sourceIndex.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
 
-    return (!m_digestFilter || m_digestFilter == user->shouldDigestAuthBeUsed())
-        && base_type::filterAcceptsRow(sourceRow, sourceParent);
+    if (m_filterMode == FilterMode::withDigestAuthentication && !user->shouldDigestAuthBeUsed())
+        return false;
+
+    if (m_filterMode == FilterMode::ldapUsers && !user->isLdap())
+        return false;
+
+    return base_type::filterAcceptsRow(sourceRow, sourceParent);
 }
 
 } // namespace nx::vms::client::desktop
