@@ -27,7 +27,6 @@ bool Receiver::start(Ice* ice, Dtls* dtls)
     m_ice = ice;
 
     m_session->demuxer()->setSrtpEncryptionData(dtls->encryptionData());
-
     m_session->reader()->onKeyframeNeeded(
         [this]()
         {
@@ -39,7 +38,6 @@ bool Receiver::start(Ice* ice, Dtls* dtls)
         });
 
     m_session->reader()->start();
-
     return true;
 }
 

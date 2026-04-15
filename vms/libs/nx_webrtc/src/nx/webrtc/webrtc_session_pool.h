@@ -69,6 +69,7 @@ public:
         const nx::network::SocketAddress& address,
         const std::string& localUfrag,
         const SessionConfig& config);
+
     /**
      * @param session id
      * @return Nullptr, if session not found.
