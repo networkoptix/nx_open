@@ -10,8 +10,9 @@ void Settings::load(const SettingsReader& settings, const QString& prefix)
 {
     QnSettingsGroupReader group(settings, prefix);
     endpoint = group.value("endpoint").toString().toStdString();
-    maxQueueSize = group.value("maxQueueSize").toULongLong();
-    maxExportBatchSize = group.value("maxExportBatchSize").toULongLong();
+    maxQueueSize = group.value("maxQueueSize", QVariant::fromValue(maxQueueSize)).toULongLong();
+    maxExportBatchSize =
+        group.value("maxExportBatchSize", QVariant::fromValue(maxExportBatchSize)).toULongLong();
     scheduleDelay = std::chrono::milliseconds(
         group.value("scheduleDelayMs", QVariant::fromValue(scheduleDelay.count())).toULongLong());
 }

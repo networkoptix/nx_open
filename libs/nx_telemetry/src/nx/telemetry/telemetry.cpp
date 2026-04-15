@@ -13,6 +13,7 @@
 #include <opentelemetry/trace/propagation/http_trace_context.h>
 #include <opentelemetry/trace/provider.h>
 
+#include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 
 #include "settings.h"
@@ -34,8 +35,8 @@ void init(const InitAttributes& attributes, const Settings& settings)
         return;
     }
 
-    NX_INFO(NX_SCOPE_TAG, "Starting telemetry for %1. Collector endpoint: %2.",
-        attributes.serviceName, settings.endpoint);
+    NX_INFO(NX_SCOPE_TAG, "Enabling telemetry reporting for %1. Settings: %2.",
+        attributes.serviceName, nx::reflect::json::serialize(settings));
 
     exporter::otlp::OtlpGrpcExporterOptions otlpOptions;
     otlpOptions.endpoint = settings.endpoint;
