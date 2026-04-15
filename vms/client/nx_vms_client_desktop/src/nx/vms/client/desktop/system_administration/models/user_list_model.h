@@ -85,14 +85,21 @@ class SortedUserListModel: public QSortFilterProxyModel
 public:
     explicit SortedUserListModel(QObject* parent = nullptr);
 
-    void setDigestFilter(std::optional<bool> value);
+    enum class FilterMode
+    {
+        noFilter,
+        withDigestAuthentication,
+        ldapUsers,
+    };
+
+    void setFilterMode(FilterMode filterMode);
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
-    std::optional<bool> m_digestFilter;
+    FilterMode m_filterMode{FilterMode::noFilter};
 };
 
 } // namespace nx::vms::client::desktop
