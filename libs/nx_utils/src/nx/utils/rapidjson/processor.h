@@ -220,7 +220,7 @@ struct NX_UTILS_API ValueHelper
         else
         {
             const std::string strVal = nx::reflect::json::serialize(val);
-            ::rapidjson::Document doc(&allocator);
+            ::rapidjson::Document doc(/*depthLimit*/ 1024, &allocator);
             doc.Parse(strVal);
             if (doc.IsObject())
                 value = doc.GetObject();
