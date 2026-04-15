@@ -43,6 +43,7 @@ Item
     property real allowedBottomMargin: d.allowedBottomMargin(contentWidth, contentHeight)
 
     property bool interactive: true
+    property bool doubleClickZoom: true
     readonly property alias flickable: flick
     readonly property real contentScale: Geometry.scaleFactor(
         Qt.size(width, height), Qt.size(contentWidth, contentHeight))
@@ -78,6 +79,9 @@ Item
 
     onDoubleClicked: (mouseX, mouseY) =>
     {
+        if (!control.doubleClickZoom)
+            return
+
         var videoItem = content.videoOutput
         var videoMappedPosition = mapToItem(videoItem, mouseX, mouseY)
         if (!videoItem.pointInVideo(videoMappedPosition))

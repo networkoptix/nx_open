@@ -21,6 +21,7 @@ Rectangle
     readonly property real collapsedWidth: speedButton.width
     property bool expanded: false
     property real expandCollapseDurationMs: 150
+    property alias displayCollapseButton: speedControlCollapseButton.visible
 
     // Whether the control is locked to the 1x speed. Used in live playback mode.
     property bool forced1x: false
@@ -38,6 +39,9 @@ Rectangle
     property real maximumSpeed: 16
     property real maximumReverseSpeed: 16
 
+    // Whether the slider is pressed and held by the user.
+    property alias pressed: speedSlider.pressed
+
     signal moved()
 
     width: expanded ? expandedWidth : collapsedWidth
@@ -53,6 +57,12 @@ Rectangle
         enabled: !speedControl.expanded
         suppressDisabledState: true
         width: 60
+
+        Binding on backgroundColor
+        {
+            when: speedControl.color.a < 1.0
+            value: "transparent"
+        }
 
         text:
         {
@@ -92,6 +102,7 @@ Rectangle
 
             Layout.alignment: Qt.AlignVCenter
             Layout.fillWidth: true
+            Layout.rightMargin: expanded && !displayCollapseButton ? 18 : 0
 
             from: parameters.minSliderValue
             to: parameters.maxSliderValue
@@ -193,6 +204,12 @@ Rectangle
             rightPadding: 18
             icon.source: "image://skin/24x24/Solid/cancel.svg"
             Layout.alignment: Qt.AlignVCenter
+
+            Binding on backgroundColor
+            {
+                when: speedControl.color.a < 1.0
+                value: "transparent"
+            }
 
             onClicked:
                 speedControl.expanded = false

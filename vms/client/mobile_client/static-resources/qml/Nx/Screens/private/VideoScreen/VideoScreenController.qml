@@ -352,7 +352,7 @@ NxObject
         setPosition(position, save)
     }
 
-    function jumpForward()
+    function jumpToNextChunk()
     {
         const jumpToLive = nextChunkMs === -1
         forcePosition(nextChunkMs)
@@ -360,7 +360,17 @@ NxObject
             playLive()
     }
 
-    function jumpBackward()
+    function jumpDistance(distance)
+    {
+        if (mediaPlayer.liveMode)
+            return
+
+        const position = mediaPlayer.position + distance
+        if (NxGlobals.isValidTime(position))
+            forcePosition(position)
+    }
+
+    function jumpToPreviousChunk()
     {
         if (NxGlobals.isValidTime(prevChunkMs))
             forcePosition(prevChunkMs)

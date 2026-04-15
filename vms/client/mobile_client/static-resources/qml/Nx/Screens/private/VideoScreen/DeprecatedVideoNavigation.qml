@@ -808,7 +808,7 @@ Item
                     anchors.right: parent.left
                     anchors.verticalCenter: parent.verticalCenter
 
-                    onClicked: controller.jumpBackward()
+                    onClicked: controller.jumpToPreviousChunk()
                 }
 
                 PlaybackJumpButton
@@ -818,7 +818,7 @@ Item
                     anchors.left: parent.right
                     anchors.verticalCenter: parent.verticalCenter
 
-                    onClicked: controller.jumpForward()
+                    onClicked: controller.jumpToNextChunk()
                 }
 
                 onClicked:

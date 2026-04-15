@@ -21,9 +21,10 @@ import nx.vms.client.mobile.timeline as Timeline
 import nx.vms.common
 
 import "private/VideoScreen"
-import "private/VideoScreen/utils.js" as VideoScreenUtils
+import "private/VideoScreen/Fullscreen"
 import "private/VideoScreen/Ptz"
 import "private/VideoScreen/Timeline" as Timeline
+import "private/VideoScreen/utils.js" as VideoScreenUtils
 
 Page
 {
@@ -48,7 +49,6 @@ Page
     property bool auxiliary: false
 
     backgroundColor: "black"
-
     clip: false
 
     // TODO: FIXME! Control left handed / right handed layouts via settings.
@@ -60,7 +60,8 @@ Page
         State
         {
             name: "withoutNavigator"
-            when: !modernVideoScreen.ownsNavigator
+
+            when: !modernVideoScreen.ownsNavigator && !d.fullscreen
 
             AnchorChanges
             {
@@ -77,13 +78,17 @@ Page
                 cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
 
                 bottomBar.color: ColorTheme.colors.dark6
+                fullscreenControlsOverlay.visible: false
             }
         },
 
         State
         {
             name: "navigatorOnTheRight"
-            when: modernVideoScreen.ownsNavigator && !LayoutController.isPortrait
+
+            when: modernVideoScreen.ownsNavigator
+                && !LayoutController.isPortrait
+                && !d.fullscreen
 
             AnchorChanges
             {
@@ -116,13 +121,17 @@ Page
                 cameraSwitcher.width: modernVideoScreen.width - navigatorProxyItem.width
 
                 bottomBar.color: ColorTheme.colors.dark6
+                fullscreenControlsOverlay.visible: false
             }
         },
 
         State
         {
             name: "navigatorOnTheBottom"
-            when: modernVideoScreen.ownsNavigator && LayoutController.isPortrait
+
+            when: modernVideoScreen.ownsNavigator
+                && LayoutController.isPortrait
+                && !d.fullscreen
 
             AnchorChanges
             {
@@ -141,6 +150,33 @@ Page
                 anchors.right: modernVideoScreen.contentItem.right
                 anchors.left: modernVideoScreen.contentItem.left
                 anchors.bottom: modernVideoScreen.contentItem.bottom
+            }
+
+            PropertyChanges
+            {
+                fullscreenControlsOverlay.visible: false
+            }
+        },
+
+        State
+        {
+            name: "fullscreen"
+
+            when: d.fullscreen
+
+            PropertyChanges
+            {
+                video.y: 0
+                video.height: modernVideoScreen.height
+                video.width: modernVideoScreen.width
+                video.doubleClickZoom: false
+
+                fullscreenControlsOverlay.visible: true
+                navigatorProxyItem.visible: false
+                navigationBar.visible: false
+                modernVideoScreen.header.visible: false
+                bottomBar.visible: false
+                bottomOverlayControls.visible: false
             }
         }
     ]
@@ -251,6 +287,24 @@ Page
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
         readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
 
+        property bool restorePortraitScreenOrientation: false
+        property bool fullscreen: false
+
+        Connections
+        {
+            target: LayoutController
+
+            function onIsPortraitChanged()
+            {
+                // The screen orientation changed due phone rotation. Orientation lock is off.
+                if (fullscreen && LayoutController.isPortrait)
+                {
+                    d.restorePortraitScreenOrientation = false
+                    fullscreen = false
+                }
+            }
+        }
+
         Timer
         {
             id: offlineStatusDelay
@@ -273,8 +327,6 @@ Page
         icon.source: lp("/images/more_vert.png")
         onClicked:
         {
-            menu.x = 0
-            menu.y = height
             menu.open()
         }
     }
@@ -323,7 +375,12 @@ Page
     {
         id: menu
 
-        parent: menuButton
+        parent: modernVideoScreen.state === "fullscreen"
+            ? fullscreenControlsOverlay.menuButtonControl
+            : menuButton
+
+        x: parent.width - width
+        y: parent.height + 8
 
         MenuItem
         {
@@ -483,6 +540,50 @@ Page
         running: controller.preloaderRequired
     }
 
+    FullscreenControlsOverlay
+    {
+        id: fullscreenControlsOverlay
+
+        anchors.fill: parent
+        controller: modernVideoScreen.controller
+
+        cameraTitle: controller.resourceHelper.qualifiedResourceName
+        cameraTimestampText: timeline.labelFormatter.cameraTimestamp(
+            controller.mediaPlayer.displayedPosition, timeline.timeZone)
+
+        showPlaybackControls: d.hasArchive
+
+        actionsButtonEnabled: controller.playingLive
+        actionsButtonVisible: actionSheet.hasActions
+
+        onBackButtonClicked:
+        {
+            d.restorePortraitScreenOrientation = false
+            Workflow.popCurrentScreen()
+            d.fullscreen = false
+        }
+
+        onExitFullscreenButtonClicked:
+        {
+            d.fullscreen = false
+            if (d.restorePortraitScreenOrientation)
+            {
+                windowContext.ui.windowHelpers.setScreenOrientation(Qt.PortraitOrientation)
+                d.restorePortraitScreenOrientation = false
+            }
+        }
+
+        onActionsButtonClicked:
+        {
+            actionSheet.open()
+        }
+
+        onMenuButtonClicked:
+        {
+            menu.open()
+        }
+    }
+
     Rectangle
     {
         id: navigationBar
@@ -551,7 +652,7 @@ Page
                         opacity: navigationBar.hasChunkNavigation ? 1 : 0
 
                         onClicked:
-                            controller.jumpBackward()
+                            controller.jumpToPreviousChunk()
                     }
 
                     ButtonBar
@@ -629,7 +730,7 @@ Page
                         opacity: navigationBar.hasChunkNavigation ? 1 : 0
 
                         onClicked:
-                            controller.jumpForward()
+                            controller.jumpToNextChunk()
                     }
                 }
 
@@ -960,6 +1061,12 @@ Page
         resource: controller.resource
         externalButtonContainer: actionButtonContainer
         externalVisualizerContainer: actionVisualizerContainer
+
+        Binding on externalMode
+        {
+            when: modernVideoScreen.state === "fullscreen"
+            value: false
+        }
     }
 
     MediaDownloadBackend
@@ -1018,6 +1125,33 @@ Page
 
                 text: timeline.labelFormatter.cameraTimestamp(
                     controller.mediaPlayer.displayedPosition, timeline.timeZone)
+            }
+
+            ControlButton
+            {
+                id: fullscreenButton
+
+                anchors.right: bottomOverlayControls.right
+                anchors.bottom: bottomOverlayControls.bottom
+                width: 48
+                height: 48
+                foregroundColor: ColorTheme.colors.light4
+                backgroundColor: "transparent"
+                icon.source: "image://skin/24x24/Outline/full_screen.svg"
+
+                onClicked:
+                {
+                    d.fullscreen = true
+                    if (LayoutController.isPortrait)
+                    {
+                        // If fullscreen mode was entered from portrait orientation - always restore
+                        // portrait orientation back, to avoid orientation change with orientation
+                        // lock enabled simply by going to the fullscreen and back.
+                        d.restorePortraitScreenOrientation = true
+                        windowContext.ui.windowHelpers.setScreenOrientation(
+                            Qt.LandscapeOrientation)
+                    }
+                }
             }
         }
 
