@@ -121,6 +121,7 @@ NX_NETWORK_API void insertOrReplaceCorsHeaders(
     const class Method& method,
     std::string origin,
     const std::string& supportedOrigins,
+    bool supportedOriginCredentials,
     std::string_view methods);
 
 /** Parses data and saves header name and data to *headerName and *headerValue. */

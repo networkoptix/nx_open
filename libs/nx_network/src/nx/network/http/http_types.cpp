@@ -103,12 +103,14 @@ void insertOrReplaceCorsHeaders(
     const Method& method,
     std::string origin,
     const std::string& supportedOrigins,
+    bool supportedOriginCredentials,
     std::string_view methods)
 {
     if (!origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin)))
     {
-        insertOrReplaceHeader(headers, {"Access-Control-Allow-Credentials", "true"});
         insertOrReplaceHeader(headers, {"Access-Control-Allow-Origin", std::move(origin)});
+        insertOrReplaceHeader(headers,
+            {"Access-Control-Allow-Credentials", supportedOriginCredentials ? "true" : "false"});
     }
     else if (!supportedOrigins.empty() && supportedOrigins.find(',') == std::string::npos)
     {

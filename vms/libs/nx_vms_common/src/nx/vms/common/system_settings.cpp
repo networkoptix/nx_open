@@ -236,6 +236,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<bool>* showServersInTreeForNonAdminsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* serverHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* supportedOriginsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<bool>* supportedOriginCredentialsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* frameOptionsHeaderAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* useHttpsOnlyForCamerasAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* securityForPowerUsersAdaptor = nullptr;
@@ -937,7 +938,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         [this] { d->serverHeaderCache.reset(); });
 
     d->supportedOriginsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-         Names::supportedOrigins, "*", this, [] { return tr("HTTP header: Origin."); });
+        Names::supportedOrigins, "*", this,
+        [] { return tr("HTTP header: Access-Control-Allow-Origin."); });
+
+    d->supportedOriginCredentialsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        Names::supportedOriginCredentials, false, this,
+        [] { return tr("HTTP header: Access-Control-Allow-Credentials."); });
 
     d->frameOptionsHeaderAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
          Names::frameOptionsHeader, "SAMEORIGIN", this, [] { return tr("HTTP header: X-Frame-Options."); });
@@ -1458,6 +1464,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->showServersInTreeForNonAdminsAdaptor
         << d->serverHeaderAdaptor
         << d->supportedOriginsAdaptor
+        << d->supportedOriginCredentialsAdaptor
         << d->frameOptionsHeaderAdaptor
         << d->showMouseTimelinePreviewAdaptor
         << d->ldapAdaptor
@@ -2666,9 +2673,20 @@ QString SystemSettings::supportedOrigins() const
     }
     return supportedOrigins;
 }
+
 void SystemSettings::setSupportedOrigins(const QString& value)
 {
     d->supportedOriginsAdaptor->setValue(value);
+}
+
+bool SystemSettings::supportedOriginCredentials() const
+{
+    return d->supportedOriginCredentialsAdaptor->value();
+}
+
+void SystemSettings::setSupportedOriginCredentials(bool value)
+{
+    d->supportedOriginCredentialsAdaptor->setValue(value);
 }
 
 QString SystemSettings::frameOptionsHeader() const

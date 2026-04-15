@@ -85,6 +85,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(statisticsReportLastVersion);
     DECLARE_SETTING_NAME(serverHeader);
     DECLARE_SETTING_NAME(supportedOrigins);
+    DECLARE_SETTING_NAME(supportedOriginCredentials);
     DECLARE_SETTING_NAME(system2faEnabled);
     DECLARE_SETTING_NAME(systemName);
     DECLARE_SETTING_NAME(trafficEncryptionForced);
@@ -557,6 +558,9 @@ public:
 
     QString supportedOrigins() const;
     void setSupportedOrigins(const QString& value);
+
+    bool supportedOriginCredentials() const;
+    void setSupportedOriginCredentials(bool value);
 
     QString frameOptionsHeader() const;
     void setFrameOptionsHeader(const QString& value);

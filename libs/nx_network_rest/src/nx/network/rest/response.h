@@ -24,6 +24,7 @@ struct NX_NETWORK_REST_API Response
     void insertOrReplaceCorsHeaders(
         const nx::network::http::Request& request,
         const QString& supportedOrigins,
+        bool supportedOriginCredentials,
         std::string_view methods);
 
     static Response result(const JsonResult& jsonResult);
