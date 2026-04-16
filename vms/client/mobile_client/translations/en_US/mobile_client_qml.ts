@@ -581,6 +581,17 @@
     </message>
 </context>
 <context>
+    <name>FullscreenControlsOverlay</name>
+    <message>
+        <source>-5 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>+5 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HorizontalCalendar</name>
     <message>
         <source>Close</source>
