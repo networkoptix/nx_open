@@ -188,6 +188,12 @@ public:
      * @return Information how many Live View service is available and used.
      */
     nx::vms::api::LicenseSummaryDataEx info() const;
+
+    /*
+     * @return Number of cameras consuming specifically Live View service channels
+     *     (after unused local recording channels absorb some live view).
+     */
+    std::map<nx::Uuid, int> usageByService() const;
 };
 
 /*

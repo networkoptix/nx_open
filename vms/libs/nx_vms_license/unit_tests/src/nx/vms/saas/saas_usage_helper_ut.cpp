@@ -808,4 +808,49 @@ TEST_F(SaasServiceUsageHelperTest, liveServiceUsage)
     manager->loadSaasDataAsync(kSaasDataJson);
 }
 
+TEST_F(SaasServiceUsageHelperTest, liveServiceUsageByService)
+{
+    // Available: 10 Core channels, 10 LiveView channels.
+
+    // 30 online cameras, none recording.
+    // Total live view demand = 30. Unused Core = 10.
+    // Net demand on LiveView service = 30 - 10 = 20.
+    auto cameras = addCameras(/*size*/ 30);
+    for (const auto& camera: cameras)
+        camera->setStatus(nx::vms::api::ResourceStatus::online);
+
+    auto usage = m_liveHelper->usageByService();
+    ASSERT_EQ(1, usage.size());
+    ASSERT_EQ(20, usage[kLiveViewServiceId]);
+
+    // Enable recording for 5 cameras.
+    // Total live view demand = 25. Unused Core = 10 - 5 = 5.
+    // Net demand on LiveView service = 25 - 5 = 20.
+    for (int i = 0; i < 5; ++i)
+        cameras[i]->setScheduleEnabled(true);
+
+    usage = m_liveHelper->usageByService();
+    ASSERT_EQ(1, usage.size());
+    ASSERT_EQ(20, usage[kLiveViewServiceId]);
+
+    // Enable recording for 15 more cameras (20 total recording).
+    // Total live view demand = 10. Unused Core = min(0, 10 - 20)
+    // Net demand on LiveView service = 10 - 0 = 10.
+    for (int i = 5; i < 20; ++i)
+        cameras[i]->setScheduleEnabled(true);
+
+    usage = m_liveHelper->usageByService();
+    ASSERT_EQ(1, usage.size());
+    ASSERT_EQ(10, usage[kLiveViewServiceId]);
+
+    // Enable recording for all 30 cameras.
+    // Total live view demand = 0. Net demand = 0.
+    for (int i = 20; i < 30; ++i)
+        cameras[i]->setScheduleEnabled(true);
+
+    usage = m_liveHelper->usageByService();
+    ASSERT_EQ(1, usage.size());
+    ASSERT_EQ(0, usage[kLiveViewServiceId]);
+}
+
 } // nx::vms::license::saas::test
