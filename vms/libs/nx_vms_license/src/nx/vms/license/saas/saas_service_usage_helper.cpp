@@ -677,4 +677,54 @@ LicenseSummaryDataEx LiveViewUsageHelper::info() const
     return result;
 }
 
+std::map<nx::Uuid, int> LiveViewUsageHelper::usageByService() const
+{
+    std::map<nx::Uuid, int> result;
+
+    if (!saasServiceManager()->saasServiceOperational())
+        return result;
+
+    const auto cameras = getAllCameras();
+
+    // Count how many unused local recording channels can absorb live view cameras.
+    int unusedCoreChannels = 0;
+    for (const auto& [serviceId, parameters]: saasServiceManager()->localRecording())
+        unusedCoreChannels += parameters.totalChannelNumber;
+    for (const auto& camera: cameras)
+    {
+        if (camera->isScheduleEnabled())
+            --unusedCoreChannels;
+    }
+    unusedCoreChannels = std::max(0, unusedCoreChannels);
+
+    // Count total live view demand.
+    int liveViewDemand = 0;
+    for (const auto& camera: cameras)
+    {
+        if (!camera->hasFlags(Qn::desktop_camera) && !camera->isScheduleEnabled()
+            && camera->isOnline() && camera->hasVideo())
+        {
+            ++liveViewDemand;
+        }
+    }
+
+    // Exclude unused core channels which will be used for live first.
+    int demand = std::max(0, liveViewDemand - unusedCoreChannels);
+
+    // Distribute services per cameras.
+    auto liveViewServices = saasServiceManager()->liveView();
+    for (const auto& [serviceId, parameters]: liveViewServices)
+    {
+        int used = std::min(demand, parameters.totalChannelNumber);
+        result[serviceId] = used;
+        demand -= used;
+    }
+
+    // If there's still demand beyond service capacities (overuse), assign to last service.
+    if (demand > 0 && !liveViewServices.empty())
+        result[liveViewServices.rbegin()->first] += demand;
+
+    return result;
+}
+
 } // nx::vms::license::saas
