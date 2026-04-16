@@ -629,8 +629,12 @@ private:
                 const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
                 if (d->isValidType(id))
                 {
+                    const auto subId = d->subscriptionId(id);
+                    if (subId == QString('*'))
+                        return false; //< ResourceParam can be stored with nil UUID - ignore it.
+
                     NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                    d->notify(d->subscriptionId(id), NotifyType::update);
+                    d->notify(subId, NotifyType::update);
                 }
                 return true;
             });
