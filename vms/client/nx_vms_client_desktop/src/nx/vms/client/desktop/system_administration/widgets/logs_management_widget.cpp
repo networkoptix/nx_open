@@ -14,6 +14,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
 
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -287,14 +288,13 @@ void LogsManagementWidget::setupUi()
     connect(m_metricsReportFetcher, &MetricsReportFetcher::reportReady, this,
         [this](const QJsonDocument& report)
         {
-            const QStringList fileNameParts {
-                "report",
-                report.object().value("system").toString()
-            };
+            const auto fileName = QString("report-%1-%2.json").arg(
+                report.object().value("system").toString(),
+                report.object().value("time").toString());
 
             const auto defaultFilePath =
                 QDir(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation))
-                    .filePath(fileNameParts.join("-") + ".json");
+                    .filePath(nx::utils::replaceNonFileNameCharacters(fileName, '_'));
 
             const auto filePath = QFileDialog::getSaveFileName(
                 this,
