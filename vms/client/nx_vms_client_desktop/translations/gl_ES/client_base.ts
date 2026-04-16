@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Ficheiro de entrada corrompido.</translation>
     </message>
   </context>
   <context>
@@ -6220,6 +6220,10 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
         <numerusform>%n os usuarios LDAP existentes non se atopan na base de datos LDAP</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>
@@ -9184,7 +9188,7 @@ O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Gardar informe</translation>
     </message>
   </context>
   <context>

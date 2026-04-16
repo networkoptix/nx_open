@@ -6120,6 +6120,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>Không tìm thấy %n người dùng LDAP hiện tại trong cơ sở dữ liệu LDAP</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

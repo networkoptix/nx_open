@@ -6220,6 +6220,10 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
         <numerusform>%n eksisterende LDAP brugere findes ikke i LDAP databasen</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

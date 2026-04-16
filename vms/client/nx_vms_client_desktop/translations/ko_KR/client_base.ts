@@ -6120,6 +6120,10 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n 기존 LDAP 사용자를 LDAP 데이터베이스에서 찾을 수 없습니다.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>
