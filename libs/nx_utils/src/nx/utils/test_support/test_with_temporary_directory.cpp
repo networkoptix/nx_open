@@ -3,6 +3,7 @@
 #include "test_with_temporary_directory.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QDirIterator>
 
 #include "test_options.h"
 
@@ -51,8 +52,21 @@ TestWithTemporaryDirectory::~TestWithTemporaryDirectory()
     if (!TestOptions::keepTemporaryDirectory())
     {
         const bool removed = m_tmpDir.removeRecursively();
+        if (!removed)
+            listDir();
         NX_ASSERT(removed);
     }
+}
+
+void TestWithTemporaryDirectory::listDir() const
+{
+    QDirIterator it(m_tmpDir.absolutePath(),
+        QDir::AllEntries | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories);
+    QString contents;
+    while (it.hasNext())
+        contents += "\n  " + it.next();
+    NX_WARNING(this, "Failed to remove directory %1:%2", m_tmpDir.absolutePath(), contents);
 }
 
 QString TestWithTemporaryDirectory::testDataDir() const
