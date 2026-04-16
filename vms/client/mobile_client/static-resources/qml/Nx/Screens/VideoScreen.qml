@@ -532,7 +532,7 @@ Page
 
     NxDotPreloader
     {
-        anchors.centerIn: video
+        anchors.centerIn: cameraSwitcher
         color: ColorTheme.colors.light16
         dotRadius: 6
         spacing: 8
