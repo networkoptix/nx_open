@@ -6219,6 +6219,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>LDAP veritabanında %n mevcut LDAP kullanıcısı bulunamadı</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

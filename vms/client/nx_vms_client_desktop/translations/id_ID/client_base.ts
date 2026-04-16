@@ -6120,6 +6120,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>%n pengguna LDAP yang ada tidak ditemukan di database LDAP</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

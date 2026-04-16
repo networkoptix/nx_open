@@ -469,7 +469,7 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>Restablecer todo</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -578,6 +578,17 @@
     <message>
       <source>AF</source>
       <translation>AF</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenControlsOverlay</name>
+    <message>
+      <source>-5 sec</source>
+      <translation type="unfinished">-5 sec</translation>
+    </message>
+    <message>
+      <source>+5 sec</source>
+      <translation type="unfinished">+5 sec</translation>
     </message>
   </context>
   <context>

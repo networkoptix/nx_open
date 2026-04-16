@@ -6220,6 +6220,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
         <numerusform>%n usuarios LDAP existentes no se encuentran en la base de datos LDAP</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

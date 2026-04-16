@@ -6220,6 +6220,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

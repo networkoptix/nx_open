@@ -6120,6 +6120,10 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>在 LDAP 資料庫中找不到 %n 位現有 LDAP 使用者。</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>
