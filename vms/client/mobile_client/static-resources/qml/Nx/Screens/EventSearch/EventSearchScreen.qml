@@ -148,7 +148,8 @@ AdaptiveScreen
         anchors.rightMargin: LayoutController.isTabletLayout ? 0 : 20
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Reset All")
-        visible: LayoutController.isTabletLayout || screen.contentItem === filtersItem
+        visible: (LayoutController.isTabletLayout || screen.contentItem === filtersItem)
+            && filtersItem.hasActiveFilters
         onClicked: screenController.clearFilters()
     }
 
@@ -330,12 +331,7 @@ AdaptiveScreen
 
         function clearFilters()
         {
-            // TODO: Should be more simple way generic. Now it does not work as expected. Selectors not updating.
-            searchSetup.timeSelection = EventSearch.TimeSelection.anytime
-            searchSetup.cameraSelection = EventSearch.CameraSelection.all
-            if (bookmarkSearchSetup)
-                bookmarkSearchSetup.searchSharedOnly = false
-
+            filtersItem.clearAll()
             updateIfRequired()
         }
 

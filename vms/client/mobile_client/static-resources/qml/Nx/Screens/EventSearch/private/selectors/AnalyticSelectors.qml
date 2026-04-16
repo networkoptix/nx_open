@@ -23,6 +23,17 @@ Column
 
     signal selectorClicked(OptionSelector selector)
 
+    readonly property bool hasActiveFilters: !pluginSelector.isDefaultValue
+        || objectTypeSelector.value !== null
+        || (objectAttributes.value && objectAttributes.hasAttributes)
+
+    function clearAll()
+    {
+        pluginSelector.value = pluginSelector.unselectedValue
+        objectTypeSelector.value = null
+        objectAttributes.value = {}
+    }
+
     spacing: 4
     width: (parent && parent.width) ?? 0
 

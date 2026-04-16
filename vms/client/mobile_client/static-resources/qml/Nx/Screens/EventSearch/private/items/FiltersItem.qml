@@ -23,6 +23,24 @@ Item
 
     signal selectorClicked(OptionSelector selector)
 
+    readonly property bool hasActiveFilters: !timeSelector.isDefaultValue
+        || !deviceSelector.isDefaultValue
+        || (!!controller?.bookmarkSearchSetup
+            && sharedOnlySelector.checkState !== Qt.Unchecked)
+        || (analyticSelectorsLoader.item?.hasActiveFilters ?? false)
+
+    function clearAll()
+    {
+        timeSelector.value = timeSelector.unselectedValue
+        deviceSelector.value = deviceSelector.unselectedValue
+
+        if (controller && controller.bookmarkSearchSetup)
+            sharedOnlySelector.checkState = Qt.Unchecked
+
+        if (analyticSelectorsLoader.item)
+            analyticSelectorsLoader.item.clearAll()
+    }
+
     Flickable
     {
         anchors.fill: parent
@@ -67,6 +85,8 @@ Item
 
             SwitchSelector
             {
+                id: sharedOnlySelector
+
                 visible: windowContext.mainSystemContext.featureAccess.canUseShareBookmark
                     && (controller?.bookmarkSearchSetup ?? false)
 
@@ -85,6 +105,8 @@ Item
 
     Loader
     {
+        id: analyticSelectorsLoader
+
         active: controller.analyticsSearchMode
             && controller.searchSetup
             && controller.analyticsSearchSetup
