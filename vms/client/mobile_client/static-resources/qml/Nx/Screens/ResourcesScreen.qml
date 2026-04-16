@@ -70,7 +70,10 @@ AdaptiveScreen
                     {
                         resourcesScreen.filterIds = []
                         videoScreenLoader.item.controller.stop()
-                        windowContext.deprecatedUiController.resource = null
+
+                        if (!resourceHelper.isLayout)
+                            windowContext.deprecatedUiController.resource = null
+
                         resourcesScreen.contentItem = camerasGrid
                     }
                 }
