@@ -454,18 +454,22 @@ TreeView
 
         function toolTipText(modelIndex)
         {
-            const customGroupId = modelDataAccessor.getData(modelIndex, "customGroupId")
-            if (customGroupId)
+            const nodeType = modelDataAccessor.getData(modelIndex, "nodeType")
+            if (nodeType && nodeType === ResourceTree.NodeType.customResourceGroup)
             {
-                const namePos = customGroupId.lastIndexOf("\n") + 1
-                if (namePos <= 0)
-                    return NxGlobals.toHtmlEscaped(customGroupId)
+                const customGroupId = modelDataAccessor.getData(modelIndex, "customGroupId")
+                if (customGroupId)
+                {
+                    const namePos = customGroupId.lastIndexOf("\n") + 1
+                    if (namePos <= 0)
+                        return NxGlobals.toHtmlEscaped(customGroupId)
 
-                const name = NxGlobals.toHtmlEscaped(customGroupId.substring(namePos))
-                const path = NxGlobals.toHtmlEscaped(
-                    customGroupId.substring(0, namePos).replace(/\n/g, "/"))
+                    const name = NxGlobals.toHtmlEscaped(customGroupId.substring(namePos))
+                    const path = NxGlobals.toHtmlEscaped(
+                        customGroupId.substring(0, namePos).replace(/\n/g, "/"))
 
-                return `<span style="color: ${ColorTheme.colors.light10};">${path}</span>${name}`
+                    return `<span style="color: ${ColorTheme.colors.light10};">${path}</span>${name}`
+                }
             }
 
             const text = modelDataAccessor.getHtmlEscapedData(modelIndex, "display")
