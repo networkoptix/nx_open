@@ -23,6 +23,8 @@ public:
     QString testDataDir() const;
 
 private:
+    void listDir() const;
+
     QDir m_tmpDir;
 };
 
