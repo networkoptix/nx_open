@@ -50,7 +50,7 @@ void MetricsReportFetcher::Private::checkResult()
 
     const QJsonObject result{
         {"reply", replyObject},
-        {"time", QDateTime::currentDateTime().toString(Qt::ISODate)},
+        {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"system", q->systemSettings()->systemName()}};
 
     emit q->reportReady(QJsonDocument(result));
