@@ -14,11 +14,12 @@ const std::map<std::string, std::map<std::string, std::string>> kObjectAttribute
         {
             {"Gender", "Woman|Man|Non-binary"},
             {"Age", "Child|Adult|Senior"},
+            {"Activity", "Standing|Walking|Running|Sitting"},
             {"Hat.Type", "Hijab|Cap|Helmet"},
-            {"Color", "Red|Yellow|Blue|Green"},
-            {"Brand", "Honda|Toyota|Ford|Mercedes"},
-            {"Size", "Small|Medium|Large"},
-            {"Type", "Sedan|SUV|Motorcycle|Truck"}
+            {"Top Clothing Color", "Red|Yellow|Blue|Green"},
+            {"Top Clothing Type", "T-shirt|Jacket|Coat|Sweater"},
+            {"Bottom Clothing Color", "Black|Blue|Gray|Brown"},
+            {"Bottom Clothing Type", "Jeans|Pants|Skirt|Shorts"}
         }
     },
     {
