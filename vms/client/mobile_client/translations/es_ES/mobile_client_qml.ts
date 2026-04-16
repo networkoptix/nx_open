@@ -805,7 +805,7 @@
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>No hay organizaciones</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -817,7 +817,7 @@
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>No hay sitios</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -943,7 +943,7 @@
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Nunca caduca</translation>
     </message>
     <message>
       <source>Shared link options</source>
