@@ -6220,6 +6220,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Les utilisateurs LDAP %n ne sont pas trouvés dans la base de données LDAP</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>

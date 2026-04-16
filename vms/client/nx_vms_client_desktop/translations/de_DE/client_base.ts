@@ -6220,6 +6220,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
       </translation>
     </message>
+    <message>
+      <source>LDAP Users</source>
+      <translation type="unfinished">LDAP Users</translation>
+    </message>
   </context>
   <context>
     <name>Videowall</name>
