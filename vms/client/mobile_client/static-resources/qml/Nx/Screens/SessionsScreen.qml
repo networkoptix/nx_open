@@ -180,6 +180,24 @@ AdaptiveScreen
         }
     }
 
+    // When leftPanel.item transitions null -> non-null (e.g. returning to landscape),
+    // Binding.RestoreBindingOrValue in AdaptiveScreen restores a stale `false` that was
+    // captured before the state transitioned to loggedIn/inPartnerOrOrg. This handler fires
+    // after the Binding has already deactivated, so re-applying the state's intent here sticks.
+    Connections
+    {
+        target: leftPanel
+
+        function onItemChanged()
+        {
+            if (!leftPanel.item)
+                return
+
+            leftPanel.visible = sessionsScreen.state === "loggedIn"
+                || sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+        }
+    }
+
     states:
     [
         State
@@ -1063,11 +1081,11 @@ AdaptiveScreen
             if (newIndex.row === -1)
             {
                 if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
-                    partnersTabButton.checked = true
+                    selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                 else if (sessionsScreen.rootType === OrganizationsModel.Organization)
-                    organizationsTabButton.checked = true
+                    selectTabByUser(OrganizationsModel.OrganizationsTab)
                 else
-                    sitesTabButton.checked = true
+                    selectTabByUser(OrganizationsModel.SitesTab)
 
                 sessionsScreen.rootIndex = newIndex
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
