@@ -396,6 +396,14 @@ Page
 
         MenuItem
         {
+            text: qsTr("Information")
+            checkable: true
+            checked: appContext.settings.showCameraInfo
+            onTriggered: appContext.settings.showCameraInfo = !appContext.settings.showCameraInfo
+        }
+
+        MenuItem
+        {
             text: qsTr("PTZ Mode")
             visible: ptzSheet.available
             height: visible ? implicitHeight : 0

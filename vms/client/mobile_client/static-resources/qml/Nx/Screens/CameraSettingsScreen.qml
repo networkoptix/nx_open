@@ -34,17 +34,6 @@ Page
 
         LabeledSwitch
         {
-            id: informationSwitch
-
-            text: qsTr("Information")
-            width: parent.width
-            checkState: appContext.settings.showCameraInfo ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged:
-                appContext.settings.showCameraInfo = checkState !== Qt.Unchecked
-        }
-
-        LabeledSwitch
-        {
             id: audioSwitch
 
             visible: audioController && audioController.audioEnabled
