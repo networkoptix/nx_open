@@ -48,41 +48,6 @@ std::set<nx::Uuid> idsFromCameras(const QnVirtualCameraResourceSet& cameras)
     return result;
 }
 
-QString parseHyperlinks(const QString& text)
-{
-    if (text.isEmpty())
-        return "";
-
-    QString result;
-    static const QString urlPattern =
-        R"(\b((http(s)?:\/\/|www\.)([-A-Z0-9+&@#\/%=~_|$\?!:,.])*([A-Z0-9+&@#\/%=~_|$])))";
-
-    QRegularExpression rx(urlPattern, QRegularExpression::CaseInsensitiveOption);
-
-    int pos = 0;
-    int lastPos = 0;
-
-    auto it = rx.globalMatch(text);
-    while (it.hasNext())
-    {
-        const QRegularExpressionMatch match = it.next();
-
-        pos = match.capturedStart();
-        result.append(text.mid(lastPos, pos - lastPos));
-        lastPos = pos;
-        pos += match.capturedLength();
-        QString linkText = text.mid(lastPos, pos - lastPos);
-        QString link = linkText;
-        if (link.startsWith("www."))
-            link.prepend("https://");
-        result.append(nx::vms::common::html::customLink(linkText, link));
-        lastPos = pos;
-    }
-
-    result.append(text.mid(lastPos));
-    return result;
-}
-
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
@@ -335,7 +300,7 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
             return bookmark.name;
 
         case DescriptionTextRole:
-            return parseHyperlinks(nx::vms::common::html::toHtml(bookmark.description));
+            return nx::vms::common::html::toHtmlWithLinks(bookmark.description);
 
         case TimestampTextRole:
             return EventSearchUtils::timestampText(bookmark.startTimeMs, systemContext());

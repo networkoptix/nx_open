@@ -117,6 +117,8 @@ public:
 
     Q_INVOKABLE QString toPlainText(const QString& value) const;
 
+    Q_INVOKABLE QString toHtmlWithLinks(const QString& text) const;
+
     /** Returns qnSyncTime->currentMSecsSinceEpoch(). */
     Q_INVOKABLE qint64 syncNowMs() const;
 

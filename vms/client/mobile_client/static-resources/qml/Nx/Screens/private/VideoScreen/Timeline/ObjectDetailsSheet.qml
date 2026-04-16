@@ -6,9 +6,12 @@ import QtQuick.Controls
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.Items
+import Nx.Items
 import Nx.Mobile.Controls
 
 import nx.vms.client.core
+import nx.vms.client.mobile
+import nx.vms.client.mobile.timeline
 
 BaseAdaptiveSheet
 {
@@ -21,6 +24,7 @@ BaseAdaptiveSheet
 
     readonly property alias count: swipeView.count
     property alias currentIndex: swipeView.currentIndex
+    property int objectsType: ObjectsLoader.ObjectsType.motion
 
     property var dateFormatter: ((timestampMs) => new Date(timestampMs).toLocaleString())
 
@@ -172,6 +176,61 @@ BaseAdaptiveSheet
                     colorBoxSize: 16
                     rowSpacing: 4
                 }
+
+                Rectangle
+                {
+                    height: 1
+                    width: objectInfoColumn.contentWidth
+                    color: ColorTheme.colors.dark11
+                    visible: actions.implicitHeight > 0
+                }
+
+                Row
+                {
+                    id: actions
+
+                    spacing: 8
+
+                    Button
+                    {
+                        id: downloadButton
+
+                        text: ""
+                        type: Button.LightInterface
+                        width: 44
+                        height: 44
+                        icon.width: 24
+                        icon.height: 24
+                        visible: enabled
+
+                        action: DownloadMediaAction
+                        {
+                            resource: modelData?.resource ?? null
+                            positionMs: modelData?.startTimeMs ?? 0
+                            durationMs: modelData?.durationMs ?? 0
+                        }
+                    }
+
+                    Button
+                    {
+                        id: shareButton
+
+                        text: ""
+                        type: Button.LightInterface
+                        width: 44
+                        height: 44
+                        icon.width: 24
+                        icon.height: 24
+                        visible: enabled
+
+                        action: ShareAction
+                        {
+                            objectData: modelData
+                            analyticsMode:
+                                sheet.objectsType === ObjectsLoader.ObjectsType.analytics
+                        }
+                    }
+                }
             }
         }
     }
@@ -195,4 +254,6 @@ BaseAdaptiveSheet
         repeater.model = sheet.model ?? []
         swipeView.setCurrentIndex(swipeView.count ? 0 : -1)
     }
+
+    onClosed: sheet.model = []
 }

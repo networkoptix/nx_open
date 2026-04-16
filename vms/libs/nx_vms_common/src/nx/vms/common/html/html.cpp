@@ -284,6 +284,41 @@ QString link(const QString& text, const nx::Url& url)
     return makeLink(text, url.toString());
 }
 
+QString toHtmlWithLinks(const QString& text)
+{
+    if (text.isEmpty())
+        return "";
+
+    QString result;
+    static const QRegularExpression rx(
+        R"(\b((http(s)?:\/\/|www\.)([-A-Z0-9+&@#\/%=~_|$\?!:,.])*([A-Z0-9+&@#\/%=~_|$])))",
+        QRegularExpression::CaseInsensitiveOption);
+
+    int pos = 0;
+    int lastPos = 0;
+
+    const QString html = toHtml(text);
+    auto it = rx.globalMatch(html);
+    while (it.hasNext())
+    {
+        const QRegularExpressionMatch match = it.next();
+
+        pos = match.capturedStart();
+        result.append(html.mid(lastPos, pos - lastPos));
+        lastPos = pos;
+        pos += match.capturedLength();
+        QString linkText = html.mid(lastPos, pos - lastPos);
+        QString link = linkText;
+        if (link.startsWith("www."))
+            link.prepend("https://");
+        result.append(customLink(linkText, link));
+        lastPos = pos;
+    }
+
+    result.append(html.mid(lastPos));
+    return result;
+}
+
 QString toHtmlEscaped(const QString& text, EscapeMethod escapeMethod)
 {
     static const QString kLt("&lt;");

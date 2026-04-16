@@ -13,8 +13,10 @@ import Nx.Mobile.Controls
 import Nx.Models
 import Nx.Screens
 import Nx.Ui
+import Nx.Models
 
 import nx.vms.client.core
+import nx.vms.client.mobile
 
 import "private"
 import "private/items"
@@ -527,24 +529,49 @@ AdaptiveScreen
 
                 onVisibleChanged: model.visible = visible
 
-                onClicked:
-                {
-                    detailsLoader.setSource(
-                        Qt.resolvedUrl("private/DetailsScreen.qml"),
-                        {
-                            "uuid": uuid,
-                            "isAnalyticsDetails": isAnalyticsItem,
-                            "camerasModel": camerasModel,
-                            "eventSearchModel": eventsModel,
-                            "currentEventIndex": currentEventIndex
-                        })
-
-                    if (!LayoutController.isTabletLayout)
-                        screen.contentItem = detailsLoader.item
-                }
+                onClicked: view.currentIndex = index
 
                 Component.onCompleted: model.visible = visible
                 Component.onDestruction: model.visible = false
+            }
+
+            onCurrentIndexChanged:
+            {
+                if (currentIndex === -1)
+                    return
+
+                const modelIndex = view.model.index(currentIndex, 0)
+                const resource = NxGlobals.modelData(modelIndex, "resource")
+                const objectData = ObjectDataAdapter.create(modelIndex)
+
+                detailsLoader.setSource(
+                    Qt.resolvedUrl("private/DetailsScreen.qml"),
+                    {
+                        "uuid": NxGlobals.modelData(modelIndex, "uuid"),
+                        "isAnalyticsDetails": screenController.analyticsSearchMode,
+                        "camerasModel": screen.camerasModel,
+                        "objectData": objectData,
+                        "hasNext": Qt.binding(() => view.currentIndex > 0),
+                        "hasPrevious": Qt.binding(() => view.currentIndex < view.count - 1),
+                        "resource": resource
+                    })
+
+                if (!LayoutController.isTabletLayout)
+                    screen.contentItem = detailsLoader.item
+            }
+
+            Binding on currentIndex
+            {
+                when: !detailsLoader.item
+                value: -1
+            }
+
+            Connections
+            {
+                target: detailsLoader.item
+
+                function onNextClicked() { view.decrementCurrentIndex() }
+                function onPreviousClicked() { view.incrementCurrentIndex() }
             }
 
             header: Preloader { topPreloader: true }
@@ -634,7 +661,10 @@ AdaptiveScreen
             for (let i = 0; i < searchModelAccessor.count; ++i)
             {
                 if (searchModelAccessor.getData(i, "uuid") == selectedUuid)
+                {
+                    view.currentIndex = i
                     return
+                }
             }
 
             screen.closeDetailsPanel()

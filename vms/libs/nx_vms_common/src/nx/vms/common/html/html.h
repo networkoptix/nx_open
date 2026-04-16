@@ -133,6 +133,11 @@ NX_VMS_COMMON_API QString link(const QString& text, const QUrl& url);
 NX_VMS_COMMON_API QString link(const QString& text, const nx::Url& url);
 
 /**
+ * Converts text to HTML with clickable URL links.
+ */
+NX_VMS_COMMON_API QString toHtmlWithLinks(const QString& text);
+
+/**
  * Extended analog of QString::toHtmlEscaped() which also affect spaces.
  */
 NX_VMS_COMMON_API QString toHtmlEscaped(const QString& text,

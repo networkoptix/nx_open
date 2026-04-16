@@ -807,6 +807,7 @@ Page
         {
             id: timelineObjectSheet
 
+            objectsType: timeline.objectsType
             dateFormatter: ((timestampMs) => timeline.labelFormatter.objectTimestamp(
                 timestampMs, timeline.timeZone))
         }

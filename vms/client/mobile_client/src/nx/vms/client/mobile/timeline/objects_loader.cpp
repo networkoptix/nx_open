@@ -1004,12 +1004,8 @@ void ObjectsLoader::endBatchUpdate()
 
 void ObjectsLoader::registerQmlTypes()
 {
-    qRegisterMetaType<ObjectData>();
     qRegisterMetaType<MultiObjectData>();
     qRegisterMetaType<ObjectBucket>();
-
-    qmlRegisterUncreatableType<ObjectData>("nx.vms.client.mobile.timeline", 1, 0, "ObjectData",
-        "ObjectData is not a creatable type");
 
     qmlRegisterUncreatableType<MultiObjectData>("nx.vms.client.mobile.timeline", 1, 0, "MultiObjectData",
         "MultiObjectData is not a creatable type");

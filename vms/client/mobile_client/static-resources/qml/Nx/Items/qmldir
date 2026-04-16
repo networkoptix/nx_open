@@ -16,6 +16,7 @@ ProxyItem 1.0 ProxyItem.qml
 ResourceTreeItem 1.0 ResourceTreeItem.qml
 SessionCredentialsEditor 1.0 SessionCredentialsEditor.qml
 SessionItem 1.0 SessionItem.qml
+ShareAction 1.0 ShareAction.qml
 SiteList 1.0 SiteList.qml
 SiteListItem 1.0 SiteListItem.qml
 Skeleton 1.0 Skeleton.qml

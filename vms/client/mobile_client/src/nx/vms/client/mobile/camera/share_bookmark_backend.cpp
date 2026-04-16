@@ -17,6 +17,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
@@ -43,7 +44,8 @@ using namespace std::chrono;
 struct ShareBookmarkBackend::Private: public SystemContextAccessor
 {
     ShareBookmarkBackend* const q;
-    QPersistentModelIndex modelIndex;
+    QPointer<timeline::AbstractObjectData> objectData;
+    utils::ScopedConnection objectDataConnection;
 
     bool isAvailable = false;
     QnCameraBookmarksManager::BookmarkOperation operation;
@@ -227,39 +229,28 @@ ShareBookmarkBackend::~ShareBookmarkBackend()
 {
 }
 
-QModelIndex ShareBookmarkBackend::modelIndex() const
+timeline::AbstractObjectData* ShareBookmarkBackend::objectData() const
 {
-    return d->modelIndex;
+    return d->objectData;
 }
 
-void ShareBookmarkBackend::setModelIndex(const QModelIndex& value)
+void ShareBookmarkBackend::setObjectData(timeline::AbstractObjectData* objectData)
 {
-    if (d->modelIndex == value)
+    if (d->objectData == objectData)
         return;
 
-    if (d->modelIndex.isValid())
-        d->modelIndex.model()->disconnect(this);
+    d->objectDataConnection.reset();
 
-    d->modelIndex = value;
-
-    if (d->modelIndex.isValid())
-    {
-        connect(d->modelIndex.model(), &QAbstractItemModel::dataChanged, this,
-            [this](const auto& topLeft, const auto& bottomRight, const auto& /*roles*/)
-            {
-                const int column = d->modelIndex.column();
-                const int row = d->modelIndex.row();
-
-                if (qBetween(topLeft.column(), column, bottomRight.column() + 1)
-                    && qBetween(topLeft.row(), row, bottomRight.row() + 1))
-                {
-                    emit bookmarkChanged();
-                }
-            });
-    }
+    d->objectData = objectData;
     resetBookmarkData();
+    emit objectDataChanged();
 
-    emit modelIndexChanged();
+    if (!d->objectData)
+        return;
+
+    d->objectDataConnection.reset(connect(
+        objectData, &timeline::AbstractObjectData::changed,
+        this, &ShareBookmarkBackend::bookmarkChanged));
 }
 
 bool ShareBookmarkBackend::isAvailable()
@@ -269,7 +260,17 @@ bool ShareBookmarkBackend::isAvailable()
 
 bool ShareBookmarkBackend::isShared() const
 {
-    return d->modelIndex.data(core::IsSharedBookmark).toBool();
+    if (!d->objectData || !NX_ASSERT(d->systemContext()))
+        return false;
+
+    constexpr api::BookmarkShareFilters kSharedBookmarkFilters =
+        api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible;
+
+    const auto bookmark = d->objectData->convertToBookmark();
+
+    return bookmark.shareable()
+        && bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
+        && d->systemContext()->featureAccess()->canUseShareBookmark();
 }
 
 QString ShareBookmarkBackend::bookmarkName() const
@@ -401,63 +402,22 @@ void ShareBookmarkBackend::resetBookmarkData()
 {
     d->bookmark = {};
 
-    d->updateFromModelIndex(d->modelIndex);
+    d->setRawResource(d->objectData ? d->objectData->resource().get() : nullptr);
 
-    if (!d->modelIndex.isValid())
+    if (!d->objectData)
         return;
 
     const auto context = d->systemContext();
     if (!NX_ASSERT(context))
         return;
 
-    if (d->modelIndex.data(core::CameraBookmarkRole).isValid())
-    {
-        // Update bookmark from bookmarks model index.
-        d->operation = QnCameraBookmarksManager::BookmarkOperation::update;
-        d->bookmark = d->modelIndex.data(core::CameraBookmarkRole).value<common::CameraBookmark>();
-        emit bookmarkChanged();
-        return;
-    }
+    d->bookmark = d->objectData->convertToBookmark();
+    d->operation = d->bookmark.guid.isNull()
+        ? QnCameraBookmarksManager::BookmarkOperation::create
+        : QnCameraBookmarksManager::BookmarkOperation::update;
 
-    // Construct bookmark from analytics object model index.
-
-    d->operation = QnCameraBookmarksManager::BookmarkOperation::create;
-
-    const auto camera = d->modelIndex.data(core::ResourceRole)
-        .value<QnResourcePtr>().dynamicCast<QnMediaResource>();
-    const auto timestampMs = d->modelIndex.data(core::TimestampMsRole).value<qint64>();
-    d->bookmark.guid = nx::Uuid::createUuid();
-    d->bookmark.tags = { detail::BookmarkConstants::objectBasedTagName() };
-    d->bookmark.cameraId = camera->getId();
-    d->bookmark.creatorId = context->userWatcher()->user()->getId();
-    d->bookmark.name = d->modelIndex.data(Qt::DisplayRole).toString();
-    d->bookmark.creationTimeStampMs = qnSyncTime->value();
-    d->bookmark.startTimeMs = milliseconds(timestampMs);
-    static const qint64 kMimDurationMs = 8000;
-    d->bookmark.durationMs = milliseconds(
-        std::max<qint64>(d->modelIndex.data(core::DurationMsRole).value<qint64>(), kMimDurationMs));
-    d->bookmark.description =
-        [this, camera, timestampMs]()
-        {
-            static const QString kTemplate("%1: %2");
-            const auto attributes = d->modelIndex.data(core::AnalyticsAttributesRole)
-                .value<core::analytics::AttributeList>();
-
-            QStringList result;
-
-            const auto dateTime = QDateTime::fromMSecsSinceEpoch(
-                timestampMs, core::ServerTimeWatcher::timeZone(camera));
-            result.append(dateTime.toString());
-            result.append(kTemplate.arg(tr("Camera"), camera->getName()));
-
-            for (const auto& attribute: attributes)
-            {
-                result.append(kTemplate.arg(
-                    attribute.displayedName, attribute.displayedValues.join(", ")));
-            }
-            return result.join("\n");
-
-        }();
+    if (d->bookmark.guid.isNull())
+        d->bookmark.guid = nx::Uuid::createUuid();
 
     emit bookmarkChanged();
 }

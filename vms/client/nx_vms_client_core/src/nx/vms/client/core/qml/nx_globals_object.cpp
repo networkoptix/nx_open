@@ -407,6 +407,11 @@ QString NxGlobalsObject::toPlainText(const QString& value) const
     return QTextDocumentFragment::fromHtml(value).toPlainText();
 }
 
+QString NxGlobalsObject::toHtmlWithLinks(const QString& text) const
+{
+    return common::html::toHtmlWithLinks(text);
+}
+
 qint64 NxGlobalsObject::syncNowMs() const
 {
     return qnSyncTime->currentMSecsSinceEpoch();

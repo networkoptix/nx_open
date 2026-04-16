@@ -5,6 +5,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 
+import Nx.Common
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
@@ -14,14 +15,11 @@ import Nx.Core.Ui
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls as MobileControls
-import Nx.Mobile.Ui.Sheets
 import Nx.Models
 import Nx.Screens
 import Nx.Settings
 import Nx.Ui
-
 import nx.vms.client.core
-import nx.vms.client.mobile
 import nx.vms.client.mobile.timeline as Timeline
 
 import "items"
@@ -35,25 +33,17 @@ Page
     property var uuid
     property bool isAnalyticsDetails: true
     property QnCameraListModel camerasModel: null
-    property alias eventSearchModel: d.accessor.model
-    property int currentEventIndex: -1
-    property alias backend: backend
+    required property Timeline.AbstractObjectData objectData
+    required property Resource resource
     readonly property alias showControls: d.showControls
     readonly property Menu menu: menu.available ? menu : null
+    property bool hasNext: false
+    property bool hasPrevious: false
 
     signal fullscreenButtonClicked
     signal searchRequested(string text)
-
-    function share()
-    {
-        if (!backend.isAvailable)
-            return
-
-        if (appContext.settings.showHowShareWorksNotification && isAnalyticsDetails)
-            howItWorksSheet.open()
-        else
-            shareBookmarkSheet.showSheet()
-    }
+    signal nextClicked()
+    signal previousClicked()
 
     title: qsTr("Preview")
     toolBar.visible: false
@@ -157,35 +147,6 @@ Page
         radius: rounded ? width / 2 : 6
         backgroundColor: ColorTheme.transparent(parameters.colors[state], transparent ? 0.5 : 1.0)
         foregroundColor: transparent ? ColorTheme.colors.light1 : parameters.textColors[state]
-    }
-
-    ShareBookmarkSheet
-    {
-        id: shareBookmarkSheet
-
-        isAnalyticsItemMode: eventDetailsScreen.isAnalyticsDetails
-        backend: ShareBookmarkBackend
-        {
-            id: backend
-
-            modelIndex: eventSearchModel.index(currentEventIndex, 0)
-        }
-
-        onShowHowItWorks: howItWorksSheet.open()
-    }
-
-    HowItWorksSheet
-    {
-        id: howItWorksSheet
-
-        description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
-            " after setting the sharing options")
-        doNotShowAgain: !appContext.settings.showHowShareWorksNotification
-        onContinued:
-        {
-            appContext.settings.showHowShareWorksNotification = !doNotShowAgain
-            shareBookmarkSheet.showSheet()
-        }
     }
 
     Rectangle
@@ -351,9 +312,9 @@ Page
                 {
                     id: attributeTable
 
-                    attributes: d.accessor.getData(currentEventIndex, "analyticsAttributes") ?? []
+                    attributes: objectData?.attributes ?? []
 
-                    visible: attributes.length > 0
+                    visible: attributes && attributes.length > 0
                     interactive: true
                     contextMenu: searchMenu
                     highlight.visible: false
@@ -380,20 +341,21 @@ Page
 
         spacing: 20
 
-        Preview
+        RemoteImage
         {
             id: previewImage
 
-            previewId: d.accessor.getData(currentEventIndex, "previewId")
-            previewState: d.accessor.getData(currentEventIndex, "previewState")
-            visible: previewState !== EventSearch.PreviewState.missing
+            readonly property real kAspectRatio: 9.0 / 16.0
+
+            requestLine: objectData?.imagePath ?? ""
 
             Layout.fillWidth: true
+            Layout.preferredHeight: width * kAspectRatio
         }
 
         Text
         {
-            text: d.accessor.getData(currentEventIndex, "resource").name
+            text: eventDetailsScreen.resource?.name
             visible: !!text
 
             elide: Text.ElideRight
@@ -411,7 +373,7 @@ Page
         {
             id: titleText
 
-            text: d.accessor.getData(currentEventIndex, "display")
+            text: objectData?.title ?? ""
             visible: !!text
 
             elide: Text.ElideRight
@@ -429,7 +391,7 @@ Page
         {
             id: descriptionText
 
-            text: d.accessor.getData(currentEventIndex, "description")
+            text: NxGlobals.toHtmlWithLinks(objectData?.description ?? "")
             visible: !!text
 
             color: ColorTheme.colors.light10
@@ -449,7 +411,7 @@ Page
         {
             Layout.fillWidth: true
 
-            model: d.accessor.getData(currentEventIndex, "tags")
+            model: objectData?.tags ?? []
             visible: hasTags
             color: ColorTheme.colors.dark8
         }
@@ -623,11 +585,11 @@ Page
             id: previousButton
 
             icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
-            enabled: currentEventIndex < d.accessor.count - 1
+            enabled: eventDetailsScreen.hasPrevious
 
             Layout.fillWidth: true
 
-            onClicked: ++currentEventIndex
+            onClicked: eventDetailsScreen.previousClicked()
         }
 
         ControlButton
@@ -660,11 +622,11 @@ Page
             id: nextButton
 
             icon.source: "image://skin/24x24/Outline/chunk_future.svg"
-            enabled: currentEventIndex > 0
+            enabled: eventDetailsScreen.hasNext
 
             Layout.fillWidth: true
 
-            onClicked: --currentEventIndex
+            onClicked: eventDetailsScreen.nextClicked()
         }
     }
 
@@ -808,8 +770,8 @@ Page
         }
     }
 
-    onEventSearchModelChanged: d.updateCurrentEvent()
-    onCurrentEventIndexChanged: d.updateCurrentEvent()
+    onResourceChanged: d.updateCurrentEvent()
+    onObjectDataChanged: d.updateCurrentEvent()
 
     Binding
     {
@@ -827,7 +789,6 @@ Page
 
         property bool hasControls: true
 
-        property ModelDataAccessor accessor: ModelDataAccessor {}
         property bool showControls: true
         property int exclusionAreaY: eventDetailsScreen.activePage
             ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
@@ -835,7 +796,7 @@ Page
 
         function updateCurrentEvent()
         {
-            if (!eventSearchModel || currentEventIndex < 0)
+            if (!objectData)
             {
                 preview.resource = null
                 preview.startTimeMs = 0
@@ -846,19 +807,18 @@ Page
 
             preview.stop()
 
-            const resource = accessor.getData(currentEventIndex, "resource")
-            if (!resource)
+            if (!eventDetailsScreen.resource)
                 return;
 
-            preview.resource = resource
+            preview.resource = eventDetailsScreen.resource
 
             const paddingTimeMs = eventDetailsScreen.isAnalyticsDetails
                 ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
                 : 0
             preview.startTimeMs =
-                accessor.getData(currentEventIndex, "timestampMs") - paddingTimeMs
+                objectData.startTimeMs - paddingTimeMs
             preview.durationMs =
-                accessor.getData(currentEventIndex, "durationMs") + paddingTimeMs * 2
+                objectData.durationMs + paddingTimeMs * 2
             preview.setPosition(preview.startTimeMs)
             slider.value = preview.startTimeMs
 
@@ -917,15 +877,13 @@ Page
 
         MenuItem
         {
-            text: backend.isShared ? qsTr("Shared") : qsTr("Share")
-
-            icon.source: backend.isShared && !eventDetailsScreen.isAnalyticsDetails
-                ? "image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green"
-                : "image://skin/20x20/Solid/share.svg?primary=light10"
-
-            enabled: backend.isAvailable
-
-            onClicked: share()
+            action: ShareAction
+            {
+                icon.width: 20
+                icon.height: 20
+                objectData: eventDetailsScreen.objectData
+                analyticsMode: eventDetailsScreen.isAnalyticsDetails
+            }
         }
     }
 

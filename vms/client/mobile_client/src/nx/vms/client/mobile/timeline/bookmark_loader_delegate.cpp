@@ -11,23 +11,12 @@
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource.h>
 #include <nx/utils/log/assert.h>
-#include <nx/utils/range_adapters.h>
+#include <nx/vms/client/mobile/timeline/bookmark_data.h>
 
 namespace nx::vms::client::mobile {
 namespace timeline {
 
 using namespace std::chrono;
-
-namespace {
-
-QString bookmarkTitle(const QnCameraBookmark& bookmark)
-{
-    return bookmark.name.isEmpty()
-        ? BookmarkLoaderDelegate::tr("Bookmark")
-        : bookmark.name;
-}
-
-} // namespace
 
 struct BookmarkLoaderDelegate::Private
 {
@@ -42,101 +31,8 @@ struct BookmarkLoaderDelegate::Private
         const QnResourcePtr& resource,
         QnCameraBookmarkList result)
     {
-        QnTimePeriodList chunks;
-        if ((int) result.size() > limit)
-        {
-            // If there are more than `limit` bookmarks, make one chunk covering the entire bucket.
-            chunks.push_back(period);
-        }
-        else
-        {
-            chunks.reserve(result.size());
-
-            for (auto it = result.crbegin(); it != result.crend(); ++it)
-                chunks.push_back(QnTimePeriod(it->startTimeMs, it->durationMs).intersected(period));
-        }
-
-        const int count = (int) result.size();
-        if (count == 1)
-        {
-            const auto& bookmark = result.front();
-
-            ObjectData perObjectData{
-                .id = bookmark.guid,
-                .startTimeMs = bookmark.startTimeMs.count(),
-                .durationMs = bookmark.durationMs.count(),
-                .title = bookmarkTitle(bookmark),
-                .description = bookmark.description,
-                .imagePath = makeImageRequest(resource, bookmark.startTimeMs.count(),
-                    kHighImageResolution),
-                .tags = QStringList{bookmark.tags.cbegin(), bookmark.tags.cend()}};
-
-            promise.emplaceResult(MultiObjectData{
-                .caption = bookmarkTitle(bookmark),
-                .description = bookmark.description,
-                .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
-                .imagePaths = {makeImageRequest(resource, bookmark.startTimeMs.count(),
-                    kLowImageResolution)},
-                .positionMs = bookmark.startTimeMs.count(),
-                .durationMs = bookmark.durationMs.count(),
-                .count = 1,
-                .objectChunks = chunks,
-                .perObjectData = {perObjectData}});
-        }
-        else if (count > 1)
-        {
-            const auto title = count <= limit
-                ? BookmarkLoaderDelegate::tr("Bookmarks (%1)").arg(count)
-                : BookmarkLoaderDelegate::tr("Bookmarks (>%1)").arg(limit);
-
-            const auto firstPosition = count <= limit
-                ? result.back().startTimeMs
-                : milliseconds(period.startTimeMs); //< If result is cropped, just use period start.
-
-            const auto duration = result.front().startTimeMs - firstPosition;
-
-            QList<ObjectData> perObjectData;
-            if (duration < minimumStackDuration)
-            {
-                for (const auto& bookmark: nx::utils::reverseRange(result))
-                {
-                    perObjectData.push_back(ObjectData{
-                        .id = bookmark.guid,
-                        .startTimeMs = bookmark.startTimeMs.count(),
-                        .durationMs = bookmark.durationMs.count(),
-                        .title = bookmarkTitle(bookmark),
-                        .description = bookmark.description,
-                        .imagePath = makeImageRequest(resource, bookmark.startTimeMs.count(),
-                            kHighImageResolution),
-                        .tags = QStringList{bookmark.tags.cbegin(), bookmark.tags.cend()}});
-                }
-            }
-
-            QStringList imagePaths;
-            for (const auto& bookmark: result)
-            {
-                imagePaths.push_back(makeImageRequest(resource, bookmark.startTimeMs.count(),
-                    kLowImageResolution));
-
-                if (imagePaths.size() >= kMaxPreviewImageCount)
-                    break;
-            }
-
-            promise.emplaceResult(MultiObjectData{
-                .caption = title,
-                .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
-                .imagePaths = imagePaths,
-                .positionMs = firstPosition.count(),
-                .durationMs = duration.count(),
-                .count = count,
-                .objectChunks = chunks,
-                .perObjectData = perObjectData});
-        }
-        else if (!chunks.empty())
-        {
-            promise.emplaceResult(MultiObjectData{
-                .objectChunks = chunks});
-        }
+        promise.emplaceResult(
+            BookmarkData::merge(result, period, minimumStackDuration, limit, resource));
     }
 };
 

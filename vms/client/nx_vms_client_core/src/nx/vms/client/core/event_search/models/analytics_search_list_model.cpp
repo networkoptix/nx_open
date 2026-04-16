@@ -1665,6 +1665,9 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
             return {};
         }
 
+        case ObjectTrackRole:
+            return QVariant::fromValue(track);
+
         case ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(camera(track));
 

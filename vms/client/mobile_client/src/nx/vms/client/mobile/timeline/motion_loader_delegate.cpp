@@ -7,13 +7,12 @@
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
-#include <nx/vms/text/human_readable.h>
+#include <nx/vms/client/mobile/timeline/motion_data.h>
 
 namespace nx::vms::client::mobile {
 namespace timeline {
 
 using namespace std::chrono;
-using nx::vms::text::HumanReadable;
 
 struct MotionLoaderDelegate::Private
 {
@@ -60,56 +59,7 @@ QFuture<MultiObjectData> MotionLoaderDelegate::load(
     QPromise<MultiObjectData> promise;
     promise.start();
 
-    const auto last = end - 1;
-
-    const auto getPreviewTimeMs =
-        [](const QnTimePeriod& motion) { return motion.startTimeMs + motion.durationMs / 2; };
-
-    if (count == 1)
-    {
-        const auto durationText = HumanReadable::timeSpan(begin->duration(),
-            HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
-            HumanReadable::SuffixFormat::Short, " ");
-
-        const auto previewTimeMs = getPreviewTimeMs(*last);
-
-        ObjectData perObjectData{
-            .startTimeMs = begin->startTimeMs,
-            .durationMs = begin->durationMs,
-            .title = tr("Motion detected"),
-            .imagePath = makeImageRequest(resource, previewTimeMs, kHighImageResolution)};
-
-        promise.emplaceResult(MultiObjectData{
-            .caption = tr("Motion detected"),
-            .description = durationText,
-            .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
-            .imagePaths = {makeImageRequest(resource, previewTimeMs, kLowImageResolution)},
-            .positionMs = begin->startTimeMs,
-            .durationMs = begin->durationMs,
-            .count = 1,
-            .perObjectData = {perObjectData}});
-    }
-    else
-    {
-        QStringList imagePaths;
-        for (auto it = last;; --it)
-        {
-            imagePaths.push_back(
-                makeImageRequest(resource, getPreviewTimeMs(*it), kLowImageResolution));
-            if (it == begin || imagePaths.size() >= kMaxPreviewImageCount)
-                break;
-        }
-
-        promise.emplaceResult(MultiObjectData{
-            .caption = count > d->maxMotionsPerBucket
-                ? tr("Motion (>%1)").arg(d->maxMotionsPerBucket)
-                : tr("Motion (%1)").arg(count),
-            .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
-            .imagePaths = imagePaths,
-            .positionMs = begin->startTimeMs,
-            .durationMs = last->startTimeMs - begin->startTimeMs,
-            .count = count});
-    }
+    promise.emplaceResult(MotionData::merge({begin, end}, d->maxMotionsPerBucket, resource));
 
     promise.finish();
     return promise.future();

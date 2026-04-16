@@ -3,10 +3,10 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QModelIndex>
 #include <QtCore/QUrl>
 
 #include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/mobile/timeline/abstract_object_data.h>
 
 namespace nx::vms::client::mobile {
 
@@ -15,10 +15,10 @@ class ShareBookmarkBackend: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(QModelIndex modelIndex
-        READ modelIndex
-        WRITE setModelIndex
-        NOTIFY modelIndexChanged)
+    Q_PROPERTY(timeline::AbstractObjectData* objectData
+        READ objectData
+        WRITE setObjectData
+        NOTIFY objectDataChanged)
 
     Q_PROPERTY(bool isAvailable
         READ isAvailable
@@ -66,8 +66,8 @@ public:
     ShareBookmarkBackend(QObject* parent = nullptr);
     virtual ~ShareBookmarkBackend() override;
 
-    QModelIndex modelIndex() const;
-    void setModelIndex(const QModelIndex& value);
+    timeline::AbstractObjectData* objectData() const;
+    void setObjectData(timeline::AbstractObjectData* value);
 
     bool isAvailable();
 
@@ -98,7 +98,7 @@ public:
     Q_INVOKABLE void resetBookmarkData();
 
 signals:
-    void modelIndexChanged();
+    void objectDataChanged();
     void bookmarkChanged();
     void isAvailableChanged();
 
