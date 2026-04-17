@@ -2,16 +2,14 @@
 
 #include <gtest/gtest.h>
 
-#include <QtCore/QCoreApplication>
-
 #include <network/system_helpers.h>
-#include <nx/branding.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_finder/private/cloud_system_description.h>
 #include <nx/vms/client/core/system_finder/private/local_system_description.h>
+#include <nx/vms/client/core/system_finder/private/system_description_aggregator.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <ui/models/system_hosts_model.h>
 
 #include "system_finder_mock.h"
 
@@ -23,6 +21,8 @@ const QString kCloudId1 = nx::Uuid::createUuid().toString(QUuid::WithBraces);
 const QString kCloudId2 = nx::Uuid::createUuid().toString(QUuid::WithBraces);
 const nx::Uuid kLocalId1 = nx::Uuid::createUuid();
 const nx::Uuid kLocalId2 = nx::Uuid::createUuid();
+const auto kServerId1 = nx::Uuid::createUuid();
+const auto kServerUrl1 = nx::Url("https://localhost:7001");
 
 } // namespace
 
@@ -54,36 +54,67 @@ public:
             Qn::SerializationFormat::json,
             nx::vms::api::PeerType::desktopClient);
         systemFinder = std::make_unique<QnSystemFinderMock>();
+
+        nx::vms::common::ServerCompatibilityValidator::initialize(
+            nx::vms::common::ServerCompatibilityValidator::Peer::desktopClient,
+            Qn::SerializationFormat::json,
+            /*ignoreAll*/ {-1});
     }
 
     /** Have a system listed in the shared cloud systems list. */
-    void givenCloudSystem(QnCloudSystem system)
+    void givenCloudSystem(const QnCloudSystem& system)
     {
         systemFinder->cloudFinder->addSystem(QnCloudSystemDescription::create(system));
     }
 
-    /** Have a system which is accessible locally. */
-    void givenAccessibleSystem(api::ModuleInformation system)
+    void whenCloudSystemLost(const QString& id)
     {
-        const QString systemId = helpers::getTargetSystemId(system);
-        const nx::Uuid localId = helpers::getLocalSystemId(system);
-        systemFinder->directFinder->addSystem(
-            LocalSystemDescription::create(
-                systemId,
-                localId,
-                system.cloudSystemId,
-                "Direct Accessible System"));
+        systemFinder->cloudFinder->removeSystem(id);
+    }
+
+    /** Have a system which is accessible locally. */
+    void givenAccessibleSystem(const api::ModuleInformation& module)
+    {
+        const QString systemId = helpers::getTargetSystemId(module);
+        const nx::Uuid localId = helpers::getLocalSystemId(module);
+        auto system = LocalSystemDescription::create(
+            systemId,
+            localId,
+            module.cloudSystemId,
+            "Direct Accessible System");
+
+        if (!module.id.isNull())
+        {
+            system->addServer(module, /*online*/ true);
+            system->setServerHost(module.id, kServerUrl1);
+        }
+
+        systemFinder->directFinder->addSystem(system);
+    }
+
+    void whenDirectSystemLost(const QString& id)
+    {
+        systemFinder->directFinder->removeSystem(id);
     }
 
     /** Have a record about a system we connected recently (only local id is stored). */
     void givenRecentSystem(nx::Uuid localId)
     {
-        systemFinder->recentFinder->addSystem(
-            LocalSystemDescription::create(
-                localId.toSimpleString(),
-                localId,
-                /*cloudSystemId*/ QString(),
-                "Recent System"));
+        constexpr auto name = "Recent System";
+
+        auto system = LocalSystemDescription::create(
+            localId.toSimpleString(), localId, /*cloudSystemId*/ QString(), name);
+
+        // Recent system finder does not store server ids, so it adds a fake ones.
+        nx::vms::api::ModuleInformationWithAddresses fakeServerInfo;
+        fakeServerInfo.id = nx::Uuid::createUuid();   //< It should be new unique id.
+        fakeServerInfo.systemName = name;
+        fakeServerInfo.version = nx::utils::SoftwareVersion(5, 1, 0, 0);
+
+        system->addServer(fakeServerInfo, /*online*/ false);
+        system->setServerHost(fakeServerInfo.id, kServerUrl1);
+
+        systemFinder->recentFinder->addSystem(system);
     }
 
     void whenLogoutFromCloud()
@@ -93,7 +124,23 @@ public:
 
     void thenSystemCountIs(int count)
     {
-        ASSERT_EQ(systemFinder->systems().count(), count);
+        ASSERT_EQ(systems().count(), count);
+    }
+
+    void thenFirstServerId(const QString& id, nx::Uuid localId, nx::Uuid serverId)
+    {
+        QnSystemHostsModel shm(nullptr, systemFinder.get());
+        shm.setSystemId(id);
+        shm.setLocalSystemId(localId.toQUuid());
+
+        EXPECT_EQ(serverId, shm.index(0, 0).data(QnSystemHostsModel::ServerIdRole).toUuid());
+    }
+
+    SystemDescriptionList systems() const { return systemFinder->systems(); }
+
+    SystemDescriptionAggregatorPtr aggregator(int i) const
+    {
+        return systems().value(i).dynamicCast<SystemDescriptionAggregator>();
     }
 
 public:
@@ -250,4 +297,37 @@ TEST_F(SystemFinderTest, disconnectFromCloudShouldNotClearOfflineSystems)
     thenSystemCountIs(1);
 }
 
-}// namespace nx::vms::client::core::test
+TEST_F(SystemFinderTest, unbindFromCloudDoesNotLeaveStaleCloudTile)
+{
+    auto moduleInfo = nx::vms::api::ModuleInformation{
+        .cloudSystemId = kCloudId1, .localSystemId = kLocalId1};
+    moduleInfo.id = kServerId1;
+
+    // System is known from a previous local connection.
+    givenRecentSystem(kLocalId1);
+    // System is accessible locally and currently cloud-bound.
+    givenAccessibleSystem(moduleInfo);
+    // Cloud also reports the system.
+    givenCloudSystem({.cloudId = kCloudId1, .localId = kLocalId1, .online = true});
+    thenSystemCountIs(1);
+
+    // Site disconnects from cloud: the direct finder loses the cloud-id system first ...
+    whenDirectSystemLost(kCloudId1);
+    // ... and re-discovers it under the local id (cloudSystemId is empty now).
+    moduleInfo.cloudSystemId.clear();
+    givenAccessibleSystem(moduleInfo);
+    // Then the cloud finder also loses it.
+    whenCloudSystemLost(kCloudId1);
+
+    // Only one tile must remain - the stale aggregator under the old cloud id must be gone.
+    thenSystemCountIs(1);
+    const auto first = systems().first();
+    EXPECT_EQ(first->id(), kLocalId1.toSimpleString());
+    EXPECT_EQ(first->localId(), kLocalId1);
+
+    // The system contains the real server and recent system is merged correctly.
+    thenFirstServerId(first->id(), first->localId(), kServerId1);
+    EXPECT_EQ(aggregator(0)->systemCount(), 2);
+}
+
+} // namespace nx::vms::client::core::test

@@ -14,7 +14,7 @@ namespace nx::vms::client::core {
 class SystemDescriptionAggregator;
 using SystemDescriptionAggregatorPtr = QSharedPointer<SystemDescriptionAggregator>;
 
-class SystemDescriptionAggregator: public SystemDescription
+class NX_VMS_CLIENT_CORE_API SystemDescriptionAggregator: public SystemDescription
 {
     using base_type = SystemDescription;
 
@@ -34,7 +34,7 @@ public:
     bool containsSystem(int priority) const;
 
     void mergeSystem(int priority, const SystemDescriptionPtr& system);
-    void mergeSystem(const SystemDescriptionAggregatorPtr& system);
+    void merge(const SystemDescriptionAggregatorPtr& system, bool safe = false);
 
     // TODO: #sivanov SystemId check is highly suspicious here, aggregator must not know about
     // model-level ids.
@@ -91,6 +91,8 @@ public:
     virtual bool isPending() const override;
 
     virtual nx::Uuid organizationId() const override;
+
+    int systemCount() const; //< For testing.
 
 private:
     void emitSystemChanged();

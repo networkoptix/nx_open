@@ -151,7 +151,7 @@ bool SystemFinder::mergeSystemIntoExisting(const SystemDescriptionPtr& system, S
             emit systemLost(existingSystem->id(), localId);
 
             auto replacementSystem = createNewAggregator(system, source);
-            replacementSystem->mergeSystem(existingSystem);
+            replacementSystem->merge(existingSystem);
             m_systems.insert(replacementSystem->id(), replacementSystem);
             emit systemDiscovered(replacementSystem);
 
@@ -260,26 +260,57 @@ void SystemFinder::onBaseSystemDiscovered(const SystemDescriptionPtr& system, So
 
 void SystemFinder::onSystemLost(const QString& systemId, const nx::Uuid& localId, Source source)
 {
-    NX_VERBOSE(this, "Lost system %1 (local id %2, source %3)", systemId, localId, source);
+    NX_DEBUG(this, "Lost system: %1, local id: %2, source: %3", systemId, localId, source);
 
     const auto it = m_systems.find(systemId);
     if (it == m_systems.end())
-        return;
-
-    const auto aggregator = *it;
-    if (!aggregator->containsSystem(source))
-        return;
-
-    if (aggregator->isAggregator())
     {
-        NX_VERBOSE(this, "Removing system %1 from aggregator %2", systemId, aggregator);
-        aggregator->removeSystem(systemId, source);
+        NX_VERBOSE(this, "System was not found, id: %1, local id: %2", systemId, localId);
+
         return;
     }
 
-    NX_VERBOSE(this, "Removing aggregator %1 as the system is the last one", aggregator);
+    const auto aggregator = *it;
+    if (!aggregator->containsSystem(source))
+    {
+        NX_VERBOSE(this, "%1 does not contain system, id: %2, local id: %3",
+            aggregator, systemId, localId);
+
+        return;
+    }
+
+    if (!aggregator->isAggregator()) //< Last system in the aggregator.
+    {
+        NX_VERBOSE(this, "Removing %1 as the system is the last one", aggregator);
+        m_systems.erase(it);
+        emit systemLost(systemId, localId);
+
+        return;
+    }
+
+    NX_VERBOSE(this, "Removing system, id: %1, local id: %2 from %3",
+        systemId, localId, aggregator);
+    aggregator->removeSystem(systemId, source);
+
+    if (systemId == aggregator->id())
+        return;
+
+    NX_VERBOSE(this, "System id changed %1 -> %2 after removing source: %3",
+        systemId, aggregator->id(), source);
     m_systems.erase(it);
     emit systemLost(systemId, localId);
+
+    if (auto existingIt = m_systems.find(aggregator->id()); existingIt == m_systems.end())
+    {
+        m_systems.insert(aggregator->id(), aggregator);
+        emit systemDiscovered(aggregator);
+    }
+    else
+    {
+        NX_VERBOSE(this, "Merging remaining subsystems of %1 into existing %2",
+            aggregator, (*existingIt));
+        (*existingIt)->merge(aggregator, /*safe*/ true);
+    }
 }
 
 SystemDescriptionList SystemFinder::systems() const
@@ -293,12 +324,7 @@ SystemDescriptionList SystemFinder::systems() const
 
 SystemDescriptionPtr SystemFinder::getSystem(const QString& systemId) const
 {
-    for (const auto& system: m_systems)
-    {
-        if (system->id() == systemId)
-            return system;
-    }
-    return {};
+    return m_systems.value(systemId);
 }
 
 } // namespace nx::vms::client::core
