@@ -89,6 +89,13 @@ NxObject
 
     Connections
     {
+        target: controller.bookmarkSearchSetup
+
+        function onParametersChanged() { controller.requestUpdate() }
+    }
+
+    Connections
+    {
         target: view ? controller.searchModel : null
 
         function onAsyncFetchStarted(request)

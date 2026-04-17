@@ -241,6 +241,9 @@ BookmarkSearchListModel::BookmarkSearchListModel(
 
     connect(d->textFilter.get(), &TextFilterSetup::textChanged,
         this, &AbstractSearchListModel::clear);
+
+    connect(this, &BookmarkSearchListModel::searchSharedOnlyChanged,
+        this, &AbstractSearchListModel::clear);
 }
 
 BookmarkSearchListModel::BookmarkSearchListModel(SystemContext* systemContext, QObject* parent):
