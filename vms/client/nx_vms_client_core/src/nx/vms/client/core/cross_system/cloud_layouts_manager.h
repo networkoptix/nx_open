@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/resource/resource_fwd.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 
 namespace nx::vms::client::core {
 
@@ -25,7 +25,9 @@ public:
     virtual ~CloudLayoutsManager() override;
 
     /** Convert layout to the cloud one. */
-    LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout);
+    LayoutResourcePtr convertLocalLayout(
+        const LayoutResourcePtr& layout,
+        LayoutResource::ItemsRemapHash* itemsRemapHash = nullptr);
 
     using SaveCallback = std::function<void(bool)>;
     void saveLayout(const CrossSystemLayoutResourcePtr& layout, SaveCallback callback = {});
