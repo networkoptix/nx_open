@@ -105,11 +105,11 @@
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Дор хаяж нэг төхөөрөмж сонгоно уу</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Дор хаяж нэг камер сонгоно уу</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
@@ -125,7 +125,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Хүртэл</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -202,7 +202,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Учир нь</translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Тайлбар</translation>
     </message>
     <message>
       <source>Source</source>
@@ -550,11 +550,11 @@
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Чанар</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Camera Recording</source>
@@ -637,11 +637,11 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Агуулга</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -932,7 +932,7 @@
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Сервер</translation>
     </message>
     <message>
       <source>PoE Over Budget</source>
@@ -974,7 +974,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Толгой хэсэг</translation>
     </message>
     <message>
       <source>Body</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Агуулга</translation>
     </message>
     <message>
       <source>Internal HTTPS Request</source>

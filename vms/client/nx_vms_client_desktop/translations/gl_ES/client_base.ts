@@ -6222,7 +6222,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Usuarios LDAP</translation>
     </message>
   </context>
   <context>

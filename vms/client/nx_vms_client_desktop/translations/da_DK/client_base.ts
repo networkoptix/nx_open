@@ -6222,7 +6222,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>LDAP Brugere</translation>
     </message>
   </context>
   <context>
