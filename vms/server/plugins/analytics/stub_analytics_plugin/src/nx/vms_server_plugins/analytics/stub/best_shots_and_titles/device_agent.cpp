@@ -2,6 +2,7 @@
 
 #include "device_agent.h"
 
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <numeric>
@@ -282,6 +283,14 @@ void DeviceAgent::configureBestShots(std::map<std::string, std::string>& setting
 
     int bestShotObjectCount = 0;
     nx::kit::utils::fromString(settings[kBestShotObjectCountSetting], &bestShotObjectCount);
+    const int clampedBestShotObjectCount = std::clamp(bestShotObjectCount, 0, kObjectCountMaxValue);
+    if (bestShotObjectCount != clampedBestShotObjectCount)
+    {
+        NX_OUTPUT << __func__ << ": clamping setting \"" << kBestShotObjectCountSetting
+            << "\" from " << bestShotObjectCount << " to " << clampedBestShotObjectCount;
+        bestShotObjectCount = clampedBestShotObjectCount;
+    }
+
     m_bestShotTrackContexts.clear();
 
     for (int i = 0; i < bestShotObjectCount; ++i)
@@ -343,6 +352,14 @@ void DeviceAgent::configureTitles(std::map<std::string, std::string>& settings)
 
     int titleObjectCount = 0;
     nx::kit::utils::fromString(settings[kTitleObjectCountSetting], &titleObjectCount);
+    const int clampedTitleObjectCount = std::clamp(titleObjectCount, 0, kObjectCountMaxValue);
+    if (titleObjectCount != clampedTitleObjectCount)
+    {
+        NX_OUTPUT << __func__ << ": clamping setting \"" << kTitleObjectCountSetting
+            << "\" from " << titleObjectCount << " to " << clampedTitleObjectCount;
+        titleObjectCount = clampedTitleObjectCount;
+    }
+
     m_titleTrackContexts.clear();
 
     for (int i = 0; i < titleObjectCount; ++i)

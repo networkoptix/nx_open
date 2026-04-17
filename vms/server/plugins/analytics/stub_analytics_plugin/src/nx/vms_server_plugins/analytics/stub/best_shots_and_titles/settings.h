@@ -42,6 +42,7 @@ extern const std::string kTitleHeightSetting;
 
 extern const std::string kTitleObjectCountSetting;
 extern const std::string kFrameNumberToGenerateTitleSetting;
+extern const int kObjectCountMaxValue;
 
 extern const std::string kEnableBestShotGeneration;
 extern const std::string kEnableObjectTitleGeneration;

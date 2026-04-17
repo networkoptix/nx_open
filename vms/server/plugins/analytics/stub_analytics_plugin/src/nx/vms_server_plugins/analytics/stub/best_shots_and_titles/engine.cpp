@@ -95,6 +95,7 @@ R"json(
                         "name": ")json" + kBestShotObjectCountSetting + R"json(",
                         "caption": "Object count",
                         "minValue": 0,
+                        "maxValue": )json" + std::to_string(kObjectCountMaxValue) + R"json(,
                         "defaultValue": 1
                     },
                     {
@@ -198,6 +199,7 @@ R"json(
                         "name": ")json" + kTitleObjectCountSetting + R"json(",
                         "caption": "Object count",
                         "minValue": 0,
+                        "maxValue": )json" + std::to_string(kObjectCountMaxValue) + R"json(,
                         "defaultValue": 1
                     },
                     {

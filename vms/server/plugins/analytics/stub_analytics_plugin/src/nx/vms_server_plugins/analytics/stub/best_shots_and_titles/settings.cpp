@@ -43,6 +43,8 @@ const std::string kTitleHeightSetting = "titleHeight";
 
 const std::string kTitleObjectCountSetting = "titleObjectCount";
 const std::string kFrameNumberToGenerateTitleSetting = "frameNumberToGenerateTitle";
+// Keep object bounding box height strictly positive: 0.05f * count must stay below 1.0f.
+const int kObjectCountMaxValue = 19;
 
 const std::string kEnableBestShotGeneration = "enableBestShotGeneration";
 const std::string kEnableObjectTitleGeneration = "enableObjectTitleGeneration";
