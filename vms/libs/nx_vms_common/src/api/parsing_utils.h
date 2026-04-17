@@ -155,7 +155,9 @@ rest::ErrorOrData<T> parseMessageBody(
         else if constexpr (std::is_same_v<T, QByteArray>)
         {
             *success = true;
-            return messageBody;
+
+            // Explicitly copy the non-owning QByteArray constructed from raw data.
+            return QByteArray(messageBody.constData(), messageBody.size());
         }
         else if constexpr (std::is_same_v<T, JsonRpcResultType>)
         {
