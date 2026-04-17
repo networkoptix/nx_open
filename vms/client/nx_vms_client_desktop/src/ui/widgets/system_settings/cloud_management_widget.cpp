@@ -238,12 +238,15 @@ void QnCloudManagementWidget::disconnectFromCloud()
     auto sessionTokenHelper = FreshSessionTokenHelper::makeHelper(
         this, title, mainText, tr("Disconnect"), FreshSessionTokenHelper::ActionType::unbind);
 
-    auto handler = nx::utils::guarded(
-        this,
+    auto handler =
         [this, isCloudUser = context()->user()->isCloud()](
             bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
-            NX_ASSERT(m_currentRequest == requestId);
+            // The request handle may be cleared already in case of disconnection before the
+            // response callback.
+            NX_ASSERT(!m_currentRequest || m_currentRequest == requestId,
+                "Unexpected request handle: %1", requestId);
+
             m_currentRequest = 0;
             ui->unlinkButton->hideIndicator();
             ui->unlinkButton->setEnabled(true);
@@ -279,13 +282,13 @@ void QnCloudManagementWidget::disconnectFromCloud()
                     "%1 is the cloud name (like Nx Cloud)")
                     .arg(nx::branding::cloudName()),
                 errorString);
-        });
+        };
 
     m_currentRequest = connectedServerApi()->unbindSystemFromCloud(
         sessionTokenHelper,
         /*password*/ QString(),
         std::move(handler),
-        this->thread());
+        this);
     ui->unlinkButton->showIndicator(isNetworkRequestRunning());
     ui->unlinkButton->setEnabled(!isNetworkRequestRunning());
 }

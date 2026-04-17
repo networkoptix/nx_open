@@ -7,7 +7,9 @@
 
 #include <ui/models/sort_filter_list_model.h>
 
-class QnSystemHostsModel: public QnSortFilterListModel
+namespace nx::vms::client::core { class SystemFinder; }
+
+class NX_VMS_CLIENT_CORE_API QnSystemHostsModel: public QnSortFilterListModel
 {
     Q_OBJECT
 
@@ -27,7 +29,8 @@ public:
         ServerIdRole,
     };
 
-    QnSystemHostsModel(QObject* parent = nullptr);
+    QnSystemHostsModel(
+        QObject* parent = nullptr, nx::vms::client::core::SystemFinder* systemFinder = nullptr);
 
     virtual bool lessThan(
         const QModelIndex& sourceLeft,

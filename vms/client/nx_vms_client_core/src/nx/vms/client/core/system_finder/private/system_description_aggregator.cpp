@@ -152,14 +152,18 @@ void SystemDescriptionAggregator::mergeSystem(int priority, const SystemDescript
     emitSystemChanged();
 }
 
-void SystemDescriptionAggregator::mergeSystem(const SystemDescriptionAggregatorPtr& system)
+void SystemDescriptionAggregator::merge(const SystemDescriptionAggregatorPtr& system, bool safe)
 {
     for (auto [source, subsystem]: nx::utils::keyValueRange(system->m_systems))
     {
-        if (NX_ASSERT(!m_systems.contains(source),
-            "Workflow failure, see SystemFinder::mergeSystemIntoExisting() method"))
+        if (!m_systems.contains(source))
         {
             mergeSystem(source, subsystem);
+        }
+        else
+        {
+            NX_ASSERT(safe,
+                "Workflow failure, see SystemFinder::mergeSystemIntoExisting() method");
         }
     }
 }
@@ -506,16 +510,21 @@ nx::utils::SoftwareVersion SystemDescriptionAggregator::version() const
 
 QString SystemDescriptionAggregator::idForToStringFromPtr() const
 {
-    QString result = nx::format("System Aggregator: %1 [id: %2, local id: %3]:\n",
+    QString result = nx::format("%1 [id: %2, local id: %3]:\n",
         name(), id(), localId().toSimpleString());
-    for (const auto& system: m_systems)
-        result += nx::toString(system) + '\n';
+    for (const auto& [key, system]: m_systems.asKeyValueRange())
+        result.append(NX_FMT("%1: %2\n", key, system));
     return result;
 }
 
 nx::Uuid SystemDescriptionAggregator::organizationId() const
 {
     return isEmptyAggregator() ? nx::Uuid{} : m_systems.first()->organizationId();
+}
+
+int SystemDescriptionAggregator::systemCount() const
+{
+    return m_systems.count();
 }
 
 } // namespace nx::vms::client::core

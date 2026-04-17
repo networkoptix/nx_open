@@ -6,7 +6,6 @@
 
 #include <network/system_helpers.h>
 #include <nx/network/socket_common.h>
-#include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/application_context.h>
@@ -75,7 +74,8 @@ class QnSystemHostsModel::HostsModel: public QAbstractListModel
     typedef QList<ServerUrlData> ServerUrlDataList;
 
 public:
-    HostsModel(QnSystemHostsModel* parent);
+    HostsModel(QnSystemHostsModel* parent, nx::vms::client::core::SystemFinder* systemFinder);
+    ~HostsModel() override;
 
 public:
     QString systemId() const;
@@ -89,6 +89,8 @@ public:
 
     bool forcedLocalhostConversion() const;
     void setForcedLocalhostConversion(bool convert);
+
+    nx::vms::client::core::SystemFinder* systemFinder() const { return m_systemFinder; }
 
 public: // overrides
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -121,6 +123,7 @@ private:
 
 private:
     QnSystemHostsModel* const m_owner;
+    nx::vms::client::core::SystemFinder* const m_systemFinder;
 
     nx::utils::ScopedConnections m_connections;
     QString m_systemId;
@@ -129,15 +132,23 @@ private:
     UrlsList m_recentConnectionUrls;
     bool m_forcedLocalhostConversion = false;
 };
-
-QnSystemHostsModel::HostsModel::HostsModel(QnSystemHostsModel* parent):
+QnSystemHostsModel::HostsModel::HostsModel(
+    QnSystemHostsModel* parent, nx::vms::client::core::SystemFinder* systemFinder):
     base_type(parent),
-    m_owner(parent)
+    m_owner(parent),
+    m_systemFinder(systemFinder)
 {
+    NX_TRACE(this, "Create, parent: %1", parent);
+
     connect(m_owner, &QnSystemHostsModel::systemIdChanged, this, &HostsModel::reloadHosts);
     connect(m_owner, &QnSystemHostsModel::localSystemIdChanged, this, &HostsModel::forceResort);
-    connect(appContext()->systemFinder(), &SystemFinder::destroyed, this,
+    connect(m_systemFinder, &SystemFinder::destroyed, this,
         [this] { m_connections.release(); });
+}
+
+QnSystemHostsModel::HostsModel::~HostsModel()
+{
+    NX_TRACE(this, "Destroy, parent: %1", m_owner);
 }
 
 void QnSystemHostsModel::HostsModel::forceResort()
@@ -295,6 +306,8 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
             if (m_systemId != system->id())
                 return;
 
+            NX_TRACE(this, "Reload, ID: %1, LID: %2", m_systemId, m_localSystemId);
+
             for (const auto& server: system->servers())
                 addServer(system, server.id);
 
@@ -312,13 +325,13 @@ void QnSystemHostsModel::HostsModel::reloadHosts()
                 });
         };
 
-    if (const auto system = appContext()->systemFinder()->getSystem(m_systemId))
+    if (const auto system = m_systemFinder->getSystem(m_systemId))
     {
         reloadHostsHandler(system);
     }
     else
     {
-        m_connections << connect(appContext()->systemFinder(),
+        m_connections << connect(m_systemFinder,
             &AbstractSystemFinder::systemDiscovered,
             this,
             reloadHostsHandler);
@@ -331,6 +344,8 @@ void QnSystemHostsModel::HostsModel::addServer(
 {
     if (systemDescription->id() != m_systemId)
         return;
+
+    NX_TRACE(this, "Add, ID: %1, LID: %2, SID: %3", m_systemId, m_localSystemId, serverId);
 
     const auto it = getDataIt(serverId);
     if (it != m_serversUrlData.end())
@@ -442,10 +457,14 @@ QHash<int, QByteArray> QnSystemHostsModel::HostsModel::roleNames() const
 //-------------------------------------------------------------------------------------------------
 // QnSystemHostsModel
 
-QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
+QnSystemHostsModel::QnSystemHostsModel(
+    QObject* parent, nx::vms::client::core::SystemFinder* systemFinder):
     base_type(parent)
 {
-    setSourceModel(new HostsModel(this));
+    if (!systemFinder)
+        systemFinder = appContext()->systemFinder();
+
+    setSourceModel(new HostsModel(this, systemFinder));
     setTriggeringRoles({UrlRole});
 }
 
@@ -528,7 +547,7 @@ QString QnSystemHostsModel::getRequiredSystemVersion(int hostIndex) const
         if (isCompatible)
             return "";
 
-        if (SystemDescriptionPtr system = appContext()->systemFinder()->getSystem(
+        if (SystemDescriptionPtr system = hostsModel()->systemFinder()->getSystem(
             hostsModel()->systemId()))
         {
             auto serverInfo = system->getServer(index.data(ServerIdRole).toUuid());
