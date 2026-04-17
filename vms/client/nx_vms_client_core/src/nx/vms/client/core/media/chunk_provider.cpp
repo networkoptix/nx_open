@@ -51,8 +51,6 @@ public:
 private:
     void updateInternal();
 
-    const QnTimePeriodList& rawPeriods() const;
-
     void setLoading(bool value);
     void notifyAboutTimePeriodsChange();
 
@@ -65,6 +63,12 @@ private:
     int updateTriesCount = 0;
     nx::utils::ScopedConnections connections;
     std::optional<milliseconds> m_forcedBottomBound;
+
+    // Since FlatCameraDataLoader handles periods internally as a cache, and the only guaranteed
+    // time to access actual periods is in response to the `ready` signal, we maintain a copy here.
+    QnTimePeriodList m_rawPeriods;
+
+    // For analytics type, time periods clipped by the analytics database range.
     QnTimePeriodList m_clippedPeriods;
 };
 
@@ -194,6 +198,8 @@ void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& valu
 
     connections.reset();
     m_loader.reset();
+    m_rawPeriods = {};
+    m_clippedPeriods = {};
     notifyAboutTimePeriodsChange();
     setLoading(false);
 
@@ -207,6 +213,7 @@ void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& valu
     connections << connect(m_loader.get(), &FlatCameraDataLoader::ready, q,
         [this](qint64 /*startTimeMs*/)
         {
+            m_rawPeriods = m_loader->periods();
             updateClippedPeriods();
             notifyAboutTimePeriodsChange();
             setLoading(false);
@@ -233,16 +240,9 @@ void ChunkProvider::ChunkProviderInternal::setResource(const QnResourcePtr& valu
     update();
 }
 
-const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::rawPeriods() const
-{
-    static QnTimePeriodList kEmptyPeriods;
-    return m_loader ? m_loader->periods() : kEmptyPeriods;
-}
-
 const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::periods() const
 {
-    static QnTimePeriodList kEmptyPeriods;
-    return m_forcedBottomBound ? m_clippedPeriods : rawPeriods();
+    return m_forcedBottomBound ? m_clippedPeriods : m_rawPeriods;
 }
 
 void ChunkProvider::ChunkProviderInternal::setForcedBottomBound(
@@ -262,7 +262,7 @@ void ChunkProvider::ChunkProviderInternal::updateClippedPeriods()
 {
     if (m_forcedBottomBound)
     {
-        m_clippedPeriods = rawPeriods().intersectedPeriods(
+        m_clippedPeriods = m_rawPeriods.intersectedPeriods(
             QnTimePeriod{m_forcedBottomBound->count(), QnTimePeriod::kInfiniteDuration});
     }
     else if (!m_clippedPeriods.empty())

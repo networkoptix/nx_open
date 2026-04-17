@@ -1040,6 +1040,19 @@ Page
         analyticsRoi: video.roiController.customRoi
     }
 
+    Timer
+    {
+        id: chunkProviderUpdateTimer
+
+        interval: 30000
+        triggeredOnStart: true
+        running: d.applicationActive && !!controller.resource
+        repeat: true
+
+        onTriggered:
+            cameraChunkProvider.update()
+    }
+
     CalendarPanel
     {
         id: calendarPanel
