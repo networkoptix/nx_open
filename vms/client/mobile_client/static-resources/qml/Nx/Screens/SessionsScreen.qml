@@ -27,6 +27,23 @@ AdaptiveScreen
     objectName: "sessionsScreen"
 
     property var rootIndex: NxGlobals.invalidModelIndex()
+    property var selectedOrganizationIndex:
+    {
+        if (state !== inPartnerOrOrgState)
+            return null
+
+        var idx = rootIndex
+        while (idx && idx !== NxGlobals.invalidModelIndex())
+        {
+            const t = accessor.getData(idx, "type")
+            if (t === OrganizationsModel.Organization)
+                return idx
+
+            idx = idx.parent
+        }
+
+        return null
+    }
 
     // Shared state for selected tab - controls both sidebar and horizontal tabs
     property int selectedTab: OrganizationsModel.SitesTab
@@ -52,18 +69,18 @@ AdaptiveScreen
 
     leftPanel
     {
-        title: navigationPanel.selectedOrganizationIndex != null ? qsTr("Resources") : ""
+        title: sessionsScreen.selectedOrganizationIndex != null ? qsTr("Resources") : ""
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
-        interactive: navigationPanel.selectedOrganizationIndex != null
+        interactive: sessionsScreen.selectedOrganizationIndex != null
         item:
         {
             if (LayoutController.isTabletLayout
                 && !organizationsModel.topLevelLoading
                 && cloudUserProfileWatcher.isOrgUser
                 && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
-                && (navigationPanel.selectedOrganizationIndex == null
-                    || organizationsModel.hasFolders(navigationPanel.selectedOrganizationIndex)))
+                && (sessionsScreen.selectedOrganizationIndex == null
+                    || organizationsModel.hasFolders(sessionsScreen.selectedOrganizationIndex)))
             {
                 return navigationPanel
             }
@@ -196,6 +213,14 @@ AdaptiveScreen
             leftPanel.visible = sessionsScreen.state === "loggedIn"
                 || sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
         }
+    }
+
+    onSelectedOrganizationIndexChanged:
+    {
+        // Restore left panel visibility after navigation. The user may have closed the panel
+        // at a deeper level. Navigating away from the organization should bring the panel back.
+        if (leftPanel.item && selectedOrganizationIndex === null)
+            leftPanel.visible = true
     }
 
     states:
@@ -429,21 +454,7 @@ AdaptiveScreen
 
         organizationsModel: organizationsModel
         searchText: siteList.searchText
-        selectedOrganizationIndex: {
-            if (sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState)
-                return null
-
-            var idx = sessionsScreen.rootIndex
-            while (idx && idx !== NxGlobals.invalidModelIndex())
-            {
-                const t = accessor.getData(idx, "type")
-                if (t === OrganizationsModel.Organization)
-                    return idx
-
-                idx = idx.parent
-            }
-            return null
-        }
+        selectedOrganizationIndex: sessionsScreen.selectedOrganizationIndex
 
         onOrganizationNodeClicked: (nodeId) =>
         {
