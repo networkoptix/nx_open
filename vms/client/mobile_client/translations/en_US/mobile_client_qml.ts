@@ -124,10 +124,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Information</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Audio</source>
         <translation></translation>
     </message>
@@ -1567,6 +1563,10 @@
     </message>
     <message>
         <source>Export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
