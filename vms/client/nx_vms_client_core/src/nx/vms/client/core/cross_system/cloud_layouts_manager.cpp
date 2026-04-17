@@ -320,7 +320,9 @@ struct CloudLayoutsManager::Private
                 }));
     }
 
-    LayoutResourcePtr convertLocalLayout(const LayoutResourcePtr& layout)
+    LayoutResourcePtr convertLocalLayout(
+        const LayoutResourcePtr& layout,
+        LayoutResource::ItemsRemapHash* itemsRemapHash)
     {
         if (!NX_ASSERT(appContext()->cloudServiceChecker()->hasService(
             nx::vms::client::core::CloudService::docdb), "It is not possible to convert a regular "
@@ -338,7 +340,7 @@ struct CloudLayoutsManager::Private
         NX_ASSERT(!layout->hasFlags(Qn::cross_system));
 
         auto cloudLayout = CrossSystemLayoutResourcePtr(new CrossSystemLayoutResource());
-        layout->cloneTo(cloudLayout);
+        layout->cloneTo(cloudLayout, itemsRemapHash);
         cloudLayout->setIdUnsafe(nx::Uuid::createUuid());
         cloudLayout->setParentId(nx::Uuid());
         cloudLayout->addFlags(Qn::local);
@@ -457,9 +459,11 @@ CloudLayoutsManager::~CloudLayoutsManager()
     d->apiRequestExecutor.pleaseStopSync();
 }
 
-LayoutResourcePtr CloudLayoutsManager::convertLocalLayout(const LayoutResourcePtr& layout)
+LayoutResourcePtr CloudLayoutsManager::convertLocalLayout(
+    const LayoutResourcePtr& layout,
+    LayoutResource::ItemsRemapHash* itemsRemapHash)
 {
-    return d->convertLocalLayout(layout);
+    return d->convertLocalLayout(layout, itemsRemapHash);
 }
 
 void CloudLayoutsManager::saveLayout(

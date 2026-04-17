@@ -206,6 +206,26 @@ void postAcceptIntercomCall(
         executor);
 }
 
+void cloneRadassModes(
+    desktop::RadassResourceManager* radassManager,
+    const core::LayoutResourcePtr& source,
+    const core::LayoutResourcePtr& target,
+    const core::LayoutResource::ItemsRemapHash& itemRemapHash)
+{
+    if (!NX_ASSERT(radassManager))
+        return;
+
+    if (!NX_ASSERT(!source.isNull() && !target.isNull() && source != target))
+        return;
+
+    for (auto it = itemRemapHash.cbegin(); it != itemRemapHash.cend(); ++it)
+    {
+        const LayoutItemIndex sourceItemIndex(source, it.key());
+        const LayoutItemIndex targetItemIndex(target, it.value());
+        radassManager->setMode(targetItemIndex, radassManager->mode(sourceItemIndex));
+    }
+}
+
 } // namespace
 
 LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* parent):
@@ -516,11 +536,13 @@ void LayoutActionHandler::saveRemoteLayoutAs(const core::LayoutResourcePtr& layo
 
     } while (true);
 
-    core::LayoutResource::ItemsRemapHash newUuidByOldUuid;
-    core::LayoutResourcePtr newLayout = layout->clone(&newUuidByOldUuid);
+    core::LayoutResource::ItemsRemapHash itemsRemapHash;
+    core::LayoutResourcePtr newLayout = layout->clone(&itemsRemapHash);
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     system()->resourcePool()->addResource(newLayout);
+
+    cloneRadassModes(system()->radassResourceManager(), layout, newLayout, itemsRemapHash);
 
     const bool isCurrent = (layout == workbench()->currentLayout()->resource());
 
@@ -606,8 +628,13 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
             }
 
             // Convert common layout to cloud one.
-            auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+            core::LayoutResource::ItemsRemapHash itemsRemapHash;
+            auto cloudLayout =
+                appContext()->cloudLayoutsManager()->convertLocalLayout(layout, &itemsRemapHash);
             cloudLayout->setName(name);
+
+            cloneRadassModes(system()->radassResourceManager(), layout, cloudLayout, itemsRemapHash);
+
             saveLayout(cloudLayout);
             workbench()->replaceLayout(layout, cloudLayout);
         });
@@ -663,11 +690,15 @@ void LayoutActionHandler::saveCloudLayoutAs(const core::LayoutResourcePtr& layou
                 removeLayouts(existing);
             }
 
-            auto cloudLayout = layout->clone();
+            core::LayoutResource::ItemsRemapHash itemsRemapHash;
+            auto cloudLayout = layout->clone(&itemsRemapHash);
             NX_ASSERT(layout->isCrossSystem());
             cloudLayout->addFlags(Qn::local);
             cloudLayout->setName(name);
             appContext()->cloudLayoutsSystemContext()->resourcePool()->addResource(cloudLayout);
+
+            cloneRadassModes(system()->radassResourceManager(), layout, cloudLayout, itemsRemapHash);
+
             saveLayout(cloudLayout);
             workbench()->replaceLayout(layout, cloudLayout);
         });
