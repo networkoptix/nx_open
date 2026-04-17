@@ -484,20 +484,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(windowContext(), &WindowContext::systemChanged, this,
         [this]() { checkForInternetUpdates(); });
 
-    if (const auto connection = system()->messageBusConnection())
-    {
-        const nx::vms::api::ModuleInformation& moduleInformation = connection->moduleInformation();
-
-        m_clientUpdateTool->setServerUrl(
-            core::LogonData{
-                .address = connection->address(),
-                .credentials = connection->credentials(),
-                .expectedServerId = moduleInformation.id,
-                .expectedServerVersion = moduleInformation.version,
-            },
-            system()->certificateVerifier());
-        //m_clientUpdateTool->requestRemoteUpdateInfo();
-    }
     // Force update when we open dialog.
     checkForInternetUpdates(/*initial=*/true);
 

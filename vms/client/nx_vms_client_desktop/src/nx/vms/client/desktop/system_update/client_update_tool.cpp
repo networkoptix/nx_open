@@ -48,8 +48,6 @@ const nx::utils::SoftwareVersion kSignaturesEmbeddedIntoZipVersion(6, 0);
 // terminate it.
 constexpr milliseconds kProcessTerminateTimeout = 15s;
 
-} // namespace
-
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
     if (!checkOnlineTryToStartIfOffline())
@@ -65,6 +63,8 @@ bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 
     return false;
 }
+
+} // namespace
 
 ClientUpdateTool::ClientUpdateTool(core::SystemContext* systemContext, QObject *parent):
     base_type(parent),
@@ -862,7 +862,10 @@ ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
     const nx::utils::SoftwareVersion kPersistentStorageIntroducedVersion{5, 0};
 
     if (!m_serverConnection)
+    {
+        NX_INFO(this, "Can't get system servers info - no connection to the server");
         return {};
+    }
 
     NX_DEBUG(this,
         "Requesting information about servers in a system with version %1",

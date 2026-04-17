@@ -50,7 +50,7 @@ struct CompatibilityVersionInstallationDialog::Private
 
     core::RemoteConnectionFactory::ProcessPtr connectionProcess;
 
-    std::shared_ptr<ClientUpdateTool> clientUpdateTool;
+    std::unique_ptr<ClientUpdateTool> clientUpdateTool;
 
     Clock::time_point lastActionStamp;
 
