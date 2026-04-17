@@ -527,8 +527,7 @@ bool VmsEventSearchListModel::requestFetch(
 
 void VmsEventSearchListModel::clearData()
 {
-    d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::fetch);
-    d->multiRequestIdHolder.resetValue(MultiRequestIdHolder::Mode::dynamic);
+    d->multiRequestIdHolder.resetAll();
 
     ScopedModelOperations::ScopedReset reset(this);
     d->data.clear();

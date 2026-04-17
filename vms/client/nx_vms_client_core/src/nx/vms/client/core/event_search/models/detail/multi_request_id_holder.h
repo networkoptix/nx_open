@@ -17,6 +17,7 @@ public:
 
     rest::Handle setValue(Mode mode, rest::Handle value);
     void resetValue(Mode mode);
+    void resetAll();
     rest::Handle value(Mode mode);
 
 public:

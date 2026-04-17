@@ -14,6 +14,11 @@ void MultiRequestIdHolder::resetValue(Mode mode)
     setValue(mode, {});
 }
 
+void MultiRequestIdHolder::resetAll()
+{
+    m_ids.fill({});
+}
+
 rest::Handle MultiRequestIdHolder::value(Mode mode)
 {
     return m_ids[static_cast<int>(mode)];

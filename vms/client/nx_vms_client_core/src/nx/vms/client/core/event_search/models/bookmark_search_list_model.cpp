@@ -380,6 +380,7 @@ bool BookmarkSearchListModel::requestFetch(
 void BookmarkSearchListModel::clearData()
 {
     ScopedReset reset(this, !d->bookmarks.empty());
+    d->requestIds.resetAll();
     d->bookmarks.clear();
 }
 
