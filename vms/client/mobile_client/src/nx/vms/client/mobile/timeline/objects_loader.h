@@ -71,6 +71,7 @@ class ObjectsLoader: public QObject
         NOTIFY maxObjectsPerBucketChanged)
     Q_PROPERTY(qint64 minimumStackDurationMs READ minimumStackDurationMs
         WRITE setMinimumStackDurationMs NOTIFY minimumStackDurationChanged)
+    Q_PROPERTY(QVariant hasContent READ hasContent NOTIFY hasContentChanged)
 
     // Virtual "output" chunks.
     Q_PROPERTY(QnTimePeriodList objectChunks READ objectChunks NOTIFY objectChunksChanged)
@@ -204,6 +205,13 @@ public:
     QnTimePeriodList objectChunks() const;
 
     /**
+     * Whether a content exist for the selected objects type.
+     * Undefined value is returned if content was never loaded yet, or is being loaded.
+     * Otherwise a bool value is returned.
+     */
+    QVariant hasContent() const;
+
+    /**
      * Data access methods.
      * Return *visible buckets* - buckets intersecting with the current time window.
      */
@@ -233,6 +241,7 @@ signals:
     void expirationTimeChanged();
     void minimumStackDurationChanged();
     void objectChunksChanged();
+    void hasContentChanged();
 
     /**
      * Structure change notifications.

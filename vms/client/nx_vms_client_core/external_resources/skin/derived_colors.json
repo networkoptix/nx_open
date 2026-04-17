@@ -368,6 +368,7 @@
                 "plusMoreBackground": "dark13",
                 "plusMoreText": "light10"
             }
-        }
+        },
+        "noContentPlaceholder": "dark10"
     }
 }

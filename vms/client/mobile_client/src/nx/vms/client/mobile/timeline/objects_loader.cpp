@@ -21,6 +21,9 @@
 #include <nx/vms/client/core/timeline/backends/caching_proxy_backend.h>
 #include <recording/time_period.h>
 
+#include "bookmark_content_watcher.h"
+#include "chunk_content_watcher.h"
+
 #include "analytics_loader_delegate.h"
 #include "bookmark_loader_delegate.h"
 #include "motion_loader_delegate.h"
@@ -97,6 +100,8 @@ struct ObjectsLoader::Private
     BackendPtr<ObjectTrackList> analyticsBackend;
     BackendPtr<QnCameraBookmarkList> bookmarksBackend;
     std::unique_ptr<AbstractLoaderDelegate> loaderDelegate;
+
+    std::unique_ptr<AbstractContentWatcher> contentWatcher;
 
     QTimer pollingTimer;
     nx::utils::PendingOperation loadOp;
@@ -565,6 +570,39 @@ struct ObjectsLoader::Private
         }
     }
 
+    void initializeContentWatcher()
+    {
+        contentWatcher.reset();
+        if (!chunkProvider)
+            return;
+
+        switch (objectsType)
+        {
+            case ObjectsType::motion:
+                contentWatcher.reset(new ChunkContentWatcher(chunkProvider,
+                    Qn::TimePeriodContent::MotionContent));
+                break;
+
+            case ObjectsType::bookmarks:
+                contentWatcher.reset(new BookmarkContentWatcher(chunkProvider));
+                break;
+
+            case ObjectsType::analytics:
+                contentWatcher.reset(new ChunkContentWatcher(chunkProvider,
+                    Qn::TimePeriodContent::AnalyticsContent));
+                break;
+        }
+
+        if (!NX_ASSERT(contentWatcher))
+            return;
+
+        connect(contentWatcher.get(), &AbstractContentWatcher::hasContentChanged,
+            q, &ObjectsLoader::hasContentChanged);
+
+        connect(q, &ObjectsLoader::objectChunksChanged, contentWatcher.get(),
+            [this]() { contentWatcher->setForced(!objectChunks.empty()); });
+    }
+
     void setBottomBound(std::optional<milliseconds> value)
     {
         if (bottomBound == value)
@@ -653,7 +691,9 @@ void ObjectsLoader::setObjectsType(ObjectsType value)
     d->clear();
     d->objectsType = value;
     d->initializeLoaderDelegate();
+    d->initializeContentWatcher();
     emit objectsTypeChanged();
+    emit hasContentChanged();
 
     d->handleWindowChanged();
 }
@@ -678,7 +718,9 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
     d->analyticsBackend.reset();
     d->bookmarksBackend.reset();
     d->initializeLoaderDelegate();
+    d->initializeContentWatcher();
     emit chunkProviderChanged();
+    emit hasContentChanged();
 
     d->bottomBound = std::nullopt;
     emit bottomBoundChanged();
@@ -963,6 +1005,18 @@ void ObjectsLoader::setMinimumStackDurationMs(qint64 value)
 QnTimePeriodList ObjectsLoader::objectChunks() const
 {
     return d->objectChunks;
+}
+
+QVariant ObjectsLoader::hasContent() const
+{
+    // There can be a situation when we loaded some new bookmarks, but `contentWatcher` hasn't
+    // updated yet. To avoid reporting no content at the same time when some content is shown,
+    // we also check for `objectChunks` here.
+    if (!d->objectChunks.empty())
+        return true;
+
+    const auto result = d->contentWatcher ? d->contentWatcher->hasContent() : std::nullopt;
+    return result ? QVariant::fromValue(*result) : QVariant{};
 }
 
 int ObjectsLoader::count() const

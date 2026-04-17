@@ -395,23 +395,30 @@ const QnTimePeriodList& ChunkProvider::periods(Qn::TimePeriodContent type) const
     return d->providers.at(type)->periods();
 }
 
+bool ChunkProvider::isLoadingContent(Qn::TimePeriodContent type) const
+{
+    return d->providers.at(type)->loading();
+}
+
 bool ChunkProvider::isLoading() const
 {
-    return d->providers.at(Qn::RecordingContent)->loading();
+    return isLoadingContent(Qn::RecordingContent);
 }
 
 bool ChunkProvider::isLoadingMotion() const
 {
-    return d->providers.at(Qn::MotionContent)->loading();
+    return isLoadingContent(Qn::MotionContent);
 }
 
 bool ChunkProvider::isLoadingAnalytics() const
 {
-    return d->providers.at(Qn::AnalyticsContent)->loading();
+    return isLoadingContent(Qn::AnalyticsContent);
 }
 
 void ChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
 {
+    emit loadingContentChanged(contentType);
+
     switch (contentType)
     {
         case Qn::RecordingContent:

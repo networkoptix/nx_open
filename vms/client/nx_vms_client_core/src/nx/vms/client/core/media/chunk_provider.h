@@ -50,6 +50,7 @@ public:
     bool isLoading() const;
     bool isLoadingMotion() const;
     bool isLoadingAnalytics() const;
+    bool isLoadingContent(Qn::TimePeriodContent type) const;
 
     Q_INVOKABLE qint64 closestChunkEndMs(qint64 position, bool forward) const;
     Q_INVOKABLE void update();
@@ -64,6 +65,7 @@ signals:
     void loadingChanged();
     void loadingMotionChanged();
     void loadingAnalyticsChanged();
+    void loadingContentChanged(Qn::TimePeriodContent type);
     void motionFilterChanged();
     void analyticsRoiChanged();
 

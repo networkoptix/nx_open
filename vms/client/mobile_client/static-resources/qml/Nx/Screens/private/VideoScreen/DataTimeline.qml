@@ -459,6 +459,18 @@ Rectangle
             }
         }
 
+        Timeline.Placeholder
+        {
+            id: noContentPlaceholder
+
+            anchors.fill: objects
+            anchors.rightMargin: recordingChunks.width
+            anchors.bottomMargin: header.height
+
+            active: !(objects.hasContent ?? true)
+            objectsType: timeline.objectsType
+        }
+
         // Archive chunks.
         Timeline.ChunkBar
         {
