@@ -116,7 +116,7 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Олдсонгүй.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Зөвшөөрөлгүй.</translation>
     </message>
     <message>
       <source>Session expired.</source>
