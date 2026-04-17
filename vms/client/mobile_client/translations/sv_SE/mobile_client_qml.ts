@@ -124,10 +124,6 @@
       <translation>Kamerainställningar</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Information</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Ljud</translation>
     </message>
@@ -1568,6 +1564,10 @@
     <message>
       <source>Export...</source>
       <translation>Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

@@ -124,10 +124,6 @@
       <translation>攝影機設定</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>資訊</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>音訊</translation>
     </message>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation>匯出...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

@@ -124,10 +124,6 @@
       <translation>הגדרות מצלמה</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>מידע</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>אודיו</translation>
     </message>
@@ -1570,6 +1566,10 @@
     <message>
       <source>Export...</source>
       <translation type="unfinished">Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

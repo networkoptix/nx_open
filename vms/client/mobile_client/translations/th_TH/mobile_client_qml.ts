@@ -124,10 +124,6 @@
       <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>ข้อมูล</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>เสียง</translation>
     </message>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation type="unfinished">Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

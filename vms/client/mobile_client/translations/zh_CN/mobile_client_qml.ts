@@ -124,10 +124,6 @@
       <translation>摄像机设置</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>信息</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>音频</translation>
     </message>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation type="unfinished">Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

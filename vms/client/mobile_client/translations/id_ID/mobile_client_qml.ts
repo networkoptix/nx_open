@@ -124,10 +124,6 @@
       <translation>Pengaturan Kamera</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Informasi</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Audio</translation>
     </message>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation>Ekspor...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

@@ -124,10 +124,6 @@
       <translation>カメラ設定</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>情報</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>音声</translation>
     </message>
@@ -583,11 +579,11 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
-      <translation type="unfinished">-5 sec</translation>
+      <translation>-5秒</translation>
     </message>
     <message>
       <source>+5 sec</source>
-      <translation type="unfinished">+5 sec</translation>
+      <translation>+5秒</translation>
     </message>
   </context>
   <context>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation>エクスポート...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

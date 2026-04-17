@@ -124,10 +124,6 @@
       <translation>Cài đặt Camera</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Thông tin</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Âm thanh</translation>
     </message>
@@ -1567,6 +1563,10 @@
     <message>
       <source>Export...</source>
       <translation>Xuất...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

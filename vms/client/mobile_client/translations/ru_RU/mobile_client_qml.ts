@@ -124,10 +124,6 @@
       <translation>Настройки камеры</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Информация</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Аудио</translation>
     </message>
@@ -1570,6 +1566,10 @@
     <message>
       <source>Export...</source>
       <translation type="unfinished">Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

@@ -124,10 +124,6 @@
       <translation>Kamerainnstillinger</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Informasjon</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Lyd</translation>
     </message>
@@ -1568,6 +1564,10 @@
     <message>
       <source>Export...</source>
       <translation type="unfinished">Export...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>

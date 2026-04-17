@@ -124,10 +124,6 @@
       <translation>Axustes da cámara</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Información</translation>
-    </message>
-    <message>
       <source>Audio</source>
       <translation>Audio</translation>
     </message>
@@ -584,11 +580,11 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
-      <translation type="unfinished">-5 sec</translation>
+      <translation>-5 segundos</translation>
     </message>
     <message>
       <source>+5 sec</source>
-      <translation type="unfinished">+5 sec</translation>
+      <translation>+5 segundos</translation>
     </message>
   </context>
   <context>
@@ -1568,6 +1564,10 @@
     <message>
       <source>Export...</source>
       <translation>Exportar...</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation type="unfinished">Information</translation>
     </message>
   </context>
   <context>
