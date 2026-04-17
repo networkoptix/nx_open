@@ -264,7 +264,7 @@ void DeviceSearcher::dispatchDiscoverPackets()
 {
     for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        const auto sock = getSockByIntf(address);
+        const std::shared_ptr<AbstractDatagramSocket> sock = getSockByIntf(address);
         if (!sock)
             continue;
 
@@ -326,7 +326,7 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     return oldSock;
 }
 
-AbstractDatagramSocket* DeviceSearcher::getSockByIntf(
+std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
     const nx::network::HostAddress& address)
 {
 
@@ -362,13 +362,13 @@ AbstractDatagramSocket* DeviceSearcher::getSockByIntf(
         p = m_socketList.emplace(QString::fromStdString(localAddress), SocketReadCtx());
     }
     if (!p.second)
-        return p.first->second.sock.get();
+        return p.first->second.sock;
 
     //creating new socket
 
     using namespace std::placeholders;
 
-    p.first->second.sock = std::make_unique<UDPSocket>();
+    p.first->second.sock = std::make_shared<UDPSocket>();
     auto sockPtr = p.first->second.sock.get();
     p.first->second.buf.reserve(kReadBufferCapacity);
     if (!sockPtr->setNonBlockingMode(true) ||
@@ -393,7 +393,7 @@ AbstractDatagramSocket* DeviceSearcher::getSockByIntf(
                 sockPtr, _1, &p.first->second.buf, _2));
     }
 
-    return sockPtr;
+    return p.first->second.sock;
 }
 
 void DeviceSearcher::startFetchDeviceXml(

@@ -126,7 +126,7 @@ private:
     class SocketReadCtx
     {
     public:
-        std::unique_ptr<AbstractDatagramSocket> sock;
+        std::shared_ptr<AbstractDatagramSocket> sock;
         nx::Buffer buf;
     };
 
@@ -162,7 +162,7 @@ private:
     void dispatchDiscoverPackets();
     bool needToUpdateReceiveSocket() const;
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
-    AbstractDatagramSocket* getSockByIntf(const HostAddress& address);
+    std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const HostAddress& address);
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
         const nx::Url& descriptionUrl,
