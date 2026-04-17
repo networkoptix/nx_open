@@ -104,7 +104,7 @@ public:
                     ? kMaximumInteractiveColumnWidth
                     : kMaximumColumnWidth;
 
-                return QSize(std::min(size.width(), maximumWidth), size.height());
+                return QSize(std::min(size.width(), maximumWidth), style::Metrics::kViewRowHeight);
             }
         }
     }
