@@ -2,15 +2,12 @@
 
 #include "resource_tree_model_index_condition.h"
 
-#include <client/client_globals.h>
 #include <core/resource/resource.h>
-#include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/core/client_core_globals.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 namespace test {
 namespace index_condition {
-
-using namespace nx::vms::client::core;
 
 Condition topLevelNode()
 {
@@ -244,32 +241,6 @@ Condition nodeTypeDataMatch(ResourceTree::NodeType nodeType)
     return dataMatch(core::NodeTypeRole, QVariant::fromValue(nodeType));
 }
 
-Condition mimeDataContainsResource(const QnResourcePtr& resource)
-{
-    return
-        [resource](const QModelIndex& index)
-        {
-            if (!index.isValid() || resource.isNull() || !resource->resourcePool())
-                return false;
-
-            const auto mimeData = MimeData(index.model()->mimeData({index}));
-            return mimeData.resources().contains(resource);
-        };
-}
-
-Condition mimeDataContainsEntity(const nx::Uuid& entityId)
-{
-    return
-        [entityId](const QModelIndex& index)
-        {
-            if (!index.isValid())
-                return false;
-
-            const auto mimeData = MimeData(index.model()->mimeData({index}));
-            return mimeData.entities().contains(entityId);
-    };
-}
-
 Condition serverIconTypeCondition()
 {
     return iconTypeMatch(ResourceIconCache::Server);
@@ -354,4 +325,4 @@ Condition non(Condition paramCondition)
 
 } // namespace index_condition
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

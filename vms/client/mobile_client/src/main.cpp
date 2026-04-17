@@ -385,7 +385,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     initializeNetworkLogging(); //< Should be initialized before ApplicationContext.
 
     const auto context = std::make_unique<mobile::ApplicationContext>(
-        startupParams, std::move(settings));
+        startupParams, std::move(settings), mobile::ApplicationContext::Mode::mobileClient);
 
     if (!loggingIsInitialized)
     {

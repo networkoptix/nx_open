@@ -4,7 +4,6 @@
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/mobile/window_context_aware.h>
 
 Q_MOC_INCLUDE("nx/vms/client/core/event_search/models/event_search_model_adapter.h")
 Q_MOC_INCLUDE("nx/vms/client/core/two_way_audio/two_way_audio_controller.h")
@@ -33,8 +32,7 @@ class MediaDownloadManager;
 class SessionManager;
 class WindowContext;
 
-class SystemContext: public core::SystemContext,
-    public WindowContextAware
+class SystemContext: public core::SystemContext
 {
     Q_OBJECT
 
@@ -57,8 +55,7 @@ public:
     /**
      * @see nx::vms::client::core::SystemContext
      */
-    SystemContext(WindowContext* context,
-        Mode mode,
+    SystemContext(Mode mode,
         nx::Uuid peerId,
         QObject* parent = nullptr);
 

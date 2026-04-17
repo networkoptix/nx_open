@@ -22,8 +22,6 @@ public:
 
     SystemContext* systemContext() const;
 
-    WindowContext* windowContext() const;
-
     QnAvailableCamerasWatcher* availableCamerasWatcher() const;
 
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;

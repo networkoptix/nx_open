@@ -9,6 +9,7 @@
 #include <nx/branding.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
+#include <nx/vms/client/desktop/resource/server.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/test_support/message_processor_mock.h>
 
@@ -44,11 +45,18 @@ MessageProcessorMock* SystemContextBasedTest::createMessageProcessor()
     return messageProcessor;
 }
 
-QnLayoutResourcePtr SystemContextBasedTest::createLayout()
+QnLayoutResourcePtr SystemContextBasedTest::createLayout() const
 {
     core::LayoutResourcePtr layout(new core::LayoutResource());
     layout->setIdUnsafe(nx::Uuid::createUuid());
     return layout;
+}
+
+QnMediaServerResourcePtr SystemContextBasedTest::createServer(const nx::Uuid& id) const
+{
+    ServerResourcePtr server(new ServerResource());
+    server->setIdUnsafe(id);
+    return server;
 }
 
 void SystemContextBasedTest::initAppContext(ApplicationContext::Features features)

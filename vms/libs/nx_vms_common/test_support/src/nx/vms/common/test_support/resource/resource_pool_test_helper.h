@@ -27,8 +27,12 @@ public:
         std::vector<nx::Uuid> data;
     };
 
+    static constexpr auto kTestServerName = "server";
     static constexpr auto kTestUserName = "user";
     static constexpr auto kTestUserName2 = "user_2";
+
+    QnResourcePoolTestHelper(nx::vms::common::SystemContext* context);
+    virtual ~QnResourcePoolTestHelper() override;
 
     static QnUserResourcePtr createUser(
         Ids parentGroupIds,
@@ -37,6 +41,9 @@ public:
         GlobalPermissions globalPermissions = GlobalPermission::none,
         const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {},
         const QString& ldapDn = "");
+
+    QnUserResourcePtr addUser(const QString& name,
+        const std::vector<nx::Uuid>& groupIds = {}) const;
 
     QnUserResourcePtr addUser(
         Ids parentGroupIds,
@@ -52,14 +59,44 @@ public:
         GlobalPermissions globalPermissions = GlobalPermission::none,
         const std::map<nx::Uuid, nx::vms::api::AccessRights>& resourceAccessRights = {});
 
-    virtual QnLayoutResourcePtr createLayout();
+    virtual QnMediaServerResourcePtr createServer(
+        const nx::Uuid& id = nx::Uuid::createUuid()) const;
+
+    QnMediaServerResourcePtr addServer(
+        const QString& name = kTestServerName,
+        const nx::Uuid& id = nx::Uuid::createUuid()) const;
+
+    QnMediaServerResourcePtr addEdgeServer(const QString& name, const QString& address) const;
+
+    virtual QnLayoutResourcePtr createLayout() const;
+
     QnLayoutResourcePtr addLayout();
+    QnLayoutResourcePtr addLayout(
+        const QString& name,
+        const nx::Uuid& parentId = nx::Uuid()) const;
+
     nx::Uuid addToLayout(const QnLayoutResourcePtr& layout, const QnResourcePtr& resource);
+    void addToLayout(const QnLayoutResourcePtr& layout, const QnResourceList& resources) const;
 
     static constexpr auto kUseDefaultLicense = Qn::LC_Count;
     static nx::CameraResourceStubPtr createCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
     nx::CameraResourceStubPtr addCamera(Qn::LicenseType licenseType = kUseDefaultLicense);
     std::vector<nx::CameraResourceStubPtr> addCameras(size_t count);
+
+    nx::CameraResourceStubPtr addCamera(
+        const QString& name,
+        const nx::Uuid& parentId = nx::Uuid(),
+        const QString& hostAddress = QString()) const;
+    nx::CameraResourceStubPtr addEdgeCamera(
+        const QString& name, const QnMediaServerResourcePtr& edgeServer) const;
+    nx::CameraResourceStubPtr addVirtualCamera(const QString& name,
+        const nx::Uuid& parentId = nx::Uuid()) const;
+    nx::CameraResourceStubPtr addIOModule(const QString& name,
+        const nx::Uuid& parentId = nx::Uuid()) const;
+    nx::CameraResourceStubPtr addRecorderCamera(const QString& name,
+        const QString& groupId, const nx::Uuid& parentId = nx::Uuid()) const;
+    nx::CameraResourceStubPtr addMultisensorSubCamera(const QString& name,
+        const QString& groupId, const nx::Uuid& parentId = nx::Uuid()) const;
 
     nx::CameraResourceStubPtr createDesktopCamera(const QnUserResourcePtr& user);
     nx::CameraResourceStubPtr addDesktopCamera(const QnUserResourcePtr& user);
@@ -72,6 +109,30 @@ public:
 
     QnWebPageResourcePtr addWebPage();
 
+    void setVideoWallScreenRuntimeStatus(
+        const QnVideoWallResourcePtr& videoWall,
+        const QnVideoWallItem& videoWallScreen,
+        bool isOnline,
+        const nx::Uuid& controlledBy = nx::Uuid());
+
+    void setupAccessToResourceForUser(
+        const QnUserResourcePtr& user,
+        const QnResourcePtr& resource,
+        bool isAccessible) const;
+
+    void setupAccessToResourceForUser(
+        const QnUserResourcePtr& user,
+        const QnResourcePtr& resource,
+        nx::vms::api::AccessRights accessRights) const;
+
+    void setupAccessToObjectForUser(
+        const QnUserResourcePtr& user,
+        const nx::Uuid& resourceOrGroupId,
+        nx::vms::api::AccessRights accessRights) const;
+
+    void setupAllMediaAccess(
+        const QnUserResourcePtr& user, nx::vms::api::AccessRights accessRights) const;
+
     QnVideoWallResourcePtr createVideoWall();
     QnVideoWallResourcePtr addVideoWall();
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall);
@@ -79,10 +140,6 @@ public:
         const QnLayoutResourcePtr& itemLayout);
     bool changeVideoWallItem(const QnVideoWallResourcePtr& videoWall, const nx::Uuid& itemId,
         const QnLayoutResourcePtr& itemLayout);
-
-    static QnMediaServerResourcePtr createServer(nx::Uuid id = nx::Uuid::createUuid());
-    QnMediaServerResourcePtr addServer(
-        nx::vms::api::ServerFlags additionalFlags = nx::vms::api::SF_None);
 
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 

@@ -131,9 +131,9 @@ bool ShareBookmarkBackend::Private::updateShareParams(
 
 void ShareBookmarkBackend::Private::showErrorMessage() const
 {
-    if (const auto context = mobileSystemContext())
+    if (const auto applicationContext = appContext())
     {
-        if (const auto windowContext = context->windowContext())
+        if (const auto windowContext = applicationContext->mainWindowContext())
         {
             emit windowContext->deprecatedUiController()->genericError(
                 ShareBookmarkBackend::tr("Error"),

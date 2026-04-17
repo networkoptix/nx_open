@@ -1,32 +1,263 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/core/client_core_globals.h>
+#include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_extra_status.h>
+#include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
-#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/core/test_utils/resource_tree_model_index_condition.h>
 
 #include "resource_tree_model_test_fixture.h"
 
 using namespace nx::vms::api;
 using namespace nx::vms::client::core;
-
-namespace nx::vms::client::desktop {
-namespace test {
-
-using namespace core::test::index_condition;
+using namespace nx::vms::client::core::test::index_condition;
 using nx::vms::client::core::ResourceTree::NodeType;
+
+namespace nx::vms::client::mobile {
+namespace test {
 
 // String constants.
 static constexpr auto kUniqueCameraName = "unique_camera_name";
 static constexpr auto kUniqueGroupName = "unique_group_name";
-static constexpr auto kRenamedCameraName = "renamed_camera_name";
+static constexpr auto kUniqueLayoutName = "unique_layout_name";
+
+static constexpr auto kCamerasAndDevicesName = "Cameras & Devices";
+static constexpr auto kLayoutsName = "Layouts";
+static constexpr auto kAllDevicesName = "All Devices";
 
 // Predefined conditions.
 static const auto kUniqueCameraNameCondition = displayFullMatch(kUniqueCameraName);
 static const auto kUniqueGroupNameCondition = displayFullMatch(kUniqueGroupName);
+static const auto kUniqueLayoutNameCondition = displayFullMatch(kUniqueLayoutName);
+
+static const auto kCamerasAndDevicesNameCondition = displayFullMatch(kCamerasAndDevicesName);
+static const auto kLayoutsNameCondition = displayFullMatch(kLayoutsName);
+static const auto kAllDevicesNameCondition = displayFullMatch(kAllDevicesName);
+
+static const auto kCamerasAndDevicesNodeCondition = allOf(
+    topLevelNode(),
+    kCamerasAndDevicesNameCondition);
+
+static const auto kLayoutsNodeCondition = allOf(
+    topLevelNode(),
+    kLayoutsNameCondition);
+
+static const auto kAllDevicesNodeCondition = allOf(
+    directChildOf(kLayoutsNodeCondition),
+    kAllDevicesNameCondition);
+
+TEST_F(ResourceTreeModelTest, emptyTreeHasTwoTopLevelNodes)
+{
+    // When user is logged in.
+    loginAsPowerUser("power_user");
+
+    // Then there are two rows in the resource tree.
+    ASSERT_EQ(model()->rowCount(), 2);
+
+    // Which are "Cameras & Devices" and "Layouts" groups.
+    ASSERT_TRUE(onlyOneMatches(kCamerasAndDevicesNodeCondition));
+    ASSERT_TRUE(onlyOneMatches(kLayoutsNodeCondition));
+}
+
+TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
+{
+    // When user is logged in.
+    loginAsAdministrator("administrator");
+
+    // Expected top-level nodes order.
+    std::vector<QString> referenceOrder = {
+        kLayoutsName,
+        kCamerasAndDevicesName};
+
+    // Check tree.
+    ASSERT_EQ(
+        transformToDisplayStrings(allMatchingIndexes(topLevelNode())),
+        referenceOrder);
+}
+
+TEST_F(ResourceTreeModelTest, camerasAndDevicesNodeExcludedFromSearch)
+{
+    // When user is logged in.
+    loginAsAdministrator("administrator");
+
+    // When search query that matches "Cameras & Devices" top level node display text is entered.
+    setSearchString(kCamerasAndDevicesName);
+
+    // Then nothing displayed in the resource tree since there are no matching resources.
+    ASSERT_EQ(model()->rowCount(), 0);
+}
+
+TEST_F(ResourceTreeModelTest, layoutsNodeExcludedFromSearch)
+{
+    // When user is logged in.
+    loginAsAdministrator("administrator");
+
+    // When search query that matches "Layouts" top level node display text is entered.
+    setSearchString(kLayoutsName);
+
+    // Then nothing displayed in the resource tree since there are no matching resources.
+    ASSERT_EQ(model()->rowCount(), 0);
+}
+
+TEST_F(ResourceTreeModelTest, allDevicesNodeIsChildOfLayoutsNode)
+{
+    // When user is logged in.
+    loginAsPowerUser("power_user");
+
+    // Then there is "All Devices" node in the Resource tree.
+    auto allDevicesIndex = uniqueMatchingIndex(kAllDevicesNameCondition);
+
+    // Which is child of "Layouts" group.
+    ASSERT_TRUE(directChildOf(kLayoutsNodeCondition)(allDevicesIndex));
+}
+
+TEST_F(ResourceTreeModelTest, allDevicesNodeIcon)
+{
+    // When user is logged in.
+    loginAsPowerUser("power_user");
+
+    // Then there is "All Devices" node in the Resource tree.
+    auto allDevicesIndex = uniqueMatchingIndex(kAllDevicesNodeCondition);
+
+    // Which has cameras icon type.
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Cameras)(allDevicesIndex));
+}
+
+TEST_F(ResourceTreeModelTest, allDevicesNodeData)
+{
+    // When user is logged in.
+    loginAsPowerUser("power_user");
+
+    // Then there is "All Devices" node in the Resource tree.
+    auto allDevicesIndex = uniqueMatchingIndex(kAllDevicesNodeCondition);
+
+    // Which has correspondent node type.
+    ASSERT_TRUE(nodeTypeDataMatch(NodeType::allDevices)(allDevicesIndex));
+}
+
+TEST_F(ResourceTreeModelTest, allDevicesNodeIsPinnedToTop)
+{
+    // When user is logged in.
+    auto user = loginAsPowerUser("power_user");
+
+    // Given two layouts on the server.
+    const auto server = addServer("server");
+    addLayout("z_layout", user->getId());
+    addLayout("0_layout", user->getId());
+
+    // Expected order of "Layouts" children.
+    std::vector<QString> referenceOrder = {
+        kAllDevicesName,
+        "0_layout",
+        "z_layout"};
+
+    ASSERT_EQ(
+        transformToDisplayStrings(allMatchingIndexes(directChildOf(kLayoutsNodeCondition))),
+        referenceOrder);
+}
+
+TEST_F(ResourceTreeModelTest, allDevicesNodeIsSearchable)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When layout resource with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // When search query that matches this layout is entered.
+    setSearchString(kUniqueLayoutName);
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(kUniqueLayoutNameCondition));
+
+    // Then there is no "All Devices" item in the resource three.
+    ASSERT_TRUE(noneMatches(kAllDevicesNameCondition));
+
+    // When search query that matches "All Devices" node is entered.
+    setSearchString(kAllDevicesName);
+
+    // Then "All Devices" is shown in the resource tree as usual.
+    ASSERT_TRUE(onlyOneMatches(kAllDevicesNameCondition));
+    ASSERT_TRUE(onlyOneMatches(kAllDevicesNodeCondition));
+}
+
+TEST_F(ResourceTreeModelTest, customGroupHasNoChildrenIfTheyDontMatchSearch)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // When camera within a group is added to the server.
+    const auto server = addServer("server");
+    const auto camera = addCamera("camera", server->getId());
+    core::entity_resource_tree::resource_grouping::setResourceCustomGroupId(camera, "group");
+
+    // When search string that matches group name but not camera name applied.
+    setSearchString("group");
+
+    // Then matching group is displayed in the resource tree with no children.
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        displayFullMatch("group"),
+        hasNoChildren())));
+    ASSERT_TRUE(noneMatches(displayFullMatch("camera")));
+}
+
+TEST_F(ResourceTreeModelTest, recorderGroupHasNoChildrenIfTheyDontMatchSearch)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // When multisensor camera added to the server.
+    const auto server = addServer("server");
+    const auto camera = addRecorderCamera("camera", "recorder", server->getId());
+    camera->setDefaultGroupName("recorder");
+
+    // When search string that matches multisensor group name but not camera name applied.
+    setSearchString("recorder");
+
+    // Then matching multisensor group displayed in the resource tree with no children.
+    ASSERT_TRUE(onlyOneMatches(allOf(
+        displayFullMatch("recorder"),
+        hasNoChildren())));
+    ASSERT_TRUE(noneMatches(displayFullMatch("camera")));
+}
+
+TEST_F(ResourceTreeModelTest, searchStringMatchesNoneOfCameras)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // Given two cameras on the server.
+    const auto server = addServer("server");
+    addCamera("camera_1", server->getId());
+    addCamera("camera_2", server->getId());
+
+    // When search string that matches none of camera names applied.
+    setSearchString("camera_3");
+
+    // Then no camera items appear in the resource tree.
+    ASSERT_TRUE(noneMatches(cameraIconTypeCondition()));
+}
+
+TEST_F(ResourceTreeModelTest, searchStringMatchesCamera)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // Given two cameras on the server.
+    const auto server = addServer("server");
+    addCamera("camera_1", server->getId());
+    addCamera("camera_2", server->getId());
+
+    // When search string that matches one of camera names applied.
+    setSearchString("camera_1");
+
+    // Then camera item appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch("camera_1")));
+}
 
 TEST_F(ResourceTreeModelTest, cameraAdds)
 {
@@ -62,6 +293,25 @@ TEST_F(ResourceTreeModelTest, cameraRemoves)
 
     // Then no more nodes with corresponding display text found in the resource tree.
     ASSERT_TRUE(noneMatches(kUniqueCameraNameCondition));
+}
+
+TEST_F(ResourceTreeModelTest, cameraRenames)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // When server is added to the resource pool.
+    const auto server = addServer("server");
+
+    // When camera with certain unique name is added to the server and then renamed.
+    const auto camera = addCamera("camera", server->getId());
+    camera->setName("renamed_camera");
+
+    // Then no nodes with original camera name appears in the resource tree.
+    ASSERT_TRUE(noneMatches(displayFullMatch("camera")));
+
+    // Then single node with new camera name appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch("renamed_camera")));
 }
 
 TEST_F(ResourceTreeModelTest, cameraIconType)
@@ -311,7 +561,7 @@ TEST_F(ResourceTreeModelTest, cameraBuggyExtraStatus)
     ASSERT_FALSE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::buggy)(cameraIndex));
 }
 
-TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
+TEST_F(ResourceTreeModelTest, cameraIsNonEditableByPowerUser)
 {
     // When user with power user permissions is logged in.
     loginAsPowerUser("power_user");
@@ -325,11 +575,11 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByAdmin)
     // Then exactly one camera node with corresponding display text appears in the tree.
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
-    // And it has editable flag.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(cameraIndex));
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(cameraIndex));
 }
 
-TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermissions)
+TEST_F(ResourceTreeModelTest, cameraIsNonEditableByCustomUserWithEditCamerasPermissions)
 {
     // When custom user with is logged in.
     const auto user = loginAsCustomUser("custom_user");
@@ -346,8 +596,8 @@ TEST_F(ResourceTreeModelTest, cameraIsEditableByCustomUserWithEditCamerasPermiss
     // Then exactly one camera node with corresponding display text appears in the tree.
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
-    // And it has editable flag.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(cameraIndex));
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, cameraIsNotEditableByPlainCustomUser)
@@ -389,7 +639,7 @@ TEST_F(ResourceTreeModelTest, cameraIsNotEditableByAdvancedViewer)
     ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(cameraIndex));
 }
 
-TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByAdmin)
+TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByAdmin)
 {
     // When user with power user permissions is logged in.
     loginAsPowerUser("power_user");
@@ -403,11 +653,11 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByAdmin)
     // Then exactly one recorder group node with corresponding display text appears in the tree.
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
-    // And it has editable flag.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(recorderIndex));
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(recorderIndex));
 }
 
-TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCamerasPermissions)
+TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByCustomUserWithEditCamerasPermissions)
 {
     // When custom user is logged in.
     const auto user = loginAsCustomUser("custom_user");
@@ -424,8 +674,8 @@ TEST_F(ResourceTreeModelTest, recorderGroupIsEditableByCustomUserWithEditCameras
     // Then exactly one recorder group node with corresponding display text appears in the tree.
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
-    // And it has editable flag.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsEditable)(recorderIndex));
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(recorderIndex));
 }
 
 TEST_F(ResourceTreeModelTest, recorderGroupIsNotEditableByPlainCustomUser)
@@ -548,49 +798,7 @@ TEST_F(ResourceTreeModelTest, twoCamerasRecorderGroupExtraStatus)
     ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera1Index));
 }
 
-TEST_F(ResourceTreeModelTest, twoCamerasOnTwoServersRecorderGroupsExtraStatus)
-{
-    // String constants
-    static constexpr auto kUniqueCameraName1 = "unique_camera_name_1";
-    static constexpr auto kUniqueCameraName2 = "unique_camera_name_2";
-
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When two servers are added to the resource pool.
-    const auto server1 = addServer("server_1");
-    const auto server2 = addServer("server_2");
-
-    // When two recorder cameras with different unique names is added to the different servers.
-    const auto camera1 = addRecorderCamera(kUniqueCameraName1, kUniqueGroupName, server1->getId());
-    const auto camera2 = addRecorderCamera(kUniqueCameraName2, kUniqueGroupName, server2->getId());
-
-    // Then two nodes with corresponding display texts appears in the resource tree.
-    const auto camera1Index = uniqueMatchingIndex(displayFullMatch(kUniqueCameraName1));
-    const auto camera2Index = uniqueMatchingIndex(displayFullMatch(kUniqueCameraName2));
-
-    // Then this nodes have different parents
-    ASSERT_TRUE(camera1Index.parent() != camera2Index.parent());
-
-    // When setLicenseUsed flag set true for the first recorder camera.
-    camera1->setScheduleEnabled(true);
-
-    // Then it provides scheduled extra status flag.
-    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(
-        camera1Index));
-
-    // As well as parent (recorder group) of the first recorder.
-    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::scheduled)(
-        camera1Index.parent()));
-
-    // Second recorder camera provides no extra status.
-    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera2Index));
-
-    // As well as parent (recorder group) of the second recorder.
-    ASSERT_TRUE(resourceExtraStatusFlagsMatch(ResourceExtraStatusFlag::empty)(camera2Index.parent()));
-}
-
-TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)
+TEST_F(ResourceTreeModelTest, cameraIsDisplayedForOnHiddenEdgeServer)
 {
     // When user with power user permissions is logged in.
     loginAsPowerUser("power_user");
@@ -609,128 +817,6 @@ TEST_F(ResourceTreeModelTest, cameraIsTopLevelNodeOnHiddenEdgeServer)
 
     // And that node have camera icon type.
     ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Camera)(cameraIndex));
-
-    // And that node is top level node.
-    ASSERT_TRUE(topLevelNode()(cameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, reducedEdgeCameraNodeType)
-{
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When edge server is added to the resource pool.
-    const auto server = addEdgeServer("server", "192.168.0.0");
-
-    // When edge camera with certain unique name is added to the server.
-    const auto camera = addEdgeCamera(kUniqueCameraName, server);
-
-    // When redundancy flag set to false.
-    server->setRedundancy(false);
-
-    // Then exactly one node with corresponding display text appears in the resource tree.
-    const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node have 'edge' node type.
-    ASSERT_TRUE(nodeTypeDataMatch(NodeType::edge)(cameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, expandedEdgeCameraNodeType)
-{
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When edge server is added to the resource pool.
-    const auto server = addEdgeServer("server", "192.168.0.0");
-
-    // When edge camera with certain unique name is added to the server.
-    const auto camera = addEdgeCamera(kUniqueCameraName, server);
-
-    // When redundancy flag set to true.
-    server->setRedundancy(true);
-
-    // Then exactly one camera node with corresponding display text appears in the resource tree.
-    const auto cameraIndex = uniqueMatchingIndex(allOf(
-        iconTypeMatch(ResourceIconCache::Camera),
-        kUniqueCameraNameCondition));
-
-    // And that node have 'resource' node type.
-    ASSERT_TRUE(nodeTypeDataMatch(NodeType::resource)(cameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, edgeServerWithVirtualCameraIsNotHidden)
-{
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When edge server is added to the resource pool.
-    const auto server = addEdgeServer("server", "192.168.0.0");
-
-    // When edge camera is added to the server.
-    const auto camera = addEdgeCamera("camera", server);
-
-    // When virtual camera with certain unique name is added to the server.
-    addVirtualCamera(kUniqueCameraName, server->getId());
-
-    // When redundancy flag set to false.
-    server->setRedundancy(false);
-
-    // Then exactly one node with corresponding display text appear in the resource tree.
-    const auto virtualCameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node have virtual camera icon type.
-    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VirtualCamera)(virtualCameraIndex));
-
-    // And that node is child of the server node.
-    ASSERT_TRUE(directChildOf(iconTypeMatch(ResourceIconCache::Server))(virtualCameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, virtualCameraOnExpandedEdgeServerIsChildOfServerNodeForAdmin)
-{
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When edge server is added to the resource pool.
-    const auto server = addEdgeServer("edge_server", "192.168.0.0");
-
-    // When camera resource is added to the server.
-    addEdgeCamera("edge_camera", server);
-
-    // When virtual camera with certain unique name is added to the server.
-    addVirtualCamera(kUniqueCameraName, server->getId());
-
-    // When redundancy flag set to true.
-    server->setRedundancy(true);
-
-    // Then exactly one node with corresponding display text appear in the resource tree.
-    const auto virtualCameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node have virtual camera icon type.
-    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::VirtualCamera)(virtualCameraIndex));
-
-    // And that node is child of server node.
-    ASSERT_TRUE(directChildOf(iconTypeMatch(ResourceIconCache::Server))(virtualCameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, cameraIsChildOfServerNodeForAdmin)
-{
-    // String constants.
-    static constexpr auto kUniqueServerName = "unique_server_name";
-
-    // When user with power user permissions is logged in.
-    loginAsPowerUser("power_user");
-
-    // When server with certain unique name is added to the resource pool.
-    const auto server = addServer(kUniqueServerName);
-
-    // When camera with certain unique name is added to the resource pool.
-    const auto camera = addCamera(kUniqueCameraName, server->getId());
-
-    // Then exactly one node with corresponding display text appear in the resource tree.
-    const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node is child of server node.
-    ASSERT_TRUE(directChildOf(displayFullMatch(kUniqueServerName))(cameraIndex));
 }
 
 TEST_F(ResourceTreeModelTest, recorderCameraIsChildOfRecorderNode)
@@ -854,60 +940,6 @@ TEST_F(ResourceTreeModelTest, subCameraIsChildOfMultisensorCameraNode)
     ASSERT_TRUE(directChildOf(kUniqueGroupNameCondition)(multisensorSubCameraIndex));
 }
 
-TEST_F(ResourceTreeModelTest, cameraHelpTopic)
-{
-    // When user is logged in.
-    loginAsPowerUser("power_user");
-
-    // When server is added to the resource pool.
-    const auto server = addServer("server");
-
-    // When camera with certain unique name is added to the server.
-    addCamera(kUniqueCameraName, server->getId());
-
-    // Then exactly one node with corresponding display text appears in the resource tree.
-    const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Camera)(cameraIndex));
-}
-
-TEST_F(ResourceTreeModelTest, ioModuleHelpTopic)
-{
-    // When user is logged in.
-    loginAsPowerUser("power_user");
-
-    // When server is added to the resource pool.
-    const auto server = addServer("server");
-
-    // When IO module with certain unique name is added to the server.
-    addIOModule(kUniqueCameraName, server->getId());
-
-    // Then exactly one node with corresponding display text appears in the resource tree.
-    const auto ioModuleIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
-
-    // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::IOModules)(ioModuleIndex));
-}
-
-TEST_F(ResourceTreeModelTest, recorderHelpTopic)
-{
-    // When user is logged in.
-    loginAsPowerUser("power_user");
-
-    // When server is added to the resource pool.
-    const auto server = addServer("server");
-
-    // When recorder with certain unique name is added to the server.
-    addRecorderCamera(kUniqueCameraName, kUniqueGroupName, server->getId());
-
-    // Then exactly one node with corresponding display text appears in the resource tree.
-    const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
-
-    // And that node provides certain help topic data.
-    ASSERT_TRUE(dataMatch(Qn::HelpTopicIdRole, HelpTopic::Id::MainWindow_Tree_Recorder)(recorderIndex));
-}
-
 TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
 {
     // When user with power user permissions is logged in.
@@ -925,32 +957,6 @@ TEST_F(ResourceTreeModelTest, cameraNodeProvidesResource)
     // And that node provides pointer to the camera resource.
     ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(camera))(
         cameraIndex));
-}
-
-// TODO: #vbreus setData() is no-op due to absence of menu::Manager instance
-// within QnResourceTreeModel instance.
-TEST_F(ResourceTreeModelTest, resourceEditActionAffectsTree)
-{
-    // When user is logged in.
-    loginAsPowerUser("power_user");
-
-    // When server is added to the resource pool.
-    const auto server = addServer("server");
-
-    // When camera with certain unique name is added to the server.
-    const auto camera = addCamera(kUniqueCameraName, server->getId());
-
-    // When camera is renamed.
-    camera->setName(kRenamedCameraName);
-
-    // Then camera resource have new name.
-    ASSERT_EQ(camera->getUserDefinedName(), kRenamedCameraName);
-
-    // Then exactly one node with new name appears in the model.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kRenamedCameraName)));
-
-    // And no nodes with initial display text left in the resource tree.
-    ASSERT_TRUE(noneMatches(displayFullMatch(kUniqueCameraName)));
 }
 
 TEST_F(ResourceTreeModelTest, recorderDisplayNameMapping)
@@ -1052,7 +1058,7 @@ TEST_F(ResourceTreeModelTest, multisensorCameraDisplayNameMapping)
             displayFullMatch(multisensorSubCamera->getUserDefinedGroupName()))));
 }
 
-TEST_F(ResourceTreeModelTest, cameraNodeIsDragEnabled)
+TEST_F(ResourceTreeModelTest, cameraNodeIsNotDragEnabled)
 {
     // When user is logged in.
     loginAsPowerUser("power_user");
@@ -1066,11 +1072,11 @@ TEST_F(ResourceTreeModelTest, cameraNodeIsDragEnabled)
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto cameraIndex = uniqueMatchingIndex(kUniqueCameraNameCondition);
 
-    // And that node is draggable.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsDragEnabled)(cameraIndex));
+    // And that node isn't draggable.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsDragEnabled)(cameraIndex));
 }
 
-TEST_F(ResourceTreeModelTest, recorderNodeIsDragEnabled)
+TEST_F(ResourceTreeModelTest, recorderNodeIsNotDragEnabled)
 {
     // When user is logged in.
     loginAsPowerUser("power_user");
@@ -1084,11 +1090,11 @@ TEST_F(ResourceTreeModelTest, recorderNodeIsDragEnabled)
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto recorderIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
-    // And that node is draggable.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsDragEnabled)(recorderIndex));
+    // And that node isn't draggable.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsDragEnabled)(recorderIndex));
 }
 
-TEST_F(ResourceTreeModelTest, multisensorCameraNodeIsDragEnabled)
+TEST_F(ResourceTreeModelTest, multisensorCameraNodeIsNotDragEnabled)
 {
     // When user is logged in.
     loginAsPowerUser("power_user");
@@ -1102,9 +1108,248 @@ TEST_F(ResourceTreeModelTest, multisensorCameraNodeIsDragEnabled)
     // Then exactly one node with corresponding display text appears in the resource tree.
     const auto multisensorCameraIndex = uniqueMatchingIndex(kUniqueGroupNameCondition);
 
-    // And that node is draggable.
-    ASSERT_TRUE(hasFlag(Qt::ItemIsDragEnabled)(multisensorCameraIndex));
+    // And that node isn't draggable.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsDragEnabled)(multisensorCameraIndex));
+}
+
+TEST_F(ResourceTreeModelTest, layoutAdds)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When layout resource with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(kUniqueLayoutNameCondition));
+}
+
+TEST_F(ResourceTreeModelTest, layoutIsChildOfLayoutsNode)
+{
+    // When user with power user permissions is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When layout resource with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then there is a single node that matches camera name found in the resource tree.
+    auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And it's child of "Layouts" node.
+    ASSERT_TRUE(directChildOf(kLayoutsNodeCondition)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, layoutsAreGroupedByType)
+{
+    // When user with power user permissions is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // Given shared and owned layouts.
+    addLayout("z_layout", user->getId());
+    addLayout("z_shared_layout", nx::Uuid());
+    addLayout("0_layout", user->getId());
+    addLayout("0_shared_layout", nx::Uuid());
+
+    // Expected order of layouts.
+    std::vector<QString> referenceOrder = {
+        kAllDevicesName,
+        "0_shared_layout",
+        "z_shared_layout",
+        "0_layout",
+        "z_layout"};
+
+    // Check tree.
+    ASSERT_EQ(
+        transformToDisplayStrings(allMatchingIndexes(directChildOf(kLayoutsNodeCondition))),
+        referenceOrder);
+}
+
+TEST_F(ResourceTreeModelTest, layoutRemoves)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(kUniqueLayoutNameCondition));
+
+    // When previously added layout is removed from resource pool.
+    resourcePool()->removeResource(layout);
+
+    // Then no more nodes with corresponding display text found in the Resource Tree.
+    ASSERT_TRUE(noneMatches(kUniqueLayoutNameCondition));
+}
+
+TEST_F(ResourceTreeModelTest, layoutRenames)
+{
+    // When user with power user permissions is logged in.
+    auto user = loginAsPowerUser("power_user");
+
+    // When camera with certain unique name is added to the server and then renamed.
+    const auto layout = addLayout("layout", user->getId());
+    layout->setName("renamed_layout");
+
+    // Then no nodes with original layout name appears in the resource tree.
+    ASSERT_TRUE(noneMatches(displayFullMatch("layout")));
+
+    // Then single node with new layout name appears in the resource tree.
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch("renamed_layout")));
+}
+
+TEST_F(ResourceTreeModelTest, layoutIconType)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When owned layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And that node have layout icon type.
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::Layout)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, sharedLayoutIconType)
+{
+    // When user is logged in.
+    loginAsPowerUser("power_user");
+
+    // When non-owned layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName);
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And that node have shared layout icon type.
+    ASSERT_TRUE(iconTypeMatch(ResourceIconCache::SharedLayout)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, lockedLayoutIconType)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When owned layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    const auto regularLayoutIconCondition = allOf(
+        iconStatusMatch(ResourceIconCache::Unknown), iconTypeMatch(ResourceIconCache::Layout));
+
+    // After layout locking...
+    layout->setLocked(true);
+
+    // That node have locked layout extra status icon.
+    ASSERT_TRUE(regularLayoutIconCondition(layoutIndex));
+    ASSERT_TRUE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::locked)(layoutIndex));
+
+    // After unlocking it back...
+    layout->setLocked(false);
+
+    // That node displays plain layout icon again.
+    ASSERT_TRUE(regularLayoutIconCondition(layoutIndex));
+    ASSERT_FALSE(hasResourceExtraStatusFlag(ResourceExtraStatusFlag::locked)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, ownLayoutIsNotEditableByAdmin)
+{
+    // When user with power user permissions is logged in.
+    const auto powerUser = loginAsPowerUser("power_user");
+
+    // When layout with unique name owned by user is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, powerUser->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByAdmin)
+{
+    // When user with power user permissions is logged in.
+    loginAsPowerUser("power_user");
+
+    // When shared layout with unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, nx::Uuid());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, sharedLayoutIsNotEditableByNonAdmin)
+{
+    // When user without power user permissions is logged in.
+    const auto liveViewerUser = loginAsLiveViewer("live_viever");
+
+    // When shared layout with unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, nx::Uuid());
+
+    // And access to the shared layout is granted to the logged in user.
+    setupAccessToResourceForUser(liveViewerUser, layout, true);
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, ownLayoutIsNotEditableByNonAdmin)
+{
+    // When user without power user permissions is logged in.
+    const auto liveViewerUser = loginAsLiveViewer("live_viever");
+
+    // When layout with unique name owned by mentioned user is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, liveViewerUser->getId());
+
+    // Then exactly one node with corresponding display texts appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And it doesn't have editable flag.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsEditable)(layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, layoutProvidesResource)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When owned layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And that node provides pointer to the layout resource.
+    ASSERT_TRUE(dataMatch(core::ResourceRole, QVariant::fromValue<QnResourcePtr>(layout))(
+        layoutIndex));
+}
+
+TEST_F(ResourceTreeModelTest, layoutNodeIsNotDragEnabled)
+{
+    // When user is logged in.
+    const auto user = loginAsPowerUser("power_user");
+
+    // When owned layout with certain unique name is added to the resource pool.
+    const auto layout = addLayout(kUniqueLayoutName, user->getId());
+
+    // Then exactly one node with corresponding display text appears in the resource tree.
+    const auto layoutIndex = uniqueMatchingIndex(kUniqueLayoutNameCondition);
+
+    // And that node isn't draggable.
+    ASSERT_FALSE(hasFlag(Qt::ItemIsDragEnabled)(layoutIndex));
 }
 
 } // namespace test
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::mobile

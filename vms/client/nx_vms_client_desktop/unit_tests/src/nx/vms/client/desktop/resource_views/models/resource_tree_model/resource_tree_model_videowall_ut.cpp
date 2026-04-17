@@ -14,7 +14,7 @@
 namespace nx::vms::client::desktop {
 namespace test {
 
-using namespace index_condition;
+using namespace core::test::index_condition;
 using core::ResourceIconCache;
 
 // String constants.

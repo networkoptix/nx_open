@@ -51,20 +51,25 @@
 #include <utils/mobile_app_info.h>
 
 #if defined(Q_OS_ANDROID)
-#include <nx/vms/client/mobile/push_notification/details/android/android_secure_storage.h>
-#include <nx/vms/client/mobile/push_notification/details/android/jni_helpers.h>
+    #include <nx/vms/client/mobile/push_notification/details/android/android_secure_storage.h>
+    #include <nx/vms/client/mobile/push_notification/details/android/jni_helpers.h>
 #elif defined(Q_OS_IOS)
-#include <ios/extension/utils/ios_secure_storage.h>
+    #include <ios/extension/utils/ios_secure_storage.h>
 #else
-#include <nx/vms/client/mobile/push_notification/details/desktop_secure_storage.h>
+    #include <nx/vms/client/mobile/push_notification/details/desktop_secure_storage.h>
 #endif
 
 namespace nx::vms::client::mobile {
 
 namespace {
 
-core::ApplicationContext::Features makeFeatures(QnMobileClientSettings* settings)
+core::ApplicationContext::Features makeFeatures(
+    QnMobileClientSettings* settings,
+    core::ApplicationContext::Mode mode)
 {
+    if (mode == core::ApplicationContext::Mode::unitTests)
+        return core::ApplicationContext::Features::none();
+
     auto result = core::ApplicationContext::Features::all();
     result.ignoreCustomization = settings->ignoreCustomization();
     return result;
@@ -86,6 +91,7 @@ std::unique_ptr<AbstractSecureStorage> createSecureStorage()
 struct ApplicationContext::Private
 {
     ApplicationContext* const q;
+    const Mode mode;
     const nx::Uuid peerId = nx::Uuid::createUuid();
     std::unique_ptr<QnMobileClientSettings> settings;
     std::unique_ptr<QnMobileClientResourceFactory> resourceFactory =
@@ -204,10 +210,17 @@ void ApplicationContext::Private::initializeMainWindowContext()
 
 void ApplicationContext::Private::initializeMainSystemContext()
 {
+    const auto systemContextMode = mode == Mode::unitTests
+        ? SystemContext::Mode::unitTests
+        : SystemContext::Mode::client;
+
     mainSystemContext.reset(appContext()->createSystemContext(
-        core::SystemContext::Mode::client)->as<SystemContext>());
+        systemContextMode)->as<SystemContext>());
 
     q->addSystemContext(mainSystemContext.get());
+
+    if (systemContextMode == SystemContext::Mode::unitTests)
+        return;
 
     connect(mainSystemContext->sessionTimeoutWatcher(),
         &core::RemoteSessionTimeoutWatcher::sessionExpired,
@@ -334,23 +347,34 @@ void ApplicationContext::Private::initializePushNotificationStorage()
 ApplicationContext::ApplicationContext(
     const QnMobileClientStartupParameters& startupParams,
     std::unique_ptr<QnMobileClientSettings> settings,
+    core::ApplicationContext::Mode mode,
     QObject* parent)
     :
-    base_type(Mode::mobileClient,
+    base_type(mode,
         Qn::SerializationFormat::json,
         api::PeerType::mobileClient,
-        makeFeatures(settings.get()),
+        makeFeatures(settings.get(), mode),
         settings->customCloudHost(),
         /*customExternalResourceFile*/ "mobile_client_external.dat",
         parent),
     d(new Private{
         .q = this,
+        .mode = mode,
         .settings = std::move(settings),
         .credentialsHelper = std::make_unique<detail::CredentialsHelper>(),
         .secureStorage = createSecureStorage()})
 {
+    if (mode == core::ApplicationContext::Mode::unitTests)
+    {
+        initializeMetaTypes();
+        resetResourceIconCache(new core::ResourceIconCache());
+        d->initializeMainSystemContext();
+        return;
+    }
+
     initializeNetworkModules(qnSettings->enableHolePunching());
     initializeMetaTypes();
+    initializeQmlTypes();
     d->initializeTranslations();
     resetResourceIconCache(new core::ResourceIconCache());
     d->initializeEngine(startupParams);
@@ -382,12 +406,11 @@ ApplicationContext::~ApplicationContext()
     if (auto networkModule = this->networkModule())
         networkModule->connectionFactory()->setUserInteractionDelegate({});
 
-    // Main system context does not exist in self-update mode.
-    if (d->mainSystemContext)
-    {
-        d->mainSystemContext->sessionManager()->resetSession();
-        removeSystemContext(d->mainSystemContext.release());
-    }
+    // Window context does not exist in unit tests mode.
+    if (d->windowContext)
+        d->windowContext->sessionManager()->resetSession();
+
+    removeSystemContext(d->mainSystemContext.release());
 
     // Currently, throughout the derived client code (desktop, mobile) it's assumed everywhere
     // that all system contexts are of that most derived level. I.e. desktop client code expects
@@ -413,7 +436,7 @@ ApplicationContext::~ApplicationContext()
 core::SystemContext* ApplicationContext::createSystemContext(
     SystemContext::Mode mode, QObject* parent)
 {
-    return new SystemContext(mainWindowContext(), mode, peerId(), parent);
+    return new SystemContext(mode, peerId(), parent);
 }
 
 nx::Uuid ApplicationContext::peerId() const

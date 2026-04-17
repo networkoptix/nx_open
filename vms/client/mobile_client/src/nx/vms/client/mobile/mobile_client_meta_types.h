@@ -5,5 +5,6 @@
 namespace nx::vms::client::mobile {
 
 void initializeMetaTypes();
+void initializeQmlTypes();
 
 } // namespace nx::vms::client::mobile

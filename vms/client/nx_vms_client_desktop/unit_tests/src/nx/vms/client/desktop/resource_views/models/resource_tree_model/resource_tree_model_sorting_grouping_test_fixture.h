@@ -16,9 +16,9 @@ public:
 
 protected:
     QStringList sortingSignificantStrings() const;
-    bool sortingIsAlphanumericCaseInsensitive(index_condition::Condition condition) const;
+    bool sortingIsAlphanumericCaseInsensitive(core::test::index_condition::Condition condition) const;
     bool sortingIsAlphanumericCaseInsensitive(const QModelIndexList& indexes) const;
-    bool checkGrouping(const std::vector<index_condition::Condition>& conditionsInOrder) const;
+    bool checkGrouping(const std::vector<core::test::index_condition::Condition>& conditionsInOrder) const;
 
 protected:
     void createAllKindsOfResources(const nx::Uuid& parentUserId) const;

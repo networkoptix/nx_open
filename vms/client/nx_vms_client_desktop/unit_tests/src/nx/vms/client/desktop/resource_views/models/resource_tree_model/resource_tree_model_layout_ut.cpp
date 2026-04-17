@@ -20,7 +20,7 @@
 namespace nx::vms::client::desktop {
 namespace test {
 
-using namespace index_condition;
+using namespace core::test::index_condition;
 using namespace nx::vms::api;
 using namespace nx::vms::client::core;
 
@@ -299,7 +299,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderAdmin)
     const auto layout = addIntercomLayout(kUniqueLayoutName, intercom->getId());
 
     // When non-power user is added to the resource pool.
-    const auto otherUser = addUser(kUniqueUserName, api::kAdvancedViewersGroupId);
+    const auto otherUser = addUser(kUniqueUserName, {api::kAdvancedViewersGroupId});
 
     // When intercom is not accessible for non-power user.
     // Then a single copy of intercom layout appears in the resource tree.
@@ -319,7 +319,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeInvisibleUnderUserWithNotEnoughP
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
     // When user with unique name and power user permissions is added to the resource pool.
-    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
+    const auto powerUser = addUser("power_user", {api::kPowerUsersGroupId});
 
     // When intercom camera is added to the resource pool.
     const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
@@ -344,7 +344,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeVisibleUnderUserWithPermissions)
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
     // When user with unique name and power user permissions is added to the resource pool.
-    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
+    const auto powerUser = addUser("power_user", {api::kPowerUsersGroupId});
 
     // When intercom camera is added to the resource pool.
     const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
@@ -369,7 +369,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutNodeNotVisibleUnderUser)
     static constexpr auto kIntercomCameraName = "intercom_camera_name";
 
     // When user with unique name and power user permissions is added to the resource pool.
-    const auto powerUser = addUser("power_user", api::kPowerUsersGroupId);
+    const auto powerUser = addUser("power_user", {api::kPowerUsersGroupId});
 
     // When intercom camera is added to the resource pool.
     const auto intercom = addIntercomCamera(kIntercomCameraName, powerUser->getId());
@@ -401,7 +401,7 @@ TEST_F(ResourceTreeModelTest, intercomLayoutLayoutTypeCheck)
     const auto layout = addIntercomLayout(kUniqueLayoutName);
 
     // When user is added to the resource pool.
-    auto user = addUser(kUserName, api::kPowerUsersGroupId);
+    auto user = addUser(kUserName, {api::kPowerUsersGroupId});
 
     // When user is the layout parent.
     layout->setParentId(user->getId());

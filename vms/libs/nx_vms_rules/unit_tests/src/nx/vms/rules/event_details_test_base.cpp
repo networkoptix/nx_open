@@ -60,12 +60,16 @@ void EventDetailsTestBase::SetUpTestSuite()
     Initializer initializer(sContext.get());
     initializer.initialize(sEngine.get());
 
-    auto server = QnResourcePoolTestHelper::createServer(kServerId);
+    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    server->setIdUnsafe(kServerId);
     server->setName(kServerName);
+    server->setUrl("http://localhost:7001");
     sContext->resourcePool()->addResource(server);
 
-    auto server2 = QnResourcePoolTestHelper::createServer(kServer2Id);
+    QnMediaServerResourcePtr server2(new QnMediaServerResource());
+    server2->setIdUnsafe(kServer2Id);
     server2->setName(kServer2Name);
+    server2->setUrl("http://localhost:7001");
     sContext->resourcePool()->addResource(server2);
 
     common::AnalyticsEngineResourcePtr engine1(new common::AnalyticsEngineResource());

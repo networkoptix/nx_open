@@ -11,13 +11,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/common/system_settings.h>
 
 #include "resource_tree_model_test_fixture.h"
 
 namespace nx::vms::client::desktop {
 namespace test {
 
-using namespace index_condition;
+using namespace core::test::index_condition;
 using core::ResourceIconCache;
 
 TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
@@ -27,7 +28,7 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
     static constexpr auto kUserName = "test_power_user";
 
     // Set up environment.
-    setSystemName(kSystemName);
+    systemContext()->globalSettings()->setSystemName(kSystemName);
     loginAsPowerUser(kUserName);
 
     // Check tree.
@@ -167,7 +168,7 @@ TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
     static constexpr auto kVideowallName = "videowall";
 
     // Set up environment.
-    setSystemName(kSystemName);
+    systemContext()->globalSettings()->setSystemName(kSystemName);
     const auto user = loginAsAdministrator(kUserName);
     const auto userId = user->getId();
     addServer(kServerName);

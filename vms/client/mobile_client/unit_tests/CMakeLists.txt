@@ -3,6 +3,7 @@
 nx_add_test(mobile_client_ut
     NO_WERROR
     PUBLIC_LIBS
+        nx_vms_common_test_support
         mobile_client_library
     PROJECT VMS
     SUITES

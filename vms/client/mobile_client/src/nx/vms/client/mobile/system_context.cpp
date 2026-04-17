@@ -59,9 +59,23 @@ struct SystemContext::Private
     std::unique_ptr<nx::client::mobile::EventRulesWatcher> eventRulesWatcher;
     std::unique_ptr<QnCameraThumbnailCache> thumbnailsCache;
 
-    const QPointer<QnCameraThumbnailProvider> thumbnailProvider{
-        appContext()->cameraThumbnailProvider()};
+    QnCameraThumbnailProvider* thumbnailProvider() const;
+    SessionManager* sessionManager() const;
 };
+
+QnCameraThumbnailProvider* SystemContext::Private::thumbnailProvider() const
+{
+    return appContext()->cameraThumbnailProvider();
+}
+
+SessionManager* SystemContext::Private::sessionManager() const
+{
+    // There is no window context in unit tests mode.
+    if (const auto windowContext = appContext()->mainWindowContext())
+        return windowContext->sessionManager();
+
+    return nullptr;
+}
 
 SystemContext* SystemContext::fromResource(const QnResource* resource)
 {
@@ -79,31 +93,32 @@ SystemContext* SystemContext::fromResource(const QnResourcePtr& resource)
     return dynamic_cast<SystemContext*>(resource->systemContext());
 }
 
-SystemContext::SystemContext(WindowContext* context,
-    Mode mode,
+SystemContext::SystemContext(Mode mode,
     nx::Uuid peerId,
     QObject* parent)
     :
     base_type(mode, peerId, parent),
-    WindowContextAware(context),
     d{new Private{}}
 {
     if (mode == Mode::cloudLayouts)
         return;
 
+    if (mode == Mode::unitTests)
+        return;
+
     d->thumbnailsCache = std::make_unique<QnCameraThumbnailCache>(this);
 
-    connect(sessionManager(), &SessionManager::stateChanged, this,
+    connect(d->sessionManager(), &SessionManager::stateChanged, this,
         [this]()
         {
-            if (sessionManager()->hasConnectedSession())
+            if (d->sessionManager()->hasConnectedSession())
                 d->thumbnailsCache->start();
             else
                 d->thumbnailsCache->stop();
         });
 
-    if (d->thumbnailProvider)
-        d->thumbnailProvider->addThumbnailCache(d->thumbnailsCache.get());
+    if (d->thumbnailProvider())
+        d->thumbnailProvider()->addThumbnailCache(d->thumbnailsCache.get());
 
     if (mode == Mode::crossSystem)
         return;
@@ -162,7 +177,7 @@ SystemContext::SystemContext(WindowContext* context,
 
     d->serverAudioConnectionWatcher =
         std::make_unique<nx::client::mobile::ServerAudioConnectionWatcher>(
-            windowContext()->sessionManager(), this);
+            d->sessionManager(), this);
 
     d->twoWayAudioController = std::make_unique<core::TwoWayAudioController>(this);
 
@@ -177,13 +192,13 @@ SystemContext::SystemContext(WindowContext* context,
     connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
     updateTimeMode();
 
-    connect(sessionManager(), &SessionManager::connectedServerVersionChanged, this,
+    connect(d->sessionManager(), &SessionManager::connectedServerVersionChanged, this,
         [this]()
         {
             static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
             const bool compatibilityMode =
-                sessionManager()->connectedServerVersion() < kUserRightsRefactoredVersion;
+                d->sessionManager()->connectedServerVersion() < kUserRightsRefactoredVersion;
             availableCamerasWatcher()->setCompatiblityMode(compatibilityMode);
         });
 
@@ -194,8 +209,8 @@ SystemContext::SystemContext(WindowContext* context,
             if (watcher->userName().isEmpty())
             {
                 NX_DEBUG(this, "User name changed to empty, stopping session");
-                if (sessionManager()->hasSession())
-                    sessionManager()->stopSessionByUser();
+                if (d->sessionManager()->hasSession())
+                    d->sessionManager()->stopSessionByUser();
             }
         });
 
@@ -229,11 +244,11 @@ SystemContext::SystemContext(WindowContext* context,
 
 SystemContext::~SystemContext()
 {
-    if (d->thumbnailProvider)
-        d->thumbnailProvider->removeThumbnailCache(d->thumbnailsCache.get());
+    if (d->thumbnailProvider())
+        d->thumbnailProvider()->removeThumbnailCache(d->thumbnailsCache.get());
 
-    if (mode() == Mode::client)
-        sessionManager()->resetSession();
+    if (d->sessionManager())
+        d->sessionManager()->resetSession();
 
     if (messageProcessor())
         deleteMessageProcessor();

@@ -141,9 +141,12 @@ void registerQmlTypes()
 void initializeMetatypesInternal()
 {
     core::initializeMetaTypes();
-    core::registerQmlTypes();
-
     registerMetaTypes();
+}
+
+void initializeQmlTypesInternal()
+{
+    core::registerQmlTypes();
     registerQmlTypes();
 }
 
@@ -151,6 +154,12 @@ void initializeMetaTypes()
 {
     static std::once_flag initialized;
     std::call_once(initialized, &initializeMetatypesInternal);
+}
+
+void initializeQmlTypes()
+{
+    static std::once_flag initialized;
+    std::call_once(initialized, &initializeQmlTypesInternal);
 }
 
 } // namespace nx::vms::client::mobile

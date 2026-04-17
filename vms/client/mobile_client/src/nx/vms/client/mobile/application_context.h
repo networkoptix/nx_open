@@ -53,6 +53,7 @@ public:
     ApplicationContext(
         const QnMobileClientStartupParameters& startupParams,
         std::unique_ptr<QnMobileClientSettings> settings,
+        Mode mode,
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 

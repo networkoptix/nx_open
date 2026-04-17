@@ -13,7 +13,7 @@
 namespace nx::vms::client::desktop {
 namespace test {
 
-using namespace index_condition;
+using namespace core::test::index_condition;
 using core::ResourceIconCache;
 
 // String constants.
@@ -115,7 +115,7 @@ TEST_F(ResourceTreeModelTest, serverIconStatus)
     loginAsPowerUser("power_user");
 
     // When server resource with certain unique name is added to the resource pool.
-    const auto server = addServer(kUniqueServerName);
+    const auto server = addServer(kUniqueServerName).objectCast<ServerResource>();
 
     // When Offline status is set to the server resource.
     server->setStatus(nx::vms::api::ResourceStatus::offline);

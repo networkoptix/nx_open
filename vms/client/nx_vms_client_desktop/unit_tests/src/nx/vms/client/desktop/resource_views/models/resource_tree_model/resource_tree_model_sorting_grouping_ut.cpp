@@ -1,16 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_tree_model_sorting_grouping_test_fixture.h"
-
 #include <QtCore/QCollator>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/ini.h>
 
+#include "resource_tree_model_sorting_grouping_test_fixture.h"
+
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::test;
-using namespace nx::vms::client::desktop::test::index_condition;
+using namespace nx::vms::client::core::test::index_condition;
 using nx::vms::client::core::ResourceIconCache;
 
 // Set of predefined conditions for lookup of interested groups of model indexes. Based mostly on

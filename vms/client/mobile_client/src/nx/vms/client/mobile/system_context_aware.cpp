@@ -12,11 +12,6 @@ SystemContext* SystemContextAware::systemContext() const
     return base_type::systemContext()->as<SystemContext>();
 }
 
-WindowContext* SystemContextAware::windowContext() const
-{
-    return systemContext()->windowContext();
-}
-
 QnAvailableCamerasWatcher* SystemContextAware::availableCamerasWatcher() const
 {
     return systemContext()->availableCamerasWatcher();

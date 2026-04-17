@@ -33,7 +33,11 @@ public:
     MessageProcessorMock* createMessageProcessor();
 
     /** Client tests should create client layouts. */
-    virtual QnLayoutResourcePtr createLayout() override;
+    virtual QnLayoutResourcePtr createLayout() const override;
+
+    /** Client tests should create client servers. */
+    virtual QnMediaServerResourcePtr createServer(
+        const nx::Uuid& id = nx::Uuid::createUuid()) const override;
 
     static void initAppContext(ApplicationContext::Features features);
     static void deinitAppContext();

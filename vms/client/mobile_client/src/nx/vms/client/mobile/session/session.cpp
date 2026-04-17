@@ -22,7 +22,6 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
-#include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
@@ -33,9 +32,10 @@
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
+#include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
-#include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
 #include <nx/vms/common/pixelation/pixelation_settings.h>
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
@@ -739,8 +739,9 @@ void Session::Private::gatherInitialConnectionInfo(int remainingTriesCount)
                     const QPointer<Private> guard = this;
                     static const auto kDigestLoginUrl =
                         QUrl("qrc:qml/Nx/Screens/Cloud/DigestLogin.qml");
+
                     const auto password = QmlWrapperHelper::showScreen(
-                        q->windowContext(), kDigestLoginUrl, properties);
+                        appContext()->mainWindowContext(), kDigestLoginUrl, properties);
 
                     if (!guard)
                         return;

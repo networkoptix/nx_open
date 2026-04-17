@@ -34,6 +34,7 @@ protected:
     {
         m_servers[0] = addServer();
         m_servers[1] = addServer();
+        m_servers[0]->setStatus(nx::vms::api::ResourceStatus::online);
         m_servers[1]->setStatus(nx::vms::api::ResourceStatus::offline);
         m_licenses.reset(new QnLicensePoolScaffold(systemContext()->licensePool()));
         m_helper.reset(new CamLicenseUsageHelper(systemContext()));

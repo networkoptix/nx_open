@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping_data.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/resource_sources/camera_resource_source.h>
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_source/resource_sources/layout_resource_source.h>
+#include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/resource_views/entity_resource_tree/resource_tree_item_factory.h>
 #include <nx/vms/client/mobile/system_context.h>
 
