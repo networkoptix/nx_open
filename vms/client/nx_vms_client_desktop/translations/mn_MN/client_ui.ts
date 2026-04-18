@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Дууссан</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -168,7 +168,7 @@
     <name>AuditLogDialog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>User actions</source>
@@ -243,7 +243,7 @@
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Хуваарьт</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>Skip Current Queue</source>
@@ -328,7 +328,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Тайлбар</translation>
     </message>
     <message>
       <source>Timeout</source>
@@ -347,7 +347,7 @@
     <name>BookmarksLog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>Bookmark Log</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
   </context>
   <context>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Хөдөлгөөн илрүүлэх</translation>
     </message>
     <message>
       <source>Media Streaming</source>
@@ -550,15 +550,15 @@
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Загвар</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Үйлдвэрлэгч</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP хаяг</translation>
     </message>
     <message>
       <source>Ping</source>
@@ -566,7 +566,7 @@
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Програм хангамж</translation>
     </message>
     <message>
       <source>Camera ID</source>
@@ -578,11 +578,11 @@
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Үндсэн урсгал</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Хоёрдогч урсгал</translation>
     </message>
     <message>
       <source>MAC Address</source>
@@ -627,7 +627,7 @@
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Хөдөлгөөн илрүүлэх</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -659,7 +659,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>Next</source>
@@ -674,7 +674,7 @@
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Бичлэг хийж байна</translation>
     </message>
     <message>
       <source>Activate License...</source>
@@ -708,7 +708,7 @@
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Баталгаажуулалт</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
@@ -756,7 +756,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>Холболт байхгүй</translation>
     </message>
     <message>
       <source>This site is connected to</source>
@@ -830,7 +830,7 @@
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>хүртэл</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -935,7 +935,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -991,7 +991,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Видео экспортлох</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1144,7 +1144,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Сайтын тохиргоо</translation>
     </message>
   </context>
   <context>
@@ -1166,7 +1166,7 @@
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Зураг</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1250,7 +1250,7 @@
     </message>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Арилгах</translation>
     </message>
     <message>
       <source>View...</source>
@@ -1281,7 +1281,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Түгжээтэй</translation>
     </message>
     <message>
       <source>Width</source>
@@ -1335,7 +1335,7 @@
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Онцлог шинж чанарууд</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Тоног төхөөрөмжийн ID</translation>
     </message>
   </context>
   <context>
@@ -1481,7 +1481,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Дууссан</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Зураг</translation>
     </message>
     <message>
       <source>Mode</source>
@@ -1567,11 +1567,11 @@
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Шалгах</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Сайтуудыг нэгтгэх...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1648,7 +1648,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>хүртэл</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -1920,7 +1920,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Сайтын удирдлага</translation>
     </message>
   </context>
   <context>
@@ -2000,7 +2000,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Нарийвчлал</translation>
     </message>
     <message>
       <source>Recording Quality</source>
@@ -2038,11 +2038,11 @@ and click on the &quot;Search&quot; button</translation>
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Нууц үгийг давтах</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Нууц үгнүүд таарахгүй байна</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2119,11 +2119,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Чанар</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -2131,7 +2131,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
@@ -2154,7 +2154,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>хүртэл</translation>
     </message>
     <message>
       <source>Limit session duration</source>
@@ -2287,7 +2287,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP хаяг</translation>
     </message>
     <message>
       <source>Port</source>
@@ -2382,7 +2382,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -2458,7 +2458,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS цаг</translation>
     </message>
     <message>
       <source>Do not sync time among servers</source>
@@ -2525,7 +2525,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Хөдөлгөөн илрүүлэх</translation>
     </message>
     <message>
       <source>Detect motion</source>

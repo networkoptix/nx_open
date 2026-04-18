@@ -12,17 +12,17 @@
 /norestart   - suppress any attempts to restart. By default UI will prompt before restart.
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
+  <String Id="ClientAndServer">Клиент ба Сервер</String>
+  <String Id="ClientOnly">Зөвхөн үйлчлүүлэгч</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
+  <String Id="ServerOnly">Зөвхөн сервер</String>
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Хаах</String>
   <String Id="InstallOptionsButton">Сонголтууд</String>
   <String Id="InstallInstallButton">Install</String>
   <String Id="InstallCloseButton">Хаах</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">Би зөвшөөрч байна</String>
   <String Id="InstallLicenseLinkText">End User License Agreement</String>
   <String Id="OptionsHeader">Setup Options</String>
   <String Id="OptionsLocationLabel">Install location:</String>
