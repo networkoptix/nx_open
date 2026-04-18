@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Tin tức</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation>Chia sẻ mở hộp thoại đánh dấu mới để tạo liên kết phát lại sau khi thiết lập tùy chọn chia sẻ</translation>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
   </context>
   <context>

@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informasi</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation>Berbagi membuka dialog bookmark baru untuk menghasilkan link playback setelah mengatur opsi berbagi</translation>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
   </context>
   <context>

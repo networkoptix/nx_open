@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Інформація про продукт</translation>
     </message>
     <message>
       <source>Audio</source>

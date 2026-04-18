@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation>Le partage ouvre la nouvelle boîte de dialogue de signet pour générer un lien de lecture après avoir défini les options de partage</translation>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
   </context>
   <context>

@@ -114,7 +114,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Bilgi</translation>
     </message>
     <message>
       <source>Audio</source>

@@ -76,7 +76,7 @@
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
       <source>Camera</source>
-      <translation>Камер</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <source>Expires in %1</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Зохион байгуулалт</translation>
     </message>
   </context>
 </TS>
