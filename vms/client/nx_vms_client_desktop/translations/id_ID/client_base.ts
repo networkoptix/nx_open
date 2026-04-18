@@ -6122,7 +6122,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Pengguna LDAP</translation>
     </message>
   </context>
   <context>
