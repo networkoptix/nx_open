@@ -272,7 +272,7 @@
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Камер сонгох</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -1372,7 +1372,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Шинэ сайт</translation>
     </message>
   </context>
   <context>
@@ -1611,7 +1611,7 @@
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>Сайтын нэр.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
@@ -1723,7 +1723,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation type="unfinished">RTP timeout (milliseconds).</translation>
+      <translation>RTP хугацаа (миллисекунд).</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
@@ -1779,7 +1779,7 @@
     </message>
     <message>
       <source>Watermark settings.</source>
-      <translation type="unfinished">Watermark settings.</translation>
+      <translation>Усны тэмдгийн тохиргоо.</translation>
     </message>
     <message>
       <source>Pixelation settings.</source>
@@ -1819,7 +1819,7 @@
     </message>
     <message>
       <source>Low quality screen video codec.</source>
-      <translation type="unfinished">Low quality screen video codec.</translation>
+      <translation>Чанар муутай дэлгэцийн видео кодек.</translation>
     </message>
     <message>
       <source>License server.</source>
@@ -1831,7 +1831,7 @@
     </message>
     <message>
       <source>Meta data storage change policy.</source>
-      <translation type="unfinished">Meta data storage change policy.</translation>
+      <translation>Мета өгөгдлийн сангийн өөрчлөлтийн бодлого.</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
