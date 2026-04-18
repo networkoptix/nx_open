@@ -275,7 +275,7 @@
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Дахин ачаалах</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -294,7 +294,7 @@
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Дахин ачаалах</translation>
     </message>
     <message>
       <source>Cut</source>

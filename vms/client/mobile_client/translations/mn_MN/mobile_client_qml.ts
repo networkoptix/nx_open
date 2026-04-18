@@ -153,7 +153,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Илбэчний алхмуудыг дагана уу</translation>
     </message>
     <message>
       <source>OK</source>
@@ -177,7 +177,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Сайтын эзэмшигчийн бүртгэлээр %1 руу холбогдоно уу</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>ШУУД</translation>
     </message>
   </context>
   <context>
@@ -273,7 +273,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
@@ -295,24 +295,12 @@
       <translation type="unfinished">Preview</translation>
     </message>
     <message>
-      <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
-    </message>
-    <message>
       <source>Search by attribute</source>
       <translation type="unfinished">Search by attribute</translation>
     </message>
     <message>
       <source>Cancel</source>
       <translation>Цуцлах</translation>
-    </message>
-    <message>
-      <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
-    </message>
-    <message>
-      <source>Share</source>
-      <translation type="unfinished">Share</translation>
     </message>
   </context>
   <context>
@@ -426,14 +414,14 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
   </context>
   <context>
     <name>EventSearchScreen</name>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -457,7 +445,7 @@
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Шүүлтүүрүүд</translation>
     </message>
     <message>
       <source>Details</source>
@@ -504,7 +492,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Хайлтын параметрүүдийг өөрчлөхийг оролдоно уу</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -555,7 +543,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Өгөгдөл байхгүй</translation>
     </message>
   </context>
   <context>
@@ -650,7 +638,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Интерфэйс</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -749,7 +737,7 @@
     <name>NavigationListView</name>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Хамтрагчид</translation>
     </message>
     <message>
       <source>Organizations</source>
@@ -764,11 +752,11 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Дэлгэрэнгүйг харуулах</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Өгөгдөл байхгүй</translation>
     </message>
   </context>
   <context>
@@ -783,7 +771,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
     <message>
       <source>Close</source>
@@ -836,6 +824,33 @@
     </message>
   </context>
   <context>
+    <name>Placeholder</name>
+    <message>
+      <source>No Bookmarks</source>
+      <translation type="unfinished">No Bookmarks</translation>
+    </message>
+    <message>
+      <source>No Objects</source>
+      <translation type="unfinished">No Objects</translation>
+    </message>
+    <message>
+      <source>No Motion</source>
+      <translation type="unfinished">No Motion</translation>
+    </message>
+    <message>
+      <source>No bookmarks have been created on this timeline</source>
+      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+    </message>
+    <message>
+      <source>No objects have been detected on this timeline</source>
+      <translation type="unfinished">No objects have been detected on this timeline</translation>
+    </message>
+    <message>
+      <source>No motion has been detected on this timeline</source>
+      <translation type="unfinished">No motion has been detected on this timeline</translation>
+    </message>
+  </context>
+  <context>
     <name>PluginSelector</name>
     <message>
       <source>Plugin</source>
@@ -879,7 +894,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Дууссан</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -953,11 +968,11 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>-аас</translation>
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Хүртэл</translation>
     </message>
   </context>
   <context>
@@ -994,7 +1009,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -1121,11 +1136,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Хайлтын параметрүүдийг өөрчлөхийг оролдоно уу</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Байгууллага байхгүй</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1133,11 +1148,11 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Хамтрагчид</translation>
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Сайт байхгүй</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -1145,7 +1160,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Фолдер хоосон байна</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
@@ -1177,7 +1192,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
   </context>
   <context>
@@ -1185,6 +1200,21 @@
     <message>
       <source>Settings</source>
       <translation>Тохиргоо</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShareAction</name>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Share</source>
+      <translation type="unfinished">Share</translation>
+    </message>
+    <message>
+      <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
   </context>
   <context>
@@ -1199,7 +1229,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Тайлбар</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -1219,19 +1249,19 @@
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Нэг цагийн дараа хугацаа нь дуусна</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Нэг өдрийн дараа хугацаа нь дуусна</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Сарын дараа хугацаа нь дуусна</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Хэзээ ч хугацаа нь дуусдаггүй</translation>
     </message>
     <message>
       <source>Shared link options</source>
@@ -1239,7 +1269,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Хуваалцах</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1258,7 +1288,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Серверт холбогдох</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1301,11 +1331,11 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Хайлтын параметрүүдийг өөрчлөхийг оролдоно уу</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Үүл</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1336,11 +1366,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>ТҮТГЭЛЗҮҮЛСЭН</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>УНТРААХ</translation>
     </message>
     <message>
       <source>PENDING</source>
@@ -1542,7 +1572,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
     <message>
       <source>No results</source>
@@ -1567,7 +1597,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Мэдээлэл</translation>
     </message>
   </context>
   <context>

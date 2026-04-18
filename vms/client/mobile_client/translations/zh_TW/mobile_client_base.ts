@@ -78,10 +78,6 @@
   <context>
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>於 %1 到期</translation>
@@ -111,48 +107,55 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::AnalyticsLoaderDelegate</name>
+    <name>nx::vms::client::mobile::timeline::AbstractObjectData</name>
+    <message>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
     <message>
       <source>Unknown Object</source>
-      <translation>未知的物件</translation>
+      <translation type="unfinished">Unknown Object</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation>物件 (&gt;%1)</translation>
-    </message>
-    <message>
-      <source>Objects (%1)</source>
-      <translation>物件 (%1)</translation>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::BookmarkLoaderDelegate</name>
+    <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation>寫入書籤</translation>
-    </message>
-    <message>
-      <source>Bookmarks (&gt;%1)</source>
-      <translation>書籤 (&gt;%1)</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation>書籤 (%1)</translation>
+      <translation type="unfinished">Bookmarks (%1)</translation>
+    </message>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::MotionLoaderDelegate</name>
+    <name>nx::vms::client::mobile::timeline::MotionData</name>
     <message>
       <source>Motion detected</source>
-      <translation>偵測到位移</translation>
+      <translation type="unfinished">Motion detected</translation>
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation>位移偵測 (&gt;%1)</translation>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation>位移偵測 (%1)</translation>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

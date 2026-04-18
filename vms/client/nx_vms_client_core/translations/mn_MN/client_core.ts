@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Шинэ сайт</translation>
     </message>
   </context>
   <context>
@@ -45,7 +45,7 @@
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>%1 руу холболтыг сэргээгээд дахин оролдоно уу</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Хоёр хүчин зүйлийн баталгаажуулалт шаардлагатай.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -163,15 +163,15 @@
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Энэ хэрэглэгчийг сайтын админ идэвхгүй болгосон байна.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Сайтад хандахад алдаа гарлаа</translation>
     </message>
     <message>
       <source>Failed to access site.</source>
-      <translation type="unfinished">Failed to access site.</translation>
+      <translation>Сайтад хандахад алдаа гарлаа.</translation>
     </message>
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your account settings.</source>
@@ -303,7 +303,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Сайт</translation>
     </message>
     <message>
       <source>Site (%1)</source>
@@ -376,7 +376,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Хайлтын параметрүүдийг өөрчлөхийг оролдоно уу</translation>
     </message>
   </context>
   <context>
@@ -387,7 +387,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Хавтаснууд</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -395,15 +395,15 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Хамтрагчид</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Үүл</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Орон нутгийн</translation>
     </message>
   </context>
   <context>

@@ -295,24 +295,12 @@
       <translation>Preview</translation>
     </message>
     <message>
-      <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation>Berbagi membuka dialog bookmark baru untuk menghasilkan link playback setelah mengatur opsi berbagi</translation>
-    </message>
-    <message>
       <source>Search by attribute</source>
       <translation>Cari berdasarkan atribut</translation>
     </message>
     <message>
       <source>Cancel</source>
       <translation>Cancel</translation>
-    </message>
-    <message>
-      <source>Shared</source>
-      <translation>Dibagikan</translation>
-    </message>
-    <message>
-      <source>Share</source>
-      <translation>Bagikan</translation>
     </message>
   </context>
   <context>
@@ -579,11 +567,11 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
-      <translation type="unfinished">-5 sec</translation>
+      <translation>-5 detik</translation>
     </message>
     <message>
       <source>+5 sec</source>
-      <translation type="unfinished">+5 sec</translation>
+      <translation>+5 detik</translation>
     </message>
   </context>
   <context>
@@ -832,6 +820,33 @@
     <message>
       <source>Can decode rare video formats using software</source>
       <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placeholder</name>
+    <message>
+      <source>No Bookmarks</source>
+      <translation type="unfinished">No Bookmarks</translation>
+    </message>
+    <message>
+      <source>No Objects</source>
+      <translation type="unfinished">No Objects</translation>
+    </message>
+    <message>
+      <source>No Motion</source>
+      <translation type="unfinished">No Motion</translation>
+    </message>
+    <message>
+      <source>No bookmarks have been created on this timeline</source>
+      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+    </message>
+    <message>
+      <source>No objects have been detected on this timeline</source>
+      <translation type="unfinished">No objects have been detected on this timeline</translation>
+    </message>
+    <message>
+      <source>No motion has been detected on this timeline</source>
+      <translation type="unfinished">No motion has been detected on this timeline</translation>
     </message>
   </context>
   <context>
@@ -1184,6 +1199,21 @@
     <message>
       <source>Settings</source>
       <translation>Pengaturan</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShareAction</name>
+    <message>
+      <source>Shared</source>
+      <translation type="unfinished">Shared</translation>
+    </message>
+    <message>
+      <source>Share</source>
+      <translation type="unfinished">Share</translation>
+    </message>
+    <message>
+      <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
   </context>
   <context>
@@ -1566,7 +1596,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informasi</translation>
     </message>
   </context>
   <context>

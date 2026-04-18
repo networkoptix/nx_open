@@ -392,7 +392,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Идэвхигүй</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -659,11 +659,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Түлхүүр</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Үнэ цэнэ</translation>
     </message>
   </context>
   <context>
@@ -767,7 +767,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Үнэ цэнэ</translation>
     </message>
   </context>
   <context>
@@ -819,7 +819,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Дууссан</translation>
     </message>
   </context>
   <context>
@@ -841,7 +841,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Арилгах</translation>
     </message>
     <message>
       <source>OK</source>
@@ -992,7 +992,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Дуусгах</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1056,11 +1056,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Тайлбар</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Зөвшөөрлийн бүлгүүд</translation>
     </message>
   </context>
   <context>
@@ -1079,7 +1079,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1102,7 +1102,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Тайлбар</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1118,7 +1118,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Зөвшөөрлийн бүлгүүд</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
@@ -1168,7 +1168,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Сонгох</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1177,7 +1177,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
@@ -1258,7 +1258,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Шинэчлэх</translation>
     </message>
     <message>
       <source>Services Required</source>
@@ -1266,7 +1266,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Сэргээгч...</translation>
     </message>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
@@ -1286,7 +1286,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Үйлдвэрлэгч</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -1298,7 +1298,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Хэрэглээ</translation>
     </message>
   </context>
   <context>
@@ -1554,7 +1554,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>үнэ цэнэ</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Экспортлох</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1713,7 +1713,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>MultiSelectionComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Сонгох</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1799,7 +1799,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
   </context>
   <context>
@@ -1896,7 +1896,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -1925,7 +1925,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Шинэ нууц үг</translation>
     </message>
     <message>
       <source>Confirm password</source>
@@ -1933,7 +1933,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Нууц үгнүүд таарахгүй байна</translation>
     </message>
   </context>
   <context>
@@ -2016,7 +2016,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Сервер офлайн байна</translation>
     </message>
   </context>
   <context>
@@ -2097,7 +2097,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Дууссан</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -2193,11 +2193,11 @@ Press Alt + Click to follow object</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>-аас</translation>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>хүртэл</translation>
     </message>
   </context>
   <context>
@@ -2215,7 +2215,7 @@ Press Alt + Click to follow object</translation>
     <name>RemoteAccess</name>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Идэвхигүй</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
@@ -2331,7 +2331,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Өөр зүйл хайж үзээрэй</translation>
     </message>
   </context>
   <context>
@@ -2346,7 +2346,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Зохион байгуулалт</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -2380,7 +2380,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>ӨГӨГДӨЛ БАЙХГҮЙ</translation>
     </message>
     <message>
       <source>OUTDATED</source>
@@ -2388,14 +2388,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>ХАНДАХ БОЛОМЖГҮЙ</translation>
     </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Серверүүд</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2403,7 +2403,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Зохион байгуулалт</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -2457,7 +2457,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объектууд</translation>
     </message>
   </context>
   <context>
@@ -2523,7 +2523,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Сонгох</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2628,11 +2628,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Өгөгдөл байхгүй</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Зөвшөөрөлгүй</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -2849,7 +2849,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -2872,11 +2872,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Орон нутгийн</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Үүл</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2884,7 +2884,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Бүтэн нэр</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2908,7 +2908,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Зөвшөөрлийн бүлгүүд</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2924,7 +2924,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Нууц үгнүүд таарахгүй байна</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
@@ -2951,7 +2951,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Нөөцүүд</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -2990,7 +2990,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Бүтэн нэр</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -3018,7 +3018,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Зөвшөөрлийн бүлгүүд</translation>
     </message>
     <message>
       <source>Access expires</source>
