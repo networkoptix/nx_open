@@ -1206,15 +1206,15 @@
     <name>ShareAction</name>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Compartido</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Compartir</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Compartir abre o diálogo de novos marcadores para xerar unha ligazón de reprodución despois de configurar as opcións de compartir</translation>
     </message>
   </context>
   <context>

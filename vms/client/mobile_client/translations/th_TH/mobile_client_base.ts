@@ -110,7 +110,7 @@
     <name>nx::vms::client::mobile::timeline::AbstractObjectData</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>กล้อง</translation>
     </message>
     <message>
       <source>Unknown Object</source>
@@ -132,7 +132,7 @@
     <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>บุ๊คมาร์ก</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
