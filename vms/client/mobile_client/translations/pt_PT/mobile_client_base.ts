@@ -68,7 +68,7 @@
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Câmara</translation>
     </message>
     <message>
       <source>Expires in %1</source>

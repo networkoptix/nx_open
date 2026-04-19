@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Deling åpner bokmerkedialogen for å generere en avspillingslenke etter å ha satt delingsalternativer</translation>
     </message>
   </context>
   <context>
