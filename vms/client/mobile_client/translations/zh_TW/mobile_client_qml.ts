@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>設定分享選項後，分享會開啟新的書籤對話框以產生播放連結</translation>
     </message>
   </context>
   <context>

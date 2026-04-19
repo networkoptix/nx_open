@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Le partage ouvre la nouvelle boîte de dialogue de signet pour générer un lien de lecture après avoir défini les options de partage</translation>
     </message>
   </context>
   <context>
