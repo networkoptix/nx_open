@@ -518,6 +518,7 @@ Page
 
         width: parent.width
         height: width / (16.0 / 9.0)
+        spacing: 8
 
         videoItem: video
         camerasModel: modernVideoScreen.camerasModel

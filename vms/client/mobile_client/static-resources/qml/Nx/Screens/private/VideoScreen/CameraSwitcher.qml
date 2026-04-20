@@ -17,6 +17,7 @@ Item
     required property VideoScreenController controller
 
     property alias interactive: listView.interactive
+    property alias spacing: listView.spacing
     property color backgroundColor: ColorTheme.colors.dark6
 
     readonly property bool switching: listView.moving
