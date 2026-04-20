@@ -209,7 +209,7 @@ func (c *Conn) close(cause error) error {
 
 func (c *Conn) readMessages(ctx context.Context) {
 	for {
-		var m anyMessage
+		var m inputMessage
 		err := c.stream.ReadObject(&m)
 		if err != nil {
 			c.close(err)
