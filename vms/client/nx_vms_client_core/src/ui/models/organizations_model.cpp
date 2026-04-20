@@ -275,8 +275,18 @@ struct OrganizationsModel::Private
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
 
-        const ScopedInsertRows insertRows(q, parentIndex, row, row);
-        parent->insert(row, std::move(node));
+        const bool isFolder = node->type == OrganizationsModel::Folder;
+
+        {
+            const ScopedInsertRows guard(q, parentIndex, row, row);
+            parent->insert(row, std::move(node));
+        }
+
+        if (isFolder)
+        {
+            if (const auto orgIdx = orgIndexFor(parent); orgIdx.isValid())
+                emit q->foldersChanged(orgIdx);
+        }
     }
 
     // Remove single node at index 'row' under 'parent'. Report model changes.
@@ -289,8 +299,18 @@ struct OrganizationsModel::Private
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
 
-        const ScopedRemoveRows removeRows(q, parentIndex, row, row);
-        parent->remove(row);
+        const bool isFolder = parent->allChildren()[row]->type == OrganizationsModel::Folder;
+
+        {
+            const ScopedRemoveRows guard(q, parentIndex, row, row);
+            parent->remove(row);
+        }
+
+        if (isFolder)
+        {
+            if (const auto orgIdx = orgIndexFor(parent); orgIdx.isValid())
+                emit q->foldersChanged(orgIdx);
+        }
     }
 
     // Remove only Folder nodes under 'parent', keeping System nodes. Report model changes.
@@ -627,6 +647,18 @@ struct OrganizationsModel::Private
 
         const ScopedInsertRows insertRows(q, sitesRoot(), 0, newRowCount - 1);
         sitesModelRowCount = newRowCount;
+    }
+
+    QModelIndex orgIndexFor(TreeNode* node) const
+    {
+        for (auto* current = node; current && current != root.get();
+            current = current->parentNode())
+        {
+            if (current->type == OrganizationsModel::Organization)
+                return q->createIndex(current->row(), 0, current);
+        }
+
+        return {};
     }
 
     void setHasChannelPartners(bool value);

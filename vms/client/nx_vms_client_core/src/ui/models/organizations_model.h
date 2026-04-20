@@ -149,6 +149,7 @@ signals:
     void firstLoadAttemptFinishedChanged();
     void hasChannelPartnersChanged();
     void hasOrganizationsChanged();
+    void foldersChanged(const QModelIndex& orgIndex);
     void fullTreeLoaded();
 
 private:

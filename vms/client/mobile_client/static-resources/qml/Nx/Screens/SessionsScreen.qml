@@ -54,6 +54,14 @@ AdaptiveScreen
     readonly property bool localSitesVisible: state !== inPartnerOrOrgState
         && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
 
+    property bool selectedOrgHasFolders: false
+
+    function refreshHasFolders()
+    {
+        selectedOrgHasFolders = selectedOrganizationIndex != null
+            && organizationsModel.hasFolders(selectedOrganizationIndex)
+    }
+
     contentItem: sessionsScreenContent
 
     overlayItem: MouseArea
@@ -80,7 +88,7 @@ AdaptiveScreen
                 && cloudUserProfileWatcher.isOrgUser
                 && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
                 && (sessionsScreen.selectedOrganizationIndex == null
-                    || organizationsModel.hasFolders(sessionsScreen.selectedOrganizationIndex)))
+                    || sessionsScreen.selectedOrgHasFolders))
             {
                 return navigationPanel
             }
@@ -212,6 +220,8 @@ AdaptiveScreen
 
     onSelectedOrganizationIndexChanged:
     {
+        sessionsScreen.refreshHasFolders()
+
         // Restore left panel visibility after navigation. The user may have closed the panel
         // at a deeper level. Navigating away from the organization should bring the panel back.
         if (leftPanel.item && selectedOrganizationIndex === null)
@@ -969,6 +979,12 @@ AdaptiveScreen
                 if (nodeIndex !== NxGlobals.invalidModelIndex())
                     goInto(nodeIndex.parent, /*animate*/ false)
             }
+        }
+
+        function onFoldersChanged(orgIndex)
+        {
+            if (orgIndex === navigationPanel.selectedOrganizationIndex)
+                sessionsScreen.refreshHasFolders()
         }
     }
 
