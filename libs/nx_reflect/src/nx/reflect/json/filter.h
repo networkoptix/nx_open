@@ -17,14 +17,22 @@ struct Matcher
     template<typename T>
     static bool matches(const T& data, const std::vector<std::string>& possibleValues)
     {
-        const auto json{serialize(data)};
-        return std::ranges::any_of(possibleValues,
-            [&json, isDataJsonString = isJsonString(json)](const auto& v)
-            {
-                return isDataJsonString && !isJsonString(v)
-                    ? std::string_view{json.data() + 1, json.size() - 2} == v
-                    : json == v;
-            });
+        if constexpr (requires(std::string_view s) { T::fromStringSafe(s); })
+        {
+            return std::ranges::any_of(possibleValues,
+                [&data](const auto& v) { return data == T::fromStringSafe(v); });
+        }
+        else
+        {
+            const auto json{serialize(data)};
+            return std::ranges::any_of(possibleValues,
+                [&json, isDataJsonString = isJsonString(json)](const auto& v)
+                {
+                    return isDataJsonString && !isJsonString(v)
+                        ? std::string_view{json.data() + 1, json.size() - 2} == v
+                        : json == v;
+                });
+        }
     }
 
     static bool matches(const std::string& value, const std::vector<std::string>& possibleValues)
