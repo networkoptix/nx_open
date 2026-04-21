@@ -11,6 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 
+#include "../connect_options.h"
 #include "base_tunnel_client.h"
 
 namespace nx::network::http::tunneling::detail {

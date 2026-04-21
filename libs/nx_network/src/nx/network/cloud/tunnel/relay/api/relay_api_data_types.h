@@ -73,6 +73,7 @@ private:
 struct BeginListeningRequest
 {
     std::string peerName;
+    std::optional<int> peerPriority;
     /** E.g., 0.1 */
     std::string protocolVersion;
 };

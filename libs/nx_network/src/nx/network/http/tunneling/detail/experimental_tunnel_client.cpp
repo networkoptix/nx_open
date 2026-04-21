@@ -11,15 +11,6 @@
 
 namespace nx::network::http::tunneling::detail {
 
-ExperimentalTunnelClient::ExperimentalTunnelClient(
-    const nx::Url& baseTunnelUrl,
-    const ConnectOptions& /*options*/,
-    ClientFeedbackFunction clientFeedbackFunction)
-    :
-    base_type(baseTunnelUrl, std::move(clientFeedbackFunction))
-{
-}
-
 void ExperimentalTunnelClient::bindToAioThread(
     aio::AbstractAioThread* aioThread)
 {
@@ -131,10 +122,12 @@ void ExperimentalTunnelClient::initiateChannel(
     const std::string& requestPath,
     std::function<void()> requestHandler)
 {
-    const auto tunnelUrl = url::Builder(m_baseTunnelUrl).appendPath(
-        http::rest::substituteParameters(
-            requestPath,
-            { m_tunnelId }));
+    const auto tunnelUrl = url::Builder(m_baseTunnelUrl)
+        .appendPath(
+            http::rest::substituteParameters(
+                requestPath,
+                { m_tunnelId }))
+        .setQuery(m_connectOptions.toUrlQuery());
 
     httpClient->setOnResponseReceived(
         [requestHandler = std::move(requestHandler)]() { requestHandler(); });

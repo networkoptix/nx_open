@@ -9,16 +9,6 @@
 
 namespace nx::network::http::tunneling::detail {
 
-ConnectionUpgradeTunnelClient::ConnectionUpgradeTunnelClient(
-    const nx::Url& baseTunnelUrl,
-    const ConnectOptions& options,
-    ClientFeedbackFunction clientFeedbackFunction)
-    :
-    base_type(baseTunnelUrl, std::move(clientFeedbackFunction)),
-    m_isConnectionTestRequested(options.contains(kConnectOptionRunConnectionTest))
-{
-}
-
 void ConnectionUpgradeTunnelClient::setTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
@@ -31,9 +21,8 @@ void ConnectionUpgradeTunnelClient::openTunnel(
     using namespace nx::network;
 
     m_tunnelUrl = url::Builder(m_baseTunnelUrl)
-        .appendPath(kConnectionUpgradeTunnelPath);
-    if (m_isConnectionTestRequested)
-        m_tunnelUrl.setQuery(QString(kConnectOptionRunConnectionTest) + "=1");
+        .appendPath(kConnectionUpgradeTunnelPath)
+        .setQuery(m_connectOptions.toUrlQuery());
     m_completionHandler = std::move(completionHandler);
 
     m_httpClient = std::make_unique<AsyncClient>(ssl::kDefaultCertificateCheck);

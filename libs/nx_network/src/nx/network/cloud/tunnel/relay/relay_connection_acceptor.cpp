@@ -52,10 +52,12 @@ private:
 ReverseConnection::ReverseConnection(
     const nx::Url& relayUrl,
     std::optional<std::chrono::milliseconds> connectTimeout,
-    std::optional<int> forcedHttpTunnelType)
+    std::optional<int> forcedHttpTunnelType,
+    std::optional<int> serverPriority)
     :
     m_relayClient(std::make_unique<api::Client>(relayUrl, forcedHttpTunnelType)),
-    m_peerName(relayUrl.userName().toStdString())
+    m_peerName(relayUrl.userName().toStdString()),
+    m_serverPriority(serverPriority)
 {
     bindToAioThread(getAioThread());
 
@@ -77,6 +79,7 @@ void ReverseConnection::connect(
     m_connectHandler = std::move(handler);
     m_relayClient->beginListening(
         m_peerName,
+        m_serverPriority,
         [this](auto&&... args) { onConnectDone(std::move(args)...); });
 }
 
@@ -266,11 +269,12 @@ void ReverseConnection::processTestConnectionNotification(
 
 //-------------------------------------------------------------------------------------------------
 
-ReverseConnector::ReverseConnector(const nx::Url& relayUrl):
+ReverseConnector::ReverseConnector(const nx::Url& relayUrl, std::optional<int> serverPriority):
     // NOTE: A null connection factory is passed to the base_type since connectAsync is overridden
     // and, thus, connections are created by this class directly.
     base_type(/*connection factory*/ nullptr),
-    m_relayUrl(relayUrl)
+    m_relayUrl(relayUrl),
+    m_serverPriority(serverPriority)
 {
 }
 
@@ -282,7 +286,11 @@ void ReverseConnector::connectAsync()
     for (auto type: httpTunnelTypes)
     {
         base_type::connectAsync(
-            std::make_unique<detail::ReverseConnection>(m_relayUrl, m_connectTimeout, type));
+            std::make_unique<detail::ReverseConnection>(
+                m_relayUrl,
+                m_connectTimeout,
+                type,
+                m_serverPriority));
     }
 }
 
@@ -295,9 +303,9 @@ void ReverseConnector::setConnectTimeout(std::optional<std::chrono::milliseconds
 
 //-------------------------------------------------------------------------------------------------
 
-ConnectionAcceptor::ConnectionAcceptor(const nx::Url& relayUrl):
+ConnectionAcceptor::ConnectionAcceptor(const nx::Url& relayUrl, std::optional<int> serverPriority):
     m_relayUrl(relayUrl),
-    m_acceptor(std::make_unique<detail::ReverseConnector>(m_relayUrl))
+    m_acceptor(std::make_unique<detail::ReverseConnector>(m_relayUrl, serverPriority))
 {
     bindToAioThread(getAioThread());
 
@@ -430,25 +438,6 @@ std::unique_ptr<AbstractStreamSocket> ConnectionAcceptor::toStreamSocket(
     if (!connection)
         return nullptr;
     return connection->takeSocket();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-ConnectionAcceptorFactory::ConnectionAcceptorFactory():
-    base_type([this](auto&&... args) { return defaultFactoryFunc(std::move(args)...); })
-{
-}
-
-ConnectionAcceptorFactory& ConnectionAcceptorFactory::instance()
-{
-    static ConnectionAcceptorFactory factoryInstance;
-    return factoryInstance;
-}
-
-std::unique_ptr<AbstractConnectionAcceptor> ConnectionAcceptorFactory::defaultFactoryFunc(
-    const nx::Url& relayUrl)
-{
-    return std::make_unique<ConnectionAcceptor>(relayUrl);
 }
 
 } // namespace nx::network::cloud::relay

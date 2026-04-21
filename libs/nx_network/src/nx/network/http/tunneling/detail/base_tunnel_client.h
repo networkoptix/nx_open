@@ -7,7 +7,9 @@
 #include <ostream>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/url_query.h>
 
+#include "../connect_options.h"
 #include "../../http_async_client.h"
 #include "../../http_types.h"
 
@@ -52,9 +54,6 @@ struct NX_NETWORK_API OpenTunnelResult
 using OpenTunnelCompletionHandler =
     nx::MoveOnlyFunc<void(OpenTunnelResult)>;
 
-using ConnectOptions = std::map<std::string, std::string>;
-constexpr char kConnectOptionRunConnectionTest[] = "run-connection-test";
-
 namespace detail {
 
 using ClientFeedbackFunction = nx::MoveOnlyFunc<void(bool /*success*/)>;
@@ -69,6 +68,7 @@ class NX_NETWORK_API BaseTunnelClient:
 public:
     BaseTunnelClient(
         const nx::Url& baseTunnelUrl,
+        const ConnectOptions& options,
         ClientFeedbackFunction clientFeedbackFunction);
     virtual ~BaseTunnelClient() = default;
 
@@ -87,6 +87,7 @@ public:
 
 protected:
     const nx::Url m_baseTunnelUrl;
+    ConnectOptions m_connectOptions;
     std::unique_ptr<AsyncClient> m_httpClient;
     OpenTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<network::AbstractStreamSocket> m_connection;

@@ -226,6 +226,13 @@ T choice(std::initializer_list<T> values)
     return *std::next(values.begin(), position);
 }
 
+template<typename Iterator>
+typename Iterator::value_type& choice(Iterator begin, Iterator end)
+{
+    auto position = number<std::size_t>(0, std::distance(begin, end) - 1);
+    return *std::next(begin, position);
+}
+
 } // namespace random
 } // namespace utils
 } // namespace nx

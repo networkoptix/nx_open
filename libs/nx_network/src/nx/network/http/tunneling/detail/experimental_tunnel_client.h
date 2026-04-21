@@ -21,10 +21,7 @@ class NX_NETWORK_API ExperimentalTunnelClient:
     using base_type = BaseTunnelClient;
 
 public:
-    ExperimentalTunnelClient(
-        const nx::Url& baseTunnelUrl,
-        const ConnectOptions& options,
-        ClientFeedbackFunction clientFeedbackFunction);
+    using base_type::base_type;
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 

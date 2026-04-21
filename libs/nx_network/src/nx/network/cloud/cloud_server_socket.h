@@ -74,6 +74,7 @@ public:
         hpm::api::AbstractMediatorConnector* mediatorConnector,
         nx::network::RetryPolicy mediatorRegistrationRetryPolicy =
             nx::network::RetryPolicy(),
+        std::optional<int> serverPriority = std::nullopt,
         nx::hpm::api::CloudConnectVersion cloudConnectVersion =
             nx::hpm::api::kCurrentCloudConnectVersion);
 
@@ -187,6 +188,7 @@ protected:
     AggregateAcceptor m_aggregateAcceptor;
     mutable nx::Mutex m_mutex;
     std::optional<CloudConnectListenerStatusReport> m_lastListenStatusReport;
+    std::optional<int> m_serverPriority;
     nx::hpm::api::CloudConnectVersion m_cloudConnectVersion =
         nx::hpm::api::kDefaultCloudConnectVersion;
     nx::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onMediatorConnectionClosed;
@@ -206,7 +208,8 @@ private:
 using CustomAcceptorFactoryFunction =
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
         const nx::hpm::api::SystemCredentials&,
-        const hpm::api::ListenResponse&);
+        const hpm::api::ListenResponse&,
+        std::optional<int>);
 
 class NX_NETWORK_API CustomAcceptorFactory:
     public nx::utils::BasicFactory<CustomAcceptorFactoryFunction>
@@ -221,7 +224,8 @@ public:
 private:
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials&,
-        const hpm::api::ListenResponse&);
+        const hpm::api::ListenResponse&,
+        std::optional<int> serverPriority);
 };
 
 } // namespace nx::network::cloud

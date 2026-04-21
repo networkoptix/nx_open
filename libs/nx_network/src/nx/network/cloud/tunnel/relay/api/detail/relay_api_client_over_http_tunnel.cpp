@@ -40,12 +40,13 @@ void ClientOverHttpTunnel::stopWhileInAioThread()
 
 void ClientOverHttpTunnel::beginListening(
     const std::string& peerName,
+    std::optional<int> peerPriority,
     BeginListeningHandler completionHandler)
 {
     dispatch(
-        [this, peerName, completionHandler = std::move(completionHandler)]() mutable
+        [this, peerName, peerPriority, completionHandler = std::move(completionHandler)]() mutable
         {
-            openServerTunnel(peerName, std::move(completionHandler));
+            openServerTunnel(peerName, peerPriority, std::move(completionHandler));
         });
 }
 
@@ -64,19 +65,27 @@ void ClientOverHttpTunnel::openConnectionToTheTargetHost(
 
 void ClientOverHttpTunnel::openServerTunnel(
     const std::string& peerName,
+    std::optional<int> peerPriority,
     BeginListeningHandler completionHandler)
 {
+    using ConnectOptions = nx::network::http::tunneling::ConnectOptions;
+
     NX_CRITICAL(isInSelfAioThread());
 
     const auto serverTunnelBaseUrl = network::url::Builder(url())
         .appendPath(network::http::rest::substituteParameters(
             kServerTunnelBasePath, {peerName})).toUrl();
 
+    ConnectOptions options;
+    if (peerPriority)
+            options.emplace(ConnectOptions::kPeerPriority, std::to_string(*peerPriority));
+
     openTunnel(
         std::make_unique<network::http::tunneling::Client>(
             serverTunnelBaseUrl,
             "",
-            m_forcedHttpTunnelType),
+            m_forcedHttpTunnelType,
+            options),
         [](auto&&... args) { return std::make_unique<detail::TunnelValidator>(
             std::forward<decltype(args)>(args)...); },
         [this, completionHandler = std::move(completionHandler)](

@@ -9,16 +9,6 @@
 
 namespace nx::network::http::tunneling::detail {
 
-GetPostTunnelClient::GetPostTunnelClient(
-    const nx::Url& baseTunnelUrl,
-    const ConnectOptions& options,
-    ClientFeedbackFunction clientFeedbackFunction)
-    :
-    base_type(baseTunnelUrl, std::move(clientFeedbackFunction)),
-    m_isConnectionTestRequested(options.contains(kConnectOptionRunConnectionTest))
-{
-}
-
 void GetPostTunnelClient::setTimeout(std::optional<std::chrono::milliseconds> timeout)
 {
     m_timeout = timeout;
@@ -29,12 +19,12 @@ void GetPostTunnelClient::openTunnel(
 {
     using namespace nx::network;
 
-    m_tunnelUrl = url::Builder(m_baseTunnelUrl).appendPath(
-        http::rest::substituteParameters(
-            kGetPostTunnelPath,
-            {std::string("1")}));
-    if (m_isConnectionTestRequested)
-        m_tunnelUrl.setQuery(QString(kConnectOptionRunConnectionTest) + "=1");
+    m_tunnelUrl = url::Builder(m_baseTunnelUrl)
+        .appendPath(
+            http::rest::substituteParameters(
+                kGetPostTunnelPath,
+                {std::string("1")}))
+        .setQuery(m_connectOptions.toUrlQuery());
     m_completionHandler = std::move(completionHandler);
 
     post([this]() { openDownChannel(); });

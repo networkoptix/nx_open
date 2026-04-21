@@ -25,9 +25,10 @@ void Client::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 
 void Client::beginListening(
     const std::string& peerName,
+    std::optional<int> peerPriority,
     BeginListeningHandler handler)
 {
-    m_actualClient->beginListening(peerName, std::move(handler));
+    m_actualClient->beginListening(peerName,peerPriority, std::move(handler));
 }
 
 void Client::startSession(

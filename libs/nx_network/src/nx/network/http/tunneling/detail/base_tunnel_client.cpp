@@ -41,15 +41,25 @@ std::string OpenTunnelResult::toString() const
             httpStatus ? http::StatusCode::toString(*httpStatus) : "-").toStdString();
 }
 
+ nx::UrlQuery ConnectOptions::toUrlQuery() const
+ {
+    nx::UrlQuery q;
+    for (const auto& [k, v]: options)
+        q.addQueryItem(k, v);
+    return q;
+ }
+
 //-------------------------------------------------------------------------------------------------
 
 namespace detail {
 
 BaseTunnelClient::BaseTunnelClient(
     const nx::Url& baseTunnelUrl,
+    const ConnectOptions& options,
     ClientFeedbackFunction clientFeedbackFunction)
     :
     m_baseTunnelUrl(baseTunnelUrl),
+    m_connectOptions(options),
     m_clientFeedbackFunction(std::move(clientFeedbackFunction))
 {
 }

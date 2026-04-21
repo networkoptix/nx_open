@@ -41,6 +41,7 @@ class NX_NETWORK_API AbstractClient:
 public:
     virtual void beginListening(
         const std::string& peerName,
+        std::optional<int> peerPriority,
         BeginListeningHandler handler) = 0;
 
     /**
@@ -91,6 +92,7 @@ public:
 
     virtual void beginListening(
         const std::string& peerName,
+        std::optional<int> peerPriority,
         BeginListeningHandler completionHandler) override;
 
     virtual void startSession(

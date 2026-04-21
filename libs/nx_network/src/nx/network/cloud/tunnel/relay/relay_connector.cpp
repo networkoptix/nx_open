@@ -170,6 +170,8 @@ void Connector::onStartRelaySessionResponse(
 
 void Connector::testConnection(nx::MoveOnlyFunc<void(bool)> handler)
 {
+    using ConnectOptions = nx::network::http::tunneling::ConnectOptions;
+
     m_connectionTestHandler = std::move(handler);
     m_relayClient->openConnectionToTheTargetHost(
         m_connectSessionId,
@@ -197,8 +199,7 @@ void Connector::testConnection(nx::MoveOnlyFunc<void(bool)> handler)
 
             m_httpPipeline->sendMessage(request.toHttpMessage());
         },
-        nx::network::http::tunneling::ConnectOptions{
-            {nx::network::http::tunneling::kConnectOptionRunConnectionTest, "1"}});
+        ConnectOptions{{{ConnectOptions::kRunConnectionTest, "1"}}});
 }
 
 void Connector::onTestConnectionResponse(nx::network::http::Message message)

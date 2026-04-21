@@ -27,6 +27,7 @@ public:
 
     virtual void beginListening(
         const std::string& peerName,
+        std::optional<int> peerPriority,
         BeginListeningHandler completionHandler) override;
 
     virtual void openConnectionToTheTargetHost(
@@ -50,6 +51,7 @@ private:
 
     void openServerTunnel(
         const std::string& peerName,
+        std::optional<int> peerPriority,
         BeginListeningHandler completionHandler);
 
     void openTunnel(

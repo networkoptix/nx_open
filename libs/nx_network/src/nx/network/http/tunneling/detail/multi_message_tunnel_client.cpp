@@ -8,7 +8,7 @@ MultiMessageClient::MultiMessageClient(
     const nx::Url& baseTunnelUrl,
     ClientFeedbackFunction clientFeedbackFunction)
     :
-    base_type(baseTunnelUrl, std::move(clientFeedbackFunction))
+    base_type(baseTunnelUrl, {}, std::move(clientFeedbackFunction))
 {
 }
 

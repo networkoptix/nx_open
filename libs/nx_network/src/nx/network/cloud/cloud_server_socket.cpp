@@ -19,12 +19,14 @@ const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::s
 CloudServerSocket::CloudServerSocket(
     hpm::api::AbstractMediatorConnector* mediatorConnector,
     nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
+    std::optional<int> serverPriority,
     nx::hpm::api::CloudConnectVersion cloudConnectVersion)
 :
     m_mediatorConnector(mediatorConnector),
     m_mediatorConnection(mediatorConnector->systemConnection()),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptQueueLen(kDefaultAcceptQueueSize),
+    m_serverPriority(serverPriority),
     m_cloudConnectVersion(cloudConnectVersion)
 {
     bindToAioThreadUnchecked(getAioThread());
@@ -441,7 +443,8 @@ void CloudServerSocket::initializeCustomAcceptors(
 
     auto acceptors = CustomAcceptorFactory::instance().create(
         *cloudCredentials,
-        response);
+        response,
+        m_serverPriority);
     for (auto& acceptor: acceptors)
     {
         acceptor->bindToAioThread(getAioThread());
@@ -714,7 +717,7 @@ void CloudServerSocket::stopWhileInAioThread()
 
 CustomAcceptorFactory::CustomAcceptorFactory():
     base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunction, this,
-        std::placeholders::_1, std::placeholders::_2))
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
 {
 }
 
@@ -727,7 +730,8 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
 std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
     CustomAcceptorFactory::defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials& credentials,
-        const hpm::api::ListenResponse& response)
+        const hpm::api::ListenResponse& response,
+        std::optional<int> serverPriority)
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
@@ -736,7 +740,8 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
         const auto trafficRelayUrlWithCredentials = url::Builder(trafficRelayUrl)
             .setUserName(credentials.hostName()).setPassword(credentials.key).toUrl();
         auto acceptor = std::make_unique<relay::ConnectionAcceptor>(
-            trafficRelayUrlWithCredentials);
+            trafficRelayUrlWithCredentials,
+            serverPriority);
         acceptor->setConnectTimeout(response.trafficRelayConnectTimeout);
         acceptors.push_back(std::move(acceptor));
     }
