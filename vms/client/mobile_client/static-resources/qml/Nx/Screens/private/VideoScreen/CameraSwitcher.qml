@@ -118,6 +118,9 @@ Item
 
         onMovementEnded:
         {
+            if (controller.resource === d.centeredResource)
+                return
+
             controller.setResource(d.centeredResource)
             d.thumbnail = listView.currentItem?.thumbnail ?? ""
         }

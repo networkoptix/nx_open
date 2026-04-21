@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 
@@ -230,7 +231,12 @@ Page
             if (modernVideoScreen.activePage)
                 Workflow.popCurrentScreen()
         }
-        resourceHelper.onResourceChanged: video.roiController.clearCustomRoi()
+
+        resourceHelper.onResourceChanged:
+        {
+            video.roiController.clearCustomRoi()
+            ptzSheet.close()
+        }
     }
 
     NxObject
@@ -1234,7 +1240,8 @@ Page
             opacity: d.controlsOpacity
             visible: opacity > 0 && d.ptzMode
 
-            onClosed: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
+            onClosed:
+                d.mode = VideoScreenUtils.VideoScreenMode.Navigation
 
             ptz.onMoveOnTapModeChanged:
             {
@@ -1248,6 +1255,21 @@ Page
                     moveOnTapOverlay.close()
                 }
             }
+
+            Overlay.modeless: Item {}
+        }
+
+        CustomPopupDimmer
+        {
+            id: ptzSheetDimmer
+
+            popup: ptzSheet
+            parent: modernVideoScreen.contentItem
+
+            anchors.top: (parent === modernVideoScreen.contentItem) ? navigationBar.top : undefined
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
         }
 
         PtzViewportMovePreloader
