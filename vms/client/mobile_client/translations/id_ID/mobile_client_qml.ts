@@ -826,27 +826,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Tidak ada Bookmark</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Tidak Ada Objek</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Tidak Ada Gerakan</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Belum ada bookmark yang dibuat pada timeline ini.</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Tidak ada objek yang terdeteksi pada timeline ini.</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Tidak ada pergerakan yang terdeteksi pada timeline ini.</translation>
     </message>
   </context>
   <context>

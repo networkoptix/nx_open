@@ -829,27 +829,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Brak zakładek</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Brak obiektów</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Brak ruchu</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Nie utworzono zakładek na tej osi czasu</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Na tej osi czasu nie wykryto obiektów</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Na tej osi czasu nie wykryto ruchu</translation>
     </message>
   </context>
   <context>
@@ -1216,7 +1216,7 @@
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
+      <translation>Udostępnianie otwiera nowe okno dialogowe zakładki, aby wygenerować łącze do odtwarzania po ustawieniu opcji udostępniania</translation>
     </message>
   </context>
   <context>

@@ -827,27 +827,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Sen marcadores</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Sen obxectos</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Sen movemento</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Non se crearon marcadores nesta liña de tempo</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Non se detectaron obxectos nesta liña de tempo</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Non se detectou ningún movemento nesta liña de tempo</translation>
     </message>
   </context>
   <context>
