@@ -27,6 +27,8 @@ Item
     readonly property string resourceName: centeredResourceHelper.qualifiedResourceName
     readonly property string lastThumbnail: d.thumbnail
 
+    clip: true
+
     function switchToPreviousCamera()
     {
         if (listView.count > 1 && !listView.moving)
