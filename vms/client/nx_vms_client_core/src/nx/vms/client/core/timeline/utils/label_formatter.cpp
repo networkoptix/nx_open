@@ -14,7 +14,7 @@ using namespace std::chrono;
 
 struct LabelFormatter::Private
 {
-    QLocale locale;
+    QLocale locale = QLocale::system();
     bool amPm = is12HourFormat();
 
     bool is12HourFormat() const
