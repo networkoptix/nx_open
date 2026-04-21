@@ -1822,10 +1822,6 @@
       <translation>Header HTTP: Server, variabel yang didukung: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>Header HTTP: Asal.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>Header HTTP: Opsi X-Frame.</translation>
     </message>
@@ -1876,6 +1872,14 @@
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>Soket mengirimkan waktu tunggu saat Server melakukan streaming data media (Detik).</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>

@@ -1822,10 +1822,6 @@
       <translation>HTTP 헤더: 서버, 지원 변수: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP 헤더: 출처.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP 헤더: X-Frame-Options.</translation>
     </message>
@@ -1876,6 +1872,14 @@
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>서버가 미디어 데이터를 스트리밍할 때 소켓 전송 시간 초과(초).</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>
