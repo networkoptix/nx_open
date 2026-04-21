@@ -2836,17 +2836,14 @@ void QnVirtualCameraResource::emitPropertyChanged(
         m_cachedHasVideo.reset();
         m_cachedSupportedMotionTypes.reset();
         m_motionType.reset();
+        m_cachedSupportedObjectTypes.reset();
         emit hasVideoChanged(::toSharedPointer(this));
         emit motionTypeChanged(::toSharedPointer(this));
+        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
     else if (key == nx::vms::api::device_properties::kPtzCapabilities)
     {
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
-    }
-    else if (key == nx::vms::api::device_properties::kNoVideoSupport)
-    {
-        m_cachedSupportedObjectTypes.reset();
-        emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
     else if (key == kUserEnabledAnalyticsEnginesProperty)
     {
