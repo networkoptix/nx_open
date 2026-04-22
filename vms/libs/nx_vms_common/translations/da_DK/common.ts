@@ -1945,11 +1945,11 @@
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Origin.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+      <translation>HTTP-header: Adgangskontrol-Tillad-Oprindelse.</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Credentials.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
+      <translation>HTTP-header: Adgangskontrol-Tillad-Legitimationsoplysninger.</translation>
     </message>
   </context>
 </TS>
