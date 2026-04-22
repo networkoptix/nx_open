@@ -190,7 +190,7 @@ public:
         {},
         "List and order of visible attributes in the table view of the Advanced Search Dialog."};
 
-    Property<bool> savePlaybackSpeed{this, "savePlaybackSpeed", true,
+    Property<bool> savePlaybackSpeed{this, "savePlaybackSpeed", false,
         "Whether playback speed is stored on pause and restored on play"};
 
     void migrateOldSettings();
