@@ -224,10 +224,8 @@ void QnStorageUrlDialog::accept()
         ScopedCursorRollback cursorRollback(this, Qt::WaitCursor);
         QnScopedTypedPropertyRollback<bool, QWidget> inputsEnabledRollback(ui->inputsWidget,
             &QWidget::setEnabled, &QWidget::isEnabled, false);
-        QnScopedTypedPropertyRollback<bool, QWidget> buttonEnabledRollback(m_okButton,
-            &QWidget::setEnabled, &QWidget::isEnabled, false);
         QnScopedTypedPropertyRollback<bool, BusyIndicatorButton> buttonIndicatorRollback(m_okButton,
-            &BusyIndicatorButton::showIndicator, &BusyIndicatorButton::isIndicatorVisible, true);
+            &BusyIndicatorButton::setBusy, &BusyIndicatorButton::isBusy, true);
 
         if (loop->exec() == kCancelled)
             return;

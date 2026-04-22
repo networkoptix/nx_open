@@ -21,6 +21,27 @@ BusyIndicatorWidget* BusyIndicatorButton::indicator() const
     return m_indicator;
 }
 
+bool BusyIndicatorButton::isBusy() const
+{
+    return isEnabled() && m_indicator->isVisible();
+}
+
+void BusyIndicatorButton::setBusy(bool busy)
+{
+    setIndicatorVisible(busy);
+    setEnabled(!busy);
+}
+
+bool BusyIndicatorButton::isIndicatorVisible() const
+{
+    return !m_indicator->isHidden();
+}
+
+void BusyIndicatorButton::setIndicatorVisible(bool show)
+{
+    m_indicator->setVisible(show);
+}
+
 void BusyIndicatorButton::resizeEvent(QResizeEvent* event)
 {
     base_type::resizeEvent(event);
@@ -39,21 +60,6 @@ void BusyIndicatorButton::paintEvent(QPaintEvent* /*event*/)
     }
 
     QStylePainter(this).drawControl(QStyle::CE_PushButton, option);
-}
-
-void BusyIndicatorButton::showIndicator(bool show)
-{
-    m_indicator->setVisible(show);
-}
-
-void BusyIndicatorButton::hideIndicator()
-{
-    showIndicator(false);
-}
-
-bool BusyIndicatorButton::isIndicatorVisible() const
-{
-    return !m_indicator->isHidden();
 }
 
 void BusyIndicatorButton::changeEvent(QEvent* event)

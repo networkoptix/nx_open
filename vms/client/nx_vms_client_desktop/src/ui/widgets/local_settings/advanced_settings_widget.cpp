@@ -3,10 +3,10 @@
 #include "advanced_settings_widget.h"
 #include "ui_advanced_settings_widget.h"
 
-#include <thread>
-
 #include <QtCore/QDir>
+#include <QtCore/QPointer>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QTimer>
 #include <QtGui/QDesktopServices>
 
 #include <client/client_globals.h>
@@ -38,6 +38,7 @@
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -354,7 +355,7 @@ void QnAdvancedSettingsWidget::applyChanges()
                         return; //< The button has been clicked already.
 
                     // Update button.
-                    okButton->showIndicator();
+                    okButton->setIndicatorVisible(true);
 
                     // Stop other clients.
                     appContext()->sharedMemoryManager()->requestToExit();
@@ -447,19 +448,137 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     {
         nx::vms::client::desktop::ServerFileCache::clearLocalCache();
     }
-    // Remove all Qt WebEngine profile directories.
-    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-    static constexpr auto kWebEngineDirName = "QtWebEngine";
-    auto webEngineData = QDir(QDir(dataLocation).filePath(kWebEngineDirName));
-    if (webEngineData.exists())
+
+    clearWebEngineData();
+}
+
+void QnAdvancedSettingsWidget::clearWebEngineData()
+{
+    auto profileManager = utils::WebEngineProfileManager::instance();
+    if (profileManager->hasActiveUsers())
     {
-        std::thread([](QDir dir)
-            {
-                if (dir.removeRecursively())
-                    return;
-                NX_ERROR(typeid(QnAdvancedSettingsWidget), "Unable to fully remove %1", dir);
-            }, webEngineData).detach();
+        // Skip if any WebEngineView instances are alive, because Chromium keeps file locks on profile
+        // directories which prevents deletion on Windows and causes crashes/data corruption on Linux.
+
+        QnMessageBox::warning(this,
+            tr("Cannot clear WebEngine cache"),
+            tr("Please close all web pages and try again."));
+        return;
     }
+
+    const bool hadProfiles = profileManager->hasActiveProfiles();
+    if (hadProfiles)
+        profileManager->clearProfiles();
+
+    const QString dataLocation =
+        QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+
+    static constexpr auto kWebEngineDirName = "QtWebEngine";
+    QDir webEngineData(QDir(dataLocation).filePath(kWebEngineDirName));
+
+    if (!webEngineData.exists())
+        return;
+
+    if (webEngineData.removeRecursively())
+    {
+        NX_INFO(this, "WebEngine cache completely removed");
+        return;
+    }
+
+    // No profiles were active, so no async lock release to wait for.
+    if (!hadProfiles)
+    {
+        NX_WARNING(this, "Unable to fully remove %1", webEngineData);
+
+        QnMessageBox::warning(this,
+            tr("Cannot clear WebEngine cache"),
+            tr("The files may be locked by another process."));
+        return;
+    }
+
+    // Chromium network service releases file locks asynchronously on its
+    // IO thread after profile destruction. Retry with a timer, showing
+    // a busy indicator and blocking the dialog to prevent profile recreation.
+    startRetryRemoval(webEngineData.absolutePath());
+}
+
+void QnAdvancedSettingsWidget::startRetryRemoval(const QString& path)
+{
+    static constexpr int kRetryIntervalMs = 200;
+
+    m_clearingCache = true;
+    ui->clearCacheButton->setBusy(true);
+
+    // Block the dialog visually and prevent closing.
+    QPointer<QWidget> dialog = window();
+    if (dialog)
+    {
+        dialog->setEnabled(false);
+        dialog->installEventFilter(this);
+    }
+
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this,
+        [this, path, timer, dialog, retryAttemptIndex = 0, done = false]() mutable
+        {
+            static constexpr int kMinDurationMs = 500;
+            static constexpr int kMaxDurationMs = 6000;
+            static constexpr int kMinRetryAttempts = kMinDurationMs / kRetryIntervalMs;
+            static constexpr int kMaxRetryAttempts = kMaxDurationMs / kRetryIntervalMs;
+
+            ++retryAttemptIndex;
+
+            if (!done)
+            {
+                QDir dir(path);
+                if (!dir.exists() || dir.removeRecursively())
+                {
+                    done = true;
+                    NX_INFO(this, "Iterative WebEngine cache removing finished succesfully. "
+                        "Attemt %1/%2", retryAttemptIndex / kMaxRetryAttempts);
+                }
+                else if (retryAttemptIndex >= kMaxRetryAttempts)
+                {
+                    done = true;
+                    NX_WARNING(this, "Unable to fully remove WebEngine data dir: %1", dir);
+
+                    QnMessageBox::warning(this,
+                        tr("WebEngine cache partially cleared"),
+                        tr("Some files may be locked by another process."));
+                }
+            }
+
+            if (done && retryAttemptIndex >= kMinRetryAttempts)
+            {
+                timer->stop();
+                timer->deleteLater();
+
+                m_clearingCache = false;
+                ui->clearCacheButton->setBusy(false);
+                if (dialog)
+                {
+                    dialog->setEnabled(true);
+                    dialog->removeEventFilter(this);
+                }
+            }
+
+            // If is done but min retry attempts not reached, just wait without trying
+            // to remove again, to ensure the busy indicator is shown for at least kMinDurationMs,
+            // it eliminates dialog disabled state flickering and looks better.
+        });
+
+    NX_INFO(this, "Iterative WebEngine cache removing has started.");
+    timer->start(kRetryIntervalMs);
+}
+
+bool QnAdvancedSettingsWidget::eventFilter(QObject* watched, QEvent* event)
+{
+    if (m_clearingCache && watched == window() && event->type() == QEvent::Close)
+    {
+        event->ignore();
+        return true;
+    }
+    return base_type::eventFilter(watched, event);
 }
 
 void QnAdvancedSettingsWidget::at_resetAllWarningsButton_clicked()

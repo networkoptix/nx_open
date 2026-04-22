@@ -245,8 +245,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
         {
             NX_ASSERT(m_currentRequest == requestId);
             m_currentRequest = 0;
-            ui->unlinkButton->hideIndicator();
-            ui->unlinkButton->setEnabled(true);
+            ui->unlinkButton->setBusy(false);
 
             if (success && reply)
             {
@@ -286,8 +285,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
         /*password*/ QString(),
         std::move(handler),
         this->thread());
-    ui->unlinkButton->showIndicator(isNetworkRequestRunning());
-    ui->unlinkButton->setEnabled(!isNetworkRequestRunning());
+    ui->unlinkButton->setBusy(isNetworkRequestRunning());
 }
 
 void QnCloudManagementWidget::onDisconnectSuccess()

@@ -253,13 +253,10 @@ void SessionRefreshDialog::validatePassword(const nx::vms::api::LoginSessionRequ
 
 void SessionRefreshDialog::lockUi(bool lock)
 {
-    const bool enabled = !lock;
-
     if (m_passwordField)
-        m_passwordField->setEnabled(enabled);
+        m_passwordField->setEnabled(!lock);
 
-    m_actionButton->setEnabled(enabled);
-    m_actionButton->showIndicator(lock);
+    m_actionButton->setBusy(lock);
 }
 
 void SessionRefreshDialog::validationResultReady()

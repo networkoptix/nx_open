@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#pragma once
+
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtWebEngineQuick/QQuickWebEngineProfile>
@@ -36,6 +38,16 @@ public:
      */
     Q_INVOKABLE QQuickWebEngineProfile* getProfile(
         const QString& name, bool offTheRecord, const QString& resourceId = "");
+
+    /** Whether any WebEngineView instances are currently using profiles. */
+    bool hasActiveUsers() const;
+
+    /** Track WebEngineView lifetime. Called from QML. */
+    Q_INVOKABLE void addProfileUser();
+    Q_INVOKABLE void removeProfileUser();
+
+    bool hasActiveProfiles() const;
+    void clearProfiles();
 
     static void registerQmlType();
 
