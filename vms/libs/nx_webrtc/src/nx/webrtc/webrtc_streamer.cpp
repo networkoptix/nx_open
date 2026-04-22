@@ -76,28 +76,33 @@ static nx::Uuid parseDeviceId(const rapidjson::Value& obj)
     return nx::Uuid::fromStringSafe(it->value.GetString());
 }
 
-static int64_t parseSeekMs(const rapidjson::Value& obj)
+static std::optional<int64_t> parseSeekMs(const rapidjson::Value& v)
 {
-    auto it = obj.FindMember("seek");
-    if (it == obj.MemberEnd())
-        return -1;
-
-    const auto& v = it->value;
-    if (v.IsDouble())
-        return static_cast<int64_t>(v.GetDouble());
     if (v.IsInt64())
         return v.GetInt64();
+
     if (v.IsInt())
         return v.GetInt();
+
+    if (v.IsDouble())
+        return static_cast<int64_t>(v.GetDouble());
+
     if (v.IsString())
     {
-        auto strValue = v.GetString();
-        if (strValue == 0 || strValue[0] == 0)
-            return -1;
-        return std::atoll(strValue);
+        const char* str = v.GetString();
+        if (!str || !*str)
+            return std::nullopt;
+
+        char* end = nullptr;
+        errno = 0;
+        int64_t value = std::strtoll(str, &end, 10);
+        if (end == str || errno == ERANGE)
+            return std::nullopt;
+
+        return value;
     }
 
-    return -1;
+    return std::nullopt;
 }
 
 static nx::vms::api::StreamIndex parseStreamIndex(const rapidjson::Value& obj)
@@ -137,13 +142,16 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
         if (deviceId.isNull())
             return;
 
-        const int64_t seekMs = parseSeekMs(addObj);
-        std::optional<std::chrono::milliseconds> positionMs;
-        if (seekMs >= 0)
-            positionMs = std::chrono::milliseconds(seekMs);
+        std::optional<std::chrono::milliseconds> positionMs; //< Empty means live stream.
+        auto seekObj = addObj.FindMember("seek");
+        if (seekObj != addObj.MemberEnd())
+        {
+            const auto seekMs = parseSeekMs(seekObj->value);
+            if (seekMs && *seekMs >= 0)
+                positionMs = std::chrono::milliseconds(*seekMs);
+        }
 
         const nx::vms::api::StreamIndex newStream = parseStreamIndex(addObj);
-
         try
         {
             m_session->createProvider(
@@ -176,10 +184,11 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
     {
         int64_t timestamp = 0;
         const auto& seekValue = d["seek"];
-        if (seekValue.IsDouble())
-            timestamp = seekValue.GetDouble();
-        else if (seekValue.IsString())
-            timestamp = std::atoll(seekValue.GetString());
+        auto timestampOpt = parseSeekMs(seekValue);
+        if (!timestampOpt)  //< TODO: Send error code when parsing failed.
+            NX_DEBUG(this, "Failed to parse seek timestamp, type: %1", seekValue.GetType());
+        else
+            timestamp = *timestampOpt;
 
         // Assume that timestamp is in milliseconds since epoch.
         int64_t timestampUs = (timestamp < 0 ? DATETIME_NOW : (int64_t) timestamp * 1000);

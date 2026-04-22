@@ -27,7 +27,7 @@ public:
 
     std::string idForToStringFromPtr() const;
 
-protected:
+private:
     void updateMetrics(int value);
 
 private:
