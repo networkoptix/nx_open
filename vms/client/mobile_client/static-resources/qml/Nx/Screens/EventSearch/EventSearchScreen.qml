@@ -519,6 +519,7 @@ AdaptiveScreen
                 currentEventIndex: index
                 resource: model.resource
                 previewId: model.previewId
+                previewAspectRatio: model.previewAspectRatio
                 trackId: model.trackId?.toString() ?? ""
                 previewState: model.previewState
                 title: model.display

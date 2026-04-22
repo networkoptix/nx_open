@@ -2,11 +2,12 @@
 
 import QtQuick
 import QtQuick.Controls
+import Qt5Compat.GraphicalEffects
 
-import Nx.Core 1.0
 import Nx.Controls 1.0
-import Nx.Core.Items 1.0
+import Nx.Core 1.0
 import Nx.Core.Controls 1.0
+import Nx.Core.Items 1.0
 import Nx.Items 1.0
 
 import nx.vms.client.core 1.0
@@ -26,6 +27,7 @@ Control
     property color borderColor: ColorTheme.colors.dark10
     property color highlightColor: ColorTheme.colors.brand_core
     property color foregroundColor: ColorTheme.colors.light16
+    property alias radius: backgroundRect.radius
 
     // Preview item will not have aspect ratio lesser than this value.
     // Actual preview image will be fit into these bounds keeping its own aspect ratio.
@@ -59,6 +61,17 @@ Control
             fillMode: Image.PreserveAspectFit
             source: previewId ? `image://previews/${previewId}` : ""
             visible: !!source.toString()
+
+            layer.enabled: radius > 0
+            layer.effect: OpacityMask
+            {
+                maskSource: Rectangle
+                {
+                    width: preview.width
+                    height: preview.height
+                    radius: preview.radius
+                }
+            }
 
             RectangularMask
             {
