@@ -1892,10 +1892,6 @@
       <translation>HTTP başlığı: Sunucu, desteklenen değişkenler: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP başlığı: Kaynak.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP başlığı: X-Frame-Seçenekleri.</translation>
     </message>
@@ -1946,6 +1942,14 @@
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>

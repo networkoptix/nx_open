@@ -1822,10 +1822,6 @@
       <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility。</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP ヘッダー: Origin。</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP ヘッダー: X-Frame-Options。</translation>
     </message>
@@ -1876,6 +1872,14 @@
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>サーバーがメディアデータをストリーミングする際のソケット送信タイムアウト (秒)。</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>HTTP ヘッダー: Access-Control-Allow-Origin</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>HTTP ヘッダー: Access-Control-Allow-Credentials</translation>
     </message>
   </context>
 </TS>

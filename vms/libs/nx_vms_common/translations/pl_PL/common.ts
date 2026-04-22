@@ -2032,10 +2032,6 @@
       <translation>Nagłówek HTTP: Serwer, obsługiwane zmienne: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>Nagłówek HTTP: Pochodzenie.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>Nagłówek HTTP: Opcje X-Frame.</translation>
     </message>
@@ -2086,6 +2082,14 @@
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
       <translation>Limit czasu wysyłania danych podczas strumieniowania multimediów przez serwer (w sekundach).</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>Nagłówek HTTP: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>Nagłówek HTTP: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>
