@@ -205,6 +205,7 @@ AdaptiveScreen
             id: noCamerasPlaceholder
 
             anchors.fill: parent
+            centered: true
             title: qsTr("No Devices")
             titleColor: ColorTheme.colors.light4
             description:
