@@ -91,10 +91,33 @@ std::string Engine::manifestString() const
     Json::object engineManifest = {
         {"capabilities", "updateMotionSensitivity"},
         {"streamTypeFilter", "compressedVideo"},
+        {"preferredStream", m_preferredStream},
         {"deviceAgentSettingsModel", settingsModel}
     };
 
     return Json(engineManifest).dump();
+}
+
+void Engine::doSetSettings(
+    nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+    const nx::sdk::IStringMap* settings)
+{
+    const char* value = settings->value("preferredStream");
+    if (value)
+    {
+        const std::string newValue = value;
+        if (newValue == "primary" || newValue == "secondary" || newValue == "undefined")
+        {
+            if (newValue != m_preferredStream)
+            {
+                m_preferredStream = newValue;
+                // Preferred stream is part of the engine manifest.
+                pushManifest(manifestString());
+            }
+        }
+    }
+
+    *outResult = nullptr;
 }
 
 } // namespace object_detection

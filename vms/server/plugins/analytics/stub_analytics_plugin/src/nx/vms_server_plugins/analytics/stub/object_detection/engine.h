@@ -20,11 +20,17 @@ public:
 
 protected:
     virtual std::string manifestString() const override;
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
 
 protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
+
+private:
+    std::string m_preferredStream = "undefined";
 };
 
 } // namespace object_detection

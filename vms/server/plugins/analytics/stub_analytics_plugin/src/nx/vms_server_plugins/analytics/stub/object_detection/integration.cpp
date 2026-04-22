@@ -30,6 +30,26 @@ std::string Integration::manifestString() const
         "description": "An example Plugin for demonstrating the Base Library of Taxonomy and providing examples of object metadata generation.",
         "version": "1.0.0",
         "vendor": "Plugin vendor",
+        "engineSettingsModel":
+        {
+            "type": "Settings",
+            "items":
+            [
+                {
+                    "type": "ComboBox",
+                    "name": "preferredStream",
+                    "caption": "Preferred stream",
+                    "defaultValue": "undefined",
+                    "range": ["primary", "secondary", "undefined"],
+                    "itemCaptions":
+                    {
+                        "primary": "Primary (high)",
+                        "secondary": "Secondary (low)",
+                        "undefined": "Auto"
+                    }
+                }
+            ]
+        },
         "isLicenseRequired": %s
     }
     )json";
