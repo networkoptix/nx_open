@@ -297,10 +297,10 @@ Page
             function onIsPortraitChanged()
             {
                 // The screen orientation changed due phone rotation. Orientation lock is off.
-                if (fullscreen && LayoutController.isPortrait)
+                if (d.fullscreen && LayoutController.isPortrait)
                 {
                     d.restorePortraitScreenOrientation = false
-                    fullscreen = false
+                    d.fullscreen = false
                 }
             }
         }
