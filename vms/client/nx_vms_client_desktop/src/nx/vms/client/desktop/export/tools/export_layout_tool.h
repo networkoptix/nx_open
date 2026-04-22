@@ -10,8 +10,6 @@
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <recording/stream_recorder.h>
 
-class QnClientVideoCamera;
-
 namespace nx::vms::client::desktop {
 
 struct NovMetadata;
@@ -48,8 +46,8 @@ public:
 private slots:
     bool exportMediaResource(const QnMediaResourcePtr& resource);
 
-    void at_camera_progressChanged(int progress);
-    void at_camera_exportFinished(const std::optional<nx::recording::Error>& status,
+    void progressChanged(int progress);
+    void exportFinished(const std::optional<nx::recording::Error>& status,
         const QString& filename);
 
 private:
@@ -73,9 +71,6 @@ private:
 
     /** Stage field, used to show correct progress in multi-video layout. */
     int m_offset = -1;
-
-    QScopedPointer<QnClientVideoCamera> m_currentCamera;
-
     bool m_isExportToExe = false;
 };
 

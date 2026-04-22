@@ -209,7 +209,7 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextData()
 
     if (result)
     {
-        NX_VERBOSE(this, "%1: Got some stream data, dataType: %2", m_logName, result->dataType);
+        NX_VERBOSE(this, "%1: Got some stream data: %2", m_logName, result);
 
         m_gotSomeFrame = true;
         return result;
