@@ -531,7 +531,8 @@ bool QnGLRenderer::drawVideoTextures(
         }
         else
         {
-            doExtraRotation = true;
+            doExtraRotation = !mediaParams.is360VR()
+                && mediaParams.viewMode == dewarping::FisheyeCameraMount::ceiling;
             itemParams.enabled = false;
         }
     }
@@ -620,7 +621,7 @@ bool QnGLRenderer::drawVideoTextures(
             program.verts[3] = toDevice(viewRect.bottomRight());
 
             if (doExtraRotation)
-                std::reverse(program.verts.begin(), program.verts.end());
+                std::ranges::reverse(program.verts);
 
             program.texCoords[0] = QVector2D(textureRect.left(), textureRect.top());
             program.texCoords[1] = QVector2D(textureRect.right(), textureRect.top());

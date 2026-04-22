@@ -1909,15 +1909,13 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 
         return result;
     }
-    else
-    {
-        const QRectF sourceSubRect = Geometry::toSubRect(channelRect, paintRect);
-        const PainterTransformScaleStripper scaleStripper(painter);
-        result = paintVideoTexture(painter,
-            channel,
-            sourceSubRect,
-            scaleStripper.mapRect(paintRect));
-    }
+
+    const QRectF sourceSubRect = Geometry::toSubRect(channelRect, paintRect);
+    const PainterTransformScaleStripper scaleStripper(painter);
+    result = paintVideoTexture(painter,
+        channel,
+        sourceSubRect,
+        scaleStripper.mapRect(paintRect));
 
     const bool videoFramePresent = result == Qn::NewFrameRendered || result == Qn::OldFrameRendered;
     if (videoFramePresent)
@@ -2087,9 +2085,9 @@ void QnMediaResourceWidget::paintAnalyticsObjectsDebugOverlay(
 
         for (const auto& packet: packets)
         {
-            for (const auto& rect: packet->rects)
+            for (const auto& packetRect: packet->rects)
             {
-                const auto absoluteObjectRect = Geometry::subRect(widgetRect, rect);
+                const auto absoluteObjectRect = Geometry::subRect(widgetRect, packetRect);
                 // Predefined color used for debug purposes in the debug method.
                 const QColor overlayColor = toTransparent(Qt::green, 0.3);
                 painter->fillRect(absoluteObjectRect, overlayColor);
