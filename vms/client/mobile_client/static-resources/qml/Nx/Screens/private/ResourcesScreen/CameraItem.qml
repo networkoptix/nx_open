@@ -197,18 +197,17 @@ Control
         }
     }
 
-    MouseArea
+    TapHandler
     {
-        id: mouseArea
-        anchors.fill: parent
-        onClicked: cameraItem.clicked()
+        id: tapHandler
+        onSingleTapped: cameraItem.clicked()
     }
 
     MaterialEffect
     {
         clip: true
         anchors.fill: parent
-        mouseArea: mouseArea
+        mouseArea: tapHandler
         rippleSize: width * 2
     }
 
