@@ -78,8 +78,16 @@ Item
     signal loadingStatusChanged(int status)
     signal closeWindows() //< Close all child windows.
 
-    Component.onCompleted: loadUserScripts()
-    Component.onDestruction: closeWindows()
+    Component.onCompleted:
+    {
+        WebEngineProfileManager.addProfileUser()
+        loadUserScripts()
+    }
+    Component.onDestruction:
+    {
+        closeWindows()
+        WebEngineProfileManager.removeProfileUser()
+    }
 
     WebEngineView
     {

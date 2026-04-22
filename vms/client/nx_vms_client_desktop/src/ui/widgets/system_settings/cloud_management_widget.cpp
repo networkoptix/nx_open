@@ -248,8 +248,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
                 "Unexpected request handle: %1", requestId);
 
             m_currentRequest = 0;
-            ui->unlinkButton->hideIndicator();
-            ui->unlinkButton->setEnabled(true);
+            ui->unlinkButton->setBusy(false);
 
             if (success && reply)
             {
@@ -289,8 +288,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
         /*password*/ QString(),
         std::move(handler),
         this);
-    ui->unlinkButton->showIndicator(isNetworkRequestRunning());
-    ui->unlinkButton->setEnabled(!isNetworkRequestRunning());
+    ui->unlinkButton->setBusy(isNetworkRequestRunning());
 }
 
 void QnCloudManagementWidget::onDisconnectSuccess()

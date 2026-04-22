@@ -20,8 +20,9 @@ namespace {
 void setBusy(QAbstractButton* button, bool on)
 {
     if (auto busyIndicator = qobject_cast<BusyIndicatorButton*>(button))
-        busyIndicator->showIndicator(on);
-    button->setEnabled(!on);
+        busyIndicator->setBusy(on);
+    else
+        button->setEnabled(!on);
 }
 
 } // namespace
