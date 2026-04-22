@@ -6,7 +6,6 @@
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
 
-#include <camera/client_video_camera.h>
 #include <client/client_globals.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
@@ -20,6 +19,9 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/reflect/json/serializer.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/vms/api/data/layout_data.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/camera/camera_data_manager.h>
@@ -28,6 +30,7 @@
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
+#include <nx/vms/client/desktop/export/tools/nov_media_export.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -87,6 +90,9 @@ struct ExportLayoutTool::Private
 
     /** Copy of the provided layout. */
     core::LayoutResourcePtr layout;
+
+    std::unique_ptr<nx::vms::client::desktop::NovMediaExport> exportRecorder;
+    std::unique_ptr<QnAbstractStreamDataProvider> exportReader;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -157,6 +163,30 @@ struct ExportLayoutTool::Private
 
         emit q->finished();
     }
+
+    void stopExport()
+    {
+        if (exportReader)
+        {
+            if (exportRecorder)
+                exportReader->removeDataProcessor(exportRecorder.get());
+            exportReader->pleaseStop();
+            exportReader->wait(); //< We should wait for reader to stop.
+        }
+
+        if (exportRecorder)
+        {
+            bool exportFinishedOk = exportRecorder->isFinished();
+            if (!exportFinishedOk)
+            {
+                exportRecorder->pleaseStop();
+                exportRecorder->wait(); //< We should wait for recorder to stop.
+            }
+            exportRecorder.reset();
+        }
+        exportReader.reset();
+    }
+
 };
 
 ExportLayoutTool::ExportLayoutTool(
@@ -448,7 +478,6 @@ bool ExportLayoutTool::start()
     }
 
     const NovMetadata metadata = prepareLayoutAndMetadata();
-
     if (!exportMetadata(metadata))
     {
         d->lastError = ExportProcessError::fileAccess;
@@ -466,8 +495,7 @@ void ExportLayoutTool::stop()
 {
     d->cancelExport();
 
-    if (m_currentCamera)
-        m_currentCamera->stopExport();
+    d->stopExport();
 
     d->finishExport(false);
 }
@@ -500,8 +528,7 @@ bool ExportLayoutTool::exportNextCamera()
         }
         else
         {
-            NX_VERBOSE(this, "Data not found");
-
+            NX_DEBUG(this, "Data not found");
             d->lastError = ExportProcessError::dataNotFound;
             d->finishExport(false);
         }
@@ -514,21 +541,7 @@ bool ExportLayoutTool::exportNextCamera()
 
 bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
 {
-    m_currentCamera.reset(new QnClientVideoCamera(resource));
-    connect(m_currentCamera.get(), SIGNAL(exportProgress(int)), this, SLOT(at_camera_progressChanged(int)));
-    connect(m_currentCamera.get(), &QnClientVideoCamera::exportFinished, this,
-        &ExportLayoutTool::at_camera_exportFinished);
-
-    int numberOfChannels = resource->getVideoLayout()->channelCount();
-    for (int i = 0; i < numberOfChannels; ++i)
-    {
-        QSharedPointer<QBuffer> motionFileBuffer(new QBuffer());
-        motionFileBuffer->open(QIODevice::ReadWrite);
-        m_currentCamera->setMotionIODevice(motionFileBuffer, i);
-    }
-
-    QString uniqId = fileNameForResource(resource);
-
+    QString fileName = fileNameForResource(resource);
     QnTimePeriodList playbackMask;
     for (const auto& bookmark: d->settings.bookmarks)
     {
@@ -536,18 +549,71 @@ bool ExportLayoutTool::exportMediaResource(const QnMediaResourcePtr& resource)
             playbackMask.includeTimePeriod({bookmark.startTimeMs, bookmark.durationMs});
     }
 
-    m_currentCamera->exportMediaPeriodToFile(d->settings.period,
-        uniqId,
-        QnStorageResourcePtr(d->storage),
-        timeZone(resource),
-        playbackMask);
+    using namespace nx::recording;
+    qint64 startTimeUs = d->settings.period.startTimeMs * 1000ll;
+    NX_ASSERT(d->settings.period.durationMs > 0, "Invalid time period, possibly LIVE is exported");
+    qint64 endTimeUs = d->settings.period.durationMs > 0
+        ? d->settings.period.endTimeMs() * 1000ll
+        : DATETIME_NOW;
 
+    d->exportReader.reset(resource->createDataProvider(Qn::CR_Default));
+    QnAbstractArchiveStreamReader* archiveReader =
+        dynamic_cast<QnAbstractArchiveStreamReader*>(d->exportReader.get());
+    if (!archiveReader)
+    {
+        d->exportReader.reset();
+        exportFinished(Error(Error::Code::invalidResourceType), fileName);
+        return false;
+    }
+
+    archiveReader->setCycleMode(false);
+    archiveReader->setQuality(MEDIA_Quality_High, true); // For 'mkv' and 'avi' files.
+    archiveReader->setPlaybackMask(playbackMask);
+    auto filter = archiveReader->streamDataFilter();
+    filter.setFlag(nx::vms::api::StreamDataFilter::motion, true);
+    filter.setFlag(nx::vms::api::StreamDataFilter::media, true);
+    archiveReader->setStreamDataFilter(filter);
+
+    QnRtspClientArchiveDelegate* rtspClient =
+        dynamic_cast<QnRtspClientArchiveDelegate*>(archiveReader->getArchiveDelegate());
+    if (rtspClient)
+    {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        rtspClient->setCamera(camera);
+        rtspClient->setPlayNowModeAllowed(false);
+        rtspClient->setMediaRole(PlaybackMode::export_);
+        rtspClient->setRange(startTimeUs, endTimeUs, 0);
+    }
+
+    d->exportRecorder = std::make_unique<nx::vms::client::desktop::NovMediaExport>(
+        resource,
+        d->exportReader.get(),
+        QnStorageResourcePtr(d->storage),
+        fileName,
+        startTimeUs,
+        endTimeUs);
+
+    connect(d->exportRecorder.get(), &QnStreamRecorder::recordingProgress,
+        this, &ExportLayoutTool::progressChanged);
+    connect(d->exportRecorder.get(), &QnStreamRecorder::recordingFinished,
+        this, &ExportLayoutTool::exportFinished, Qt::QueuedConnection);
+
+    // TODO: add analytics objects to an export file as well.
+
+    d->exportReader->addDataProcessor(d->exportRecorder.get());
+    if (archiveReader)
+        archiveReader->jumpTo(startTimeUs, startTimeUs);
+
+    d->exportReader->start();
+    d->exportRecorder->start();
     return true;
 }
 
-void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recording::Error>& status,
+void ExportLayoutTool::exportFinished(const std::optional<nx::recording::Error>& status,
     const QString& filename)
 {
+    d->stopExport();
+
     if (d->status == ExportProcessStatus::cancelled)
         return;
 
@@ -578,55 +644,10 @@ void ExportLayoutTool::at_camera_exportFinished(const std::optional<nx::recordin
         d->finishExport(false);
         return;
     }
-
-    auto camera = dynamic_cast<QnClientVideoCamera*>(sender());
-    if (!camera)
-        return;
-
-    int numberOfChannels = camera->resource()->getVideoLayout()->channelCount();
-    bool error = false;
-
-    if (camera->recorder())
-    {
-        auto strartTimes = camera->recorder()->startTimestamps();
-        if (!strartTimes.empty())
-        {
-            QString strartTimesFileName =
-                NX_FMT("start_times_%1.txt", fileNameForResource(camera->resource()));
-            QByteArray buffer;
-            for(const auto& time: strartTimes)
-                buffer.append(QByteArray::number(time) + " ");
-            writeData(strartTimesFileName, buffer);
-        }
-    }
-
-    for (int i = 0; i < numberOfChannels; ++i)
-    {
-        if (QSharedPointer<QBuffer> motionFileBuffer = camera->motionIODevice(i))
-        {
-            motionFileBuffer->close();
-            if (error)
-                continue;
-
-            QString uniqId = fileNameForResource(camera->resource());
-            QString motionFileName = lit("motion%1_%2.bin").arg(i).arg(uniqId);
-            /* Other buffers must be closed even in case of error. */
-            writeData(motionFileName, motionFileBuffer->buffer());
-        }
-    }
-
-    if (error)
-    {
-        d->lastError = ExportProcessError::unsupportedMedia;
-        d->finishExport(false);
-    }
-    else
-    {
-        exportNextCamera();
-    }
+    exportNextCamera();
 }
 
-void ExportLayoutTool::at_camera_progressChanged(int progress)
+void ExportLayoutTool::progressChanged(int progress)
 {
     emit valueChanged(m_offset * 100 + progress);
 }

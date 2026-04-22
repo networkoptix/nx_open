@@ -21,18 +21,14 @@ class NovMediaExport:
     public nx::StorageRecordingContext
 {
 public:
-    NovMediaExport(const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider);
+    NovMediaExport(const QnMediaResourcePtr& resource,
+        QnAbstractStreamDataProvider* mediaProvider,
+        const QnStorageResourcePtr& storage,
+        const QString& filename,
+        int64_t startTimeUs,
+        int64_t endTimeUs);
     virtual ~NovMediaExport() override;
-
-    void setServerTimeZone(QTimeZone value);
-    void setStorage(const QString& fileName, const QnStorageResourcePtr& storage);
     virtual std::optional<nx::recording::Error> getLastError() const override;
-    const std::vector<int64_t>& startTimestamps() { return m_startTimestamps; }
-
-    /*
-    * Export motion stream to separate file
-    */
-    void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
 
 private:
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
@@ -54,7 +50,9 @@ private:
     virtual bool fileStarted(
         qint64 /*startTimeMs*/, int /*timeZone*/, const QString& /*fileName*/) override  { return true; };
 
-    bool saveMotion(const QnConstMetaDataV1Ptr& media);
+    bool saveMotion(const QnConstMetaDataV1Ptr& media) override;
+    bool writeFile(const QString& fileName, const QByteArray& data);
+    void writeMotionData();
 
 private:
     QString m_baseFileName;
@@ -68,7 +66,7 @@ private:
     QString m_metadataFileName;
     std::vector<int64_t> m_startTimestamps;
     bool m_finishAllFiles = false;
-    QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
+    std::unique_ptr<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 } // namespace nx::vms::client::desktop

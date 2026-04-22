@@ -11,27 +11,34 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/export/tools/export_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx/vms/common/system_settings.h>
 #include <recording/helpers/recording_context_helpers.h>
 
 namespace nx::vms::client::desktop {
 
 NovMediaExport::NovMediaExport(
-    const QnResourcePtr& dev, QnAbstractStreamDataProvider* mediaProvider):
-    QnStreamRecorder(dev),
-    nx::StorageRecordingContext(true),
-    m_mediaProvider(mediaProvider)
+    const QnMediaResourcePtr& resource,
+    QnAbstractStreamDataProvider* mediaProvider,
+    const QnStorageResourcePtr& storage,
+    const QString& filename,
+    int64_t startTimeUs,
+    int64_t endTimeUs)
+    :
+    QnStreamRecorder(resource),
+    nx::StorageRecordingContext(/*exportMode*/ true),
+    m_baseFileName(filename),
+    m_storage(storage),
+    m_mediaProvider(mediaProvider),
+    m_timeZone(timeZone(resource))
 {
+    setContainer("mkv");
+    setProgressBounds(startTimeUs, endTimeUs);
 }
 
 NovMediaExport::~NovMediaExport()
 {
     stop();
-}
-
-void NovMediaExport::setServerTimeZone(QTimeZone value)
-{
-    m_timeZone = std::move(value);
 }
 
 void NovMediaExport::adjustMetaData(QnAviArchiveMetadata& metaData) const
@@ -68,41 +75,82 @@ void NovMediaExport::initializeRecordingContext(int64_t startTimeUs)
         m_metadataFileName = m_recordingContext.fileName;
 }
 
-void NovMediaExport::setStorage(const QString& fileName, const QnStorageResourcePtr& storage)
-{
-    m_baseFileName = fileName;
-    m_storage = storage;
-}
-
-void NovMediaExport::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])
-{
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionFileList[i] = motionFileList[i];
-}
-
 bool NovMediaExport::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
-    if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
+    if (!motion)
     {
-        NX_VERBOSE(this,
-            "Saving motion, timestamp %1 us, resource: %2",
-            motion->timestamp, m_resource);
-        motion->serialize(m_motionFileList[motion->channelNumber].data());
+        NX_WARNING(this, "Empty motion data");
+        return false;
     }
 
+    int channel = motion->channelNumber;
+    if (channel >= CL_MAX_CHANNELS)
+    {
+        NX_WARNING(this, "Invalid motion data: %1", motion);
+        return false;
+    }
+
+    if (!motion->isEmpty())
+    {
+        if (!m_motionFileList[channel])
+        {
+            m_motionFileList[channel].reset(new QBuffer());
+            m_motionFileList[channel]->open(QIODevice::ReadWrite);
+        }
+
+        NX_VERBOSE(this, "Saving motion, timestamp %1 us", motion->timestamp);
+        motion->serialize(m_motionFileList[channel].get());
+    }
+    return true;
+}
+
+bool NovMediaExport::writeFile(const QString& path, const QByteArray& data)
+{
+    NX_DEBUG(this, "Creating file: %1", path);
+    std::unique_ptr<QIODevice> file(m_storage->open(path, QIODevice::WriteOnly));
+    if (!file)
+    {
+        NX_WARNING(this, "Failed to create file: %1", path);
+        setLastError(nx::recording::Error::Code::fileCreate);
+        return false;
+    }
+    if (file->write(data) == -1)
+    {
+        NX_WARNING(this, "Failed to write to file: %1", path);
+        setLastError(nx::recording::Error::Code::fileWrite);
+        return false;
+    }
     return true;
 }
 
 void NovMediaExport::reportFinished()
 {
     if (m_finishAllFiles)
-    {
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        {
-            if (m_motionFileList[i])
-                m_motionFileList[i]->close();
-        }
         emit recordingFinished(getLastError(), m_recordingContext.fileName);
+}
+
+void NovMediaExport::writeMotionData()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
+        if (m_motionFileList[i])
+        {
+            m_motionFileList[i]->close();
+            QString path = NX_FMT("motion%1_%2.bin", i, m_baseFileName);
+            if (!writeFile(path, m_motionFileList[i]->buffer()))
+                return;
+        }
+    }
+
+    if (!m_startTimestamps.empty())
+    {
+        QString path = NX_FMT("start_times_%1.txt", m_baseFileName);
+        QByteArray buffer;
+        for (const auto& time: m_startTimestamps)
+            buffer.append(QByteArray::number(time) + " ");
+
+        if (!writeFile(path, buffer))
+            return;
     }
 }
 
@@ -168,6 +216,7 @@ void NovMediaExport::endOfRun()
             NX_WARNING(this, "SignVideo: metadata tag was not updated");
         }
     }
+    writeMotionData();
 }
 
 void NovMediaExport::setLastError(nx::recording::Error::Code code)
