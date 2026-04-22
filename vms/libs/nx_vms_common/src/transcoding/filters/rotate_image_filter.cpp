@@ -3,8 +3,14 @@
 #include "rotate_image_filter.h"
 
 #include <nx/media/ffmpeg/frame_info.h>
+#include <nx/media/ffmpeg/shared_memory_frame_allocator.h>
+#include <nx/utils/log/log.h>
 
-CLVideoDecoderOutputPtr rotateImage(const CLConstVideoDecoderOutputPtr& frame, int angle)
+CLVideoDecoderOutputPtr rotateImage(
+    const CLConstVideoDecoderOutputPtr& frame,
+    int angle,
+    bool useSharedMemory,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator)
 {
     if (angle > 180)
         angle = 270;
@@ -24,8 +30,32 @@ CLVideoDecoderOutputPtr rotateImage(const CLConstVideoDecoderOutputPtr& frame, i
             transposeChroma = true;
     }
 
-    CLVideoDecoderOutputPtr dstPict(new CLVideoDecoderOutput());
-    dstPict->reallocate(dstWidth, dstHeight, frame->format);
+    CLVideoDecoderOutputPtr dstPict;
+    if (useSharedMemory)
+    {
+        // Isolated analytics path: rotation output must stay in SHM so IPC can pass only handles
+        // without copying pixel payload through message queue.
+        dstPict = nx::media::ffmpeg::allocateSystemFrameInSharedMemory(
+            dstWidth,
+            dstHeight,
+            static_cast<AVPixelFormat>(frame->format),
+            sharedMemoryAllocator);
+        if (!dstPict)
+        {
+            NX_WARNING(
+                NX_SCOPE_TAG,
+                "Failed to allocate shared-memory frame for rotation, size %1x%2 format %3",
+                dstWidth,
+                dstHeight,
+                frame->format);
+            return nullptr;
+        }
+    }
+    else
+    {
+        dstPict.reset(new CLVideoDecoderOutput());
+        dstPict->reallocate(dstWidth, dstHeight, frame->format);
+    }
     dstPict->assignMiscData(frame.get());
 
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get((AVPixelFormat) frame->format);

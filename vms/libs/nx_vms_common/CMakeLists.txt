@@ -71,8 +71,9 @@ target_compile_definitions(nx_vms_common
         NX_VMS_COMMON_API=${API_IMPORT_MACRO}
 )
 
-if(LINUX)
+if(LINUX AND NOT ANDROID)
     add_dependencies(nx_vms_common libgl_stub libegl_stub libglx_stub libx11_stub libva-x11_stub)
+    target_link_libraries(nx_vms_common PRIVATE rt)
 endif()
 
 target_include_directories(nx_vms_common

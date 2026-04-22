@@ -2,9 +2,14 @@
 
 #include "ffmpeg_video_decoder.h"
 
+#include <array>
+#include <cerrno>
+#include <chrono>
+
 extern "C" {
 #include <libavutil/cpu.h>
-#include <libavutil/imgutils.h>
+#include <libavutil/frame.h>
+#include <libavutil/hwcontext.h>
 } // extern "C"
 
 #include <nx/codec/h264/common.h>
@@ -14,10 +19,12 @@ extern "C" {
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/ffmpeg/old_api.h>
+#include <nx/media/ffmpeg/shared_memory_frame_allocator.h>
 #include <nx/media/utils.h>
 #include <nx/metric/metrics_storage.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/math/rate_limiter.h>
 #include <utils/media/frame_type_extractor.h>
 
 static const int LIGHT_CPU_MODE_FRAME_PERIOD = 2;
@@ -30,6 +37,215 @@ bool isImage(const QnConstCompressedVideoDataPtr& data)
         || data->flags & QnAbstractMediaData::MediaFlags_StillImage;
 }
 
+AVPixelFormat hardwareFrameSoftwareFormat(const AVFrame* frame)
+{
+    // HW transfer requires frame->hw_frames_ctx so we can read its software counterpart format.
+    if (!frame || !frame->hw_frames_ctx)
+        return AV_PIX_FMT_NONE;
+
+    const auto* const hwFramesContext =
+        reinterpret_cast<const AVHWFramesContext*>(frame->hw_frames_ctx->data);
+    if (!hwFramesContext)
+        return AV_PIX_FMT_NONE;
+
+    return hwFramesContext->sw_format;
+}
+
+} // namespace
+
+void logVideoMemoryInvariantViolation(
+    const CLConstVideoDecoderOutputPtr& frame,
+    std::string_view context)
+{
+    // Centralized invariant check used by both motion and analytics conversion paths:
+    // hardware-backed frames must be explicitly marked as VideoMemory by HwVideoDecoder.
+    // Keep this rate-limited to avoid log floods under high frame throughput.
+    static nx::utils::math::RateLimiter limiter(std::chrono::seconds(5), /*amountAllowed*/ 1);
+    if (!limiter.isAllowed())
+        return;
+
+    NX_WARNING(
+        NX_SCOPE_TAG,
+        "Invariant violation: frame has hw_frames_ctx but is not marked VideoMemory (%1). "
+        "format=%2 memType=%3 data0=%4",
+        context,
+        frame ? frame->format : -1,
+        frame ? static_cast<int>(frame->memoryType()) : -1,
+        reinterpret_cast<quintptr>(frame ? frame->data[0] : nullptr));
+}
+
+CLVideoDecoderOutputPtr transferDecodedFrameToSystemMemory(
+    const CLConstVideoDecoderOutputPtr& sourceFrame,
+    bool useSharedMemory,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator)
+{
+    if (!sourceFrame)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to transfer decoded frame: source is null");
+        return nullptr;
+    }
+
+    if (!NX_ASSERT(
+            !sourceFrame->hw_frames_ctx || sourceFrame->memoryType() == MemoryType::VideoMemory))
+    {
+        logVideoMemoryInvariantViolation(sourceFrame, "transferDecodedFrameToSystemMemory");
+        return nullptr;
+    }
+
+    // Hardware-backed frames must be marked in HwVideoDecoder::receiveFrame().
+    if (sourceFrame->memoryType() != MemoryType::VideoMemory)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to transfer decoded frame: source is not marked as video-memory frame");
+        return nullptr;
+    }
+
+    if (!useSharedMemory)
+    {
+        // Current-process mode needs normal RAM frame, so just materialize it and return.
+        return sourceFrame->toSystemMemory();
+    }
+
+    const AVPixelFormat transferFormat = hardwareFrameSoftwareFormat(sourceFrame.get());
+    if (transferFormat == AV_PIX_FMT_NONE)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to determine software pixel format for hardware frame transfer");
+        return nullptr;
+    }
+
+    CLVideoDecoderOutputPtr transferredFrame =
+        nx::media::ffmpeg::allocateSystemFrameInSharedMemory(
+            sourceFrame->width,
+            sourceFrame->height,
+            transferFormat,
+            sharedMemoryAllocator);
+    // Isolated mode expects SHM-backed output, so allocate transfer destination in SHM.
+    if (!transferredFrame)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to allocate shared-memory frame %1x%2 format %3",
+            sourceFrame->width,
+            sourceFrame->height,
+            transferFormat);
+        return nullptr;
+    }
+
+    const int transferResult = av_hwframe_transfer_data(
+        transferredFrame.get(),
+        sourceFrame.get(),
+        0);
+    if (transferResult < 0)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to transfer frame from video memory to shared memory: %1",
+            nx::media::ffmpeg::avErrorToString(transferResult));
+        return nullptr;
+    }
+
+    if (transferredFrame->format == AV_PIX_FMT_YUV420P || transferredFrame->format == AV_PIX_FMT_NV12)
+    {
+        // No extra conversion needed. Keep the transferred SHM frame as-is.
+        transferredFrame->assignMiscData(sourceFrame.get());
+        return transferredFrame;
+    }
+
+    CLVideoDecoderOutputPtr yuvFrame =
+        nx::media::ffmpeg::allocateSystemFrameInSharedMemory(
+            transferredFrame->width,
+            transferredFrame->height,
+            AV_PIX_FMT_YUV420P,
+            sharedMemoryAllocator);
+    // Some HW outputs transfer to non-YUV420 formats. Convert into SHM YUV frame to preserve
+    // existing downstream assumptions and keep IPC payload deterministic.
+    if (!yuvFrame)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to allocate shared-memory YUV frame %1x%2",
+            transferredFrame->width,
+            transferredFrame->height);
+        return nullptr;
+    }
+
+    if (!transferredFrame->convertTo(yuvFrame.get()))
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to convert transferred frame format %1 to YUV420P",
+            transferredFrame->format);
+        return nullptr;
+    }
+
+    yuvFrame->assignMiscData(sourceFrame.get());
+    return yuvFrame;
+}
+
+CLVideoDecoderOutputPtr ensureDecodedFrameInSharedMemory(
+    const CLConstVideoDecoderOutputPtr& sourceFrame,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator)
+{
+    if (!sourceFrame)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to ensure SHM frame: source frame is null");
+        return nullptr;
+    }
+
+    if (!NX_ASSERT(
+            !sourceFrame->hw_frames_ctx || sourceFrame->memoryType() == MemoryType::VideoMemory))
+    {
+        logVideoMemoryInvariantViolation(sourceFrame, "ensureDecodedFrameInSharedMemory");
+        return nullptr;
+    }
+
+    if (nx::media::ffmpeg::isFrameBackedBySharedMemory(sourceFrame.get()))
+    {
+        // Already compliant with isolated-mode transport requirements.
+        return qSharedPointerConstCast<CLVideoDecoderOutput>(sourceFrame);
+    }
+
+    if (sourceFrame->memoryType() == MemoryType::VideoMemory)
+    {
+        // GPU-backed source: transfer directly into SHM buffer.
+        return transferDecodedFrameToSystemMemory(
+            sourceFrame,
+            /*useSharedMemory*/ true,
+            sharedMemoryAllocator);
+    }
+
+    CLVideoDecoderOutputPtr targetFrame =
+        nx::media::ffmpeg::allocateSystemFrameInSharedMemory(
+            sourceFrame->width,
+            sourceFrame->height,
+            static_cast<AVPixelFormat>(sourceFrame->format),
+            sharedMemoryAllocator);
+    // RAM-backed source: allocate destination in SHM and copy/convert data there.
+    if (!targetFrame)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to allocate SHM frame for copy %1x%2 format %3",
+            sourceFrame->width,
+            sourceFrame->height,
+            sourceFrame->format);
+        return nullptr;
+    }
+
+    if (!sourceFrame->convertTo(targetFrame.get()))
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG,
+            "Failed to copy software-decoded frame to SHM, format %1",
+            sourceFrame->format);
+        return nullptr;
+    }
+
+    targetFrame->assignMiscData(sourceFrame.get());
+    return targetFrame;
 }
 
 QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
@@ -143,6 +359,22 @@ bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
             m_currentWidth = m_context->width;
             m_currentHeight = m_context->height;
         }
+    }
+
+    if (m_config.useSharedMemory)
+    {
+        // Software decode path in isolated mode: FFmpeg allocates output frame planes in SHM.
+        m_context->get_buffer2 = nx::media::ffmpeg::getFfmpegSharedMemoryBuffer;
+        m_shmBufferContext =
+            std::make_unique<nx::media::ffmpeg::FfmpegSharedMemoryBufferContext>();
+        m_shmBufferContext->owner = nullptr;
+        m_shmBufferContext->allocator = m_config.sharedMemoryAllocator;
+        m_context->opaque = m_shmBufferContext.get();
+    }
+    else
+    {
+        m_shmBufferContext.reset();
+        m_context->opaque = nullptr;
     }
 
     m_frameTypeExtractor = std::make_unique<FrameTypeExtractor>(

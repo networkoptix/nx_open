@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <cstdint>
 #include <deque>
+#include <string_view>
 
 #include <QtGui/QImage>
 
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
+#include <nx/media/ffmpeg/shared_memory_frame_allocator.h>
 #include <nx/media/ffmpeg_helper.h>
 #include <nx/media/video_data_packet.h>
 
@@ -65,6 +68,7 @@ private:
     void setMultiThreadDecoding(bool value);
 
 private:
+    std::unique_ptr<nx::media::ffmpeg::FfmpegSharedMemoryBufferContext> m_shmBufferContext;
     AVCodecContext *m_context;
 
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
@@ -94,3 +98,20 @@ private:
     const DecoderConfig m_config;
     bool m_opened = false;
 };
+
+NX_VMS_COMMON_API CLVideoDecoderOutputPtr transferDecodedFrameToSystemMemory(
+    const CLConstVideoDecoderOutputPtr& sourceFrame,
+    bool useSharedMemory,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator);
+
+NX_VMS_COMMON_API CLVideoDecoderOutputPtr ensureDecodedFrameInSharedMemory(
+    const CLConstVideoDecoderOutputPtr& sourceFrame,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator);
+
+/**
+ * Logs broken decoder contract where a frame still has hw_frames_ctx but is not marked
+ * as MemoryType::VideoMemory. `context` should identify the caller/checkpoint.
+ */
+NX_VMS_COMMON_API void logVideoMemoryInvariantViolation(
+    const CLConstVideoDecoderOutputPtr& frame,
+    std::string_view context);

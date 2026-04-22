@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <nx/media/decoder_types.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/media/media_data_packet.h>
@@ -10,6 +12,11 @@
 extern "C" {
 #include <libavutil/pixfmt.h>
 }
+
+namespace nx::media::ffmpeg {
+class FfmpegSharedMemoryAllocator;
+using FfmpegSharedMemoryAllocatorPtr = std::shared_ptr<FfmpegSharedMemoryAllocator>;
+} // namespace nx::media::ffmpeg
 
 static constexpr int kMaxDecodeThread = 4;
 
@@ -20,6 +27,8 @@ struct DecoderConfig
     MultiThreadDecodePolicy mtDecodePolicy = MultiThreadDecodePolicy::autoDetect;
     bool forceGrayscaleDecoding = false; //< Force grayscale decoding if true. Don't change current value if false.
     bool forceRgbaFormat = false; //< Forces YUV -> RGB conversion on decoder thread.
+    bool useSharedMemory = false; //< Use shared memory for decoded frames.
+    nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr sharedMemoryAllocator; //< Optional explicit SHM allocator.
 };
 
 //!Abstract interface. Every video decoder MUST implement this interface.

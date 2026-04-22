@@ -14,6 +14,10 @@ nx_add_target(nx_media_core LIBRARY
     FOLDER common/libs
 )
 
+if(LINUX AND NOT ANDROID)
+    target_link_libraries(nx_media_core PRIVATE rt)
+endif()
+
 target_compile_definitions(nx_media_core
     PRIVATE NX_MEDIA_CORE_API=${API_EXPORT_MACRO}
     INTERFACE NX_MEDIA_CORE_API=${API_IMPORT_MACRO}

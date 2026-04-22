@@ -62,7 +62,7 @@ CLVideoDecoderOutput::~CLVideoDecoderOutput()
     clean();
 }
 
-CLVideoDecoderOutputPtr CLVideoDecoderOutput::toSystemMemory()
+CLVideoDecoderOutputPtr CLVideoDecoderOutput::toSystemMemory() const
 {
     /* Retrieve data from GPU to CPU */
     CLVideoDecoderOutputPtr softwareFrame(new CLVideoDecoderOutput());
