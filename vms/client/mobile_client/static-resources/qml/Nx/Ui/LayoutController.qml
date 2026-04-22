@@ -13,7 +13,7 @@ NxObject
     id: layoutController
 
     property ApplicationWindow mainWindow
-    property StackView stackView: mainWindow.uiContainer.stackView //< Makes proper context for the Workflow.
+    property StackView stackView: mainWindow?.uiContainer.stackView ?? null //< Makes proper context for the Workflow.
 
     // Current display orientation.
     readonly property bool isPortrait: mainWindow ? mainWindow.width <= mainWindow.height : false
