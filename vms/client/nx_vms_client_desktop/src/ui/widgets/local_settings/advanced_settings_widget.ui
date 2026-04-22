@@ -348,7 +348,7 @@
         <number>8</number>
        </property>
        <item>
-        <widget class="QPushButton" name="clearCacheButton">
+        <widget class="nx::vms::client::desktop::BusyIndicatorButton" name="clearCacheButton">
          <property name="text">
           <string>Clear Local Cache</string>
          </property>
@@ -613,6 +613,11 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::BusyIndicatorButton</class>
+   <extends>QPushButton</extends>
+   <header>nx/vms/client/desktop/common/widgets/busy_indicator_button.h</header>
+  </customwidget>
   <customwidget>
    <class>nx::vms::client::desktop::AlertLabel</class>
    <extends>QWidget</extends>

@@ -27,11 +27,17 @@ public:
 
     bool isRestartRequired() const;
 
+protected:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
 private slots:
     void at_clearCacheButton_clicked();
     void at_resetAllWarningsButton_clicked();
 
 private:
+    void clearWebEngineData();
+    void startRetryRemoval(const QString& path);
+
     bool isAudioDownmixed() const;
     void setAudioDownmixed(bool value);
 
@@ -66,6 +72,8 @@ private:
 
 private:
     QScopedPointer<Ui::AdvancedSettingsWidget> ui;
+
+    bool m_clearingCache = false;
 
     struct Private;
     nx::utils::ImplPtr<Private> d;

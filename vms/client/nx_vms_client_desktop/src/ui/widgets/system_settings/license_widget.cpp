@@ -78,7 +78,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     connect(ui->activateLicenseButton, &QPushButton::clicked, this,
         [this]()
         {
-            ui->activateLicenseButton->showIndicator();
+            ui->activateLicenseButton->setIndicatorVisible(true);
             emit licenseActivationRequested();
         });
 
@@ -86,14 +86,14 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     connect(ui->activateLicenseManualButton, &QPushButton::clicked, this,
         [this]()
         {
-            ui->activateLicenseManualButton->showIndicator();
+            ui->activateLicenseManualButton->setIndicatorVisible(true);
             emit licenseActivationRequested();
         });
 
     connect(ui->activateFreeLicenseButton, &QPushButton::clicked, this,
         [this]()
         {
-            ui->activateFreeLicenseButton->showIndicator();
+            ui->activateFreeLicenseButton->setIndicatorVisible(true);
             setSerialKey(nx::branding::freeLicenseKey());
             emit licenseActivationRequested();
         });
@@ -197,9 +197,9 @@ void QnLicenseWidget::updateControls()
         ui->activateLicenseButton->setEnabled(canActivate);
         ui->activateLicenseManualButton->setEnabled(canActivate);
 
-        ui->activateLicenseButton->hideIndicator();
-        ui->activateFreeLicenseButton->hideIndicator();
-        ui->activateLicenseManualButton->hideIndicator();
+        ui->activateLicenseButton->setIndicatorVisible(false);
+        ui->activateFreeLicenseButton->setIndicatorVisible(false);
+        ui->activateLicenseManualButton->setIndicatorVisible(false);
     }
     updateManualActivationLinkText();
 }

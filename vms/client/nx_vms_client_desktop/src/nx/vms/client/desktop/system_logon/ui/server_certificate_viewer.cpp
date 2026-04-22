@@ -351,8 +351,7 @@ void ServerCertificateViewer::pinCertificate()
             handle = 0;
         }));
 
-    m_okButton->showIndicator();
-    m_okButton->setEnabled(false);
+    m_okButton->setBusy(true);
     while (handle > 0)
         qApp->processEvents();
 

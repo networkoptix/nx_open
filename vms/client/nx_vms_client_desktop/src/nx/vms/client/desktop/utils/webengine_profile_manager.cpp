@@ -2,6 +2,8 @@
 
 #include "webengine_profile_manager.h"
 
+#include <algorithm>
+
 #include <QtCore/QDir>
 #include <QtCore/QHash>
 #include <QtCore/QStandardPaths>
@@ -11,6 +13,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/log/assert.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -24,6 +27,7 @@ struct WebEngineProfileManager::Private
 {
     WebEngineProfileManager* const parent;
     QHash<QString, QPointer<QQuickWebEngineProfile>> profiles;
+    int activeUserCount = 0;
 
     Private(WebEngineProfileManager* parent): parent(parent) {}
 
@@ -84,6 +88,41 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
             });
     }
     return profile.data();
+}
+
+bool WebEngineProfileManager::hasActiveUsers() const
+{
+    return d->activeUserCount > 0;
+}
+
+void WebEngineProfileManager::addProfileUser()
+{
+    ++d->activeUserCount;
+}
+
+void WebEngineProfileManager::removeProfileUser()
+{
+    if (NX_ASSERT(d->activeUserCount > 0, "Profile user count underflow: %1"), d->activeUserCount)
+        --d->activeUserCount;
+}
+
+bool WebEngineProfileManager::hasActiveProfiles() const
+{
+    return std::ranges::any_of(d->profiles,
+        [](const QPointer<QQuickWebEngineProfile>& p) { return !p.isNull(); });
+}
+
+void WebEngineProfileManager::clearProfiles()
+{
+    if (!NX_ASSERT(!hasActiveUsers()))
+        return;
+
+    for (auto& profile: d->profiles)
+    {
+        if (profile)
+            profile->deleteLater();
+    }
+    d->profiles.clear();
 }
 
 Q_INVOKABLE QQuickWebEngineProfile* WebEngineProfileManager::getProfile(

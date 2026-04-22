@@ -8,7 +8,7 @@ namespace nx::vms::client::desktop {
 
 class BusyIndicatorWidget;
 
-class BusyIndicatorButton : public QPushButton
+class BusyIndicatorButton: public QPushButton
 {
     Q_OBJECT
     using base_type = QPushButton;
@@ -18,9 +18,11 @@ public:
 
     BusyIndicatorWidget* indicator() const;
 
-    void showIndicator(bool show = true);
-    void hideIndicator();
+    bool isBusy() const;
+    void setBusy(bool busy);
+
     bool isIndicatorVisible() const;
+    void setIndicatorVisible(bool visible);
 
 protected:
     virtual void resizeEvent(QResizeEvent* event) override;
