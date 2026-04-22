@@ -3,11 +3,10 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 
 import Nx.Core
-import Nx.Core.Items
 import Nx.Core.Controls
+import Nx.Core.Items
 import Nx.Mobile
 import Nx.Ui
 
@@ -22,16 +21,17 @@ Control
     property EventSearchModel eventsModel: null
     property int currentEventIndex: -1
     property alias previewId: preview.previewId
+    property alias previewAspectRatio: preview.previewAspectRatio
     property string trackId //< This property is used in GUI tests, do not remove.
     property alias previewState: preview.previewState
     property var resource
     property var timestampMs
     property alias title: titleItem.text
+    property alias extraText: extraTextItem.text
     property alias eventTimestampText: eventTimeItem.text
     property bool shared: false
 
     implicitWidth: (parent && parent.width) ?? 0
-    implicitHeight: 122
     padding: 12
     clip: true
 
@@ -51,22 +51,14 @@ Control
         {
             id: preview
 
+            minimumAspectRatio: 1
+
             Layout.preferredWidth: 120
-            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             backgroundColor: ColorTheme.colors.dark6
             borderColor: backgroundColor
-
-            layer.enabled: true
-            layer.effect: OpacityMask
-            {
-                maskSource: Rectangle
-                {
-                    width: preview.width
-                    height: preview.height
-                    radius: 4
-                }
-            }
+            radius: 4
 
             Rectangle
             {
@@ -110,6 +102,22 @@ Control
                 color: ColorTheme.colors.light4
                 font.pixelSize: 16
                 font.weight: Font.Medium
+                lineHeight: 1.25
+            }
+
+            Text
+            {
+                id: extraTextItem
+
+                width: parent.width
+                visible: !!NxGlobals.toPlainText(text)         
+                elide: Text.ElideRight
+                wrapMode: Text.WrapAnywhere
+                maximumLineCount: 2
+
+                color: ColorTheme.colors.light10
+                font.pixelSize: 16
+                font.weight: Font.Normal
                 lineHeight: 1.25
             }
 

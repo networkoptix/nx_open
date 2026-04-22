@@ -136,9 +136,11 @@ Page
             currentEventIndex: index
             resource: model.resource
             previewId: model.previewId
+            previewAspectRatio: model.previewAspectRatio
             trackId: model.trackId?.toString() ?? ""
             previewState: model.previewState
             title: model.display
+            extraText: model.description
             timestampMs: model.timestampMs
             shared: !!model.isSharedBookmark
 
