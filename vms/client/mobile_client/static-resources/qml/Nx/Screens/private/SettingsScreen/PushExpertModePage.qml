@@ -233,7 +233,6 @@ BaseSettingsPage
         id: preloaderOverlay
 
         parent: pushExpertModePage
-        blurSource: pushExpertModePage
     }
 
     Connections
