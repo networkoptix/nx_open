@@ -1956,10 +1956,6 @@
       <translation>Cabeceira HTTP: Servidor, variables compatibles: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>Cabeceira HTTP: orixe.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>Cabeceira HTTP: opcións de X-Frame.</translation>
     </message>
@@ -2014,6 +2010,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>Controla como se cargan as integracións. Os valores posibles son: &quot;ManifestoControlado&quot;&quot;, &quot;ForzarCarganunProcesoSeparado&quot;,&quot;ForzarCargaenProcesoActual&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>Cabeceira HTTP: Control-de-Acceso-Permitir-Orixe.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>Cabeceira HTTP: Control-de-Acceso-Permitir-Credenciais.</translation>
     </message>
   </context>
 </TS>

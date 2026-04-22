@@ -1886,10 +1886,6 @@
       <translation>Header HTTP: Server, variabel yang didukung: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>Header HTTP: Asal.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>Header HTTP: Opsi X-Frame.</translation>
     </message>
@@ -1944,6 +1940,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>Mengontrol cara integrasi dimuat. Nilai yang mungkin adalah: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>Header HTTP: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>Header HTTP: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>

@@ -6122,7 +6122,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>LDAP 使用者</translation>
     </message>
   </context>
   <context>

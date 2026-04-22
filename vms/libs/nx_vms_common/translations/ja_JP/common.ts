@@ -1886,10 +1886,6 @@
       <translation>HTTPヘッダー: サーバー、サポートされている変数: $vmsName, $vmsVersion, $company, $compatibility。</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP ヘッダー: Origin。</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP ヘッダー: X-Frame-Options。</translation>
     </message>
@@ -1944,6 +1940,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>インテグレーションの読み込み方法を制御します。以下より選択してください: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;, &quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>HTTP ヘッダー: Access-Control-Allow-Origin</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>HTTP ヘッダー: Access-Control-Allow-Credentials</translation>
     </message>
   </context>
 </TS>

@@ -1886,10 +1886,6 @@
       <translation>Tiêu đề HTTP: Máy chủ, các biến được hỗ trợ: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>Tiêu đề HTTP: Nguồn gốc.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>Tiêu đề HTTP: X-Frame-Options.</translation>
     </message>
@@ -1944,6 +1940,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>Kiểm soát cách thức tải các tích hợp. Các giá trị có thể là: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>

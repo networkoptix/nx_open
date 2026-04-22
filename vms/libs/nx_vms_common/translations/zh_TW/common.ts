@@ -1886,10 +1886,6 @@
       <translation>HTTP header：伺服器，支援的變數： $vmsName、 $vmsVersion、 $company、 $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP header: Origin.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP header: X-Frame-Options.</translation>
     </message>
@@ -1944,6 +1940,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>控制整合載入的方式，可選值如下：&quot;manifestControlled&quot;、&quot;forceLoadingInSeparateProcess&quot;、&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>HTTP header: Access-Control-Allow-Origin</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>HTTP header: Access-Control-Allow-Credentials</translation>
     </message>
   </context>
 </TS>

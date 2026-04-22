@@ -563,7 +563,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>

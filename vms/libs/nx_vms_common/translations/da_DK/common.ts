@@ -1956,10 +1956,6 @@
       <translation>HTTP header: Server, understøttede variabler: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
-      <source>HTTP header: Origin.</source>
-      <translation>HTTP header: Oprindelse.</translation>
-    </message>
-    <message>
       <source>HTTP header: X-Frame-Options.</source>
       <translation>HTTP header: X-Frame indstillinger.</translation>
     </message>
@@ -2014,6 +2010,14 @@
     <message>
       <source>Controls how integrations are loaded. Possible values are: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</source>
       <translation>Styrer, hvordan integrationer indlæses. Mulige værdier er: &quot;manifestControlled&quot;, &quot;forceLoadingInSeparateProcess&quot;,&quot;forceLoadingInCurrentProcess&quot;</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Origin.</source>
+      <translation>HTTP-header: Adgangskontrol-Tillad-Oprindelse.</translation>
+    </message>
+    <message>
+      <source>HTTP header: Access-Control-Allow-Credentials.</source>
+      <translation>HTTP-header: Adgangskontrol-Tillad-Legitimationsoplysninger.</translation>
     </message>
   </context>
 </TS>

@@ -452,7 +452,7 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>全部重置</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -567,11 +567,11 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
-      <translation type="unfinished">-5 sec</translation>
+      <translation>-5 秒</translation>
     </message>
     <message>
       <source>+5 sec</source>
-      <translation type="unfinished">+5 sec</translation>
+      <translation>+5 秒</translation>
     </message>
   </context>
   <context>
@@ -826,27 +826,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>沒有書籤</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>沒有物件</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>沒有位移</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>此時間軸上未建立任何書籤</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>此時間軸上未偵測到任何物件</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>此時間軸上未偵測到任何位移</translation>
     </message>
   </context>
   <context>
