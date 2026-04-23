@@ -36,7 +36,7 @@ Rectangle
 
     property real minimumDurationMs: 500
 
-    readonly property real defaultDurationMs: 60 * 60 * 1000
+    readonly property real defaultDurationMs: 24 * 60 * 60 * 1000
 
     readonly property real bottomBoundMs:
         objects.bottomBoundMs ?? (endTimeMs - defaultDurationMs)
@@ -435,6 +435,16 @@ Rectangle
                     {
                         if (content.height <= 0)
                             return
+
+                        // On the first height assignment, objects.height is 0, so
+                        // objects.millisecondsPerPixel is meaninglessly large (durationMs / 1).
+                        // Using it as a zoom reference would zoom out to weeks of data.
+                        // Just set the initial height and skip the zoom calculation.
+                        if (objects.height <= 0)
+                        {
+                            objects.height = content.height
+                            return
+                        }
 
                         // Zoom to keep approximately the same time-to-pixel ratio.
                         // Start time and duration are integer, thus we cannot ensure the same
@@ -940,6 +950,45 @@ Rectangle
 
             target: timeScale
             property: "durationMs"
+        }
+    }
+
+    // Adjusts the initial zoom level when archive data becomes available.
+    // If no archive exists within the default 24h window, zooms out to show the entire archive.
+    Connections
+    {
+        target: timeline.chunkProvider
+
+        property bool initialZoomApplied: false
+
+        function onLoadingChanged()
+        {
+            if (initialZoomApplied || timeline.chunkProvider.loading)
+                return
+
+            initialZoomApplied = true
+
+            const nowMs = NxGlobals.syncNowMs()
+            const archiveStartMs = timeline.chunkProvider.bottomBound
+
+            // No archive at all.
+            if (archiveStartMs < 0)
+                return
+
+            // Check if the latest archive chunk extends into the last 24 hours.
+            const latestChunkEndMs =
+                timeline.chunkProvider.closestChunkEndMs(nowMs, /*forward*/ false)
+            if (latestChunkEndMs >= 0 && latestChunkEndMs >= nowMs - timeline.defaultDurationMs)
+                return //< There is archive within the default window; keep the 24h zoom.
+
+            // No archive within the last 24 hours. Zoom out to show the entire archive.
+            const archiveDurationMs = nowMs - archiveStartMs
+            if (archiveDurationMs > timeline.defaultDurationMs)
+            {
+                timeScale.durationMs = archiveDurationMs
+                timeScale.startTimeMs = archiveStartMs
+                timeline.windowAtLive = true
+            }
         }
     }
 
