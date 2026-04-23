@@ -11,6 +11,10 @@
 
 namespace nx::network::http {
 
+// Cap on bytes produced by a gzip/deflate content decoder. Mitigates decompression-bomb DoS on
+// Content-Encoding: gzip (ANAS-191).
+static constexpr std::uint64_t kMaxDecompressedMessageBodySize = 32 * 1024 * 1024;
+
 bool HttpStreamReader::parseBytes(
     const ConstBufferRefType& data,
     size_t* bytesProcessed)
@@ -448,7 +452,11 @@ std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter>
     HttpStreamReader::createContentDecoder(const std::string& encodingName)
 {
     if (encodingName == "gzip" || encodingName == "deflate")
-        return std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
+    {
+        auto uncompressor = std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
+        uncompressor->setMaxOutputSize(kMaxDecompressedMessageBodySize);
+        return uncompressor;
+    }
     return nullptr;
 }
 
