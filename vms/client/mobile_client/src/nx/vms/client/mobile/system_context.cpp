@@ -3,7 +3,6 @@
 #include "system_context.h"
 
 #include <QtGui/QGuiApplication>
-#include <QtQml/QQmlEngine>
 
 #include <api/runtime_info_manager.h>
 #include <camera/camera_thumbnail_cache.h>
@@ -15,7 +14,6 @@
 #include <nx/branding.h>
 #include <nx/client/mobile/soft_trigger/event_rules_watcher.h>
 #include <nx/client/mobile/two_way_audio/server_audio_connection_watcher.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/event_search/models/analytics_search_list_model.h>
@@ -23,18 +21,12 @@
 #include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/bookmark_search_setup.h>
-#include <nx/vms/client/core/network/network_manager.h>
-#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/event_search/utils/common_object_search_setup.h>
-#include <nx/vms/client/mobile/session/session_manager.h>
-#include <nx/vms/client/mobile/system_context.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/client/mobile/workarounds/user_rights_workaround.h>
 #include <nx/vms/discovery/manager.h>
 #include <ui/camera_thumbnail_provider.h>
@@ -60,21 +52,11 @@ struct SystemContext::Private
     std::unique_ptr<QnCameraThumbnailCache> thumbnailsCache;
 
     QnCameraThumbnailProvider* thumbnailProvider() const;
-    SessionManager* sessionManager() const;
 };
 
 QnCameraThumbnailProvider* SystemContext::Private::thumbnailProvider() const
 {
     return appContext()->cameraThumbnailProvider();
-}
-
-SessionManager* SystemContext::Private::sessionManager() const
-{
-    // There is no window context in unit tests mode.
-    if (const auto windowContext = appContext()->mainWindowContext())
-        return windowContext->sessionManager();
-
-    return nullptr;
 }
 
 SystemContext* SystemContext::fromResource(const QnResource* resource)
@@ -107,15 +89,6 @@ SystemContext::SystemContext(Mode mode,
         return;
 
     d->thumbnailsCache = std::make_unique<QnCameraThumbnailCache>(this);
-
-    connect(d->sessionManager(), &SessionManager::stateChanged, this,
-        [this]()
-        {
-            if (d->sessionManager()->hasConnectedSession())
-                d->thumbnailsCache->start();
-            else
-                d->thumbnailsCache->stop();
-        });
 
     if (d->thumbnailProvider())
         d->thumbnailProvider()->addThumbnailCache(d->thumbnailsCache.get());
@@ -165,9 +138,6 @@ SystemContext::SystemContext(Mode mode,
     connect(qApp, &QGuiApplication::applicationStateChanged, this, updateDiscoveryState);
 
     d->availableCamerasWatcher = std::make_unique<QnAvailableCamerasWatcher>(this);
-    connect(userWatcher(), &core::UserWatcher::userChanged,
-        d->availableCamerasWatcher.get(), &QnAvailableCamerasWatcher::setUser);
-
     d->resourceDiscoveryManager = std::make_unique<QnResourceDiscoveryManager>(this);
     d->resourceProcessor = std::make_unique<core::ResourceProcessor>(this);
     d->resourceProcessor->moveToThread(d->resourceDiscoveryManager.get());
@@ -176,8 +146,7 @@ SystemContext::SystemContext(Mode mode,
     d->resourceDiscoveryManager->start();
 
     d->serverAudioConnectionWatcher =
-        std::make_unique<nx::client::mobile::ServerAudioConnectionWatcher>(
-            d->sessionManager(), this);
+        std::make_unique<nx::client::mobile::ServerAudioConnectionWatcher>(this);
 
     d->twoWayAudioController = std::make_unique<core::TwoWayAudioController>(this);
 
@@ -191,28 +160,6 @@ SystemContext::SystemContext(Mode mode,
     const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
     connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
     updateTimeMode();
-
-    connect(d->sessionManager(), &SessionManager::connectedServerVersionChanged, this,
-        [this]()
-        {
-            static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
-
-            const bool compatibilityMode =
-                d->sessionManager()->connectedServerVersion() < kUserRightsRefactoredVersion;
-            availableCamerasWatcher()->setCompatiblityMode(compatibilityMode);
-        });
-
-    const auto watcher = userWatcher();
-    connect(watcher, &core::UserWatcher::userNameChanged, this,
-        [this, watcher]()
-        {
-            if (watcher->userName().isEmpty())
-            {
-                NX_DEBUG(this, "User name changed to empty, stopping session");
-                if (d->sessionManager()->hasSession())
-                    d->sessionManager()->stopSessionByUser();
-            }
-        });
 
     // Workaround for supporting audio-only devices when connecting to server versions earlier than
     // 6.1, which do not send resource type information for mobile client.
@@ -246,9 +193,6 @@ SystemContext::~SystemContext()
 {
     if (d->thumbnailProvider())
         d->thumbnailProvider()->removeThumbnailCache(d->thumbnailsCache.get());
-
-    if (d->sessionManager())
-        d->sessionManager()->resetSession();
 
     if (messageProcessor())
         deleteMessageProcessor();

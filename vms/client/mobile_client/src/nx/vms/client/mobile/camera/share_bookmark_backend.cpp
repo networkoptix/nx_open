@@ -24,12 +24,10 @@
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
 #include <nx/vms/client/mobile/ui/share_link_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
-#include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/text/human_readable.h>
 #include <utils/common/delayed.h>
@@ -131,15 +129,9 @@ bool ShareBookmarkBackend::Private::updateShareParams(
 
 void ShareBookmarkBackend::Private::showErrorMessage() const
 {
-    if (const auto applicationContext = appContext())
-    {
-        if (const auto windowContext = applicationContext->mainWindowContext())
-        {
-            emit windowContext->deprecatedUiController()->genericError(
-                ShareBookmarkBackend::tr("Error"),
-                ShareBookmarkBackend::tr("Cannot share bookmark."));
-        }
-    }
+    emit q->errorOccurred(
+        ShareBookmarkBackend::tr("Error"),
+        ShareBookmarkBackend::tr("Cannot share bookmark."));
 }
 
 //--------------------------------------------------------------------------------------------------

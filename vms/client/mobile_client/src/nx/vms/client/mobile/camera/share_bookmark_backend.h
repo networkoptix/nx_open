@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QUrl>
 
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/mobile/timeline/abstract_object_data.h>
@@ -101,6 +100,7 @@ signals:
     void objectDataChanged();
     void bookmarkChanged();
     void isAvailableChanged();
+    void errorOccurred(const QString& title, const QString& text);
 
 private:
     struct Private;

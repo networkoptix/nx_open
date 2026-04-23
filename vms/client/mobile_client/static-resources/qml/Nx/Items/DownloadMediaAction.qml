@@ -50,7 +50,7 @@ Action
         {
             id: mediaDownloadBackend
 
-            onErrorOccured: (title, description) => Workflow.openStandardDialog(title, description)
+            onErrorOccurred: (title, description) => Workflow.openStandardDialog(title, description)
         }
     }
 }

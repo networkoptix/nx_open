@@ -29,9 +29,11 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/utils/reconnect_helper.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/push_notification/details/push_ipc_data.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -274,6 +276,16 @@ Session::Private::Private(
             // This value won't change, but it's not so critical.
             updateSystemName(settings->systemName());
         });
+
+    connect(q->userWatcher(), &core::UserWatcher::userNameChanged, this,
+        [this]()
+        {
+            emit this->q->userNameChanged(this->q->userWatcher()->userName());
+        });
+
+    connect(q->systemContext()->sessionTimeoutWatcher(),
+        &core::RemoteSessionTimeoutWatcher::sessionExpired,
+        q, &Session::expired);
 
     m_suspendedTimer.setInterval(2min);
     m_suspendedTimer.setSingleShot(true);

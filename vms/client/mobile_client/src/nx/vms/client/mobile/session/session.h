@@ -155,10 +155,14 @@ signals:
     void restoringConnectionChanged();
     void wasConnectedChanged();
     void systemNameChanged();
+    void userNameChanged(const QString& name);
     void connectedServerVersionChanged();
 
     /** Signalizes that session successfully restored after connection loss. */
     void restored();
+
+    /** The session was expired by the Site timeout. */
+    void expired();
 
     /**
      * Signalizes when session is stopped due to error in initial connection process

@@ -52,7 +52,7 @@ public:
 signals:
     void downloadAvailabilityChanged();
     void resourceChanged();
-    void errorOccured(const QString& title, const QString& description);
+    void errorOccurred(const QString& title, const QString& description);
 
 private:
     virtual void onContextReady() override;

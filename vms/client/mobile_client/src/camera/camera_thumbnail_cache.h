@@ -35,9 +35,6 @@ public:
         QObject* parent = nullptr);
     virtual ~QnCameraThumbnailCache() override;
 
-    void start();
-    void stop();
-
     virtual QString cacheId() const override;
     virtual QPixmap getThumbnail(const QString& thumbnailId) const override;
     QString thumbnailId(const nx::Uuid& resourceId) const;
@@ -48,7 +45,10 @@ public:
 signals:
     void thumbnailUpdated(const nx::Uuid& resourceId, const QString& thumbnailId);
 
-private slots:
+private:
+    void start();
+    void stop();
+
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 

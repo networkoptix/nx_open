@@ -10,7 +10,6 @@
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/session/session_manager.h>
 
 using namespace nx::vms::client;
 
@@ -19,13 +18,11 @@ namespace client {
 namespace mobile {
 
 ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
-    nx::vms::client::mobile::SessionManager* sessionManager,
     nx::vms::client::core::SystemContext* systemContext,
     QObject* parent)
     :
     base_type(parent),
-    SystemContextAware(systemContext),
-    m_sessionManager(sessionManager)
+    SystemContextAware(systemContext)
 {
     const auto userWatcher = systemContext->userWatcher();
 
@@ -43,10 +40,10 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
         this, &ServerAudioConnectionWatcher::handleResourceRemoved);
     connect(userWatcher, &nx::vms::client::core::UserWatcher::userChanged,
         this, &ServerAudioConnectionWatcher::tryAddCurrentServerConnection);
-    connect(m_sessionManager, &nx::vms::client::mobile::SessionManager::hasConnectedSessionChanged,
-        this, &ServerAudioConnectionWatcher::handleConnectedChanged);
+    connect(systemContext, &nx::vms::client::core::SystemContext::remoteIdChanged,
+        this, &ServerAudioConnectionWatcher::handleRemoteIdChanged);
 
-    handleConnectedChanged();
+    handleRemoteIdChanged();
     for (const auto& resource: resourcePool()->getResources<nx::vms::client::core::DesktopResource>())
         handleResourceAdded(resource);
 }
@@ -105,13 +102,14 @@ void ServerAudioConnectionWatcher::handleResourceRemoved(const QnResourcePtr& re
     }
 }
 
-void ServerAudioConnectionWatcher::handleConnectedChanged()
+void ServerAudioConnectionWatcher::handleRemoteIdChanged()
 {
     tryRemoveCurrentServerConnection();
 
-    if (!m_sessionManager->hasConnectedSession())
-        return;
     m_remoteServerId = systemContext()->currentServerId();
+    if (m_remoteServerId.isNull())
+        return;
+
     handleResourceAdded(resourcePool()->getResourceById<QnMediaServerResource>(m_remoteServerId));
 }
 

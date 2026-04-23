@@ -181,7 +181,7 @@ void MediaDownloadBackend::Private::runDownloadForContext(const VideoDownloadCon
 
 void MediaDownloadBackend::Private::showDownloadProcessError()
 {
-    emit q->errorOccured(tr("Can't download video"),
+    emit q->errorOccurred(tr("Can't download video"),
         tr("Please check a network connection."));
 }
 

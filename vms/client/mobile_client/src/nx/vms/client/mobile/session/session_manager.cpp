@@ -6,7 +6,7 @@
 
 #include <QtQml/QtQml>
 
-#include <network/system_helpers.h>
+#include <mobile_client/mobile_client_ui_controller.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/url.h>
@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/connection_info.h>
 #include <nx/vms/client/core/network/credentials_manager.h>
+#include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -71,11 +72,10 @@ void SessionManager::Private::startSession(
 {
     resetSession();
 
-    // TODO: #sivanov Make this class SystemContextAware.
-    session = Session::create(core::appContext()->currentSystemContext()->as<SystemContext>(),
-        data,
-        supposedSystemName,
-        std::move(connectionCallback));
+    // TODO: #amalov Create separate system context for different sessions.
+    auto systemContext = core::appContext()->currentSystemContext()->as<SystemContext>();
+    session = Session::create(
+        systemContext, data, supposedSystemName, std::move(connectionCallback));
 
     const auto handleStateChanged =
         [this]()
@@ -98,6 +98,33 @@ void SessionManager::Private::startSession(
         q, &SessionManager::sessionParametersChanged);
     connect(session.get(), &Session::restored,
         q, &SessionManager::sessionRestored);
+
+    connect(session.get(), &Session::userNameChanged, q,
+        [this](const QString& name)
+        {
+            if (name.isEmpty() && q->hasSession())
+            {
+                NX_DEBUG(this, "User name changed to empty, stopping session");
+                q->stopSessionByUser();
+            }
+        }, Qt::QueuedConnection);
+
+    connect(session.get(), &Session::expired, q,
+        [this]()
+        {
+            q->stopSessionByUser();
+
+            auto error = core::errorDescription(
+                core::RemoteConnectionErrorCode::sessionExpired,
+                /*moduleInformation*/ {}, /*engineVersion*/ {});
+
+            executeLater(
+                [this, error]()
+                {
+                    emit q->windowContext()->deprecatedUiController()->genericError(
+                        error.shortText, error.longText);
+                }, q);
+        }, Qt::QueuedConnection);
 
     connect(session.get(), &Session::finishedWithError, this,
         [this](
@@ -146,7 +173,6 @@ void SessionManager::Private::handleSessionChanged()
     emit q->stateChanged();
     emit q->sessionHostChanged();
     emit q->systemNameChanged();
-    emit q->sessionHostChanged();
     emit q->connectedServerVersionChanged();
     emit q->hasReconnectingSessionChanged();
     emit q->hasConnectedSessionChanged();
@@ -290,7 +316,7 @@ SessionManager::SessionManager(WindowContext* context, QObject* parent):
 SessionManager::~SessionManager()
 {
     if (hasSession())
-        d->resetSession();
+        resetSession();
 }
 
 void SessionManager::startSessionWithCredentials(

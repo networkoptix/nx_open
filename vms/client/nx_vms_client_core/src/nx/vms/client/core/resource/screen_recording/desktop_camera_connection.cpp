@@ -329,30 +329,37 @@ void DesktopCameraConnection::run()
 
     while (!m_needStop)
     {
-        QnMediaServerResourcePtr server;
-        RemoteConnectionPtr connection;
+        nx::Url serverUrl;
+        nx::utils::SoftwareVersion serverVersion;
+        nx::network::ssl::AdapterFunc adapterFunc;
+
         {
             NX_MUTEX_LOCKER lock(&d->mutex);
-            server = d->server;
+            auto server = d->server;
+            lock.unlock();
+
             if (server)
             {
-                const auto systemContext = SystemContext::fromResource(server);
-                if (NX_ASSERT(systemContext))
-                    connection = systemContext->connection();
+                if (const auto systemContext = SystemContext::fromResource(server);
+                    NX_ASSERT(systemContext))
+                {
+                    if (auto connection = systemContext->connection())
+                    {
+                        serverUrl = server->getApiUrl();
+                        serverVersion = server->getVersion();
+                        adapterFunc = connection->certificateCache()->makeAdapterFunc(
+                            server->getId(), serverUrl);
+                    }
+                }
             }
         }
 
-        if (!connection)
+        if (!adapterFunc)
             break;
 
-        const auto serverId = server->getId();
-        const auto serverVersion = server->getVersion();
-        auto url = server->getApiUrl();
-        url.setPath("/desktop_camera");
-        server.reset();
+        serverUrl.setPath("/desktop_camera");
 
-        auto newClient = std::make_unique<nx::network::http::HttpClient>(
-            connection->certificateCache()->makeAdapterFunc(serverId, url));
+        auto newClient = std::make_unique<nx::network::http::HttpClient>(adapterFunc);
 
         newClient->addAdditionalHeader("user-name", d->credentials.username);
         const auto uniqueId = DesktopResource::calculateUniqueId(
@@ -365,7 +372,7 @@ void DesktopCameraConnection::run()
 
         setupNetwork(std::move(newClient), {}, serverVersion);
 
-        if (!d->httpClient->doGet(url))
+        if (!d->httpClient->doGet(serverUrl))
         {
             terminatedSleep(1000 * 10);
             continue;

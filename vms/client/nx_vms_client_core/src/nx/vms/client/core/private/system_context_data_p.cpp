@@ -26,6 +26,7 @@ void SystemContext::Private::handleConnectionChanged(const RemoteConnectionPtr& 
             q, &SystemContext::credentialsChanged);
     }
 
+    emit q->remoteIdChanged(q->currentServerId());
     emit q->credentialsChanged();
 }
 

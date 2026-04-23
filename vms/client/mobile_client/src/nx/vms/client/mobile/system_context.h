@@ -28,10 +28,6 @@ class BookmarkSearchSetup;
 
 namespace nx::vms::client::mobile {
 
-class MediaDownloadManager;
-class SessionManager;
-class WindowContext;
-
 class SystemContext: public core::SystemContext
 {
     Q_OBJECT

@@ -5,7 +5,6 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/media/jpeg.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/proxy_image_result.h>
@@ -107,6 +106,14 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(
     QnThumbnailCacheBase(parent),
     SystemContextAware(context)
 {
+    connect(context, &nx::vms::client::core::SystemContext::remoteIdChanged, this,
+        [this](nx::Uuid serverId)
+        {
+            if (serverId.isNull())
+                stop();
+            else
+                start();
+        });
 }
 
 QnCameraThumbnailCache::~QnCameraThumbnailCache()
@@ -219,6 +226,8 @@ void QnCameraThumbnailCache::refreshThumbnail(const nx::Uuid& id)
 
     auto callback = [this, id](const QImage& image)
     {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
         ThumbnailData& thumbnailData = m_thumbnailByResourceId[id];
         if (image.isNull())
         {
@@ -242,11 +251,14 @@ void QnCameraThumbnailCache::refreshThumbnail(const nx::Uuid& id)
         thumbnailData.time = m_elapsedTimer.elapsed();
         thumbnailData.loading = false;
 
+        lock.unlock();
+
         if (thumbnailLoaded)
             emit thumbnailUpdated(id, thumbnailId);
     };
 
-    auto request = cameraRequestManager()->request(camera, callback, maxImageHeight);
+    auto request = cameraRequestManager()->request(
+        camera, nx::utils::guarded(this, std::move(callback)), maxImageHeight);
 
     if (!request)
     {

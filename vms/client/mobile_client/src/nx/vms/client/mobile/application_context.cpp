@@ -8,7 +8,6 @@
 
 #include <core/resource/mobile_client_resource_factory.h>
 #include <mobile_client/mobile_client_settings.h>
-#include <mobile_client/mobile_client_ui_controller.h>
 #include <nx/build_info.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/guarded_callback.h>
@@ -221,30 +220,6 @@ void ApplicationContext::Private::initializeMainSystemContext()
 
     if (systemContextMode == SystemContext::Mode::unitTests)
         return;
-
-    connect(mainSystemContext->sessionTimeoutWatcher(),
-        &core::RemoteSessionTimeoutWatcher::sessionExpired,
-        q,
-        nx::utils::guarded(q,
-            [this](core::RemoteSessionTimeoutWatcher::SessionExpirationReason)
-            {
-                const auto manager = appContext()->mainWindowContext()->sessionManager();
-                if (!manager)
-                    return;
-
-                manager->stopSessionByUser();
-
-                auto error = core::errorDescription(
-                    core::RemoteConnectionErrorCode::sessionExpired,
-                    /*moduleInformation*/ {}, /*engineVersion*/ {});
-
-                executeLater(
-                    [this, error]()
-                    {
-                        emit windowContext->deprecatedUiController()->genericError(
-                            error.shortText, error.longText);
-                    }, q);
-            }));
 
     initializeConnectionUserInteractionDelegate();
 }

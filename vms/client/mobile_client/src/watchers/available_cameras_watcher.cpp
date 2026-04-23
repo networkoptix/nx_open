@@ -6,6 +6,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 
 #include "available_cameras_watcher_p.h"
 
@@ -30,13 +32,30 @@ public:
 };
 
 QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(
-    nx::vms::common::SystemContext* systemContext,
+    nx::vms::client::core::SystemContext* systemContext,
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::SystemContextAware(systemContext),
+    SystemContextAware(systemContext),
     d_ptr(new QnAvailableCamerasWatcherPrivate(this))
 {
+    connect(userWatcher(), &nx::vms::client::core::UserWatcher::userChanged,
+        this, &QnAvailableCamerasWatcher::setUser);
+
+    connect(systemContext, &nx::vms::client::core::SystemContext::remoteIdChanged, this,
+        [this](nx::Uuid serverId)
+        {
+            if (serverId.isNull())
+                return;
+
+            static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
+
+            const bool compatibilityMode =
+                this->systemContext()->moduleInformation().version < kUserRightsRefactoredVersion;
+
+            setCompatibilityMode(compatibilityMode);
+        });
+
     const auto handleAccessRightsChanged =
         [this]()
         {
@@ -101,7 +120,7 @@ bool QnAvailableCamerasWatcher::compatibilityMode() const
     return d->compatibilityMode;
 }
 
-void QnAvailableCamerasWatcher::setCompatiblityMode(bool compatibilityMode)
+void QnAvailableCamerasWatcher::setCompatibilityMode(bool compatibilityMode)
 {
     Q_D(QnAvailableCamerasWatcher);
     if (d->compatibilityMode == compatibilityMode)

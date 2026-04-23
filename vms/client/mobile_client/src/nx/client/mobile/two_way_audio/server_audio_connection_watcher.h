@@ -8,8 +8,6 @@
 #include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/core/system_context_aware.h>
 
-namespace nx::vms::client::mobile { class SessionManager; }
-
 namespace nx {
 namespace client {
 namespace mobile {
@@ -21,7 +19,6 @@ class ServerAudioConnectionWatcher: public QObject, nx::vms::client::core::Syste
 
 public:
     ServerAudioConnectionWatcher(
-        nx::vms::client::mobile::SessionManager* sessionManager,
         nx::vms::client::core::SystemContext* systemContext,
         QObject* parent = nullptr);
 
@@ -34,13 +31,12 @@ private:
 
     void handleResourceRemoved(const QnResourcePtr& resource);
 
-    void handleConnectedChanged();
+    void handleRemoteIdChanged();
 
 private:
     nx::Uuid m_remoteServerId;
     nx::vms::client::core::DesktopResourcePtr m_desktop;
     QnMediaServerResourcePtr m_server;
-    QPointer<nx::vms::client::mobile::SessionManager> m_sessionManager;
 };
 
 } // namespace mobile

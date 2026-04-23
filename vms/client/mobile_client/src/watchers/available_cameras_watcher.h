@@ -5,12 +5,11 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <nx/utils/uuid.h>
-#include <nx/vms/common/system_context_aware.h>
+#include <nx/vms/client/core/system_context_aware.h>
 
 class QnAvailableCamerasWatcherPrivate;
 
-class QnAvailableCamerasWatcher: public QObject, public nx::vms::common::SystemContextAware
+class QnAvailableCamerasWatcher: public QObject, public nx::vms::client::core::SystemContextAware
 {
     Q_OBJECT
 
@@ -18,9 +17,9 @@ class QnAvailableCamerasWatcher: public QObject, public nx::vms::common::SystemC
 
 public:
     QnAvailableCamerasWatcher(
-        nx::vms::common::SystemContext* systemContext,
+        nx::vms::client::core::SystemContext* systemContext,
         QObject* parent = nullptr);
-    ~QnAvailableCamerasWatcher();
+    virtual ~QnAvailableCamerasWatcher() override;
 
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr& user);
@@ -28,7 +27,7 @@ public:
     QnVirtualCameraResourceList availableCameras() const;
 
     bool compatibilityMode() const;
-    void setCompatiblityMode(bool compatibilityMode);
+    void setCompatibilityMode(bool compatibilityMode);
 
 signals:
     void cameraAdded(const QnResourcePtr& resource);

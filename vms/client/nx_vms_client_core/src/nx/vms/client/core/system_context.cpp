@@ -163,8 +163,6 @@ void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
     d->initializeIoPortsInterface();
 
     d->handleConnectionChanged(oldConnection, connection());
-
-    emit remoteIdChanged(currentServerId());
 }
 
 void SystemContext::setConnection(RemoteConnectionPtr value)
