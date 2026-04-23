@@ -235,7 +235,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
         [
             {
                 "id": "nx.stub.objectTypeWithAttributeList",
-                "name": "Stub: Object Type with Attribute List",
+                "name": "Stub: Object Type With Attribute List",
                 "attributes": [
                     {
                         "attributeList": "nx.stub.attributeList"
@@ -293,7 +293,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Object Type containing Enum attributes with inline items.",
                 "id": "nx.stub.objectTypeEnumAtributesWithInlineItems",
-                "name": "Stub: Object Type Enum attributes with inline items",
+                "name": "Stub: Object Type Enum Attributes With Inline Items",
                 "attributes":
                 [
                     {
@@ -310,7 +310,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Object Type containing dependent attributes.",
                 "id": "nx.stub.objectTypeWithDependentAttributes",
-                "name": "Stub: Object Type with dependent attributes",
+                "name": "Stub: Object Type With Dependent Attributes",
                 "attributes":
                 [
                     {
@@ -379,7 +379,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Derived Object Type that blacklists some Attributes of its base Type with \"omittedBaseAttributes\".",
                 "id": "nx.stub.derivedObjectTypeWithOmittedAttributes",
-                "name": "Stub: Derived Object Type with omitted attributes",
+                "name": "Stub: Derived Object Type With Omitted Attributes",
                 "base": "nx.stub.baseObjectType1",
                 "omittedBaseAttributes":
                 [
@@ -400,14 +400,14 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Hidden derived Object Type. Such Types are not shown in the Analytics Panel.",
                 "id": "nx.stub.hiddenDerivedObjectType",
-                "name": "Stub: Hidden derived object type",
+                "name": "Stub: Hidden Derived Object Type",
                 "base": "nx.stub.baseObjectType1",
                 "flags": "hiddenDerivedType"
             },
             {
                 "_comment": "Hidden derived Object Types can have their own Attributes. Such Attributes are shown when its base Type is selected in the Analytics Panel.",
                 "id": "nx.stub.hiddenDerivedObjectTypeWithOwnAttributes",
-                "name": "Stub: Hidden derived object type with own attributes",
+                "name": "Stub: Hidden Derived Object Type With Own Attributes",
                 "base": "nx.stub.baseObjectType2",
                 "flags": "hiddenDerivedType",
                 "attributes":
@@ -421,7 +421,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Declaring a Derived Object Type makes its base supported as well.",
                 "id": "nx.stub.derivedObjectTypeWithUnsupportedBase",
-                "name": "Stub: Derived Object Type with unsupported base",
+                "name": "Stub: Derived Object Type With Unsupported Base",
                 "base": "nx.stub.baseObjectType2",
                 "attributes":
                 [
@@ -434,7 +434,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             },
             {
                 "id": "nx.stub.objectTypeWithNumberAttributes",
-                "name": "Stub: Object Type with Number attributes",
+                "name": "Stub: Object Type With Number Attributes",
                 "attributes":
                 [
                     {
@@ -480,7 +480,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             },
             {
                 "id": "nx.stub.objectTypeWithBooleanAttributes",
-                "name": "Stub: Object Type with Boolean attributes",
+                "name": "Stub: Object Type With Boolean Attributes",
                 "attributes":
                 [
                     {
@@ -519,13 +519,13 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             },
             {
                 "id": "nx.stub.objectTypeWithIcon",
-                "name": "Stub: Object Type with icon",
+                "name": "Stub: Object Type With Icon",
                 "icon": "nx.base.car"
             },
             {
                 "_comment": "Object Types can inherit from the Types declared in the Base Type Library.",
                 "id": "nx.stub.objectTypeInheritedFromBaseTypeLibraryType",
-                "name": "Stub: Object Type inherited from a Base Type Library Type",
+                "name": "Stub: Object Type Inherited From A Base Type Library Type",
                 "base": "nx.base.Person",
                 "omittedBaseAttributes":
                 [
@@ -558,7 +558,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Object Types can use Enum Types declared in the Base Type Library.",
                 "id": "nx.stub.objectTypeUsingBaseTypeLibraryEnumType",
-                "name": "Stub: Custom Type using Base Type Library Enum Type",
+                "name": "Stub: Custom Type Using Base Type Library Enum Type",
                 "attributes":
                 [
                     {
@@ -571,7 +571,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Object Types can use Color Types declared in the Base Type Library.",
                 "id": "nx.stub.objectTypeUsingBaseTypeLibraryColorType",
-                "name": "Stub: Custom Type using Base Type Library Color Type",
+                "name": "Stub: Custom Type Using Base Type Library Color Type",
                 "attributes":
                 [
                     {
@@ -584,7 +584,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Base Type Library Object Types can be used to declare Attributes being nested Objects.",
                 "id": "nx.stub.objectTypeUsingBaseTypeLibraryObjectType",
-                "name": "Stub: Custom Type using Base Type Library Object Type",
+                "name": "Stub: Custom Type Using Base Type Library Object Type",
                 "attributes":
                 [
                     {
@@ -597,7 +597,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Objects of live-only types are not recorded to the database and archive and available in the Live mode only.",
                 "id": "nx.stub.liveOnlyObjectType",
-                "name": "Stub: Live-only Object Type",
+                "name": "Stub: Live-Only Object Type",
                 "flags": "liveOnly",
                 "attributes":
                 [
@@ -610,7 +610,7 @@ static const std::string kDeviceAgentManifest = /*suppress newline*/ 1 + (const 
             {
                 "_comment": "Objects of non-indexable types aren't available for search, but still recorded to the archive.",
                 "id": "nx.stub.nonIndexableObjectType",
-                "name": "Stub: Non-indexable Object Type",
+                "name": "Stub: Non-Indexable Object Type",
                 "flags": "nonIndexable",
                 "attributes":
                 [
