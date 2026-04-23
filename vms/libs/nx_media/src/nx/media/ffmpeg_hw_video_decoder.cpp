@@ -23,7 +23,15 @@ namespace {
 AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
 {
     if (!rhi)
+    {
+        // VideoToolbox does not require an external GPU context (AVHWDeviceContext.hwctx is always
+        // null for VideoToolbox), so it can be used even without an RHI instance.
+#if defined(Q_OS_APPLE)
+        return AV_HWDEVICE_TYPE_VIDEOTOOLBOX;
+#else
         return AV_HWDEVICE_TYPE_NONE;
+#endif
+    }
 
     switch (rhi->backend())
     {
