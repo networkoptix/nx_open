@@ -23,8 +23,14 @@ public:
         Method method = Method::gzip);
     virtual ~Uncompressor() override;
 
+    void setMaxOutputSize(std::uint64_t maxOutputSize);
+
     virtual bool processData(const ConstBufferRefType& data) override;
     virtual size_t flush() override;
+
+private:
+    //Forwards decompressed data to the next filter, enforcing the max output size cap.
+    bool writeOutput(const ConstBufferRefType& out);
 
 private:
     class Private;

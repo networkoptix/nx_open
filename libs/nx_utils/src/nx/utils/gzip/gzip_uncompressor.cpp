@@ -24,6 +24,8 @@ public:
     z_stream zStream;
     Buffer outputBuffer;
     Method method = Method::gzip;
+    std::uint64_t totalOutputBytes = 0;
+    std::uint64_t maxOutputSize = 0; //< 0 means no limit.
 };
 
 Uncompressor::Uncompressor(
@@ -43,10 +45,29 @@ Uncompressor::~Uncompressor()
     inflateEnd(&d->zStream);
 }
 
+void Uncompressor::setMaxOutputSize(std::uint64_t maxOutputSize)
+{
+    d->maxOutputSize = maxOutputSize;
+}
+
+bool Uncompressor::writeOutput(const ConstBufferRefType& out)
+{
+    d->totalOutputBytes += out.size();
+    if (d->maxOutputSize > 0 && d->totalOutputBytes > d->maxOutputSize)
+    {
+        d->state = Private::State::failed;
+        return false;
+    }
+    return m_nextFilter->processData(out);
+}
+
 bool Uncompressor::processData(const ConstBufferRefType& data)
 {
     if (data.empty())
         return true;
+
+    if (d->state == Private::State::failed)
+        return false;
 
     bool isFirstInflateAttempt = true;
     int zFlushMode = Z_NO_FLUSH;
@@ -113,7 +134,8 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                         if (d->zStream.avail_out == 0 && d->zStream.avail_in > 0)
                         {
                             // Setting new output buffer and calling inflate once again.
-                            m_nextFilter->processData(d->outputBuffer);
+                            if (!writeOutput(d->outputBuffer))
+                                return false;
                             d->zStream.next_out = (Bytef*) d->outputBuffer.data();
                             d->zStream.avail_out = (uInt) d->outputBuffer.size();
                             continue;
@@ -121,7 +143,7 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                         else if (d->zStream.avail_in == 0)
                         {
                             // Input depleted.
-                            return m_nextFilter->processData(ConstBufferRefType(
+                            return writeOutput(ConstBufferRefType(
                                 d->outputBuffer.data(),
                                 (uInt) d->outputBuffer.size() - d->zStream.avail_out));
                         }
@@ -129,9 +151,12 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                         {
                             if (d->zStream.avail_out < (uInt) d->outputBuffer.size())
                             {
-                                m_nextFilter->processData(ConstBufferRefType(
+                                if (!writeOutput(ConstBufferRefType(
                                     d->outputBuffer.data(),
-                                    (uInt) d->outputBuffer.size() - d->zStream.avail_out));
+                                    (uInt) d->outputBuffer.size() - d->zStream.avail_out)))
+                                {
+                                    return false;
+                                }
                                 d->zStream.next_out = (Bytef*) d->outputBuffer.data();
                                 d->zStream.avail_out = (uInt) d->outputBuffer.size();
                             }
@@ -155,9 +180,12 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                             // May be some more out buf is required?
                             if (d->zStream.avail_out < (uInt) d->outputBuffer.size())
                             {
-                                m_nextFilter->processData(ConstBufferRefType(
+                                if (!writeOutput(ConstBufferRefType(
                                     d->outputBuffer.data(),
-                                    (uInt) d->outputBuffer.size() - d->zStream.avail_out));
+                                    (uInt) d->outputBuffer.size() - d->zStream.avail_out)))
+                                {
+                                    return false;
+                                }
                                 d->zStream.next_out = (Bytef*) d->outputBuffer.data();
                                 d->zStream.avail_out = (uInt) d->outputBuffer.size();
                                 continue; //< Trying with more output buffer.
@@ -178,7 +206,7 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
                         {
                             if (d->zStream.avail_out > 0)
                             {
-                                m_nextFilter->processData(ConstBufferRefType(
+                                return writeOutput(ConstBufferRefType(
                                     d->outputBuffer.data(),
                                     (uInt) d->outputBuffer.size() - d->zStream.avail_out));
                             }
@@ -209,6 +237,9 @@ bool Uncompressor::processData(const ConstBufferRefType& data)
 
 size_t Uncompressor::flush()
 {
+    if (d->state == Private::State::failed)
+        return 0;
+
     d->zStream.next_in = nullptr;
     d->zStream.avail_in = 0;
     d->zStream.next_out = (Bytef*) d->outputBuffer.data();
@@ -218,10 +249,10 @@ size_t Uncompressor::flush()
     if ((zResult == Z_OK || zResult == Z_STREAM_END)
         && (uInt) d->outputBuffer.size() > d->zStream.avail_out)
     {
-        m_nextFilter->processData(ConstBufferRefType(
-            d->outputBuffer.data(),
-            (uInt) d->outputBuffer.size() - d->zStream.avail_out));
-        return (uInt) d->outputBuffer.size() - d->zStream.avail_out;
+        const size_t produced = (uInt) d->outputBuffer.size() - d->zStream.avail_out;
+        if (!writeOutput(ConstBufferRefType(d->outputBuffer.data(), produced)))
+            return 0;
+        return produced;
     }
 
     return 0;
