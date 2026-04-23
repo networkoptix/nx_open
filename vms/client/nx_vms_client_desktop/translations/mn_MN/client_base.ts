@@ -367,7 +367,7 @@
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation type="unfinished">Add Bookmark...</translation>
+      <translation>Хавчуурга нэмэх...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>

@@ -785,7 +785,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Аналитик үйл явдлууд</translation>
     </message>
   </context>
   <context>
