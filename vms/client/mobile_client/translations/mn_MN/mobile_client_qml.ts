@@ -261,7 +261,7 @@
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Бүсчлэл</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -561,7 +561,7 @@
     <name>FocusControl</name>
     <message>
       <source>AF</source>
-      <translation type="unfinished">AF</translation>
+      <translation>AF</translation>
     </message>
   </context>
   <context>
@@ -1552,7 +1552,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Бүсчлэл</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
