@@ -132,6 +132,43 @@ BaseSettingsPage
             }
         }
 
+        Row
+        {
+            spacing: 8
+
+            visible: appContext.settings.useMaxHardwareDecodersCount
+
+            Text
+            {
+                text: "Max HW decoders:"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            QuickControls.ComboBox
+            {
+                id: maxHwDecodersComboBox
+
+                model: [
+                    { text: "Unlimited", value: 0 },
+                    { text: "3", value: 3 }
+                ]
+                textRole: "text"
+                valueRole: "value"
+                width: 180
+                currentIndex: appContext.settings.maxHardwareDecodersCount === 3 ? 1 : 0
+                onActivated:
+                {
+                    if (currentValue === appContext.settings.maxHardwareDecodersCount)
+                        return
+
+                    appContext.settings.maxHardwareDecodersCount = currentValue
+                    d.openRestartDialog()
+                }
+            }
+        }
+
         LabeledSwitch
         {
             id: forceTrafficLoggingSwitch

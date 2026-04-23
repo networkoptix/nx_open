@@ -54,6 +54,7 @@ public:
         UseDownloadVideoFeature,
 
         UseMaxHardwareDecodersCount,
+        MaxHardwareDecodersCount,
 
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
@@ -163,6 +164,11 @@ private:
             bool,
             useMaxHardwareDecodersCount, setUseMaxHardwareDecodersCount,
             UseMaxHardwareDecodersCount, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            int,
+            maxHardwareDecodersCount, setMaxHardwareDecodersCount,
+            MaxHardwareDecodersCount, 0) //< 0 means "use as many as the device supports" (translated to INT_MAX at startup).
 
         QN_DECLARE_RW_PROPERTY(
             bool,

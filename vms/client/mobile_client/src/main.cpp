@@ -158,11 +158,17 @@ int runUi(QGuiApplication* application)
     maxFfmpegResolutions[(int) AV_CODEC_ID_NONE] = maxFfmpegResolution;
     maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
 
-    static constexpr int kSingleHardwareDecoderCount = 1;
-    static constexpr int kMultipleHardwareDecoderCount = 3;
-    const int hardwareDecodersCount = qnSettings->useMaxHardwareDecodersCount()
-        ? kMultipleHardwareDecoderCount
-        : kSingleHardwareDecoderCount;
+    // When parallel decoding is enabled, try to use as many HW decoders as the device supports.
+    // The limit defaults to unlimited (0 in settings), but can be overridden in Developer Settings
+    // for debugging. The system falls back to SW automatically when codec slots are exhausted.
+    int hardwareDecodersCount = 1;
+    if (qnSettings->useMaxHardwareDecodersCount())
+    {
+        const int devLimit = qnSettings->maxHardwareDecodersCount();
+        // std::numeric_limits<int>::max() matches VideoDecoderRegistry::addPlugin default,
+        // meaning no practical limit on concurrent HW decoders.
+        hardwareDecodersCount = (devLimit > 0) ? devLimit : std::numeric_limits<int>::max();
+    }
     nx::media::DecoderRegistrar::registerDecoders(maxFfmpegResolutions, hardwareDecodersCount);
 
     #if defined(Q_OS_ANDROID)
