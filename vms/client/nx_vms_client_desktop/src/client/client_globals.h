@@ -338,9 +338,9 @@ namespace Qn
 
         AdditionalTextRole,                         /**< Role for additional description text (QString). */
         RemovableRole,                              /**< An item is removable (bool). */
-        CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
-        AdditionalActionRole,                       /**< Additional action (QSharedPointer<QAction>). */
-        OnCloseActionRole,                          /**< Action to trigger on tile close (QSharedPointer<QAction>). */
+        CommandActionRole,                          /**< Primary event tile action (CommandActionPtr). */
+        AdditionalActionRole,                       /**< Additional event tile action (CommandActionPtr). */
+        OnCloseActionRole,                          /**< Action to trigger on tile close (CommandActionPtr). */
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */

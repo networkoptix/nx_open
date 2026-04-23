@@ -39,6 +39,8 @@ private:
 
     void removeNotification(const nx::vms::rules::NotificationActionBasePtr& action);
 
+    void removedDeviceWarning();
+
 private:
     std::unique_ptr<CrossSystemNotificationsListener> m_listener;
 };

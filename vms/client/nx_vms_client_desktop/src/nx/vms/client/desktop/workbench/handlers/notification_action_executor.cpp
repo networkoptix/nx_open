@@ -68,6 +68,14 @@ QnCameraBookmark bookmarkFromAction(
     return bookmark;
 }
 
+SystemContext* activeDeviceContext(const QnResourcePtr& resource)
+{
+    if (resource && !resource->hasFlags(Qn::removed))
+        return SystemContext::fromResource(resource);
+
+    return nullptr;
+}
+
 }  // namespace
 
 NotificationActionExecutor::NotificationActionExecutor(QObject* parent):
@@ -90,7 +98,6 @@ NotificationActionExecutor::NotificationActionExecutor(QObject* parent):
 
     connect(action(menu::AcknowledgeNotificationAction), &QAction::triggered,
         this, &NotificationActionExecutor::handleAcknowledgeAction);
-
 }
 
 NotificationActionExecutor::~NotificationActionExecutor()
@@ -117,25 +124,23 @@ void NotificationActionExecutor::handleAcknowledgeAction()
     const auto notification = actionParams.argument<NotificationActionPtr>(Qn::ActionDataRole);
 
     const auto camera = actionParams.resource().dynamicCast<QnVirtualCameraResource>();
-    auto systemContext = SystemContext::fromResource(camera);
+    auto systemContext = activeDeviceContext(camera);
 
-    if (!camera || !systemContext || camera->hasFlags(Qn::removed))
+    if (!systemContext)
     {
-        QnSessionAwareMessageBox::warning(
-            mainWindowWidget(),
-            tr("Unable to acknowledge event on removed camera."));
-
         removeNotification(notification);
+        removedDeviceWarning();
+
         return;
     }
 
-    if (!accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (!systemContext->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
     {
+        removeNotification(notification);
         QnSessionAwareMessageBox::warning(
             mainWindowWidget(),
             tr("Unable to acknowledge event on inaccessible camera."));
 
-        removeNotification(notification);
         return;
     }
 
@@ -167,8 +172,7 @@ void NotificationActionExecutor::handleAcknowledgeAction()
             acknowledgeBookmark.actionId = notification->id();
             acknowledgeBookmark.actionServerId = notification->originPeerId();
 
-            auto callback = nx::utils::guarded(
-                this,
+            auto callback =
                 [this, id = notification->id(), camera](
                     rest::Handle,
                     bool success,
@@ -182,20 +186,31 @@ void NotificationActionExecutor::handleAcknowledgeAction()
 
                     NX_VERBOSE(this, "Acknowledged action id: %1, bookmark id: %2", id, bookmark->id);
 
-                    const auto systemContext = SystemContext::fromResource(camera);
-                    systemContext->cameraBookmarksManager()->addExistingBookmark(
-                        nx::vms::common::bookmarkFromApi(std::move(*bookmark)));
-                });
+                    if (const auto systemContext = activeDeviceContext(camera);
+                        systemContext && systemContext == this->system())
+                    {
+                        // There are no bookmarks in cross-system contexts.
+                        systemContext->cameraBookmarksManager()->addExistingBookmark(
+                            nx::vms::common::bookmarkFromApi(std::move(*bookmark)));
+                    }
+                };
 
-            auto systemContext = SystemContext::fromResource(camera);
-            const auto handle = systemContext->connectedServerApi()->acknowledge(
-                acknowledgeBookmark,
-                std::move(callback),
-                this->thread());
+            if (auto systemContext = activeDeviceContext(camera))
+            {
+                const auto handle = systemContext->connectedServerApi()->acknowledge(
+                    acknowledgeBookmark,
+                    std::move(callback),
+                    this);
 
-            // Hiding notification instantly to keep UX smooth.
-            if (handle)
+                // Hiding notification instantly to keep UX smooth.
+                if (handle)
+                    removeNotification(notification);
+            }
+            else
+            {
                 removeNotification(notification);
+                removedDeviceWarning();
+            }
         });
 
     bookmarksDialog->show();
@@ -270,6 +285,12 @@ void NotificationActionExecutor::removeNotification(
 {
     action->setState(nx::vms::rules::State::stopped);
     emit notificationActionReceived(action, {});
+}
+
+void NotificationActionExecutor::removedDeviceWarning()
+{
+    QnSessionAwareMessageBox::warning(
+        mainWindowWidget(), tr("Unable to acknowledge event on removed camera."));
 }
 
 } // namespace nx::vms::client::desktop

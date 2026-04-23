@@ -3,47 +3,33 @@
 #include "notification_list_model_p.h"
 
 #include <analytics/common/object_metadata.h>
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/taxonomy/abstract_state_watcher.h>
-#include <nx/analytics/taxonomy/object_type.h>
-#include <nx/utils/metatypes.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
-#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
-#include <nx/vms/client/core/skin/color_theme.h>
-#include <nx/vms/client/core/skin/resource_icon_cache.h>
-#include <nx/vms/client/core/skin/skin.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
-#include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/rules/actions/repeat_sound_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/actions/show_on_alarm_layout_action.h>
 #include <nx/vms/rules/utils/type.h>
-#include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/delayed.h>
-#include <utils/media/audio_player.h>
 
 namespace nx::vms::client::desktop {
 
@@ -55,26 +41,9 @@ namespace {
 constexpr auto kDisplayTimeout = std::chrono::milliseconds(12500);
 constexpr auto kProcessNotificationCacheTimeout = std::chrono::milliseconds(500);
 
-QnResourcePtr getResource(nx::Uuid resourceId, const QString& cloudSystemId)
-{
-    if (resourceId.isNull())
-        return {};
-
-    nx::vms::client::core::SystemContext* systemContext = nullptr;
-    if (!cloudSystemId.isEmpty())
-        systemContext = appContext()->systemContextByCloudSystemId(cloudSystemId);
-
-    if (!systemContext)
-        systemContext = appContext()->currentSystemContext();
-
-    if (!NX_ASSERT(systemContext))
-        return {};
-
-    return systemContext->resourcePool()->getResourceById(resourceId);
-}
-
 // TODO: #amalov Simplify device transfer logic using list only.
 QnVirtualCameraResourceList getActionDevices(
+    const QnResourcePool* resourcePool,
     const nx::vms::rules::NotificationAction* action,
     const QString& cloudSystemId)
 {
@@ -91,7 +60,7 @@ QnVirtualCameraResourceList getActionDevices(
     QnVirtualCameraResourceList result;
     for (const auto deviceId : deviceIds)
     {
-        auto device = getResource(deviceId, cloudSystemId).dynamicCast<QnVirtualCameraResource>();
+        auto device = resourcePool->getResourceById<QnVirtualCameraResource>(deviceId);
 
         if (!device && context)
         {
@@ -332,7 +301,9 @@ void NotificationListModel::Private::onNotificationAction(
     const QSharedPointer<nx::vms::rules::NotificationAction>& action,
     const QString& cloudSystemId)
 {
-    NX_VERBOSE(this, "Cloud system id: %1", cloudSystemId);
+    NX_VERBOSE(this, "Received notification, Cloud system id: %1", cloudSystemId);
+
+    nx::vms::client::core::SystemContext* systemContext = system();
 
     if (!cloudSystemId.isEmpty())
     {
@@ -347,18 +318,18 @@ void NotificationListModel::Private::onNotificationAction(
             NX_VERBOSE(this, "Invalid context status: %1, system: %2", status, cloudSystemId);
             return;
         }
+
+        systemContext = context->systemContext();
     }
 
     EventData eventData;
     eventData.lifetime = kDisplayTimeout;
     eventData.level = action->level();
-    eventData.iconPath = iconPath(action, cloudSystemId);
     eventData.cloudSystemId = cloudSystemId;
 
-    if (NX_ASSERT(system()))
-        fillEventData(system(), action.get(), eventData);
+    fillEventData(systemContext, action.get(), eventData);
 
-    setupClientAction(action, eventData);
+    setupClientAction(systemContext->resourcePool(), action, eventData);
 
     // Cache is required to prevent the app from freezing when a lot of notifications are received.
     m_notificationsCache.push_front(std::move(eventData));
@@ -375,8 +346,8 @@ void NotificationListModel::Private::onRepeatSoundAction(
         eventData.level = nx::vms::event::Level::common;
         eventData.iconPath = eventIconPath(nx::vms::rules::Icon::inputSignal);
         eventData.sourceName = action->sourceName();
-        if (NX_ASSERT(system()))
-            fillEventData(system(), action.get(), eventData);
+
+        fillEventData(system(), action.get(), eventData);
 
         if (!this->q->addEvent(eventData))
             return;
@@ -407,20 +378,17 @@ void NotificationListModel::Private::onAlarmLayoutAction(
     eventData.iconPath = "16x16/Outline/soft_trigger.svg";
     eventData.sourceName = action->sourceName();
 
-    if (NX_ASSERT(system()))
-    {
-        eventData.previewCamera =
-            system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                action->eventDeviceIds()).value(0);
-        eventData.cameras =
-            system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
-                action->deviceIds());
-    }
+    eventData.previewCamera =
+        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            action->eventDeviceIds()).value(0);
+    eventData.cameras =
+        system()->resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            action->deviceIds());
+
     eventData.actionId = menu::OpenInAlarmLayoutAction;
     eventData.actionParameters = eventData.cameras;
 
-    if (NX_ASSERT(system()))
-        fillEventData(system(), action.get(), eventData);
+    fillEventData(system(), action.get(), eventData);
 
     if (!this->q->addEvent(eventData))
         return;
@@ -430,19 +398,21 @@ void NotificationListModel::Private::onAlarmLayoutAction(
 }
 
 void NotificationListModel::Private::setupClientAction(
+    const QnResourcePool* resourcePool,
     const nx::vms::rules::NotificationActionPtr& action,
     EventData& eventData)
 {
     using nx::vms::rules::ClientAction;
 
-    const auto server = getResource(action->serverId(), eventData.cloudSystemId)
-        .dynamicCast<QnMediaServerResource>();
-    const auto devices = getActionDevices(action.get(), eventData.cloudSystemId);
+    const auto server = resourcePool->getResourceById<QnMediaServerResource>(action->serverId());
+    const auto devices = getActionDevices(resourcePool, action.get(), eventData.cloudSystemId);
     const auto camera = (devices.count() == 1) ? devices.front() : QnVirtualCameraResourcePtr();
 
     eventData.source = camera ? camera.staticCast<QnResource>() : server.staticCast<QnResource>();
     if (eventData.source || !action->serverId().isNull())
         eventData.sourceName = action->sourceName();
+
+    eventData.iconPath = eventIconPath(action->icon(), action->customIcon(), devices);
 
     switch (action->clientAction())
     {
@@ -516,8 +486,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     if (!camera || !action->acknowledge())
         return;
 
-    if (NX_ASSERT(system()) &&
-        !system()->accessController()->hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (!ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
     {
         NX_VERBOSE(this, "Can't setup acknowledge action id: %1, lacking bookmark permissions",
             action->id());
@@ -544,17 +513,6 @@ void NotificationListModel::Private::setupAcknowledgeAction(
 
     connect(eventData.extraAction.data(), &CommandAction::triggered,
         [this, actionHandler]() { executeLater(actionHandler, this); });
-}
-
-QString NotificationListModel::Private::iconPath(
-    const nx::vms::rules::NotificationActionPtr& action,
-    const QString& cloudSystemId) const
-{
-    QnResourceList devices;
-    if (needIconDevices(action->icon()))
-        devices = getActionDevices(action.get(), cloudSystemId);
-
-    return eventIconPath(action->icon(), action->customIcon(), devices);
 }
 
 int NotificationListModel::Private::maximumCount() const

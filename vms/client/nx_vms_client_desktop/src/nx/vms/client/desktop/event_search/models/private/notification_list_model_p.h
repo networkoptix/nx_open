@@ -58,10 +58,8 @@ private:
     void updateCloudItems(const QString& systemId);
     void removeCloudItems(const QString& systemId);
 
-    QString iconPath(
-        const nx::vms::rules::NotificationActionPtr& action, const QString& cloudSystemId) const;
-
     void setupClientAction(
+        const QnResourcePool* resourcePool,
         const nx::vms::rules::NotificationActionPtr& action,
         EventData& eventData);
     void setupAcknowledgeAction(
