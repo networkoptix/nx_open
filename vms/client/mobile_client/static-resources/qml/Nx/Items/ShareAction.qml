@@ -3,8 +3,10 @@
 import QtQuick.Controls
 
 import Nx.Core
+import Nx.Mobile.Controls
 import Nx.Mobile.Ui.Sheets
 import Nx.Ui
+
 import nx.vms.client.mobile
 
 Action
@@ -40,7 +42,8 @@ Action
         {
             id: backend
 
-            onErrorOccurred: Workflow.openStandardPopup(title, text)
+            onBookmarkCreated: Workflow.showBanner(qsTr("Bookmark created"), Banner.Success)
+            onSharingFailed: Workflow.showBanner(qsTr("Cannot share bookmark"), Banner.Error)
         }
 
         ShareBookmarkSheet

@@ -1,8 +1,9 @@
 module Nx.Mobile.Controls
 
-BaseAdaptiveSheet 1.0 BaseAdaptiveSheet.qml
 AdaptiveSheet 1.0 AdaptiveSheet.qml
 Banner 1.0 Banner.qml
+BannerSource 1.0 BannerSource.qml
+BaseAdaptiveSheet 1.0 BaseAdaptiveSheet.qml
 Button 1.0 Button.qml
 ButtonBar 1.0 ButtonBar.qml
 ButtonBox 1.0 ButtonBox.qml
@@ -24,3 +25,4 @@ TextButton 1.0 TextButton.qml
 TextField 1.0 TextField.qml
 TextInput 1.0 TextInput.qml
 ToolBarButton 1.0 ToolBarButton.qml
+WindowBanner 1.0 WindowBanner.qml

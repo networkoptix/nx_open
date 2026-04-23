@@ -254,3 +254,8 @@ function openStandardPopup(title, message)
         }
     )
 }
+
+function showBanner(text, type)
+{
+    mainWindow.banner.show(text, type)
+}

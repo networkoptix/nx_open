@@ -6,6 +6,7 @@ import QtQuick.Controls as Controls
 import Nx.Controls
 import Nx.Core
 import Nx.Mobile
+import Nx.Mobile.Controls
 import Nx.Screens
 import Nx.Ui
 
@@ -22,6 +23,7 @@ Controls.ApplicationWindow
 
     property alias windowParams: windowParams
     property alias uiContainer: uiContainer
+    property alias banner: uiContainer.windowBanner
 
     visible: true
     background: Rectangle { color: ColorTheme.colors.dark4 }
@@ -115,14 +117,16 @@ Controls.ApplicationWindow
             && uiContainer.stackView.currentItem.objectName === "sessionsScreen"
             && cloudOfflineDelayed
 
-        readonly property string warningText:
+        BannerSource
         {
-            if (windowContext.sessionManager.hasReconnectingSession)
-                return qsTr("Connection lost. Reconnecting...")
-            return showCloudOfflineWarning
-                ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
-                    .arg(appContext.appInfo.cloudName())
-                : ""
+            active: !!text
+            type: Banner.Error
+            text: windowContext.sessionManager.hasReconnectingSession
+                ? qsTr("Connection lost. Reconnecting...")
+                : d.showCloudOfflineWarning
+                    ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
+                        .arg(appContext.appInfo.cloudName())
+                    : ""
         }
 
         onCloudOfflineChanged:

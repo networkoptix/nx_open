@@ -196,7 +196,7 @@ Page
     toolBar.contentItem.clip: false
     gradientToolbarBackground: true
 
-    Banner
+    VideoScreenBanner
     {
         id: banner
 

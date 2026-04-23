@@ -54,7 +54,6 @@ struct ShareBookmarkBackend::Private: public SystemContextAccessor
     void shareBookmarkLink(const QString& bookmarkId) const;
     bool updateShareParams(const common::BookmarkShareableParams& shareParams,
         bool showNativeShareSheet = false);
-    void showErrorMessage() const;
 };
 
 ShareBookmarkBackend::Private::Private(ShareBookmarkBackend* q):
@@ -100,7 +99,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
             bookmark.share = backupShareParams;
             emit q->bookmarkChanged();
 
-            executeLater([this]() { showErrorMessage(); }, q);
+            executeLater([this]() { emit q->sharingFailed(); }, q);
 
             return false;
         };
@@ -112,6 +111,9 @@ bool ShareBookmarkBackend::Private::updateShareParams(
         {
             if (!handleResult(result))
                 return;
+
+            if (operation == QnCameraBookmarksManager::BookmarkOperation::create)
+                executeLater([this]() { emit q->bookmarkCreated(); }, q);
 
             // As we created or updated bookmark - there is no need to create it next time.
             operation = QnCameraBookmarksManager::BookmarkOperation::update;
@@ -125,13 +127,6 @@ bool ShareBookmarkBackend::Private::updateShareParams(
         });
 
     return handleResult(manager->changeBookmarkRest(operation, bookmark, std::move(callback)));
-}
-
-void ShareBookmarkBackend::Private::showErrorMessage() const
-{
-    emit q->errorOccurred(
-        ShareBookmarkBackend::tr("Error"),
-        ShareBookmarkBackend::tr("Cannot share bookmark."));
 }
 
 //--------------------------------------------------------------------------------------------------

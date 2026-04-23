@@ -19,6 +19,9 @@ AdaptiveSheet
     property var externalButtonContainer
     property bool externalMode: actionButtons.count === 1
     readonly property bool hasActions: actionButtons.count > 0
+    property bool available: true
+
+    signal unavailableAction()
 
     title: qsTr("Actions")
     spacing: 24
@@ -49,6 +52,7 @@ AdaptiveSheet
         {
             id: delegate
 
+            readonly property bool available: model.enabled && sheet.available
             readonly property bool prolonged: model.type === CameraButton.Type.prolonged
             readonly property string iconSource: model.iconPath
             readonly property string hintText: model.hint + model.name
@@ -62,7 +66,7 @@ AdaptiveSheet
             icon.width: 24
             icon.height: 24
             icon.source: iconSource
-            opacity: model.enabled ? 1.0 : 0.3
+            opacity: available ? 1.0 : 0.3
             type: externalMode ? Button.Type.Interface : Button.LightInterface
             down: instantActionHandler.pressed || prolongedActionHandler.pressed
             checked: down && prolonged
@@ -83,7 +87,7 @@ AdaptiveSheet
                 {
                     id: instantActionHandler
 
-                    enabled: !prolonged && model.enabled
+                    enabled: !prolonged && available
 
                     onTapped: Qt.callLater(startAction)
                     onPressedChanged:
@@ -99,7 +103,7 @@ AdaptiveSheet
                 {
                     id: prolongedActionHandler
 
-                    enabled: prolonged && model.enabled
+                    enabled: prolonged && available
 
                     property bool fullyActivated: false
                     readonly property real fullActivationTimeS: 0.5
@@ -137,10 +141,15 @@ AdaptiveSheet
                 {
                     id: disabledActionHandler
 
-                    enabled: !model.enabled
+                    enabled: !available
                     onPressedChanged:
                     {
-                        if (pressed)
+                        if (!pressed)
+                            return
+
+                        if (!sheet.available)
+                            sheet.unavailableAction()
+                        else
                             actionVisualizer.showHint(qsTr("Disabled by schedule"))
                     }
                 }
@@ -224,12 +233,19 @@ AdaptiveSheet
 
             implicitWidth: 44
             implicitHeight: 44
+            opacity: sheet.available ? 1.0 : 0.3
 
             icon.source: "image://skin/24x24/Outline/grid_view.svg"
             icon.width: 24
             icon.height: 24
 
-            onClicked: sheet.open()
+            onClicked:
+            {
+                if (sheet.available)
+                    sheet.open()
+                else
+                    sheet.unavailableAction()
+            }
         }
     }
 }

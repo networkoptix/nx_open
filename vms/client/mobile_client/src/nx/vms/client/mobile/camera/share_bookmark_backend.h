@@ -98,9 +98,10 @@ public:
 
 signals:
     void objectDataChanged();
+    void bookmarkCreated();
     void bookmarkChanged();
     void isAvailableChanged();
-    void errorOccurred(const QString& title, const QString& text);
+    void sharingFailed();
 
 private:
     struct Private;

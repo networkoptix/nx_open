@@ -28,22 +28,12 @@ Item
 
     property alias stackView: stackView
     property alias navigationBar: screenNavigationBar
-
-    WarningPanel
-    {
-        id: topLevelWarning
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        text: d.warningText
-        opened: text.length
-    }
+    property alias windowBanner: windowBanner
 
     ColumnLayout
     {
         id: mobileLayout
 
-        anchors.topMargin: topLevelWarning.height
         anchors.fill: parent
         spacing: 1
         visible: !LayoutController.isTabletLayout
@@ -79,7 +69,6 @@ Item
     {
         id: tabletLayout
 
-        anchors.topMargin: topLevelWarning.height
         anchors.fill: parent
         spacing: 1
         visible: LayoutController.isTabletLayout
@@ -138,6 +127,13 @@ Item
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
+    }
+
+    WindowBanner
+    {
+        id: windowBanner
+
+        width: parent.width
     }
 
     UiController

@@ -378,7 +378,7 @@ Page
     toolBar.contentItem.clip: false
     gradientToolbarBackground: true
 
-    Banner
+    VideoScreenBanner
     {
         id: banner
 
@@ -794,7 +794,6 @@ Page
                     Layout.preferredWidth: childrenRect.width
                     Layout.preferredHeight: childrenRect.height
 
-                    enabled: controller.playingLive
                     visible: actionSheet.hasActions
                 }
             }
@@ -1044,10 +1043,23 @@ Page
         externalButtonContainer: actionButtonContainer
         externalVisualizerContainer: actionVisualizerContainer
 
+        available: controller.playingLive
+        onUnavailableAction: actionBanner.trigger()
+        onAvailableChanged: actionBanner.reset()
+
         Binding on externalMode
         {
             when: modernVideoScreen.state === "fullscreen"
             value: false
+        }
+
+        BannerSource
+        {
+            id: actionBanner
+
+            text: qsTr("Go to Live to activate soft triggers")
+            type: Banner.Warning
+            closeable: true
         }
     }
 
