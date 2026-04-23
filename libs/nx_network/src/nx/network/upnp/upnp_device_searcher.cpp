@@ -87,6 +87,16 @@ void DeviceSearcher::stop()
     if (auto timerId = std::exchange(m_timerId, 0))
         m_timerManager->joinAndDeleteTimer(timerId);
 
+    {
+        const auto lock = m_handlerGuard->lock();
+        NX_ASSERT(lock);
+        for (auto& [_, handlers]: m_handlers)
+        {
+            for (auto [handler, _]: handlers)
+                handler->pleaseStop();
+        }
+    }
+
     // After timer is stopped, no new socket can be added to m_socketList
     decltype(m_socketList) socketList;
     {

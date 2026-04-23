@@ -72,7 +72,7 @@ class PortMapperMocked:
 {
 public:
     PortMapperMocked(
-        DeviceSearcher* deviceSearcher,
+        nx::utils::TimerManager* timerManager,
         const HostAddress& internalIp,
         std::chrono::milliseconds checkMappingsInterval = kDefaultCheckMappingsInterval);
     AsyncClientMock& clientMock();

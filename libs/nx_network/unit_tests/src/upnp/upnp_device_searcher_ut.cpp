@@ -30,15 +30,9 @@ TEST(Upnp, Urn)
     }
 }
 
-class TestSearchHandler:
-    public SearchAutoHandler
+class TestSearchHandler: public SearchHandler
 {
 public:
-    TestSearchHandler(DeviceSearcher* deviceSearcher):
-        SearchAutoHandler(deviceSearcher, QLatin1String("InternetGatewayDevice"))
-    {
-    }
-
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
@@ -57,6 +51,7 @@ public:
         return true;
     }
 
+    virtual void pleaseStop() override {}
 };
 
 // TODO: implement over mocked sockets
@@ -65,7 +60,7 @@ TEST(UpnpDeviceSearcher, DISABLED_General)
     nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher(
         &timerManager, std::make_unique<DeviceSearcherDefaultSettings>());
-    TestSearchHandler testSearcher(&deviceSearcher);
+    TestSearchHandler testSearcher;
     QThread::sleep(5);
 }
 

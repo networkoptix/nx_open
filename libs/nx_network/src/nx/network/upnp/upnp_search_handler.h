@@ -11,8 +11,6 @@
 
 namespace nx::network::upnp {
 
-class DeviceSearcher;
-
 /**
  * Receives discovered devices info.
  */
@@ -35,19 +33,7 @@ public:
         const DeviceInfo& devInfo,
         const QByteArray& xmlDevInfo) = 0;
     virtual bool isEnabled() const = 0;
-};
-
-class NX_NETWORK_API SearchAutoHandler:
-    public SearchHandler
-{
-public:
-    SearchAutoHandler(
-        nx::network::upnp::DeviceSearcher* deviceSearcher, const QString& devType = QString());
-    virtual ~SearchAutoHandler() override;
-
-    nx::network::upnp::DeviceSearcher* deviceSearcher() const;
-private:
-    nx::network::upnp::DeviceSearcher* m_deviceSearcher = nullptr;
+    virtual void pleaseStop() = 0;
 };
 
 } // namespace nx::network::upnp

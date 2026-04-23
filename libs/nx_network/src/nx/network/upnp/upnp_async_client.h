@@ -102,9 +102,6 @@ public:
     //! ID string of this client
     static constexpr auto kClientId = "NX UpnpAsyncClient";
 
-    //! UPnP Device for @var kWanIp
-    static constexpr auto kInternalGateway = "InternetGatewayDevice";
-
     //! UPnP Service for @fn externalIp, @fn addMapping
     static constexpr auto kWanIp = "WANIPConnection";
 

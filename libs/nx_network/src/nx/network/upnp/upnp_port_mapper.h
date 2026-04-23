@@ -14,16 +14,15 @@
 namespace nx::network::upnp {
 
 class NX_NETWORK_API PortMapper:
-    SearchAutoHandler,
+    SearchHandler,
     nx::utils::TimerEventHandler
 {
 public:
     PortMapper(
-        nx::network::upnp::DeviceSearcher* deviceSearcher,
+        nx::utils::TimerManager* timerManager,
         bool isEnabled = true,
         std::chrono::milliseconds checkMappingsInterval = kDefaultCheckMappingsInterval,
-        const QString& description = QString(),
-        const QString& device = AsyncClient::kInternalGateway);
+        const QString& description = QString());
     ~PortMapper();
 
     PortMapper(const PortMapper&) = delete;
@@ -125,8 +124,11 @@ private:
         size_t retries = 5,
         std::optional<std::chrono::milliseconds> duration = std::nullopt);
 
+    virtual void pleaseStop() override;
+
 protected: // for testing only
     nx::Mutex m_mutex;
+    nx::utils::TimerManager* m_timerManager;
     bool m_isEnabled;
     std::unique_ptr<AsyncClient> m_upnpClient;
     quint64 m_timerId;

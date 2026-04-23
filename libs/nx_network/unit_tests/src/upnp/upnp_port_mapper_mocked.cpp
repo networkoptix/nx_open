@@ -141,11 +141,11 @@ bool AsyncClientMock::rmMapping(quint16 port, Protocol protocol)
 }
 
 PortMapperMocked::PortMapperMocked(
-    DeviceSearcher* deviceSearcher,
+    nx::utils::TimerManager* timerManager,
     const HostAddress& internalIp,
     std::chrono::milliseconds checkMappingsInterval)
     :
-    PortMapper(deviceSearcher, true, checkMappingsInterval, lit("UpnpPortMapperMocked"), QString())
+    PortMapper(timerManager, true, checkMappingsInterval, lit("UpnpPortMapperMocked"))
 {
     m_upnpClient.reset(new AsyncClientMock);
 
