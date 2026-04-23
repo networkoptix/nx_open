@@ -1340,7 +1340,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Бүсчлэл</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
