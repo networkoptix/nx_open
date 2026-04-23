@@ -25,13 +25,12 @@ static constexpr int kMappingTimeRatio = 10; //< 10 times longer then we check.
 } // namespace
 
 PortMapper::PortMapper(
-    nx::network::upnp::DeviceSearcher* deviceSearcher,
+    nx::utils::TimerManager* timerManager,
     bool isEnabled,
     std::chrono::milliseconds checkMappingsInterval,
-    const QString& description,
-    const QString& device)
+    const QString& description)
     :
-    SearchAutoHandler(deviceSearcher, device),
+    m_timerManager(timerManager),
     m_isEnabled(isEnabled),
     m_upnpClient(new AsyncClient()),
     m_description(description),
@@ -40,19 +39,22 @@ PortMapper::PortMapper(
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     // NOTE: onTimer can be invoked before returned value is saved to m_timerId.
-    m_timerId = deviceSearcher->timerManager()->addTimer(
-        this, std::chrono::milliseconds(m_checkMappingsInterval));
+    m_timerId = m_timerManager->addTimer(this, std::chrono::milliseconds(m_checkMappingsInterval));
 }
 
 PortMapper::~PortMapper()
+{
+    pleaseStop();
+}
+
+void PortMapper::pleaseStop()
 {
     quint64 timerId = 0;
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         std::swap(m_timerId, timerId);
     }
-
-    deviceSearcher()->timerManager()->joinAndDeleteTimer(timerId);
+    m_timerManager->joinAndDeleteTimer(timerId);
     m_upnpClient.reset();
 }
 
@@ -200,7 +202,7 @@ void PortMapper::onTimer(const quint64& /*timerId*/)
 
     if (m_timerId)
     {
-        m_timerId = deviceSearcher()->timerManager()->addTimer(
+        m_timerId = m_timerManager->addTimer(
             this, std::chrono::milliseconds(m_checkMappingsInterval));
     }
 }
