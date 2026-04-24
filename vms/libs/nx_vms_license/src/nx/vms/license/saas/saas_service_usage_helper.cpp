@@ -315,14 +315,9 @@ int CloudStorageServiceUsageHelper::licenseDeficit() const
 void CloudStorageServiceUsageHelper::calculateAvailableUnsafe() const
 {
     auto& cache = *m_cache;
-    const auto saasData = saasServiceManager()->data();
     auto cloudStorageData = systemContext()->saasServiceManager()->cloudStorageData();
     for (const auto& [id, parameters]: cloudStorageData)
     {
-        // Only include services that were purchased for this site (even if quantity is now 0
-        // after removal). Skip services that only exist in the channel partner catalog.
-        if (!saasData.services.contains(id))
-            continue;
         auto& cacheData = cache[{parameters.maxResolutionMp, id}];
         cacheData.total += parameters.totalChannelNumber;
         cacheData.available += parameters.totalChannelNumber;
@@ -352,9 +347,22 @@ void CloudStorageServiceUsageHelper::countCameraAsUsedUnsafe(
 {
     const int megapixels = getMegapixels(camera);
     ServiceInfo key{megapixels, nx::Uuid()};
-    auto it = m_cache->lower_bound(key);
+    const auto saasData = saasServiceManager()->data();
+    const auto firstFittingTierIt = m_cache->lower_bound(key);
+
+    // First priority: smallest purchased tier that fits the camera.
+    auto it = std::find_if(firstFittingTierIt, m_cache->end(),
+        [&](const auto& entry) { return saasData.services.contains(entry.first.serviceId); });
+
+    // Second priority: smallest catalog tier that fits.
+    if (it == m_cache->end())
+        it = firstFittingTierIt;
+
+    // Fallback: no tier fits the camera's resolution; create a null entry.
+    // Those will be filtered out in buildQuantityReport.
     if (it == m_cache->end())
         it = m_cache->emplace(key, LicenseSummaryData()).first;
+
     ++it->second.inUse;
 }
 
@@ -515,19 +523,17 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
     std::map<QString, nx::Uuid> result;
     using Data = std::pair<nx::Uuid, int>; //< ServiceId and channels.
     std::multimap<int, Data> availableChannels;
+    std::set<nx::Uuid> purchasedServices;
     if (saasServiceManager()->saasServiceOperational())
     {
         const auto saasData = saasServiceManager()->data();
         auto cloudStorageData = saasServiceManager()->cloudStorageData();
         for (const auto& [id, parameters]: cloudStorageData)
         {
-            // Only include services that were purchased for this site (even if quantity is now 0
-            // after removal). Skip services that only exist in the channel partner catalog.
+            availableChannels.emplace(
+                parameters.maxResolutionMp, Data{id, parameters.totalChannelNumber});
             if (saasData.services.contains(id))
-            {
-                availableChannels.emplace(
-                    parameters.maxResolutionMp, Data{id, parameters.totalChannelNumber});
-            }
+                purchasedServices.insert(id);
         }
     }
 
@@ -535,16 +541,24 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
     {
         if (!camera->isBackupEnabled())
             continue;
-        // Spend a service on the camera.
         const int megapixels = getMegapixels(camera);
-        auto it = availableChannels.lower_bound(megapixels);
+        const auto firstFittingResolutionIt = availableChannels.lower_bound(megapixels);
+
+        // First priority: smallest purchased tier that fits the camera.
+        auto it = std::find_if(firstFittingResolutionIt, availableChannels.end(),
+            [&](const auto& entry) { return purchasedServices.contains(entry.second.first); });
+
+        // Second priority: smallest catalog tier that fits.
+        if (it == availableChannels.end())
+            it = firstFittingResolutionIt;
+
         if (it == availableChannels.end())
         {
-            result.emplace(camera->getPhysicalId(), nx::Uuid()); //< No service available.
+            result.emplace(camera->getPhysicalId(), nx::Uuid()); //< No service fits.
             continue;
         }
 
-        // If all channels of the current service is spend, go next service
+        // If all channels of the current service are spent, go to next service with channels.
         for (auto it2 = it; it2 != availableChannels.end(); ++it2)
         {
             Data& data = it2->second;
@@ -557,7 +571,8 @@ std::map<QString, nx::Uuid> CloudStorageServiceUsageHelper::servicesByCameras() 
 
         Data& data = it->second;
         result.emplace(camera->getPhysicalId(), data.first);
-        --data.second;
+        if (data.second > 0)
+            --data.second;
     }
 
     return result;

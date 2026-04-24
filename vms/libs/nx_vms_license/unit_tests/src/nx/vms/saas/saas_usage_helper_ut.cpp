@@ -526,11 +526,9 @@ TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasProposeChanges)
     ASSERT_EQ(0, info[SaasCloudStorageParameters::kUnlimitedResolution].inUse);
 }
 
-// VMS-61807: When cloud storage services are removed (quantity becomes 0), cameras should not
-// be reported as using a service that was never purchased. Previously, cameras were incorrectly
-// assigned to the lowest-resolution service available from the channel partner (e.g. 2 MP) instead
-// of the purchased service (e.g. 10 MP). This happened because calculateAvailableUnsafe() included
-// all services from the channel partner catalog, not just purchased ones.
+// VMS-61807: When cloud storage services are removed (quantity becomes 0) but the camera fits
+// in a purchased tier, cameras should be counted against the purchased service (preserving the
+// relationship to what was actually bought).
 TEST_F(SaasServiceUsageHelperTest, CloudStorageNoPhantomUsageAfterServicesRemoved)
 {
     using namespace nx::vms::api;
@@ -598,9 +596,10 @@ TEST_F(SaasServiceUsageHelperTest, CloudStorageNoPhantomUsageAfterServicesRemove
     ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
 }
 
-// VMS-61807: Verify that services only present in the channel partner catalog (never purchased)
-// do not appear in usage reports, even when their resolution matches a camera.
-TEST_F(SaasServiceUsageHelperTest, CloudStorageNeverPurchasedServiceExcluded)
+// VMS-61807: When only some cloud storage services were purchased and cameras fit in the purchased
+// tier, cameras should be counted against the purchased service, not against a smaller-tier
+// catalog service that was never bought.
+TEST_F(SaasServiceUsageHelperTest, CloudStoragePrefersPurchasedTierOverCatalog)
 {
     using namespace nx::vms::api;
 
@@ -633,20 +632,109 @@ TEST_F(SaasServiceUsageHelperTest, CloudStorageNeverPurchasedServiceExcluded)
     // Add 2 cameras with 2 MP resolution and backup enabled.
     auto cameras = addCameras(/*size*/ 2, /*megapixels*/ 2, /*useBackup*/ true);
 
-    // Only the 10 MP service (the only purchased one) should be in the cache.
-    // The 2 MP cameras should be assigned to it (lowest purchased service >= 2 MP).
+    // The 2 MP cameras fit in the 10 MP tier (the purchased one), so they should be assigned to
+    // the 10 MP service rather than the smaller-tier 5 MP catalog service (never purchased).
     auto serviceInfo = m_cloudeStorageHelper->allInfoByService();
-    ASSERT_EQ(1, serviceInfo.size());
     ASSERT_EQ(2, serviceInfo[kServiceTenMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceFiveMegapixels].inUse);
+    ASSERT_EQ(0, serviceInfo[kServiceUnlimitedMegapixels].inUse);
 
     ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
     ASSERT_EQ(2, m_cloudeStorageHelper->overflowLicenseCount());
 
-    // servicesByCameras() should also assign cameras to the purchased 10 MP service,
-    // not to null UUID. This prevents the watcher from treating them as unknown.
+    // servicesByCameras() should assign cameras to the purchased 10 MP service, not to null.
+    // This prevents the watcher from treating them as unknown and prematurely disabling backup.
     auto mapping = m_cloudeStorageHelper->servicesByCameras();
     for (const auto& [cameraId, serviceId]: mapping)
         ASSERT_EQ(kServiceTenMegapixels, serviceId);
+}
+
+// VMS-62028: When a camera's resolution exceeds all purchased tiers, it should be counted against
+// the smallest catalog tier that fits (even if not purchased). This shows overuse on the correct
+// tier and acts as an incentive for the user to purchase that tier.
+TEST_F(SaasServiceUsageHelperTest, CloudStorageFallsBackToCatalogWhenNoPurchasedTierFits)
+{
+    using namespace nx::vms::api;
+
+    // Simulate a site where only the 5 MP service is purchased.
+    // The 10 MP and unlimited services exist in the catalog but were never purchased.
+    static const std::string kSaasDataOnly5MpJson = R"json(
+    {
+      "cloudSystemId": "2df6b2f1-df31-451d-aac9-6bcb663e210b",
+      "state" : "active",
+      "services" : {
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0de": {
+          "quantity": 1
+        },
+        "46fd4533-16dd-4e07-b285-ef059b4ecb31": {
+          "quantity": 10
+        }
+      },
+      "security" : {
+        "lastCheck": "2023-06-05 18:10:52",
+        "tmpExpirationDate" : "2023-06-05 20:40:52",
+        "issue" : "No issues"
+      },
+      "signature" : ""
+    }
+    )json";
+
+    auto manager = systemContext()->saasServiceManager();
+    manager->loadSaasDataAsync(kSaasDataOnly5MpJson);
+
+    // Add 1 camera at 15 MP (exceeds both purchased 5 MP and catalog 10 MP tiers).
+    // The camera should be assigned to the unlimited (catalog) service - smallest tier that fits.
+    auto cameras = addCameras(/*size*/ 1, /*megapixels*/ 15, /*useBackup*/ true);
+
+    auto serviceInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(0, serviceInfo[kServiceFiveMegapixels].inUse); //< Purchased but doesn't fit camera.
+    ASSERT_EQ(0, serviceInfo[kServiceTenMegapixels].inUse); //< Catalog, doesn't fit 15 MP camera.
+    ASSERT_EQ(1, serviceInfo[kServiceUnlimitedMegapixels].inUse); //< Catalog, smallest that fits.
+
+    // Overflow detected: catalog service has 0 total, 1 inUse.
+    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
+}
+
+// VMS-62028: When a camera's resolution exceeds the only purchased tier, it should fall back to
+// the smallest catalog tier that fits (shows overuse on that tier).
+TEST_F(SaasServiceUsageHelperTest, CloudStorageCameraExceedsPurchasedTier)
+{
+    using namespace nx::vms::api;
+
+    // 5 MP service purchased with 1 channel.
+    static const std::string kSaasDataOnly5MpJson = R"json(
+    {
+      "cloudSystemId": "2df6b2f1-df31-451d-aac9-6bcb663e210b",
+      "state" : "active",
+      "services" : {
+        "60a18a70-452b-46a1-9bfd-e66af6fbd0de": {
+          "quantity": 1
+        },
+        "46fd4533-16dd-4e07-b285-ef059b4ecb31": {
+          "quantity": 10
+        }
+      },
+      "security" : {
+        "lastCheck": "2023-06-05 18:10:52",
+        "tmpExpirationDate" : "2023-06-05 20:40:52",
+        "issue" : "No issues"
+      },
+      "signature" : ""
+    }
+    )json";
+
+    auto manager = systemContext()->saasServiceManager();
+    manager->loadSaasDataAsync(kSaasDataOnly5MpJson);
+
+    // Camera at 8 MP: 5 MP tier (purchased) doesn't fit. 10 MP tier (catalog) fits.
+    auto cameras = addCameras(/*size*/ 1, /*megapixels*/ 8, /*useBackup*/ true);
+
+    auto serviceInfo = m_cloudeStorageHelper->allInfoByService();
+    ASSERT_EQ(0, serviceInfo[kServiceFiveMegapixels].inUse); //< Purchased but doesn't fit.
+    ASSERT_EQ(1, serviceInfo[kServiceTenMegapixels].inUse); //< Catalog fallback.
+    ASSERT_EQ(0, serviceInfo[kServiceUnlimitedMegapixels].inUse);
+
+    ASSERT_TRUE(m_cloudeStorageHelper->isOverflow());
 }
 
 TEST_F(SaasServiceUsageHelperTest, CloudRecordingSaasAccumulateLicenseUsage)
