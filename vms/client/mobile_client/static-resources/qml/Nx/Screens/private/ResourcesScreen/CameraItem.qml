@@ -345,7 +345,18 @@ Control
                     Component.onCompleted:
                     {
                         cameraItem.mediaPlayer = this
-                        playLive()
+
+                        // Qt.callLater defers playLive() to the next event loop iteration.
+                        // This is necessary because QVideoSink::rhi() - the RHI context used
+                        // to select a hardware video decoder (e.g. VideoToolbox, MediaCodec) -
+                        // is set by the Qt scene graph on the render thread during its first
+                        // render pass. At the time Component.onCompleted fires, the VideoOutput
+                        // inside MultiVideoOutput has just been created but not yet rendered,
+                        // so rhi() is still null. Calling playLive() directly here would cause
+                        // the hardware decoder to be skipped and the stream to fall back to
+                        // software decoding. Deferring by one event loop iteration gives the
+                        // scene graph time to perform its first render pass and initialize rhi().
+                        Qt.callLater(playLive)
                     }
                 }
 
