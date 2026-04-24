@@ -27,7 +27,7 @@ FocusScope
     // the parent container to provide the maximum amount of available space.
     property bool longContent: false
 
-    property alias toolBar: toolBar //< TODO: the given alias must be removed.
+    property alias toolBar: toolBar
     property alias title: toolBar.title
     property alias titleUnderlineVisible: toolBar.titleUnderlineVisible
 
@@ -58,7 +58,6 @@ FocusScope
 
     property alias menuButton: menuButton
 
-    property var customToolBarClickHandler
     property var customBackHandler
 
     property bool isActive: StackView.status === StackView.Active
@@ -98,12 +97,6 @@ FocusScope
 
             icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
             visible: false
-        }
-
-        onToolBarClicked:
-        {
-            if (root.customToolBarClickHandler)
-                root.customToolBarClickHandler()
         }
     }
 

@@ -181,17 +181,6 @@ AdaptiveScreen
         }
     }
 
-    customToolBarClickHandler: () =>
-    {
-        if (!LayoutController.isTabletLayout
-            && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-            && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
-            && !breadcrumb.visible)
-        {
-            breadcrumb.openWith(linearizationListModel.sourceRoot?.parent)
-        }
-    }
-
     Connections
     {
         target: LayoutController
@@ -480,59 +469,70 @@ AdaptiveScreen
     {
         id: sessionsScreenContent
 
+        Breadcrumb
+        {
+            id: breadcrumb
+
+            readonly property bool canBeShown: !LayoutController.isTabletLayout
+                && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+                && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
+
+            width: parent.width
+            visible: false
+
+            model:
+            {
+                if (!canBeShown || !visible)
+                    return []
+
+                const start = linearizationListModel.sourceRoot?.parent
+                if (!start || start === NxGlobals.invalidModelIndex())
+                    return []
+
+                let data = []
+                for (let node = start; node && node.row !== -1; node = node.parent)
+                {
+                    data.push({
+                        name: accessor.getData(node, "display"),
+                        nodeId: accessor.getData(node, "nodeId")
+                    })
+                }
+
+                return data.reverse()
+            }
+
+            onItemClicked: (nodeId) => goBack(organizationsModel.indexFromNodeId(nodeId))
+
+            onCanBeShownChanged:
+            {
+                if (!canBeShown)
+                    visible = false
+            }
+
+            Connections
+            {
+                target: sessionsScreen.toolBar
+
+                function onToolBarClicked()
+                {
+                    if (breadcrumb.canBeShown)
+                        breadcrumb.visible = !breadcrumb.visible
+                }
+            }
+        }
+
         HorizontalSlide
         {
             id: siteListContainer
 
             anchors.fill: parent
+            anchors.topMargin: 20 + (breadcrumb.visible ? breadcrumb.height : 0)
+
             visible: !loadingIndicator.visible
-
-            Breadcrumb
-            {
-                id: breadcrumb
-
-                width: parent.width
-
-                onItemClicked: (nodeId) =>
-                {
-                    goBack(organizationsModel.indexFromNodeId(nodeId))
-                }
-
-                function openWith(root)
-                {
-                    if (root === NxGlobals.invalidModelIndex())
-                        return
-
-                    let data = []
-
-                    for (let node = root; node && node.row !== -1; node = node.parent)
-                    {
-                        data.push({
-                            name: accessor.getData(node, "display"),
-                            nodeId: accessor.getData(node, "nodeId")
-                        })
-                    }
-
-                    model = data.reverse()
-                    open()
-                }
-
-                Connections
-                {
-                    target: LayoutController
-
-                    function onIsTabletLayoutChanged()
-                    {
-                        if (LayoutController.isTabletLayout && breadcrumb.visible)
-                            breadcrumb.close()
-                    }
-                }
-            }
 
             ColumnLayout
             {
                 anchors.fill: parent
-                anchors.topMargin: 20 + (breadcrumb.visible ? breadcrumb.height : 0)
                 spacing: 20
 
                 SearchEdit
@@ -1218,5 +1218,4 @@ AdaptiveScreen
         selectedTab = tab
         appGlobalState.lastSelectedOrgTab = tab
     }
-
 }

@@ -6,39 +6,39 @@ import QtQuick.Controls
 import Nx.Core
 import Nx.Core.Controls
 
-Popup
+Rectangle
 {
-    id: breadcrumbPopup
-
-    height: 72
+    id: breadcrumbPanel
 
     property alias model: breadcrumbList.model
 
     signal itemClicked(var nodeId)
 
-    padding: 0
-    topPadding: 0
-    bottomPadding: 0
-    leftPadding: 0
-    rightPadding: 0
+    height: 72
+    color: ColorTheme.colors.dark10
 
-    popupType: Popup.Item
+    onModelChanged:
+    {
+        if (visible)
+            breadcrumbPanel.resetFades()
+    }
 
-    onAboutToShow:
+    onVisibleChanged:
+    {
+        if (visible)
+            breadcrumbPanel.resetFades()
+    }
+
+    function resetFades()
     {
         breadcrumbList.positionViewAtEnd()
+        // Snap fades to the correct initial state without Behavior animation; fadeTimer then
+        // re-enables animated bindings to atXBeginning/atXEnd once the ListView has settled.
         leftFadeBehavior.enabled = false
         rightFadeBehavior.enabled = false
         leftFade.opacity = 1
         rightFade.opacity = 0
-        fadeTimer.start()
-    }
-
-    background: Rectangle
-    {
-        width: breadcrumbPopup.width
-        height: breadcrumbPopup.height
-        color: ColorTheme.colors.dark10
+        fadeTimer.restart()
     }
 
     ListView
@@ -64,7 +64,7 @@ Popup
 
             readonly property bool lastItem: index == breadcrumbList.model.length - 1
             width: breadcrumbButtonBackground.width + (lastItem ? 0 : (20 + 4 * 2))
-            height: parent.height
+            height: breadcrumbList.height
 
             Rectangle
             {
@@ -90,11 +90,7 @@ Popup
                 TapHandler
                 {
                     gesturePolicy: TapHandler.WithinBounds
-                    onSingleTapped:
-                    {
-                        breadcrumbPopup.itemClicked(modelData.nodeId)
-                        breadcrumbPopup.close()
-                    }
+                    onSingleTapped: breadcrumbPanel.itemClicked(modelData.nodeId)
                 }
             }
 
@@ -118,7 +114,6 @@ Popup
         id: fadeTimer
 
         interval: 100
-        running: breadcrumbPopup.opened
         repeat: false
         onTriggered:
         {
