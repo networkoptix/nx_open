@@ -448,7 +448,11 @@ AdaptiveScreen
                 padding: 0
                 text: qsTr("Reset")
                 visible: optionSelectorItem.selector && !optionSelectorItem.selector.isDefaultValue
-                onClicked: optionSelectorItem.clear()
+                onClicked:
+                {
+                    optionSelectorItem.clear()
+                    leftPanelPopup.close()
+                }
             }
         }
 
