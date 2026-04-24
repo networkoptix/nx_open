@@ -2027,23 +2027,23 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Non se pode borrar a caché de WebEngine</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Por favor, pecha todas as páxinas web e téntao de novo.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Os ficheiros poden estar bloqueados por outro proceso.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>A caché de WebEngine limpouse parcialmente</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Algúns ficheiros poden estar bloqueados por outro proceso.</translation>
     </message>
   </context>
   <context>
