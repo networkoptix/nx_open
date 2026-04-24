@@ -69,7 +69,7 @@ protected:
         RecordingType recordingType,
         RecordingMetadataTypes metadataTypes,
         StreamQuality streamQuality = StreamQuality::normal,
-        int fps = 0,
+        float fps = 0.0,
         int bitrateKbps = 0)
     {
         using namespace std::chrono;

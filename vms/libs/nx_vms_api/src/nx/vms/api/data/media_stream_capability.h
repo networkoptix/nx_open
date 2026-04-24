@@ -3,6 +3,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
@@ -17,13 +18,23 @@ struct NX_VMS_API CameraStreamCapability
     float maxBitrateKbps = 0;
     float defaultBitrateKbps = 0;
     int defaultFps = 0;
-    int maxFps = 0;
 
-    CameraStreamCapability(float minBitrate = 0.0, float maxBitrate = 0.0, int fps = 0);
-    bool isNull() const;
+    /**%apidoc
+     * By default availableFps is used. If it is empty, the incoming fps will be clamped to the range [minFps; maxFps]
+     */
+    float minFps = 0.0;
+    float maxFps = 0.0;
+
+    /**%apidoc:{std::vector<float>} */
+    std::set<float> availableFps;
+
     QString toString() const;
+    float calcMaxFps() const noexcept;
+    void setRangeFps(float maxFps, float minFps = 1.0);
+    float strictFps(float fps) const noexcept;
+    bool isRangeFpsValid() const noexcept;
 };
-#define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(maxFps)
+#define CameraStreamCapability_Fields (minBitrateKbps)(maxBitrateKbps)(defaultBitrateKbps)(defaultFps)(minFps)(maxFps)(availableFps)
 QN_FUSION_DECLARE_FUNCTIONS(CameraStreamCapability, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(CameraStreamCapability, CameraStreamCapability_Fields)
 

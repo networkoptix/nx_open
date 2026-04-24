@@ -37,7 +37,7 @@ const std::array<Qt::DayOfWeek, kDaysInWeek>& daysOfWeek()
     return result;
 }
 
-nx::vms::api::CameraScheduleTaskDataList defaultSchedule(int maxFps)
+nx::vms::api::CameraScheduleTaskDataList defaultSchedule(float maxFps)
 {
     nx::vms::api::CameraScheduleTaskDataList schedule;
     for (qint8 dayOfWeek = 1; dayOfWeek <= 7; ++dayOfWeek)

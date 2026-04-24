@@ -32,7 +32,7 @@ private:
             resourcePool()->getResourcesByIds<QnVirtualCameraResource>(targetDeviceField->ids());
         int maxFps{0};
         for (const auto& camera: cameras)
-            maxFps = (maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps()));
+            maxFps = std::max(maxFps, (int) camera->getMaxFps());
 
         QSignalBlocker blocker{m_spinBox};
         m_spinBox->setEnabled(maxFps > 0);

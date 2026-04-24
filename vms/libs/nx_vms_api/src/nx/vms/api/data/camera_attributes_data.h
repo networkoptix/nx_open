@@ -27,7 +27,7 @@ struct NX_VMS_API CameraScheduleTaskData: public ScheduleTaskData
     StreamQuality streamQuality = StreamQuality::undefined;
 
     /**%apidoc[opt] Frames per second. */
-    int fps = 0;
+    float fps = 0.0;
 
     /**%apidoc[opt] Bitrate. */
     int bitrateKbps = 0;

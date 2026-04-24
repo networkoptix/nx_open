@@ -23,6 +23,6 @@ NX_VMS_COMMON_API QByteArray scheduleToByteArray(
 
 NX_VMS_COMMON_API bool timeInSchedule(QDateTime datetime, const QByteArray& schedule);
 
-NX_VMS_COMMON_API nx::vms::api::CameraScheduleTaskDataList defaultSchedule(int fps);
+NX_VMS_COMMON_API nx::vms::api::CameraScheduleTaskDataList defaultSchedule(float fps);
 
 } // namespace nx::vms::common

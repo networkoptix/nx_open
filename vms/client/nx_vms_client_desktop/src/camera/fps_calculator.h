@@ -8,12 +8,12 @@ namespace Qn {
 
 void calculateMaxFps(
     const QnVirtualCameraResourceList& cameras,
-    int *maxFps);
+    float *maxFps);
 
 /** Returns max fps. */
-int calculateMaxFps(const QnVirtualCameraResourceList& cameras);
+float calculateMaxFps(const QnVirtualCameraResourceList& cameras);
 
 /** Returns max fps. */
-int calculateMaxFps(const QnVirtualCameraResourcePtr& camera);
+float calculateMaxFps(const QnVirtualCameraResourcePtr& camera);
 
 } // namespace Qn

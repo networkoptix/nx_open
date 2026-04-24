@@ -662,10 +662,9 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
             // TODO: Code duplication with `calculateRecordingSchedule` method in the reducer.
             if (camera->getScheduleTasks().empty())
             {
-                int maxFps = camera->getMaxFps();
+                auto maxFps = camera->getMaxFps();
                 if (camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
                     maxFps = QnVirtualCameraResource::kDefaultMaxFps;
-
                 setSchedule(nx::vms::common::defaultSchedule(maxFps), {camera});
             }
         }

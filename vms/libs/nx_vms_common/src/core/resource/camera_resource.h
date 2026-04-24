@@ -56,7 +56,7 @@ class NX_VMS_COMMON_API QnVirtualCameraResource:
     using base_type = QnMediaResource;
 
 public:
-    static constexpr int kDefaultMaxFps = 15;
+    static constexpr float kDefaultMaxFps = 15.0;
     static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
     static QString intercomSpecificPortName();
 
@@ -261,9 +261,14 @@ public:
      */
     void setMotionType(nx::vms::api::MotionType value);
 
-    virtual int getMaxFps(nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
+    virtual float getMaxFps(nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
+    std::set<float> getAvailableFps(nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
+    float strictFpsToLimits(float initialFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const noexcept;
 
-    virtual void setMaxFps(int fps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
+    void setFpsLimits(float minFps, float maxFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
+    void setMaxFps(float maxFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
+    void setAvailableFps(std::set<float> availableFps,
+        nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
 
     virtual int reservedSecondStreamFps() const;
 
@@ -348,6 +353,7 @@ public:
     void setCameraCapability(nx::vms::api::DeviceCapability capability, bool value);
 
     nx::vms::api::CameraMediaCapability cameraMediaCapability() const;
+    std::optional<nx::vms::api::CameraStreamCapability> streamCapability(nx::vms::api::StreamIndex idx) const;
     void setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value);
     void updateCameraMediaCapability(
         std::function<void(nx::vms::api::CameraMediaCapability& capability)> updater);

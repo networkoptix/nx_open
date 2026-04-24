@@ -35,7 +35,7 @@ QnScheduleTaskList makeSchedule(
     Qn::RecordingType recordingType,
     Qn::RecordingMetadataTypes metadataTypes,
     Qn::StreamQuality streamQuality = Qn::StreamQuality::normal,
-    int fps = 0,
+    float fps = 0.0,
     int bitrateKbps = 0
 )
 {

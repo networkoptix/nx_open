@@ -917,26 +917,68 @@ void QnVirtualCameraResource::updateInternal(const QnResourcePtr& source, Notifi
     }
 }
 
-int QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) const
+float QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) const
 {
-    const auto capabilities = cameraMediaCapability();
-    if (auto f = capabilities.streamCapabilities.find(streamIndex);
-        f != capabilities.streamCapabilities.cend() && f->second.maxFps > 0)
-    {
-        return f->second.maxFps;
-    }
-
-    // Compatibility with version < 3.1.2
-    QString value = getProperty(nx::vms::api::device_properties::kMaxFps);
-    return value.isNull() ? kDefaultMaxFps : value.toInt();
+    const auto readMaxFps = [this]() ->std::optional<float>
+        {
+            // Compatibility with version < 3.1.2
+            const QString strValue = getProperty(nx::vms::api::device_properties::kMaxFps);
+            bool ok = false;
+            int intValue = strValue.toInt(&ok);
+            return ok ? std::make_optional((float)intValue) : std::nullopt;
+        };
+    return streamCapability(streamIndex)
+        .transform([](const auto& caps) { return caps.maxFps; })
+        .or_else(readMaxFps)
+        .value_or(kDefaultMaxFps);
 }
 
-void QnVirtualCameraResource::setMaxFps(int fps, nx::vms::api::StreamIndex streamIndex)
+std::set<float> QnVirtualCameraResource::getAvailableFps(
+    nx::vms::api::StreamIndex streamIndex/* = nx::vms::api::StreamIndex::primary*/) const
+{
+    return streamCapability(streamIndex)
+        .transform([](const auto& caps) { return caps.availableFps; })
+        .value_or(std::set<float>{});
+}
+
+float QnVirtualCameraResource::strictFpsToLimits(float fps,
+    nx::vms::api::StreamIndex streamIndex/* = nx::vms::api::StreamIndex::primary*/) const noexcept
+{
+    return streamCapability(streamIndex)
+        .transform([fps](const auto& caps) { return caps.strictFps(fps); })
+        .value_or(fps);
+}
+
+void QnVirtualCameraResource::setAvailableFps(
+    std::set<float> availableFps,
+    nx::vms::api::StreamIndex streamIndex)
 {
     updateCameraMediaCapability(
-        [streamIndex, fps](nx::vms::api::CameraMediaCapability& capability)
+        [streamIndex, fps = std::move(availableFps)](nx::vms::api::CameraMediaCapability& capability)
         {
-            capability.streamCapabilities[streamIndex].maxFps = fps;
+            capability.streamCapabilities[streamIndex].availableFps = std::move(fps);
+        });
+}
+
+void QnVirtualCameraResource::setFpsLimits(float minFps, float maxFps,
+    nx::vms::api::StreamIndex streamIndex/* = nx::vms::api::StreamIndex::primary*/)
+{
+    updateCameraMediaCapability(
+        [=](nx::vms::api::CameraMediaCapability& capability)
+        {
+            capability.streamCapabilities[streamIndex].minFps = minFps;
+            capability.streamCapabilities[streamIndex].maxFps = maxFps;
+        });
+}
+
+void QnVirtualCameraResource::setMaxFps(float maxFps,
+    nx::vms::api::StreamIndex streamIndex/* = nx::vms::api::StreamIndex::primary*/)
+{
+    updateCameraMediaCapability(
+        [=](nx::vms::api::CameraMediaCapability& capability)
+        {
+            capability.streamCapabilities[streamIndex].minFps = 1.0;
+            capability.streamCapabilities[streamIndex].maxFps = maxFps;
         });
 }
 
@@ -1100,6 +1142,13 @@ bool QnVirtualCameraResource::hasDualStreaming() const
 nx::vms::api::CameraMediaCapability QnVirtualCameraResource::cameraMediaCapability() const
 {
     return m_cachedCameraMediaCapabilities.get();
+}
+
+std::optional<nx::vms::api::CameraStreamCapability> QnVirtualCameraResource::streamCapability(nx::vms::api::StreamIndex idx) const
+{
+    const auto caps = cameraMediaCapability();
+    const auto it = caps.streamCapabilities.find(idx);
+    return it != caps.streamCapabilities.end() ? std::make_optional(it->second) : std::nullopt;
 }
 
 void QnVirtualCameraResource::setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value)

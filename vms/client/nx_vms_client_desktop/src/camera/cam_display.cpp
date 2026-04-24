@@ -194,7 +194,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnAbstractArchiveStreamR
         m_useMtDecoding = m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
 #endif
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera && camera->getMaxFps() >= 50)
+    if (camera && camera->getMaxFps() >= 50.0)
         m_useMtDecoding = m_forceMtDecoding = true; // we can get render speed limit instead. MT decoding and displaying frame queue turn on simultaneously
 
     if (camera && camera->hasFlags(Qn::virtual_camera))

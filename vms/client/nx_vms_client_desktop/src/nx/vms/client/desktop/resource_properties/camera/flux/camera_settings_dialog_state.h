@@ -115,7 +115,7 @@ struct CombinedProperties
     CombinedValue defaultKeepCameraTimeSettingsState = CombinedValue::None;
     CombinedValue defaultRemoteArchiveSynchronizationEnabledState = CombinedValue::None;
 
-    int maxFps = 0;
+    float maxFps = 0.0;
 };
 NX_REFLECTION_INSTRUMENT(CombinedProperties,
     (isDtsBased)(isVirtualCamera)(isIoModule)(isArecontCamera)(supportsAudio)(supportsVideo)

@@ -9,35 +9,35 @@ namespace Qn {
 
 void calculateMaxFps(
     const QnVirtualCameraResourceList& cameras,
-    int* maxFps)
+    float* maxFps)
 {
     using namespace nx::vms::api;
 
     if (maxFps)
-        *maxFps = std::numeric_limits<int>::max();
+        *maxFps = std::numeric_limits<float>::max();
 
     for (const auto& camera: cameras)
     {
-        int cameraFps = camera->getStatus() != nx::vms::api::ResourceStatus::unauthorized
+        auto cameraFps = camera->getStatus() != nx::vms::api::ResourceStatus::unauthorized
             ? camera->getMaxFps()
             : QnVirtualCameraResource::kDefaultMaxFps;
 
         if (camera->hasDualStreaming())
             cameraFps -= camera->reservedSecondStreamFps();
         if (maxFps)
-            *maxFps = qMin(*maxFps, cameraFps);
+            *maxFps = std::min(*maxFps, cameraFps);
     }
 }
 
-int calculateMaxFps(
+float calculateMaxFps(
     const QnVirtualCameraResourceList& cameras)
 {
-    int maxFps = std::numeric_limits<int>::max();
+    float maxFps = std::numeric_limits<float>::max();
     calculateMaxFps(cameras, &maxFps);
     return maxFps;
 }
 
-int calculateMaxFps(
+float calculateMaxFps(
     const QnVirtualCameraResourcePtr& camera)
 {
     return calculateMaxFps(QnVirtualCameraResourceList() << camera);
