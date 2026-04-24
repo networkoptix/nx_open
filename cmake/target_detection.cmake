@@ -76,12 +76,17 @@ function(detect_target)
             set(ANDROID TRUE PARENT_SCOPE)
             set(detected_platform "android")
             set(detected_modification "")
-            if(targetDevice STREQUAL "android_arm64")
+            if(targetDevice STREQUAL "android_arm32")
+                message(FATAL_ERROR
+                    "32-bit Android (armv7/armeabi-v7a) is no longer supported. "
+                    "Use targetDevice=android_arm64.")
+            elseif(targetDevice STREQUAL "android_arm64")
                 set(detected_arch "arm64")
                 set(detected_platform_new "android_arm64")
             else()
-                set(detected_arch "arm")
-                set(detected_platform_new "android_arm32")
+                message(FATAL_ERROR
+                    "Unknown Android target device: ${targetDevice}. "
+                    "Use targetDevice=android_arm64.")
             endif()
         elseif(targetDevice MATCHES "ios")
             set(detected_arch "arm")

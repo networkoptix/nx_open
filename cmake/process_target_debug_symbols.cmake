@@ -57,21 +57,16 @@ function(nx_process_linux_target_debug_symbols target)
         set(DUMP_SYMS "${CONAN_BREAKPAD-TOOLS_ROOT}/bin/dump_syms")
     endif()
 
-    if(targetDevice STREQUAL "android_arm32" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
-        # On macOS the dump_syms_linux is built only for 64-bit elf files.
-        set(DUMP_SYMS_COMMAND)
+    # Android dependencies contain debug symbols that also need to be processed.
+    # Stripping debug symbols is handled in Gradle.
+    if(ANDROID)
+        get_filename_component(COMPILER_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        set(GEN_SYM_ARGS "--platform=android" "--readelf-path=${COMPILER_DIR}/llvm-readelf" "--lib-paths=${QT_DIR}/lib")
     else()
-        # Android dependencies contain debug symbols that also need to be processed.
-        # Stripping debug symbols is handled in Gradle.
-        if(ANDROID)
-            get_filename_component(COMPILER_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
-            set(GEN_SYM_ARGS "--platform=android" "--readelf-path=${COMPILER_DIR}/llvm-readelf" "--lib-paths=${QT_DIR}/lib")
-        else()
-            set(GEN_SYM_ARGS "--skip-deps")
-        endif()
-        set(DUMP_SYMS_COMMAND COMMAND
-            "${PYTHON_EXECUTABLE}" "${CONAN_BREAKPAD-TOOLS_ROOT}/generate_breakpad_symbols.py" --dump-syms-path "${DUMP_SYMS}" --build-dir "${PROJECT_BINARY_DIR}" --symbols-dir "${breakpadSymbolsOutputDir}" --binary "$<TARGET_FILE:${target}>" --verbose ${GEN_SYM_ARGS})
+        set(GEN_SYM_ARGS "--skip-deps")
     endif()
+    set(DUMP_SYMS_COMMAND COMMAND
+        "${PYTHON_EXECUTABLE}" "${CONAN_BREAKPAD-TOOLS_ROOT}/generate_breakpad_symbols.py" --dump-syms-path "${DUMP_SYMS}" --build-dir "${PROJECT_BINARY_DIR}" --symbols-dir "${breakpadSymbolsOutputDir}" --binary "$<TARGET_FILE:${target}>" --verbose ${GEN_SYM_ARGS})
 
     add_custom_command(TARGET ${target} POST_BUILD
         ${DUMP_SYMS_COMMAND}

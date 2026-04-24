@@ -23,12 +23,10 @@ APK_DIR="$WORK_DIR/$APK_DIR_NAME"
 AAB_BUILD_CONF_FILE="$WORK_DIR/aab_build.conf"
 
 declare -A FULL_ABI_NAME_BY_SHORT=(
-    [arm32]=armeabi-v7a
     [arm64]=arm64-v8a
 )
 
 declare -A TOOLCHAIN_PREFIX_BY_ABI=(
-    [arm32]=arm-linux-androideabi
     [arm64]=aarch64-linux-android
 )
 
@@ -264,9 +262,16 @@ copyApks()
     for ABI in ${ANDROID_ABIS[@]}
     do
         ABI_DIR="${ABI_BUILD_DIRS[$ABI]}"
+        local SRC_DIR="$(realpath "$ABI_DIR/distrib")"
+        local DST_DIR="$(realpath "$DISTRIBUTION_OUTPUT_DIR")"
 
         echo "  Copying APK for $ABI"
-        cp "$ABI_DIR/distrib/"*.apk "$DISTRIBUTION_OUTPUT_DIR"
+        if [ "$SRC_DIR" = "$DST_DIR" ]
+        then
+            echo "  APKs are already in the output directory, skipping copy."
+        else
+            cp "$SRC_DIR/"*.apk "$DST_DIR"
+        fi
     done
 }
 
@@ -292,7 +297,7 @@ main()
     declare -A ABI_BUILD_DIRS
     for ABI in ${ANDROID_ABIS[@]}
     do
-        ABI_BUILD_DIRS[$ABI]="$CURRENT_BUILD_DIR/android_$ABI/src/android_$ABI-build"
+        ABI_BUILD_DIRS[$ABI]="$BUILD_DIR"
     done
 
     buildDistribution
