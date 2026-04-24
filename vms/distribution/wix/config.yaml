@@ -9,6 +9,7 @@ distribution_output_dir: '${distribution_output_dir}'
 # Source directories
 bin_source_dir: '${bin_source_dir}'
 current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
+qt_conf_path: '${qt_conf_path}'
 cmake_binary_dir: '${CMAKE_BINARY_DIR}'
 ucrt_directory: '${ucrt_directory}'
 vcrt_directory: '${vcrt_directory}'
