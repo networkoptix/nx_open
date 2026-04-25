@@ -369,6 +369,10 @@
                 "plusMoreText": "light10"
             }
         },
-        "noContentPlaceholder": "dark10"
+        "contentPlaceholder": {
+            "icon": "light16",
+            "caption": "light12",
+            "description": "light16"
+        }
     }
 }

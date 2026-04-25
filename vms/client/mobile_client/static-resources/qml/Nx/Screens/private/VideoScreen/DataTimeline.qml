@@ -471,7 +471,7 @@ Rectangle
 
         Timeline.Placeholder
         {
-            id: noContentPlaceholder
+            id: contentPlaceholder
 
             anchors.fill: objects
             anchors.rightMargin: recordingChunks.width

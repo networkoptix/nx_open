@@ -34,7 +34,7 @@ Item
             id: placeholderImage
 
             anchors.horizontalCenter: placeholderColumn.horizontalCenter
-            primaryColor: ColorTheme.colors.mobileTimeline.noContentPlaceholder
+            primaryColor: ColorTheme.colors.mobileTimeline.contentPlaceholder.icon
             sourceSize: Qt.size(64, 64)
 
             sourcePath:
@@ -68,7 +68,7 @@ Item
 
                 width: textColumn.width
                 horizontalAlignment: Text.AlignHCenter
-                color: ColorTheme.colors.mobileTimeline.noContentPlaceholder
+                color: ColorTheme.colors.mobileTimeline.contentPlaceholder.caption
                 font.pixelSize: 16
                 font.weight: Font.Medium
 
@@ -95,7 +95,7 @@ Item
                 width: textColumn.width
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                color: ColorTheme.colors.mobileTimeline.noContentPlaceholder
+                color: ColorTheme.colors.mobileTimeline.contentPlaceholder.description
                 font.pixelSize: 14
 
                 text:
