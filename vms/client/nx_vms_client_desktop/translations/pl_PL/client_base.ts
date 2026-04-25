@@ -2065,23 +2065,23 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Nie można wyczyścić pamięci podręcznej WebEngine</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Zamknij wszystkie strony internetowe i spróbuj ponownie.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Pliki mogą zostać zablokowane przez inny proces.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Pamięć podręczna WebEngine została częściowo wyczyszczona</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Niektóre pliki mogą być zablokowane przez inny proces.</translation>
     </message>
   </context>
   <context>
