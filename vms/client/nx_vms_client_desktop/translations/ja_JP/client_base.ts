@@ -2006,6 +2006,26 @@ License Key: %2</source>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
       <translation>注意: ハードウェアビデオデコーディングが有効になっている場合、画像補正は利用できません。</translation>
     </message>
+    <message>
+      <source>Cannot clear WebEngine cache</source>
+      <translation>WebEngine のキャッシュをクリアできません。</translation>
+    </message>
+    <message>
+      <source>Please close all web pages and try again.</source>
+      <translation>すべてのWebページを閉じてから、再度お試しください。</translation>
+    </message>
+    <message>
+      <source>The files may be locked by another process.</source>
+      <translation>ファイルが別のプロセスによってロックされている可能性があります。</translation>
+    </message>
+    <message>
+      <source>WebEngine cache partially cleared</source>
+      <translation>WebEngine のキャッシュが部分的にクリアされました。</translation>
+    </message>
+    <message>
+      <source>Some files may be locked by another process.</source>
+      <translation>一部のファイルが別のプロセスによってロックされている可能性があります。</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

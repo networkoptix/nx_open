@@ -2025,6 +2025,26 @@ Licensnøgle: %2</translation>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
       <translation>Bemærk: Billedforbedring er ikke tilgængelig, når Hardware Video Decoding er aktiveret.</translation>
     </message>
+    <message>
+      <source>Cannot clear WebEngine cache</source>
+      <translation>Kan ikke rydde WebEngine cache</translation>
+    </message>
+    <message>
+      <source>Please close all web pages and try again.</source>
+      <translation>Luk alle websider og prøv igen.</translation>
+    </message>
+    <message>
+      <source>The files may be locked by another process.</source>
+      <translation>Filerne kan være låst af en anden proces.</translation>
+    </message>
+    <message>
+      <source>WebEngine cache partially cleared</source>
+      <translation>WebEngine cache delvist ryddet</translation>
+    </message>
+    <message>
+      <source>Some files may be locked by another process.</source>
+      <translation>Nogle filer kan være låst af en anden proces.</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

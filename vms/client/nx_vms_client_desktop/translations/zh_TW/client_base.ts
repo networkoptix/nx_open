@@ -2006,6 +2006,26 @@ License Key: %2</source>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
       <translation>注意：影像增強不可在開啟硬體影像解碼時使用。</translation>
     </message>
+    <message>
+      <source>Cannot clear WebEngine cache</source>
+      <translation>無法清除 WebEngine 快取</translation>
+    </message>
+    <message>
+      <source>Please close all web pages and try again.</source>
+      <translation>請關閉所有網頁並重試。</translation>
+    </message>
+    <message>
+      <source>The files may be locked by another process.</source>
+      <translation>檔案可能已被其他程序鎖定。</translation>
+    </message>
+    <message>
+      <source>WebEngine cache partially cleared</source>
+      <translation>WebEngine快取已部分清除</translation>
+    </message>
+    <message>
+      <source>Some files may be locked by another process.</source>
+      <translation>有些檔案可能已被其他程序鎖定。</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>

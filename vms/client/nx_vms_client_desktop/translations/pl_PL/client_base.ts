@@ -2063,6 +2063,26 @@ Klucz licencyjny: %2</translation>
       <source>Note: Image Enhancement is not available when Hardware Video Decoding is turned on.</source>
       <translation>Uwaga: Funkcja ulepszania obrazu nie jest dostępna, gdy włączone jest sprzętowe dekodowanie wideo.</translation>
     </message>
+    <message>
+      <source>Cannot clear WebEngine cache</source>
+      <translation>Nie można wyczyścić pamięci podręcznej WebEngine</translation>
+    </message>
+    <message>
+      <source>Please close all web pages and try again.</source>
+      <translation>Zamknij wszystkie strony internetowe i spróbuj ponownie.</translation>
+    </message>
+    <message>
+      <source>The files may be locked by another process.</source>
+      <translation>Pliki mogą zostać zablokowane przez inny proces.</translation>
+    </message>
+    <message>
+      <source>WebEngine cache partially cleared</source>
+      <translation>Pamięć podręczna WebEngine została częściowo wyczyszczona</translation>
+    </message>
+    <message>
+      <source>Some files may be locked by another process.</source>
+      <translation>Niektóre pliki mogą być zablokowane przez inny proces.</translation>
+    </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
