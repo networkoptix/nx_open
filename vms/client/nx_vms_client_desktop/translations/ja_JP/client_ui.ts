@@ -2331,7 +2331,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation>内蔵およびUSB Webカメラの自動検出</translation>
+      <translation>内蔵カメラおよび USB Web カメラを自動検出する</translation>
     </message>
     <message>
       <source>Remote Access</source>
