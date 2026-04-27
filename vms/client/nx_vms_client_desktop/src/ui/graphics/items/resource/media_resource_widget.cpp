@@ -1911,12 +1911,14 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
         return result;
     }
 
-    const QRectF sourceSubRect = Geometry::toSubRect(channelRect, paintRect);
-    const PainterTransformScaleStripper scaleStripper(painter);
-    result = paintVideoTexture(painter,
-        channel,
-        sourceSubRect,
-        scaleStripper.mapRect(paintRect));
+    {
+        const QRectF sourceSubRect = Geometry::toSubRect(channelRect, paintRect);
+        const PainterTransformScaleStripper scaleStripper(painter);
+        result = paintVideoTexture(painter,
+            channel,
+            sourceSubRect,
+            scaleStripper.mapRect(paintRect));
+    }
 
     const bool videoFramePresent = result == Qn::NewFrameRendered || result == Qn::OldFrameRendered;
     if (videoFramePresent)
