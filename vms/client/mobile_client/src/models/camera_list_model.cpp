@@ -201,14 +201,16 @@ void QnCameraListModel::setRawLayout(QnLayoutResource* value)
     emit layoutChanged();
 }
 
-QVariant QnCameraListModel::filterIds() const
+UuidList QnCameraListModel::filterIds() const
 {
-    return QVariant::fromValue(d->filterIds.values());
+    return d->filterIds.values();
 }
 
-void QnCameraListModel::setFilterIds(const QVariant &ids)
+void QnCameraListModel::setFilterIds(const UuidList& ids)
 {
-    d->filterIds = nx::utils::toQSet(ids.value<QList<nx::Uuid>>());
+    d->filterIds = nx::utils::toQSet(ids);
+    emit filterIdsChanged();
+
     invalidateFilter();
 }
 
@@ -251,7 +253,7 @@ void QnCameraListModel::setSelectedIds(const UuidList& value)
         if (const int row = resourceIndex.row(); row >= 0)
             emit dataChanged(index(row, 0), index(row, 0), {Qt::CheckStateRole});
     }
-    emit selectedIdsChagned();
+    emit selectedIdsChanged();
 }
 
 void QnCameraListModel::setSelected(int row, bool selected)
@@ -269,7 +271,7 @@ void QnCameraListModel::setSelected(int row, bool selected)
         d->selectedIds.remove(id);
 
     emit dataChanged(index(row, 0), index(row, 0), {Qt::CheckStateRole});
-    emit selectedIdsChagned();
+    emit selectedIdsChanged();
 }
 
 int QnCameraListModel::rowByResource(QnResource* rawResource) const

@@ -75,7 +75,7 @@ QnMobileClientUiController::QnMobileClientUiController(
             NX_DEBUG(this, "initialize(): sessionStartedSuccessfully(): current screen is <%1>",
                 currentScreen());
             if (currentScreen() != Screen::ResourcesScreen)
-                emit resourcesScreenRequested(QVariant());
+                emit resourcesScreenRequested(UuidList{});
         });
 
     using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
@@ -202,10 +202,10 @@ void QnMobileClientUiController::openConnectToServerScreen(
         url.displayAddress(), url.userName(), url.password(), operationId);
 }
 
-void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filterIds)
+void QnMobileClientUiController::openResourcesScreen(const UuidList& filterIds)
 {
     NX_DEBUG(this, "openResourcesScreen(): resources count is <%1>", filterIds.size());
-    emit resourcesScreenRequested(QVariant::fromValue(filterIds));
+    emit resourcesScreenRequested(filterIds);
 }
 
 void QnMobileClientUiController::openVideoScreen(QnResource* cameraResource, qint64 timestamp)

@@ -25,7 +25,9 @@ class QnCameraListModel: public QSortFilterProxyModel,
     Q_OBJECT
     using base_type = QSortFilterProxyModel;
 
-    Q_PROPERTY(QVariant filterIds READ filterIds WRITE setFilterIds
+    Q_PROPERTY(UuidList filterIds
+        READ filterIds
+        WRITE setFilterIds
         NOTIFY filterIdsChanged)
     Q_PROPERTY(QnLayoutResource* layout
         READ rawLayout
@@ -40,7 +42,7 @@ class QnCameraListModel: public QSortFilterProxyModel,
     Q_PROPERTY(UuidList selectedIds
         READ selectedIds
         WRITE setSelectedIds
-        NOTIFY selectedIdsChagned)
+        NOTIFY selectedIdsChanged)
 
 public:
     static void registerQmlType();
@@ -54,8 +56,8 @@ public:
     QnLayoutResource* rawLayout() const;
     void setRawLayout(QnLayoutResource* value);
 
-    QVariant filterIds() const;
-    void setFilterIds(const QVariant& ids);
+    UuidList filterIds() const;
+    void setFilterIds(const UuidList& ids);
 
     UuidList selectedIds() const;
     void setSelectedIds(const UuidList& value);
@@ -79,7 +81,7 @@ signals:
     void countChanged();
     void totalCountChanged();
     void filterIdsChanged();
-    void selectedIdsChagned();
+    void selectedIdsChanged();
     void systemContextsSetChanged();
 
 protected:

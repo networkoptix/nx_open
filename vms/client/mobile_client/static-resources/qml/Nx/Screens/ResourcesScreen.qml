@@ -68,7 +68,6 @@ AdaptiveScreen
                     leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
                     leftControl.onClicked:
                     {
-                        resourcesScreen.filterIds = []
                         videoScreenLoader.item.controller.stop()
 
                         if (!resourceHelper.isLayout)
@@ -154,9 +153,11 @@ AdaptiveScreen
             }
             else
             {
-                resourcesScreen.filterIds = []
-
                 resourcesScreen.contentItem = videoScreenLoader.item
+                videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
+                // Filter out all the cameras except selected to prevent ability to swipe between
+                // cameras.
+                videoScreenLoader.item.camerasModel.filterIds = [cameraResource.id]
                 videoScreenLoader.item.controller.start(cameraResource, -1)
             }
         }
@@ -195,7 +196,6 @@ AdaptiveScreen
                 videoScreenLoader.item.camerasModel = camerasModel
                 videoScreenLoader.item.controller.start(resource, -1)
 
-                resourcesScreen.filterIds = []
                 resourcesScreen.contentItem = videoScreenLoader.item
             }
         }

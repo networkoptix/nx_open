@@ -70,7 +70,6 @@ private:
         WRITE setAvoidHandlingConnectionStuff
         NOTIFY avoidHandlingConnectionStuffChanged)
 
-    using ResourceIdList = QList<nx::Uuid>;
     using SessionManager = nx::vms::client::mobile::SessionManager;
 
 public:
@@ -98,13 +97,13 @@ public:
     Q_INVOKABLE void openConnectToServerScreen(
         const nx::Url& url,
         const QString& operationId);
-    Q_INVOKABLE void openResourcesScreen(const ResourceIdList& filterIds = ResourceIdList());
+    Q_INVOKABLE void openResourcesScreen(const UuidList& filterIds = UuidList{});
     Q_INVOKABLE void openVideoScreen(QnResource* cameraResource, qint64 timestamp);
     Q_INVOKABLE void openSessionsScreen();
 
 signals:
     void resourceChanged();
-    void resourcesScreenRequested(const QVariant& filterIds);
+    void resourcesScreenRequested(const UuidList& filterIds);
     void videoScreenRequested(QnResource* cameraResource, qint64 timestamp);
     void sessionsScreenRequested();
     void avoidHandlingConnectionStuffChanged();

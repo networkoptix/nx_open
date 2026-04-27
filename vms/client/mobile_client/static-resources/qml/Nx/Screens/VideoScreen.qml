@@ -38,8 +38,8 @@ Page
     property alias controller: controller
     property alias menu: menu
 
-    property QnCameraListModel camerasModel:
-        QnCameraListModel {} //< Keeps ability to switch between cameras when screen is opened by link.
+    readonly property QnCameraListModel defaultCamerasModel: QnCameraListModel {}
+    property QnCameraListModel camerasModel: defaultCamerasModel
 
     property real targetTimestamp: -1
 
