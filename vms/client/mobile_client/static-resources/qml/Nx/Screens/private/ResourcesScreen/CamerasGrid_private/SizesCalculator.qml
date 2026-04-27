@@ -16,25 +16,10 @@ NxObject
     readonly property int minColumnsCount: d.calculateMinColumnsCount()
     readonly property int defaultColumnsCount: d.calculateDefaultColumnsCount()
 
-    onMinColumnsCountChanged:
-    {
-        if (d.userDefinedColumnsCount === kInvalidColumnsCount)
-            d.userDefinedColumnsCount = defaultColumnsCount
-
-        if (d.userDefinedColumnsCount < minColumnsCount)
-            d.userDefinedColumnsCount = minColumnsCount
-    }
-
-    onDefaultColumnsCountChanged:
-    {
-        if (d.userDefinedColumnsCount === kInvalidColumnsCount
-            || d.userDefinedColumnsCount > defaultColumnsCount)
-        {
-            d.userDefinedColumnsCount = defaultColumnsCount
-        }
-    }
-
-    readonly property int columnsCount: d.userDefinedColumnsCount
+    readonly property int columnsCount:
+        d.userDefinedColumnsCount === kInvalidColumnsCount
+            ? defaultColumnsCount
+            : MathUtils.bound(minColumnsCount, d.userDefinedColumnsCount, defaultColumnsCount)
 
     readonly property bool widthFillingZoomAvailable:
     {
@@ -75,11 +60,12 @@ NxObject
 
     function setUserDefinedColumnsCount(newColumnsCount)
     {
-        if (newColumnsCount === kInvalidColumnsCount)
-            newColumnsCount = defaultColumnsCount
+        d.userDefinedColumnsCount = newColumnsCount
+    }
 
-        d.userDefinedColumnsCount =
-            MathUtils.bound(minColumnsCount, newColumnsCount, defaultColumnsCount)
+    function rawUserDefinedColumnsCount()
+    {
+        return d.userDefinedColumnsCount
     }
 
     function widthFillingZoomEnabled()
@@ -110,14 +96,6 @@ NxObject
             + ((enlargedRowsCount > 0 && normalRowsCount > 0) ? spacing : 0)
     }
 
-    function getUserDefinedColumnsCount()
-    {
-        if (d.userDefinedColumnsCount === kInvalidColumnsCount)
-            return defaultColumnsCount
-        else
-            return d.userDefinedColumnsCount
-    }
-
     function cellHeightFromWidth(cellWidth)
     {
         return d.roundDimension(cellWidth * kAspectRatio)
@@ -140,7 +118,15 @@ NxObject
     {
         id: d
 
+        // Raw user-defined value. May be out of [minColumnsCount, defaultColumnsCount] after
+        // geometry change or a reload with a different camera count. kInvalidColumnsCount means
+        // the user has not customized and columnsCount tracks defaultColumnsCount.
+        // The user-defined value is stored raw so that the user's intent survives transient states:
+        // the load running before cellsCount is final (first camera arrived but others still coming
+        // from the resource pool), and geometry changes that temporarily reduce defaultColumnsCount
+        // (e.g. rotation to portrait).
         property int userDefinedColumnsCount: kInvalidColumnsCount
+
         property bool widthFillingZoomEnabled: false
 
         // Round off logic must be similar for any calculation to avoid visual artifacts.
@@ -228,12 +214,14 @@ NxObject
             if (widthFillingZoomAvailable && d.widthFillingZoomEnabled)
                 return cellWidthCorrespondingToAvailableWidth
 
-            // If a user modified columns count, we do not care about scroll.
-            if (d.userDefinedColumnsCount !== defaultColumnsCount
-                && d.userDefinedColumnsCount !== kInvalidColumnsCount)
-            {
+            // If a user explicitly chose a columns count different from default that's currently
+            // achievable, honor it (width-fill, ignore scroll). Compare against the clamped
+            // columnsCount, not the raw userDefinedColumnsCount: a stored userDef that's out of
+            // the current [minColumnsCount, defaultColumnsCount] range would otherwise trigger
+            // this branch and stretch cells to full width even though the user's intent
+            // is unreachable - columnsCount was already clamped to defaultColumnsCount.
+            if (columnsCount !== defaultColumnsCount)
                 return cellWidthCorrespondingToAvailableWidth
-            }
 
             const cellHeightCorrespondingToAvailableWidth =
                 cellHeightFromWidth(cellWidthCorrespondingToAvailableWidth)

@@ -105,23 +105,18 @@ Item
             {
                 sizesCalculator.availableWidth = width
                 sizesCalculator.availableHeight = height
+                return
             }
-            else
-            {
-                const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
-                    previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
 
-                previousContentY = -1
-                sizesCalculator.availableWidth = width
-                sizesCalculator.availableHeight = height
+            const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
+                previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
 
-                if (centerIndex === -1)
-                    return //< Just in case.
+            previousContentY = -1
+            sizesCalculator.availableWidth = width
+            sizesCalculator.availableHeight = height
 
+            if (centerIndex !== -1)
                 contentY = contentYToCenterIndexStatic(centerIndex)
-            }
-
-            d.saveTargetColumnsCount()
         }
 
         // Required for contentY update during screen resize. Must use statically calculated
@@ -201,13 +196,16 @@ Item
                         Qt.callLater(
                             function()
                             {
+                                // Sync availableWidth/Height now in case the flickable is mid-
+                                // resize (geometryChangeAccumulatorTimer hasn't fired yet — e.g.
+                                // rotation in progress, or initial layout passes at startup),
+                                // so the loads below work on current dimensions.
                                 flickable.updateSizesCalculatorAvailableGeometry()
                                 d.loadTargetColumnsCount()
                                 d.loadLayoutPosition()
                             })
                     }
 
-                    onSystemContextsSetChanged: updateControlState()
                     onLayoutChanged: updateControlState()
                 }
 
@@ -394,6 +392,16 @@ Item
                 const maxLogicalRotation =
                     sizesCalculator.defaultColumnsCount * kDefaultRotationStep
 
+                if (logicalRotation < minLogicalRotation || maxLogicalRotation < logicalRotation)
+                {
+                    // Rebase against the currently displayed columns count if logicalRotation
+                    // drifted out of the valid range (e.g. after orientation change, pinch gesture,
+                    // or a reload that clamped the raw user intent). Otherwise the first wheel tick
+                    // would either be wasted on clamping from far outside the range or silently
+                    // overwrite the cross-orientation raw value.
+                    logicalRotation = sizesCalculator.columnsCount * kDefaultRotationStep
+                }
+
                 const newLogicalRotation = logicalRotation + event.angleDelta.y
 
                 if ((newLogicalRotation < minLogicalRotation
@@ -423,11 +431,14 @@ Item
                     const newColumnsCountUserModifier =
                         Math.floor(logicalRotation / kDefaultRotationStep)
 
-                    if (newColumnsCountUserModifier
-                        === sizesCalculator.getUserDefinedColumnsCount())
-                    {
+                    // Compare to columnsCount (the clamped, displayed value) rather than
+                    // the raw user-defined value. Otherwise, when the raw user intent is
+                    // outside the current orientation's [min, default] range (e.g. after a
+                    // rotation to a more restrictive orientation), the first wheel tick would
+                    // always be treated as a change and overwrite the cross-orientation
+                    // intent without any visible effect.
+                    if (newColumnsCountUserModifier === sizesCalculator.columnsCount)
                         return
-                    }
 
                     updateAnchor()
 
@@ -453,8 +464,7 @@ Item
 
             function updateStartLogicalRotation()
             {
-                const currentUserModifier = sizesCalculator.getUserDefinedColumnsCount()
-                logicalRotation = currentUserModifier * kDefaultRotationStep
+                logicalRotation = sizesCalculator.columnsCount * kDefaultRotationStep
             }
         }
     }
@@ -747,6 +757,14 @@ Item
     {
         target: windowContext.sessionManager
 
+        // In "All cameras" mode (layout is null) QnCameraListModel does not emit layoutChanged
+        // on system switch; specific-layout mode is covered by onLayoutChanged.
+        function onSessionStartedSuccessfully()
+        {
+            if (!layout)
+                camerasModel.updateControlState()
+        }
+
         function onSessionRestored()
         {
             camerasModel.updateControlState()
@@ -777,9 +795,15 @@ Item
             const theOnlyColumnStretchMode =
                 sizesCalculator.columnsCount === 1 && sizesCalculator.widthFillingZoomEnabled()
 
-            camerasGridHelper.saveTargetColumnsCount(
-                layout,
-                theOnlyColumnStretchMode ? 0 : sizesCalculator.columnsCount)
+            // Save the raw user intent, not the clamped columnsCount. Otherwise a geometry change
+            // that temporarily reduces defaultColumnsCount (e.g. rotation) would persist
+            // the clamped value and lose the user's choice on the other orientation or after
+            // a reconnect with more cameras.
+            const valueToSave = theOnlyColumnStretchMode
+                ? 0
+                : sizesCalculator.rawUserDefinedColumnsCount()
+
+            camerasGridHelper.saveTargetColumnsCount(layout, valueToSave)
         }
 
         function loadTargetColumnsCount()
@@ -788,13 +812,24 @@ Item
 
             if (loadedTargetColumnsCount === 0)
             {
-                sizesCalculator.setUserDefinedColumnsCount(1)
-                sizesCalculator.setWidthFillingZoomEnabled(true)
-                return
+                // Saved stretch mode: apply it if still available, otherwise fall back to
+                // tracking defaultColumnsCount so the layout adapts to the new camera count.
+                if (sizesCalculator.widthFillingZoomAvailable)
+                {
+                    sizesCalculator.setUserDefinedColumnsCount(1)
+                    sizesCalculator.setWidthFillingZoomEnabled(true)
+                }
+                else
+                {
+                    sizesCalculator.setUserDefinedColumnsCount(sizesCalculator.kInvalidColumnsCount)
+                    sizesCalculator.setWidthFillingZoomEnabled(false)
+                }
             }
-
-            sizesCalculator.setUserDefinedColumnsCount(loadedTargetColumnsCount)
-            sizesCalculator.setWidthFillingZoomEnabled(false)
+            else
+            {
+                sizesCalculator.setUserDefinedColumnsCount(loadedTargetColumnsCount)
+                sizesCalculator.setWidthFillingZoomEnabled(false)
+            }
 
             wheelHandler.updateStartLogicalRotation()
         }
