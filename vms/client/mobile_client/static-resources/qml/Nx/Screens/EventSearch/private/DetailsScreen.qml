@@ -347,7 +347,9 @@ Page
 
             readonly property real kAspectRatio: 9.0 / 16.0
 
-            requestLine: objectData?.imagePath ?? ""
+            visible: !LayoutController.isTabletLayout
+            requestLine:
+                (!LayoutController.isTabletLayout && objectData) ? objectData.imagePath : ""
 
             Layout.fillWidth: true
             Layout.preferredHeight: width * kAspectRatio
