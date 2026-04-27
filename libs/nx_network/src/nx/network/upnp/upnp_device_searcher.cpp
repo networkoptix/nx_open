@@ -53,7 +53,6 @@ DeviceSearcher::DeviceSearcher(
     m_needToUpdateReceiveSocket(false),
     m_timerManager(timerManager)
 {
-    m_receiveBuffer.reserve(kReadBufferCapacity);
 }
 
 DeviceSearcher::~DeviceSearcher()
@@ -103,8 +102,8 @@ void DeviceSearcher::stop()
         NX_MUTEX_LOCKER lock(&m_mutex);
         std::swap(socketList, m_socketList);
     }
-    for (auto& [_, ctx]: socketList)
-        ctx.sock->pleaseStopSync();
+    for (auto& [_, sock]: socketList)
+        sock->pleaseStopSync();
     socketList.clear();
     if (m_receiveSocket)
         m_receiveSocket->pleaseStopSync();
@@ -191,53 +190,44 @@ int DeviceSearcher::cacheTimeout() const
 }
 
 void DeviceSearcher::onSomeBytesRead(
-    AbstractCommunicatingSocket* sock,
-    SystemError::ErrorCode errorCode,
-    nx::Buffer* readBuffer,
-    size_t /*bytesRead*/)
+    AbstractDatagramSocket* socket,
+    std::shared_ptr<nx::Buffer> buffer,
+    SystemError::ErrorCode errorCode)
 {
     if (errorCode)
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-
-        if (sock == m_receiveSocket.get())
+        if (socket == m_receiveSocket.get())
         {
             m_needToUpdateReceiveSocket = true;
         }
         else
         {
-            // Removing socket from m_socketList
-            for (auto it = m_socketList.begin(); it != m_socketList.end(); ++it)
-            {
-                if (it->second.sock.get() == sock)
-                {
-                    m_socketList.erase(it);
-                    break;
-                }
-            }
+            std::erase_if(m_socketList,
+                [socket](const auto& entry) { return entry.second.get() == socket; });
         }
         return;
     }
 
-    auto SCOPED_GUARD_FUNC =
-        [this, readBuffer, sock](DeviceSearcher*)
+    nx::utils::ScopeGuard readSocketGuard = nx::utils::makeScopeGuard(
+        [this, buffer, socket]()
         {
-            using namespace std::placeholders;
-
-            readBuffer->resize(0);
-            sock->readSomeAsync(
-                readBuffer,
-                std::bind(&DeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2));
-        };
-    std::unique_ptr<DeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(this, SCOPED_GUARD_FUNC);
+            buffer->resize(0);
+            socket->readSomeAsync(
+                buffer.get(),
+                [this, buffer, socket] (SystemError::ErrorCode ec, size_t /*bytesRead*/)
+                {
+                    onSomeBytesRead(socket, buffer, ec);
+                });
+        });
 
     HostAddress remoteHost;
     nx::network::http::Request foundDeviceReply;
     {
-        AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(sock);
+        AbstractDatagramSocket* udpSock = static_cast<AbstractDatagramSocket*>(socket);
         //reading socket and parsing UPnP response packet
         remoteHost = udpSock->lastDatagramSourceAddress().address;
-        if (!foundDeviceReply.parse(*readBuffer))
+        if (!foundDeviceReply.parse(*buffer))
             return;
     }
 
@@ -274,15 +264,16 @@ void DeviceSearcher::dispatchDiscoverPackets()
 {
     for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
     {
-        const std::shared_ptr<AbstractDatagramSocket> sock = getSockByIntf(address);
-        if (!sock)
+        const auto socket = getSocketByInterface(address);
+        if (!socket)
             continue;
 
         const auto lock = m_handlerGuard->lock();
         NX_ASSERT(lock);
         for( const auto& handler : m_handlers )
         {
-            if (std::any_of(handler.second.begin(), handler.second.end(),
+            if (std::ranges::any_of(
+                handler.second,
                 [](const std::pair<SearchHandler*, uintptr_t>& value)
                 {
                     return value.first->isEnabled();
@@ -294,11 +285,11 @@ void DeviceSearcher::dispatchDiscoverPackets()
 
                 nx::Buffer data;
                 data.append("M-SEARCH * HTTP/1.1\r\n");
-                data.append("Host: " + sock->getLocalAddress().toString() + "\r\n");
+                data.append("Host: " + socket->getLocalAddress().toString() + "\r\n");
                 data.append("ST:" + toUpnpUrn(deviceType, "device").toStdString() + "\r\n");
                 data.append("Man:\"sdp:discover\"\r\n");
                 data.append("MX:5\r\n\r\n" );
-                sock->sendTo(data.data(), data.size(), groupAddress.toString().toStdString(), kGroupPort);
+                socket->sendTo(data.data(), data.size(), groupAddress.toString().toStdString(), kGroupPort);
             }
         }
     }
@@ -336,10 +327,9 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     return oldSock;
 }
 
-std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
+std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSocketByInterface(
     const nx::network::HostAddress& address)
 {
-
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
     bool isReceiveSocketUpdated = false;
     {
@@ -351,59 +341,57 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf(
 
     if (oldSock)
         oldSock->pleaseStopSync();
+
     if (isReceiveSocketUpdated)
     {
+        auto buffer = std::make_shared<nx::Buffer>();
+        buffer->reserve(kReadBufferCapacity);
         NX_MUTEX_LOCKER lock(&m_mutex);
+        auto sock = m_receiveSocket.get();
         m_receiveSocket->readSomeAsync(
-            &m_receiveBuffer,
-            [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
-                SystemError::ErrorCode errorCode,
-                std::size_t bytesRead)
+            buffer.get(),
+            [this, sock, buffer](SystemError::ErrorCode errorCode, std::size_t /*bytesRead*/)
             {
-                onSomeBytesRead(sock, errorCode, buf, bytesRead);
+                onSomeBytesRead(sock, buffer, errorCode);
             });
     }
 
-    const auto& localAddress = address.toString();
-
-    pair<map<QString, SocketReadCtx>::iterator, bool> p;
+    const auto localAddress = address.toString();
     {
         NX_MUTEX_LOCKER lk(&m_mutex);
-        p = m_socketList.emplace(QString::fromStdString(localAddress), SocketReadCtx());
+        auto iter = m_socketList.find(localAddress);
+        if (iter != m_socketList.end())
+            return iter->second;
     }
-    if (!p.second)
-        return p.first->second.sock;
 
-    //creating new socket
-
-    using namespace std::placeholders;
-
-    p.first->second.sock = std::make_shared<UDPSocket>();
-    auto sockPtr = p.first->second.sock.get();
-    p.first->second.buf.reserve(kReadBufferCapacity);
-    if (!sockPtr->setNonBlockingMode(true) ||
-        !sockPtr->setReuseAddrFlag(true) ||
-        !sockPtr->bind(SocketAddress(localAddress)) ||
-        !sockPtr->setMulticastIF(localAddress) ||
-        !sockPtr->setRecvBufferSize(kMaxUpnpResponsePacketSize))
+    // Creating new socket.
+    auto socket = std::make_shared<UDPSocket>();
+    if (!socket->setNonBlockingMode(true) ||
+        !socket->setReuseAddrFlag(true) ||
+        !socket->bind(SocketAddress(localAddress)) ||
+        !socket->setMulticastIF(localAddress) ||
+        !socket->setRecvBufferSize(kMaxUpnpResponsePacketSize))
     {
-        sockPtr->post(
-            std::bind(
-                &DeviceSearcher::onSomeBytesRead, this,
-                sockPtr, SystemError::getLastOSErrorCode(), nullptr, 0));
-    }
-    else
-    {
-        // TODO: #akolesnikov Something very strange. We start async operation with some internal
-        // handle and RETURN this socket.
-        sockPtr->readSomeAsync(
-            &p.first->second.buf,
-            std::bind(
-                &DeviceSearcher::onSomeBytesRead, this,
-                sockPtr, _1, &p.first->second.buf, _2));
+        return nullptr;
     }
 
-    return p.first->second.sock;
+    // TODO: #akolesnikov Something very strange. We start async operation with some internal
+    // handle and RETURN this socket.
+    {
+        NX_MUTEX_LOCKER lk(&m_mutex);
+        auto [it, inserted] = m_socketList.emplace(localAddress, socket);
+        if (!inserted)
+            return it->second;
+    }
+    auto buffer = std::make_shared<nx::Buffer>();
+    buffer->reserve(kReadBufferCapacity);
+    socket->readSomeAsync(
+        buffer.get(),
+        [this, buffer, socket = socket.get()] (SystemError::ErrorCode ec, size_t /*bytesRead*/)
+        {
+            onSomeBytesRead(socket, buffer, ec);
+        });
+    return socket;
 }
 
 void DeviceSearcher::startFetchDeviceXml(

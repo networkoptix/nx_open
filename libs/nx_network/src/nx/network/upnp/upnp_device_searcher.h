@@ -123,13 +123,6 @@ private:
         }
     };
 
-    class SocketReadCtx
-    {
-    public:
-        std::shared_ptr<AbstractDatagramSocket> sock;
-        nx::Buffer buf;
-    };
-
     std::unique_ptr<AbstractDeviceSearcherSettings> m_settings;
     bool m_ignoreUsb0NetworkInterfaceIfOthersExist;
     std::function<bool()> m_isHttpsForced;
@@ -140,7 +133,7 @@ private:
     std::map< QString, std::map< SearchHandler*, uintptr_t > > m_handlers;
     mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     /** map<local interface ip, socket>. */
-    std::map<QString, SocketReadCtx> m_socketList;
+    std::map<std::string, std::shared_ptr<AbstractDatagramSocket>> m_socketList;
     HttpClientsDict m_httpClients;
     /** map<device host address, device info>. */
     std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevices;
@@ -149,20 +142,18 @@ private:
     QElapsedTimer m_cacheTimer;
 
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> m_receiveSocket;
-    nx::Buffer m_receiveBuffer;
     bool m_needToUpdateReceiveSocket;
     nx::utils::TimerManager* m_timerManager;
 
     void onSomeBytesRead(
-        AbstractCommunicatingSocket* sock,
-        SystemError::ErrorCode errorCode,
-        nx::Buffer* readBuffer,
-        size_t bytesRead);
+        AbstractDatagramSocket* socket,
+        std::shared_ptr<nx::Buffer> buffer,
+        SystemError::ErrorCode errorCode);
 
     void dispatchDiscoverPackets();
     bool needToUpdateReceiveSocket() const;
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
-    std::shared_ptr<AbstractDatagramSocket> getSockByIntf(const HostAddress& address);
+    std::shared_ptr<AbstractDatagramSocket> getSocketByInterface(const HostAddress& address);
     void startFetchDeviceXml(
         const QByteArray& uuidStr,
         const nx::Url& descriptionUrl,
