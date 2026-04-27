@@ -11,15 +11,47 @@ extern "C" {
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
+#include <nx/ranges.h>
 #include <nx/utils/log/log.h>
 
 using namespace nx::vms::api;
 
-static bool isMoovFormat(const QString& container)
+namespace {
+
+bool isMoovFormat(const QString& container)
 {
     return container.compare("mp4", Qt::CaseInsensitive) == 0
         || container.compare("ismv", Qt::CaseInsensitive) == 0;
 }
+
+// Container-specific ordered audio codec preferences.
+// This mapping is needed because, as of this writing, no libav/libavformat
+// function is known to return a ready-to-use list of audio codecs supported by a
+// container in the priority order required by this code path. The order matters:
+// multiple codecs may be reported as supported by the muxer, but that does not
+// guarantee equivalent playback behavior. For example, some players may accept MP3
+// in MP4/ISMV nominally, yet fail to play audio, while AAC plays correctly.
+// Therefore this table encodes both compatibility and preference.
+const std::map<QString, std::vector<AVCodecID>> kAudioFallbacksByContainer = {
+    {"mp4", {AV_CODEC_ID_AAC, AV_CODEC_ID_MP3}},
+    {"ismv", {AV_CODEC_ID_AAC, AV_CODEC_ID_MP3}},
+    {"webm", {AV_CODEC_ID_OPUS, AV_CODEC_ID_VORBIS}},
+    {"mpegts", {AV_CODEC_ID_MP2, AV_CODEC_ID_AAC, AV_CODEC_ID_MP3}},
+    {"ts", {AV_CODEC_ID_MP2, AV_CODEC_ID_AAC, AV_CODEC_ID_MP3}},
+};
+
+// Fallbacks for other containers.
+const std::vector kAudioFallbacks = {
+    AV_CODEC_ID_MP3,
+    AV_CODEC_ID_VORBIS,
+};
+
+QString codecNameForId(AVCodecID c)
+{
+    return QString::fromLatin1(avcodec_get_name(c));
+}
+
+} // namespace
 
 bool QnFfmpegTranscoder::setVideoCodec(
     AVCodecID codec,
@@ -109,10 +141,11 @@ int QnFfmpegTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media
 
         if (++m_eofCounter >= 3)
             return -8; // EOF reached
-        else
-            return 0;
+
+        return 0;
     }
-    else if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
+
+    if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
 
     m_eofCounter = 0;
@@ -247,9 +280,14 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
 {
     if (!video)
         m_mediaTranscoder.resetVideo();
+    else if (!NX_ASSERT(video->context))
+        return false;
 
     if (!audio)
         m_mediaTranscoder.resetAudio();
+    else if (!NX_ASSERT(audio->context))
+        return false;
+
 
     if (video && m_videoCodec != AV_CODEC_ID_NONE)
     {
@@ -295,40 +333,76 @@ bool QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const 
 
     if (audio)
     {
-        if (m_audioCodec == AV_CODEC_ID_PROBE)
+        // NOTE: #skolesnik If m_audioCodec was assigned explicitly via setAudioCodec
+        // before entering this block, this probe path is skipped, and the
+        // container-specific codec checks below are not performed. As of this
+        // writing, setAudioCodec itself does not perform such checks either,
+        // regardless of the current m_muxer state.
+        if (AV_CODEC_ID_PROBE == m_audioCodec)
         {
-            m_audioCodec = AV_CODEC_ID_NONE;
-            if (audio->context && m_muxer.isCodecSupported(audio->context->getCodecId()))
+            const auto isCodecSupported =
+                [this](const AVCodecID c)
+                {
+                    return m_muxer.isCodecSupported(c);
+                };
+
+            if (const auto sourceCodec = audio->context->getCodecId(); isCodecSupported(sourceCodec))
             {
-                setAudioCodec(audio->context->getCodecId(), TranscodeMethod::TM_DirectStreamCopy);
+                // This check itself is not sufficient for direct stream copy.
+                // Additional container/bitstream compatibility checks should be performed here
+                // when such logic is implemented.
+                setAudioCodec(sourceCodec, TM_DirectStreamCopy);
             }
             else
             {
-                static const std::vector<AVCodecID> audioCodecs =
-                    {AV_CODEC_ID_MP3, AV_CODEC_ID_VORBIS}; //< Audio codecs to transcode.
-                for (const auto& codec: audioCodecs)
+                const auto container = m_muxer.container().toLower();
+                const std::vector supportedCodecs =
+                    kAudioFallbacksByContainer.contains(container)
+                        ? kAudioFallbacksByContainer.at(container)
+                        : kAudioFallbacks
+                    | std::views::filter(isCodecSupported)
+                    | nx::ranges::to<std::vector>();
+
+                if (supportedCodecs.empty())
                 {
-                    if (m_muxer.isCodecSupported(codec))
-                    {
-                        setAudioCodec(codec, TranscodeMethod::TM_FfmpegTranscode);
-                        if (isMoovFormat(m_muxer.container())
-                            && audio->context->getSampleRate() < kMinMp4Mp3SampleRate
-                            && codec == AV_CODEC_ID_MP3)
-                        {
-                            m_mediaTranscoder.setAudioSampleRate(kMinMp4Mp3SampleRate);
-                        }
-                        break;
-                    }
+                    m_audioCodec = AV_CODEC_ID_NONE;
+                    m_mediaTranscoder.resetAudio();
+                    NX_WARNING(
+                        this, "No supported audio codecs for container %1", m_muxer.container());
+                }
+                else
+                {
+                    NX_DEBUG(this,
+                        "Supported audio codecs for container %1: %2",
+                        m_muxer.container(),
+                        supportedCodecs
+                            | std::views::transform(codecNameForId)
+                            | nx::ranges::to<std::vector>());
+
+                    const auto fallback = supportedCodecs.front();
+                    NX_DEBUG(this,
+                        "Selecting fallback audio codec %1 instead of %2 for container %3",
+                        codecNameForId(fallback),
+                        codecNameForId(sourceCodec),
+                        m_muxer.container());
+                    setAudioCodec(fallback, TM_FfmpegTranscode);
                 }
             }
-            NX_DEBUG(this, "Auto select audio codec %1 for format %2",
-                m_audioCodec, m_muxer.container());
+
+            if (AV_CODEC_ID_MP3 == m_audioCodec
+                && audio->context->getSampleRate() < kMinMp4Mp3SampleRate
+                && isMoovFormat(m_muxer.container()))
+            {
+                NX_DEBUG(this, "Resampling audio codec %1", codecNameForId(m_audioCodec));
+                m_mediaTranscoder.setAudioSampleRate(kMinMp4Mp3SampleRate);
+            }
         }
 
         if (m_mediaTranscoder.audioTranscoder() && !m_mediaTranscoder.openAudio(audio))
         {
+            NX_WARNING(this, "Failed to open audio codec %1: stream disabled.", codecNameForId(m_audioCodec));
             m_mediaTranscoder.resetAudio();
-            m_audioCodec = AV_CODEC_ID_NONE; // can't open transcoder. disable audio
+            m_audioCodec = AV_CODEC_ID_NONE;
         }
     }
 
