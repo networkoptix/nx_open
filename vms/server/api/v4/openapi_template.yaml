@@ -1,8 +1,7 @@
 openapi: 3.0.2
 info:
   title: "REST v4 (VMS 6.1+)"
-  version: 3.0.0
-
+  version: 4.0.0
 tags:
   - name: Login
   - name: Site
