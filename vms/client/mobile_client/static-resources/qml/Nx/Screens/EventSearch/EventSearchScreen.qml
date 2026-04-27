@@ -475,6 +475,18 @@ AdaptiveScreen
         }
     }
 
+    CustomPopupDimmer
+    {
+        id: filterPopupDimmer
+
+        anchors.fill: parent
+        anchors.leftMargin: leftPanelPopup.x + leftPanelPopup.width
+
+        parent: screen
+        popup: leftPanelPopup
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
+    }
+
     Item
     {
         id: searchContent

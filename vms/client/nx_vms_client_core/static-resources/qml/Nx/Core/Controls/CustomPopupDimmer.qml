@@ -60,4 +60,6 @@ Rectangle
         enabled: d.opened
         anchors.fill: dimmer
     }
+
+    TapHandler {}
 }
