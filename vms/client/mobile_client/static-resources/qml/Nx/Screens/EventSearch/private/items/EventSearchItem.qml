@@ -102,7 +102,7 @@ Control
                 width: parent.width
                 visible: !!text
                 elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
+                wrapMode: Text.Wrap
                 maximumLineCount: LayoutController.isTablet ? 3 : 2
 
                 color: ColorTheme.colors.light4
@@ -118,7 +118,7 @@ Control
                 width: parent.width
                 visible: !!NxGlobals.toPlainText(text)
                 elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
+                wrapMode: Text.Wrap
                 maximumLineCount: 2
 
                 color: ColorTheme.colors.light10
@@ -134,7 +134,7 @@ Control
                 width: parent.width
                 visible: !!text
                 elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
+                wrapMode: Text.Wrap
                 maximumLineCount: 1
 
                 color: ColorTheme.colors.light10
@@ -152,7 +152,7 @@ Control
                 width: parent.width
                 visible: text.length
                 elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
+                wrapMode: Text.Wrap
                 maximumLineCount: 1
 
                 color: ColorTheme.colors.light16
