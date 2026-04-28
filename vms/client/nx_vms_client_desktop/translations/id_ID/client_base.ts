@@ -2008,23 +2008,23 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Tidak dapat menghapus cache WebEngine</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Mohon tutup semua halaman web dan coba lagi.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>File-file tersebut mungkin sedang terkunci oleh proses lain.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Cache WebEngine sebagian telah dibersihkan</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Beberapa file mungkin terkunci oleh proses lain.</translation>
     </message>
   </context>
   <context>
