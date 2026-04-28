@@ -30,6 +30,12 @@ Item
 
     property alias scrubbingActive: speedControl.pressed
 
+    onVisibleChanged:
+    {
+        if (visible)
+            opacityController.reportUserActivity()
+    }
+
     QtObject
     {
         id: opacityController

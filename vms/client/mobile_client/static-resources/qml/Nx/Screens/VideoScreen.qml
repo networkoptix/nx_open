@@ -56,6 +56,8 @@ Page
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 
+    readonly property bool fullscreen: d.fullscreen
+
     states:
     [
         State
@@ -171,6 +173,7 @@ Page
                 video.height: modernVideoScreen.height
                 video.width: modernVideoScreen.width
                 video.doubleClickZoom: false
+                cameraSwitcher.height: modernVideoScreen.height
 
                 fullscreenControlsOverlay.visible: true
                 navigatorProxyItem.visible: false

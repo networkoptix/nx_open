@@ -29,6 +29,8 @@ AdaptiveScreen
 
     property alias filterIds: camerasGrid.filterIds
 
+    fullscreen: videoScreenLoader.item?.fullscreen ?? false
+
     toolBar.controls:
         [
             LayoutItemProxy
