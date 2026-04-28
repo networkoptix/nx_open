@@ -229,6 +229,12 @@ Page
             }
         }
 
+        onPlayingLiveChanged:
+        {
+            if (!playingLive)
+                d.mode = VideoScreenUtils.VideoScreenMode.Navigation
+        }
+
         resourceHelper.onResourceRemoved:
         {
             if (modernVideoScreen.activePage)
@@ -238,7 +244,7 @@ Page
         resourceHelper.onResourceChanged:
         {
             video.roiController.clearCustomRoi()
-            ptzSheet.close()
+            d.mode = VideoScreenUtils.VideoScreenMode.Navigation
         }
     }
 
@@ -399,8 +405,11 @@ Page
 
         MenuItem
         {
+            id: cameraSettingsMenuItem
+
             text: qsTr("Camera Settings")
-            onClicked:
+
+            onTriggered:
             {
                 Workflow.openCameraSettingsScreen(
                     controller.mediaPlayer,
@@ -411,18 +420,29 @@ Page
 
         MenuItem
         {
+            id: informationMenuItem
+
             text: qsTr("Information")
             checkable: true
             checked: appContext.settings.showCameraInfo
-            onTriggered: appContext.settings.showCameraInfo = !appContext.settings.showCameraInfo
+
+            onTriggered:
+                appContext.settings.showCameraInfo = !appContext.settings.showCameraInfo
         }
 
         MenuItem
         {
+            id: ptzMenuItem
+
             text: qsTr("PTZ Mode")
             visible: ptzSheet.available
             height: visible ? implicitHeight : 0
-            onClicked:
+
+            enabled: controller.playingLive
+            showDisabled: true
+            disabledDescription: qsTr("Live mode only")
+
+            onTriggered:
             {
                 d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 video.to1xScale()
@@ -432,6 +452,7 @@ Page
         MenuItem
         {
             id: bookmarksMenuItem
+
             text: qsTr("Bookmarks")
             visible: (controller.systemContext?.hasViewBookmarksPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
@@ -444,6 +465,7 @@ Page
         MenuItem
         {
             id: objectsMenuItem
+
             text: qsTr("Objects")
             visible: (controller.systemContext?.hasSearchObjectsPermission
                 && !(controller.resource?.flags & ResourceFlag.cross_system)) ?? false
@@ -459,10 +481,17 @@ Page
         MenuItem
         {
             id: exportMenuItem
+
             text: qsTr("Export...")
+
             visible: mediaDownloadBackend.isDownloadAvailable
             height: visible ? implicitHeight : 0
-            onTriggered: downloadMediaSheet.open()
+            enabled: !controller.playingLive
+            showDisabled: true
+            disabledDescription: qsTr("Archive mode only")
+
+            onTriggered:
+                downloadMediaSheet.open()
         }
     }
 

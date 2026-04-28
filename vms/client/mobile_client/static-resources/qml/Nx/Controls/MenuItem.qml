@@ -12,8 +12,14 @@ MenuItem
 {
     id: control
 
-    property alias horizontalAlignment: text.horizontalAlignment
-    property alias textColor: text.color
+    property alias horizontalAlignment: mainText.horizontalAlignment
+    property alias textColor: mainText.color
+
+    property string description: ""
+    property string disabledDescription: ""
+    property real descriptionSpacing: 2
+
+    property bool showDisabled: false
 
     font.pixelSize: 16
     leftPadding: 20
@@ -22,14 +28,14 @@ MenuItem
     icon.width: 20
     icon.height: 20
 
-    implicitWidth: enabled
+    implicitWidth: (enabled || showDisabled)
         ? Math.max(
             background.implicitWidth,
             contentItem.implicitWidth
                 + (indicator && control.checkable ? indicator.implicitWidth + spacing : 0)
                 + leftPadding + rightPadding)
         : 0
-    implicitHeight: enabled
+    implicitHeight: (enabled || showDisabled)
         ? Math.max(
             background.implicitHeight,
             contentItem.implicitHeight + topPadding + bottomPadding)
@@ -37,6 +43,8 @@ MenuItem
 
     background: Rectangle
     {
+        id: menuItemBackground
+
         implicitHeight: 48
         implicitWidth: 48
         color: control.checked ? ColorTheme.colors.brand : ColorTheme.colors.dark14
@@ -52,27 +60,35 @@ MenuItem
 
     contentItem: Item
     {
-        implicitWidth: icon.implicitWidth + control.spacing + text.implicitWidth
-        visible: control.enabled
+        id: menuItemContent
+
+        implicitWidth: icon.implicitWidth + control.spacing + mainText.implicitWidth
+
+        implicitHeight: mainText.implicitHeight + (descriptionText.text
+            ? control.descriptionSpacing + descriptionText.implicitHeight
+            : 0)
+
+        visible: control.enabled || control.showDisabled
+        opacity: control.enabled ? 1 : 0.3
 
         ColoredImage
         {
             id: icon
 
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: mainText.verticalCenter
 
             sourcePath: control.icon.source
             sourceSize: Qt.size(control.icon.width, control.icon.height)
-            primaryColor: text.color
+            primaryColor: mainText.color
             visible: !!sourcePath
         }
 
         Text
         {
-            id: text
+            id: mainText
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            y: Math.round((parent.height - parent.implicitHeight) / 2)
+
             anchors.left: icon.right
             anchors.leftMargin: icon.visible ? control.spacing : 0
             anchors.right: parent.right
@@ -81,11 +97,29 @@ MenuItem
                 : 0
 
             text: control.text
-            verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
             font: control.font
-            opacity: enabled ? 1 : 0.3
             color: control.checked ? ColorTheme.colors.dark1 : ColorTheme.colors.light4
+        }
+
+        Text
+        {
+            id: descriptionText
+
+            anchors.top: mainText.bottom
+            anchors.topMargin: control.descriptionSpacing
+            anchors.left: mainText.left
+            anchors.right: mainText.right
+
+            text: control.disabledDescription && !enabled
+                ? control.disabledDescription
+                : control.description
+
+            wrapMode: Text.Wrap
+            font.pixelSize: 14
+            color: ColorTheme.colors.light10
+            horizontalAlignment: mainText.horizontalAlignment
+            visible: !!text
         }
     }
 
@@ -97,6 +131,6 @@ MenuItem
 
         sourcePath: "image://skin/20x20/Outline/check.svg"
         sourceSize: Qt.size(20, 20)
-        primaryColor: text.color
+        primaryColor: mainText.color
     }
 }
