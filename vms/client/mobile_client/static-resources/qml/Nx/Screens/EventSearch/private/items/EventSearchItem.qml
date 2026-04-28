@@ -169,9 +169,8 @@ Control
         }
     }
 
-    MouseArea
+    TapHandler
     {
-        anchors.fill: parent
-        onClicked: control.clicked()
+        onTapped: control.clicked()
     }
 }

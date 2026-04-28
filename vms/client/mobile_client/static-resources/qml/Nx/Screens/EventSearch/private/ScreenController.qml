@@ -9,9 +9,7 @@ import Nx.Core.Ui
 import Nx.Mobile
 import Nx.Models
 
-import QtQuick.Controls //< remove me
-
-import nx.vms.client.core 1.0
+import nx.vms.client.core
 
 NxObject
 {
@@ -46,19 +44,12 @@ NxObject
             || direction === EventSearch.FetchDirection.older)
         {
             if (direction === EventSearch.FetchDirection.newer)
-            {
                 view.positionViewAtBeginning()
-                view.currentIndex = 0 //< Select the first item position correcly.
-            }
             else
-            {
                 view.positionViewAtEnd()
-                view.currentIndex = view.count - 1 //< Select the last item position correcly.
-            }
         }
         else
         {
-            view.currentIndex = -1
             controller.searchModel.clear()
             direction = EventSearch.FetchDirection.older
         }
@@ -70,8 +61,12 @@ NxObject
     {
         id: refreshWatcher
 
+        property int lastRequestType: ViewUpdateWatcher.RequestType.None
+
         onUpdateRequested: (requestType) =>
         {
+            lastRequestType = requestType
+
             switch (requestType)
             {
                 case ViewUpdateWatcher.RequestType.TopFetch:
@@ -114,6 +109,9 @@ NxObject
             view.headerItem.visible = false
             view.footerItem.visible = false
 
+            if (view.count === 0)
+                return
+
             const initialPosition = request.direction === EventSearch.FetchDirection.newer
                 ? ListView.Beginning
                 : ListView.End
@@ -123,9 +121,12 @@ NxObject
             const targetPosition = request.direction === EventSearch.FetchDirection.newer
                 ? ListView.End
                 : ListView.Beginning
+            const targetIndex = refreshWatcher.lastRequestType === ViewUpdateWatcher.RequestType.BottomFetch
+                ? view.count - 1
+                : 0
 
             d.goToPosAnimation.from = view.contentY
-            view.positionViewAtIndex(centralItemIndex, targetPosition)
+            view.positionViewAtIndex(targetIndex, targetPosition)
             d.goToPosAnimation.to = view.contentY
             d.goToPosAnimation.running = true
         }
