@@ -97,7 +97,18 @@ Rectangle
     // Perform animated scroll and zoom into the specified window.
     function setWindow(newStartTimeMs, newDurationMs)
     {
+        const nowMs = NxGlobals.syncNowMs()
         content.cancelAnimations()
+
+        newStartTimeMs = Math.max(newStartTimeMs, timeline.bottomBoundMs)
+        newDurationMs = Math.max(newDurationMs, timeline.minimumDurationMs)
+
+        if (newStartTimeMs + newDurationMs >= nowMs)
+        {
+            newDurationMs = Math.max(timeline.minimumDurationMs, nowMs - newStartTimeMs)
+            newStartTimeMs = Math.max(timeline.bottomBoundMs, nowMs - newDurationMs)
+            animatedScroll.toLive = true
+        }
 
         animatedScroll.from = startTimeMs
         animatedScroll.to = newStartTimeMs

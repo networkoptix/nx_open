@@ -43,7 +43,7 @@ Popup
         id: calendar
         layer.enabled: true
 
-        onPicked: control.picked(position)
+        onPicked: (position) => control.picked(position)
         onCloseClicked: close()
     }
 

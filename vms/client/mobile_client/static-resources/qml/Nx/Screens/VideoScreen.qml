@@ -1074,11 +1074,18 @@ Page
         id: calendarPanel
 
         horizontal: true
-        position: timeline.positionMs
+        position: timeline.startTimeMs
         timeZone: controller.resourceHelper.timeZone
         chunkProvider: cameraChunkProvider
 
-        onPicked: controller.forcePosition(position, true)
+        onPicked: (position) =>
+        {
+            const oneHourMs = 60 * 60 * 1000
+            const oneDayMs = 24 * oneHourMs
+
+            // Navigate to the day with one hour margins on each side.
+            timeline.setWindow(position - oneHourMs, oneDayMs + oneHourMs * 2)
+        }
     }
 
     Timeline.ObjectsTypeSheet
