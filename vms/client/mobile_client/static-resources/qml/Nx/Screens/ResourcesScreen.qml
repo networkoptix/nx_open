@@ -94,6 +94,8 @@ AdaptiveScreen
 
     customRightControl: ToolBarButton
     {
+        id: kebabMenuButton
+
         icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
         visible: resourcesScreen.contentItem === videoScreenLoader.item
         onClicked:
@@ -240,6 +242,10 @@ AdaptiveScreen
                 padding: resourcesScreen.fullscreen
                     ? 0
                     : (LayoutController.isTabletLayout ? 20 : 0)
+
+                // The visible kebab button lives in resourcesScreen's toolBar (above), so
+                // anchor the menu to it instead of VideoScreen's hidden internal kebab.
+                menuAnchor: kebabMenuButton
 
                 Component.onCompleted:
                 {

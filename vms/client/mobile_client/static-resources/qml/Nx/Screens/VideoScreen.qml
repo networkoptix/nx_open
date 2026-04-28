@@ -337,6 +337,12 @@ Page
         }
     }
 
+    // Anchor item for the kebab menu in non-fullscreen state. Defaults to the toolBar's
+    // own kebab IconButton, but can be overridden when this VideoScreen is embedded in
+    // another screen whose own toolbar hosts the visible kebab (e.g. tablet layout in
+    // ResourcesScreen, where modernVideoScreen.toolBar is hidden).
+    property Item menuAnchor: menuButton
+
     property MotionAreaButton motionAreaButton: MotionAreaButton
     {
         text: qsTr("Area")
@@ -383,7 +389,7 @@ Page
 
         parent: modernVideoScreen.state === "fullscreen"
             ? fullscreenControlsOverlay.menuButtonControl
-            : menuButton
+            : modernVideoScreen.menuAnchor
 
         x: parent.width - width
         y: parent.height + 8
