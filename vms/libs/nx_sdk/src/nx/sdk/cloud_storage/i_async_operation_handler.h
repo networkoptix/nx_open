@@ -41,6 +41,7 @@ class IIndexArchive: public Interface<IIndexArchive>
 public:
     virtual const IMediaChunkList* addedChunks() const = 0;
     virtual const IMediaChunkList* removedChunks() const = 0;
+    virtual const IMediaChunkList* intervalsToRemove() const = 0;
     virtual int streamIndex() const = 0;
 };
 

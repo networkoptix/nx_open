@@ -109,6 +109,9 @@ IndexArchive::IndexArchive(int streamIndex, const IndexData& indexData)
                 m_removedChunks.reset(
                     new MediaChunkList(operationToPeriod.second));
                 break;
+            case ChunkOperation::removeInterval:
+                m_intervalsToRemove.reset(new MediaChunkList(operationToPeriod.second));
+                break;
         }
     }
 
@@ -117,6 +120,9 @@ IndexArchive::IndexArchive(int streamIndex, const IndexData& indexData)
 
     if (!m_removedChunks)
         m_removedChunks.reset(new MediaChunkList({}));
+
+    if (!m_intervalsToRemove)
+        m_intervalsToRemove.reset(new MediaChunkList({}));
 }
 
 const IMediaChunkList* IndexArchive::addedChunks() const
@@ -127,6 +133,11 @@ const IMediaChunkList* IndexArchive::addedChunks() const
 const IMediaChunkList* IndexArchive::removedChunks() const
 {
     return m_removedChunks.get();
+}
+
+const IMediaChunkList* IndexArchive::intervalsToRemove() const
+{
+    return m_intervalsToRemove.get();
 }
 
 int IndexArchive::streamIndex() const
