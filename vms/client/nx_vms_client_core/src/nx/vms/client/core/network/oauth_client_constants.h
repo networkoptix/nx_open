@@ -9,7 +9,6 @@ namespace nx::vms::client::core {
 NX_REFLECTION_ENUM_CLASS(OauthClientType,
     undefined,
     connect,
-    renewDesktop, //< Consider using renew.
     loginCloud,
     passwordApply,
     passwordDisconnect,

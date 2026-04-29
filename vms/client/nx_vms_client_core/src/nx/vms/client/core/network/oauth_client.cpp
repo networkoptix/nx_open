@@ -238,7 +238,7 @@ QUrl OauthClient::url() const
 
     if (d->authData.empty()) //< Request auth code.
         builder.addQueryItem("response_type", "code");
-    else if (!d->authData.credentials.authToken.empty()) //< Request 2FA validation.
+    else if (!d->authData.credentials.authToken.empty()) //< Pass token for 2FA or renew.
         builder.addQueryItem("access_token", d->authData.credentials.authToken.value);
 
     if (const auto email = d->email(); !email.empty())

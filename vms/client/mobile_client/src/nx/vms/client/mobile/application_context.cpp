@@ -238,8 +238,10 @@ ApplicationContext::ApplicationContext(
         this,
         [this]()
         {
+            const auto token = QString::fromStdString(
+                cloudStatusWatcher()->credentials().authToken.value);
             d->windowContext->uiController()->screens()->showCloudLoginScreen(
-                /*reauthentication*/ true);
+                /*reauthentication*/ true, /*user*/ {}, token);
         });
 }
 

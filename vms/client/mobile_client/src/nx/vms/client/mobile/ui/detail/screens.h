@@ -26,7 +26,8 @@ public:
     bool show2faValidationScreen(const network::http::Credentials& credentials) const;
 
     /** Show cloud authentication screen. */
-    bool showCloudLoginScreen(bool reauthentication) const;
+    bool showCloudLoginScreen(
+        bool reauthentication, const QString& user = {}, const QString& token = {}) const;
 };
 
 } // namespace detail

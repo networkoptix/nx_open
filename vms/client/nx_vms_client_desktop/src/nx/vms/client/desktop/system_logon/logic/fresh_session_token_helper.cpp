@@ -160,14 +160,18 @@ core::CloudAuthDataOrError
     if (!m_parent)
         return std::unexpected{core::OauthDataRequestError::noParent};
 
-    const auto login = qnCloudStatusWatcher->cloudLogin();
-    if (login.isEmpty())
+    const auto clientType = info(m_actionType).clientType;
+    if (!NX_ASSERT(clientType == core::OauthClientType::renew))
+        return std::unexpected{core::OauthDataRequestError::unexpectedClientType};
+
+    auto credentials = qnCloudStatusWatcher->credentials();
+    if (credentials.username.empty())
         return std::unexpected{core::OauthDataRequestError::cloudLoginEmpty};
 
     const auto params = OauthLoginDialog::LoginParams{
-        .clientType = info(m_actionType).clientType,
+        .clientType = clientType,
         .flags = m_flags,
-        .credentials = nx::network::http::Credentials(login.toStdString(), {}),
+        .credentials = credentials,
         .closeCondition = closeCondition
     };
 

@@ -60,7 +60,8 @@ NX_REFLECTION_ENUM_CLASS(OauthDataRequestError,
     tokenValidationFailed,
     wrongThread,
     noParent,
-    cloudLoginEmpty
+    cloudLoginEmpty,
+    unexpectedClientType
 );
 
 using CloudAuthDataOrError = std::expected<CloudAuthData, OauthDataRequestError>;
