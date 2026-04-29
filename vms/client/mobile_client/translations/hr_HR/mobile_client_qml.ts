@@ -1600,6 +1600,14 @@
       <source>Information</source>
       <translation>Information</translation>
     </message>
+    <message>
+      <source>Live mode only</source>
+      <translation type="unfinished">Live mode only</translation>
+    </message>
+    <message>
+      <source>Archive mode only</source>
+      <translation type="unfinished">Archive mode only</translation>
+    </message>
   </context>
   <context>
     <name>main</name>
