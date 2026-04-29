@@ -20,7 +20,7 @@ required_conan_version = ">=1.53.0"
 # Help packages are not required to be built from the same commit.
 VMS_HELP_VERSION = "6.1.1-89279333d5a1729710eb0725ae1316292ebce6b6"
 QUICK_START_GUIDE_VERSION = "6.1.1-bf62f21a322871a4a230fb0aac5b56192c22dcc8"
-MOBILE_USER_MANUAL_VERSION = "25.2-71ea7dbe593558eb154f14cb852282c9123641b1"
+MOBILE_USER_MANUAL_VERSION = "25.2-477f699d45bd52648973e73158d9c80e1035777c"
 
 
 # Conan does not provide a generator which makes it possible to easily access package folders for
