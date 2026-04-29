@@ -73,6 +73,7 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
     const QString& title,
     core::OauthClientType clientType,
     bool sessionAware,
+    const nx::network::http::Credentials& credentials,
     const QString& cloudSystem,
     Qt::WindowFlags flags,
     std::function<bool()> closeCondition)
@@ -87,6 +88,7 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
         : std::make_unique<QnSessionAware<OauthLoginDialog>>(
             parent, clientType, cloudSystem, flags);
     dialog->setWindowTitle(title);
+    dialog->setCredentials(credentials);
     connect(
         dialog.get(),
         &OauthLoginDialog::authDataReady,

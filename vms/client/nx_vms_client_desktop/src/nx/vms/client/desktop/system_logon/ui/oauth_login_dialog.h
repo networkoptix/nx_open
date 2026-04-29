@@ -30,6 +30,7 @@ public:
         const QString& title,
         core::OauthClientType clientType,
         bool sessionAware,
+        const nx::network::http::Credentials& credentials,
         const QString& cloudSystem = QString(),
         Qt::WindowFlags flags = {},
         std::function<bool()> closeCondition = {});

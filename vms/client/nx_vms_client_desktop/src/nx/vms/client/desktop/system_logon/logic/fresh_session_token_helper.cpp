@@ -111,6 +111,7 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshToke
             m_title,
             info(m_actionType).clientType,
             /*sessionAware*/ true,
+            qnCloudStatusWatcher->credentials(),
             connection->moduleInformation().cloudSystemId,
             Qt::WindowStaysOnTopHint
         );
@@ -167,6 +168,7 @@ core::CloudAuthData FreshSessionTokenHelper::requestAuthData(std::function<bool(
         m_title,
         info(m_actionType).clientType,
         /*sessionAware*/ false,
+        qnCloudStatusWatcher->credentials(),
         /*cloudSystem*/ {},
         /*flags*/ {},
         closeCondition
