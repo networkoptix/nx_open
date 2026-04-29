@@ -139,7 +139,9 @@ Control
                     checked: false
 
                     type: Button.Type.LightInterface
-                    icon.source: "image://skin/24x24/Outline/ptz.svg"
+                    foregroundColor: ColorTheme.colors.light4
+                    background.opacity: 0.5
+                    icon.source: "image://skin/24x24/Outline/re_centre.svg"
                     icon.width: 24
                     icon.height: 24
                 }

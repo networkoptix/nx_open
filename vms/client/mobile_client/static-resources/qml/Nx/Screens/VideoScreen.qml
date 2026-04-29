@@ -1333,6 +1333,7 @@ Page
             width: modernVideoScreen.width
             height: parent.height
             parent: modernVideoScreen
+            opacity: ptzSheet.opened ? 0.0 : 1.0
 
             onClicked:
             {

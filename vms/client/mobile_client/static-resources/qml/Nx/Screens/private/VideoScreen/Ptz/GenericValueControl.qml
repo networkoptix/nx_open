@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Mobile.Controls
@@ -19,9 +20,14 @@ Control
     property alias upButton: upButtonControl
     property alias downButton: downButtonControl
 
+    implicitWidth: 52
+    implicitHeight: 164
+
     component ValueButton: Button
     {
         type: Button.Type.LightInterface
+        foregroundColor: ColorTheme.colors.light4
+        background.opacity: 0.6
         radius: 0
         padding: 0
         enabled: control.enableValueControls
@@ -30,7 +36,7 @@ Control
         icon.height: 24
     }
 
-    contentItem: Column
+    contentItem: ColumnLayout
     {
         spacing: 2
 
@@ -38,30 +44,33 @@ Control
         {
             id: upButtonControl
 
-            width: 52
-            height: 56
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: 56
+
             topPadding: 2
-            anchors.horizontalCenter: parent.horizontalCenter
         }
 
         Control
         {
             id: centralArea
 
-            width: 52
-            height: 48
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: 48
+
             visible: control.showCentralArea
-            anchors.horizontalCenter: parent.horizontalCenter
         }
 
         ValueButton
         {
             id: downButtonControl
 
-            width: 52
-            height: 56
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.preferredHeight: 56
+
             bottomPadding: 2
-            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 

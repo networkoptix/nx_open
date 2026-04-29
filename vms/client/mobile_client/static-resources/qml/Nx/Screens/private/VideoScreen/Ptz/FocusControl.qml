@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+import Nx.Core
 import Nx.Mobile.Controls
 
 GenericValueControl
@@ -18,12 +19,15 @@ GenericValueControl
 
     centralArea: Button
     {
-        text: qsTr("AF") //< Autofocus.
         type: Button.Type.LightInterface
+        foregroundColor: ColorTheme.colors.light10
+        background.opacity: 0.6
         radius: 0
         leftPadding: 0
         rightPadding: 0
-        font.pixelSize: 16
+        icon.source: "image://skin/24x24/Outline/af.svg"
+        icon.width: 24
+        icon.height: 24
         onClicked: control.autoFocusClicked()
     }
 }

@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Shapes
 
 import Nx.Core
 import Nx.Models
@@ -35,11 +36,33 @@ Item
     {
         anchors.centerIn: parent
 
-        color: ColorTheme.colors.light4
+        color: hasCurrentIndex ? ColorTheme.colors.light4 : ColorTheme.colors.light10
         font.pixelSize: 16
         text: hasCurrentIndex
             ? modelAccessor.getData(currentIndex, "display")
-            : qsTr("PTZ Presets")
+            : qsTr("Select Preset")
+
+        Shape
+        {
+            id: dotLine
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.bottom
+
+            visible: !hasCurrentIndex
+
+            ShapePath
+            {
+                strokeStyle: ShapePath.DashLine
+                dashPattern: [0.001, 2]
+                strokeWidth: 1
+                strokeColor: ColorTheme.colors.light10
+                capStyle: ShapePath.RoundCap
+
+                PathLine { x: dotLine.width }
+            }
+        }
     }
 
     MouseArea
@@ -58,9 +81,9 @@ Item
         enabled: currentIndex > 0
         background: null
         padding: 20
-        icon.source: "image://skin/20x20/Outline/arrow_left.svg"
-        icon.width: 20
-        icon.height: 20
+        icon.source: "image://skin/24x24/Outline/arrow_left_2px.svg"
+        icon.width: 24
+        icon.height: 24
 
         onClicked:
         {
@@ -79,9 +102,9 @@ Item
         enabled: currentIndex < modelAccessor.count - 1
         background: null
         padding: 20
-        icon.source: "image://skin/20x20/Outline/arrow_right.svg"
-        icon.width: 20
-        icon.height: 20
+        icon.source: "image://skin/24x24/Outline/arrow_right_2px.svg"
+        icon.width: 24
+        icon.height: 24
 
         onClicked:
         {

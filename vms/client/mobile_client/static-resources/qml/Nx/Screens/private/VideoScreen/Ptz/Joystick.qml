@@ -27,7 +27,7 @@ Rectangle
     implicitWidth: 112
     implicitHeight: implicitWidth
     radius: width / 2
-    color: ColorTheme.colors.dark12
+    color: ColorTheme.transparent(ColorTheme.colors.dark12, 0.5)
 
     Canvas
     {
@@ -170,48 +170,15 @@ Rectangle
             color: ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
         }
 
-        Rectangle
+        Image
         {
             id: circleMarker
 
             anchors.centerIn: parent
 
-            width: 16
-            height: width
-            radius: width / 2
-            color: "transparent"
-            border.color: ColorTheme.colors.dark9
-            border.width: 2
+            source: "image://skin/24x24/Outline/circle.svg?primary=light4"
+            sourceSize: Qt.size(24, 24)
         }
-    }
-
-    Image
-    {
-        id: pointerImage
-
-        property vector2d position: d.radialVector.times(
-            1 + 0.15 * (d.dragging ? d.movementVector.length() : 1)).plus(d.centerPoint)
-
-        source: "image://skin/ptz/ptz_arrow.svg?primary=light1"
-        sourceSize: Qt.size(24, 24)
-
-        x: position.x - width / 2
-        y: position.y - height / 2
-        scale: d.dragging ? d.movementVector.length() : 1
-        visible: mouseArea.pressed
-        rotation: JoystickUtils.getAngle(d.radialVector) * 180 / Math.PI
-    }
-
-    Rectangle
-    {
-        id: centerMarker
-
-        width: 4
-        height: 4
-        radius: 2
-
-        anchors.centerIn: parent
-        visible: d.dragging
     }
 
     MouseArea
@@ -271,7 +238,7 @@ Rectangle
                 ? Qt.vector2d(buttonDirection == JoystickUtils.Direction.Left ? -offset : offset, 0)
                 : Qt.vector2d(0, buttonDirection == JoystickUtils.Direction.Top ? -offset : offset))
 
-            source: "image://skin/ptz/ptz_arrow.svg?primary=light1"
+            source: "image://skin/24x24/Outline/arrow_right_2px.svg?primary=light10"
             sourceSize: Qt.size(24, 24)
 
             x: position.x - width / 2
