@@ -1599,6 +1599,14 @@
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Live mode only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive mode only</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>main</name>
