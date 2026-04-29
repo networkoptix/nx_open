@@ -319,7 +319,7 @@ struct CloudCrossSystemContext::Private
         if (!automaticReconnection && status != Status::connecting)
             setupAutomaticReconnection();
 
-        emit q->statusChanged(oldStatus);
+        emit q->statusChanged(oldStatus, status);
     }
 
     void makeConnection(

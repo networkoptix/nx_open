@@ -86,7 +86,7 @@ public:
 
 signals:
     void needsCloudAuthorizationChanged();
-    void statusChanged(Status oldStatus);
+    void statusChanged(Status oldStatus, Status newStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);
     void cloudAuthorizationRequested(QPrivateSignal);

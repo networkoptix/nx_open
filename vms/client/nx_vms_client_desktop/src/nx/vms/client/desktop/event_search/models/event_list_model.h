@@ -49,6 +49,7 @@ public:
         QnVirtualCameraResourceList cameras;
         QnResourcePtr source;
         QString sourceName;
+        nx::Uuid acknowledgeDeviceId;
 
         // Client action data.
         menu::IDType actionId = menu::NoAction;

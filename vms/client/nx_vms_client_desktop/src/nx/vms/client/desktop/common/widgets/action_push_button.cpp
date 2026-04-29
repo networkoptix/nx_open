@@ -2,6 +2,8 @@
 
 #include "action_push_button.h"
 
+#include <nx/vms/client/desktop/common/utils/command_action.h>
+
 namespace nx::vms::client::desktop {
 
 ActionPushButton::ActionPushButton(QWidget* parent): base_type(parent)
@@ -75,6 +77,9 @@ void ActionPushButton::updateFromAction()
     setShortcut(m_action->shortcut());
     setShortcutAutoRepeat(m_action->autoRepeat());
     setVisible(m_action->isVisible());
+
+    if (const auto commandAction = CommandAction::linkedCommandAction(m_action))
+        setIndicatorVisible(commandAction->indicatorVisible());
 }
 
 } // namespace nx::vms::client::desktop

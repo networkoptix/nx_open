@@ -27,6 +27,8 @@ class CommandAction: public QObject
     Q_OBJECT
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(bool visible READ visible WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool indicatorVisible READ indicatorVisible WRITE setIndicatorVisible
+        NOTIFY indicatorChanged)
     Q_PROPERTY(bool checkable READ checkable WRITE setCheckable NOTIFY changed)
     Q_PROPERTY(bool checked READ checked WRITE setChecked NOTIFY changed)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY changed)
@@ -44,6 +46,11 @@ public:
 
     bool visible() const;
     void setVisible(bool value);
+
+    void setBusy(bool value);
+
+    bool indicatorVisible() const;
+    void setIndicatorVisible(bool value);
 
     bool checkable() const;
     void setCheckable(bool value);
@@ -76,6 +83,7 @@ signals:
 
     void enabledChanged(bool value);
     void visibleChanged(bool value);
+    void indicatorChanged(bool value);
     void changed();
 
 private:

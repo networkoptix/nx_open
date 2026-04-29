@@ -110,7 +110,9 @@ public:
     void setPlaceholder(const QString& text);
     const QString& placeholder() const;
 
+    // Shows loading indicator instead of placeholder or image until reset to false.
     void setForceLoadingIndicator(bool force);
+    bool forceLoadingIndicator() const;
 
 protected:
     virtual void paintEvent(QPaintEvent* event) override;

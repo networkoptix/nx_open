@@ -7,6 +7,7 @@
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
@@ -18,8 +19,8 @@
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_executor.h>
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/rules/actions/repeat_sound_action.h>
@@ -29,7 +30,6 @@
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/workbench/workbench_context.h>
-#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -40,6 +40,19 @@ namespace {
 
 constexpr auto kDisplayTimeout = std::chrono::milliseconds(12500);
 constexpr auto kProcessNotificationCacheTimeout = std::chrono::milliseconds(500);
+
+bool canShowNotification(core::CloudCrossSystemContext::Status status)
+{
+    using Status = core::CloudCrossSystemContext::Status;
+
+    return !(status == Status::uninitialized || status == Status::unsupportedPermanently
+        || status == Status::unsupportedTemporary);
+}
+
+bool isConnected(core::CloudCrossSystemContext::Status status)
+{
+    return status == core::CloudCrossSystemContext::Status::connected;
+}
 
 // TODO: #amalov Simplify device transfer logic using list only.
 QnVirtualCameraResourceList getActionDevices(
@@ -95,6 +108,30 @@ void fillEventData(
         action->attributes());
 }
 
+void updateAcknowledgeAction(
+    core::CloudCrossSystemContext::Status status, EventListModel::EventData& eventData)
+{
+    const bool connected = isConnected(status);
+    if (connected && eventData.extraAction && !eventData.acknowledgeDeviceId.isNull())
+    {
+        const auto systemContext = appContext()->systemContextByCloudSystemId(
+            eventData.cloudSystemId);
+        const auto device = systemContext->resourcePool()
+            ->getResourceById<QnVirtualCameraResource>(eventData.acknowledgeDeviceId);
+
+        if (device && systemContext->accessController()->hasPermissions(
+            device, Qn::ManageBookmarksPermission))
+        {
+            eventData.extraAction->setBusy(false);
+        }
+        else
+        {
+            eventData.extraAction.clear();
+            eventData.removable = true;
+        }
+    }
+}
+
 nx::Uuid actionSourceId(const nx::vms::rules::NotificationActionBasePtr& action)
 {
     if (!action->deviceIds().empty())
@@ -114,7 +151,7 @@ NotificationListModel::Private::Private(NotificationListModel* q):
     connect(handler, &NotificationActionHandler::cleared, q,
         [this]()
         {
-            m_notificationsCache.clear();
+            clearCache();
             this->q->clear();
         });
 
@@ -140,16 +177,20 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         &NotificationListModel::Private::onProcessNotificationsCacheTimeout);
     m_notificationsCacheTimer.start(kProcessNotificationCacheTimeout);
 
+    using Status = core::CloudCrossSystemContext::Status;
+
     auto processNewSystem = [this](const QString& systemId)
     {
         connect(appContext()->cloudCrossSystemManager()->systemContext(systemId),
             &core::CloudCrossSystemContext::statusChanged, this,
-            [this, systemId](core::CloudCrossSystemContext::Status oldStatus)
+            [this, systemId](Status oldStatus, Status newStatus)
             {
                 if (oldStatus == core::CloudCrossSystemContext::Status::connected)
                     removeCloudItems(systemId);
                 else
-                    updateCloudItems(systemId);
+                    updateCloudItems(systemId, newStatus);
+
+                m_updatedCache[systemId] = newStatus;
             });
     };
 
@@ -164,6 +205,8 @@ NotificationListModel::Private::Private(NotificationListModel* q):
         [this](const QString& systemId)
         {
             removeCloudItems(systemId);
+
+            m_updatedCache[systemId] = core::CloudCrossSystemContext::Status::uninitialized;
         });
 }
 
@@ -171,13 +214,17 @@ NotificationListModel::Private::~Private()
 {
 }
 
-void NotificationListModel::Private::updateCloudItems(const QString& systemId)
+void NotificationListModel::Private::updateCloudItems(
+    const QString& systemId, core::CloudCrossSystemContext::Status status)
 {
-    for (auto it = m_itemsByCloudSystem.find(systemId);
-        it != m_itemsByCloudSystem.end() && it.key() == systemId;
-        ++it)
+    for (const auto itemId: nx::utils::rangeAdapter(m_itemsByCloudSystem.equal_range(systemId)))
     {
-        q->setData(q->indexOf(it.value()), false, Qn::ForcePreviewLoaderRole);
+        auto eventData = q->getEvent(q->indexOf(itemId).row());
+        eventData.forcePreviewLoader = false;
+
+        updateAcknowledgeAction(status, eventData);
+
+        q->updateEvent(eventData);
     }
 }
 
@@ -220,6 +267,34 @@ void NotificationListModel::Private::onProcessNotificationsCacheTimeout()
 
     std::list<EventData> eventList;
     std::swap(m_notificationsCache, eventList);
+
+    for (auto it = eventList.begin(); it != eventList.end();)
+    {
+        if (m_removedCache.contains(it->id))
+        {
+            it = eventList.erase(it);
+            continue;
+        }
+
+        if (!it->cloudSystemId.isEmpty())
+        {
+            if (const auto systemIt = m_updatedCache.find(it->cloudSystemId);
+                systemIt != m_updatedCache.end())
+            {
+                if (!canShowNotification(systemIt->second))
+                {
+                    it = eventList.erase(it);
+                    continue;
+                }
+
+                updateAcknowledgeAction(systemIt->second, *it);
+            }
+        }
+
+        ++it;
+    }
+
+    clearCache();
 
     const auto addedEvents = this->q->addEvents(std::move(eventList));
     if (addedEvents.empty())
@@ -283,7 +358,9 @@ void NotificationListModel::Private::removeNotification(
 
     if (const auto actionId = action->id(); !actionId.isNull())
     {
-        q->removeEvent(actionId);
+        if (!q->removeEvent(actionId))
+            m_removedCache.insert(actionId);
+
         return;
     }
 
@@ -312,8 +389,7 @@ void NotificationListModel::Private::onNotificationAction(
         const auto context = appContext()->cloudCrossSystemManager()->systemContext(cloudSystemId);
         const auto status = context ? context->status() : Status::uninitialized;
 
-        if (status == Status::uninitialized || status == Status::unsupportedPermanently
-            || status == Status::unsupportedTemporary)
+        if (!canShowNotification(status))
         {
             NX_VERBOSE(this, "Invalid context status: %1, system: %2", status, cloudSystemId);
             return;
@@ -478,6 +554,13 @@ void NotificationListModel::Private::removeAllItems(nx::Uuid ruleId)
     }
 }
 
+void NotificationListModel::Private::clearCache()
+{
+    m_notificationsCache.clear();
+    m_removedCache.clear();
+    m_updatedCache.clear();
+}
+
 void NotificationListModel::Private::setupAcknowledgeAction(
     const nx::vms::rules::NotificationActionPtr& action,
     const QnResourcePtr& camera,
@@ -486,7 +569,8 @@ void NotificationListModel::Private::setupAcknowledgeAction(
     if (!camera || !action->acknowledge())
         return;
 
-    if (!ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
+    if (!camera->hasFlags(Qn::fake) //< Enable the button for loading device.
+        && !ResourceAccessManager::hasPermissions(camera, Qn::ManageBookmarksPermission))
     {
         NX_VERBOSE(this, "Can't setup acknowledge action id: %1, lacking bookmark permissions",
             action->id());
@@ -495,24 +579,26 @@ void NotificationListModel::Private::setupAcknowledgeAction(
 
     NX_VERBOSE(this, "Setting up acknowledge action id: %1", action->id());
 
-    eventData.removable = false;
-    eventData.level = nx::vms::event::Level::critical;
+    auto buttonAction = CommandActionPtr::create();
+    buttonAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
+    buttonAction->setText(tr("Acknowledge"));
+    if (camera->hasFlags(Qn::fake))
+        buttonAction->setBusy(true);
 
-    eventData.extraAction = CommandActionPtr::create();
-    eventData.extraAction->setIconPath("20x20/Solid/bookmark.svg?primary=light4");
-    eventData.extraAction->setText(tr("Acknowledge"));
-
-    const auto actionHandler =
+    connect(buttonAction.get(), &CommandAction::triggered, q,
         [this, camera, action]()
         {
             menu::Parameters params;
             params.setResources({camera});
             params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(menu::AcknowledgeNotificationAction, params);
-        };
+        },
+        Qt::QueuedConnection);
 
-    connect(eventData.extraAction.data(), &CommandAction::triggered,
-        [this, actionHandler]() { executeLater(actionHandler, this); });
+    eventData.removable = false;
+    eventData.level = nx::vms::event::Level::critical;
+    eventData.acknowledgeDeviceId = camera->getId();
+    eventData.extraAction = std::move(buttonAction);
 }
 
 int NotificationListModel::Private::maximumCount() const

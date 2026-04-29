@@ -831,10 +831,13 @@ void EventTile::clear()
     setFooterText({});
     setTimestamp({});
     setPlaceholder({});
-    setImageProvider({}, true);
+    setImageProvider({}, /*force*/ true);
     setVideoPreviewResource({});
     setPreviewHighlightRect({});
     setAction({});
+    setAdditionalAction({});
+    setOnCloseAction({});
+    setForcePreviewLoader(false);
     setBusyIndicatorVisible(false);
     setProgressBarVisible(false);
     setProgressValue(0.0);

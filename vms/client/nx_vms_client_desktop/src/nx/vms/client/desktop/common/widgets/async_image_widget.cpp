@@ -463,6 +463,11 @@ void AsyncImageWidget::setForceLoadingIndicator(bool force)
     updateThumbnailStatus(m_previousStatus);
 }
 
+bool AsyncImageWidget::forceLoadingIndicator() const
+{
+    return m_forceLoadingIndicator;
+}
+
 void AsyncImageWidget::updateSizeHint() const
 {
     QSize perfectSize;

@@ -3,19 +3,17 @@
 #pragma once
 
 #include <QtCore/QPointer>
-#include <QtCore/QScopedPointer>
 #include <QtGui/QAction>
-#include <QtWidgets/QPushButton>
 
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 
 namespace nx::vms::client::desktop {
 
-class ActionPushButton: public QPushButton
+class ActionPushButton: public BusyIndicatorButton
 {
     Q_OBJECT
-    using base_type = QPushButton;
+    using base_type = BusyIndicatorButton;
 
 public:
     explicit ActionPushButton(QWidget* parent = nullptr);

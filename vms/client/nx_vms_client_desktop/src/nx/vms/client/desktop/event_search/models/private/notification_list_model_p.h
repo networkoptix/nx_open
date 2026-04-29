@@ -6,6 +6,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
 
+#include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/rules/actions/actions_fwd.h>
 
 #include "../notification_list_model.h"
@@ -55,7 +56,7 @@ private:
 
     void onProcessNotificationsCacheTimeout();
 
-    void updateCloudItems(const QString& systemId);
+    void updateCloudItems(const QString& systemId, core::CloudCrossSystemContext::Status status);
     void removeCloudItems(const QString& systemId);
 
     void setupClientAction(
@@ -71,6 +72,8 @@ private:
 
     void removeAllItems(nx::Uuid ruleId);
 
+    void clearCache();
+
 private:
     NotificationListModel* const q = nullptr;
     int m_maximumCount = NotificationListModel::kDefaultMaximumCount;
@@ -84,6 +87,8 @@ private:
 
     QTimer m_notificationsCacheTimer;
     std::list<EventData> m_notificationsCache;
+    std::set<nx::Uuid> m_removedCache;
+    std::map<QString, core::CloudCrossSystemContext::Status> m_updatedCache;
 };
 
 } // namespace nx::vms::client::desktop

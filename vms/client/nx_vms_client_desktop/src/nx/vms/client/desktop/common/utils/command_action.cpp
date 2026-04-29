@@ -39,6 +39,7 @@ struct CommandAction::Private
     bool checked = false;
     bool enabled = true;
     bool visible = true;
+    bool indicatorVisible = false;
     QString text;
     QString iconPath;
     QUrl iconUrl;
@@ -93,6 +94,26 @@ void CommandAction::setVisible(bool value)
 
     d->visible = value;
     emit visibleChanged(value);
+}
+
+void CommandAction::setBusy(bool value)
+{
+    setIndicatorVisible(value);
+    setEnabled(!value);
+}
+
+bool CommandAction::indicatorVisible() const
+{
+    return d->indicatorVisible;
+}
+
+void CommandAction::setIndicatorVisible(bool value)
+{
+    if (d->indicatorVisible == value)
+        return;
+
+    d->indicatorVisible = value;
+    emit indicatorChanged(value);
 }
 
 bool CommandAction::checkable() const
@@ -244,6 +265,7 @@ QAction* CommandAction::createQtAction(const CommandActionPtr& source, QObject* 
 
     QObject::connect(source.get(), &CommandAction::enabledChanged, action, &QAction::setEnabled);
     QObject::connect(source.get(), &CommandAction::visibleChanged, action, &QAction::setVisible);
+    QObject::connect(source.get(), &CommandAction::indicatorChanged, action, &QAction::changed);
     QObject::connect(source.get(), &CommandAction::changed, action, updateAction);
 
     QObject::connect(action, &QAction::toggled, source.get(), &CommandAction::toggle);
