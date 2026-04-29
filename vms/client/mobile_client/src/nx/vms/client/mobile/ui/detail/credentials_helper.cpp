@@ -75,7 +75,7 @@ core::OauthClient* CredentialsHelper::createOauthClient(
 {
     const core::OauthClientType type = token.isEmpty()
         ? core::OauthClientType::loginCloud
-        : core::OauthClientType::renewDesktop;
+        : core::OauthClientType::renew;
 
     static constexpr std::chrono::days kRefreshTokenLifetime(180);
     const auto result = new core::OauthClient(type, core::OauthViewType::mobile, /*cloudSystem*/ {},
