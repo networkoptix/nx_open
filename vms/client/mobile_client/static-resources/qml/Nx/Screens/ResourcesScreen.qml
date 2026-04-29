@@ -115,8 +115,25 @@ AdaptiveScreen
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
         interactive: true
-        visible: true
         item: resourceTreeSheet
+
+        onCloseButtonClicked: appContext.settings.resourcesPanelVisible = false
+        onVisibleChanged:
+        {
+            if (visible && leftPanel.item)
+                appContext.settings.resourcesPanelVisible = true
+        }
+    }
+
+    Binding
+    {
+        id: initialLeftPanelVisibilityBinding
+
+        when: leftPanel.item
+        target: leftPanel
+        property: "visible"
+        value: appContext.settings.resourcesPanelVisible
+        restoreMode: Binding.RestoreNone
     }
 
     rightPanel
@@ -128,6 +145,24 @@ AdaptiveScreen
         item: resourcesScreen.contentItem === videoScreenLoader.item
             ? videoScreenLoader.item.navigatorItem
             : null
+
+        onCloseButtonClicked: appContext.settings.timelinePanelVisible = false
+        onVisibleChanged:
+        {
+            if (visible && rightPanel.item)
+                appContext.settings.timelinePanelVisible = true
+        }
+    }
+
+    Binding
+    {
+        id: initialRightPanelVisibilityBinding
+
+        when: rightPanel.item
+        target: rightPanel
+        property: "visible"
+        value: appContext.settings.timelinePanelVisible
+        restoreMode: Binding.RestoreNone
     }
 
     ResourceTreeItem

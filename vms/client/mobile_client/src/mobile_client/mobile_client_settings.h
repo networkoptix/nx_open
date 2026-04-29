@@ -67,6 +67,9 @@ public:
 
         ForceTabletMode,
 
+        TimelinePanelVisible,
+        ResourcesPanelVisible,
+
         VariableCount
     };
 
@@ -195,6 +198,16 @@ private:
             bool,
             forceTabletMode, setForceTabletMode,
             ForceTabletMode, false)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            timelinePanelVisible, setTimelinePanelVisible,
+            TimelinePanelVisible, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            resourcesPanelVisible, setResourcesPanelVisible,
+            ResourcesPanelVisible, true)
 
     QN_END_PROPERTY_STORAGE()
 

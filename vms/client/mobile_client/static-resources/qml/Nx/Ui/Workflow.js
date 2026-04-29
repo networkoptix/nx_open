@@ -96,7 +96,7 @@ function openConnectToServerScreen(host, user, password, operationId)
         item.focusCredentialsField()
 }
 
-function openResourcesScreen(systemName, filterIds)
+function openResourcesScreen(systemName, filterIds = [])
 {
     var item = stackView.get(0, Controls.StackView.ForceLoad)
     if (item && item.objectName == "resourcesScreen")
