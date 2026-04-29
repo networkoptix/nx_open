@@ -9,11 +9,25 @@ import Nx.Core
 import Nx.Mobile
 import Nx.Mobile.Controls
 
-BaseAdaptiveSheet
+AdaptiveSheet
 {
     id: sheet
 
     signal durationPicked(int duration)
+
+    titleTextItem
+    {
+        text: qsTr("Download next")
+
+        horizontalAlignment: Text.AlignHCenter
+
+        font.pixelSize: 16
+        font.weight: 400
+        color: ColorTheme.colors.light18
+    }
+
+    spacing: 0
+    contentSpacing: 0
 
     Repeater
     {
@@ -29,7 +43,6 @@ BaseAdaptiveSheet
         }
 
         model: [
-            {"text": qsTr("Download next"), "durationMs": -1},
             menuItemForMinutesDownload(20),
             menuItemForMinutesDownload(10),
             menuItemForMinutesDownload(5),
@@ -42,26 +55,25 @@ BaseAdaptiveSheet
             width: parent.width
             height: 52
 
+            Rectangle
+            {
+                visible: index < repeater.count
+                height: 1
+                width: parent.width
+                anchors.top: parent.top
+                color: ColorTheme.colors.dark12
+            }
+
             Text
             {
-                anchors.fill: parent
+                anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
 
                 font.pixelSize: 16
                 font.weight: 400
                 color: ColorTheme.colors.light10
 
                 text: modelData.text
-            }
-
-            Rectangle
-            {
-                visible: index < repeater.count - 1
-                height: 1
-                width: parent.width
-                anchors.bottom: parent.bottom
-                color: ColorTheme.colors.dark12
             }
 
             MouseArea
