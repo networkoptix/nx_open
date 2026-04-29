@@ -2415,6 +2415,55 @@ static void registerDeviceHandlers(
      * Web player also supports all Tracker parameters:
      * <br/>
      * <code>https://&lt;server_ip&gt;:&lt;port&gt;/webrtc/?camera_id=12AB42FD5912&position=1674240507000000&stream=0&resolutionWhenTranscoding=320x240&resolution=240p&rotation=auto&speed=1.0&deliveryMethod=srtp</code>
+     * <br/>
+     * WebRTC data channel supports JSON control messages. Both string and binary data channel
+     * messages are parsed as UTF-8 JSON objects.
+     * <br/>
+     * Common field:
+     * <pre><code>{
+     *   "deviceId": "550e8400-e29b-41d4-a716-446655440000"
+     * }</code></pre>
+     * The <code>deviceId</code> field is the UUID of the target stream/provider device. For some
+     * commands, the device UUID may also be passed as the command value.
+     * <br/>
+     * Supported data channel messages:
+     * <pre><code>{
+     *   "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+     *   "seek": 1674240507000
+     * }</code></pre>
+     * Seeks the stream to the specified timestamp, in milliseconds since Unix epoch. Negative
+     * values switch playback to the current/live position. The value may be a JSON number or a
+     * string containing an integer.
+     * <pre><code>{
+     *   "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+     *   "stream": 1
+     * }</code></pre>
+     * Changes stream quality. <code>1</code> or <code>"1"</code> selects the secondary stream.
+     * Any other value selects the primary stream.
+     * <pre><code>{
+     *   "pause": "550e8400-e29b-41d4-a716-446655440000"
+     * }</code></pre>
+     * Pauses playback for the target stream.
+     * <pre><code>{
+     *   "resume": "550e8400-e29b-41d4-a716-446655440000"
+     * }</code></pre>
+     * Resumes playback for the target stream.
+     * <pre><code>{
+     *   "nextFrame": "550e8400-e29b-41d4-a716-446655440000"
+     * }</code></pre>
+     * Advances paused playback by one frame.
+     * <br/>
+     * Equivalent form for <code>pause</code>, <code>resume</code>, and <code>nextFrame</code>:
+     * <pre><code>{
+     *   "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+     *   "pause": ""
+     * }</code></pre>
+     * Response messages are sent back through the same data channel:
+     * <pre><code>{
+     *   "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+     *   "timestampMs": 1674240507000,
+     *   "status": 0
+     * }</code></pre>
      *
      * %jsonrpc[unused]
      * %caption Open WebRTC Tracker
