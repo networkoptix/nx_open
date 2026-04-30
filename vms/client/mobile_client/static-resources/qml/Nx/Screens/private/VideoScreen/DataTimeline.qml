@@ -371,6 +371,8 @@ Rectangle
             anchors.leftMargin: 12
             anchors.right: timeScale.left
 
+            z: 1
+
             chunkProvider: timeline.chunkProvider
             minimumStackDurationMs: timeline.minimumDurationMs / (1.0 - zoomInMarginFraction * 2.0)
 
@@ -643,6 +645,18 @@ Rectangle
             enabled: timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
         }
 
+        Rectangle
+        {
+            id: timeMarkerLine
+
+            color: ColorTheme.colors.mobileTimeline.timeMarker.background
+            visible: !timeMarker.isOutside
+
+            y: timeMarker.y
+            width: timeMarker.width
+            height: 1
+        }
+
         // Current time marker ("current" as currently played).
         Item
         {
@@ -667,6 +681,7 @@ Rectangle
 
             width: content.width
             height: 1
+            z: 1
 
             y:
             {
@@ -677,17 +692,6 @@ Rectangle
                     return timeScale.y - Math.ceil(header.height / 2.0) + timeScale.height
 
                 return timeScale.y + timeScale.timeToPosition(timeline.positionMs)
-            }
-
-            Rectangle
-            {
-                id: timeMarkerLine
-
-                color: ColorTheme.colors.mobileTimeline.timeMarker.background
-                visible: !timeMarker.isOutside
-
-                width: timeMarker.width
-                height: 1
             }
 
             Rectangle
