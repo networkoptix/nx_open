@@ -45,7 +45,7 @@ Rectangle
 
     property bool interactive: true
 
-    signal objectTileTapped(Timeline.MultiObjectData data)
+    signal detailsRequested(Timeline.MultiObjectData data)
 
     color: ColorTheme.colors.mobileTimeline.background
 
@@ -400,7 +400,7 @@ Rectangle
                 if (isZoomable(modelData))
                     zoomToTile(modelData)
                 else
-                    timeline.objectTileTapped(modelData)
+                    timeline.setPosition(modelData.positionMs)
             }
 
             onLongPressed: (modelData) =>
@@ -408,7 +408,7 @@ Rectangle
                 if (isZoomable(modelData))
                     zoomToTile(modelData)
                 else
-                    timeline.setPosition(modelData.positionMs)
+                    timeline.detailsRequested(modelData)
             }
 
             preloaderDelegate: Component

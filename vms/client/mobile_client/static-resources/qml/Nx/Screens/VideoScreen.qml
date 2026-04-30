@@ -835,7 +835,7 @@ Page
 
             timeZone: video.resourceHelper.timeZone
 
-            onObjectTileTapped: (data) =>
+            onDetailsRequested: (data) =>
             {
                 if (!data?.perObjectData)
                     return
