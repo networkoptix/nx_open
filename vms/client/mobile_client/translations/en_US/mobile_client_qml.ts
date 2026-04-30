@@ -558,13 +558,6 @@
     </message>
 </context>
 <context>
-    <name>FocusControl</name>
-    <message>
-        <source>AF</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>FullscreenControlsOverlay</name>
     <message>
         <source>-5 sec</source>
@@ -871,7 +864,7 @@
 <context>
     <name>Presets</name>
     <message>
-        <source>PTZ Presets</source>
+        <source>Select Preset</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -879,6 +872,14 @@
     <name>PtzSheet</name>
     <message>
         <source>PTZ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tap anywhere on video to center view there</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Re-Centering</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
