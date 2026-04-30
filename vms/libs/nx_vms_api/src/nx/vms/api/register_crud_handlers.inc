@@ -3134,6 +3134,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/manifest
      * Equivalent of IEngine::pushManifest().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Engine manifest
      * %ingroup Analytics
      * %struct PushEngineManifestData
@@ -3146,6 +3148,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{engineId}/deviceAgents/{deviceId}/manifest
      * Equivalent of IDeviceAgent::pushManifest().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Device Agent Manifest
      * %ingroup Analytics
      * %struct PushDeviceAgentManifestData
@@ -3176,6 +3180,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/integrationDiagnosticEvent
      * Equivalent of IEngine::pushIntegrationDiagnosticEvent().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Engine Diagnostic Event
      * %ingroup Analytics
      * %struct EngineIntegrationDiagnosticEvent
@@ -3188,6 +3194,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/integrationDiagnosticEvent
      * Equivalent of IDeviceAgent::pushIntegrationDiagnosticEvent().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Agent Diagnostic Event
      * %ingroup Analytics
      * %struct DeviceAgentIntegrationDiagnosticEvent
@@ -3200,6 +3208,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/object
      * Equivalent of IDeviceAgent::IHandler::handleMetadata().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Object metadata
      * %ingroup Analytics
      * %struct ApiObjectMetadataPacket
@@ -3212,6 +3222,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/event
      * Equivalent of IDeviceAgent::IHandler::handleMetadata().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Event metadata
      * %ingroup Analytics
      * %struct ApiEventMetadataPacket
@@ -3224,6 +3236,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/bestShot
      * Equivalent of IDeviceAgent::IHandler::handleMetadata().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Best Shot metadata
      * %ingroup Analytics
      * %struct ApiBestShotMetadataPacket
@@ -3236,6 +3250,8 @@ static void registerIntegrationRequestRestHandlers(nx::network::rest::HandlerPoo
 
     /**%apidoc POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/title
      * Equivalent of IDeviceAgent::IHandler::handleMetadata().
+     * Supported only for Analytics API Integrations (`integrationType`: `api`).
+     * SDK Integrations (`integrationType`: `sdk`) must use SDK methods instead of this endpoint.
      * %caption Push Title metadata
      * %ingroup Analytics
      * %struct ApiObjectTitleMetadataPacket

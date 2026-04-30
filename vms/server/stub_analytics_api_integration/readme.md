@@ -6,6 +6,20 @@
 
 It is an Electron application used to test Analytics API workflow for working with Integrations.
 
+# Integration type and REST endpoint scope
+
+This stub represents an Analytics API Integration (`"integrationType": "api"`), so it uses
+Analytics REST "push" endpoints under:
+
+- `POST /rest/v{4-}/analytics/engines/{id}/manifest`
+- `POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/manifest`
+- `POST /rest/v{4-}/analytics/engines/{id}/integrationDiagnosticEvent`
+- `POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/integrationDiagnosticEvent`
+- `POST /rest/v{4-}/analytics/engines/{id}/deviceAgents/{deviceId}/metadata/*`
+
+These endpoints are not intended for SDK Integrations (`"integrationType": "sdk"`). SDK
+Integrations must use SDK C++ methods/callbacks instead of calling these REST endpoints.
+
 # Install Electron, nodejs and other dependencies
 
 Run the following commands from the application's root directory(the example is for Ubuntu Linux):
