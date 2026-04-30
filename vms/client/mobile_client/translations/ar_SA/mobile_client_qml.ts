@@ -562,13 +562,6 @@
     </message>
   </context>
   <context>
-    <name>FocusControl</name>
-    <message>
-      <source>AF</source>
-      <translation type="unfinished">AF</translation>
-    </message>
-  </context>
-  <context>
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
@@ -875,8 +868,8 @@
   <context>
     <name>Presets</name>
     <message>
-      <source>PTZ Presets</source>
-      <translation>اعدادات ال PTZ</translation>
+      <source>Select Preset</source>
+      <translation type="unfinished">Select Preset</translation>
     </message>
   </context>
   <context>
@@ -884,6 +877,14 @@
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Tap anywhere on video to center view there</source>
+      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+    </message>
+    <message>
+      <source>Cancel Re-Centering</source>
+      <translation type="unfinished">Cancel Re-Centering</translation>
     </message>
   </context>
   <context>

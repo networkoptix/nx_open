@@ -558,13 +558,6 @@
     </message>
   </context>
   <context>
-    <name>FocusControl</name>
-    <message>
-      <source>AF</source>
-      <translation>AF</translation>
-    </message>
-  </context>
-  <context>
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
@@ -871,8 +864,8 @@
   <context>
     <name>Presets</name>
     <message>
-      <source>PTZ Presets</source>
-      <translation>PTZ-förinställningar</translation>
+      <source>Select Preset</source>
+      <translation type="unfinished">Select Preset</translation>
     </message>
   </context>
   <context>
@@ -880,6 +873,14 @@
     <message>
       <source>PTZ</source>
       <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Tap anywhere on video to center view there</source>
+      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+    </message>
+    <message>
+      <source>Cancel Re-Centering</source>
+      <translation type="unfinished">Cancel Re-Centering</translation>
     </message>
   </context>
   <context>
@@ -1601,11 +1602,11 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Endast liveläge</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Endast arkivläge</translation>
     </message>
   </context>
   <context>
