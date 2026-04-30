@@ -56,8 +56,8 @@ void TwoWayAudioCameraButtonController::Private::updateButton()
 
             return CameraButtonData {
                 .id = kTwoWayAudioButtonId,
-                .name = TwoWayAudioCameraButtonController::tr("Press and hold to speak"),
-                .hint = "",
+                .name = TwoWayAudioCameraButtonController::tr("Microphone"),
+                .hint = TwoWayAudioCameraButtonController::tr("Press and hold to speak"),
                 .iconName = "mic",
                 .type = CameraButtonData::Type::prolonged,
                 .enabled = true};

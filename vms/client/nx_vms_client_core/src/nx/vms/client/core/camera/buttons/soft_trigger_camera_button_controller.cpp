@@ -139,14 +139,14 @@ bool isVmsRule(const nx::vms::rules::Rule* /*rule*/)
 }
 
 using HintStyle = SoftTriggerCameraButtonController::HintStyle;
-QString buttonHint(bool prolonged, HintStyle hintStyle)
+QString buttonHint(bool prolonged, HintStyle hintStyle, const QString& name)
 {
     if (!prolonged)
         return {};
 
     return hintStyle == HintStyle::mobile
-        ? SoftTriggerCameraButtonController::tr("Press and hold to") + ' '
-        : SoftTriggerCameraButtonController::tr("press and hold");
+        ? SoftTriggerCameraButtonController::tr("Press and hold to %1").arg(name)
+        : SoftTriggerCameraButtonController::tr("%1 (press and hold)").arg(name);
 }
 
 CameraButtonData::Type prolongedToType(bool prolonged)
@@ -163,10 +163,11 @@ CameraButtonData buttonFromRule(
 {
     const auto params = rule->eventParams();
     const bool prolonged = rule->isActionProlonged();
+    const auto name = nx::vms::rules::Strings::softTriggerName(params.caption);
     return CameraButtonData {
         .id = rule->id(),
-        .name = nx::vms::rules::Strings::softTriggerName(params.caption),
-        .hint = buttonHint(prolonged, hintStyle),
+        .name = name,
+        .hint = buttonHint(prolonged, hintStyle, name),
         .iconName = params.description,
         .type = prolongedToType(prolonged),
         .enabled = true};
@@ -190,10 +191,11 @@ CameraButtonData buttonFromRule(
 
     const auto engine = context->vmsRulesEngine();
     const bool prolonged = nx::vms::rules::isProlonged(engine, rule->actionBuilders()[0]);
+    const auto buttonName = nx::vms::rules::Strings::softTriggerName(name->value());
     return CameraButtonData {
         .id = rule->id(),
-        .name = nx::vms::rules::Strings::softTriggerName(name->value()),
-        .hint = buttonHint(prolonged, hintStyle),
+        .name = buttonName,
+        .hint = buttonHint(prolonged, hintStyle, buttonName),
         .iconName = icon->value(),
         .type = prolongedToType(prolonged),
         .enabled = true};

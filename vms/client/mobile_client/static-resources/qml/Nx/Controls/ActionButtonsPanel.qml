@@ -72,7 +72,7 @@ Item
                 return //< Prolonged actions should be activated on button press without hint.
 
             if (down)
-                hintControl.showHint(d.hint(index), d.name(index), d.iconPath(index), true)
+                hintControl.showHint("", d.hint(index) || d.name(index), d.iconPath(index), true)
             else
                 hintControl.hide()
         }
@@ -106,7 +106,7 @@ Item
             // Show hint for the prolonged action
             const kKeepHintOpened = true
             d.stopButtonAction(index, kKeepHintOpened)
-            hintControl.showHint(d.hint(index), d.name(index), d.iconPath(index))
+            hintControl.showHint("", d.hint(index) || d.name(index), d.iconPath(index))
         }
 
         onLongPressedChanged: (index, pressed, down) =>
@@ -124,7 +124,7 @@ Item
             }
             else if (!prolonged && down && enabled && canShowHint(index))
             {
-                hintControl.showHint(d.hint(index), d.name(index), d.iconPath(index), true)
+                hintControl.showHint("", d.hint(index) || d.name(index), d.iconPath(index), true)
             }
         }
 

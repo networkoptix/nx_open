@@ -24,8 +24,8 @@ AdaptiveSheet
     signal unavailableAction()
 
     title: qsTr("Actions")
+    titleTextItem.font.pixelSize: 18
     spacing: 24
-    contentSpacing: spacing
 
     onResourceChanged: actionVisualizer.hide()
 
@@ -55,27 +55,37 @@ AdaptiveSheet
             readonly property bool available: model.enabled && sheet.available
             readonly property bool prolonged: model.type === CameraButton.Type.prolonged
             readonly property string iconSource: model.iconPath
-            readonly property string hintText: model.hint + model.name
-            readonly property var visualizer:
-                model.group === CameraButtonController.ButtonGroup.twoWayAudio
+            readonly property string hintText: model.hint || model.name
+
+            readonly property var visualizer: sheet.externalMode
+                && model.group === CameraButtonController.ButtonGroup.twoWayAudio
                     ? actionVisualizer.voiceVisualizer
                     : actionVisualizer.defaultVisualizer
 
+            readonly property string visualizerText:
+                model.group === CameraButtonController.ButtonGroup.twoWayAudio
+                    ? qsTr("Speak...")
+                    : model.name
+
             parent: externalMode ? externalButtonContainer : sheetLayout
 
+            text: externalMode ? "" : model.name
             icon.width: 24
             icon.height: 24
             icon.source: iconSource
             opacity: available ? 1.0 : 0.3
             type: externalMode ? Button.Type.Interface : Button.LightInterface
             down: instantActionHandler.pressed || prolongedActionHandler.pressed
-            checked: down && prolonged
+            textHorizontalAlignment: Qt.AlignLeft
             clip: true
 
-            implicitHeight: 44
-            implicitWidth: 44
+            implicitWidth: parent.width
 
-            Layout.fillWidth: true
+            spacing: 8
+            leftPadding: externalMode ? 0 : 16
+            rightPadding: externalMode ? 0 : 16
+            topPadding: externalMode ? 0 : 10
+            bottomPadding: externalMode ? 0 : 10
 
             Item
             {
@@ -169,7 +179,7 @@ AdaptiveSheet
                 if (model.group === CameraButtonController.ButtonGroup.twoWayAudio)
                     windowContext.ui.windowHelpers.requestRecordAudioPermissionIfNeeded()
 
-                actionVisualizer.showActivity(visualizer, model.name, iconSource)
+                actionVisualizer.showActivity(visualizer, visualizerText, iconSource)
             }
 
             function stopAction()
@@ -194,7 +204,7 @@ AdaptiveSheet
                     else if (!prolonged)
                         actionVisualizer.showSuccess(hintText)
                     else if (controller.actionIsActive(model.id) && delegate.down)
-                        actionVisualizer.showActivity(visualizer, name, iconSource)
+                        actionVisualizer.showActivity(visualizer, visualizerText, iconSource)
                 }
 
                 function onActionCancelled(id)
@@ -205,14 +215,12 @@ AdaptiveSheet
         }
     }
 
-    GridLayout
+    ColumnLayout
     {
         id: sheetLayout
 
         width: parent.width
-        columns: 5
-        columnSpacing: 12
-        rowSpacing: 12
+        spacing: 8
     }
 
     footer: Button
@@ -231,8 +239,7 @@ AdaptiveSheet
             visible: !externalMode
             parent: externalMode ? null : externalButtonContainer
 
-            implicitWidth: 44
-            implicitHeight: 44
+            anchors.fill: parent
             opacity: sheet.available ? 1.0 : 0.3
 
             icon.source: "image://skin/24x24/Outline/grid_view.svg"

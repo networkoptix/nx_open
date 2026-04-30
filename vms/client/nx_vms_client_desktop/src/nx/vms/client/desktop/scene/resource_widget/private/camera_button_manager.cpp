@@ -123,9 +123,7 @@ QString getToolTip(const CameraButtonData& data)
         }
         case CameraButtonData::Type::prolonged:
         {
-            return data.hint.isEmpty()
-                ? data.name
-                : nx::format("%1 (%2)").args(data.name, data.hint).toQString();
+            return data.hint.isEmpty() ? data.name : data.hint;
         }
         case CameraButtonData::Type::checkable:
         {

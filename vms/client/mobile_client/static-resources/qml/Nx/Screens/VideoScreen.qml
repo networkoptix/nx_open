@@ -791,8 +791,8 @@ Page
                 {
                     id: actionButtonContainer
 
-                    Layout.preferredWidth: childrenRect.width
-                    Layout.preferredHeight: childrenRect.height
+                    Layout.preferredWidth: 44
+                    Layout.preferredHeight: 44
 
                     visible: actionSheet.hasActions
                 }
