@@ -94,7 +94,9 @@ ListView
         property bool active: false
         property bool filteringPressing: false
 
-        icon.source: model.iconPath
+        icon.source: model.iconPath ? model.iconPath + "?primary=white" : ""
+        icon.width: 24
+        icon.height: 24
         enabledMask: model.enabled
         padding: 0
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined

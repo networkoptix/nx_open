@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include <nx/vms/client/core/skin/soft_trigger_pixmaps.h>
 #include <nx/vms/client/desktop/common/widgets/icon_combo_box.h>
-#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 #include <nx/vms/rules/event_filter_fields/customizable_icon_field.h>
 
 #include "dropdown_text_picker_widget_base.h"
@@ -23,7 +23,7 @@ public:
             field, context, parent)
     {
         constexpr auto kDropdownIconSize = 40;
-        const auto pixmaps = SoftTriggerPixmaps::pixmaps();
+        const auto pixmaps = core::SoftTriggerPixmaps::pixmaps();
         const auto nextEvenValue = [](int value) { return value + (value & 1); };
         const auto columnCount = nextEvenValue(qCeil(qSqrt(pixmaps.size())));
 
@@ -50,7 +50,8 @@ protected:
     {
         DropdownTextPickerWidgetBase<vms::rules::CustomizableIconField, IconComboBox>::updateUi();
 
-        m_comboBox->setCurrentIcon(SoftTriggerPixmaps::effectivePixmapName(m_field->value()));
+        m_comboBox->setCurrentIcon(
+            core::SoftTriggerPixmaps::effectivePixmapName(m_field->value()));
     }
 };
 

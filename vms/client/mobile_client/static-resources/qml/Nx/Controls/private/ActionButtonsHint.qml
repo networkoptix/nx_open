@@ -89,7 +89,7 @@ Rectangle
         activityPreloader.visible = false
 
         visualDataLoader.sourceComponent = imageComponent
-        visualDataLoader.item.source = iconPath
+        visualDataLoader.item.source = iconPath ? iconPath + "?primary=white" : ""
 
         control.state = "visible"
     }
@@ -103,7 +103,7 @@ Rectangle
         activityPreloader.visible = true
 
         visualDataLoader.sourceComponent = imageComponent
-        visualDataLoader.item.source = iconPath
+        visualDataLoader.item.source = iconPath ? iconPath + "?primary=white" : ""
 
         control.state = "visible"
     }

@@ -12,7 +12,6 @@
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>

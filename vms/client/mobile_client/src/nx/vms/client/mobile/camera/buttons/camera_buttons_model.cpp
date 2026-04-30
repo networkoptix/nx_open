@@ -6,13 +6,12 @@
 
 #include <nx/utils/algorithm/comparator.h>
 #include <nx/vms/client/core/camera/buttons/camera_button_data.h>
+#include <nx/vms/client/core/skin/soft_trigger_pixmaps.h>
 #include <nx/vms/client/mobile/camera/buttons/camera_button_controller.h>
 
 namespace nx::vms::client::mobile {
 
 namespace {
-
-static const QString kDefaultIconName = "_bell_on";
 
 using CameraButtonData = core::CameraButtonData;
 using AbstractCameraButtonController = core::AbstractCameraButtonController;
@@ -28,13 +27,12 @@ enum Roles
     group
 };
 
-QString getIconPath(int group, QString iconName)
+QString getIconPath(int group, const QString& iconName)
 {
-    if (iconName.isEmpty())
-        iconName = kDefaultIconName;
     return group == static_cast<int>(CameraButtonController::ButtonGroup::ptz)
         ? iconName
-        : QStringLiteral("image://skin/soft_triggers/user_selectable/%1.svg").arg(iconName);
+        : QStringLiteral("image://skin/%1").arg(
+            core::SoftTriggerPixmaps::effectivePixmapPath(iconName));
 }
 
 } // namespace

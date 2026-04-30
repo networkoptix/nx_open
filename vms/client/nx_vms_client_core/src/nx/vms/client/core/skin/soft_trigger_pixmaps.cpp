@@ -12,7 +12,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/skin/skin.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 namespace {
 
@@ -165,4 +165,4 @@ QPixmap SoftTriggerPixmaps::pixmapByName(const QString& name)
         : pixmap;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

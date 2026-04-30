@@ -5,9 +5,9 @@
 #include <QtCore/QStringList>
 #include <QtGui/QPixmap>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
-struct SoftTriggerPixmaps
+struct NX_VMS_CLIENT_CORE_API SoftTriggerPixmaps
 {
     using MapT = QVector<QPair<QString, QPixmap>>;
 
@@ -35,4 +35,4 @@ struct SoftTriggerPixmaps
     static QPixmap pixmapByName(const QString& name);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

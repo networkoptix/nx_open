@@ -4,8 +4,8 @@
 
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/icon.h>
+#include <nx/vms/client/core/skin/soft_trigger_pixmaps.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/desktop/style/soft_trigger_pixmaps.h>
 
 #include "camera_button.h"
 
@@ -34,7 +34,7 @@ struct CameraButton::Private
 
 void CameraButton::Private::updateIcon()
 {
-    const auto buttonPixmap = SoftTriggerPixmaps::pixmapByName(iconName);
+    const auto buttonPixmap = core::SoftTriggerPixmaps::pixmapByName(iconName);
 
     const auto generateStatePixmap =
         [this, buttonPixmap] (const QColor& backgroundColor)
@@ -80,7 +80,7 @@ QString CameraButton::iconName() const
 
 void CameraButton::setIconName(const QString& name)
 {
-    const auto iconName = SoftTriggerPixmaps::effectivePixmapName(name);
+    const auto iconName = core::SoftTriggerPixmaps::effectivePixmapName(name);
     if (d->iconName == iconName)
         return;
 
