@@ -10,7 +10,6 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <new>
 #include <numeric>
 #include <ranges>
 #include <string>
@@ -113,11 +112,12 @@ public:
         {
             ptr = m_segment->allocate_aligned(size, sharedMemoryAlignment());
         }
-        catch (const std::bad_alloc&)
+        catch (const boost::interprocess::bad_alloc&)
         {
             NX_WARNING(
                 NX_SCOPE_TAG,
-                "Failed to allocate shared memory block of size %1 in segment %2",
+                "Failed to allocate shared memory block of size %1 in segment %2 "
+                "(boost::interprocess::bad_alloc)",
                 size,
                 m_segmentName);
             return nullptr;
