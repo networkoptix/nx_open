@@ -154,6 +154,7 @@ class NxOpenConan(ConanFile):
         self.build_requires("qt-host/6.9.1" "#593e82a6bad53a827e568d713f62867a")
         self.tool_requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
         self.tool_requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
+        self.tool_requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
         self.tool_requires("openssl/1.1.1q" "#389fdbabc290c55ab79fee03761f20dd")
 
         if not self.isEmscripten:
