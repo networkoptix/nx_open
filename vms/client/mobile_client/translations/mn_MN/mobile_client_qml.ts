@@ -865,7 +865,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Урьдчилсан тохиргоог сонгох</translation>
     </message>
   </context>
   <context>

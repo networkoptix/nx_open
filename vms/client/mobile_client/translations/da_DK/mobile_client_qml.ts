@@ -865,7 +865,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Vælg Forudindstilling</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Tryk hvor som helst på videoen for at centrere visningen der</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>

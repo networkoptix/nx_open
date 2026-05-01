@@ -865,7 +865,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Elegir Preset</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Toca en cualquier parte del video para centrar la vista</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>

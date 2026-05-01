@@ -865,7 +865,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Välj förinställning</translation>
     </message>
   </context>
   <context>

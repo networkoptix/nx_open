@@ -864,7 +864,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>プリセットを選択</translation>
     </message>
   </context>
   <context>
@@ -875,11 +875,11 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>動画上をタップすると、そこを中心として表示されます。</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>中心指定移動をキャンセル</translation>
     </message>
   </context>
   <context>
@@ -1601,11 +1601,11 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>ライブモードのみ</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>アーカイブモードのみ</translation>
     </message>
   </context>
   <context>

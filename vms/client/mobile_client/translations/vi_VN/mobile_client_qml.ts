@@ -864,7 +864,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Chọn thiết lập sẵn</translation>
     </message>
   </context>
   <context>

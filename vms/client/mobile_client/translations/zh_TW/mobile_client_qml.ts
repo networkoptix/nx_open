@@ -864,7 +864,7 @@
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>選擇預設集</translation>
     </message>
   </context>
   <context>
@@ -875,7 +875,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>點擊影片中任意位置即可將該處置中</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
