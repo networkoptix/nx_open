@@ -16,6 +16,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_STRING("", customizedDeploymentServiceUrl,
         "Overrides the current Deployment service url");
 
+    NX_INI_STRING("", customizedMergeServiceUrl,
+        "Overrides the current Merge service url");
+
     NX_INI_STRING("", customizedMotionDbServiceUrl,
         "Overrides the current Deployment service url");
 
