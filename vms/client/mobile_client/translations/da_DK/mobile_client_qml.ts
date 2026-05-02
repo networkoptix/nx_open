@@ -880,7 +880,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Annuller gencentrering</translation>
     </message>
   </context>
   <context>
