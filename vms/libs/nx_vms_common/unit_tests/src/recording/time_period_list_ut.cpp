@@ -236,6 +236,47 @@ TEST( QnTimePeriodsListTest, unionByCombiningSeveral )
     ASSERT_EQ(resultList, sourceList);
 }
 
+// VMS-62059
+TEST(QnTimePeriodsListTest, unionByCombiningSeveralAfterGap)
+{
+    // The appending period starts in a gap between two existing periods (so it does
+    // not overlap the previous one), and extends across several following periods.
+    // All overlapped following periods must be merged into the resulting period.
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5)
+        << QnTimePeriod(40, 5);
+
+    QnTimePeriodList appendingList;
+    appendingList << QnTimePeriod(16, 30); //< (16..46) starts in (15..20) gap.
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5) << QnTimePeriod(16, 30);
+
+    QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
+TEST( QnTimePeriodsListTest, unionByCombiningSeveralAfterGapIntoInfinite )
+{
+    // Same as above, but the bridging appending period also extends into the
+    // trailing infinite period: the result must end with a single infinite period.
+    QnTimePeriodList sourceList;
+    sourceList << QnTimePeriod(10, 5) << QnTimePeriod(20, 5) << QnTimePeriod(30, 5)
+        << QnTimePeriod(40, QnTimePeriod::kInfiniteDuration);
+
+    QnTimePeriodList appendingList;
+    appendingList << QnTimePeriod(16, 30);
+
+    QnTimePeriodList resultList;
+    resultList << QnTimePeriod(10, 5)
+        << QnTimePeriod(16, QnTimePeriod::kInfiniteDuration);
+
+    QnTimePeriodList::unionTimePeriods(sourceList, appendingList);
+
+    ASSERT_EQ(resultList, sourceList);
+}
+
 
 TEST( QnTimePeriodsListTest, unionByLimits )
 {
