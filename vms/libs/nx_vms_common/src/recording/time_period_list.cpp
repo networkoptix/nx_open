@@ -660,28 +660,35 @@ void QnTimePeriodList::unionTimePeriods(QnTimePeriodList& basePeriods, const QnT
             /* Space is empty, just inserting period or prepending to next. */
             ++iter;
             if (iter != basePeriods.end() && iter->startTimeMs <= period.endTimeMs())
+            {
                 iter->addPeriod(period);
+            }
             else
+            {
                 iter = basePeriods.insert(iter, period);
+                continue;
+            }
         }
         else if (iter->startTimeMs > period.endTimeMs())
         {
             /* Prepending before the first chunk. */
             iter = basePeriods.insert(iter, period);
+            continue;
         }
         else
         {
             /* Periods are overlapped. */
             iter->addPeriod(period);
+        }
 
-            /* Try to combine with the following */
-            auto next = iter + 1;
-            while (next != basePeriods.end() && next->startTimeMs <= iter->endTimeMs())
-            {
-                iter->addPeriod(*next);
-                next = basePeriods.erase(next);
-                iter = next - 1;
-            }
+        /* The period at iter has just been extended by addPeriod() and may now overlap with
+         * one or more of the following basePeriods. We will merge such overlaps. */
+        auto next = iter + 1;
+        while (next != basePeriods.end() && next->startTimeMs <= iter->endTimeMs())
+        {
+            iter->addPeriod(*next);
+            next = basePeriods.erase(next);
+            iter = next - 1;
         }
     }
 }
