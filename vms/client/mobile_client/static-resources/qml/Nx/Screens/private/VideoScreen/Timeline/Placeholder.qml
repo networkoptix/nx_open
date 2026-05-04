@@ -3,116 +3,70 @@
 import QtQuick
 
 import Nx.Core
-import Nx.Core.Controls
+import Nx.Items
 
 import nx.vms.client.mobile.timeline as Timeline
 
-Item
+Placeholder
 {
     id: placeholder
 
     property bool active: false
     property int objectsType: Timeline.ObjectsLoader.ObjectsType.motion
 
+    property int fadeDurationMs: 200
+
     opacity: active ? 1 : 0
     visible: opacity > 0.01
 
-    Behavior on opacity { NumberAnimation { duration: 200 }}
+    Behavior on opacity { NumberAnimation { duration: placeholder.fadeDurationMs }}
 
-    Column
+    imageColor: ColorTheme.colors.mobileTimeline.contentPlaceholder.icon
+    textColor: ColorTheme.colors.mobileTimeline.contentPlaceholder.caption
+    descriptionColor: ColorTheme.colors.mobileTimeline.contentPlaceholder.description
+
+    imageSource:
     {
-        id: placeholderColumn
-
-        anchors.verticalCenter: placeholder.verticalCenter
-        width: placeholder.width
-
-        padding: 20
-        spacing: 24
-
-        ColoredImage
+        switch (placeholder.objectsType)
         {
-            id: placeholderImage
+            case Timeline.ObjectsLoader.ObjectsType.bookmarks:
+                return "image://skin/64x64/Outline/nobookmarks.svg"
 
-            anchors.horizontalCenter: placeholderColumn.horizontalCenter
-            primaryColor: ColorTheme.colors.mobileTimeline.contentPlaceholder.icon
-            sourceSize: Qt.size(64, 64)
+            case Timeline.ObjectsLoader.ObjectsType.analytics:
+                return "image://skin/64x64/Outline/noobjects.svg"
 
-            sourcePath:
-            {
-                switch (placeholder.objectsType)
-                {
-                    case Timeline.ObjectsLoader.ObjectsType.bookmarks:
-                        return "image://skin/64x64/Outline/nobookmarks.svg"
-
-                    case Timeline.ObjectsLoader.ObjectsType.analytics:
-                        return "image://skin/64x64/Outline/noobjects.svg"
-
-                    case Timeline.ObjectsLoader.ObjectsType.motion:
-                        return "image://skin/64x64/Outline/motion.svg"
-                }
-            }
+            case Timeline.ObjectsLoader.ObjectsType.motion:
+                return "image://skin/64x64/Outline/motion.svg"
         }
+    }
 
-        Column
+    text:
+    {
+        switch (placeholder.objectsType)
         {
-            id: textColumn
+            case Timeline.ObjectsLoader.ObjectsType.bookmarks:
+                return qsTr("No Bookmarks")
 
-            spacing: 12
+            case Timeline.ObjectsLoader.ObjectsType.analytics:
+                return qsTr("No Objects")
 
-            width: placeholderColumn.width - placeholderColumn.leftPadding
-                - placeholderColumn.rightPadding
+            case Timeline.ObjectsLoader.ObjectsType.motion:
+                return qsTr("No Motion")
+        }
+    }
 
-            Text
-            {
-                id: placeholderText
+    description:
+    {
+        switch (placeholder.objectsType)
+        {
+            case Timeline.ObjectsLoader.ObjectsType.bookmarks:
+                return qsTr("No bookmarks have been created on this timeline")
 
-                width: textColumn.width
-                horizontalAlignment: Text.AlignHCenter
-                color: ColorTheme.colors.mobileTimeline.contentPlaceholder.caption
-                font.pixelSize: 16
-                font.weight: Font.Medium
+            case Timeline.ObjectsLoader.ObjectsType.analytics:
+                return qsTr("No objects have been detected on this timeline")
 
-                text:
-                {
-                    switch (placeholder.objectsType)
-                    {
-                        case Timeline.ObjectsLoader.ObjectsType.bookmarks:
-                            return qsTr("No Bookmarks")
-
-                        case Timeline.ObjectsLoader.ObjectsType.analytics:
-                            return qsTr("No Objects")
-
-                        case Timeline.ObjectsLoader.ObjectsType.motion:
-                            return qsTr("No Motion")
-                    }
-                }
-            }
-
-            Text
-            {
-                id: placeholderDetailsText
-
-                width: textColumn.width
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.WordWrap
-                color: ColorTheme.colors.mobileTimeline.contentPlaceholder.description
-                font.pixelSize: 14
-
-                text:
-                {
-                    switch (placeholder.objectsType)
-                    {
-                        case Timeline.ObjectsLoader.ObjectsType.bookmarks:
-                            return qsTr("No bookmarks have been created on this timeline")
-
-                        case Timeline.ObjectsLoader.ObjectsType.analytics:
-                            return qsTr("No objects have been detected on this timeline")
-
-                        case Timeline.ObjectsLoader.ObjectsType.motion:
-                            return qsTr("No motion has been detected on this timeline")
-                    }
-                }
-            }
+            case Timeline.ObjectsLoader.ObjectsType.motion:
+                return qsTr("No motion has been detected on this timeline")
         }
     }
 }

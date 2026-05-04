@@ -486,7 +486,6 @@ Rectangle
 
             anchors.fill: objects
             anchors.rightMargin: recordingChunks.width
-            anchors.bottomMargin: header.height
 
             active: !(objects.hasContent ?? true)
             objectsType: timeline.objectsType

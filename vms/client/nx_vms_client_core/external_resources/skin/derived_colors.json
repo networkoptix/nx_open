@@ -373,6 +373,11 @@
             "icon": "light16",
             "caption": "light12",
             "description": "light16"
+        },
+        "archivePlaceholder": {
+            "icon": "light10",
+            "caption": "light4",
+            "description": "light12"
         }
     }
 }

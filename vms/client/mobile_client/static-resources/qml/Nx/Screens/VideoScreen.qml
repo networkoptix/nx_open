@@ -823,11 +823,10 @@ Page
         {
             id: timeline
 
-            z: 1
             width: navigator.width
             anchors.top: navigator.top
             anchors.bottom: bottomBar.top
-            visible: d.canViewArchive
+            visible: d.hasArchive
 
             chunkProvider: cameraChunkProvider
             objectsType: modernVideoScreen.selectedObjectsType
@@ -864,7 +863,7 @@ Page
             width: navigator.width
             height: 68
             anchors.bottom: navigator.bottom
-            visible: d.canViewArchive
+            visible: d.hasArchive
 
             color: ColorTheme.colors.dark4
 
@@ -975,104 +974,18 @@ Page
                     }
                 }
             }
-
-            RowLayout
-            {
-                id: searchControls
-
-                anchors.fill: parent
-                anchors.leftMargin: 12
-                anchors.rightMargin: 12
-
-                visible: d.searchActive
-
-                spacing: 8
-
-                Text
-                {
-                    text: d.searchResults
-                        ? `${d.searchIndex + 1} of ${d.searchResults}`
-                        : qsTr("No results")
-
-                    color: ColorTheme.colors.light10
-                    font.pixelSize: 16
-                    font.weight: 400
-                    padding: 8
-
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
-                ControlButton
-                {
-                    id: searchUp
-
-                    icon.source: "image://skin/24x24/Outline/arrow_up.svg"
-                    enabled: d.searchIndex < (d.searchResults - 1)
-
-                    onClicked:
-                        ++d.searchIndex
-                }
-
-                ControlButton
-                {
-                    id: searchDown
-
-                    icon.source: "image://skin/24x24/Outline/arrow_down.svg"
-                    enabled: d.searchIndex > 0
-
-                    onClicked:
-                        --d.searchIndex
-                }
-            }
         }
 
-        Item
+        ArchivePlaceholder
         {
-            id: noRightsPlaceholder
+            id: archivePlaceholder
 
             anchors.fill: navigator
-            visible: !d.canViewArchive
+            color: ColorTheme.colors.mobileTimeline.background
 
-            Column
-            {
-                spacing: 24
-                anchors.centerIn: parent
-
-                ColoredImage
-                {
-                    sourcePath: "image://skin/64x64/Outline/no_information.svg"
-                    sourceSize: Qt.size(64, 64)
-                    primaryColor: ColorTheme.colors.light10
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                Column
-                {
-                    spacing: 16
-                    width: noRightsPlaceholder.width
-
-                    Text
-                    {
-                        text: qsTr("Not available")
-                        font.pixelSize: 16
-                        font.weight: Font.Medium
-                        color: ColorTheme.colors.light4
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
-
-                    Text
-                    {
-                        text: qsTr("You do not have permission<br>to view the archive",
-                            "<br> is a line break")
-                        font.pixelSize: 12
-                        color: ColorTheme.colors.light12
-                        horizontalAlignment: Text.AlignHCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        wrapMode: Text.Wrap
-                    }
-                }
-            }
+            canViewArchive: d.canViewArchive
+            hasArchive: d.hasArchive
+            loading: cameraChunkProvider.loading
         }
     }
 

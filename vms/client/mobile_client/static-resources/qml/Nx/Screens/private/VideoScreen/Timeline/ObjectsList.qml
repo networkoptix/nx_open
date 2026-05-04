@@ -120,6 +120,7 @@ Item
             property bool fadingOut: false
 
             readonly property bool isPreloaderNeeded: !pooled && !fadingOut
+                && (loader.hasContent ?? true)
                 && !loader.synchronous
                 && bucket?.state === Timeline.ObjectBucket.Initial
                 && bucket.isLoading

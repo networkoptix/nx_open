@@ -7,11 +7,13 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Controls
 
-ColumnLayout
+Item
 {
     id: control
 
-    width: 247
+    implicitWidth: Math.min(maximumWidth, layout.implicitWidth + horizontalPadding * 2)
+    implicitHeight: layout.implicitHeight
+    clip: true
 
     property alias imageSource: placeholderIcon.sourcePath
     property alias text: placeholderText.text
@@ -19,67 +21,85 @@ ColumnLayout
     property alias buttonText: button.text
     property alias buttonIcon: button.icon
 
+    property alias imageColor: placeholderIcon.primaryColor
+    property alias textColor: placeholderText.color
+    property alias descriptionColor: placeholderDescription.color
+
+    property real horizontalPadding: 16
+    property real maximumWidth: 342
+
     signal buttonClicked()
 
-    ColoredImage
+    ColumnLayout
     {
-        id: placeholderIcon
+        id: layout
 
-        sourceSize: Qt.size(64, 64)
+        anchors.centerIn: control
 
-        Layout.alignment: Qt.AlignHCenter
-    }
+        width: Math.min(control.maximumWidth, control.width) - control.horizontalPadding * 2
+        spacing: 0
 
-    Text
-    {
-        id: placeholderText
+        ColoredImage
+        {
+            id: placeholderIcon
 
-        Layout.topMargin: 24
-        Layout.fillWidth: true
+            sourceSize: Qt.size(64, 64)
 
-        color: ColorTheme.colors.light4
+            Layout.alignment: Qt.AlignHCenter
+        }
 
-        horizontalAlignment: Text.AlignHCenter
+        Text
+        {
+            id: placeholderText
 
-        font.pixelSize: 16
-        font.weight: Font.Medium
+            Layout.topMargin: 24
+            Layout.fillWidth: true
 
-        textFormat: Text.StyledText
-    }
+            color: ColorTheme.colors.light4
 
-    Text
-    {
-        id: placeholderDescription
+            horizontalAlignment: Text.AlignHCenter
 
-        Layout.topMargin: 16
-        Layout.fillWidth: true
+            font.pixelSize: 16
+            font.weight: Font.Medium
 
-        visible: text !== ""
-        color: ColorTheme.colors.light12
+            textFormat: Text.StyledText
+        }
 
-        horizontalAlignment: Text.AlignHCenter
+        Text
+        {
+            id: placeholderDescription
 
-        font.pixelSize: 12
-        font.weight: Font.Normal
+            Layout.topMargin: 16
+            Layout.fillWidth: true
 
-        textFormat: Text.StyledText
-        wrapMode: Text.WordWrap
-    }
+            visible: text !== ""
+            color: ColorTheme.colors.light12
 
-    Button
-    {
-        id: button
+            horizontalAlignment: Text.AlignHCenter
 
-        Layout.topMargin: 24
-        Layout.alignment: Qt.AlignHCenter
+            font.pixelSize: 14
+            font.weight: Font.Normal
 
-        visible: button.text !== ""
-        color: ColorTheme.colors.brand_core
-        textColor: ColorTheme.colors.dark1
+            textFormat: Text.StyledText
+            wrapMode: Text.WordWrap
+        }
 
-        icon.width: 24
-        icon.height: 24
+        Button
+        {
+            id: button
 
-        onClicked: control.buttonClicked()
+            Layout.topMargin: 24
+            Layout.alignment: Qt.AlignHCenter
+
+            visible: button.text !== ""
+            color: ColorTheme.colors.brand_core
+            textColor: ColorTheme.colors.dark1
+
+            icon.width: 24
+            icon.height: 24
+
+            onClicked:
+                control.buttonClicked()
+        }
     }
 }
