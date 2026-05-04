@@ -517,9 +517,9 @@ void ActionHandler::addToLayout(
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int layoutSize = layout->getItems().size();
-    auto tierLimit = systemContext()->saasServiceManager()->tier().maxItemsInLayout;
-    if (layoutSize >= qnRuntime->maxSceneItems() || (tierLimit && layoutSize >= tierLimit))
+    const auto layoutSize = layout->getItems().size();
+
+    if (layoutSize >= workbench()->currentLayout()->maximumItemCount())
     {
         if (workbench()->currentLayout()->resource() == layout)
         {
@@ -989,8 +989,6 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    const int maxItems = qnRuntime->maxSceneItems();
-
     bool adjustAspectRatio = (layout->getItems().isEmpty() || !layout->hasCellAspectRatio())
         && !layout->hasBackground();
 
@@ -1027,17 +1025,17 @@ void ActionHandler::at_openInLayoutAction_triggered()
             }
         }
 
-        /* Update cross-references. */
+        // Update cross-references.
         for (auto pos = itemDataByUuid.begin(); pos != itemDataByUuid.end(); pos++)
         {
             if (!pos->zoomTargetUuid.isNull())
                 pos->zoomTargetUuid = itemDataByUuid[pos->zoomTargetUuid].uuid;
         }
 
-        /* Add to layout. */
+        // Add to layout.
         for (const auto& data: itemDataByUuid)
         {
-            if (layout->getItems().size() >= maxItems)
+            if (layout->getItems().size() >= workbench()->currentLayout()->maximumItemCount())
                 return;
 
             layout->addItem(data);

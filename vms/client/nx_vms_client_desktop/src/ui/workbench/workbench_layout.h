@@ -332,6 +332,9 @@ public:
     /** Whether this layout is a Video Wall review layout. */
     bool isVideoWallReviewLayout() const;
 
+    /** Maximum number of items on the layout that can be reached as a result of user actions. */
+    int maximumItemCount() const;
+
     /** Debug string representation. */
     QString toString() const;
 

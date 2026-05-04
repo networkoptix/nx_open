@@ -25,6 +25,8 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <utils/common/util.h>
 
@@ -955,6 +957,18 @@ bool QnWorkbenchLayout::isShowreelReviewLayout() const
 bool QnWorkbenchLayout::isVideoWallReviewLayout() const
 {
     return ::isVideoWallReviewLayout(resource());
+}
+
+int QnWorkbenchLayout::maximumItemCount() const
+{
+    auto result = qnRuntime->maxSceneItems();
+    if (nx::vms::common::saas::saasInitialized(system()))
+    {
+        if (const auto saasItemsLimit = system()->saasServiceManager()->tier().maxItemsInLayout)
+            result = std::min(result, saasItemsLimit);
+    }
+
+    return result;
 }
 
 QString QnWorkbenchLayout::toString() const

@@ -754,8 +754,21 @@ ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const Item
     if (!d->hasPermissions(resource, Qn::ViewContentPermission))
         return d->itemOperationResult(Error::denied());
 
-    const auto actionParams = menu::Parameters(resource);
-    if (!d->context->menu()->canTrigger(menu::OpenInCurrentLayoutAction, actionParams))
+    if (!d->hasPermissions(d->layout->resource(), Qn::ModifyLayoutPermissions))
+        return d->itemOperationResult(Error::denied());
+
+    if (d->layout->resource()->getItems().size() >= d->layout->maximumItemCount())
+        return d->itemOperationResult(Error::failed(tr("Layout is full")));
+
+    const auto actionParams = d->isCurrentLayout()
+        ? menu::Parameters(resource)
+        : menu::Parameters(resource).withArgument(core::LayoutResourceRole, d->layout->resource());
+
+    const auto checkedAction = d->isCurrentLayout()
+        ? menu::OpenInCurrentLayoutAction
+        : menu::OpenInLayoutAction;
+
+    if (!d->context->menu()->canTrigger(checkedAction, actionParams))
     {
         return d->itemOperationResult(
             Error::failed(tr("Cannot add the resource to the layout")));
@@ -823,6 +836,12 @@ Error TabApiBackend::removeItem(const QUuid& itemId)
     const auto item = d->layout->item(itemId);
     if (!item)
         return cantFindItemResult();
+
+    const auto actionParams =
+        menu::Parameters({LayoutItemIndex(d->layout->resource(), item->uuid())});
+
+    if (!d->context->menu()->canTrigger(menu::RemoveLayoutItemFromSceneAction, actionParams))
+        return Error::failed(tr("Cannot remove item from the layout"));
 
     d->layout->removeItem(item);
     return Error::success();

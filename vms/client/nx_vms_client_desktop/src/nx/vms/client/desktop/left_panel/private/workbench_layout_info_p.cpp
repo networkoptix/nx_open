@@ -2,7 +2,6 @@
 
 #include "workbench_layout_info_p.h"
 
-#include <client/client_runtime_settings.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -120,11 +119,6 @@ nx::Uuid WorkbenchLayoutInfo::controlledVideoWallItemId() const
 int WorkbenchLayoutInfo::itemCount() const
 {
     return workbench()->currentLayout()->items().size();
-}
-
-int WorkbenchLayoutInfo::maximumItemCount() const
-{
-    return qnRuntime->maxSceneItems();
 }
 
 bool WorkbenchLayoutInfo::isLocked() const

@@ -39,7 +39,6 @@ class WorkbenchLayoutInfo:
         NOTIFY currentLayoutChanged)
     Q_PROPERTY(nx::Uuid reviewedShowreelId READ reviewedShowreelId NOTIFY currentLayoutChanged)
     Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
-    Q_PROPERTY(int maximumItemCount READ maximumItemCount CONSTANT)
     Q_PROPERTY(bool isLocked READ isLocked NOTIFY isLockedChanged)
     Q_PROPERTY(bool isPreviewSearchLayout READ isPreviewSearchLayout CONSTANT)
     Q_PROPERTY(bool isShowreelReviewLayout READ isShowreelReviewLayout CONSTANT)
@@ -56,7 +55,6 @@ public:
     nx::Uuid controlledVideoWallItemId() const;
 
     int itemCount() const;
-    int maximumItemCount() const;
     bool isLocked() const;
     bool isPreviewSearchLayout() const;
     bool isShowreelReviewLayout() const;
