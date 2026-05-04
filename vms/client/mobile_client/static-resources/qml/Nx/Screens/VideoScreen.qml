@@ -422,7 +422,7 @@ Page
         {
             id: informationMenuItem
 
-            text: qsTr("Information")
+            text: qsTr("Camera Info")
             checkable: true
             checked: appContext.settings.showCameraInfo
 
