@@ -387,27 +387,27 @@ Rectangle
                 return modelData.count > 1 && modelData.durationMs >= minimumStackDurationMs
             }
 
-            onTapped: (modelData) =>
+            function zoomToTile(modelData)
             {
-                if (!isZoomable(modelData))
-                    return
-
-                // Stack tapped. Zoom into.
                 const marginMs = Math.round(modelData.durationMs * zoomInMarginFraction)
 
                 timeline.setWindow(
                     modelData.positionMs - marginMs, modelData.durationMs + marginMs * 2)
             }
 
-            onSingleTapped: (modelData) =>
+            onTapped: (modelData) =>
             {
-                if (!isZoomable(modelData))
+                if (isZoomable(modelData))
+                    zoomToTile(modelData)
+                else
                     timeline.objectTileTapped(modelData)
             }
 
-            onDoubleTapped: (modelData) =>
+            onLongPressed: (modelData) =>
             {
-                if (!isZoomable(modelData))
+                if (isZoomable(modelData))
+                    zoomToTile(modelData)
+                else
                     timeline.setPosition(modelData.positionMs)
             }
 
@@ -658,11 +658,8 @@ Rectangle
 
             readonly property real markerWidth:
             {
-                if (isOutside && !timeline.positionAtLive)
-                    return timeMarkerText.width
-
-                return dragHandler.draggingTimeMarker
-                    ? Math.max(timeMarkerText.width, timeScale.width)
+                return isOutside && !timeline.positionAtLive
+                    ? timeMarkerTexts.width
                     : timeScale.width
             }
 
@@ -705,7 +702,7 @@ Rectangle
                 anchors.verticalCenter: timeMarker.verticalCenter
 
                 width: timeMarker.markerWidth - recordingChunks.width
-                height: header.height
+                height: timeMarker.isOutside ? header.height : 35
                 clip: true
                 color: ColorTheme.colors.mobileTimeline.timeMarker.background
 
@@ -733,41 +730,67 @@ Rectangle
                 }
             }
 
-            Text
+            Column
             {
-                id: timeMarkerText
+                id: timeMarkerTexts
 
-                leftPadding: 16
-                rightPadding: timeMarker.isOutside ? 12 : timeScale.labelOffset
+                readonly property var lines:
+                {
+                    if (timeMarker.isOutside)
+                        return []
+
+                    return timeScale.labelFormatter.timeMarker(
+                        timeline.positionMs, timeScale.timeZone, timeScale.zoomLevel)
+                }
+
+                leftPadding: timeMarker.isOutside ? 16 : 0
+                rightPadding: timeMarker.isOutside ? 12 : 0
+                spacing: 0
 
                 anchors.verticalCenter: timeMarker.verticalCenter
                 anchors.right: timeMarkerRect.right
 
-                text:
+                Text
                 {
-                    if (timeline.positionAtLive)
-                        return qsTr("Live")
+                    id: firstLine
 
-                    if (timeMarker.isOutside)
+                    width: timeMarker.isOutside ? implicitWidth : timeMarkerRect.width
+
+                    text:
                     {
-                        return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
-                            timeScale.timeZone)
+                        if (timeline.positionAtLive)
+                            return qsTr("Live")
+
+                        if (timeMarker.isOutside)
+                        {
+                            return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
+                                timeScale.timeZone)
+                        }
+
+                        return timeMarkerTexts.lines[0] ?? ""
                     }
 
-                    if (dragHandler.draggingTimeMarker)
-                    {
-                        return timeScale.labelFormatter.pressedTimeMarker(timeline.positionMs,
-                            timeScale.timeZone, timeScale.millisecondsPerPixel)
-                    }
+                    color: ColorTheme.colors.mobileTimeline.timeMarker.text
 
-                    return timeScale.labelFormatter.timeMarker(timeline.positionMs,
-                        timeScale.timeZone, timeScale.zoomLevel)
+                    font.pixelSize: 12
+                    font.weight: Font.Medium
+                    horizontalAlignment: Qt.AlignHCenter
                 }
 
-                color: ColorTheme.colors.mobileTimeline.timeMarker.text
+                Text
+                {
+                    id: secondLine
 
-                font.pixelSize: 12
-                font.weight: 400
+                    text: timeMarkerTexts.lines[1] ?? ""
+                    width: timeMarkerRect.width
+                    visible: !!text
+
+                    color: firstLine.color
+
+                    font.pixelSize: 11
+                    font.weight: Font.Medium
+                    horizontalAlignment: Qt.AlignHCenter
+                }
             }
 
             ColoredImage
@@ -776,13 +799,13 @@ Rectangle
 
                 visible: timeline.positionAtLive
 
-                anchors.right: timeMarkerText.left
-                anchors.rightMargin: 2 - timeMarkerText.leftPadding
+                anchors.right: timeMarkerTexts.left
+                anchors.rightMargin: 2 - timeMarkerTexts.leftPadding
                 anchors.verticalCenter: timeMarker.verticalCenter
 
                 sourcePath: "image://skin/16x16/Solid/play_arrow.svg"
                 sourceSize: Qt.size(16, 16)
-                primaryColor: timeMarkerText.color
+                primaryColor: firstLine.color
             }
         }
 
@@ -828,8 +851,11 @@ Rectangle
 
                 if (draggingTimeMarker)
                 {
+                    // Don't let the time marker go outside of the window, except for Live.
+                    const minPos = timeline.windowAtLive ? 0 : 0.5
+
                     timeScale.setPosition(
-                        Math.max(0, Math.min(timeScale.height - 1, y)))
+                        Math.max(minPos, Math.min(timeScale.height - 1, y)))
                 }
                 else if (draggingTimeline)
                 {

@@ -91,63 +91,16 @@ QString LabelFormatter::tickLabel(
     return {};
 }
 
-QString LabelFormatter::timeMarker(
-    qint64 timeMs, const QTimeZone& timeZone, TimelineZoomLevel::LevelType level) const
+QStringList LabelFormatter::timeMarker(
+    qint64 timeMs, const QTimeZone& timeZone, TimelineZoomLevel::LevelType /*level*/) const
 {
     const auto dt = QDateTime::fromMSecsSinceEpoch(timeMs, timeZone);
 
-    switch (level)
-    {
-        case TimelineZoomLevel::Years:
-            return d->locale.toString(dt, "yyyy");
-
-        case TimelineZoomLevel::Months:
-        case TimelineZoomLevel::Days:
-            return d->locale.toString(dt, "d MMM");
-
-        case TimelineZoomLevel::Hours:
-        case TimelineZoomLevel::Minutes:
-        {
-            return d->amPm
-                ? d->locale.toString(dt, "h:mm AP")
-                : d->locale.toString(dt, "h:mm");
-        }
-
-        case TimelineZoomLevel::Seconds:
-            return nx::format("%1s", d->locale.toString(dt, "s"));
-
-        case TimelineZoomLevel::Milliseconds:
-            return nx::format("%1s", d->locale.toString(dt, "s.zzz"));
-    }
-
-    NX_ASSERT(false);
-    return {};
-}
-
-QString LabelFormatter::pressedTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
-    qreal millisecondsPerPixel) const
-{
-    const auto dt = QDateTime::fromMSecsSinceEpoch(timeMs, timeZone);
-    const milliseconds resolution{(int) millisecondsPerPixel};
-
-    if (resolution >= 12h)
-        return d->locale.toString(dt, "d MMM");
-
-    if (resolution >= 30s)
-    {
-        return d->amPm
-            ? d->locale.toString(dt, "h:mm AP")
-            : d->locale.toString(dt, "h:mm");
-    }
-
-    if (resolution >= 500ms)
-    {
-        return d->amPm
+    return {
+        d->locale.toString(dt, "d MMM yy"),
+        d->amPm
             ? d->locale.toString(dt, "h:mm:ss AP")
-            : d->locale.toString(dt, "h:mm:ss");
-    }
-
-    return nx::format("%1s", d->locale.toString(dt, "s.zzz"));
+            : d->locale.toString(dt, "h:mm:ss")};
 }
 
 QString LabelFormatter::externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const

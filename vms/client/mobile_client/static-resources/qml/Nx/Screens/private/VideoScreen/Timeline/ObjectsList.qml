@@ -47,6 +47,7 @@ Item
     signal tapped(Timeline.MultiObjectData modelData)
     signal singleTapped(Timeline.MultiObjectData modelData)
     signal doubleTapped(Timeline.MultiObjectData modelData)
+    signal longPressed(Timeline.MultiObjectData modelData)
 
     function timeToPosition(timeMs)
     {
@@ -236,6 +237,9 @@ Item
 
                 onTapped:
                     view.tapped(delegateHolder.bucket.data)
+
+                onLongPressed:
+                    view.longPressed(delegateHolder.bucket.data)
 
                 onSingleTapped:
                 {

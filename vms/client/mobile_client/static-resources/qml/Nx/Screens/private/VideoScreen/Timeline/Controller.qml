@@ -61,7 +61,8 @@ AbstractTimelineController
 
         function onPlayingLiveChanged()
         {
-            timeline.positionAtLive = controller.playingLive
+            if (!timeline.positioning)
+                timeline.positionAtLive = controller.playingLive
         }
     }
 
@@ -74,7 +75,7 @@ AbstractTimelineController
             if (timelineController.updating)
                 return
 
-            if (timeline.positioning || !timeline.positionAtLive)
+            if ((timeline.positioning && !controller.playingLive) || !timeline.positionAtLive)
                 controller.setPosition(timeline.positionMs)
         }
 

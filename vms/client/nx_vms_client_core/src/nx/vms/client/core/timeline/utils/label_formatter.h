@@ -28,12 +28,8 @@ public:
         TimelineZoomLevel::LevelType level) const;
 
     /** Format time marker inside current time window. */
-    Q_INVOKABLE QString timeMarker(qint64 timeMs, const QTimeZone& timeZone,
+    Q_INVOKABLE QStringList timeMarker(qint64 timeMs, const QTimeZone& timeZone,
         TimelineZoomLevel::LevelType level) const;
-
-    /** Format time marker pressed for repositioning. */
-    Q_INVOKABLE QString pressedTimeMarker(
-        qint64 timeMs, const QTimeZone& timeZone, qreal millisecondsPerPixel) const;
 
     /** Format time marker outside current time window. */
     Q_INVOKABLE QString externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const;
