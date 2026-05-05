@@ -91,7 +91,7 @@ Session::Session(
     if (m_purpose == Purpose::send)
     {
         m_tracks = std::make_unique<TracksForSend>(this);
-        m_consumer = std::make_unique<Consumer>(this);
+        m_consumer = std::make_shared<Consumer>(this);
         m_providerFactory = std::move(providerFactory);
     }
     else if (m_purpose == Purpose::recv)
@@ -287,7 +287,7 @@ void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
     }
 
     m_providers.emplace(deviceId, provider);
-    provider->setDataConsumer(m_consumer.get());
+    provider->setDataConsumer(m_consumer);
 }
 
 void Session::setTranscodingParams(

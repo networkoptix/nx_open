@@ -6,9 +6,9 @@
 
 namespace nx::webrtc {
 
-void AbstractCameraDataProvider::setDataConsumer(Consumer* consumer)
+void AbstractCameraDataProvider::setDataConsumer(std::weak_ptr<Consumer> consumer)
 {
-    m_consumer = consumer;
+    m_consumer = std::move(consumer);
 }
 
 } // namespace nx::webrtc

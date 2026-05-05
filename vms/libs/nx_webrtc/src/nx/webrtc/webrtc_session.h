@@ -127,7 +127,7 @@ private:
     std::unique_ptr<AbstractIceDelegate> m_transceiver;
     std::map<nx::Uuid, std::shared_ptr<AbstractCameraDataProvider>> m_providers; //< Streaming side. Can be null.
     std::unique_ptr<Transcoder> m_muxer; //< Streaming side. Can be null.
-    std::unique_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
+    std::shared_ptr<Consumer> m_consumer; //< Streaming side. Can be null.
     std::unique_ptr<Demuxer> m_demuxer; //< Receiving side. Can be null.
     std::shared_ptr<Reader> m_reader; //< Receiving side. Can be null.
     SdpParseResult m_sdpParseResult;
