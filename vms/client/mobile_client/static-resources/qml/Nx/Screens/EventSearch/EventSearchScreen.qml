@@ -227,7 +227,7 @@ AdaptiveScreen
                 searchField.text = text
 
                 if (LayoutController.isPortrait)
-                    screen.contentItem = searchContent
+                    screen.closeDetailsPanel()
             }
         }
     }
