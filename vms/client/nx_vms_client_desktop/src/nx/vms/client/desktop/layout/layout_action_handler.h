@@ -100,7 +100,7 @@ private:
     void openLayouts(
         const core::LayoutResourceList& layouts,
         const StreamSynchronizationState& playbackState,
-        bool forceStateUpdate = false);
+        bool overrideExistingPlaybackState = false);
 
     QString generateUniqueLayoutName(const QnUserResourcePtr& user) const;
 };
