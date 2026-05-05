@@ -900,7 +900,7 @@ bool LayoutActionHandler::closeLayouts(const core::LayoutResourceList& resources
 void LayoutActionHandler::openLayouts(
     const core::LayoutResourceList& layouts,
     const StreamSynchronizationState& playbackState,
-    bool forceStateUpdate)
+    bool overrideExistingPlaybackState)
 {
     if (!NX_ASSERT(!layouts.empty()))
         return;
@@ -909,7 +909,7 @@ void LayoutActionHandler::openLayouts(
     for (const auto& layout: layouts)
     {
         auto wbLayout = workbench()->layout(layout);
-        const bool updateState = !wbLayout || forceStateUpdate;
+        const bool updateState = !wbLayout || overrideExistingPlaybackState;
 
         if (!wbLayout)
             wbLayout = workbench()->addLayout(layout);
@@ -927,7 +927,7 @@ void LayoutActionHandler::openLayouts(
             for (auto item: wbLayout->items())
             {
                 // Do not set item's playback parameters if they are already set.
-                if (forceStateUpdate || !item->data(Qn::ItemTimeRole).isValid())
+                if (overrideExistingPlaybackState || !item->data(Qn::ItemTimeRole).isValid())
                 {
                     item->setData(Qn::ItemTimeRole,
                         state.timeUs == DATETIME_NOW ? DATETIME_NOW : state.timeUs / 1000);
@@ -1174,12 +1174,12 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
 
     // Update state depending on how the action was called.
     auto currentState = streamSynchronizer->state();
-    bool forceStateUpdate = false;
+    bool overrideExistingPlaybackState = false;
 
     if (parameters.hasArgument(Qn::LayoutSyncStateRole))
     {
         currentState = parameters.argument<StreamSynchronizationState>(Qn::LayoutSyncStateRole);
-        forceStateUpdate = (currentState.timeUs != DATETIME_INVALID);
+        overrideExistingPlaybackState = (currentState.timeUs != DATETIME_INVALID);
     }
     else if (!currentMediaWidget
         || !isCameraWithFootage(currentMediaWidget)
@@ -1211,7 +1211,27 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
     {
         NX_ASSERT(!calledFromScene, "Layouts can not be passed from the scene");
         NX_ASSERT(resources.size() == layouts.size(), "Mixed resources are not expected here");
-        openLayouts(layouts, currentState, forceStateUpdate);
+
+        if (streamSynchronizer->isRunning()) //< Current layout sync is on.
+        {
+            const bool hasValidItemTime = std::ranges::any_of(layouts,
+                [](const auto& layout)
+                {
+                    if (layout->isFile())
+                        return false;
+                    return std::ranges::any_of(layout->getItems(),
+                        [&layout](const auto& item)
+                        {
+                            return layout->itemData(item.uuid, Qn::ItemTimeRole).isValid();
+                        });
+                });
+
+            // We try to preserve playback position for layouts when it does not override anything.
+            if (!hasValidItemTime)
+                overrideExistingPlaybackState = true;
+        }
+
+        openLayouts(layouts, currentState, overrideExistingPlaybackState);
 
         // Do not return in case mixed resource set is passed somehow.
     }
