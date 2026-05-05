@@ -32,7 +32,7 @@ public:
     void setInitialized(bool value) { m_initialized = value; }
     virtual bool isStarted() const = 0;
 
-    void setDataConsumer(Consumer* consumer);
+    void setDataConsumer(std::weak_ptr<Consumer> consumer);
 
 public: // Initialize.
 
@@ -63,7 +63,7 @@ protected:
     int64_t m_positionUs = DATETIME_NOW;
     AuditHandle m_auditHandle;
     bool m_initialized = false;
-    Consumer* m_consumer;
+    std::weak_ptr<Consumer> m_consumer;
 };
 
 using AbstractCameraDataProviderPtr = std::shared_ptr<AbstractCameraDataProvider>;
