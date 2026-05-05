@@ -38,6 +38,29 @@
     </message>
   </context>
   <context>
+    <name>ArchivePlaceholder</name>
+    <message>
+      <source>Not Available</source>
+      <translation type="unfinished">Not Available</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>You do not have permission to view the archive</source>
+      <translation type="unfinished">You do not have permission to view the archive</translation>
+    </message>
+    <message>
+      <source>You do not have any recorded video in the archive</source>
+      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+    </message>
+    <message>
+      <source>Timeline is loading...</source>
+      <translation type="unfinished">Timeline is loading...</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -1575,19 +1598,6 @@
       <translation>物件</translation>
     </message>
     <message>
-      <source>No results</source>
-      <translation>沒有結果</translation>
-    </message>
-    <message>
-      <source>Not available</source>
-      <translation>無法使用</translation>
-    </message>
-    <message>
-      <source>You do not have permission&lt;br&gt;to view the archive</source>
-      <comment>&lt;br&gt; is a line break</comment>
-      <translation>您沒有查看存檔的權限</translation>
-    </message>
-    <message>
       <source>PTZ Mode</source>
       <translation>PTZ模式</translation>
     </message>
@@ -1596,16 +1606,16 @@
       <translation>匯出...</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>資訊</translation>
-    </message>
-    <message>
       <source>Live mode only</source>
       <translation type="unfinished">Live mode only</translation>
     </message>
     <message>
       <source>Archive mode only</source>
       <translation type="unfinished">Archive mode only</translation>
+    </message>
+    <message>
+      <source>Camera Info</source>
+      <translation type="unfinished">Camera Info</translation>
     </message>
   </context>
   <context>

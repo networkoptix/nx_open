@@ -12329,6 +12329,14 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Cannot maximize the item</source>
       <translation>항목을 최대화할 수 없습니다</translation>
     </message>
+    <message>
+      <source>Layout is full</source>
+      <translation type="unfinished">Layout is full</translation>
+    </message>
+    <message>
+      <source>Cannot remove item from the layout</source>
+      <translation type="unfinished">Cannot remove item from the layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>

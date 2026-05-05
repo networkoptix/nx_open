@@ -38,6 +38,29 @@
     </message>
   </context>
   <context>
+    <name>ArchivePlaceholder</name>
+    <message>
+      <source>Not Available</source>
+      <translation type="unfinished">Not Available</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>You do not have permission to view the archive</source>
+      <translation type="unfinished">You do not have permission to view the archive</translation>
+    </message>
+    <message>
+      <source>You do not have any recorded video in the archive</source>
+      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+    </message>
+    <message>
+      <source>Timeline is loading...</source>
+      <translation type="unfinished">Timeline is loading...</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -1575,19 +1598,6 @@
       <translation>オブジェクト</translation>
     </message>
     <message>
-      <source>No results</source>
-      <translation>該当なし</translation>
-    </message>
-    <message>
-      <source>Not available</source>
-      <translation>利用不可</translation>
-    </message>
-    <message>
-      <source>You do not have permission&lt;br&gt;to view the archive</source>
-      <comment>&lt;br&gt; is a line break</comment>
-      <translation>アーカイブを閲覧する&lt;br&gt;権限がありません。</translation>
-    </message>
-    <message>
       <source>PTZ Mode</source>
       <translation>PTZ モード</translation>
     </message>
@@ -1596,16 +1606,16 @@
       <translation>エクスポート...</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>情報</translation>
-    </message>
-    <message>
       <source>Live mode only</source>
       <translation>ライブモードのみ</translation>
     </message>
     <message>
       <source>Archive mode only</source>
       <translation>アーカイブモードのみ</translation>
+    </message>
+    <message>
+      <source>Camera Info</source>
+      <translation type="unfinished">Camera Info</translation>
     </message>
   </context>
   <context>

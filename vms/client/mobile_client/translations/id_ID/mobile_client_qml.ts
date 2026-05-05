@@ -38,6 +38,29 @@
     </message>
   </context>
   <context>
+    <name>ArchivePlaceholder</name>
+    <message>
+      <source>Not Available</source>
+      <translation type="unfinished">Not Available</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>You do not have permission to view the archive</source>
+      <translation type="unfinished">You do not have permission to view the archive</translation>
+    </message>
+    <message>
+      <source>You do not have any recorded video in the archive</source>
+      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+    </message>
+    <message>
+      <source>Timeline is loading...</source>
+      <translation type="unfinished">Timeline is loading...</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -1575,19 +1598,6 @@
       <translation>Objek</translation>
     </message>
     <message>
-      <source>No results</source>
-      <translation>Tidak ada hasil</translation>
-    </message>
-    <message>
-      <source>Not available</source>
-      <translation>Tidak tersedia</translation>
-    </message>
-    <message>
-      <source>You do not have permission&lt;br&gt;to view the archive</source>
-      <comment>&lt;br&gt; is a line break</comment>
-      <translation>Anda tidak memiliki izin&lt;br&gt;untuk melihat archive</translation>
-    </message>
-    <message>
       <source>PTZ Mode</source>
       <translation>Mode PTZ</translation>
     </message>
@@ -1596,16 +1606,16 @@
       <translation>Ekspor...</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Informasi</translation>
-    </message>
-    <message>
       <source>Live mode only</source>
       <translation>Mode live saja</translation>
     </message>
     <message>
       <source>Archive mode only</source>
       <translation>Mode archive saja</translation>
+    </message>
+    <message>
+      <source>Camera Info</source>
+      <translation type="unfinished">Camera Info</translation>
     </message>
   </context>
   <context>

@@ -12331,6 +12331,14 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Cannot maximize the item</source>
       <translation>Không thể tối đa hóa mục</translation>
     </message>
+    <message>
+      <source>Layout is full</source>
+      <translation type="unfinished">Layout is full</translation>
+    </message>
+    <message>
+      <source>Cannot remove item from the layout</source>
+      <translation type="unfinished">Cannot remove item from the layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>

@@ -38,6 +38,29 @@
     </message>
   </context>
   <context>
+    <name>ArchivePlaceholder</name>
+    <message>
+      <source>Not Available</source>
+      <translation type="unfinished">Not Available</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>You do not have permission to view the archive</source>
+      <translation type="unfinished">You do not have permission to view the archive</translation>
+    </message>
+    <message>
+      <source>You do not have any recorded video in the archive</source>
+      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+    </message>
+    <message>
+      <source>Timeline is loading...</source>
+      <translation type="unfinished">Timeline is loading...</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -1575,19 +1598,6 @@
       <translation>Đối tượng</translation>
     </message>
     <message>
-      <source>No results</source>
-      <translation>Không có kết quả</translation>
-    </message>
-    <message>
-      <source>Not available</source>
-      <translation>Không khả dụng</translation>
-    </message>
-    <message>
-      <source>You do not have permission&lt;br&gt;to view the archive</source>
-      <comment>&lt;br&gt; is a line break</comment>
-      <translation>Bạn không có quyền&lt;br&gt;xem kho lưu trữ</translation>
-    </message>
-    <message>
       <source>PTZ Mode</source>
       <translation>Chế độ PTZ</translation>
     </message>
@@ -1596,16 +1606,16 @@
       <translation>Xuất...</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Tin tức</translation>
-    </message>
-    <message>
       <source>Live mode only</source>
       <translation type="unfinished">Live mode only</translation>
     </message>
     <message>
       <source>Archive mode only</source>
       <translation type="unfinished">Archive mode only</translation>
+    </message>
+    <message>
+      <source>Camera Info</source>
+      <translation type="unfinished">Camera Info</translation>
     </message>
   </context>
   <context>

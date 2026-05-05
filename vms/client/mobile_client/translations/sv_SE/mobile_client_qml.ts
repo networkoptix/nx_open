@@ -38,6 +38,29 @@
     </message>
   </context>
   <context>
+    <name>ArchivePlaceholder</name>
+    <message>
+      <source>Not Available</source>
+      <translation type="unfinished">Not Available</translation>
+    </message>
+    <message>
+      <source>No Archive</source>
+      <translation type="unfinished">No Archive</translation>
+    </message>
+    <message>
+      <source>You do not have permission to view the archive</source>
+      <translation type="unfinished">You do not have permission to view the archive</translation>
+    </message>
+    <message>
+      <source>You do not have any recorded video in the archive</source>
+      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+    </message>
+    <message>
+      <source>Timeline is loading...</source>
+      <translation type="unfinished">Timeline is loading...</translation>
+    </message>
+  </context>
+  <context>
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
@@ -1576,19 +1599,6 @@
       <translation>Objekt</translation>
     </message>
     <message>
-      <source>No results</source>
-      <translation>Inga resultat</translation>
-    </message>
-    <message>
-      <source>Not available</source>
-      <translation>Inte tillgänglig</translation>
-    </message>
-    <message>
-      <source>You do not have permission&lt;br&gt;to view the archive</source>
-      <comment>&lt;br&gt; is a line break</comment>
-      <translation>Du har inte behörighet&lt;br&gt;att visa arkivet</translation>
-    </message>
-    <message>
       <source>PTZ Mode</source>
       <translation>PTZ läge</translation>
     </message>
@@ -1597,16 +1607,16 @@
       <translation>Export...</translation>
     </message>
     <message>
-      <source>Information</source>
-      <translation>Information</translation>
-    </message>
-    <message>
       <source>Live mode only</source>
       <translation>Endast liveläge</translation>
     </message>
     <message>
       <source>Archive mode only</source>
       <translation>Endast arkivläge</translation>
+    </message>
+    <message>
+      <source>Camera Info</source>
+      <translation type="unfinished">Camera Info</translation>
     </message>
   </context>
   <context>

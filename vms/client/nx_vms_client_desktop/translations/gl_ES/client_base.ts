@@ -12510,6 +12510,14 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
       <source>Cannot maximize the item</source>
       <translation>Non se pode maximizar o elemento</translation>
     </message>
+    <message>
+      <source>Layout is full</source>
+      <translation type="unfinished">Layout is full</translation>
+    </message>
+    <message>
+      <source>Cannot remove item from the layout</source>
+      <translation type="unfinished">Cannot remove item from the layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
