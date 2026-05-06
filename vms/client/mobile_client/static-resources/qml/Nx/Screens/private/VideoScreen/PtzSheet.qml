@@ -8,6 +8,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Controls
 import Nx.Mobile.Controls
+import Nx.Ui
 
 AdaptiveSheet
 {
@@ -24,10 +25,9 @@ AdaptiveSheet
     titleTextItem.font.pixelSize: 18
 
     alwaysShowCloseButton: true
-    spacing: 24
-    contentSpacing: 20
     interactive: !panel.joystick.active
-    extraBottomPadding: 0
+    spacing: 0
+    bottomPadding: 0
 
     modal: false
     closePolicy: Popup.NoAutoClose
@@ -37,6 +37,7 @@ AdaptiveSheet
         id: panel
 
         width: parent.width
+        height: LayoutController.isPortrait ? implicitHeight : sheet.availableContentHeight
         visible: !sheet.moveOnTapMode
     }
 

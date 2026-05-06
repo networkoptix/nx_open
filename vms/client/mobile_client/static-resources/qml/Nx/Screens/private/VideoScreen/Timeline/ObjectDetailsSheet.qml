@@ -29,7 +29,7 @@ BaseAdaptiveSheet
     property var dateFormatter: ((timestampMs) => new Date(timestampMs).toLocaleString())
 
     spacing: 16
-    extraBottomPadding: (pageNavigationBar.count > 1) ? 0 : 20
+    bottomPadding: (pageNavigationBar.count > 1) ? 0 : 20
 
     SwipeView
     {

@@ -21,7 +21,7 @@ Drawer
 
     property bool closeAutomatically: true
     property bool alwaysShowCloseButton: false
-    property real extraBottomPadding: 0
+    readonly property alias availableContentHeight: flickable.height
 
     x: (parent.width - width) / 2
     edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
@@ -36,7 +36,7 @@ Drawer
             - parent.SafeArea.margins.bottom //< OS navigation bar.
 
         return Math.min(
-            bottomPadding
+            topPadding + bottomPadding
                 + content.anchors.topMargin
                 + (control.header ? StyleHints.headerHeight : 0)
                 + flickable.anchors.topMargin
@@ -54,8 +54,8 @@ Drawer
     modal: true
     focus: true
     padding: 0
-    topPadding: SafeArea.margins.top
-    bottomPadding: d.keyboardHeight > 0 ? d.keyboardHeight : SafeArea.margins.bottom
+    topPadding: 0
+    bottomPadding: 24
 
     Overlay.modal: OverlayBackground
     {
@@ -120,7 +120,7 @@ Drawer
 
             anchors.fill: parent
             anchors.topMargin: d.extraTopMargin
-            anchors.bottomMargin: 24 + extraBottomPadding
+            anchors.bottomMargin: d.extraBottomMargin
 
             padding: 0
             background: Item {}
@@ -298,7 +298,11 @@ Drawer
     {
         id: d
 
-        readonly property int extraTopMargin: LayoutController.isPortrait ? 15 : 0
+        readonly property int extraTopMargin:
+            (LayoutController.isPortrait ? 15 : 0) + control.SafeArea.margins.top
+
+        readonly property int extraBottomMargin:
+            d.keyboardHeight > 0 ? d.keyboardHeight : control.SafeArea.margins.bottom
 
         // Temporary solution. Will be fixed properly after UI refactor.
         readonly property real keyboardHeight: Qt.platform.os === "android"
