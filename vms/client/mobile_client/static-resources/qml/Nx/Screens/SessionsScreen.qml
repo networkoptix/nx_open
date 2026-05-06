@@ -121,7 +121,7 @@ AdaptiveScreen
         menuButton
         {
             icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-            visible: feedStateProvider.notifications.length !== 0
+            visible: feedStateProvider.count !== 0
             indicator.visible: feed.filtered
 
             onClicked: feed.openFilterMenu()
@@ -259,7 +259,7 @@ AdaptiveScreen
                 rightButton
                 {
                     icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
-                    visible: feedStateProvider.notifications.length !== 0
+                    visible: feedStateProvider.count !== 0
                     onClicked: feed.openFilterMenu()
                 }
 

@@ -11,6 +11,7 @@ NxObject
     id: feedState
 
     readonly property alias notifications: notifications.notifications
+    readonly property alias count: notifications.count
     readonly property alias unviewedCount: notifications.unviewedCount
     readonly property alias notificationsEnabled: d.notificationsEnabled
     readonly property bool hasOsPermission: appContext.pushManager.hasOsPermission

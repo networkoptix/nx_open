@@ -230,6 +230,6 @@ AdaptiveScreen
 
         property bool canFilter: feedState.hasOsPermission
             && feedState.notificationsEnabled
-            && (feedState.notifications.length !== 0 || feed.searching || feed.filtered)
+            && (feedState.count !== 0 || feed.searching || feed.filtered)
     }
 }

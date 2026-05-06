@@ -18,6 +18,7 @@ class PushNotificationProvider: public QObject
     Q_PROPERTY(QString user MEMBER m_user NOTIFY userChanged)
     Q_PROPERTY(QVariant cloudSystemIds MEMBER m_cloudSystemIds NOTIFY cloudSystemIdsChanged)
     Q_PROPERTY(QVector<PushNotification> notifications MEMBER m_notifications NOTIFY updated)
+    Q_PROPERTY(int count READ count NOTIFY updated)
     Q_PROPERTY(int unviewedCount MEMBER m_unviewedCount NOTIFY updated)
 
 public:
@@ -25,6 +26,7 @@ public:
 
     Q_INVOKABLE void update();
     Q_INVOKABLE void setViewed(const QString& id, bool value);
+    int count() const { return m_notifications.count(); }
 
     static void registerQmlType();
 
