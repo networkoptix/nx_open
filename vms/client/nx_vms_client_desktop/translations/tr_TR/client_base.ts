@@ -12506,7 +12506,7 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Ekran düzeni dolu</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

@@ -12511,7 +12511,7 @@ Le recomendamos que no abra esta página web. Si comprende los riesgos, puede ab
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Diseño está lleno</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

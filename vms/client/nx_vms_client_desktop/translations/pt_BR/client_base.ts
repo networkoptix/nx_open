@@ -12511,7 +12511,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout está cheio</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

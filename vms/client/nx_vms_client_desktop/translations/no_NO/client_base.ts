@@ -12508,7 +12508,7 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Visning er full</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

@@ -12511,7 +12511,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layouten är full</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

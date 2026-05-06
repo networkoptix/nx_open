@@ -12512,7 +12512,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout ist voll</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

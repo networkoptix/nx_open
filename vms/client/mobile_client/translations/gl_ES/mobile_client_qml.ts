@@ -41,23 +41,23 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>Non dipoñible</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Sen arquivo</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Non tes permiso para ver o arquivo</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Non tes ningún vídeo gravado no arquivo</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>A cronoloxía está a cargar...</translation>
     </message>
   </context>
   <context>
@@ -903,7 +903,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Cancelar o recentrado</translation>
     </message>
   </context>
   <context>
@@ -1608,15 +1608,15 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Só modo en directo</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Só modo en directo</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Información da cámara</translation>
     </message>
   </context>
   <context>

@@ -12509,11 +12509,11 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout er fuld</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>Kan ikke fjerne elementet fra layoutet</translation>
     </message>
   </context>
   <context>

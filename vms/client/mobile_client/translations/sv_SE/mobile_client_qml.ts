@@ -41,11 +41,11 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>Inte tillgänglig</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Inget arkiv</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
@@ -899,7 +899,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Tryck var som helst på video för att centrera vyn där</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>

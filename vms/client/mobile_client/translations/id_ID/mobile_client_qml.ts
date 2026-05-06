@@ -41,23 +41,23 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>Tidak Tersedia</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Tidak Ada Archive</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Anda tidak memiliki izin untuk melihat archive</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Anda tidak memiliki rekaman video apa pun di archive</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>Timeline sedang dimuat...</translation>
     </message>
   </context>
   <context>
@@ -1615,7 +1615,7 @@
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Info Kamera</translation>
     </message>
   </context>
   <context>

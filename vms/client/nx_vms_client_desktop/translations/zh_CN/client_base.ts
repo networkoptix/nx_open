@@ -12328,7 +12328,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>布局已满</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

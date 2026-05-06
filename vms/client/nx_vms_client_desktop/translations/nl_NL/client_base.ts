@@ -12512,7 +12512,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Schermindeling is vol</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

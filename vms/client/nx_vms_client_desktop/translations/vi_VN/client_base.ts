@@ -12333,7 +12333,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Bố cục đã bị đầy</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

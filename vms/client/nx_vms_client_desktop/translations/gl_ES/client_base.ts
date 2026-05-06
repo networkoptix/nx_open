@@ -12512,11 +12512,11 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>O deseño está cheo</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>Non se pode eliminar o elemento do deseño</translation>
     </message>
   </context>
   <context>

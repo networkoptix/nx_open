@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Немає архіву</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>

@@ -12513,7 +12513,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Mise en page pleine</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>

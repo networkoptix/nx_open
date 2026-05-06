@@ -12333,11 +12333,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     </message>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Layout sudah penuh</translation>
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>Tidak dapat menghapus item dari layout</translation>
     </message>
   </context>
   <context>

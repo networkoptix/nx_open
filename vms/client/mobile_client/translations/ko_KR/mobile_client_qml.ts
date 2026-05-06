@@ -41,11 +41,11 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>사용 불가</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>보관하지 않음</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
