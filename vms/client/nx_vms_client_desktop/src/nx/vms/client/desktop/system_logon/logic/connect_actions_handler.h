@@ -75,6 +75,7 @@ private:
         StorePassword = 1 << 1,
         UpdateSystemWeight = 1 << 2,
         StorePreferredCloudServer = 1 << 3,
+        SecondaryInstance = 1 << 4,
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 

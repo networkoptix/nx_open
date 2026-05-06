@@ -121,11 +121,6 @@ WelcomeScreen::WelcomeScreen(WindowContext* context, QWidget* parent):
 
     setHelpTopic(this, HelpTopic::Id::Login);
 
-    connect(&appContext()->localSettings()->autoLogin,
-        &nx::utils::property_storage::BaseProperty::changed,
-        this,
-        &WelcomeScreen::resetAutoLogin);
-
     createSystemModel();
 }
 

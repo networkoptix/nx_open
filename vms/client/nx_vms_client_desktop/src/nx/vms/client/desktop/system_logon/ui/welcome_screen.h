@@ -153,7 +153,6 @@ signals:
     void isCloudEnabledChanged();
     void visibleControlsChanged();
     void gridEnabledChanged();
-    void resetAutoLogin();
     void globalPreloaderVisibleChanged(bool visible);
     void messageChanged();
     void openTile(const QString& systemId, const QString& errorMessage = "",
