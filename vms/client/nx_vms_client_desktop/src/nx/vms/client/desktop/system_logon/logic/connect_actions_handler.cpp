@@ -983,7 +983,7 @@ void ConnectActionsHandler::storeConnectionRecord(
         appContext()->localSettings()->lastUsedConnection =
             {builder.toUrl(), /*systemId*/ localId};
     }
-    else
+    else if (!options.testFlag(SecondaryInstance))
     {
         // Clear the stored value to be sure that we wouldn't connect to the wrong system.
         appContext()->localSettings()->lastUsedConnection = {};
@@ -1279,7 +1279,10 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
             // Ignore warning messages for now if one client instance is opened already.
             if (logonData->secondaryInstance)
+            {
+                options |= SecondaryInstance;
                 d->warnMessagesDisplayed = true;
+            }
 
             NX_VERBOSE(this, "Connecting to the server %1 with testing before",
                 logonData->address);
