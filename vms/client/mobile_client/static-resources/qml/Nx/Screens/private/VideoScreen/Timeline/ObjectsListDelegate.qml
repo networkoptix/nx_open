@@ -5,6 +5,7 @@ import QtQuick.Shapes
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Items
 
 import nx.vms.client.mobile.timeline as Timeline
 
@@ -19,16 +20,37 @@ Item
     readonly property bool isStack: modelData?.count > 1
         && modelData.durationMs >= objectsList.minimumStackDurationMs
 
+    readonly property bool isSkeleton: (modelData?.count ?? 0) === 0
+
     Rectangle
     {
         id: background
 
         radius: 6
         color: ColorTheme.colors.mobileTimeline.tile.background
+        visible: !delegate.isSkeleton
         height: delegate.height
         anchors.left: delegate.left
         anchors.right: delegate.right
         anchors.rightMargin: 10
+    }
+
+    Skeleton
+    {
+        id: skeleton
+
+        anchors.fill: background
+        visible: delegate.isSkeleton
+
+        controller: objectsList.skeletonController
+        color: ColorTheme.colors.mobileTimeline.tile.background2
+        fillerColor: ColorTheme.lighter(color, 2)
+
+        Rectangle
+        {
+            anchors.fill: parent
+            radius: background.radius
+        }
     }
 
     Item
@@ -37,6 +59,8 @@ Item
 
         anchors.left: background.right
         z: -1
+
+        visible: !delegate.isSkeleton
 
         Rectangle
         {
@@ -141,6 +165,7 @@ Item
         y: 8
         width: background.width - 16
         height: background.height - 16
+        visible: !delegate.isSkeleton
         clip: true
 
         Item

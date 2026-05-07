@@ -20,3 +20,4 @@ ShareAction 1.0 ShareAction.qml
 SiteList 1.0 SiteList.qml
 SiteListItem 1.0 SiteListItem.qml
 Skeleton 1.0 Skeleton.qml
+SkeletonController 1.0 SkeletonController.qml

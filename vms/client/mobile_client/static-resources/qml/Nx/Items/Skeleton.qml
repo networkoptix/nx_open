@@ -12,7 +12,9 @@ Item
     default property alias data: skeletonMask.data
 
     property color color: ColorTheme.colors.dark6
-    property real speed: 600 //< Pixels/second
+    property color fillerColor: Qt.rgba(0.12, 0.15, 0.16, 1)
+
+    property SkeletonController controller
 
     Rectangle
     {
@@ -26,34 +28,20 @@ Item
         {
             id: filler
 
-            width: 180
+            x: skeleton.controller?.fillerPosition ?? 0
+
+            width: skeleton.controller?.fillerWidth ?? 0
             height: parent.height
+
+            readonly property color transparentColor:
+                ColorTheme.transparent(skeleton.fillerColor, 0)
 
             gradient: Gradient
             {
                 orientation: Gradient.Horizontal
-                GradientStop { position: 0.0; color: Qt.rgba(0.12, 0.15, 0.16, 0) }
-                GradientStop { position: 0.5; color: Qt.rgba(0.12, 0.15, 0.16, 1) }
-                GradientStop { position: 1.0; color: Qt.rgba(0.12, 0.15, 0.16, 0) }
-            }
-
-            SequentialAnimation on x
-            {
-                loops: Animation.Infinite
-
-                PropertyAnimation
-                {
-                    id: moveAnimation
-                    from: -filler.width
-                    to: skeletonBackground.width
-                    duration: 1000 * (skeletonBackground.width + filler.width) / skeleton.speed
-                    easing.type: Easing.Linear
-                }
-
-                PauseAnimation
-                {
-                    duration: moveAnimation.duration * 0.8
-                }
+                GradientStop { position: 0.0; color: filler.transparentColor }
+                GradientStop { position: 0.5; color: skeleton.fillerColor }
+                GradientStop { position: 1.0; color: filler.transparentColor }
             }
         }
     }
@@ -85,5 +73,21 @@ Item
         maskSource: skeletonMask
         anchors.fill: parent
         maskEnabled: true
+    }
+
+    Component
+    {
+        id: defaultController
+
+        SkeletonController
+        {
+            skeletonWidth: skeleton.width
+        }
+    }
+
+    Component.onCompleted:
+    {
+        if (!skeleton.controller)
+            skeleton.controller = defaultController.createObject(skeleton)
     }
 }

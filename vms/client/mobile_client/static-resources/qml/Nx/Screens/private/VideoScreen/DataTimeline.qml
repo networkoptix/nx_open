@@ -489,7 +489,7 @@ Rectangle
             anchors.fill: objects
             anchors.rightMargin: recordingChunks.width
 
-            active: !(objects.hasContent ?? true)
+            active: objects.hasContent === false
             objectsType: timeline.objectsType
         }
 
@@ -587,6 +587,9 @@ Rectangle
 
                     color:
                     {
+                        if (objects.hasContent === false)
+                            return "transparent"
+
                         if (timeline.chunkProvider.loading)
                             return ColorTheme.colors.mobileTimeline.chunks.lastSecond
 

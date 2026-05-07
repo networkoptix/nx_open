@@ -6,6 +6,7 @@ import QtQuick.Shapes
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Items
 
 import nx.vms.client.mobile.timeline as Timeline
 
@@ -43,6 +44,11 @@ Item
 
     property Component delegate: Component { ObjectsListDelegate {} }
     property Component preloaderDelegate
+
+    readonly property SkeletonController skeletonController: SkeletonController
+    {
+        skeletonWidth: view.width
+    }
 
     signal tapped(Timeline.MultiObjectData modelData)
     signal singleTapped(Timeline.MultiObjectData modelData)
@@ -119,9 +125,11 @@ Item
             property Item item
             property bool pooled: false
             property bool fadingOut: false
+            readonly property bool active: !pooled && !fadingOut && !d.forcedSkeletons
+            readonly property bool forcedSkeleton: !pooled && !fadingOut && d.forcedSkeletons
 
-            readonly property bool isPreloaderNeeded: !pooled && !fadingOut
-                && (loader.hasContent ?? true)
+            readonly property bool isPreloaderNeeded: active
+                && loader.hasContent !== false
                 && !loader.synchronous
                 && bucket?.state === Timeline.ObjectBucket.Initial
                 && bucket.isLoading
@@ -160,18 +168,52 @@ Item
                 states: [
                     State
                     {
-                        name: "InitialOrEmpty"
-                        when: !delegateHolder.pooled && !delegateHolder.fadingOut
-                            && (delegateHolder.bucket?.state === Timeline.ObjectBucket.Initial
-                                || delegateHolder.bucket?.state === Timeline.ObjectBucket.Empty)
+                        name: "Initial"
+
+                        when: delegateHolder.active
+                            && delegateHolder.bucket?.state === Timeline.ObjectBucket.Initial
+                            && !delegateHolder.bucket?.isLoading
+                    },
+
+                    State
+                    {
+                        name: "Empty"
+
+                        when: delegateHolder.active
+                            && delegateHolder.bucket?.state === Timeline.ObjectBucket.Empty
+                    },
+
+                    State
+                    {
+                        name: "VisibleStatesBase"
+                        PropertyChanges { target: delegateLoader; opacity: 1.0 }
+                    },
+
+                    State
+                    {
+                        name: "LoadingSkeleton"
+                        extend: "VisibleStatesBase"
+
+                        when: delegateHolder.active
+                            && d.skeletonsEnabled
+                            && delegateHolder.bucket?.state === Timeline.ObjectBucket.Initial
+                            && delegateHolder.bucket?.isLoading
                     },
 
                     State
                     {
                         name: "Ready"
-                        when: !delegateHolder.pooled && !delegateHolder.fadingOut
-                            && (delegateHolder.bucket?.state === Timeline.ObjectBucket.Ready)
-                        PropertyChanges { target: delegateLoader; opacity: 1.0 }
+                        extend: "VisibleStatesBase"
+
+                        when: delegateHolder.active
+                            && delegateHolder.bucket?.state === Timeline.ObjectBucket.Ready
+                    },
+
+                    State
+                    {
+                        name: "ForcedSkeleton"
+                        extend: "VisibleStatesBase"
+                        when: delegateHolder.forcedSkeleton
                     },
 
                     State
@@ -184,15 +226,15 @@ Item
                 transitions: [
                     Transition
                     {
-                        from: "InitialOrEmpty"
-                        to: "Ready"
+                        from: "Initial,Empty"
+                        to: "Ready,LoadingSkeleton,ForcedSkeleton"
                         reversible: true
                         NumberAnimation { property: "opacity"; duration: view.fadeDurationMs }
                     },
 
                     Transition
                     {
-                        from: "Ready"
+                        from: "Ready,LoadingSkeleton,ForcedSkeleton"
                         to: "FadingOut"
 
                         SequentialAnimation
@@ -262,6 +304,28 @@ Item
 
         property var holders: []
         property var pooledHolders: []
+
+        // Don't show skeletons when the last content existence query returned false
+        // (so we may have a placeholder up).
+        readonly property bool skeletonsEnabled: view.hasContent !== false
+
+        readonly property bool forcedSkeletons:
+        {
+            if (!d.skeletonsEnabled || !view.chunkProvider)
+                return false
+
+            switch (view.objectsType)
+            {
+                case Timeline.ObjectsLoader.ObjectsType.motion:
+                    return view.chunkProvider.loadingMotion
+
+                case Timeline.ObjectsLoader.ObjectsType.analytics:
+                    return view.chunkProvider.loadingAnalytics
+
+                case Timeline.ObjectsLoader.ObjectsType.bookmarks:
+                    return false
+            }
+        }
 
         function ensureItem(index, bucket)
         {
