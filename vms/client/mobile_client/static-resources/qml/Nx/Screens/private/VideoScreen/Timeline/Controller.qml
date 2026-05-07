@@ -76,7 +76,7 @@ AbstractTimelineController
                 return
 
             if ((timeline.positioning && !controller.playingLive) || !timeline.positionAtLive)
-                controller.setPosition(timeline.positionMs)
+                controller.setPosition(timeline.positionMs, /*save*/ !timeline.positioning)
         }
 
         function onPositionAtLiveChanged()
