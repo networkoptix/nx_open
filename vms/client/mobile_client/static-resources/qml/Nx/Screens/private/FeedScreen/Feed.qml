@@ -274,14 +274,10 @@ Item
             {
                 id: delegate
 
-                readonly property bool animateActivation: feed.filtered
-
                 width: notifications.width
 
                 revealDistance: 100
                 activationDistance: 100
-
-                activationAnimation: animateActivation ? activationAnimation : undefined
 
                 contentItem: Notification
                 {
@@ -335,18 +331,12 @@ Item
                         ? "image://skin/20x20/Solid/eye_off.svg"
                         : "image://skin/20x20/Solid/eye.svg"
 
-                    function apply()
-                    {
-                        model.viewed = !model.viewed
-                    }
-
                     onClicked:
                     {
                         feedState.setViewed(model.id, !model.viewed)
                         feedState.update()
 
-                        if (!animateActivation)
-                            apply()
+                        model.viewed = !model.viewed
                     }
 
                     Behavior on viewed
@@ -357,31 +347,6 @@ Item
                             PropertyAction { }
                         }
                     }
-                }
-
-                ParallelAnimation
-                {
-                    id: activationAnimation
-
-                    NumberAnimation
-                    {
-                        target: delegate.revealedItem
-                        property: "opacity"
-                        to: 0
-                        duration: 200
-                        easing.type: Easing.OutCubic
-                    }
-
-                    NumberAnimation
-                    {
-                        target: notification
-                        property: "x"
-                        to: -notifications.width
-                        duration: 200
-                        easing.type: Easing.OutCubic
-                    }
-
-                    onFinished: delegate.revealedItem.apply()
                 }
             }
 
