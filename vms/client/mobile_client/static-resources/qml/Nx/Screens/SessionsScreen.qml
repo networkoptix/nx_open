@@ -983,8 +983,7 @@ AdaptiveScreen
 
         function onFoldersChanged(orgIndex)
         {
-            if (orgIndex === navigationPanel.selectedOrganizationIndex)
-                sessionsScreen.refreshHasFolders()
+            sessionsScreen.refreshHasFolders()
         }
     }
 
