@@ -246,6 +246,10 @@ AdaptiveScreen
             screen.customResourceId = undefined
             screen.camerasModel = cameraListModel
             screen.analyticsSearchMode = isAnalyticsSearchMode
+
+            searchField.clear()
+            filtersItem.clearAll()
+
             screen.contentItem = searchContent
 
             screenController.requestUpdate()
