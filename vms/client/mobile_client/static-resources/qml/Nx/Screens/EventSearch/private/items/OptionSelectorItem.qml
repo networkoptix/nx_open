@@ -26,6 +26,11 @@ Item
     property string title: selector ? selector.descriptionText : ""
     property OptionSelector selector: null
 
+    // Whether the active screen delegate auto-closes on a single-item selection (i.e. emits
+    // `applyRequested`). Used by the host screen to mirror this auto-close behavior on Reset.
+    readonly property bool closesOnApply:
+        !!delegateLoader.item && delegateLoader.item.hasOwnProperty("applyRequested")
+
     function apply()
     {
         d.callDelegateFunction("apply")

@@ -455,7 +455,8 @@ AdaptiveScreen
                 onClicked:
                 {
                     optionSelectorItem.clear()
-                    leftPanelPopup.close()
+                    if (optionSelectorItem.closesOnApply)
+                        leftPanelPopup.close()
                 }
             }
         }
