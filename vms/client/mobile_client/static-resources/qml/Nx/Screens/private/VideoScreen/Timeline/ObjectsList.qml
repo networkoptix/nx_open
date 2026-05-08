@@ -25,6 +25,8 @@ Item
     readonly property real millisecondsPerPixel: durationMs / Math.max(height, 1)
     readonly property alias bucketSizeMs: loader.bucketSizeMs
 
+    property real currentPositionMs: -1
+
     property alias minimumStackDurationMs: loader.minimumStackDurationMs
 
     property real tileHeight: 100

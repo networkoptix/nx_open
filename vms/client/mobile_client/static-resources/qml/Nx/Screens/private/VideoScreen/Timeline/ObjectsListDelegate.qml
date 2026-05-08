@@ -17,7 +17,7 @@ Item
     //  var modelData
     //  ObjectsList objectsList
 
-    readonly property bool isStack: modelData?.count > 1
+    readonly property bool isStack: modelData && modelData.count > 1
         && modelData.durationMs >= objectsList.minimumStackDurationMs
 
     readonly property bool isSkeleton: (modelData?.count ?? 0) === 0
@@ -27,12 +27,26 @@ Item
         id: background
 
         radius: 6
-        color: ColorTheme.colors.mobileTimeline.tile.background
         visible: !delegate.isSkeleton
         height: delegate.height
         anchors.left: delegate.left
         anchors.right: delegate.right
         anchors.rightMargin: 10
+
+        color:
+        {
+            if (!delegate.isStack
+                && modelData
+                && objectsList.currentPositionMs >= modelData.positionMs
+                && objectsList.currentPositionMs < (modelData.positionMs + modelData.durationMs))
+            {
+                return ColorTheme.colors.mobileTimeline.tile.backgroundHighlight
+            }
+
+            return ColorTheme.colors.mobileTimeline.tile.background
+        }
+
+        Behavior on color { ColorAnimation { duration: 150 }}
     }
 
     Skeleton
@@ -197,7 +211,7 @@ Item
                 visible: delegate.isStack
 
                 maxCountToDisplay: objectsList.maxObjectsPerBucket
-                totalCount: delegate.isStack ? modelData?.count : 0
+                totalCount: delegate.isStack ? modelData.count : 0
                 paths: modelData?.imagePaths ?? []
             }
         }

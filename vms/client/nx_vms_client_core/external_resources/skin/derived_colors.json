@@ -359,6 +359,7 @@
             "background": "dark9",
             "background2": "dark8",
             "background3": "dark7",
+            "backgroundHighlight": "dark13",
             "caption": "light4",
             "description": "light16",
             "preview": {

@@ -379,6 +379,7 @@ Rectangle
             startTimeMs: timeline.startTimeMs
             durationMs: timeline.durationMs
             liveTimeMs: NxGlobals.syncNowMs()
+            currentPositionMs: timeline.positionMs
 
             interactive: timeline.interactive
 
