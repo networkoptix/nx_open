@@ -280,7 +280,7 @@ Page
             || showDefaultPasswordWarning
             || showNoLicensesWarning
 
-        property bool forceVideoPause: false
+        property bool forceVideoPause: downloadMediaSheet.opened
 
         readonly property bool canViewArchive: controller.accessRightsHelper.canViewArchive
         readonly property bool hasArchive: canViewArchive && cameraChunkProvider.bottomBound >= 0
