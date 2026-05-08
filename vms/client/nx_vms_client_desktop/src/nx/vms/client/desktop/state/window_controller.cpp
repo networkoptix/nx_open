@@ -46,9 +46,14 @@ Qt::WindowStates WindowController::windowState() const
 
 void WindowController::setWindowState(Qt::WindowStates state)
 {
-    m_window->show();
-    qApp->processEvents();
-
+    // Do not call m_window->show() + qApp->processEvents() here. State restoration runs from
+    // ClientStateHandler::clientStarted before QApplication::exec(); a synchronous show + event
+    // flush forces the QQuickWidget hosting the main scene to render its first frame before
+    // QQuickWidget's QRhi has been propagated to the offscreen QQuickWindow. On configurations
+    // with slow Vulkan device enumeration (multi-ICD hosts, NVIDIA hybrid GPUs) that produced a
+    // null QRhi at QQuickWindow::beforeSynchronizing and crashed RhiRenderingItem.
+    // Setting the desired state before the first show lets Qt apply it natively when the
+    // window is realized.
     if (m_window->windowState().testFlag(Qt::WindowFullScreen)
         != state.testFlag(Qt::WindowFullScreen))
     {
