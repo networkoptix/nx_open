@@ -78,7 +78,6 @@ private:
     virtual CodecParametersConstPtr getAudioCodecParameters(
         const CodecParametersConstPtr& sourceCodecpar, const std::string& container) override;
 
-    virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const override;
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void onSuccessfulPrepare() override;
     virtual void reportFinished() override;

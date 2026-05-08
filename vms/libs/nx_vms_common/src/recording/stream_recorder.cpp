@@ -17,12 +17,7 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/util.h>
 
-namespace {
-
-static const int STORE_QUEUE_SIZE = 50;
-static const int kPrebufferHardLimit = 2000; //< Near 1 minute of video buffer for 30fps.
-
-} // namespace
+namespace { static const int STORE_QUEUE_SIZE = 50; } // namespace
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev)
 :
@@ -72,50 +67,6 @@ void QnStreamRecorder::markNeedKeyData()
         m_gotKeyFrame[i] = false;
 }
 
-void QnStreamRecorder::flushPrebuffer()
-{
-    if (!m_prebuffer.isEmpty())
-        NX_VERBOSE(this, "Flushing prebuffer for resource %1", m_resource);
-
-    while (!m_prebuffer.isEmpty())
-    {
-        QnConstAbstractMediaDataPtr d;
-        m_prebuffer.pop(d);
-        if (needSaveData(d))
-            saveData(d);
-        else if (d->dataType == QnAbstractMediaData::VIDEO)
-            markNeedKeyData();
-    }
-    m_nextIFrameTime = m_lastPrimaryTime = AV_NOPTS_VALUE;
-}
-
-qint64 QnStreamRecorder::isPrimaryStream(const QnConstAbstractMediaDataPtr& md) const
-{
-    if (!m_hasVideo)
-        return md->dataType == QnAbstractMediaData::AUDIO;
-    return md->dataType == QnAbstractMediaData::VIDEO && md->channelNumber == 0;
-}
-
-qint64 QnStreamRecorder::isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md) const
-{
-    if (!m_hasVideo)
-        return md->dataType == QnAbstractMediaData::AUDIO;
-    return md->dataType == QnAbstractMediaData::VIDEO
-        && md->channelNumber == 0
-        && md->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
-}
-
-qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
-{
-    for (int i = 0; i < m_prebuffer.size(); ++i)
-    {
-        const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
-        if (isPrimaryKeyFrame(media) && media->timestamp > baseTime)
-            return media->timestamp;
-    }
-    return AV_NOPTS_VALUE;
-}
-
 void QnStreamRecorder::updateProgress(qint64 timestampUs)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -146,20 +97,11 @@ int QnStreamRecorder::getStreamIndex(const QnConstAbstractMediaDataPtr& mediaDat
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
-    if (m_needReopen)
-    {
-        m_needReopen = false;
-        close();
-    }
-
-    const QnConstAbstractMediaDataPtr md =
-        std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
-
+    const auto md = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!md)
         return true; //< skip unknown data
 
     NX_VERBOSE(this, "Process data %1", md);
-
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
         if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
@@ -172,48 +114,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         }
     }
 
-    m_prebuffer.push(md);
-    const bool alwaysSave = md->flags & QnAbstractMediaData::MediaFlags_AlwaysSave;
-    const bool timeDiscontinue = isPrimaryStream(md) && md->timestamp < m_lastPrimaryTime;
-    bool hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
-    const qint64 kNoPtsValue = (qint64) AV_NOPTS_VALUE;
-
-    if (timeDiscontinue)
-        NX_VERBOSE(this, "Time discontinue. Resource: %1", m_resource);
-    if (hardLimitReached)
-        NX_VERBOSE(this, "Pre-buffer hard limit reached. Resource: %1", m_resource);
-
-    if (m_prebufferingUsec == 0 || alwaysSave || timeDiscontinue)
-    {
-        flushPrebuffer();
-    }
-    else if (isPrimaryStream(md) || hardLimitReached)
-    {
-        if (isPrimaryStream(md))
-        {
-            m_lastPrimaryTime = md->timestamp;
-            if (m_nextIFrameTime == kNoPtsValue && isPrimaryKeyFrame(md))
-                m_nextIFrameTime = md->timestamp;
-        }
-        while ((m_nextIFrameTime != kNoPtsValue && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
-            || hardLimitReached)
-        {
-            while (!m_prebuffer.isEmpty() && (!isPrimaryStream(m_prebuffer.front())
-                || m_prebuffer.front()->timestamp < m_nextIFrameTime
-                || m_prebuffer.size() > kPrebufferHardLimit))
-            {
-                QnConstAbstractMediaDataPtr d;
-                m_prebuffer.pop(d);
-                if (needSaveData(d))
-                    saveData(d);
-                else if (md->dataType == QnAbstractMediaData::VIDEO)
-                    markNeedKeyData();
-            }
-            m_nextIFrameTime = findNextIFrame(m_nextIFrameTime);
-            hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
-        }
-    }
-
+    saveData(md);
     updateProgress(md->timestamp);
     return true;
 }
@@ -223,11 +124,6 @@ bool QnStreamRecorder::isAudioRecorded() const
     if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
         return camera->isAudioRecorded();
     return true;
-}
-
-void QnStreamRecorder::resetPacketCount()
-{
-    m_packetCount = 0;
 }
 
 bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaData)
@@ -337,20 +233,11 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true; // skip data
     }
 
-    bool canStartNewFile = m_hasVideo ?
-        md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY) :
-        md->dataType == QnAbstractMediaData::AUDIO;
-
-    if (canStartNewFile && needToTruncate(md))
-    {
-        m_endDateTimeUs = md->timestamp;
-        NX_VERBOSE(this, "Truncating file %1", startTimeUs());
-        close();
-        m_endDateTimeUs = m_startDateTimeUs = md->timestamp;
-    }
-
     if (m_firstTime)
     {
+        bool canStartNewFile = m_hasVideo
+            ? md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY)
+            : md->dataType == QnAbstractMediaData::AUDIO;
         if (!canStartNewFile)
         {
             NX_DEBUG(this, "Skip packet before first video(or audio in case audio only) packet: %1"
@@ -375,7 +262,6 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     int channel = md->channelNumber;
-
     if (md->flags & AV_PKT_FLAG_KEY)
         m_gotKeyFrame[channel] = true;
 
@@ -437,32 +323,12 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-void QnStreamRecorder::setPrebufferingUsec(int value)
-{
-    m_prebufferingUsec = value;
-}
-
-int QnStreamRecorder::getPrebufferingUsec() const
-{
-    return m_prebufferingUsec;
-}
-
-bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& /*media*/)
-{
-    return true;
-}
-
 void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_bofDateTimeUs = bof;
     m_eofDateTimeUs = eof;
     m_lastProgress = -1;
-}
-
-void QnStreamRecorder::setNeedReopen()
-{
-    m_needReopen = true;
 }
 
 bool QnStreamRecorder::isAudioPresent() const

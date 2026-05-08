@@ -41,7 +41,6 @@ private:
     virtual void reportFinished() override;
 
     // Empty callbacks.
-    virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& /*md*/) const override { return false; };
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& /*data*/) override {};
     virtual void beforeIoClose(StorageContext& /*context*/) override {};
     virtual void initMetadataStream(StorageContext& /*context*/) override {};

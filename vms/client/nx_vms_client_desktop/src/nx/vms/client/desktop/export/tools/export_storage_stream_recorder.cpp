@@ -281,11 +281,6 @@ QString ExportStorageStreamRecorder::fixedFileName() const
     return QString();
 }
 
-bool ExportStorageStreamRecorder::needToTruncate(const QnConstAbstractMediaDataPtr& /*md*/) const
-{
-    return false;
-}
-
 void ExportStorageStreamRecorder::onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& /*md*/)
 {
 }

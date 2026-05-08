@@ -35,19 +35,14 @@ class NX_VMS_COMMON_API QnStreamRecorder:
     Q_OBJECT
 
 public:
-
     QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
     void close();
     qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
     void setProgressBounds(qint64 bof, qint64 eof);
-    void setNeedReopen();
     bool isAudioPresent() const;
-
-    // For tests.
     int64_t packetCount() const;
-    void resetPacketCount();
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual bool canReplaceData() const override { return false; }
@@ -60,9 +55,7 @@ signals:
 protected:
     virtual void endOfRun() override;
 
-    void setPrebufferingUsec(int value);
     void markNeedKeyData();
-    int getPrebufferingUsec() const;
     void setPreciseStartDateTime(int64_t startTimeUs);
 
     AudioLayoutConstPtr getAudioLayout();
@@ -72,16 +65,13 @@ protected:
     void setAudioLayout(const AudioLayoutConstPtr& audioLayout);
     void setHasVideo(bool hasVideo);
 
-    virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media) = 0;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
-    virtual bool needToTruncate(const QnConstAbstractMediaDataPtr& md) const = 0;
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& md) = 0;
     virtual void onSuccessfulPrepare() {};
     virtual void reportFinished();
     virtual void afterClose() {};
     virtual bool dataHoleDetected(const QnConstAbstractMediaDataPtr& md);
-    virtual void updateContainerMetadata(QnAviArchiveMetadata* /*metadata*/) const {}
     virtual int getStreamIndex(const QnConstAbstractMediaDataPtr& mediaData) const;
     virtual void adjustMetaData(QnAviArchiveMetadata& metaData) const = 0;
     virtual std::vector<uint8_t> prepareEncryptor(quint64 /*nonce*/) { return std::vector<uint8_t>(); }
@@ -89,10 +79,6 @@ protected:
     virtual void setLastError(nx::recording::Error::Code code) = 0;
 
 private:
-    void flushPrebuffer();
-    qint64 isPrimaryStream(const QnConstAbstractMediaDataPtr& md) const;
-    qint64 isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md) const;
-    qint64 findNextIFrame(qint64 baseTime);
     void updateProgress(qint64 timestampUs);
     bool prepareToStart(const QnConstAbstractMediaDataPtr& mediaData);
 
@@ -120,19 +106,14 @@ protected:
     int64_t m_startDateTimeUs = AV_NOPTS_VALUE;
     bool m_interleavedStream = false;
     bool m_hasVideo = true;
-    QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 
 private:
     QnConstResourceVideoLayoutPtr m_videoLayout;
     AudioLayoutConstPtr m_audioLayout;
     qint64 m_currentChunkLen = 0;
-    int m_prebufferingUsec = 0;
     qint64 m_bofDateTimeUs = AV_NOPTS_VALUE;
     qint64 m_eofDateTimeUs = AV_NOPTS_VALUE;
     int m_lastProgress = -1;
-    bool m_needReopen = false;
-    qint64 m_lastPrimaryTime = AV_NOPTS_VALUE;
-    qint64 m_nextIFrameTime = AV_NOPTS_VALUE;
     mutable nx::Mutex m_mutex;
     std::atomic<int64_t> m_packetCount = 0;
 };
