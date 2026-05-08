@@ -82,14 +82,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>於 %1 到期</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>錯誤</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>無法分享書籤。</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

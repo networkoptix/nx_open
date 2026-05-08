@@ -83,14 +83,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>Caduca en %1</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>Erro</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>Non se pode compartir o marcador.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

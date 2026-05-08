@@ -83,14 +83,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>Upphör om %1</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>Fel</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>Kan inte dela bokmärke.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

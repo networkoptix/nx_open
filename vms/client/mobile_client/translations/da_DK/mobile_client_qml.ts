@@ -1240,6 +1240,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Deling åbner den nye bogmærke dialogboks for at generere et afspilningslink efter indstilling af delingsindstillingerne</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>Bogmærke oprettet</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>Kan ikke dele bogmærke</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1617,6 +1625,10 @@
     <message>
       <source>Camera Info</source>
       <translation>Kamera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation>Gå til Live for at aktivere soft udløsere</translation>
     </message>
   </context>
   <context>

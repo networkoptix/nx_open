@@ -1239,6 +1239,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>공유 옵션을 설정한 후 공유하면 재생 링크를 생성하기 위한 새 북마크 대화 상자가 열립니다</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>북마크를 공유할 수 없습니다</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1616,6 +1624,10 @@
     <message>
       <source>Camera Info</source>
       <translation type="unfinished">Camera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

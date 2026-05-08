@@ -82,14 +82,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>Hết hạn trong %1</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>Lỗi</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>Không thể chia sẻ dấu trang.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

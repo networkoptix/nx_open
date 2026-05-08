@@ -83,14 +83,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>Udløber om %1</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>Fejl</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>Kan ikke dele bogmærke.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

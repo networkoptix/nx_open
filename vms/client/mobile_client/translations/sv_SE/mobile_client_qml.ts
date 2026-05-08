@@ -1240,6 +1240,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Delning öppnar den nya bokmärkesdialogrutan för att generera en uppspelningslänk efter att delningsalternativen har ställts in</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>Bokmärke skapat</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>Kan inte dela bokmärke</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1617,6 +1625,10 @@
     <message>
       <source>Camera Info</source>
       <translation type="unfinished">Camera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

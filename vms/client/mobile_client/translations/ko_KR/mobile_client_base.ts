@@ -82,14 +82,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>%1에 만료됩니다</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>오류</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>북마크를 공유할 수 없습니다.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

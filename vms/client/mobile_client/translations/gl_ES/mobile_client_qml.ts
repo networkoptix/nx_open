@@ -1240,6 +1240,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Compartir abre o diálogo de novos marcadores para xerar unha ligazón de reprodución despois de configurar as opcións de compartir</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>Marcador creado</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>Non se pode compartir o marcador</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1617,6 +1625,10 @@
     <message>
       <source>Camera Info</source>
       <translation>Información da cámara</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

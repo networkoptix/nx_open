@@ -82,14 +82,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>%1で期限切れ</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>エラー</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>ブックマークを共有できません。</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

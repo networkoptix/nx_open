@@ -82,14 +82,6 @@
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
       <translation>Berakhir dalam %1</translation>
     </message>
-    <message>
-      <source>Error</source>
-      <translation>Error</translation>
-    </message>
-    <message>
-      <source>Cannot share bookmark.</source>
-      <translation>Tidak dapat membagikan bookmark.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>

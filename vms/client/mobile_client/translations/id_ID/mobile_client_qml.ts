@@ -1239,6 +1239,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Berbagi membuka dialog bookmark baru untuk menghasilkan link playback setelah mengatur opsi berbagi</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>Bookmark telah dibuat</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>Tidak dapat membagikan bookmark</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1616,6 +1624,10 @@
     <message>
       <source>Camera Info</source>
       <translation>Info Kamera</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

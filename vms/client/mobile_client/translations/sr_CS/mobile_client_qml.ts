@@ -1241,6 +1241,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation type="unfinished">Cannot share bookmark</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1618,6 +1626,10 @@
     <message>
       <source>Camera Info</source>
       <translation type="unfinished">Camera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

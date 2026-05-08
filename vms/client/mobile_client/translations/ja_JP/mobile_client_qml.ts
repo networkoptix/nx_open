@@ -45,19 +45,19 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation>アーカイブなし</translation>
+      <translation>アーカイブがありません</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>アーカイブを閲覧する権限がありません。</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>アーカイブに録画済みの映像はありません。</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>タイムラインを読み込み中...</translation>
     </message>
   </context>
   <context>
@@ -1239,6 +1239,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>共有オプションの設定後、再生リンクを生成するための新しいブックマークダイアログが開きます。</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>ブックマークを作成しました。</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>ブックマークを共有できません。</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1615,7 +1623,11 @@
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>カメラ情報</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation>ソフトトリガーを利用するには、ライブ映像を再生してください。</translation>
     </message>
   </context>
   <context>

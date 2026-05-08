@@ -1242,6 +1242,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>Udostępnianie otwiera nowe okno dialogowe zakładki, aby wygenerować łącze do odtwarzania po ustawieniu opcji udostępniania</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>Zakładka utworzona</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation>Nie można udostępnić zakładki</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1619,6 +1627,10 @@
     <message>
       <source>Camera Info</source>
       <translation type="unfinished">Camera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>

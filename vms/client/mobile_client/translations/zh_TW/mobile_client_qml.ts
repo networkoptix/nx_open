@@ -1239,6 +1239,14 @@
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
       <translation>設定分享選項後，分享會開啟新的書籤對話框以產生播放連結</translation>
     </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation>書籤已建立</translation>
+    </message>
+    <message>
+      <source>Cannot share bookmark</source>
+      <translation type="unfinished">Cannot share bookmark</translation>
+    </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
@@ -1616,6 +1624,10 @@
     <message>
       <source>Camera Info</source>
       <translation type="unfinished">Camera Info</translation>
+    </message>
+    <message>
+      <source>Go to Live to activate soft triggers</source>
+      <translation type="unfinished">Go to Live to activate soft triggers</translation>
     </message>
   </context>
   <context>
