@@ -94,12 +94,25 @@ RhiRenderingItemRenderer::~RhiRenderingItemRenderer() {}
 
 void RhiRenderingItemRenderer::setWindow(QQuickWindow* window)
 {
-    if (m_window == window)
+    if (m_window == window && m_paintRenderer)
         return;
 
     m_window = window;
+
+    QRhi* rhi = m_window ? m_window->rhi() : nullptr;
+    if (!rhi)
+    {
+        // QQuickWindow::rhi() can be null at the first beforeSynchronizing when the
+        // QQuickWidget's offscreen QRhi has not been propagated yet (observed during
+        // cold-startup setVisible cascades on Linux + Vulkan with slow ICD enumeration).
+        // Defer creation; the next sync will retry once rhi is available.
+        NX_WARNING(this, "QQuickWindow has no QRhi yet; deferring renderer init");
+        m_paintRenderer.reset();
+        return;
+    }
+
     m_paintRenderer.reset(new RhiPaintDeviceRenderer(
-        m_window->rhi(),
+        rhi,
         {
             .cacheSize = 0, //< Use max texture size.
             .atlasSize = 1024, //< Tuned for scene rendering.
@@ -109,12 +122,17 @@ void RhiRenderingItemRenderer::setWindow(QQuickWindow* window)
 
 void RhiRenderingItemRenderer::syncPaintDevice(RhiPaintDevice* pd)
 {
+    if (!m_paintRenderer)
+        return;
     m_paintRenderer->sync(pd);
 }
 
 void RhiRenderingItemRenderer::frameStart()
 {
     // This function is invoked on the render thread, if there is one.
+
+    if (!m_paintRenderer)
+        return;
 
     QRhi* rhi = m_window->rhi();
     if (!NX_ASSERT(rhi, "QQuickWindow is not using QRhi for rendering"))
@@ -156,6 +174,9 @@ void RhiRenderingItemRenderer::frameStart()
 void RhiRenderingItemRenderer::mainPassRecordingStart()
 {
     // This function is invoked on the render thread, if there is one.
+
+    if (!m_paintRenderer)
+        return;
 
     QRhi* rhi = m_window->rhi();
     if (!rhi)

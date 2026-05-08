@@ -255,6 +255,8 @@ RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi, Settings settings):
     m_rhi(rhi),
     m_settings(settings)
 {
+    if (!NX_ASSERT(m_rhi, "RhiPaintDeviceRenderer requires a non-null QRhi"))
+        return;
     m_textureSizeMax = m_rhi->resourceLimit(QRhi::TextureSizeMax);
     if (m_settings.cacheSize == 0)
         m_settings.cacheSize = m_textureSizeMax;
