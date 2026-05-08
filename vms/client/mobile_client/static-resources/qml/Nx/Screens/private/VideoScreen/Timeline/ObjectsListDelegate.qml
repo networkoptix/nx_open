@@ -17,7 +17,7 @@ Item
     //  var modelData
     //  ObjectsList objectsList
 
-    readonly property bool isStack: modelData && modelData.count > 1
+    readonly property bool isStack: !!modelData && modelData.count > 1
         && modelData.durationMs >= objectsList.minimumStackDurationMs
 
     readonly property bool isSkeleton: (modelData?.count ?? 0) === 0
