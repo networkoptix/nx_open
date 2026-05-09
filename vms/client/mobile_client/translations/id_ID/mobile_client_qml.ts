@@ -1627,7 +1627,7 @@
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Buka Live untuk mengaktifkan soft trigger</translation>
     </message>
   </context>
   <context>
