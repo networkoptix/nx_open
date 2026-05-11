@@ -52,9 +52,12 @@ QuickControls.Page
             ToolBar
             {
                 id: toolBar
+
                 title: control && control.title
                 titleUnderlineVisible: control.titleUnderlineVisible
                 leftButtonIcon.source: stackView.depth > 1 ? d.kBackButtonIconSource : ""
+                anchors.left: column.left
+
                 onLeftButtonClicked: control.leftButtonClicked()
                 onClicked: control.headerClicked()
             }
@@ -62,6 +65,7 @@ QuickControls.Page
             WarningPanel
             {
                 id: warningPanel
+                anchors.left: toolBar.left
             }
         }
 
@@ -70,6 +74,8 @@ QuickControls.Page
             anchors.bottom: parent.bottom
 
             height: 1
+            x: Math.min(warningPanel.x, toolBar.x)
+
             width: Math.max(
                 toolBar.visible ? toolBar.width : 0,
                 warningPanel.opened ? warningPanel.width : 0)

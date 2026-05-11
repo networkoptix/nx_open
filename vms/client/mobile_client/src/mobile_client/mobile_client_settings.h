@@ -70,6 +70,8 @@ public:
         TimelinePanelVisible,
         ResourcesPanelVisible,
 
+        LeftHandedMode,
+
         VariableCount
     };
 
@@ -182,6 +184,11 @@ private:
             bool,
             newTimelinePrototype, setNewTimelinePrototype,
             NewTimelinePrototype, true)
+
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            leftHandedMode, setLeftHandedMode,
+            LeftHandedMode, false)
 
         QN_DECLARE_RW_PROPERTY(
             QString,

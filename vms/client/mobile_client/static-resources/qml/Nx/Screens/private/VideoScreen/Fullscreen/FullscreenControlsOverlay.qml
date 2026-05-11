@@ -30,6 +30,9 @@ Item
 
     property alias scrubbingActive: speedControl.pressed
 
+    LayoutMirroring.enabled: false
+    LayoutMirroring.childrenInherit: true
+
     onVisibleChanged:
     {
         if (visible)

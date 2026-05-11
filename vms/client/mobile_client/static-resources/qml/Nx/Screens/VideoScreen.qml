@@ -52,8 +52,7 @@ Page
     backgroundColor: "black"
     clip: false
 
-    // TODO: FIXME! Control left handed / right handed layouts via settings.
-    LayoutMirroring.enabled: false
+    LayoutMirroring.enabled: appContext.settings.leftHandedMode
     LayoutMirroring.childrenInherit: true
 
     readonly property bool fullscreen: d.fullscreen
@@ -375,7 +374,13 @@ Page
             }
         ]
 
-    toolBar.contentItem.clip: false
+    toolBar.contentItem
+    {
+        LayoutMirroring.enabled: false
+        LayoutMirroring.childrenInherit: true
+        clip: false
+    }
+
     gradientToolbarBackground: true
 
     VideoScreenBanner
@@ -559,6 +564,8 @@ Page
     CameraSwitcher
     {
         id: cameraSwitcher
+
+        anchors.left: parent.left
 
         width: parent.width
         height: width / (16.0 / 9.0)

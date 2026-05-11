@@ -179,7 +179,7 @@ BaseSettingsPage
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.forceTrafficLogging)
+                if (value === appContext.settings.forceTrafficLogging)
                     return
 
                 appContext.settings.forceTrafficLogging = value
@@ -196,7 +196,7 @@ BaseSettingsPage
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.ignoreCustomization)
+                if (value === appContext.settings.ignoreCustomization)
                     return
 
                 appContext.settings.ignoreCustomization = value
@@ -215,7 +215,7 @@ BaseSettingsPage
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.supportMetaOrganizations)
+                if (value === appContext.settings.supportMetaOrganizations)
                     return
 
                 appContext.settings.supportMetaOrganizations = value
@@ -236,10 +236,27 @@ BaseSettingsPage
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.newTimelinePrototype)
+                if (value === appContext.settings.newTimelinePrototype)
                     return
 
                 appContext.settings.newTimelinePrototype = value
+            }
+        }
+
+        LabeledSwitch
+        {
+            id: leftHandedMode
+
+            width: parent.width
+            text: "Left Handed Mode"
+            checkState: appContext.settings.leftHandedMode ? Qt.Checked : Qt.Unchecked
+            onCheckStateChanged:
+            {
+                const value = checkState != Qt.Unchecked
+                if (value === appContext.settings.leftHandedMode)
+                    return
+
+                appContext.settings.leftHandedMode = value
             }
         }
 
@@ -311,7 +328,7 @@ BaseSettingsPage
             onCheckStateChanged:
             {
                 const value = checkState != Qt.Unchecked
-                if (value == appContext.settings.crashReportingEnabled)
+                if (value === appContext.settings.crashReportingEnabled)
                     return
 
                 appContext.settings.crashReportingEnabled = value

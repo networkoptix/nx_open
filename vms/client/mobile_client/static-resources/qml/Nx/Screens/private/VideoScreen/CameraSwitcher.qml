@@ -45,6 +45,9 @@ Item
     {
         id: listView
 
+        LayoutMirroring.enabled: false
+        LayoutMirroring.childrenInherit: true
+
         anchors.fill: parent
         orientation: Qt.Horizontal
         snapMode: ListView.SnapOneItem
