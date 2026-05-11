@@ -200,16 +200,7 @@ Item
         anchors
         {
             fill: parent
-            topMargin:
-            {
-                if (windowContext.deprecatedUiController.currentScreen === Controller.SessionsScreen)
-                    return 0 //< On the SessionsScreen it is always mobile layout for the feed.
-
-                return LayoutController.isTabletLayout ? 20 : 0
-            }
-            leftMargin: 20
-            rightMargin: 20
-            bottomMargin: 20
+            margins: 20
         }
 
         spacing: 16

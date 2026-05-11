@@ -31,7 +31,8 @@ Control
         if (windowContext.deprecatedUiController.currentScreen === Controller.SessionsScreen)
             return false //< On the SessionsScreen it is always mobile layout for the feed.
 
-        return LayoutController.isTabletLayout
+        // Use tablet layout in portrait and landscape device orientation.
+        return LayoutController.isTablet
     }
 
     signal clicked()
