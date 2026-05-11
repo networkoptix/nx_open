@@ -83,9 +83,13 @@ AdaptiveScreen
         interactive: sessionsScreen.selectedOrganizationIndex != null
         item:
         {
-            if (LayoutController.isTabletLayout
-                && !organizationsModel.topLevelLoading
-                && cloudUserProfileWatcher.isOrgUser
+            if (!LayoutController.isTabletLayout)
+                return null
+
+            if (loadingIndicator.loading)
+                return navigationPanelSkeleton
+
+            if (cloudUserProfileWatcher.isOrgUser
                 && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
                 && (sessionsScreen.selectedOrganizationIndex == null
                     || sessionsScreen.selectedOrgHasFolders))
@@ -436,6 +440,35 @@ AdaptiveScreen
 
             iconColor: LayoutController.isTabletLayout ? "dark1" : "light4"
             cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
+        }
+    }
+
+    Skeleton
+    {
+        id: navigationPanelSkeleton
+
+        Column
+        {
+            spacing: 8
+
+            anchors
+            {
+                left: parent.left
+                top: parent.top
+                right: parent.right
+                margins: 20
+            }
+
+            Repeater
+            {
+                model: 2
+
+                delegate: MaskItem
+                {
+                    width: parent.width
+                    height: 40
+                }
+            }
         }
     }
 
@@ -895,46 +928,41 @@ AdaptiveScreen
             readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
                 && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
                 || !organizationsModel.firstLoadAttemptFinished
-
-            component MaskItem: Rectangle
-            {
-                radius: 8
-                color: "white"
-                antialiasing: false
-            }
+            readonly property bool topTabsVisible:
+                sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
+                    && !LayoutController.isTabletLayout
 
             Row
             {
                 id: systemTabsRowSkeleton
 
-                visible: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
-
+                visible: loadingIndicator.topTabsVisible
                 x: 20
                 y: 4
                 spacing: 4
 
-                MaskItem
+                Repeater
                 {
-                    width: 120
-                    height: 40
-                }
+                    model: 2
 
-                MaskItem
-                {
-                    width: 120
-                    height: 40
+                    delegate: MaskItem
+                    {
+                        width: 120
+                        height: 40
+                    }
                 }
             }
 
             Flow
             {
                 anchors.fill: parent
-                topPadding: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState ? 64 : 16
+                topPadding: loadingIndicator.topTabsVisible ? 64 : 16
                 leftPadding: 20
                 spacing: siteList.spacing
+
                 Repeater
                 {
-                    model: 4
+                    model: LayoutController.isTablet && LayoutController.isPortrait ? 6 : 4
 
                     delegate: MaskItem
                     {
