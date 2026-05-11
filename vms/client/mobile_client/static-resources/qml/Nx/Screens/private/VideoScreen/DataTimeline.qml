@@ -38,8 +38,7 @@ Rectangle
 
     readonly property real defaultDurationMs: 24 * 60 * 60 * 1000
 
-    readonly property real bottomBoundMs:
-        objects.bottomBoundMs ?? (endTimeMs - defaultDurationMs)
+    readonly property alias bottomBoundMs: d.bottomBoundMs
 
     property real timeScaleWidth: 70
 
@@ -997,8 +996,10 @@ Rectangle
         }
     }
 
-    // Adjusts the initial zoom level when archive data becomes available.
-    // If no archive exists within the default 24h window, zooms out to show the entire archive.
+    // When the archive data becomes available for each opened camera:
+    // - adjusts bottom bound and current timeline window, if needed;
+    // - adjusts the initial zoom level when the first camera is opened (if no archive exists
+    //   within the default 24h window, zooms out to show the entire archive).
     Connections
     {
         target: timeline.chunkProvider
@@ -1007,10 +1008,8 @@ Rectangle
 
         function onLoadingChanged()
         {
-            if (initialZoomApplied || timeline.chunkProvider.loading)
+            if (timeline.chunkProvider.loading)
                 return
-
-            initialZoomApplied = true
 
             const nowMs = NxGlobals.syncNowMs()
             const archiveStartMs = timeline.chunkProvider.bottomBound
@@ -1018,6 +1017,21 @@ Rectangle
             // No archive at all.
             if (archiveStartMs < 0)
                 return
+
+            d.bottomBoundMs = Math.min(nowMs - timeline.defaultDurationMs, archiveStartMs)
+
+            if (initialZoomApplied)
+            {
+                if (timeScale.startTimeMs >= d.bottomBoundMs)
+                    return
+
+                timeScale.startTimeMs = d.bottomBoundMs
+                timeScale.durationMs = Math.min(timeScale.durationMs, nowMs - d.bottomBoundMs)
+                timeline.windowAtLive = timeScale.startTimeMs + timeScale.durationMs >= nowMs
+                return
+            }
+
+            initialZoomApplied = true
 
             // Check if the latest archive chunk extends into the last 24 hours.
             const latestChunkEndMs =
@@ -1039,6 +1053,8 @@ Rectangle
     Connections
     {
         id: d
+
+        property real bottomBoundMs: NxGlobals.syncNowMs() - timeline.defaultDurationMs
 
         target: timeline.Window.window
 

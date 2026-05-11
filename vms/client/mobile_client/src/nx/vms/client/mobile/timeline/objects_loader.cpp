@@ -12,6 +12,7 @@
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/math/math.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
@@ -212,10 +213,9 @@ struct ObjectsLoader::Private
         }
 
         // Calculate the window encompassing fully or partially visible buckets.
-        const auto start = window.startTime()
-            - ((window.startTime() - *bottomBound) % bucketSize);
+        const auto start = window.startTime() - qMod(window.startTime() - *bottomBound, bucketSize);
 
-        const auto endRemainder = (window.endTime() - *bottomBound) % bucketSize;
+        const auto endRemainder = qMod(window.endTime() - *bottomBound, bucketSize);
 
         const auto end = endRemainder > 0ms
             ? (window.endTime() - endRemainder + bucketSize)
