@@ -51,8 +51,10 @@ Drawer
         ? Popup.CloseOnEscape | Popup.CloseOnReleaseOutside
         : Popup.NoAutoClose
 
+    interactive: visible //< Swipe is available only for close.
     modal: true
     focus: true
+
     padding: 0
     topPadding: 0
     bottomPadding: 24
