@@ -732,7 +732,7 @@ Page
 
         onValueChanged:
         {
-            if (!pressed && value == to)
+            if (!pressed && value == to && !preview.autoRepeat)
                 preview.preview()
         }
 
