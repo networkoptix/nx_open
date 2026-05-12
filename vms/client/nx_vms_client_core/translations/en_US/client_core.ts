@@ -479,11 +479,11 @@
 <context>
     <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
-        <source>Press and hold to</source>
+        <source>Press and hold to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>press and hold</source>
+        <source>%1 (press and hold)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -492,6 +492,10 @@
     <message>
         <source>Press and hold to speak</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Microphone</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
