@@ -477,12 +477,12 @@
   <context>
     <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
-      <source>Press and hold to</source>
-      <translation>กดค้างไว้</translation>
+      <source>Press and hold to %1</source>
+      <translation type="unfinished">Press and hold to %1</translation>
     </message>
     <message>
-      <source>press and hold</source>
-      <translation>กดค้างไว้</translation>
+      <source>%1 (press and hold)</source>
+      <translation type="unfinished">%1 (press and hold)</translation>
     </message>
   </context>
   <context>
@@ -490,6 +490,10 @@
     <message>
       <source>Press and hold to speak</source>
       <translation>กดค้างไว้เพื่อพูด</translation>
+    </message>
+    <message>
+      <source>Microphone</source>
+      <translation type="unfinished">Microphone</translation>
     </message>
   </context>
   <context>

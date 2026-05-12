@@ -22,6 +22,10 @@
       <source>Close</source>
       <translation>Zamknij</translation>
     </message>
+    <message>
+      <source>Speak...</source>
+      <translation type="unfinished">Speak...</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticSelectors</name>
@@ -49,15 +53,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Nie masz uprawnień do przeglądania archiwum</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Nie masz żadnych nagrań wideo w archiwum</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>Trwa ładowanie osi czasu...</translation>
     </message>
   </context>
   <context>
@@ -905,7 +909,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Anuluj ponowne centrowanie</translation>
     </message>
   </context>
   <context>
@@ -1618,19 +1622,19 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Tylko tryb na żywo</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Tylko tryb archiwizacji</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Informacje o kamerze</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Przejdź do trybu na żywo, aby aktywować wyzwalacze programowe</translation>
     </message>
   </context>
   <context>

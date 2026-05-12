@@ -22,6 +22,10 @@
       <source>Close</source>
       <translation>關閉​​​</translation>
     </message>
+    <message>
+      <source>Speak...</source>
+      <translation type="unfinished">Speak...</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticSelectors</name>
