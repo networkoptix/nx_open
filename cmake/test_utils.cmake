@@ -152,6 +152,10 @@ function(nx_add_functional_test target)
     foreach(src IN LISTS FT_TEST_BINARIES)
         list(APPEND copy_cmds
             COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}" "${dest_dir}/${src}"
+            COMMAND ${CMAKE_COMMAND}
+            -DBINARY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}
+            -DDEST=${dest_dir}/lib
+            -P ${open_source_root}/cmake/copy_runtime_deps.cmake
         )
         list(APPEND copy_deps "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}")
         list(APPEND dest_generated_files "${dest_dir}/${src}")
