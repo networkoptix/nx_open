@@ -23,11 +23,12 @@ static constexpr char kOrganizationPath[] = "/partners/api/v2/organizations/{org
 static constexpr char kAllOrganizationsUsers[] = "/partners/api/v2/internal/users/all";
 
 static constexpr char kInternalSsoOrgUserPath[] =
-    "/v3/internal/sso/organizations/{organizationId}/users/{email}/";
+    "/partners/api/v3/internal/sso/organizations/{organizationId}/users/{email}/";
 
 static constexpr char kInternalSsoOrgUserSendConfirmationPath[] =
-    "/v3/internal/sso/organizations/{organizationId}/users/{email}/send_confirmation/";
+    "/partners/api/v3/internal/sso/organizations/{organizationId}/users/{email}/send_confirmation/";
 
-static constexpr char kInternalSsoOrganizationsInfoPath[] = "/v3/internal/sso/organizations/info/";
+static constexpr char kInternalSsoOrganizationsInfoPath[] =
+    "/partners/api/v3/internal/sso/organizations/info/";
 
 } // namespace nx::cloud::cps::api
