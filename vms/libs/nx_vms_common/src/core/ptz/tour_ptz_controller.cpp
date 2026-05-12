@@ -11,6 +11,7 @@
 
 #include <api/resource_property_adaptor.h>
 
+#include <core/resource/resource.h>
 #include <core/ptz/tour_ptz_executor.h>
 #include <core/ptz/ptz_controller_pool.h>
 
@@ -42,6 +43,13 @@ QnTourPtzController::QnTourPtzController(
     m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
         [this]{ emit changed(DataField::tours); }, Qt::QueuedConnection);
+
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
+        [](const QnResourcePtr& resource)
+        {
+            if (NX_ASSERT(resource))
+                resource->savePropertiesAsync();
+        });
 }
 
 QnTourPtzController::~QnTourPtzController()
