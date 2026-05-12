@@ -27,6 +27,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(0, clientWebServerPort,
         "[CI] Enables web server to remotely control the Nx Client operation; port should be in\n"
         "range 1..65535 (typically 7012) to enable; 0 means disabled.");
+    NX_INI_INT(2000, softTriggerTooltipDurationMs,
+        "Duration in milliseconds for the soft trigger action tooltip.");
 };
 
 Ini& ini();

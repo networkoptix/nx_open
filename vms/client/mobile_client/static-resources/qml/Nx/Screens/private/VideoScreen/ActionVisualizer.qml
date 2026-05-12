@@ -5,6 +5,7 @@ import QtQuick.Controls
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Settings
 
 import nx.client.mobile
 
@@ -63,7 +64,7 @@ Loader
 
                 Text
                 {
-                    id: text
+                    id: textItem
 
                     text: control.text
                     color: ColorTheme.colors.light4
@@ -187,7 +188,7 @@ Loader
     {
         id: hideTimer
 
-        interval: 2000
+        interval: appContext?.settings.iniConfigValue("softTriggerTooltipDurationMs") ?? 2000
         onTriggered: control.hide()
     }
 }

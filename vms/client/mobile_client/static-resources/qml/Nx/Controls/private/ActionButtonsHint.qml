@@ -214,7 +214,7 @@ Rectangle
     {
         id: hideTimer
 
-        interval: 2000
+        interval: appContext?.settings.iniConfigValue("softTriggerTooltipDurationMs") ?? 2000
         onTriggered: control.state = "hidden"
     }
 

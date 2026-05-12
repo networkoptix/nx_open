@@ -27,11 +27,11 @@ AdaptiveSheet
     titleTextItem.font.pixelSize: 18
     spacing: 24
 
-    onResourceChanged: actionVisualizer.hide()
+    onResourceChanged: hintControl.hide()
 
     ActionVisualizer
     {
-        id: actionVisualizer
+        id: hintControl
 
         parent: externalMode ? externalVisualizerContainer : sheet.titleCustomArea
         externalMode: sheet.externalMode
@@ -103,9 +103,9 @@ AdaptiveSheet
                     onPressedChanged:
                     {
                         if (pressed)
-                            actionVisualizer.showHint(hintText, iconSource, /*keepOpened*/ true)
+                            hintControl.showHint(hintText, iconSource, /*keepOpened*/ true)
                         else
-                            actionVisualizer.hide()
+                            hintControl.hide()
                     }
                 }
 
@@ -125,7 +125,7 @@ AdaptiveSheet
                     onTapped:
                     {
                         if (!fullyActivated)
-                            Qt.callLater(() => actionVisualizer.showHint(hintText, iconSource))
+                            Qt.callLater(() => hintControl.showHint(hintText, iconSource))
                     }
 
                     onPressedChanged:
@@ -160,7 +160,7 @@ AdaptiveSheet
                         if (!sheet.available)
                             sheet.unavailableAction()
                         else
-                            actionVisualizer.showHint(qsTr("Disabled by schedule"))
+                            hintControl.showHint(qsTr("Disabled by schedule"))
                     }
                 }
             }
@@ -172,14 +172,14 @@ AdaptiveSheet
 
                 if (!controller.startAction(model.id))
                 {
-                    actionVisualizer.showFailure(hintText)
+                    hintControl.showFailure(hintText)
                     return
                 }
 
                 if (model.group === CameraButtonController.ButtonGroup.twoWayAudio)
                     windowContext.ui.windowHelpers.requestRecordAudioPermissionIfNeeded()
 
-                actionVisualizer.showActivity(visualizer, visualizerText, iconSource)
+                hintControl.showActivity(visualizer, visualizerText, iconSource)
             }
 
             function stopAction()
@@ -187,7 +187,7 @@ AdaptiveSheet
                 if (controller.actionIsActive(model.id))
                     controller.stopAction(model.id)
 
-                actionVisualizer.hide()
+                hintControl.hide()
             }
 
             Connections
@@ -200,16 +200,16 @@ AdaptiveSheet
                         return
 
                     if (!success)
-                        actionVisualizer.showFailure(hintText)
+                        hintControl.showFailure(hintText)
                     else if (!prolonged)
-                        actionVisualizer.showSuccess(hintText)
+                        hintControl.showSuccess(hintText)
                     else if (controller.actionIsActive(model.id) && delegate.down)
-                        actionVisualizer.showActivity(visualizer, visualizerText, iconSource)
+                        hintControl.showActivity(visualizer, visualizerText, iconSource)
                 }
 
                 function onActionCancelled(id)
                 {
-                    actionVisualizer.hide()
+                    hintControl.hide()
                 }
             }
         }

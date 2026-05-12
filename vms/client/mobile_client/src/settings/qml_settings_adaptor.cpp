@@ -13,7 +13,7 @@ using nx::vms::client::core::appContext;
 namespace nx::client::mobile {
 
 QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
-    QQmlPropertyMap(parent)
+    QQmlPropertyMap(this, parent)
 {
     // Set mobile settings values.
     const auto mobileIds = qnSettings->variables();
@@ -63,6 +63,11 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
 
             appContext()->coreSettings()->setValue(key, value);
         });
+}
+
+QVariant QmlSettingsAdaptor::iniConfigValue(const QString& name)
+{
+    return nx::vms::client::core::getIniValue(mobile_client::ini(), name);
 }
 
 } // namespace nx::client::mobile
