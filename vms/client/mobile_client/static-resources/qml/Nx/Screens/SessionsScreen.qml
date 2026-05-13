@@ -484,10 +484,12 @@ AdaptiveScreen
         currentTab: sessionsScreen.selectedTab
         onTabSelected: (selectedTabValue) =>
         {
-            sessionsScreen.selectTabByUser(selectedTabValue)
-            // When inside a partner, tab click means "go back to the top-level tab view".
+            // When inside a partner, go back to root with the user-chosen tab.
+            // Pass the tab explicitly so goBack does not override it based on rootType.
             if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState)
-                goBack(NxGlobals.invalidModelIndex())
+                goBack(NxGlobals.invalidModelIndex(), selectedTabValue)
+            else
+                sessionsScreen.selectTabByUser(selectedTabValue)
         }
 
         organizationsModel: organizationsModel
@@ -1119,7 +1121,7 @@ AdaptiveScreen
             update()
     }
 
-    function goBack(index)
+    function goBack(index, tabOverride)
     {
         if (searchField.displayText)
         {
@@ -1140,7 +1142,9 @@ AdaptiveScreen
 
             if (newIndex.row === -1)
             {
-                if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
+                if (tabOverride !== undefined)
+                    selectTabByUser(tabOverride)
+                else if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
                     selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                 else if (sessionsScreen.rootType === OrganizationsModel.Organization)
                     selectTabByUser(OrganizationsModel.OrganizationsTab)
