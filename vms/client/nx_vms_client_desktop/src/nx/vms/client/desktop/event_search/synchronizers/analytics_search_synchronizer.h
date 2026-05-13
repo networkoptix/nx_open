@@ -47,10 +47,9 @@ private:
     void updateCachedDevices();
     void updateMediaResourceWidgetAnalyticsMode(QnMediaResourceWidget* widget);
     void updateAllMediaResourceWidgetsAnalyticsMode();
-    void updateObjectTypesFromSettings();
+    void updateObjectFilterFromSettings();
     void updateTimeSelectionFromSettings();
     void updateAreaFromSettings();
-    void updateAttributeFiltersFromSettings();
     void updateTextSearchScopeFromSettings();
     void updateReferenceTrackIdFromSettings();
     void updateCameraSelectionFromSettings();
