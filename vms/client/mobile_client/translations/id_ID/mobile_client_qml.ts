@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Speak...</source>
-      <translation type="unfinished">Speak...</translation>
+      <translation>Bicara...</translation>
     </message>
   </context>
   <context>

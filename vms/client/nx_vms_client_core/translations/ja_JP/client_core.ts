@@ -478,11 +478,11 @@
     <name>nx::vms::client::core::SoftTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to %1</source>
-      <translation type="unfinished">Press and hold to %1</translation>
+      <translation>長押しで</translation>
     </message>
     <message>
       <source>%1 (press and hold)</source>
-      <translation type="unfinished">%1 (press and hold)</translation>
+      <translation>%1 (長押し)</translation>
     </message>
   </context>
   <context>
@@ -493,7 +493,7 @@
     </message>
     <message>
       <source>Microphone</source>
-      <translation type="unfinished">Microphone</translation>
+      <translation>マイク</translation>
     </message>
   </context>
   <context>

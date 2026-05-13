@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Speak...</source>
-      <translation type="unfinished">Speak...</translation>
+      <translation>Falar...</translation>
     </message>
   </context>
   <context>
@@ -1632,7 +1632,7 @@
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Vaia a En directo para activar disparadores suaves</translation>
     </message>
   </context>
   <context>
