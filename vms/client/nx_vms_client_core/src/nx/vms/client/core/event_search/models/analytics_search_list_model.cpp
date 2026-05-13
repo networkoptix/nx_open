@@ -465,10 +465,11 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(
     if (q->cameraSet().type() == ManagedCameraSet::Type::single && filterRect.isValid())
         filter.boundingBox = filterRect;
 
-    NX_VERBOSE(q, "Requesting object tracks:\n    from: %1\n    to: %2\n"
-        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6",
+    NX_VERBOSE(q, "Requesting object tracks:\n    from: %1, to: %2\n"
+        "    object types: %3\n    box: %4\n    text filter: %5\n    sort: %6, limit: %7",
         nx::utils::timestampToDebugString(filter.timePeriod.startTimeMs),
         nx::utils::timestampToDebugString(filter.timePeriod.endTimeMs()),
+        filter.objectTypeId,
         filter.boundingBox,
         filter.freeText,
         QVariant::fromValue(filter.sortOrder).toString(),

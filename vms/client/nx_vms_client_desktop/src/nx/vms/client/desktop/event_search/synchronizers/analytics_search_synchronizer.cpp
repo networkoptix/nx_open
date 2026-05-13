@@ -395,7 +395,7 @@ void AnalyticsSearchSynchronizer::updateAllMediaResourceWidgetsAnalyticsMode()
     }
 }
 
-void AnalyticsSearchSynchronizer::updateObjectTypesFromSettings()
+void AnalyticsSearchSynchronizer::updateObjectFilterFromSettings()
 {
     const QStringList& objectTypeIds = system()->userSettings()->objectSearchObjectTypeIds();
 
@@ -409,9 +409,19 @@ void AnalyticsSearchSynchronizer::updateObjectTypesFromSettings()
     filterModel->setSelectedDevices(commonSetup()->selectedCameras());
 
     if (filterModel->findFilterObjectType(objectTypeIds))
+    {
         m_analyticsSetup->setObjectTypes(objectTypeIds);
+
+        // Attribute filters may be selected in UI only after the object type is selected,
+        // so update them if the object type was loaded.
+        m_analyticsSetup->setAttributeFilters(
+            system()->userSettings()->objectSearchAttributeFilters());
+    }
     else
+    {
         m_analyticsSetup->setObjectTypes({});
+        m_analyticsSetup->setAttributeFilters({});
+    }
 }
 
 void AnalyticsSearchSynchronizer::updateTimeSelectionFromSettings()
@@ -433,12 +443,6 @@ void AnalyticsSearchSynchronizer::updateAreaFromSettings()
         if (QnMediaResourceWidget* mediaWidget = this->mediaWidget())
             mediaWidget->setAnalyticsFilterRect(area);
     }
-}
-
-void AnalyticsSearchSynchronizer::updateAttributeFiltersFromSettings()
-{
-    m_analyticsSetup->setAttributeFilters(
-        system()->userSettings()->objectSearchAttributeFilters());
 }
 
 void AnalyticsSearchSynchronizer::updateCameraSelectionFromSettings()
@@ -493,12 +497,13 @@ void AnalyticsSearchSynchronizer::updateEngineIdFromSettings()
 
 void AnalyticsSearchSynchronizer::updateFiltersFromSettings()
 {
+    NX_VERBOSE(this, "Updating search setup from user settings");
+
     updateCameraSelectionFromSettings();
     updateEngineIdFromSettings();
-    updateObjectTypesFromSettings();
+    updateObjectFilterFromSettings();
     updateTimeSelectionFromSettings();
     updateAreaFromSettings();
-    updateAttributeFiltersFromSettings();
 }
 
 void AnalyticsSearchSynchronizer::handleWidgetAnalyticsFilterRectChanged()
@@ -662,7 +667,7 @@ void AnalyticsSearchSynchronizer::setupSettingsStorage()
             // camera-dependent settings when cameras become available. As a side effect it tries
             // to re-apply the settings every time the camera selection is changed, but that does
             // not affect the behavior, as the settings are in sync with the current state.
-            updateObjectTypesFromSettings();
+            updateObjectFilterFromSettings();
             updateAreaFromSettings();
         });
 
