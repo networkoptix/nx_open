@@ -2416,6 +2416,26 @@ static void registerDeviceHandlers(
      * <br/>
      * <code>https://&lt;server_ip&gt;:&lt;port&gt;/webrtc/?camera_id=12AB42FD5912&position=1674240507000000&stream=0&resolutionWhenTranscoding=320x240&resolution=240p&rotation=auto&speed=1.0&deliveryMethod=srtp</code>
      * <br/>
+     * WebRTC signaling messages are sent as JSON objects over the WebSocket. SDP offers and
+     * answers are sent in the following form. The SDP value follows the offer/answer model from
+     * https://datatracker.ietf.org/doc/html/rfc3264.
+     * <pre><code>{
+     *   "sdp": {
+     *     "type": "offer",
+     *     "sdp": "..."
+     *   }
+     * }</code></pre>
+     * ICE candidates are sent in the following form. The candidate value follows the ICE
+     * candidate format from https://datatracker.ietf.org/doc/html/rfc8445.
+     * <pre><code>{
+     *   "ice": {
+     *     "candidate": "candidate:...",
+     *     "sdpMid": 0,
+     *     "sdpMLineIndex": 0,
+     *     "usernameFragment": "..."
+     *   }
+     * }</code></pre>
+     * <br/>
      * WebRTC data channel supports JSON control messages. Both string and binary data channel
      * messages are parsed as UTF-8 JSON objects.
      * <br/>
