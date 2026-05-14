@@ -556,6 +556,12 @@ Page
         onShowRoiHint:
             banner.showText(roiHintText)
 
+        onClicked:
+        {
+            if (d.fullscreen)
+                fullscreenControlsOverlay.toggle()
+        }
+
         Connections
         {
             target: video.roiController

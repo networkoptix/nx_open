@@ -33,18 +33,25 @@ Item
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 
+    function toggle()
+    {
+        opacityController.setOverlayVisible(!opacityController.overlayVisible)
+    }
+
     onVisibleChanged:
     {
         if (visible)
-            opacityController.reportUserActivity()
+            opacityController.setOverlayVisible(true)
     }
 
     QtObject
     {
         id: opacityController
 
+        property bool overlayVisible: true
+
         // Opacity value expected for any overlay control or block unless otherwise specified.
-        property real defaultControlsOpacity: hasUserActivity && !control.scrubbingActive
+        property real defaultControlsOpacity: overlayVisible && !control.scrubbingActive
             ? 1.0
             : 0.0
 
@@ -58,7 +65,7 @@ Item
         }
 
         // Opacity value for the speed controller.
-        property real speedControlOpacity: control.scrubbingActive || hasUserActivity
+        property real speedControlOpacity: control.scrubbingActive || overlayVisible
             ? 1.0
             : 0.0
 
@@ -71,13 +78,16 @@ Item
             }
         }
 
-        // User activity flag.
-        property bool hasUserActivity: true
+        function setOverlayVisible(value)
+        {
+            overlayVisible = value
+            reportUserActivity()
+        }
 
         function reportUserActivity()
         {
-            hasUserActivity = true
-            userInactivityTimer.restart()
+            if (overlayVisible)
+                userInactivityTimer.restart()
         }
     }
 
@@ -86,7 +96,8 @@ Item
         id: userInactivityTimer
         interval: 5000
         repeat: false
-        onTriggered: opacityController.hasUserActivity = false
+
+        onTriggered: opacityController.setOverlayVisible(false)
     }
 
     // Rewind tap controls.
@@ -384,6 +395,7 @@ Item
     {
         anchors.fill: parent
         hoverEnabled: true
+
         onPressed: (mouse) =>
         {
             opacityController.reportUserActivity()
