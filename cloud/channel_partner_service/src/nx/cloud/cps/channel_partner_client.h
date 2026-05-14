@@ -10,6 +10,7 @@
 
 #include "api/organization.h"
 #include "api/system_data.h"
+#include "api/system_user_deletions.h"
 #include "api/user_data.h"
 
 namespace nx::cloud::cps {
@@ -116,6 +117,10 @@ public:
     void getSsoOrganizationsInfo(
         api::SsoOrganizationInfoRequest request,
         nx::MoveOnlyFunc<void(api::Result, api::SsoOrganizationInfoResponse)> handler);
+
+    void notifyUserDeletedFromSystems(
+        api::SystemUserDeletionsRequest request,
+        nx::MoveOnlyFunc<void(api::Result)> handler);
 };
 
 } // namespace nx::cloud::cps

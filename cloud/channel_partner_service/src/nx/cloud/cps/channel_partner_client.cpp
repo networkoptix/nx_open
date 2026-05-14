@@ -172,4 +172,16 @@ void ChannelPartnerClient::getSsoOrganizationsInfo(
         std::move(handler));
 }
 
+void ChannelPartnerClient::notifyUserDeletedFromSystems(
+    api::SystemUserDeletionsRequest request,
+    nx::MoveOnlyFunc<void(api::Result)> handler)
+{
+    base_type::template makeAsyncCall<void>(
+        nx::network::http::Method::post,
+        api::kInternalCloudSystemsUserDeletedPath,
+        {}, // query
+        std::move(request),
+        std::move(handler));
+}
+
 } // namespace nx::cloud::cps

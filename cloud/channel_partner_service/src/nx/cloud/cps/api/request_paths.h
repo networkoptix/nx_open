@@ -31,4 +31,7 @@ static constexpr char kInternalSsoOrgUserSendConfirmationPath[] =
 static constexpr char kInternalSsoOrganizationsInfoPath[] =
     "/partners/api/v3/internal/sso/organizations/info/";
 
+static constexpr char kInternalCloudSystemsUserDeletedPath[] =
+    "/partners/api/v4/internal/cloud_systems/user_deleted/";
+
 } // namespace nx::cloud::cps::api
