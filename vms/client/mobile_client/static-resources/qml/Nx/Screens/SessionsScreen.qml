@@ -287,7 +287,7 @@ AdaptiveScreen
                 sessionsScreen
                 {
                     title: qsTr("Welcome, %1!").arg(cloudUserProfileWatcher.fullName)
-                    leftPanel.visible: true
+                    leftPanel.visible: !!leftPanel.item
                 }
                 rightButton
                 {
@@ -354,7 +354,7 @@ AdaptiveScreen
                     title: searchField.displayText
                         ? ""
                         : accessor.getData(sessionsScreen.rootIndex, "display")
-                    leftPanel.visible: true
+                    leftPanel.visible: !!leftPanel.item
                 }
 
                 rightButton
