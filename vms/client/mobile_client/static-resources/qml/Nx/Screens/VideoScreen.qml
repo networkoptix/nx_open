@@ -838,7 +838,7 @@ Page
             objectsType: modernVideoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
-                && !ptzSheet.opened && !actionSheet.opened
+                && !ptzSheet.opened && !actionSheet.opened && !downloadMediaSheet.opened
 
             timeZone: video.resourceHelper.timeZone
 
