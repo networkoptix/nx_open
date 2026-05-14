@@ -59,7 +59,7 @@ AdaptiveSheet
 
             readonly property var visualizer: sheet.externalMode
                 && model.group === CameraButtonController.ButtonGroup.twoWayAudio
-                    ? hintContol.voiceVisualizer
+                    ? hintControl.voiceVisualizer
                     : hintControl.defaultVisualizer
 
             readonly property string visualizerText:
