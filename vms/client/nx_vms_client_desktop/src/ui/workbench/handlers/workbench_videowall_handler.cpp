@@ -346,7 +346,6 @@ nx::Url serverUrl(const QnResourcePtr& resource)
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new nx::vms::license::VideoWallLicenseUsageHelper(systemContext(), this)),
     #ifdef _DEBUG
         /* Limit by reasonable size. */
         m_uuidPool(new UuidPool(uuidPoolBase, 256))
@@ -407,9 +406,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             qnResourcesChangesManager->deleteResource(m_localDesktopCamera);
             m_localDesktopCamera.clear();
         });
-
-    m_licensesHelper->setCustomValidator(
-        std::make_unique<license::VideoWallLicenseValidator>(systemContext()));
 
     m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
@@ -1677,7 +1673,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
             return;
         }
     }
-    else if (m_licensesHelper->totalLicenses(Qn::LC_VideoWall) == 0)
+    else if (systemContext()->videoWallLicenseUsageHelper()->totalLicenses(Qn::LC_VideoWall) == 0)
     {
         showLicensesErrorDialog(
             tr("To enable this feature, please activate a Video Wall license."));

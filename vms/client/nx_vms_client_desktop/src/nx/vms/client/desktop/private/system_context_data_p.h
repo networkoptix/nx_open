@@ -3,7 +3,7 @@
 #pragma once
 
 #include <api/media_server_statistics_manager.h>
-#include <camera/camera_bookmarks_manager.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/bookmarks/bookmark_tags_watcher.h>
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
@@ -20,6 +20,7 @@
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
+#include <nx/vms/client/desktop/system_health/license_health_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
@@ -31,7 +32,7 @@
 #include <nx/vms/client/desktop/videowall/desktop_camera_stub_controller.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
 #include <nx/vms/client/desktop/virtual_camera/virtual_camera_manager.h>
-#include <storage/server_storage_manager.h>
+#include <nx/vms/license/usage_helper.h>
 
 #include "../system_context.h"
 
@@ -69,6 +70,10 @@ struct SystemContext::Private
     std::unique_ptr<UserNotificationSettingsManager> userNotificationSettingsManager;
     std::unique_ptr<StorageLocationCameraController> storageLocationCameraController;
     std::unique_ptr<RadassResourceManager> radassResourceManager;
+    std::unique_ptr<core::AnalyticsSettingsManager> analyticsSettingsManager;
+
+    std::unique_ptr<LicenseHealthWatcher> licenseHealthWatcher;
+    std::unique_ptr<nx::vms::license::VideoWallLicenseUsageHelper> videoWallLicenseUsageHelper;
 };
 
 } // namespace nx::vms::client::desktop

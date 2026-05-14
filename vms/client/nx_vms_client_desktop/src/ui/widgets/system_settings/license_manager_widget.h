@@ -4,7 +4,7 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <licensing/license_fwd.h>
-#include <nx/vms/client/desktop/license/license_helpers.h>
+#include <nx/vms/client/desktop/license/deactivator.h>
 #include <nx/vms/license/license_usage_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>

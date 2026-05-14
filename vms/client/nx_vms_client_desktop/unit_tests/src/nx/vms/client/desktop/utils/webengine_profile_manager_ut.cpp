@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <client/client_module.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/webpage/web_engine.h>
 
 namespace nx::vms::client::desktop::utils {
 
@@ -14,7 +14,7 @@ class WebEngineProfileManagerTest: public testing::Test
 protected:
     static void SetUpTestCase()
     {
-        QnClientModule::initWebEngine();
+        initWebEngine();
     }
 };
 

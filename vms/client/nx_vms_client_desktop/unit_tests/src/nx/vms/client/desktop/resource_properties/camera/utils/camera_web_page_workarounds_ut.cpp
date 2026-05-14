@@ -2,21 +2,20 @@
 
 #include <thread>
 
-#include <gtest/gtest.h>
+#include <QtHttpReply.h>
+#include <QtHttpRequest.h>
+#include <QtHttpServer.h>
 
-#include <QtTest/QSignalSpy>
+#include <gtest/gtest.h>
 
 #include <QtCore/QScopedPointer>
 #include <QtQml/QQmlEngine>
+#include <QtTest/QSignalSpy>
 
-#include <QtHttpServer.h>
-#include <QtHttpRequest.h>
-#include <QtHttpReply.h>
-
-#include <client/client_module.h>
-#include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
+#include <nx/vms/client/desktop/resource_properties/camera/utils/camera_web_page_workarounds.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/webpage/web_engine.h>
 
 using namespace std::chrono;
 
@@ -38,7 +37,7 @@ protected:
     // This function is named SetUpTestSuite() in GTest 1.10+
     static void SetUpTestCase()
     {
-        QnClientModule::initWebEngine();
+        initWebEngine();
         qRegisterMetaType<QtHttpRequest*>();
         qRegisterMetaType<QtHttpReply*>();
         utils::WebEngineProfileManager::registerQmlType();

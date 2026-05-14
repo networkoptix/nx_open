@@ -13,6 +13,7 @@ class DeviceAgentSettingsAdapter;
 class CameraSettingsAnalyticsEnginesWatcherInterface;
 class CameraAdvancedParametersManifestManager;
 class CameraSettingsResourceAccessWatcher;
+class SystemContext;
 
 class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
@@ -182,13 +183,15 @@ public:
 
     static std::pair<bool, State> setDeviceAgentSettingsValues(
         State state,
+        SystemContext* systemContext,
         const nx::Uuid& engineId,
         const QString& activeElement,
         const QJsonObject& values,
         const QJsonObject& paramValues,
         const QJsonObject& invalidValues = QJsonObject());
 
-    static State refreshDeviceAgentSettings(State state, const nx::Uuid& engineId);
+    static State refreshDeviceAgentSettings(
+        State state, SystemContext* systemContext, nx::Uuid engineId);
 
     /**
      * Resets Analytics Device Agent Data.

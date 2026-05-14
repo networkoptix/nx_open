@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/vms/client/desktop/license/license_helpers.h>
+#include <nx/vms/client/desktop/license/deactivator.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 

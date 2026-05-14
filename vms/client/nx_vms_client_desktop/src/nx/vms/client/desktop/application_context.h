@@ -19,8 +19,15 @@ class QOpenGLWidget;
 struct QnStartupParameters;
 
 namespace nx::cloud::gateway { class VmsGatewayEmbeddable; }
-namespace nx::vms::client::core { class ObjectDisplaySettings; }
 namespace nx::speech_synthesizer{ class TextToWaveServer; }
+
+namespace nx::vms::client::core {
+
+class ObjectDisplaySettings;
+
+namespace analytics { class AnalyticsMetadataProviderFactory; };
+
+} // namespace nx::vms::client::core
 
 namespace nx::vms::client::desktop {
 
@@ -154,6 +161,9 @@ public:
      */
     void initializeDesktopCamera(QOpenGLWidget* window);
 
+    /** Should be called after resource searchers are initialized. */
+    void startLocalResourceSearch();
+
     /**
      * @return Id of the current peer in the Message Bus. It is persistent and is not changed
      *     between the application runs. Desktop Client calculates actual peer id depending on the
@@ -192,6 +202,8 @@ public:
      * Map of analytics objects colors by object type. Persistently stored on a PC.
      */
     core::ObjectDisplaySettings* objectDisplaySettings() const;
+
+    core::analytics::AnalyticsMetadataProviderFactory* analyticsMetadataProviderFactory() const;
 
     ClientStateHandler* clientStateHandler() const;
 

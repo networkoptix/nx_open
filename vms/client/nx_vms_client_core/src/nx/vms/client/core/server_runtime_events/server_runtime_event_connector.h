@@ -13,6 +13,7 @@ namespace nx::vms::api {
 
 enum class EventReason;
 
+struct DeviceAgentSettingsMaybeChangedData;
 struct ServerRuntimeEventData;
 struct SiteHealthMessage;
 
@@ -28,7 +29,8 @@ public:
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
 signals:
-    void deviceAgentSettingsMaybeChanged(nx::Uuid deviceId, nx::Uuid engineId);
+    void deviceAgentSettingsMaybeChanged(
+        const nx::vms::api::DeviceAgentSettingsMaybeChangedData& data);
     void deviceFootageChanged(const std::vector<nx::Uuid>& deviceIds);
     void analyticsStorageParametersChanged(nx::Uuid serverId);
     void deviceAdvancedSettingsManifestChanged(const std::set<nx::Uuid>& deviceIds);

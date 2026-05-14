@@ -2,7 +2,6 @@
 
 #include "device_agent_settings_adapter.h"
 
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
@@ -10,7 +9,7 @@
 #include <nx/vms/client/core/analytics/analytics_settings_multi_listener.h>
 #include <nx/vms/client/desktop/analytics/analytics_actions_helper.h>
 #include <nx/vms/client/desktop/common/utils/camera_web_authenticator.h>
-#include <utils/common/delayed.h>
+#include <nx/vms/client/desktop/system_context.h>
 
 #include "../flux/camera_settings_dialog_state.h"
 #include "../flux/camera_settings_dialog_store.h"
@@ -25,7 +24,6 @@ public:
     QWidget* parent = nullptr;
     CameraSettingsDialogStore* store = nullptr;
     QnVirtualCameraResourcePtr camera;
-    core::AnalyticsSettingsManager* settingsManager = nullptr;
     std::unique_ptr<core::AnalyticsSettingsMultiListener> settingsListener;
 };
 
@@ -40,8 +38,6 @@ DeviceAgentSettingsAdapter::DeviceAgentSettingsAdapter(
 {
     d->store = store;
     d->parent = parent;
-    d->settingsManager = qnClientModule->analyticsSettingsManager();
-    NX_ASSERT(d->settingsManager);
 }
 
 DeviceAgentSettingsAdapter::~DeviceAgentSettingsAdapter()
@@ -56,8 +52,10 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
 
         if (camera)
         {
+            auto settingsManager = SystemContext::fromResource(camera)->analyticsSettingsManager();
+
             d->settingsListener = std::make_unique<core::AnalyticsSettingsMultiListener>(
-                qnClientModule->analyticsSettingsManager(),
+                settingsManager,
                 camera,
                 core::AnalyticsSettingsMultiListener::ListenPolicy::allEngines);
 
@@ -110,13 +108,14 @@ void DeviceAgentSettingsAdapter::setCamera(const QnVirtualCameraResourcePtr& cam
 
 void DeviceAgentSettingsAdapter::applySettings()
 {
-    if (!d->settingsManager)
-        return;
-
     if (!d->camera)
         return;
 
-    const nx::Uuid& cameraId = d->camera->getId();
+    auto settingsManager = SystemContext::fromResource(d->camera)->analyticsSettingsManager();
+    if (!settingsManager)
+        return;
+
+    const nx::Uuid cameraId = d->camera->getId();
 
     const auto& settingsByEngineId = d->store->state().analytics.settingsByEngineId;
     QHash<core::DeviceAgentId, QPair<QJsonObject, QJsonObject>> settingsToSet;
@@ -131,20 +130,21 @@ void DeviceAgentSettingsAdapter::applySettings()
         }
     }
 
-    d->settingsManager->applyChanges(settingsToSet);
+    settingsManager->applyChanges(settingsToSet);
 }
 
 void DeviceAgentSettingsAdapter::refreshSettings()
 {
-    if (!d->settingsManager)
+    if (!d->camera)
         return;
 
-    if (!d->camera)
+    auto settingsManager = SystemContext::fromResource(d->camera)->analyticsSettingsManager();
+    if (!settingsManager)
         return;
 
     const nx::Uuid& cameraId = d->camera->getId();
     for (const nx::Uuid& engineId: d->store->state().analytics.enabledEngines())
-        d->settingsManager->refreshSettings(core::DeviceAgentId{cameraId, engineId});
+        settingsManager->refreshSettings(core::DeviceAgentId{cameraId, engineId});
 }
 
 std::unordered_map<nx::Uuid, core::DeviceAgentData> DeviceAgentSettingsAdapter::dataByEngineId() const

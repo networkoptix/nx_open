@@ -16,8 +16,6 @@
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
 #include <nx/vms/client/desktop/utils/multiscreen_widget_geometry_setter.h>
-#include <nx/vms/license/license_usage_fwd.h>
-#include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchItem;
@@ -270,7 +268,6 @@ private:
         QTimer* syncPlayTimer; //< Timer for periodical play position sync.
     } m_controlMode;
 
-    nx::vms::license::VideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<UuidPool> m_uuidPool;
     QScopedPointer<MultiscreenWidgetGeometrySetter> m_geometrySetter;
 

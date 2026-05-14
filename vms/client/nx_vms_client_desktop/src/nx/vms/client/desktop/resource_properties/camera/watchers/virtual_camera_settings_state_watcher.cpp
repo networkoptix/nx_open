@@ -6,7 +6,6 @@
 
 #include <QtCore/QTimer>
 
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/system_context.h>

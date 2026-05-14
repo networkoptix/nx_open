@@ -71,7 +71,6 @@ private:
     rest::Handle m_lastHandle = 0;
     std::deque<RequestInfo> m_requests;
 };
-using AnalyticsSettingsMockApiInterfacePtr = std::shared_ptr<AnalyticsSettingsMockApiInterface>;
 
 /**
  * Class for convenient checks if listener dataChanged signal was emitted.
@@ -100,7 +99,7 @@ protected:
     QnResourcePool* resourcePool() const;
 
     QScopedPointer<core::AnalyticsSettingsManager> m_manager;
-    AnalyticsSettingsMockApiInterfacePtr m_serverInterfaceMock;
+    AnalyticsSettingsMockApiInterface* m_serverInterfaceMock = nullptr;
 };
 
 } // namespace test

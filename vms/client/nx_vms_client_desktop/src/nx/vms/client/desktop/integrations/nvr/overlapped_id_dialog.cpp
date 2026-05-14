@@ -5,7 +5,6 @@
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QWidget>
 
-#include <client/client_module.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <ui/workbench/workbench_context.h>
 

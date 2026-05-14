@@ -14,6 +14,7 @@
 #include <nx/utils/std_helpers.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/time/formatter.h>
 
 #include "camera_settings_dialog_state_reducer.h"
@@ -823,7 +824,13 @@ void CameraSettingsDialogStore::setDeviceAgentSettingsValues(
         [&](State state)
         {
             return Reducer::setDeviceAgentSettingsValues(
-                std::move(state), engineId, activeElement, values, paramValues, invalidValues);
+                std::move(state),
+                d->resource->systemContext()->as<SystemContext>(),
+                engineId,
+                activeElement,
+                values,
+                paramValues,
+                invalidValues);
         });
 }
 void CameraSettingsDialogStore::handleOverusedEngines(const std::set<nx::Uuid>& overusedEngines)
@@ -840,7 +847,8 @@ void CameraSettingsDialogStore::refreshDeviceAgentSettings(const nx::Uuid& engin
     d->executeAction(
         [&](State state)
         {
-            return Reducer::refreshDeviceAgentSettings(std::move(state), engineId);
+            return Reducer::refreshDeviceAgentSettings(
+                std::move(state), d->resource->systemContext()->as<SystemContext>(), engineId);
         });
 }
 

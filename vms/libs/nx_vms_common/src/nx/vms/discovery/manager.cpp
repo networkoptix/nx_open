@@ -268,7 +268,7 @@ void Manager::start(QnResourcePool* resourcePool)
             d->legacyMulticastFinder->start();
         });
 
-
+    d->resourcePoolConnections.reset(); //< Prevent connection duplication.
     if (!resourcePool)
         return;
 

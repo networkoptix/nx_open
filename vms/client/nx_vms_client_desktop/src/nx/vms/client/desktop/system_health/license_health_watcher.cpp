@@ -15,6 +15,8 @@ LicenseHealthWatcher::LicenseHealthWatcher(
     base_type(parent),
     m_licensePool(licensePool)
 {
+    NX_CRITICAL(licensePool);
+
     connect(&m_timer, &QTimer::timeout, this, &LicenseHealthWatcher::at_timer);
     m_timer.start(1000 * 60);
 }

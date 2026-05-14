@@ -14,7 +14,6 @@
 #include <qt_graphics_items/graphics_label.h>
 
 #include <api/runtime_info_manager.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource_media_layout.h>
@@ -851,44 +850,6 @@ QString QnResourceWidget::tooltipText(const QString& toolTip, const QString& hot
 #endif
     }
     return result;
-}
-
-bool QnResourceWidget::isVideoWallLicenseValid() const
-//TODO @pprivalov: code duplication with resource_status_helper
-{
-    auto helper = qnClientModule->videoWallLicenseUsageHelper();
-    if (helper->isValid())
-        return true;
-
-    const QnPeerRuntimeInfo localInfo = m_resource->systemContext()->runtimeInfoManager()->localInfo();
-    NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
-    nx::Uuid currentScreenId = localInfo.data.videoWallInstanceGuid;
-
-    // Gather all online screen ids.
-    // The order of screens should be the same across all client instances.
-    auto videoWallOnlineScreensWatcher = systemContext()->videoWallOnlineScreensWatcher();
-    const auto onlineScreens = videoWallOnlineScreensWatcher->onlineScreens();
-
-    const int allowedLiceses = helper->totalLicenses(Qn::LC_VideoWall);
-
-    // Calculate the number of screens that should show invalid license overlay.
-    using Helper = nx::vms::license::VideoWallLicenseUsageHelper;
-    size_t screensToDisable = 0;
-    while (screensToDisable < onlineScreens.size()
-        && Helper::licensesForScreens(onlineScreens.size() - screensToDisable) > allowedLiceses)
-    {
-        ++screensToDisable;
-    }
-
-    if (screensToDisable > 0)
-    {
-        // If current screen falls into the range - report invalid license.
-        const size_t i = std::distance(onlineScreens.begin(), onlineScreens.find(currentScreenId));
-        if (i < screensToDisable)
-            return false;
-    }
-
-    return true;
 }
 
 QnResourceWidget::SelectionState QnResourceWidget::selectionState() const

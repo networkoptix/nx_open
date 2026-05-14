@@ -5,7 +5,6 @@
 #include <QtGui/QAction>
 
 #include <camera/resource_display.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_controller_pool.h>

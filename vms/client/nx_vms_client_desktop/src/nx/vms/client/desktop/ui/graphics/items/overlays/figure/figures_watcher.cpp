@@ -2,17 +2,18 @@
 
 #include "figures_watcher.h"
 
-#include "box.h"
-#include "polyline.h"
-#include "polygon.h"
-
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
-#include <client/client_module.h>
+#include <core/resource/camera_resource.h>
 #include <nx/vms/client/core/analytics/analytics_settings_multi_listener.h>
 #include <nx/vms/client/core/skin/color_theme.h>
+#include <nx/vms/client/desktop/system_context.h>
+
+#include "box.h"
+#include "polygon.h"
+#include "polyline.h"
 
 namespace {
 
@@ -228,8 +229,12 @@ RoiFiguresWatcher::RoiFiguresWatcher(
     if (!camera)
         return;
 
+    auto settingsManager = SystemContext::fromResource(camera)->analyticsSettingsManager();
+    if (!settingsManager)
+        return;
+
     d->settingsListener.reset(new core::AnalyticsSettingsMultiListener(
-        qnClientModule->analyticsSettingsManager(),
+        settingsManager,
         camera,
         core::AnalyticsSettingsMultiListener::ListenPolicy::enabledEngines));
 

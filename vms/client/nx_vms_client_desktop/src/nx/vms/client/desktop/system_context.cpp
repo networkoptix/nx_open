@@ -9,10 +9,12 @@
 #include <client/client_runtime_settings.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
+#include <nx/vms/client/core/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/intercom/intercom_manager.h>
+#include <nx/vms/client/desktop/license/videowall_license_validator.h>
 #include <nx/vms/client/desktop/other_servers/other_servers_manager.h>
 #include <nx/vms/client/desktop/resource/local_resources_initializer.h>
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
@@ -130,6 +132,14 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->storageLocationCameraController = std::make_unique<StorageLocationCameraController>(this);
             d->radassResourceManager = std::make_unique<RadassResourceManager>(
                 std::make_unique<SettingsRadassStorage>(this));
+            d->analyticsSettingsManager =
+                core::AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(this);
+            d->licenseHealthWatcher = std::make_unique<LicenseHealthWatcher>(licensePool());
+            d->videoWallLicenseUsageHelper =
+                std::make_unique<nx::vms::license::VideoWallLicenseUsageHelper>(this);
+            d->videoWallLicenseUsageHelper->setCustomValidator(
+                std::make_unique<license::VideoWallLicenseValidator>(this));
+
             break;
 
         case Mode::crossSystem:
@@ -291,6 +301,16 @@ StorageLocationCameraController* SystemContext::storageLocationCameraController(
 RadassResourceManager* SystemContext::radassResourceManager() const
 {
     return d->radassResourceManager.get();
+}
+
+core::AnalyticsSettingsManager* SystemContext::analyticsSettingsManager() const
+{
+    return d->analyticsSettingsManager.get();
+}
+
+nx::vms::license::VideoWallLicenseUsageHelper* SystemContext::videoWallLicenseUsageHelper() const
+{
+    return d->videoWallLicenseUsageHelper.get();
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

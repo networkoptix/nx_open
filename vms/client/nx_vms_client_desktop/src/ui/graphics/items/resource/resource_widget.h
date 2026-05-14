@@ -412,8 +412,6 @@ protected:
     QString tooltipText(const QString& toolTip, const QString& hotkey) const;
     QString tooltipText(const QString& toolTip, const QKeySequence& hotkey) const;
 
-    bool isVideoWallLicenseValid() const;
-
     QIcon loadSvgIcon(const QString& name) const;
 
 private:

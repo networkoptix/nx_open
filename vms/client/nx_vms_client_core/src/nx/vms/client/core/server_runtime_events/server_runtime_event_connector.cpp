@@ -29,6 +29,8 @@ void ServerRuntimeEventConnector::setMessageProcessor(QnCommonMessageProcessor* 
 void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     const ServerRuntimeEventData& eventData)
 {
+    const auto payload = nx::toBufferView(eventData.eventData);
+
     switch (eventData.eventType)
     {
         case ServerRuntimeEventType::undefined:
@@ -38,19 +40,15 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceAgentSettingsMaybeChanged:
         {
             DeviceAgentSettingsMaybeChangedData result;
-            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
-                return;
-
-            emit deviceAgentSettingsMaybeChanged(
-                result.deviceId,
-                result.engineId);
+            if (NX_ASSERT(reflect::json::deserialize(payload, &result)))
+                emit deviceAgentSettingsMaybeChanged(result);
 
             return;
         }
         case ServerRuntimeEventType::deviceFootageChanged:
         {
             DeviceFootageChangedData result;
-            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(payload, &result)))
                 return;
 
             emit deviceFootageChanged(result.deviceIds);
@@ -60,7 +58,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::analyticsStorageParametersChanged:
         {
             AnalyticsStorageParametersChangedData result;
-            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(payload, &result)))
                 return;
 
             emit analyticsStorageParametersChanged(result.serverId);
@@ -70,7 +68,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::deviceAdvancedSettingsManifestChanged:
         {
             DeviceAdvancedSettingsManifestChangedData result;
-            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(payload, &result)))
                 return;
 
             emit deviceAdvancedSettingsManifestChanged(result.deviceIds);
@@ -80,7 +78,7 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         case ServerRuntimeEventType::serviceDisabled:
         {
             ServiceDisabledData result;
-            if (!NX_ASSERT(reflect::json::deserialize(nx::Buffer(eventData.eventData), &result)))
+            if (!NX_ASSERT(reflect::json::deserialize(payload, &result)))
                 return;
 
             emit serviceDisabled(result.reason, result.deviceIds);
@@ -91,11 +89,8 @@ void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
         {
             nx::vms::api::SiteHealthMessage message;
 
-            if (NX_ASSERT(nx::reflect::json::deserialize(
-                nx::toBufferView(eventData.eventData), &message)))
-            {
+            if (NX_ASSERT(nx::reflect::json::deserialize(payload, &message)))
                 emit(siteHealthMessage(message));
-            }
 
             return;
         }

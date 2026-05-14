@@ -10,7 +10,6 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <camera/fps_calculator.h>
-#include <client/client_module.h>
 #include <core/resource/camera_media_stream_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -3018,6 +3017,7 @@ State CameraSettingsDialogStateReducer::setAnalyticsStreamIndex(
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsValues(
     State state,
+    SystemContext* systemContext,
     const nx::Uuid& engineId,
     const QString& activeElement,
     const QJsonObject& values,
@@ -3055,7 +3055,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
 
     if (!activeElement.isEmpty())
     {
-        bool loading = qnClientModule->analyticsSettingsManager()->activeSettingsChanged(
+        bool loading = systemContext->analyticsSettingsManager()->activeSettingsChanged(
             core::DeviceAgentId{state.singleCameraProperties.id, engineId},
             activeElement,
             state.analytics.settingsByEngineId[engineId].model,
@@ -3069,12 +3069,12 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setDeviceAgentSettingsV
 }
 
 State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
-    State state, const nx::Uuid& engineId)
+    State state, SystemContext* systemContext, nx::Uuid engineId)
 {
     if (!NX_ASSERT(state.isSingleCamera()))
         return state;
 
-    qnClientModule->analyticsSettingsManager()->refreshSettings(
+    systemContext->analyticsSettingsManager()->refreshSettings(
         core::DeviceAgentId{state.singleCameraProperties.id, engineId});
 
     auto& settings = state.analytics.settingsByEngineId[engineId];

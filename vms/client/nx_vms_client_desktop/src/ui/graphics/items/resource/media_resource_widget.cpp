@@ -21,7 +21,6 @@
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <client/client_globals.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <common/common_globals.h>
 #include <core/ptz/activity_ptz_controller.h>
@@ -74,7 +73,7 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
-#include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/license/utils.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/opengl/opengl_renderer.h>
@@ -112,6 +111,7 @@
 #include <nx/vms/common/saas/saas_utils.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
+#include <nx/vms/common/utils/object_painter_helper.h>
 #include <nx/vms/crypt/crypt.h>
 #include <nx/vms/license/usage_helper.h>
 #include <nx/vms/time/formatter.h>
@@ -143,8 +143,6 @@
 #include <utils/common/synctime.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/math/color_transformations.h>
-
-#include "nx/vms/common/utils/object_painter_helper.h"
 
 using namespace std::chrono;
 
@@ -2633,7 +2631,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             if (systemContext()->saasServiceManager()->saasShutDown())
                 return Qn::SaasShutDown;
         }
-        else if (!isVideoWallLicenseValid())
+        else if (!license::isVideoWallLicenseValid(resource()))
         {
             return Qn::VideowallWithoutLicenseOverlay;
         }

@@ -2,8 +2,6 @@
 
 #include "video_stream_display.h"
 
-#include <QtGui/QWindow>
-
 #include <algorithm>
 #include <chrono>
 
@@ -12,7 +10,6 @@ extern "C" {
 #include <libswscale/swscale.h>
 } // extern "C"
 
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/resource_property_key.h>
@@ -22,7 +19,6 @@ extern "C" {
 #include <nx/media/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/client/core/utils/video_cache.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -31,7 +27,6 @@ extern "C" {
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/opengl/gl_functions.h>
-#include <utils/common/adaptive_sleep.h>
 
 #include "gl_renderer.h"
 

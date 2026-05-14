@@ -11,7 +11,14 @@
 
 class QnMediaServerStatisticsManager;
 
-namespace nx::vms::client::core { class AnalyticsEventsSearchTreeBuilder; }
+namespace nx::vms::license { class VideoWallLicenseUsageHelper; }
+
+namespace nx::vms::client::core {
+
+class AnalyticsEventsSearchTreeBuilder;
+class AnalyticsSettingsManager;
+
+} // namespace nx::vms::client::core
 
 namespace nx::vms::client::desktop {
 
@@ -100,6 +107,8 @@ public:
     UserNotificationSettingsManager* userNotificationSettingsManager() const;
     StorageLocationCameraController* storageLocationCameraController() const;
     RadassResourceManager* radassResourceManager() const;
+    core::AnalyticsSettingsManager* analyticsSettingsManager() const;
+    nx::vms::license::VideoWallLicenseUsageHelper* videoWallLicenseUsageHelper() const;
 
 protected:
     virtual void setMessageProcessor(QnCommonMessageProcessor* messageProcessor) override;

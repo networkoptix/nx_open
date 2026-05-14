@@ -48,7 +48,7 @@ struct AnalyticsSettingsManager::Private
 
     void start();
 
-    void refreshSettings(const DeviceAgentId& agentId);
+    bool refreshSettings(const DeviceAgentId& agentId);
     void handleListenerDeleted(const DeviceAgentId& id);
 
     bool hasSubscription(const DeviceAgentId& id) const;
@@ -141,14 +141,14 @@ void AnalyticsSettingsManager::Private::start()
     engineManifestChangesListener->start();
 }
 
-void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& agentId)
+bool AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& agentId)
 {
     auto [device, engine] = toResources(agentId);
     if (!device || !engine)
-        return;
+        return false;
 
     if (!NX_ASSERT(serverInterface))
-        return;
+        return false;
 
     NX_DEBUG(this, "Refreshing settings for %1 - %2", device->getName(), engine->getName());
 
@@ -172,7 +172,11 @@ void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& age
     {
         pendingRefreshRequests.append(handle);
         updateStatus(agentId, DeviceAgentData::Status::loading);
+
+        return true;
     }
+
+    return false;
 }
 
 void AnalyticsSettingsManager::Private::handleListenerDeleted(const DeviceAgentId& id)
@@ -305,7 +309,7 @@ AnalyticsSettingsManager::~AnalyticsSettingsManager()
 void AnalyticsSettingsManager::setServerInterface(
     AnalyticsSettingsServerInterfacePtr serverInterface)
 {
-    d->serverInterface = serverInterface;
+    d->serverInterface = std::move(serverInterface);
 }
 
 void AnalyticsSettingsManager::refreshSettings(const DeviceAgentId& agentId)

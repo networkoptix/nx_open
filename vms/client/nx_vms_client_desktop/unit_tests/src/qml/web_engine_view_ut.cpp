@@ -10,8 +10,8 @@
 #include <QtCore/QObject>
 #include <QtQml/QQmlComponent>
 
-#include <client/client_module.h>
 #include <nx/vms/client/desktop/utils/qml_property.h>
+#include <nx/vms/client/desktop/webpage/web_engine.h>
 
 #include "qml_test_environment.h"
 
@@ -23,7 +23,7 @@ class WebEngineViewTest: public testing::Test
 protected:
     static void SetUpTestCase()
     {
-        QnClientModule::initWebEngine();
+        initWebEngine();
     }
 };
 

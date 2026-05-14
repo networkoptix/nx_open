@@ -3,7 +3,6 @@
 #include "call_notifications_list_model_p.h"
 
 #include <api/server_rest_connection.h>
-#include <client/client_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_management/resource_pool.h>

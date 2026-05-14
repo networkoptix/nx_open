@@ -41,7 +41,6 @@
     #include <QtGui/private/qvulkandefaultinstance_p.h>
 #endif
 
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>
@@ -56,7 +55,6 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/rlimit.h>
-#include <nx/utils/timer_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -71,6 +69,7 @@
 #include <nx/vms/client/desktop/state/window_geometry_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/dialogs/eula_dialog.h>
+#include <nx/vms/client/desktop/webpage/web_engine.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <statistics/statistics_manager.h>
 #include <ui/dialogs/common/message_box.h>
@@ -245,7 +244,7 @@ void setGraphicsSettingsEarly(const QnStartupParameters& /*startupParams*/)
 
     if (nx::build_info::isMacOsX())
     {
-        // This should go into QnClientModule::initSurfaceFormat(),
+        // This should go into initSurfaceFormat(),
         // but we must set OpenGL version before creation of GUI application.
 
         QSurfaceFormat format;
@@ -294,6 +293,25 @@ void setGraphicsSettingsEarly(const QnStartupParameters& /*startupParams*/)
     }
 }
 
+void initSurfaceFormat()
+{
+    // Warning: do not set version or profile here.
+
+    auto format = QSurfaceFormat::defaultFormat();
+
+    if (qnRuntime->lightMode().testFlag(Qn::LightModeNoMultisampling))
+        format.setSamples(2);
+    format.setSwapBehavior(appContext()->localSettings()->glDoubleBuffer()
+        ? QSurfaceFormat::DoubleBuffer
+        : QSurfaceFormat::SingleBuffer);
+    format.setSwapInterval(ini().limitFrameRate ? 1 : 0);
+
+    format.setDepthBufferSize(24);
+    format.setStencilBufferSize(8);
+
+    QSurfaceFormat::setDefaultFormat(format);
+}
+
 // This function is called AFTER QApplication is created.
 void setGraphicsSettings()
 {
@@ -307,6 +325,8 @@ void setGraphicsSettings()
         {GraphicsApi::vulkan, QSGRendererInterface::Vulkan},
         {GraphicsApi::metal, QSGRendererInterface::Metal},
     };
+
+    initSurfaceFormat();
 
     auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
 
@@ -415,9 +435,6 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
     if (startupParams.selfUpdateMode)
         return kSuccessCode;
 
-    // TODO: #sivanov Move QnClientModule contents to Application Context and System Context.
-    QnClientModule client(applicationContext->currentSystemContext(), startupParams);
-
     NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
 
     const auto graphicsApi = appContext()->runtimeSettings()->graphicsApi();
@@ -430,7 +447,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     setGraphicsSettings();
 
-    client.initWebEngine();
+    initWebEngine();
 
     if (startupParams.customUri.isValid())
         sendCloudPortalConfirmation(startupParams.customUri, application);
@@ -513,7 +530,7 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     applicationContext->initializeDesktopCamera(
         qobject_cast<QOpenGLWidget*>(mainWindow->viewport()));
-    client.startLocalSearchers();
+    applicationContext->startLocalResourceSearch();
 
     windowContext->handleStartupParameters(startupParams);
 

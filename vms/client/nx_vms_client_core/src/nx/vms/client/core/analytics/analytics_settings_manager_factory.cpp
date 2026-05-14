@@ -4,15 +4,11 @@
 
 #include <QtCore/QObject>
 
-#include <api/common_message_processor.h>
 #include <api/server_rest_connection.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <nx/reflect/json.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/api/data/server_runtime_event_data.h>
+#include <nx/vms/client/core/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/core/system_context.h>
-#include <utils/common/delayed.h>
 
 #include "analytics_settings_manager.h"
 
@@ -46,8 +42,8 @@ public:
             return api->getDeviceAnalyticsSettings(
                 device,
                 engine,
-                nx::utils::guarded(m_owner, std::move(callback)),
-                m_owner->thread());
+                std::move(callback),
+                m_owner.get());
         }
 
         return {};
@@ -70,8 +66,8 @@ public:
                 engine,
                 settingsValues,
                 settingsModel,
-                nx::utils::guarded(m_owner, std::move(callback)),
-                m_owner->thread());
+                std::move(callback),
+                m_owner.get());
         }
 
         return {};
@@ -98,8 +94,8 @@ public:
                 settingsModel,
                 settingsValues,
                 paramValues,
-                nx::utils::guarded(m_owner, std::move(callback)),
-                m_owner->thread());
+                std::move(callback),
+                m_owner.get());
         }
 
         return {};
@@ -116,30 +112,16 @@ AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(SystemContext* s
 {
     auto manager = std::make_unique<AnalyticsSettingsManager>(systemContext);
 
-    auto serverInterface = std::make_shared<AnalyticsSettingsServerRestApiInterface>(
-        systemContext,
-        manager.get());
-    manager->setServerInterface(serverInterface);
+    manager->setServerInterface(std::make_unique<AnalyticsSettingsServerRestApiInterface>(
+        systemContext, manager.get()));
 
     QObject::connect(
-        systemContext->messageProcessor(),
-        &QnCommonMessageProcessor::serverRuntimeEventOccurred,
+        systemContext->serverRuntimeEventConnector(),
+        &ServerRuntimeEventConnector::deviceAgentSettingsMaybeChanged,
         manager.get(),
-        [managerPtr = manager.get()](const ServerRuntimeEventData& eventData)
+        [managerPtr = manager.get()](const DeviceAgentSettingsMaybeChangedData& payload)
         {
-            if (eventData.eventType == ServerRuntimeEventType::deviceAgentSettingsMaybeChanged)
-            {
-                const auto [payload, success] =
-                    nx::reflect::json::deserialize<DeviceAgentSettingsMaybeChangedData>(
-                        eventData.eventData.toStdString());
-
-                if (!NX_ASSERT(success, "Could not deserialize event data"))
-                    return;
-
-                managerPtr->storeSettings(
-                    {payload.deviceId, payload.engineId},
-                    payload.settingsData);
-            }
+            managerPtr->storeSettings({payload.deviceId, payload.engineId}, payload.settingsData);
         });
 
     return manager;

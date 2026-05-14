@@ -107,16 +107,18 @@ ListenerNotifier::ListenerNotifier(const core::AnalyticsSettingsListenerPtr& lis
 
 void AnalyticsSettingsTestFixture::SetUp()
 {
-    m_serverInterfaceMock = std::make_shared<AnalyticsSettingsMockApiInterface>();
+    auto serverInterfaceMock = std::make_unique<AnalyticsSettingsMockApiInterface>();
+    m_serverInterfaceMock = serverInterfaceMock.get();
+
     createMessageProcessor();
     m_manager.reset(new core::AnalyticsSettingsManager(systemContext()));
-    m_manager->setServerInterface(m_serverInterfaceMock);
+    m_manager->setServerInterface(std::move(serverInterfaceMock));
 }
 
 void AnalyticsSettingsTestFixture::TearDown()
 {
     m_manager.reset();
-    m_serverInterfaceMock.reset();
+    m_serverInterfaceMock = nullptr;
 }
 
 AnalyticsEngineResourcePtr AnalyticsSettingsTestFixture::addEngine()

@@ -9,7 +9,6 @@
 #include <QtQml/QtQml>
 
 #include <api/runtime_info_manager.h>
-#include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_property_key.h>
@@ -17,7 +16,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/license/utils.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
@@ -30,7 +29,6 @@
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>
 
 namespace nx::vms::client::desktop {
 
@@ -62,7 +60,6 @@ private:
     void updateLicenseUsage();
     void setLicenseUsage(LicenseUsage value);
     void setStatus(StatusFlags value);
-    bool isVideoWallLicenseValid() const;
 
 private:
     QPointer<WindowContext> m_context;
@@ -263,7 +260,7 @@ void ResourceStatusHelper::Private::updateStatus()
 
     StatusFlags status{};
     m_status.setFlag(StatusFlag::videowallLicenseRequired,
-        qnRuntime->isVideoWallMode() && !isVideoWallLicenseValid());
+        qnRuntime->isVideoWallMode() && !license::isVideoWallLicenseValid(m_resource));
 
     if (m_camera)
     {
@@ -435,47 +432,6 @@ void ResourceStatusHelper::Private::executeAction(ActionType type)
             break;
         }
     }
-}
-
-bool ResourceStatusHelper::Private::isVideoWallLicenseValid() const
-{
-    if (!NX_ASSERT(m_resource && qnRuntime->isVideoWallMode()))
-        return true;
-
-    auto systemContext = SystemContext::fromResource(m_resource);
-
-    auto helper = qnClientModule->videoWallLicenseUsageHelper();
-    if (helper->isValid())
-        return true;
-
-    const QnPeerRuntimeInfo localInfo = systemContext->runtimeInfoManager()->localInfo();
-    NX_ASSERT(localInfo.data.peer.peerType == nx::vms::api::PeerType::videowallClient);
-    nx::Uuid currentScreenId = localInfo.data.videoWallInstanceGuid;
-
-    // Gather all online screen ids.
-    // The order of screens should be the same across all client instances.
-    const auto onlineScreens = systemContext->videoWallOnlineScreensWatcher()->onlineScreens();
-
-    const int allowedLiceses = helper->totalLicenses(Qn::LC_VideoWall);
-
-    // Calculate the number of screens that should show invalid license overlay.
-    using Helper = nx::vms::license::VideoWallLicenseUsageHelper;
-    size_t sceensToDisable = 0;
-    while (sceensToDisable < onlineScreens.size()
-        && Helper::licensesForScreens(onlineScreens.size() - sceensToDisable) > allowedLiceses)
-    {
-        ++sceensToDisable;
-    }
-
-    if (sceensToDisable > 0)
-    {
-        // If current screen falls into the range - report invalid license.
-        const size_t i = std::distance(onlineScreens.begin(), onlineScreens.find(currentScreenId));
-        if (i < sceensToDisable)
-            return false;
-    }
-
-    return true;
 }
 
 } // namespace nx::vms::client::desktop

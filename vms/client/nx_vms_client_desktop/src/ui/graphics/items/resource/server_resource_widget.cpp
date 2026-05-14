@@ -18,7 +18,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
-#include <nx/vms/client/desktop/license/videowall_license_validator.h>
+#include <nx/vms/client/desktop/license/utils.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -931,7 +931,7 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
 {
-    if (qnRuntime->isVideoWallMode() && !isVideoWallLicenseValid())
+    if (qnRuntime->isVideoWallMode() && !license::isVideoWallLicenseValid(m_resource))
         return Qn::VideowallWithoutLicenseOverlay;
 
     auto status = m_resource->getStatus();

@@ -61,7 +61,7 @@ public:
         const QJsonObject& paramValues,
         AnalyticsActiveSettingsCallback callback) = 0;
 };
-using AnalyticsSettingsServerInterfacePtr = std::shared_ptr<AnalyticsSettingsServerInterface>;
+using AnalyticsSettingsServerInterfacePtr = std::unique_ptr<AnalyticsSettingsServerInterface>;
 
 class NX_VMS_CLIENT_CORE_API AnalyticsSettingsListener: public QObject
 {
@@ -109,8 +109,8 @@ public:
     virtual ~AnalyticsSettingsManager() override;
 
     /**
-     * Server interface should be passed to send actual requests to the media server. Ownership will
-     * be shared.
+     * Server interface should be passed to send actual requests to the media server.
+     * Ownership will be taken.
      */
     void setServerInterface(AnalyticsSettingsServerInterfacePtr serverInterface);
 

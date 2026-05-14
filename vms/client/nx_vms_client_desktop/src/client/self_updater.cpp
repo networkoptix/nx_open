@@ -13,7 +13,6 @@
 #endif // defined(Q_OS_LINUX)
 
 #include <client/client_installations_manager.h>
-#include <client/client_module.h>
 #include <client/client_startup_parameters.h>
 #include <nx/branding.h>
 #include <nx/build_info.h>

@@ -44,6 +44,7 @@
 #include <nx/utils/trace/session.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/analytics/analytics_metadata_provider_factory.h>
 #include <nx/vms/client/core/analytics/object_display_settings.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
@@ -100,6 +101,7 @@
 #include <nx/vms/client/desktop/webpage/web_page_data_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/network/server_compatibility_validator.h>
+#include <nx/vms/discovery/manager.h>
 #include <platform/platform_abstraction.h>
 #include <ui/workaround/qtbug_workaround.h>
 #include <utils/math/color_transformations.h>
@@ -155,6 +157,12 @@ struct LocalResourcesContext
     std::unique_ptr<core::ResourceProcessor> resourceProcessor;
     std::unique_ptr<QnLocalResourceStatusWatcher> localResourceStatusWatcher;
     std::unique_ptr<ResourceDirectoryBrowser> resourceDirectoryBrowser;
+};
+
+struct QtMessageRedirector final
+{
+    QtMessageRedirector() { nx::enableQtMessageAsserts(); }
+    ~QtMessageRedirector() { nx::disableQtMessageAsserts(); }
 };
 
 core::ApplicationContext::Mode toCoreMode(ApplicationContext::Mode value)
@@ -349,6 +357,7 @@ struct ApplicationContext::Private
     std::unique_ptr<RunningInstancesManager> runningInstancesManager;
 
     // Local resources search modules.
+    std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
     std::unique_ptr<LocalResourcesContext> localResourcesContext;
 
     // Specialized context parts.
@@ -359,9 +368,11 @@ struct ApplicationContext::Private
 
     // Miscellaneous modules.
     std::unique_ptr<DebugInfoStorage> debugInfoStorage;
+    std::unique_ptr<QtMessageRedirector> qtMessageRedirector;
     std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
     std::unique_ptr<PerformanceMonitor> performanceMonitor;
 
+    std::unique_ptr<core::analytics::AnalyticsMetadataProviderFactory> analyticsMetadataProviderFactory;
     std::unique_ptr<ApplauncherGuard> applauncherGuard;
     std::unique_ptr<QnClientAutoRunWatcher> autoRunWatcher;
     std::unique_ptr<integrations::Storage> integrationStorage;
@@ -373,7 +384,6 @@ struct ApplicationContext::Private
     std::unique_ptr<nx::speech_synthesizer::TextToWaveServer> textToWaveServer;
     std::unique_ptr<WebPageDataCache> webPageDataCache;
     std::unique_ptr<QnQtbugWorkaround> qtBugWorkarounds;
-    std::unique_ptr<core::DesktopResourceSearcher> desktopResourceSearcher;
     std::unique_ptr<nx::vms::client::desktop::joystick::Manager> joystickManager;
     std::unique_ptr<nx::vms::client::desktop::AudioVideoInput> audioVideoInput;
 
@@ -459,7 +469,7 @@ struct ApplicationContext::Private
 
     void initializeLogging(const QnStartupParameters& startupParameters)
     {
-        nx::enableQtMessageAsserts();
+        qtMessageRedirector = std::make_unique<QtMessageRedirector>();
 
         using namespace nx::log;
 
@@ -606,6 +616,9 @@ struct ApplicationContext::Private
         if (mode == Mode::desktopClient)
         {
             mainSystemContext->createMessageProcessor<QnDesktopClientMessageProcessor>(q);
+
+            mainSystemContext->startModuleDiscovery(q->moduleDiscoveryManager());
+            q->moduleDiscoveryManager()->start(mainSystemContext->resourcePool());
         }
 
         if (auto networkModule = q->networkModule())
@@ -795,7 +808,6 @@ ApplicationContext::ApplicationContext(
             d->initializeSystemContext();
             if (features.core.flags.testFlag(CoreFeatureFlag::cross_site))
                 d->initializeCrossSystemModules();
-            d->mainSystemContext->startModuleDiscovery(moduleDiscoveryManager());
             d->updateVersionIfNeeded();
             d->initializeQml();
             d->initializeLocalResourcesSearch();
@@ -813,6 +825,9 @@ ApplicationContext::ApplicationContext(
             d->cloudGateway = std::make_unique<nx::cloud::gateway::VmsGatewayEmbeddable>();
             d->localProxyServer = std::make_unique<LocalProxyServer>();
             d->joystickManager.reset(joystick::Manager::create());
+            d->analyticsMetadataProviderFactory =
+                std::make_unique<core::analytics::AnalyticsMetadataProviderFactory>();
+            d->analyticsMetadataProviderFactory->registerMetadataProviders();
 
             QObject::connect(d->sharedMemoryManager.get(),
                 &SharedMemoryManager::clientCommandRequested,
@@ -922,6 +937,11 @@ void ApplicationContext::initializeDesktopCamera([[maybe_unused]] QOpenGLWidget*
     d->desktopResourceSearcher->setLocal(true);
     resourceDiscoveryManager()->addDeviceSearcher(d->desktopResourceSearcher.get());
 #endif
+}
+
+void ApplicationContext::startLocalResourceSearch()
+{
+    resourceDiscoveryManager()->start();
 }
 
 nx::Uuid ApplicationContext::peerId() const
@@ -1092,6 +1112,12 @@ joystick::Manager* ApplicationContext::joystickManager() const
 const QnStartupParameters& ApplicationContext::startupParameters() const
 {
     return d->startupParameters;
+}
+
+core::analytics::AnalyticsMetadataProviderFactory*
+    ApplicationContext::analyticsMetadataProviderFactory() const
+{
+    return d->analyticsMetadataProviderFactory.get();
 }
 
 std::unique_ptr<QnAbstractStreamDataProvider> ApplicationContext::createAudioInputProvider() const

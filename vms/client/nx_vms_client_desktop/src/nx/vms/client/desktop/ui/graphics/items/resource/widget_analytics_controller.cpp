@@ -8,7 +8,6 @@
 
 #include <analytics/common/object_metadata.h>
 #include <analytics/db/analytics_db_types.h>
-#include <client/client_module.h>
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/analytics_logging_ini.h>
