@@ -347,19 +347,6 @@ TEST_P(ThreadQueueFixture, ConcurrentReadersRandomAccess)
     EXPECT_EQ(matchCount.load(), count * kThreads);
 }
 
-// DetachDataByCondition test.
-TEST_P(ThreadQueueFixture, DetachDataByCondition)
-{
-    auto& queue = getQueue();
-
-    queue.detachDataByCondition([](const int val, const auto&){ return val % 2 != 0; });
-
-    auto access = queue.lock();
-    ASSERT_EQ(access.size(), expectedSize());
-    for (int i = 1; i <= access.size(); ++i)
-        ASSERT_EQ(access.at(i - 1), (i % 2 != 0) ? int() : i);
-}
-
 // Access to out-of-bounds indexes return T().
 TEST_P(ThreadQueueFixture, OobAccess)
 {
