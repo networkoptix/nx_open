@@ -112,6 +112,8 @@ const QString kOnvifRemoteArchiveMinChunkDuration("onvifRemoteArchiveMinChunkDur
 
 const QString kOnvifRemoteArchiveStartSkipDuration("onvifRemoteArchiveStartSkipDuration");
 
+const QString kOnvifRemoteArchiveChopHeader("onvifRemoteArchiveChopHeader");
+
 const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
 
 const QString kOnvifRemoteArchiveDisableFastDownload("onvifRemoteArchiveDisableFastDownload");
