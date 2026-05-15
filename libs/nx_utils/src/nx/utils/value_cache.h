@@ -7,7 +7,10 @@
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex_locker.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace nx::utils {
 
@@ -113,9 +116,42 @@ public:
     ValueType get() const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (m_valueVersion == m_version && !m_timer.hasExpired(m_expirationTime))
+        while (true)
+        {
+            if (m_valueVersion == m_version && !m_timer.hasExpired(m_expirationTime))
+                return m_value;
+
+            if (m_updateInProgress)
+            {
+                if (m_valueVersion >= 0)
+                    return m_value;
+                m_updateDone.wait(lock.mutex());
+                continue;
+            }
+
+            m_updateInProgress = true;
+            const int64_t version = ++m_version;
+            auto guard = nx::utils::makeScopeGuard(
+                [this]()
+                {
+                    m_updateInProgress = false;
+                    m_updateDone.wakeAll();
+                });
+
+            std::optional<ValueType> value;
+            {
+                nx::Unlocker<nx::Mutex> unlocker(&lock);
+                value.emplace(base_type::m_valueGenerator());
+            }
+
+            if (version >= m_valueVersion)
+            {
+                m_value = std::move(*value);
+                m_valueVersion = version;
+                m_timer.restart();
+            }
             return m_value;
-        return updated(&lock);
+        }
     }
 
     // Updated(lock) function is not virtual, so this function is required as well.
@@ -156,6 +192,8 @@ protected:
 private:
     mutable ElapsedTimer m_timer;
     const std::chrono::milliseconds m_expirationTime;
+    mutable bool m_updateInProgress = false;
+    mutable nx::WaitCondition m_updateDone;
 };
 
 //-------------------------------------------------------------------------------------------------
