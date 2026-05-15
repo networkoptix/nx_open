@@ -187,6 +187,12 @@ PushNotificationFilterModel::PushNotificationFilterModel(QObject* parent):
             m_recentlyEditedIds.clear();
             invalidate();
         });
+
+    connect(this, &PushNotificationFilterModel::modelAboutToBeReset, this,
+        [this]()
+        {
+            m_recentlyEditedIds.clear();
+        });
 }
 
 void PushNotificationFilterModel::registerQmlType()

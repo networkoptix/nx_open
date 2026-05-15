@@ -57,8 +57,9 @@ private:
  * regardless of the current viewed-status filter.
  *
  * Viewed-status filter has three modes: All, Viewed, and Unviewed. When a notification is marked
- * as read while the Unviewed filter is active, it stays visible in the list until the filter is
- * switched, so it doesn't unexpectedly disappear from the user's view.
+ * as read while the Unviewed filter is active, it stays visible in the list until either the
+ * filter is switched or the feed is fully refreshed, so it doesn't unexpectedly disappear from the
+ * user's view.
  */
 class PushNotificationFilterModel: public QSortFilterProxyModel
 {
