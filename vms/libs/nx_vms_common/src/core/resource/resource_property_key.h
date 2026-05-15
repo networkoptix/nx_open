@@ -160,6 +160,9 @@ NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveMinChunkDuration;
 // Skip this many seconds at the start of remote archive when downloading it.
 NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveStartSkipDuration;
 
+// Chop HTTP header from device response manually when fetching archive
+NX_VMS_COMMON_API extern const QString kOnvifRemoteArchiveChopHeader;
+
 NX_VMS_COMMON_API extern const QString kDisableRtspMetadataStream;
 
 // Do not attempt downloading remote archive faster than real-time. This is necessary since some
