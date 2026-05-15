@@ -14,6 +14,7 @@ struct NX_VMS_COMMON_API ImageCorrectionResult
     float gamma = 1.0f;
     int hystogram[256];
     bool filled = false;
+    int pixels = 0;
 
     void analyseImage(
         const quint8* yPlane,
@@ -22,6 +23,7 @@ struct NX_VMS_COMMON_API ImageCorrectionResult
         int stride,
         const nx::vms::api::ImageCorrectionData& data,
         const QRectF& srcRect = QRectF(0.0, 0.0, 1.0, 1.0));
+    void update(const nx::vms::api::ImageCorrectionData& data);
 private:
     float calcGamma(int leftPos, int rightPos, int pixels) const;
 };

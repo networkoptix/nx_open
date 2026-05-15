@@ -538,7 +538,7 @@ void DecodedPictureToOpenGLUploader::UploadedPicture::setDecodedFrame(
 }
 
 void DecodedPictureToOpenGLUploader::UploadedPicture::processImage(
-    quint8* yPlane,
+    const quint8* yPlane,
     int width,
     int height,
     int stride,

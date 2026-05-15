@@ -70,9 +70,13 @@ void ImageCorrectionResult::analyseImage(
             hystogram[(quint8) value]++;
         }
     }
+    pixels = (right-left) * (bottom-top);
+    update(data);
+}
 
+void ImageCorrectionResult::update(const nx::vms::api::ImageCorrectionData& data)
+{
     // get histogram range
-    int pixels = (right-left) * (bottom-top);
     int leftThreshold = data.blackLevel * pixels + 0.5;
     int rightThreshold = data.whiteLevel * pixels + 0.5;
 

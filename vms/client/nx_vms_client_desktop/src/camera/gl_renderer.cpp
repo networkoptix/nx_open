@@ -592,7 +592,9 @@ bool QnGLRenderer::drawVideoTextures(
 
             if (programKey.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma)
             {
-                const auto parameters = picLock->imageCorrectionResult();
+                auto parameters = picLock->imageCorrectionResult();
+                if (isPaused() || (picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage))
+                    parameters.update(m_decodedPictureProvider.getImageCorrection());
                 program.loadGammaCorrection(parameters);
                 if (m_histogramConsumer)
                     m_histogramConsumer->setHistogramData(parameters);
@@ -727,7 +729,9 @@ bool QnGLRenderer::drawVideoTextures(
 
     if (programKey.imageCorrection == MediaOutputShaderProgram::YuvImageCorrection::gamma)
     {
-        const auto parameters = picLock->imageCorrectionResult();
+        auto parameters = picLock->imageCorrectionResult();
+        if (isPaused() || (picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage))
+            parameters.update(m_decodedPictureProvider.getImageCorrection());
         program->loadGammaCorrection(parameters);
         if (m_histogramConsumer)
             m_histogramConsumer->setHistogramData(parameters);
