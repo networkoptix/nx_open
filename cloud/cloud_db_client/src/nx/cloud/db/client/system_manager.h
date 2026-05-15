@@ -31,6 +31,7 @@ public:
 
     virtual void getSystemsByEmail(
         const std::string& email,
+        std::optional<std::string> ssoOrganizationId,
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
 
     virtual void getSystemsFiltered(

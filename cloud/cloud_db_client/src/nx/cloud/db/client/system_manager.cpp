@@ -71,6 +71,7 @@ void SystemManager::getSystemsWithCacheHeaders(
 
 void SystemManager::getSystemsByEmail(
     const std::string& email,
+    std::optional<std::string> ssoOrganizationId,
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     api::Filter filter;
@@ -78,6 +79,8 @@ void SystemManager::getSystemsByEmail(
         api::FilterField::customization, nx::branding::customization().toStdString());
     QUrlQuery query;
     api::serializeToUrlQuery(filter, &query);
+    if (ssoOrganizationId)
+        query.addQueryItem("organizationId", QString::fromStdString(*ssoOrganizationId));
 
     m_requestsExecutor->makeAsyncCall<api::SystemDataExList>(
         nx::network::http::Method::get,

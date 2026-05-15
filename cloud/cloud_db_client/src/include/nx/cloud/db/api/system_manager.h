@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <string>
 
 #include "result_code.h"
@@ -49,6 +50,7 @@ public:
 
     virtual void getSystemsByEmail(
         const std::string& email,
+        std::optional<std::string> ssoOrganizationId,
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) = 0;
 
     virtual void getSystemsFiltered(
