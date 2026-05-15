@@ -78,7 +78,7 @@ public:
         GLuint pboID( int index ) const;
         int flags() const;
         void processImage(
-            quint8* yPlane,
+            const quint8* yPlane,
             int width,
             int height,
             int stride,
