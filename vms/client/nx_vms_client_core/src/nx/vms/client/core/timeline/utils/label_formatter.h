@@ -6,6 +6,7 @@
 
 #include <QtCore/QLocale>
 #include <QtCore/QObject>
+#include <QtGui/QColor>
 
 #include <nx/vms/client/core/timeline/data/timeline_zoom_level.h>
 #include <nx/utils/impl_ptr.h>
@@ -13,11 +14,18 @@
 namespace nx::vms::client::core {
 namespace timeline {
 
+/**
+ * Used by VideoScreen to format date/time strings with partial locale awareness.
+ * 12-hour format AM/PM markers are forced to latin AM/PM.
+ * RTL locale support is rudimentary in this implementation.
+ */
 class NX_VMS_CLIENT_CORE_API LabelFormatter: public QObject
 {
     Q_OBJECT
     Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(bool amPm READ isAmPm NOTIFY localeChanged)
+    Q_PROPERTY(bool rtl READ isRtl NOTIFY localeChanged)
 
 public:
     explicit LabelFormatter(QObject* parent = nullptr);
@@ -28,8 +36,8 @@ public:
         TimelineZoomLevel::LevelType level) const;
 
     /** Format time marker inside current time window. */
-    Q_INVOKABLE QStringList timeMarker(qint64 timeMs, const QTimeZone& timeZone,
-        TimelineZoomLevel::LevelType level) const;
+    Q_INVOKABLE QString htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
+        QColor primaryColor, QColor secondaryColor) const;
 
     /** Format time marker outside current time window. */
     Q_INVOKABLE QString externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const;
@@ -46,6 +54,9 @@ public:
 
     QLocale locale() const;
     void setLocale(QLocale value);
+
+    bool isAmPm() const;
+    bool isRtl() const;
 
     static void registerQmlType();
 

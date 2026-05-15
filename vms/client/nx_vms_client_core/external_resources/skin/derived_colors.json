@@ -347,7 +347,8 @@
         },
         "timeMarker": {
             "background": "light4",
-            "text": "dark4"
+            "text": "dark4",
+            "secondaryText": "dark15"
         },
         "header": {
             "background": "mobileTimeline.background",

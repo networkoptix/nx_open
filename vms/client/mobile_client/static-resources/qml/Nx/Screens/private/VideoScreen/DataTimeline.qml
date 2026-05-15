@@ -676,7 +676,7 @@ Rectangle
             readonly property real markerWidth:
             {
                 return isOutside && !timeline.positionAtLive
-                    ? timeMarkerTexts.width
+                    ? timeMarkerText.width
                     : timeScale.width
             }
 
@@ -709,7 +709,11 @@ Rectangle
                 anchors.verticalCenter: timeMarker.verticalCenter
 
                 width: timeMarker.markerWidth - recordingChunks.width
-                height: timeMarker.isOutside ? header.height : 35
+
+                height: timeMarker.isOutside
+                    ? header.height
+                    : (timeScale.labelFormatter.amPm ? 39 : 41) //< Fine tuning.
+
                 clip: true
                 color: ColorTheme.colors.mobileTimeline.timeMarker.background
 
@@ -737,67 +741,39 @@ Rectangle
                 }
             }
 
-            Column
+            Text
             {
-                id: timeMarkerTexts
-
-                readonly property var lines:
-                {
-                    if (timeMarker.isOutside)
-                        return []
-
-                    return timeScale.labelFormatter.timeMarker(
-                        timeline.positionMs, timeScale.timeZone, timeScale.zoomLevel)
-                }
+                id: timeMarkerText
 
                 leftPadding: timeMarker.isOutside ? 16 : 0
                 rightPadding: timeMarker.isOutside ? 12 : 0
-                spacing: 0
 
-                anchors.verticalCenter: timeMarker.verticalCenter
                 anchors.right: timeMarkerRect.right
+                anchors.verticalCenter: timeMarkerRect.verticalCenter
 
-                Text
+                width: timeMarker.isOutside ? implicitWidth : timeScale.width
+
+                text:
                 {
-                    id: firstLine
+                    if (timeline.positionAtLive)
+                        return qsTr("Live")
 
-                    width: timeMarker.isOutside ? implicitWidth : timeMarkerRect.width
-
-                    text:
+                    if (timeMarker.isOutside)
                     {
-                        if (timeline.positionAtLive)
-                            return qsTr("Live")
-
-                        if (timeMarker.isOutside)
-                        {
-                            return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
-                                timeScale.timeZone)
-                        }
-
-                        return timeMarkerTexts.lines[0] ?? ""
+                        return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
+                            timeScale.timeZone)
                     }
 
-                    color: ColorTheme.colors.mobileTimeline.timeMarker.text
-
-                    font.pixelSize: 12
-                    font.weight: Font.Medium
-                    horizontalAlignment: Qt.AlignHCenter
+                    return timeScale.labelFormatter.htmlTimeMarker(timeline.positionMs,
+                        timeScale.timeZone, ColorTheme.colors.mobileTimeline.timeMarker.text,
+                        ColorTheme.colors.mobileTimeline.timeMarker.secondaryText)
                 }
 
-                Text
-                {
-                    id: secondLine
-
-                    text: timeMarkerTexts.lines[1] ?? ""
-                    width: timeMarkerRect.width
-                    visible: !!text
-
-                    color: firstLine.color
-
-                    font.pixelSize: 11
-                    font.weight: Font.Medium
-                    horizontalAlignment: Qt.AlignHCenter
-                }
+                font.pixelSize: 12
+                color: ColorTheme.colors.mobileTimeline.timeMarker.text
+                horizontalAlignment: timeScale.labelFormatter.rtl ? Qt.AlignLeft : Qt.AlignRight
+                verticalAlignment: Qt.AlignVCenter
+                textFormat: Text.RichText
             }
 
             ColoredImage
@@ -806,13 +782,13 @@ Rectangle
 
                 visible: timeline.positionAtLive
 
-                anchors.right: timeMarkerTexts.left
-                anchors.rightMargin: 2 - timeMarkerTexts.leftPadding
+                anchors.right: timeMarkerText.left
+                anchors.rightMargin: 2 - timeMarkerText.leftPadding
                 anchors.verticalCenter: timeMarker.verticalCenter
 
                 sourcePath: "image://skin/16x16/Solid/play_arrow.svg"
                 sourceSize: Qt.size(16, 16)
-                primaryColor: firstLine.color
+                primaryColor: timeMarkerText.color
             }
         }
 
