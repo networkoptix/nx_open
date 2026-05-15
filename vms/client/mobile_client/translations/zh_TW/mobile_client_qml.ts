@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Speak...</source>
-      <translation type="unfinished">Speak...</translation>
+      <translation>說話...</translation>
     </message>
   </context>
   <context>
@@ -53,15 +53,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>您沒有查看錄影資料的權限</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>您的存檔中沒有任何錄影資料。</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>正在載入時間軸…</translation>
     </message>
   </context>
   <context>
@@ -906,7 +906,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>取消返回中心</translation>
     </message>
   </context>
   <context>
@@ -1249,7 +1249,7 @@
     </message>
     <message>
       <source>Cannot share bookmark</source>
-      <translation type="unfinished">Cannot share bookmark</translation>
+      <translation>無法分享書籤。</translation>
     </message>
   </context>
   <context>
@@ -1619,19 +1619,19 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>僅限 Live 模式</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>僅限存檔模式</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>攝影機資訊</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>前往 Live 啟動軟體觸發</translation>
     </message>
   </context>
   <context>

@@ -12332,7 +12332,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>無法從佈局中移除項目</translation>
     </message>
   </context>
   <context>
