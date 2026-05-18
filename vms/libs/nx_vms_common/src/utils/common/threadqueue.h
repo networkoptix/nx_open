@@ -214,6 +214,12 @@ public:
         m_waitCond.wakeAll();
     }
 
+    bool isTerminated() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_terminated;
+    }
+
 private:
     void lockInternal() const
     {
