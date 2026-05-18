@@ -77,6 +77,9 @@ Page
 
             PropertyChanges
             {
+                cameraSwitcher.height: Math.min(cameraSwitcher.width / (16.0 / 9.0),
+                    modernVideoScreen.height - modernVideoScreen.toolBar.height - bottomBar.height)
+
                 cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
 
                 bottomBar.color: ColorTheme.colors.dark6
@@ -118,6 +121,9 @@ Page
                 navigatorProxyItem.y: -modernVideoScreen.toolBar.height
 
                 modernVideoScreen.toolBar.width: modernVideoScreen.width - navigatorProxyItem.width
+
+                cameraSwitcher.height: Math.min(cameraSwitcher.width / (16.0 / 9.0),
+                    modernVideoScreen.height - modernVideoScreen.toolBar.height - bottomBar.height)
 
                 cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
                 cameraSwitcher.width: modernVideoScreen.width - navigatorProxyItem.width
