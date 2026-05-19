@@ -86,18 +86,9 @@ FocusScope
         titleUnderlineVisible: false
         leftControl: root.customLeftControl ?? defaultLeftControl
         rightControl: root.customRightControl
+            ? [root.customRightControl, menuButton]
+            : [menuButton]
         useGradientBackground: root.fullscreen
-
-        centerControl: ToolBarButton
-        {
-            id: menuButton
-
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-
-            icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
-            visible: false
-        }
     }
 
     Item
@@ -105,6 +96,14 @@ FocusScope
         id: defaultToolbarControlsContainer
 
         visible: false
+
+        ToolBarButton
+        {
+            id: menuButton
+
+            icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+            visible: false
+        }
 
         ToolBarButton
         {
