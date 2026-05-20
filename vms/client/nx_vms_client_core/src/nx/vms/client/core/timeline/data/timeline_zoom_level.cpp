@@ -96,7 +96,7 @@ qint64 TimelineZoomLevel::nextTick(qint64 tick, const QTimeZone& tz) const
             if (nextDateTime.date().month() != dateTime.date().month()
                 || (nextDateTime.date().day() + interval) > 31)
             {
-                return QDateTime(QDate(date.year(), date.month(), 1), QTime{}).addMonths(1)
+                return QDateTime(QDate(date.year(), date.month(), 1), QTime(0, 0), tz).addMonths(1)
                     .toMSecsSinceEpoch();
             }
 
