@@ -5178,7 +5178,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
       <translation type="unfinished">
-        <numerusform>Witryna przestanie działać za %n dni</numerusform>
+        <numerusform>System przestanie działać za %n dni</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
@@ -10228,7 +10228,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>Nie masz uprawnień do edycji ustawień tej kamery</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
@@ -10243,15 +10243,15 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>Nie można modyfikować użytkownika, którego login nie jest unikalny</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>Być może nie masz uprawnień do modyfikowania niektórych członków tej grupy lub obejmuje ona użytkowników z duplikatami danych logowania</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>Nie masz uprawnień do modyfikowania tej grupy</translation>
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
@@ -11944,7 +11944,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Istnieje inny użytkownik z tym loginem. Aby uniknąć problemów, wszyscy użytkownicy muszą mieć unikalny login.</translation>
     </message>
     <message>
       <source>Organization user</source>
@@ -12098,11 +12098,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Spowoduje to natychmiastowe usunięcie dostępu do systemu dla tego użytkownika</translation>
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Użytkownik o podanym adresie e-mail ma już dostęp administratora za pośrednictwem partnera kanału</translation>
     </message>
   </context>
   <context>
