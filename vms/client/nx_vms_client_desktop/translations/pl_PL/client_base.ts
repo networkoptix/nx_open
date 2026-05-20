@@ -1049,7 +1049,7 @@
     </message>
     <message>
       <source>Site Update...</source>
-      <translation>Aktualizacja witryny...</translation>
+      <translation>Aktualizacja systemu...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation>Połącz serwery...</translation>
+      <translation>Złącz systemy...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -1695,7 +1695,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>
-      <translation>Wpisz tutaj krótki opis witryny.</translation>
+      <translation>Wpisz tutaj krótki opis systemu.</translation>
     </message>
   </context>
   <context>
@@ -2194,40 +2194,40 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>This server is removed from Site</source>
-      <translation>Ten serwer usunięto z witryny</translation>
+      <translation>Ten serwer usunięto z systemu</translation>
     </message>
     <message>
       <source>This user is removed from Site</source>
-      <translation>Ten użytkownik został usunięty z witryny</translation>
+      <translation>Ten użytkownik został usunięty z systemu</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from Site</source>
       <comment>Numerus form depends on the number of devices</comment>
-      <translation>
-        <numerusform>Te urządzenia usunięto z witryny</numerusform>
-        <numerusform>Te urządzenia usunięto z witryny</numerusform>
-        <numerusform>Te urządzenia usunięto z witryny</numerusform>
-        <numerusform>Te urządzenia usunięto z witryny</numerusform>
+      <translation type="unfinished">
+        <numerusform>Te urządzenia usunięto z systemu</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
+        <numerusform>These devices are removed from Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from Site</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation>
-        <numerusform>Te kamery usunięto z witryny</numerusform>
-        <numerusform>Te kamery usunięto z witryny</numerusform>
-        <numerusform>Te kamery usunięto z witryny</numerusform>
-        <numerusform>Te kamery usunięto z witryny</numerusform>
+      <translation type="unfinished">
+        <numerusform>Te kamery usunięto z systemu</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
+        <numerusform>These cameras are removed from Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
       <comment>Numerus form depends on the number of resources</comment>
-      <translation>
-        <numerusform>Te zasoby usunięto z witryny</numerusform>
-        <numerusform>Te zasoby usunięto z witryny</numerusform>
-        <numerusform>Te zasoby usunięto z witryny</numerusform>
-        <numerusform>Te zasoby usunięto z witryny</numerusform>
+      <translation type="unfinished">
+        <numerusform>Te zasoby usunięto z systemu</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
+        <numerusform>These resources are removed from Site</numerusform>
       </translation>
     </message>
   </context>
@@ -2412,7 +2412,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation>Zmieniono nazwę witryny</translation>
+      <translation>Zmieniono nazwę systemu</translation>
     </message>
     <message>
       <source>Site merge</source>
@@ -2786,7 +2786,7 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Nie można odłączyć witryny od %1</translation>
+      <translation>Nie można odłączyć systemu od %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
@@ -2805,19 +2805,19 @@ Klucz licencyjny: %2</translation>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Wszyscy użytkownicy %1 zostaną usunięci z witryny</translation>
+      <translation>Wszyscy użytkownicy %1 zostaną usunięci z systemu</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation>Zostaniesz wylogowany z witryny. Strona będzie dostępna tylko przez sieć lokalną</translation>
+      <translation>Zostaniesz wylogowany. System będzie dostępny tylko przez sieć lokalną</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation>Dostęp do witryny będzie możliwy wyłącznie za pośrednictwem sieci lokalnej</translation>
+      <translation>Dostęp do systemu będzie możliwy wyłącznie za pośrednictwem sieci lokalnej</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation>Istniejące dane (ustawienia witryny i archiwum) zostaną zachowane</translation>
+      <translation>Istniejące dane (ustawienia systemu i archiwum) zostaną zachowane</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -3016,7 +3016,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation>Nie udało się zalogować do witryny &quot;%1&quot;</translation>
+      <translation>Nie udało się zalogować do systemu &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -3491,7 +3491,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation>Ustawienia są tylko do odczytu. Skontaktuj się z administratorem witryny. Wszystkie zmiany zostaną utracone po wyjściu z programu.</translation>
+      <translation>Ustawienia są tylko do odczytu. Skontaktuj się z administratorem systemu. Wszystkie zmiany zostaną utracone po wyjściu z programu.</translation>
     </message>
   </context>
   <context>
@@ -4400,7 +4400,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation>ZAMKNIĘCIE WITRYNY</translation>
+      <translation>ZAMKNIĘCIE SYSTEMU</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
@@ -4923,7 +4923,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation>Nie udało się zapisać ustawień witryny</translation>
+      <translation>Nie udało się zapisać ustawień systemu</translation>
     </message>
   </context>
   <context>
@@ -5058,7 +5058,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation>Wyłączenie witryny</translation>
+      <translation>Wyłączenie systemu</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
@@ -5178,7 +5178,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
       <translation type="unfinished">
-        <numerusform>Witryna przestanie działać za %n dni</numerusform>
+        <numerusform>System przestanie działać za %n dni</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
@@ -5596,7 +5596,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation>Wyłączenie witryny</translation>
+      <translation>Wyłączenie systemu</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
@@ -7105,7 +7105,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation>Wyłączenie witryny</translation>
+      <translation>Wyłączenie systemu</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
@@ -7444,7 +7444,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation>Użyj tego łącza, aby dodać kamerę do innej witryny</translation>
+      <translation>Użyj tego łącza, aby dodać kamerę do innego systemu</translation>
     </message>
   </context>
   <context>
@@ -7562,7 +7562,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation>%1 zostanie usunięta z witryny i zastąpiona wybraną kamerą</translation>
+      <translation>%1 zostanie usunięta z systemu i zastąpiona wybraną kamerą</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
@@ -7877,7 +7877,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation>Użytkownicy Channel Partner mają dostęp do tej witryny</translation>
+      <translation>Użytkownicy Channel Partner mają dostęp do tego systemu</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
@@ -8071,7 +8071,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation>Właściciel witryny lokalnej jest nieobecny lub wyłączony.</translation>
+      <translation>Właściciel systemu lokalnego jest nieobecny lub wyłączony.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
@@ -8203,7 +8203,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation>Ta kamera wymaga hasła do skonfigurowania. Poproś administratora witryny, aby to zrobił.</translation>
+      <translation>Ta kamera wymaga hasła do skonfigurowania. Poproś administratora systemu, aby to zrobił.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
@@ -9663,7 +9663,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation>Połącz witryny</translation>
+      <translation>Połącz systemy</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9680,7 +9680,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation>Oto aktualny adres URL witryny.</translation>
+      <translation>Oto aktualny adres URL systemu.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
@@ -10228,7 +10228,7 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>Nie masz uprawnień do edycji ustawień tej kamery</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
@@ -10243,15 +10243,15 @@ Możesz wymusić wykrywanie ruchu, ale może to doprowadzić do znacznego wzrost
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>Nie można modyfikować użytkownika, którego login nie jest unikalny</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>Być może nie masz uprawnień do modyfikowania niektórych członków tej grupy lub obejmuje ona użytkowników z duplikatami danych logowania</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>Nie masz uprawnień do modyfikowania tej grupy</translation>
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
@@ -11944,7 +11944,7 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Istnieje inny użytkownik z tym loginem. Aby uniknąć problemów, wszyscy użytkownicy muszą mieć unikalny login.</translation>
     </message>
     <message>
       <source>Organization user</source>
@@ -12098,11 +12098,11 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Spowoduje to natychmiastowe usunięcie dostępu do systemu dla tego użytkownika</translation>
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Użytkownik o podanym adresie e-mail ma już dostęp administratora za pośrednictwem partnera kanału</translation>
     </message>
   </context>
   <context>
