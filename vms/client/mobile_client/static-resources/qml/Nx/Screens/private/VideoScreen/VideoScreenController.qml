@@ -313,11 +313,12 @@ NxObject
         d.savePosition()
     }
 
-    function playLive()
+    function playLive(suppressSavePosition)
     {
         d.playing = true
         mediaPlayer.playLive()
-        d.savePosition()
+        if (!suppressSavePosition)
+            d.savePosition()
     }
 
     function stop()
