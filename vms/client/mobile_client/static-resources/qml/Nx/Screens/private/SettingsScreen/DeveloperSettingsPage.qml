@@ -391,6 +391,27 @@ BaseSettingsPage
                 appContext.settings.forceTabletMode = (checkState !== Qt.Unchecked)
             onClicked: d.openRestartDialog()
         }
+
+        Row
+        {
+            spacing: 8
+
+            Text
+            {
+                text: "Side panel width"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            QuickControls.SpinBox
+            {
+                from: 100
+                to: 500
+                value: appContext.settings.sidePanelWidth
+                onValueModified: appContext.settings.sidePanelWidth = value
+            }
+        }
     }
 
     ItemSelectionDialog

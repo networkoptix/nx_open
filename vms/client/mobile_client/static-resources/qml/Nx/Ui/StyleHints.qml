@@ -4,8 +4,13 @@ pragma Singleton
 
 import QtQml
 
+import nx.vms.client.mobile
+
 QtObject
 {
     // Common height for the toolbar and panel header.
     readonly property int headerHeight: 64
+
+    // Width of the side panels on tablet layout.
+    property int panelWidth: appContext.settings.sidePanelWidth
 }

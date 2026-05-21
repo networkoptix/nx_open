@@ -23,7 +23,7 @@ Page
 
     signal closeButtonClicked
 
-    implicitWidth: 330
+    implicitWidth: StyleHints.panelWidth
     background: Rectangle { color: root.color }
     padding: 0
 
