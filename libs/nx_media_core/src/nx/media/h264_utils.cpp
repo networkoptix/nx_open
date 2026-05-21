@@ -2,16 +2,59 @@
 
 #include "h264_utils.h"
 
+#include <nx/codec/h264/sequence_parameter_set.h>
+#include <nx/codec/h264/picture_parameter_set.h>
 #include <nx/codec/nal_units.h>
+#include <nx/utils/string.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::media::h264 {
 
 namespace {
 
+constexpr int kMaxHexDumpLength = 128;
+
 int getNalSize(const uint8_t* ptr)
 {
     return (ptr[0] << 8) | ptr[1];
+}
+
+int parseSpsId(const uint8_t* data, int size)
+{
+    nx::media::h264::SequenceParameterSet sps;
+    sps.decodeBuffer(data, data + size);
+    if (sps.deserialize() != 0)
+    {
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Failed to parse SPS: %1", nx::utils::toHex(data, std::min(size, kMaxHexDumpLength)));
+        return -1;
+    }
+    return sps.seq_parameter_set_id;
+}
+
+int parsePpsId(const uint8_t* data, int size)
+{
+    nx::media::h264::PictureParameterSet pps;
+    pps.decodeBuffer(data, data + size);
+    if (pps.deserialize() != 0)
+    {
+        NX_DEBUG(NX_SCOPE_TAG,
+            "Failed to parse PPS: %1", nx::utils::toHex(data, std::min(size, kMaxHexDumpLength)));
+        return -1;
+    }
+    return pps.pic_parameter_set_id;
+}
+
+void truncateMap(std::map<int, std::vector<uint8_t>>& m, int maxSize, const char* name)
+{
+    if (m.size() > (size_t)maxSize)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Truncating %1 map from %2 to %3 entries",
+            name, m.size(), maxSize);
+        auto it = m.begin();
+        std::advance(it, maxSize);
+        m.erase(it, m.end());
+    }
 }
 
 } // namespace
@@ -113,17 +156,32 @@ std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t si
 
 std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits)
 {
-    std::vector<std::vector<uint8_t>> spsVector;
-    std::vector<std::vector<uint8_t>> ppsVector;
+    std::map<int, std::vector<uint8_t>> spsMap;
+    std::map<int, std::vector<uint8_t>> ppsMap;
+    int brokenNalIndex = std::numeric_limits<int>::max();
     for (const auto& nalu: nalUnits)
     {
         const auto nalType = nx::media::h264::decodeType(*nalu.data);
         if (nalType == nuSPS)
-            spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
+        {
+            int id = parseSpsId(nalu.data, nalu.size);
+            if (id == -1) //< Pack it anyway.
+                id = --brokenNalIndex;
+            spsMap[id] = std::vector<uint8_t>(nalu.data, nalu.data + nalu.size);
+        }
         else if (nalType == nuPPS)
-            ppsVector.emplace_back(nalu.data, nalu.data + nalu.size);
+        {
+            int id = parsePpsId(nalu.data, nalu.size);
+            if (id == -1) //< Pack it anyway.
+                id = --brokenNalIndex;
+            ppsMap[id] = std::vector<uint8_t>(nalu.data, nalu.data + nalu.size);
+        }
     }
-    if (spsVector.empty() || ppsVector.empty())
+
+    truncateMap(spsMap, /*MaxSpsNumber*/ 31, "SPS");
+    truncateMap(ppsMap, /*MaxPpsNumber*/ 255, "PPS");
+
+    if (spsMap.empty() || ppsMap.empty())
     {
         NX_WARNING(NX_SCOPE_TAG, "Failed to write h264 extra data, no sps/pps found");
         return std::vector<uint8_t>();
@@ -132,21 +190,26 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     // Get extra data size.
     int extradataSize = 5; // Version, profile, profile compat, level, nal size length.
     extradataSize += 1; // Sps count.
-    for(const auto& sps: spsVector)
+    for(const auto& sps: spsMap)
     {
         extradataSize += sizeof(uint16_t); // Sps size.
-        extradataSize += sps.size(); // Sps data.
+        extradataSize += sps.second.size(); // Sps data.
     }
     extradataSize += 1; // pps count
-    for(const auto& pps: ppsVector)
+    for(const auto& pps: ppsMap)
     {
         extradataSize += sizeof(uint16_t); // Pps size.
-        extradataSize += pps.size(); // Pps data.
+        extradataSize += pps.second.size(); // Pps data.
     }
 
-    auto sps = spsVector[0];
-    auto pps = ppsVector[0];
+    const auto& sps = spsMap.begin()->second;
     std::vector<uint8_t> extradata(extradataSize);
+    if (sps.size() < 4)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Invalid SPS: %1", nx::utils::toHex(sps.data(), sps.size()));
+        return std::vector<uint8_t>();
+    }
+
     nx::utils::BitStreamWriter bitstream(extradata.data(), extradata.data() + extradataSize);
     try
     {
@@ -157,19 +220,19 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
         bitstream.putBits(8, sps[3]); // Profile level.
         bitstream.putBits(8, 0xff); // 6 bits reserved(111111) + 2 bits nal size length - 1: 3(11).
 
-        uint8_t numSps = uint8_t(spsVector.size()) | 0xe0;
+        uint8_t numSps = uint8_t(spsMap.size()) | 0xe0;
         bitstream.putBits(8, numSps); // 3 bits reserved (111) + 5 bits number of sps.
 
-        for(const auto& spsData: spsVector)
+        for(const auto& spsData: spsMap)
         {
-            bitstream.putBits(16, spsData.size());
-            bitstream.putBytes(spsData.data(), spsData.size());
+            bitstream.putBits(16, spsData.second.size());
+            bitstream.putBytes(spsData.second.data(), spsData.second.size());
         }
-        bitstream.putBits(8, ppsVector.size()); // Number of pps.
-        for(const auto& ppsData: ppsVector)
+        bitstream.putBits(8, ppsMap.size()); // Number of pps.
+        for(const auto& ppsData: ppsMap)
         {
-            bitstream.putBits(16, ppsData.size());
-            bitstream.putBytes(ppsData.data(), ppsData.size());
+            bitstream.putBits(16, ppsData.second.size());
+            bitstream.putBytes(ppsData.second.data(), ppsData.second.size());
         }
         bitstream.flushBits();
     }
