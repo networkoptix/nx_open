@@ -3,15 +3,13 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 #include <QtCore/QSize>
-#include <QtCore/QThread>
 #include <QtGui/QImage>
 
 class QnAspectRatio;
 
 namespace nx::vms::client::desktop {
-
-class ThreadedImageLoaderPrivate;
 
 /**
  * @brief The QnThreadedImageLoader class is intended for threaded processing of images.
@@ -92,19 +90,27 @@ public:
 
 signals:
     /**
-     * Signal that will be emitted when processing is finished and Output param is NOT SET.
-     * @param output Result image.
+     * Emitted when processing is finished and Output param is NOT SET. `output` is a null QImage
+     * if the input could not be read or produced a null image.
+     * @param output  Result image, null on failure.
      */
     void imageLoaded(const QImage& output);
 
     /**
-     * Signal that will be emitted when processing is finished and Output param is SET.
-     * @param output Full path to the result image.
+     * Emitted when processing is finished and Output param is SET. `output` is an empty string if
+     * the input could not be read or the file could not be written to disk.
+     * @param output  Full path to the result file, empty on failure.
      */
     void imageSaved(const QString& output);
 
 private:
-    ThreadedImageLoaderPrivate* m_loader;
+    struct ThreadedImageLoaderWorker;
+    friend struct ThreadedImageLoaderWorker; //< In order not to duplicate setters.
+
+    struct Parameters;
+    QScopedPointer<Parameters> parameters;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(ThreadedImageLoader::Flags)
 
 } // namespace nx::vms::client::desktop

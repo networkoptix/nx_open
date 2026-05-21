@@ -13,7 +13,7 @@ namespace Ui {
 
 namespace nx::vms::client::desktop {
 
-class LocalFileCache;
+class LocalImageCache;
 
 } // namespace nx::vms::client::desktop
 
@@ -98,7 +98,7 @@ private:
     QnAbstractPtzHotkeyDelegate* m_hotkeysDelegate;
     QPointer<QnMediaResourceWidget> m_widget;
 
-    nx::vms::client::desktop::LocalFileCache *m_cache;
+    nx::vms::client::desktop::LocalImageCache *m_cache;
     QSet<QString> m_pendingPreviews;
 
     QnPtzManageModel::RowData m_lastRowData;

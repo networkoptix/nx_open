@@ -24,9 +24,9 @@
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_connection_controller.h>
 #include <nx/vms/client/desktop/videowall/desktop_camera_stub_controller.h>
@@ -62,8 +62,8 @@ struct SystemContext::Private
     std::unique_ptr<DesktopCameraStubController> desktopCameraStubController;
     std::unique_ptr<IntercomManager> intercomManager;
     std::unique_ptr<SystemHealthState> systemHealthState;
-    std::unique_ptr<LocalFileCache> localFileCache;
-    std::unique_ptr<ServerImageCache> serverImageCache;
+    std::unique_ptr<LocalImageCache> localImageCache;
+    std::unique_ptr<ServerFileCache> serverImageCache;
     std::unique_ptr<ServerNotificationCache> serverNotificationCache;
     std::unique_ptr<ServerRemoteAccessWatcher> serverRemoteAccessWatcher;
     std::unique_ptr<ServerPortWatcher> serverPortWatcher;

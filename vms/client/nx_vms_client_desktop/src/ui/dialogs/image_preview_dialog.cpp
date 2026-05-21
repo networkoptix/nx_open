@@ -22,7 +22,12 @@ void QnImagePreviewDialog::openImage(const QString &filename)
 {
     auto loader = new ThreadedImageLoader(this);
     loader->setInput(filename);
-    connect(loader, &ThreadedImageLoader::imageLoaded, this, &QnImagePreviewDialog::setImage);
+    connect(loader, &ThreadedImageLoader::imageLoaded, this,
+        [this](const QImage& image)
+        {
+            if (!image.isNull())
+                setImage(image);
+        });
     connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 }

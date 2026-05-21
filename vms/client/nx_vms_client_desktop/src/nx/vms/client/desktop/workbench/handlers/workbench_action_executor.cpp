@@ -7,13 +7,14 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/actions.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/actions/enter_fullscreen_action.h>
@@ -65,10 +66,14 @@ void WorkbenchActionExecutor::execute(const ActionPtr& action)
         if (!NX_ASSERT(soundAction))
             return;
 
-        QString filePath = system()->serverNotificationCache()->getFullPath(soundAction->sound());
+        const auto safeFilePath =
+            system()->serverNotificationCache()->absoluteFilePath(soundAction->sound());
         // If file doesn't exist then it's already deleted or not downloaded yet.
         // It should not be played when downloaded.
-        AudioPlayer::playFileAsync(filePath);
+        if (!safeFilePath.isEmpty())
+            AudioPlayer::playFileAsync(safeFilePath);
+        else
+            NX_WARNING(this, "Rejecting unsafe sound filename: %1", soundAction->sound());
     }
     else if (action->type() == rules::utils::type<SpeakAction>())
     {

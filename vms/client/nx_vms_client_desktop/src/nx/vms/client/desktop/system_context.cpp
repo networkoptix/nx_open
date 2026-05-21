@@ -7,6 +7,7 @@
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
+#include <common/common_globals.h>
 #include <core/resource/resource.h>
 #include <nx/branding.h>
 #include <nx/vms/client/core/analytics/analytics_settings_manager_factory.h>
@@ -29,9 +30,9 @@
 #include <nx/vms/client/desktop/system_logon/logic/delayed_data_loader.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/utils/server_remote_access_watcher.h>
 #include <nx/vms/client/desktop/utils/user_notification_settings_manager.h>
 #include <nx/vms/client/desktop/videowall/videowall_online_screens_watcher.h>
@@ -123,8 +124,9 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->nonEditableUsersAndGroups = std::make_unique<NonEditableUsersAndGroups>(this);
             d->defaultPasswordCamerasWatcher = std::make_unique<DefaultPasswordCamerasWatcher>(
                 this);
-            d->localFileCache = std::make_unique<LocalFileCache>(this);
-            d->serverImageCache = std::make_unique<ServerImageCache>(this);
+            d->localImageCache = std::make_unique<LocalImageCache>();
+            d->serverImageCache = std::make_unique<ServerFileCache>(
+                this, Qn::kWallpapersFolder);
             d->serverNotificationCache = std::make_unique<ServerNotificationCache>(this);
             d->serverRemoteAccessWatcher = std::make_unique<ServerRemoteAccessWatcher>(this);
             d->userNotificationSettingsManager =
@@ -273,12 +275,12 @@ SystemHealthState* SystemContext::systemHealthState() const
     return d->systemHealthState.get();
 }
 
-LocalFileCache* SystemContext::localFileCache() const
+LocalImageCache* SystemContext::localImageCache() const
 {
-    return d->localFileCache.get();
+    return d->localImageCache.get();
 }
 
-ServerImageCache* SystemContext::serverImageCache() const
+ServerFileCache* SystemContext::serverImageCache() const
 {
     return d->serverImageCache.get();
 }

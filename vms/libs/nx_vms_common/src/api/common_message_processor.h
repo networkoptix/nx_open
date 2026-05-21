@@ -93,9 +93,11 @@ signals:
 
     void initialResourcesReceived();
 
-    void fileAdded(const QString& filename);
-    void fileUpdated(const QString& filename);
-    void fileRemoved(const QString& filename);
+    // storedFilePath contains server-storage-relative path of the form "<category>/<filename>"
+    // (a flat key, not a real directory).
+    void fileAdded(const QString& storedFilePath);
+    void fileUpdated(const QString& storedFilePath);
+    void fileRemoved(const QString& storedFilePath);
 
     void videowallControlMessageReceived(const nx::vms::api::VideowallControlMessageData& message);
 

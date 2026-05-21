@@ -5,12 +5,13 @@
 
 #include <QtCore/QFileInfo>
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/input_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -59,11 +60,16 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked()
     if (filename.isEmpty())
         return;
 
-    QString filePath = system()->serverNotificationCache()->getFullPath(filename);
-    if (!QFileInfo(filePath).exists())
+    const auto safeFilePath = system()->serverNotificationCache()->absoluteFilePath(filename);
+    if (safeFilePath.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting unsafe sound filename: %1", filename);
+        return;
+    }
+    if (!QFileInfo::exists(safeFilePath))
         return;
 
-    bool result = AudioPlayer::playFileAsync(filePath, this, [this] { enablePlayButton(); });
+    bool result = AudioPlayer::playFileAsync(safeFilePath, this, [this] { enablePlayButton(); });
     if (result)
         ui->playButton->setEnabled(false);
 }

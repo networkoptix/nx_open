@@ -2,12 +2,14 @@
 
 #include "grid_background_item.h"
 
+#include <QtCore/QFileInfo>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QPainter>
 
 #include <core/resource/user_resource.h>
 #include <nx/media/yuvconvert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -18,13 +20,15 @@
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
+#include <utils/common/delayed.h>
 
 using namespace nx::vms::client::desktop;
 using nx::vms::client::core::Geometry;
@@ -191,17 +195,16 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsScene* scene, QnWorkbenchCon
     const bool isOpenGL = !views.empty() && qobject_cast<QOpenGLWidget*>(views.first());
     d_ptr->nativePaintBackground = nx::build_info::isWindows() && isOpenGL;
 
-    const auto imageLoaded =
-        [this](const QString& filename, ServerFileCache::OperationResult status)
+    // Only the server-backed cache emits asynchronous download results. Local cache lookups are
+    // resolved synchronously by `requestImageLoad`.
+    connect(system()->serverImageCache(), &ServerFileCache::fileDownloaded, this,
+        [this](
+            const QString& filename,
+            FileCache::OperationResult status,
+            const QString& /*absolutePath*/)
         {
-            at_imageLoaded(filename, status == ServerFileCache::OperationResult::ok);
-        };
-
-    const auto localFilesCache = system()->localFileCache();
-    connect(localFilesCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
-
-    const auto appServerImageCache = system()->serverImageCache();
-    connect(appServerImageCache, &ServerFileCache::fileDownloaded, this, imageLoaded);
+            at_imageLoaded(filename, status == FileCache::OperationResult::ok);
+        });
 
     connect(context,
         &QnWorkbenchContext::userChanged,
@@ -304,7 +307,25 @@ void QnGridBackgroundItem::updateDisplay()
         return;
 
     d->imageStatus = ImageStatus::Loading;
-    cache()->downloadFile(d->imageData.fileName);
+    requestImageLoad(d->imageData.fileName);
+}
+
+void QnGridBackgroundItem::requestImageLoad(const QString& filename)
+{
+    const auto fileCache = cache();
+    if (auto serverCache = qobject_cast<ServerFileCache*>(fileCache))
+    {
+        serverCache->downloadFile(filename);
+        return;
+    }
+
+    // Local cache: existence is decided synchronously, but `at_imageLoaded` is delivered
+    // asynchronously to preserve the prior signal-based ordering.
+    const auto path = fileCache ? fileCache->absoluteFilePath(filename) : QString();
+    const bool ok = !path.isEmpty() && QFileInfo::exists(path);
+    executeLater(
+        [this, filename, ok] { at_imageLoaded(filename, ok); },
+        this);
 }
 
 const QRectF& QnGridBackgroundItem::viewportRect() const
@@ -436,25 +457,41 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
         return;
     }
 
+    const auto fileCache = cache();
+    const auto path = fileCache ? fileCache->absoluteFilePath(filename) : QString();
+    if (path.isEmpty())
+    {
+        if (fileCache)
+            NX_WARNING(this, "Rejecting unsafe background image filename: %1", filename);
+        return;
+    }
+
     const auto loader = new ThreadedImageLoader(this);
-    loader->setInput(cache()->getFullPath(filename));
-    loader->setSize(cache()->getMaxImageSize());
+    loader->setInput(path);
+    loader->setSize(file_cache::maxBackgroundImageSize());
     connect(loader, &ThreadedImageLoader::imageLoaded, this,
         [this, filename = d->imageData.fileName](const QImage& image)
         {
+            if (image.isNull())
+            {
+                Q_D(QnGridBackgroundItem);
+                if (filename == d->imageData.fileName)
+                    d->imageStatus = ImageStatus::None;
+                return;
+            }
             setImage(image, filename);
         });
     connect(loader, &ThreadedImageLoader::imageLoaded, loader, &QObject::deleteLater);
     loader->start();
 }
 
-ServerImageCache* QnGridBackgroundItem::cache()
+FileCache* QnGridBackgroundItem::cache()
 {
     Q_D(const QnGridBackgroundItem);
 
     return d->imageData.isLocal
-        ? system()->localFileCache()
-        : system()->serverImageCache();
+        ? static_cast<FileCache*>(system()->localImageCache())
+        : static_cast<FileCache*>(system()->serverImageCache());
 }
 
 void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename)

@@ -4,7 +4,7 @@
 
 #include <QtGui/QStandardItemModel>
 
-#include <nx/vms/client/desktop/utils/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
 
 class QnClientMessageProcessor;
 class QnNotificationSoundModel;
@@ -24,22 +24,23 @@ public:
     void setMessageProcessor(QnClientMessageProcessor* messageProcessor);
 
     bool storeSound(
-        const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
-    bool updateTitle(const QString &filename, const QString &title);
+        const QString& filePath, int maxLengthMSecs = -1, const QString& customTitle = QString());
+    bool updateTitle(const QString& unsafeFilename, const QString& title);
     virtual void clear() override;
 
     QnNotificationSoundModel* persistentGuiModel() const;
 
 private:
-    void at_fileAddedEvent(const QString &filename);
-    void at_fileUpdatedEvent(const QString &filename);
-    void at_fileRemovedEvent(const QString &filename);
+    void at_fileAddedEvent(const QString& storedFilePath);
+    void at_fileUpdatedEvent(const QString& storedFilePath);
+    void at_fileRemovedEvent(const QString& storedFilePath);
 
-    void at_soundConverted(const QString &filePath);
+    void at_soundConverted(const QString& filePath);
 
-    void at_fileListReceived(const QStringList &filenames, OperationResult status);
-    void at_fileAdded(const QString &filename, OperationResult status);
-    void at_fileRemoved(const QString &filename, OperationResult status);
+    void at_fileListReceived(const QStringList& filenames, OperationResult status);
+    void at_fileAdded(
+        const QString& filename, OperationResult status, const QString& absolutePath);
+    void at_fileRemoved(const QString& filename, OperationResult status);
 
 private:
     QnNotificationSoundModel* m_model;

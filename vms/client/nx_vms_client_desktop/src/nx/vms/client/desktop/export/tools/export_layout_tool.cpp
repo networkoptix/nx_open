@@ -33,8 +33,8 @@
 #include <nx/vms/client/desktop/export/tools/nov_media_export.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
 #include <nx/vms/client/desktop/utils/timezone_helper.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
@@ -427,14 +427,22 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
             systemContext = appContext()->currentSystemContext();
 
         bool exportedLayout = d->layout->isFile();  // we have changed background to an exported layout
-        ServerImageCache* cache = exportedLayout
-            ? systemContext->localFileCache()
-            : systemContext->serverImageCache();
+        const auto cache = exportedLayout
+            ? static_cast<FileCache*>(systemContext->localImageCache())
+            : static_cast<FileCache*>(systemContext->serverImageCache());
 
-        QImage background(cache->getFullPath(d->layout->backgroundImageFilename()));
+        if (!NX_ASSERT(cache, "No image cache available for layout background export"))
+            return false;
+
+        const auto backgroundPath = cache->absoluteFilePath(d->layout->backgroundImageFilename());
+        if (backgroundPath.isEmpty())
+        {
+            NX_WARNING(this, "Rejecting unsafe background image filename: %1",
+                d->layout->backgroundImageFilename());
+        }
+        const auto background = backgroundPath.isEmpty() ? QImage() : QImage(backgroundPath);
         if (!background.isNull())
         {
-
             if (!tryInLoop([this, background]
             {
                 QIODevicePtr imageFile(d->storage->open(d->layout->backgroundImageFilename(),
@@ -448,7 +456,7 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
                 return false;
             }
 
-            systemContext->localFileCache()->storeImageData(
+            systemContext->localImageCache()->storeImage(
                 d->layout->backgroundImageFilename(),
                 background);
         }

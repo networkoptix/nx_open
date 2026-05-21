@@ -18,7 +18,7 @@
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/time/timezone.h>
 
@@ -144,7 +144,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
         if (backgroundFile)
         {
             QByteArray data = backgroundFile->readAll();
-            LocalFileCache cache(appContext()->currentSystemContext());
+            LocalImageCache cache;
             cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();

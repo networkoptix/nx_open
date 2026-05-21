@@ -18,7 +18,7 @@ class QnGridBackgroundItemPrivate;
 
 namespace nx::vms::client::desktop {
 
-class ServerImageCache;
+class FileCache;
 
 } // namespace nx::vms::client::desktop
 
@@ -66,7 +66,8 @@ private slots:
     void setImage(const QImage& image, const QString& filename = QString());
 
 private:
-    nx::vms::client::desktop::ServerImageCache* cache();
+    nx::vms::client::desktop::FileCache* cache();
+    void requestImageLoad(const QString& filename);
     void updateConnectedState();
 
     Q_DECLARE_PRIVATE(QnGridBackgroundItem)

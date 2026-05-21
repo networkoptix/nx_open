@@ -120,10 +120,11 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/state/thumbnail_search_state.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -2993,13 +2994,15 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    ServerImageCache *cache = new ServerImageCache(system(), this);
+    auto cache = new ServerFileCache(system(), Qn::kWallpapersFolder, this);
     cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());
-    connect(cache, &ServerImageCache::fileUploaded, cache, &QObject::deleteLater);
-    connect(cache, &ServerImageCache::fileUploaded, this,
-        [this, checkCondition, progressDialog]
-            (const QString &filename, ServerFileCache::OperationResult status)
+
+    auto handleResult =
+        [this, cache, checkCondition, progressDialog]
+            (const QString& filename, FileCache::OperationResult status)
         {
+            cache->deleteLater();
+
             if (!progressDialog || progressDialog->wasCanceled())
                 return;
 
@@ -3008,16 +3011,29 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             if (!checkCondition())
                 return;
 
-            if (status != ServerFileCache::OperationResult::ok)
+            if (status != FileCache::OperationResult::ok)
             {
                 QnMessageBox::critical(mainWindowWidget(), tr("Failed to upload image"));
                 return;
             }
 
             setCurrentLayoutBackground(filename);
+        };
+
+    connect(cache, &ServerFileCache::fileUploaded, this, handleResult);
+
+    auto importer = new ImageImporter(cache, cache);
+    connect(importer, &ImageImporter::imported, this,
+        [cache, handleResult]
+            (const QString& filename, FileCache::OperationResult status)
+        {
+            if (status == FileCache::OperationResult::ok)
+                cache->uploadFile(filename);
+            else
+                handleResult(filename, status);
         });
 
-    cache->storeImage(parameters.resource()->getUrl());
+    importer->importFromFile(parameters.resource()->getUrl());
     progressDialog->show();
 }
 

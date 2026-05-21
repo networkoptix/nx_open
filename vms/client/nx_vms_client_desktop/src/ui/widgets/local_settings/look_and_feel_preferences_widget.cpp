@@ -18,7 +18,9 @@
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
@@ -215,7 +217,7 @@ void QnLookAndFeelPreferencesWidget::onBackgroundImageSelected(const QString& fi
     appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
 
     const QString previousCachedName = appContext()->localSettings()->backgroundImage().imagePath();
-    QString cachedName = ServerImageCache::cachedImageFilename(fileName);
+    QString cachedName = file_cache::cachedImageFilename(fileName);
     if (previousCachedName == cachedName ||
         QDir::toNativeSeparators(previousCachedName).toLower() ==
         QDir::toNativeSeparators(fileName).toLower())
@@ -226,16 +228,18 @@ void QnLookAndFeelPreferencesWidget::onBackgroundImageSelected(const QString& fi
     progressDialog->setText(tr("Please wait while image is being prepared..."));
     progressDialog->setInfiniteMode();
 
-    auto imgCache = new LocalFileCache(appContext()->currentSystemContext(), this);
+    auto imgCache = new LocalImageCache(this);
+    auto importer = new ImageImporter(imgCache, imgCache);
     connect(
-        imgCache,
-        &ServerFileCache::fileUploaded,
+        importer,
+        &ImageImporter::imported,
         this,
-        [this, imgCache, progressDialog, fileName](const QString& storedFileName)
+        [this, imgCache, progressDialog, fileName](
+            const QString& storedFileName, FileCache::OperationResult status)
         {
             if (progressDialog)
             {
-                if (!progressDialog->wasCanceled())
+                if (!progressDialog->wasCanceled() && status == FileCache::OperationResult::ok)
                 {
                     BackgroundImage background = appContext()->localSettings()->backgroundImage();
                     background.name = storedFileName;
@@ -251,7 +255,7 @@ void QnLookAndFeelPreferencesWidget::onBackgroundImageSelected(const QString& fi
             imgCache->deleteLater();
         });
 
-    imgCache->storeImage(fileName);
+    importer->importFromFile(fileName);
     progressDialog->show();
 }
 

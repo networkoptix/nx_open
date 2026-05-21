@@ -3,6 +3,7 @@
 #include "layout_background_settings_widget.h"
 #include "ui_layout_background_settings_widget.h"
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
 #include <QtCore/QtMath>
 #include <QtGui/QDesktopServices>
@@ -11,6 +12,7 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
@@ -18,8 +20,9 @@
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/widgets/common/framed_label.h>
@@ -57,7 +60,8 @@ QnAspectRatio screenAspectRatio()
 
 struct LayoutBackgroundSettingsWidget::Private
 {
-    QPointer<ServerImageCache> cache;
+    QPointer<FileCache> cache;
+    std::unique_ptr<ImageImporter> importer;
 
     // Workaround for WhatsThis mode clicks.
     bool skipNextMouseReleaseEvent = false;
@@ -138,11 +142,31 @@ LayoutBackgroundSettingsWidget::~LayoutBackgroundSettingsWidget()
 
 void LayoutBackgroundSettingsWidget::uploadImage()
 {
+    if (!d->cache)
+        return;
+
+    if (!d->importer)
+    {
+        d->importer = std::make_unique<ImageImporter>(d->cache.data());
+        connect(d->importer.get(), &ImageImporter::imported, this,
+            [this](const QString& filename, FileCache::OperationResult status)
+            {
+                if (status != FileCache::OperationResult::ok)
+                {
+                    onImageUploaded(filename, false);
+                    return;
+                }
+                if (auto serverCache = qobject_cast<ServerFileCache*>(d->cache.data()))
+                    serverCache->uploadFile(filename);
+                else
+                    onImageUploaded(filename, true);
+            });
+    }
+
     const auto& background = m_store->state().background;
-    if (background.cropToMonitorAspectRatio)
-        d->cache->storeImage(background.imageSourcePath, screenAspectRatio());
-    else
-        d->cache->storeImage(background.imageSourcePath);
+    d->importer->importFromFile(
+        background.imageSourcePath,
+        background.cropToMonitorAspectRatio ? screenAspectRatio() : QnAspectRatio());
     m_store->startUploading();
 }
 
@@ -194,32 +218,37 @@ void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, boo
 {
     if (d->cache)
         d->cache->disconnect(this);
+    d->importer.reset();
 
     d->cache = isLocalFile
-        ? systemContext->localFileCache()
-        : systemContext->serverImageCache();
+        ? static_cast<FileCache*>(systemContext->localImageCache())
+        : static_cast<FileCache*>(systemContext->serverImageCache());
 
     // Cross-site and CSL contexts have no file caches.
     if (!d->cache)
         return;
 
-    connect(
-        d->cache,
-        &ServerFileCache::fileDownloaded,
-        this,
-        [this](const QString& filename, ServerFileCache::OperationResult status)
-        {
-            onImageDownloaded(filename, status == ServerFileCache::OperationResult::ok);
-        });
+    if (auto serverCache = qobject_cast<ServerFileCache*>(d->cache.data()))
+    {
+        connect(serverCache, &ServerFileCache::fileDownloaded, this,
+            [this](
+                const QString& filename,
+                FileCache::OperationResult status,
+                const QString& absolutePath)
+            {
+                const bool ok = status == FileCache::OperationResult::ok;
+                // For non-ok status the signal carries an empty path; fall back to a lookup so
+                // `onImageDownloaded` can still match the result against the active download.
+                const QString path = ok ? absolutePath : d->cache->absoluteFilePath(filename);
+                onImageDownloaded(filename, path, ok);
+            });
 
-    connect(
-        d->cache,
-        &ServerFileCache::fileUploaded,
-        this,
-        [this](const QString& filename, ServerFileCache::OperationResult status)
-        {
-            onImageUploaded(filename, status == ServerFileCache::OperationResult::ok);
-        });
+        connect(serverCache, &ServerFileCache::fileUploaded, this,
+            [this](const QString& filename, FileCache::OperationResult status)
+            {
+                onImageUploaded(filename, status == FileCache::OperationResult::ok);
+            });
+    }
 }
 
 void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& state)
@@ -281,12 +310,17 @@ void LayoutBackgroundSettingsWidget::loadState(const LayoutSettingsDialogState& 
     }
 }
 
-void LayoutBackgroundSettingsWidget::onImageDownloaded(const QString& filename, bool ok)
+void LayoutBackgroundSettingsWidget::onImageDownloaded(
+    const QString& filename, const QString& path, bool ok)
 {
-    const auto& state = m_store->state();
+    if (path.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting unsafe background image filename: %1", filename);
+        return;
+    }
 
     // Check if loading was aborted or another image was selected.
-    if (d->cache->getFullPath(filename) != state.background.imageSourcePath)
+    if (path != m_store->state().background.imageSourcePath)
         return;
 
     if (ok)
@@ -342,8 +376,32 @@ void LayoutBackgroundSettingsWidget::startDownloading()
     if (!state.background.canStartDownloading())
         return;
 
-    d->cache->downloadFile(state.background.filename);
-    m_store->startDownloading(d->cache->getFullPath(state.background.filename));
+    if (!d->cache)
+        return;
+
+    const auto& filename = state.background.filename;
+    const auto path = d->cache->absoluteFilePath(filename);
+    if (path.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting unsafe background image filename: %1", filename);
+        return;
+    }
+
+    m_store->startDownloading(path);
+
+    if (auto serverCache = qobject_cast<ServerFileCache*>(d->cache.data()))
+    {
+        serverCache->downloadFile(filename);
+    }
+    else
+    {
+        // Local cache: existence is decided synchronously, but `onImageDownloaded` is delivered
+        // asynchronously to match the server cache behavior and avoid reentrancy issues.
+        executeLater(
+            [this, filename, path, ok = QFileInfo::exists(path)]
+            { onImageDownloaded(filename, path, ok); },
+            this);
+    }
 }
 
 void LayoutBackgroundSettingsWidget::viewFile()

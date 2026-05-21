@@ -93,7 +93,7 @@
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 #include <nx/vms/client/desktop/utils/date_validator.h>
 #include <nx/vms/client/desktop/utils/mouse_spy.h>
-#include <nx/vms/client/desktop/utils/server_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/file_cache.h>
 #include <nx/vms/client/desktop/utils/upload_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/client/desktop/utils/window_context_aware_attached.h>
@@ -188,7 +188,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<Qn::LightModeFlags>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnPingUtility::PingResponse>();
-    qRegisterMetaType<ServerFileCache::OperationResult>();
+    qRegisterMetaType<FileCache::OperationResult>();
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<VirtualCameraState>();
     qRegisterMetaType<VirtualCameraUpload>();

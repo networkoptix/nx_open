@@ -7,7 +7,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/models/notification_sound_model.h>
 

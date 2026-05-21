@@ -18,9 +18,9 @@ class NX_VMS_COMMON_API AbstractStoredFileNotificationManager: public QObject
     Q_OBJECT
 
 signals:
-    void added(QString filename);
-    void updated(QString filename);
-    void removed(QString filename);
+    void added(QString storedFilePath);
+    void updated(QString storedFilePath);
+    void removed(QString storedFilePath);
 };
 
 /*!

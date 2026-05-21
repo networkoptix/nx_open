@@ -110,6 +110,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         "${QML_FILES}"
         "${SHADER_FILES}"
     ADDITIONAL_MOCABLES
+        src/nx/vms/client/desktop/image_providers/threaded_image_loader.cpp
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp
     ADDITIONAL_MOCABLES

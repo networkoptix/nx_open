@@ -40,7 +40,7 @@ private:
 
 private:
     void onImageUploaded(const QString& filename, bool ok);
-    void onImageDownloaded(const QString& filename, bool ok);
+    void onImageDownloaded(const QString& filename, const QString& path, bool ok);
 
     void setPreview(const QImage& image);
 

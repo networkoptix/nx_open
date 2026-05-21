@@ -37,7 +37,8 @@
 #include <nx/vms/client/desktop/system_administration/watchers/logs_management_watcher.h>
 #include <nx/vms/client/desktop/system_administration/widgets/log_settings_dialog.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 #include <nx/vms/text/time_strings.h>
 #include <ui/common/palette.h>
@@ -436,17 +437,24 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty())
     {
-        QString path = nx::vms::client::desktop::LocalFileCache::fullPath(
-            backgroundImage,
-            Qn::kWallpapersFolder);
-        QFile lock(path);
-        lock.open(QFile::ReadWrite);
-        nx::vms::client::desktop::ServerFileCache::clearLocalCache();
-        lock.close();
+        const auto safeFilePath =
+            system()->localImageCache()->absoluteFilePath(backgroundImage);
+        if (!safeFilePath.isEmpty())
+        {
+            QFile lock(safeFilePath);
+            lock.open(QFile::ReadWrite);
+            nx::vms::client::desktop::file_cache::clearLocalCache();
+            lock.close();
+        }
+        else
+        {
+            NX_WARNING(this, "Rejecting unsafe background image filename: %1", backgroundImage);
+            nx::vms::client::desktop::file_cache::clearLocalCache();
+        }
     }
     else
     {
-        nx::vms::client::desktop::ServerFileCache::clearLocalCache();
+        nx::vms::client::desktop::file_cache::clearLocalCache();
     }
 
     clearWebEngineData();

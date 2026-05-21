@@ -3,6 +3,7 @@
 #include "ptz_manage_dialog.h"
 #include "ui_ptz_manage_dialog.h"
 
+#include <QtCore/QFileInfo>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QStyledItemDelegate>
@@ -12,6 +13,7 @@
 #include <core/ptz/ptz_tour.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/core/ptz/helpers.h>
@@ -26,7 +28,7 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/ui/messages/ptz_messages.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/widgets/ptz_tour_widget.h>
@@ -107,7 +109,7 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_hotkeysDelegate(),
-    m_cache(system()->localFileCache()),
+    m_cache(system()->localImageCache()),
     m_submitting(false)
 {
     ui->setupUi(this);
@@ -141,13 +143,6 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     connect(m_model, &QnPtzManageModel::modelReset, this, &QnPtzManageDialog::at_model_modelReset);
     connect(this, &QnAbstractPtzDialog::synchronized, m_model, &QnPtzManageModel::setSynchronized);
     connect(ui->tourEditWidget, SIGNAL(tourSpotsChanged(QnPtzTourSpotList)), this, SLOT(at_tourSpotsChanged(QnPtzTourSpotList)));
-    connect(m_cache, &ServerFileCache::fileDownloaded, this,
-        [this](const QString &filename, ServerFileCache::OperationResult status)
-        {
-            if (status != ServerFileCache::OperationResult::ok)
-                return;
-            at_cache_imageLoaded(filename);
-        });
 
     //connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnPtzManageDialog::updateHotkeys);
 
@@ -690,8 +685,14 @@ void QnPtzManageDialog::at_cache_imageLoaded(const QString &filename)
     if (rowData.id() != filename)
         return;
 
+    const auto path = m_cache->absoluteFilePath(filename);
+    if (path.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting unsafe PTZ image filename: %1", filename);
+        return;
+    }
     auto loader = new ThreadedImageLoader(this);
-    loader->setInput(m_cache->getFullPath(filename));
+    loader->setInput(path);
     loader->setTransformationMode(Qt::FastTransformation);
     loader->setSize(ui->previewLabel->size());
     loader->setFlags(ThreadedImageLoader::TouchSizeFromOutside);
@@ -708,7 +709,7 @@ void QnPtzManageDialog::storePreview(const QString& id)
     // TODO: #dklychkov get image from the resource
     // widget->display()->mediaResource()->getImage(...);
     QImage image;
-    m_cache->storeImageData(id, image);
+    m_cache->storeImage(id, image);
 }
 
 void QnPtzManageDialog::setPreview(const QImage &image)
@@ -776,7 +777,13 @@ void QnPtzManageDialog::updateUi()
 
     ui->previewGroupBox->setEnabled(isPreset || isTour);
     if (ui->previewGroupBox->isEnabled())
-        m_cache->downloadFile(selectedRow.id());
+    {
+        const auto path = m_cache->absoluteFilePath(selectedRow.id());
+        if (!path.isEmpty() && QFileInfo::exists(path))
+            at_cache_imageLoaded(selectedRow.id());
+        else
+            setPreview(QImage());
+    }
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
     ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.modified);

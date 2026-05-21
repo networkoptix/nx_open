@@ -5,9 +5,10 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include <nx/audio/audiodevice.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/rules/action_builder_fields/sound_field.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>
@@ -109,13 +110,19 @@ void VolumePicker::onTestButtonClicked()
         if (soundUrl.isEmpty())
             return;
 
-        QString filePath = systemContext()->serverNotificationCache()->getFullPath(soundUrl);
-        if (!QFileInfo(filePath).exists())
+        const auto safeFilePath =
+            systemContext()->serverNotificationCache()->absoluteFilePath(soundUrl);
+        if (safeFilePath.isEmpty())
+        {
+            NX_WARNING(this, "Rejecting unsafe sound filename: %1", soundUrl);
+            return;
+        }
+        if (!QFileInfo::exists(safeFilePath))
             return;
 
         m_audioDeviceCachedVolume = nx::audio::AudioDevice::instance()->volume();
         nx::audio::AudioDevice::instance()->setVolume(m_field->value());
-        if (AudioPlayer::playFileAsync(filePath, this, [this] { onTextSaid(); }))
+        if (AudioPlayer::playFileAsync(safeFilePath, this, [this] { onTextSaid(); }))
         {
             m_inProgress = true;
             m_testPushButton->setEnabled(false);

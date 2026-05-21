@@ -2,8 +2,9 @@
 
 #include "sound_controller.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <utils/media/audio_player.h>
 
@@ -55,25 +56,25 @@ QSharedPointer<AudioPlayer> loopSound(const QString& filePath)
 SoundController::SoundController(WindowContextAware* windowContextAware):
     WindowContextAware(windowContextAware)
 {
-    const auto serverNotificationCache = system()->serverNotificationCache();
-    connect(serverNotificationCache,
-        &ServerNotificationCache::fileDownloaded, this,
-        [this, serverNotificationCache]
-            (const QString& soundUrl, ServerFileCache::OperationResult status)
+    connect(system()->serverNotificationCache(),
+        &ServerFileCache::fileDownloaded, this,
+        [this](
+            const QString& soundUrl,
+            ServerFileCache::OperationResult status,
+            const QString& absolutePath)
         {
+            const bool wasRequestedAsSingleShot = m_soundsToLoad.remove(soundUrl);
+
             if (status == ServerFileCache::OperationResult::ok)
             {
-                const auto path = serverNotificationCache->getFullPath(soundUrl);
-
-                if (m_soundsToLoad.contains(soundUrl))
+                if (wasRequestedAsSingleShot)
                 {
-                    m_soundsToLoad.remove(soundUrl);
                     m_loadedSounds.insert(soundUrl);
-                    createSingleShotPlayer(path);
+                    createSingleShotPlayer(absolutePath);
                 }
 
                 for (const auto& id: m_eventsByLoadingSound.values(soundUrl))
-                    m_loopedPlayers[id] = loopSound(path);
+                    m_loopedPlayers[id] = loopSound(absolutePath);
             }
 
             m_eventsByLoadingSound.remove(soundUrl);
@@ -88,7 +89,9 @@ void SoundController::play(const QString& soundUrl)
 {
     if (m_loadedSounds.contains(soundUrl))
     {
-        createSingleShotPlayer(system()->serverNotificationCache()->getFullPath(soundUrl));
+        const auto path = system()->serverNotificationCache()->absoluteFilePath(soundUrl);
+        if (NX_ASSERT(!path.isEmpty()))
+            createSingleShotPlayer(path);
         return;
     }
 
