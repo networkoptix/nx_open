@@ -2523,7 +2523,6 @@ static void registerDeviceHandlers(
         std::make_unique<WebRtcCameraTrackerHandler>(authenticator, serverModule, serverConnector));
 
     /**%apidoc GET /rest/v{3-4}/devices/{id}/virtual/status
-     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Returns virtual Device status.
      * %caption Get virtual Device status
      * %ingroup Virtual Devices
@@ -2538,7 +2537,6 @@ static void registerDeviceHandlers(
         std::make_unique<VirtualDeviceReadStatus>(*serverModule, *serverConnector));
 
     /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/prepare
-     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Returns Device footage preparation result.
      * %caption Virtual Device preparation
      * %ingroup Virtual Devices
@@ -2552,7 +2550,6 @@ static void registerDeviceHandlers(
         std::make_unique<VirtualDeviceReadPrepare>(*serverModule, *serverConnector));
 
     /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/consume
-     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Starts a consume operation, importing already uploaded file as camera footage.
      * %caption Start Virtual Device Consume
      * %ingroup Virtual Devices
@@ -2566,7 +2563,6 @@ static void registerDeviceHandlers(
         std::make_unique<VirtualDeviceUpdateConsume>(*serverModule, *serverConnector));
 
     /**%apidoc PATCH /rest/v{3-4}/devices/{id}/virtual/lock
-     * %deprecated Use <b>/rest/v{3-}/devices/{deviceId}/virtual/uploads/{uploadId}</b> endpoint instead.
      * Locks virtual device.
      * %caption Lock Virtual Device
      * %ingroup Virtual Devices
@@ -2588,7 +2584,7 @@ static void registerDeviceHandlers(
      * %param[ref] _local,_strict,_ticket
      * %return:{VirtualDeviceStatus} Virtual device status.
      */
-    reg("rest/v{3-}/devices/:id/virtual/extend",
+    reg("rest/v{3-4}/devices/:id/virtual/extend",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateExtend>(*serverModule, *serverConnector));
 
@@ -2601,7 +2597,7 @@ static void registerDeviceHandlers(
      * %param[ref] _local,_strict,_ticket
      * %return:{VirtualDeviceStatus} Virtual device status.
      */
-    reg("rest/v{3-}/devices/:id/virtual/release",
+    reg("rest/v{3-4}/devices/:id/virtual/release",
         GlobalPermission::none,
         std::make_unique<VirtualDeviceUpdateRelease>(*serverModule, *serverConnector));
 
