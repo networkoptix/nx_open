@@ -387,6 +387,22 @@ Page
         clip: false
     }
 
+    toolBar.titleControl
+    {
+        leftPadding: recordingStatusIndicator.sourcePath ? recordingStatusIndicator.width : 0
+        horizontalAlignment: Qt.AlignLeft
+    }
+
+    RecordingStatusIndicator
+    {
+        id: recordingStatusIndicator
+
+        parent: toolBar.titleControl
+        anchors.verticalCenter: parent.verticalCenter
+
+        resource: cameraSwitcher.resource
+    }
+
     gradientToolbarBackground: true
 
     VideoScreenBanner

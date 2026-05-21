@@ -8,7 +8,6 @@ import Nx.Core.Controls
 import nx.vms.client.core
 
 ColoredImage
-
 {
     id: control
 
@@ -19,9 +18,11 @@ ColoredImage
     sourceSize: control.useSmallIcon
         ? statusHelper.smallIconSize
         : statusHelper.normalIconSize
+
     sourcePath: control.useSmallIcon
         ? statusHelper.qmlSmallIconName
         : statusHelper.qmlIconName
+
     primaryColor: ColorTheme.colors.red
 
     RecordingStatusHelper

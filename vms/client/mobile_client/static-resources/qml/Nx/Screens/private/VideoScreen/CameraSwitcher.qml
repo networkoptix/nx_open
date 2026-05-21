@@ -25,6 +25,7 @@ Item
     readonly property real transitionFraction: Math.abs(d.swipeOffset / switcher.width)
 
     readonly property string resourceName: centeredResourceHelper.qualifiedResourceName
+    readonly property alias resource: d.centeredResource
     readonly property string lastThumbnail: d.thumbnail
 
     clip: true
