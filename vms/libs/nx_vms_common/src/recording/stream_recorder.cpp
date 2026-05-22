@@ -52,7 +52,7 @@ void QnStreamRecorder::close()
             ? m_endDateTimeUs / 1000 - startTimeUs() / 1000 : 0,
         0));
 
-    closeRecordingContext(durationMs); //< Different actions per context (cloud, storage, etc)
+    closeRecordingContext(std::chrono::milliseconds(startTimeUs() / 1000), durationMs); //< Different actions per context (cloud, storage, etc)
     markNeedKeyData();
     m_firstTime = true;
     m_fileOpened = false;
@@ -131,7 +131,6 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
     m_endDateTimeUs = mediaData->timestamp;
     if (m_startDateTimeUs == (int64_t)AV_NOPTS_VALUE)
         m_startDateTimeUs = mediaData->timestamp;
-    m_interleavedStream = m_videoLayout && m_videoLayout->channelCount() > 1;
     m_isAudioPresent = m_audioLayout && !m_audioLayout->tracks().empty() && isAudioRecorded();
     const auto audioLayout = m_isAudioPresent ? m_audioLayout : AudioLayoutConstPtr();
     auto metaData = prepareMetaData(mediaData, m_videoLayout);
@@ -160,12 +159,17 @@ bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
     return false;
 }
 
+void QnStreamRecorder::setUtcOffsetAllowed(bool value)
+{
+    m_isUtcOffsetAllowed = value;
+}
+
 QnAviArchiveMetadata QnStreamRecorder::prepareMetaData(
     const QnConstAbstractMediaDataPtr&, const QnConstResourceVideoLayoutPtr& videoLayout)
 {
     QnAviArchiveMetadata result;
     result.version = QnAviArchiveMetadata::kVersionBeforeTheIntegrityCheck;
-    if (isUtcOffsetAllowed())
+    if (m_isUtcOffsetAllowed)
         result.startTimeMs = m_startDateTimeUs / 1000LL;
 
     result.dewarpingParams = m_mediaDevice->getDewarpingParams();
@@ -339,11 +343,6 @@ bool QnStreamRecorder::isAudioPresent() const
 int64_t QnStreamRecorder::startTimeUs() const
 {
     return m_startDateTimeUs;
-}
-
-bool QnStreamRecorder::isInterleavedStream() const
-{
-    return m_interleavedStream;
 }
 
 QnConstAbstractMediaDataPtr QnStreamRecorder::encryptDataIfNeed(const QnConstAbstractMediaDataPtr& data)

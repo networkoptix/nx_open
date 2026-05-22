@@ -60,6 +60,11 @@ void NovMediaExport::onSuccessfulPacketWrite(
     m_signer.processMedia(avCodecParams, data, size);
 }
 
+qint64 NovMediaExport::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
+{
+    return md->timestamp - startTimeUs();
+}
+
 void NovMediaExport::initializeRecordingContext(int64_t startTimeUs)
 {
     NX_ASSERT(m_recordingContext.isEmpty());

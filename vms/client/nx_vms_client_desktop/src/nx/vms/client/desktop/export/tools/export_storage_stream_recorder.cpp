@@ -134,17 +134,6 @@ void ExportStorageStreamRecorder::onSuccessfulPacketWrite(
     m_signer.processMedia(avCodecParams, data, size);
 }
 
-void ExportStorageStreamRecorder::fileFinished(
-    qint64 /*durationMs*/, const QString& /*fileName*/, qint64 /*fileSize*/, qint64 /*startTimeMs*/)
-{
-}
-
-bool ExportStorageStreamRecorder::fileStarted(
-    qint64 /*startTimeMs*/, int /*timeZone*/, const QString& /*fileName*/)
-{
-    return true;
-}
-
 void ExportStorageStreamRecorder::initMetadataStream(StorageContext& /*context*/)
 {
 }

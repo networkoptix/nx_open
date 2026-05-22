@@ -20,7 +20,6 @@
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <recording/abstract_recording_context.h>
-#include <recording/abstract_recording_context_callback.h>
 #include <recording/stream_recorder_data.h>
 #include <utils/color_space/image_correction.h>
 
@@ -29,8 +28,7 @@ namespace nx::common::metadata { class QnCompressedObjectMetadataPacket; }
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,
     // Public, because private breaks clang build.
-    public virtual /*mix-in*/ nx::AbstractRecordingContext, //< Uses.
-    public virtual nx::AbstractRecordingContextCallback //< Implements.
+    public virtual /*mix-in*/ nx::AbstractRecordingContext //< Uses.
 {
     Q_OBJECT
 
@@ -43,6 +41,7 @@ public:
     void setProgressBounds(qint64 bof, qint64 eof);
     bool isAudioPresent() const;
     int64_t packetCount() const;
+    int64_t startTimeUs() const;
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual bool canReplaceData() const override { return false; }
@@ -64,6 +63,7 @@ protected:
     void setVideoLayout(const QnConstResourceVideoLayoutPtr& videoLayout);
     void setAudioLayout(const AudioLayoutConstPtr& audioLayout);
     void setHasVideo(bool hasVideo);
+    void setUtcOffsetAllowed(bool value);
 
     virtual bool saveMotion(const QnConstMetaDataV1Ptr& media) = 0;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
@@ -89,12 +89,6 @@ private:
     bool isAudioRecorded() const;
 
 protected:
-    // nx::AbstractRecordingContextCallback implementation
-    virtual int64_t startTimeUs() const override;
-    virtual bool isInterleavedStream() const override;
-    virtual bool isUtcOffsetAllowed() const override { return true; }
-
-protected:
     bool m_firstTime = true;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
     bool m_isAudioPresent = false;
@@ -104,7 +98,6 @@ protected:
     bool m_finishReported = false;
     int64_t m_endDateTimeUs = AV_NOPTS_VALUE;
     int64_t m_startDateTimeUs = AV_NOPTS_VALUE;
-    bool m_interleavedStream = false;
     bool m_hasVideo = true;
 
 private:
@@ -114,6 +107,7 @@ private:
     qint64 m_bofDateTimeUs = AV_NOPTS_VALUE;
     qint64 m_eofDateTimeUs = AV_NOPTS_VALUE;
     int m_lastProgress = -1;
+    bool m_isUtcOffsetAllowed = true;
     mutable nx::Mutex m_mutex;
     std::atomic<int64_t> m_packetCount = 0;
 };

@@ -11,7 +11,6 @@
 #include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <recording/abstract_recording_context.h>
-#include <recording/abstract_recording_context_callback.h>
 #include <recording/stream_recorder_data.h>
 
 namespace nx {
@@ -21,9 +20,7 @@ namespace nx {
  * storage(s) and writes media packets to this file.
  */
 class NX_VMS_COMMON_API StorageRecordingContext:
-    public virtual AbstractRecordingContext, //< Implements.
-    // Public, because private breaks clang build.
-    public virtual /*mix-in*/ AbstractRecordingContextCallback //< Uses.
+    public virtual AbstractRecordingContext //< Implements.
 {
 protected:
     struct StorageContext
@@ -51,7 +48,8 @@ public:
     void setLastError(nx::recording::Error::Code code);
 
     // AbstractRecordingContext.
-    virtual void closeRecordingContext(std::chrono::milliseconds durationMs) override;
+    virtual void closeRecordingContext(
+        std::chrono::milliseconds startTime, std::chrono::milliseconds duration) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
     virtual AVMediaType streamAvMediaType(
         QnAbstractMediaData::DataType dataType, int streamIndex) const override;
@@ -79,21 +77,24 @@ protected:
     virtual void onSuccessfulPacketWrite(
         AVCodecParameters* avCodecParams, const uint8_t* data, int size) = 0;
 
-    virtual void fileFinished(
-        qint64 durationMs, const QString& fileName, qint64 fileSize, qint64 startTimeMs) = 0;
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) = 0;
 
-    virtual bool fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName) = 0;
+    // For server recorder only.
+    virtual bool onFileStarted(const QString& /*fileName*/) { return true; }
+    virtual void fileFinished(
+        std::chrono::milliseconds /*duration*/,
+        const QString& /*fileName*/,
+        qint64 /*fileSize*/,
+        std::chrono::milliseconds /*startTime*/) {}
 
 private:
     const bool m_exportMode;
     bool m_convertDataToMp4Format;
     std::string m_container;
-    bool m_packetWritten = false;
     std::optional<nx::recording::Error> m_lastError;
     nx::media::AnnexbToMp4 m_annexbToMp4;
     std::map<int, int64_t> m_streamIndexToLastDts;
-
-    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
+    bool m_interleavedStream = false;
 
     void cleanFfmpegContexts();
     void writeHeader(StorageContext& context);

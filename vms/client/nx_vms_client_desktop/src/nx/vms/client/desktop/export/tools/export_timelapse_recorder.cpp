@@ -24,6 +24,7 @@ ExportTimelapseRecorder::ExportTimelapseRecorder(
     base_type(resource, mediaProvider),
     m_timeStepUsec(timeStepUsec)
 {
+    setUtcOffsetAllowed(false);
     setTranscoderQuality(Qn::StreamQuality::rapidReview);
     setTranscoderFixedFrameRate(kFramerate);
 }
@@ -54,11 +55,6 @@ qint64 ExportTimelapseRecorder::getPacketTimeUsec(const QnConstAbstractMediaData
     const auto result = m_currentRelativeTimeUsec;
     m_currentRelativeTimeUsec += kOutputDeltaUsec;
     return result;
-}
-
-bool ExportTimelapseRecorder::isUtcOffsetAllowed() const
-{
-    return false;
 }
 
 } // namespace nx::vms::client::desktop

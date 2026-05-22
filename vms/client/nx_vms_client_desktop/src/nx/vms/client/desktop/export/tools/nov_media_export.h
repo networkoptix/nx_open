@@ -39,15 +39,12 @@ private:
     virtual void onSuccessfulPacketWrite(
         AVCodecParameters* avCodecParams, const uint8_t* data, int size) override;
     virtual void reportFinished() override;
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md) override;
 
     // Empty callbacks.
     virtual void onSuccessfulWriteData(const QnConstAbstractMediaDataPtr& /*data*/) override {};
     virtual void beforeIoClose(StorageContext& /*context*/) override {};
     virtual void initMetadataStream(StorageContext& /*context*/) override {};
-    virtual void fileFinished(
-        qint64 /*durationMs*/, const QString& /*fileName*/, qint64 /*fileSize*/, qint64 /*startTimeMs*/) override {};
-    virtual bool fileStarted(
-        qint64 /*startTimeMs*/, int /*timeZone*/, const QString& /*fileName*/) override  { return true; };
 
     bool saveMotion(const QnConstMetaDataV1Ptr& media) override;
     bool writeFile(const QString& fileName, const QByteArray& data);

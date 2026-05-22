@@ -224,11 +224,6 @@ void StorageRecordingContext::initIoContext(StorageContext& context)
     }
 }
 
-qint64 StorageRecordingContext::getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md)
-{
-    return md->timestamp - startTimeUs();
-}
-
 AVMediaType StorageRecordingContext::streamAvMediaType(
     QnAbstractMediaData::DataType dataType, int streamIndex) const
 {
@@ -359,7 +354,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     }
 
     auto startWriteTime = high_resolution_clock::now();
-    auto ret = isInterleavedStream()
+    auto ret = m_interleavedStream
         ? av_interleaved_write_frame(context.formatCtx, packet)
         : av_write_frame(context.formatCtx, packet);
 
@@ -382,7 +377,6 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         return;
     }
 
-    m_packetWritten = true;
     onSuccessfulPacketWrite(
         context.formatCtx->streams[streamIndex]->codecpar, packetData, packetDataSize);
 }
@@ -392,62 +386,40 @@ std::optional<nx::recording::Error> StorageRecordingContext::getLastError() cons
     return m_lastError;
 }
 
-void StorageRecordingContext::closeRecordingContext(std::chrono::milliseconds durationMs)
+void StorageRecordingContext::closeRecordingContext(
+    std::chrono::milliseconds startTime, std::chrono::milliseconds duration)
 {
     NX_VERBOSE(this, "closeRecordingContext called");
-    if (m_packetWritten) //< TODO: #lbusygin Change to `if (m_recordingContext.formatCtx)`.
-    {
-        onFlush(m_recordingContext);
-
-        av_write_trailer(m_recordingContext.formatCtx);
-    }
-
-    qint64 fileSize = 0;
     if (m_recordingContext.formatCtx)
     {
+        onFlush(m_recordingContext);
+        av_write_trailer(m_recordingContext.formatCtx);
+
         nx::utils::media::closeFfmpegIOContext(m_recordingContext.formatCtx->pb);
-        if (startTimeUs() != qint64(AV_NOPTS_VALUE))
-            fileSize =  m_recordingContext.storage->getFileSize(m_recordingContext.fileName);
         beforeIoClose(m_recordingContext);
         m_recordingContext.formatCtx->pb = nullptr;
         avformat_free_context(m_recordingContext.formatCtx);
-    }
+        m_recordingContext.formatCtx = 0;
 
-    m_recordingContext.formatCtx = 0;
-    if (startTimeUs() != qint64(AV_NOPTS_VALUE))
-    {
         NX_VERBOSE(this, "About to call fileFinished");
         if (!m_lastError || m_lastError->code != Error::Code::fileCreate)
         {
+            qint64 fileSize = m_recordingContext.storage->getFileSize(m_recordingContext.fileName);
             NX_VERBOSE(
-                this, "Calling fileFinished() for '%1', file size: %2, duration: %3",
-                nx::utils::url::hidePassword(m_recordingContext.fileName), fileSize, durationMs);
+                this, "Calling fileFinished for '%1', file size: %2, duration: %3",
+                nx::utils::url::hidePassword(m_recordingContext.fileName), fileSize, duration);
             fileFinished(
-                durationMs.count(), m_recordingContext.fileName, fileSize, startTimeUs() / 1000);
-        }
-        else
-        {
-            NX_WARNING(
-                this, "Won't call fileFinished() for '%1' because we failed to create file previously",
-                nx::utils::url::hidePassword(m_recordingContext.fileName));
+                duration, m_recordingContext.fileName, fileSize, startTime);
+            return;
         }
     }
-    else if (!m_lastError)
-    {
-        NX_WARNING(
-            this, "Won't call fileFinished() for '%1' because of invalid start time and no last error set",
-            nx::utils::url::hidePassword(m_recordingContext.fileName));
 
+    if (!m_lastError)
         m_lastError = Error(Error::Code::dataNotFound);
-    }
-    else
-    {
-        NX_WARNING(
-            this, "Won't call fileFinished() for '%1' because of invalid start time. Last error is: %2",
-            nx::utils::url::hidePassword(m_recordingContext.fileName), *m_lastError);
-    }
 
-    m_packetWritten = false;
+    NX_WARNING(
+        this, "Skipping call fileFinished because file: '%1' could not be created, error: %2",
+        nx::utils::url::hidePassword(m_recordingContext.fileName), *m_lastError);
 }
 
 void StorageRecordingContext::setLastError(nx::recording::Error::Code code)
@@ -461,6 +433,7 @@ bool StorageRecordingContext::doPrepareToStart(
     const AudioLayoutConstPtr& audioLayout,
     const QnAviArchiveMetadata& metadata)
 {
+    m_interleavedStream = videoLayout && videoLayout->channelCount() > 1;
     try
     {
         auto& ctx = m_recordingContext;
@@ -476,10 +449,7 @@ bool StorageRecordingContext::doPrepareToStart(
         }
 
         allocateFfmpegObjects(mediaData, videoLayout, audioLayout, ctx);
-        if (!fileStarted(
-            startTimeUs() / 1000,
-            QDateTime::currentDateTime().offsetFromUtc() / 60,
-            ctx.fileName))
+        if (!onFileStarted(ctx.fileName))
         {
             throw ErrorEx(
                 Error::Code::fileWrite,

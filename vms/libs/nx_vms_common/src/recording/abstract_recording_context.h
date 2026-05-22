@@ -22,7 +22,8 @@ class AbstractRecordingContext
 {
 public:
     virtual ~AbstractRecordingContext() = default;
-    virtual void closeRecordingContext(std::chrono::milliseconds durationMs) = 0;
+    virtual void closeRecordingContext(
+        std::chrono::milliseconds startTime, std::chrono::milliseconds duration) = 0;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) = 0;
     virtual AVMediaType streamAvMediaType(
         QnAbstractMediaData::DataType dataType, int streamIndex) const = 0;
