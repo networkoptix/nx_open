@@ -157,31 +157,35 @@ void NovMediaExport::writeMotionData()
 bool NovMediaExport::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     NX_VERBOSE(this, "Export media data: %1", md);
-    if (!m_isLayoutsInitialised)
-    {
-        m_isLayoutsInitialised = true;
-        setVideoLayout(m_mediaDevice->getVideoLayout(m_mediaProvider));
-        setAudioLayout(m_mediaDevice->getAudioLayout(m_mediaProvider));
-        setHasVideo(m_mediaDevice->hasVideo(m_mediaProvider));
-    }
+    setHasVideo(m_mediaDevice->hasVideo(m_mediaProvider));
 
     if (md->dataType == QnAbstractMediaData::VIDEO)
     {
-        if (m_videoCodecParameters && md->context && !m_videoCodecParameters->isEqual(*md->context))
+        if (!m_videoCodecParameters
+            || (md->context && !m_videoCodecParameters->isEqual(*md->context)))
         {
-            NX_DEBUG(this, "Video codec parameters have changed from %1 to %2. Close file",
-                m_videoCodecParameters->toString(), md->context->toString());
-            close();
+            NX_DEBUG(this, "New video codec parameters: %1", md->context->toString());
+            setVideoLayout(m_mediaDevice->getVideoLayout(m_mediaProvider));
+            if (m_fileOpened)
+            {
+                NX_DEBUG(this, "Video codec parameters have changed. Close file");
+                close();
+            }
         }
         m_videoCodecParameters = md->context;
     }
     else if (md->dataType == QnAbstractMediaData::AUDIO)
     {
-        if (m_audioCodecParameters && md->context && !m_audioCodecParameters->isEqual(*md->context))
+        if (!m_audioCodecParameters
+            || (md->context && !m_audioCodecParameters->isEqual(*md->context)))
         {
-            NX_DEBUG(this, "Audio codec parameters have changed from %1 to %2. Close file",
-                m_audioCodecParameters->toString(), md->context->toString());
-            close();
+            NX_DEBUG(this, "New audio codec parameters: %1", md->context->toString());
+            setAudioLayout(m_mediaDevice->getAudioLayout(m_mediaProvider));
+            if (m_fileOpened)
+            {
+                NX_DEBUG(this, "Audio codec parameters have changed. Close file");
+                close();
+            }
         }
         m_audioCodecParameters = md->context;
     }

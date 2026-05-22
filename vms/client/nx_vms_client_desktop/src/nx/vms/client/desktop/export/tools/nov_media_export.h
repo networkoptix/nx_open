@@ -57,7 +57,6 @@ private:
     QString m_baseFileName;
     QnStorageResourcePtr m_storage;
     QnAbstractStreamDataProvider* m_mediaProvider;
-    bool m_isLayoutsInitialised = false;
     QTimeZone m_timeZone{QTimeZone::LocalTime};
     CodecParametersConstPtr m_videoCodecParameters;
     CodecParametersConstPtr m_audioCodecParameters;

@@ -3632,6 +3632,12 @@ bool QnMediaResourceWidget::hasAudio() const
 
     if (d->mediaResource) // Handle local files.
     {
+        // TODO #lbusygin: Something like this needs to be done with the archive: if the audio
+        // on the camera is disabled, it will not play from the archive.
+        const auto aviResource = d->mediaResource.dynamicCast<QnAviResource>();
+        if (aviResource && aviResource->isEmbedded())
+            return true; //< in NOV files audio can start in any random moment.
+
         if (auto audioLayout = d->mediaResource->getAudioLayout(d->display()->dataProvider()))
             return !audioLayout->tracks().empty();
     }
@@ -3682,7 +3688,7 @@ void QnMediaResourceWidget::updateAudioPlaybackState()
 
     bool effectiveMuted =
         !isActiveWindow ||
-        !hasAudio() ||
+        !hasAudio() ||//< is this really necessary here?
         (isPlayingAll ? canBeMuted() && isMuted() : !isCentral);
 
     if (shouldShowAudioSpectrum())
