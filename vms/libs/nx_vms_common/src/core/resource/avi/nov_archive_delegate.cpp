@@ -176,11 +176,11 @@ bool QnNovArchiveDelegate::openFile(const QString& filename)
     NX_DEBUG(this, "Open file: %1", filename);
     m_currentFile.close();
     m_currentFile.setStorage(m_storage);
-    m_currentFile.setAudioChannel(m_audioChannel);
 
     if (!m_currentFile.open(m_resource, filename))
         return false;
 
+    m_currentFile.setAudioChannel(m_audioChannel);
     if (!m_startTimes.empty() && m_fileIndex < (int)m_startTimes.size())
         m_currentFile.setStartTimeUs(m_startTimes[m_fileIndex] * 1000);
 
