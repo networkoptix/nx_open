@@ -17,8 +17,13 @@ Page
 
     property var self
     property var bookmarks: []
-    property bool allowExport: true
+    property bool allowExport: false
+    property bool allowShare: false
     property bool readOnly: false
+
+    readonly property var currentBookmark: pageController.current !== 0
+        ? bookmarks[pageController.current - 1]
+        : undefined
 
     width: bookmarks.length > 1 ? 300 : undefined
     height: bookmarks.length > 1 ? 300 : undefined
@@ -49,7 +54,7 @@ Page
                     id: bookmarkView
                     width: bookmarkLoader.width
                     height: bookmarkLoader.height
-                    bookmark: root.bookmarks[pageController.current - 1]
+                    bookmark: root.currentBookmark
 
                     onTagClicked: function(tag)
                     {
@@ -123,6 +128,22 @@ Page
                     visible: root.allowExport
 
                     onClicked: root.self.onExportClicked(pageController.current - 1)
+                }
+
+                ImageButton
+                {
+                    implicitWidth: 30
+                    implicitHeight: 30
+                    icon.source: root.currentBookmark && root.currentBookmark.shareable
+                        ? "image://skin/20x20/Solid/shared.svg"
+                        : "image://skin/20x20/Solid/share.svg"
+                    icon.width: 20
+                    icon.height: 20
+                    primaryColor: ColorTheme.colors.light4
+                    secondaryColor: ColorTheme.colors.green
+                    visible: root.allowShare
+
+                    onClicked: root.self.onShareClicked(pageController.current - 1)
                 }
 
                 Item

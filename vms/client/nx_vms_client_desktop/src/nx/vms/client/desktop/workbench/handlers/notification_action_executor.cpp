@@ -149,7 +149,9 @@ void NotificationActionExecutor::handleAcknowledgeAction()
         return;
 
     auto bookmarksDialog = createSelfDestructingDialog<QnCameraBookmarkDialog>(
-        /*mandatoryDescription*/ true , mainWindowWidget());
+        QnCameraBookmarkDialog::Mode::edit,
+        /*mandatoryDescription*/ true,
+        mainWindowWidget());
 
     bookmark.description.clear(); //< Force user to fill description out.
     bookmarksDialog->setTags(this->systemContext()->bookmarkTagWatcher()->tags());

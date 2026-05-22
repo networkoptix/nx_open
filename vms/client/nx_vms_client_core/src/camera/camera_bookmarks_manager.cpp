@@ -4,6 +4,8 @@
 
 #include <camera/camera_bookmarks_query.h>
 #include <camera/private/camera_bookmarks_manager_p.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/log_strings_format.h>
@@ -14,7 +16,7 @@ QnCameraBookmarksManager::QnCameraBookmarksManager(
     nx::vms::client::core::SystemContext* systemContext,
     QObject* parent)
     :
-    QObject(parent),
+    base_type(parent),
     d(new QnCameraBookmarksManagerPrivate(systemContext))
 {
 }
@@ -65,96 +67,113 @@ int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCall
     return d->getBookmarkTagsAsync(maxTags, callback);
 }
 
-void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback)
-{
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
-    d->addCameraBookmark(bookmark, callback);
-
-    emit bookmarkAdded(bookmark);
-}
-
 void QnCameraBookmarksManager::addExistingBookmark(const QnCameraBookmark& bookmark)
 {
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
-    d->addExistingBookmark(bookmark);
+    if (!NX_ASSERT(bookmark.isValid(), "Invalid bookmark"))
+        return;
 
+    d->addOrUpdateBookmarkInQueries(bookmark);
     emit bookmarkAdded(bookmark);
 }
 
-bool QnCameraBookmarksManager::changeBookmarkRest(BookmarkOperation operation,
+bool QnCameraBookmarksManager::submitBookmarkOperation(BookmarkOperation operation,
     const QnCameraBookmark& bookmark,
-    OperationV4Callback&& callback)
+    OperationCallbackType&& callback)
 {
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
-    if (!bookmark.isValid())
+    if (!NX_ASSERT(bookmark.isValid(), "Invalid bookmark cannot be added, updated or removed"))
         return false;
 
-    const auto serverId = d->getServerForBookmark(bookmark);
-    if (!serverId)
+    const auto server =
+        nx::vms::client::core::bookmarks::getServerForBookmark(bookmark, d->systemContext());
+    if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
         return false;
 
-    const auto model = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
-        bookmark, *serverId, /*includeDigest*/ true);
-    const auto path = operation == BookmarkOperation::create
-        ? nx::format("rest/v4/devices/%1/bookmarks", model.deviceId).toQString()
-        : nx::format("rest/v4/devices/%1/bookmarks/%2", model.deviceId, model.id).toQString();
-    const auto method = operation == BookmarkOperation::create
-        ? nx::network::http::Method::post
-        : nx::network::http::Method::patch;
+    const auto apiBookmark = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
+        bookmark, server->getId(), /*includeDigest*/ true);
 
-    auto localCallback =
-        [this, requestCallback = std::move(callback), operation]
-            (bool success, rest::Handle /*handle*/, rest::ErrorOrData<QByteArray> response)
+    QString path;
+    nx::network::http::Method method;
+    QString errorMessage;
+
+    switch (operation)
+    {
+        case BookmarkOperation::create:
+            path = nx::format("rest/v4/devices/%1/bookmarks", apiBookmark.deviceId);
+            method = nx::network::http::Method::post;
+            errorMessage = "Cannot create bookmark";
+            break;
+
+        case BookmarkOperation::update:
+            path = nx::format("rest/v4/devices/%1/bookmarks/%2", apiBookmark.deviceId,
+                apiBookmark.id);
+            method = nx::network::http::Method::patch;
+            errorMessage = "Cannot update bookmark";
+            break;
+
+        case BookmarkOperation::remove:
+            path = nx::format("rest/v4/devices/*/bookmarks/%1", apiBookmark.id);
+            method = nx::network::http::Method::delete_;
+            errorMessage = "Cannot delete bookmark";
+            break;
+    }
+
+    auto restCallback =
+        [this, operation, errorMessage, operationCallback = std::move(callback),
+            bookmarkId = bookmark.guid]
+        (bool success, rest::Handle /*handle*/, rest::ErrorOrData<QByteArray> response)
         {
-            const auto errorMessage = operation == BookmarkOperation::create
-                ? "Cannot create bookmark."
-                : "Cannot update bookmark.";
             NX_LOG_RESPONSE(this, success, response, errorMessage);
 
-            nx::vms::api::BookmarkV3 result;
-            if (!success || !response.has_value()
-                || !QJson::deserialize<nx::vms::api::BookmarkV3>(response.value(), &result))
+            if (!success)
             {
-                requestCallback(false, {});
+                if (operationCallback)
+                    operationCallback(false, {});
                 return;
             }
 
-            requestCallback(true, result);
+            std::optional<nx::vms::api::BookmarkV3> operationResult;
+            if (operation == BookmarkOperation::create || operation == BookmarkOperation::update)
+            {
+                operationResult = nx::vms::api::BookmarkV3();
+                if (!response.has_value() || !QJson::deserialize<nx::vms::api::BookmarkV3>(
+                    response.value(), &*operationResult))
+                {
+                    NX_ASSERT(false, "Unexpected response");
+                    if (operationCallback)
+                        operationCallback(false, {});
+                    return;
+                }
+            }
 
-            const auto bookmark = nx::vms::common::bookmarkFromApi(result); //< result is moved here.
-            if (operation == BookmarkOperation::create)
-                emit bookmarkAdded(bookmark);
-            else
-                emit bookmarkUpdated(bookmark);
+            if (operationCallback)
+                operationCallback(true, operationResult);
+
+            switch (operation)
+            {
+                case BookmarkOperation::create:
+                {
+                    const auto bookmark = nx::vms::common::bookmarkFromApi(operationResult.value());
+                    d->addOrUpdateBookmarkInQueries(bookmark);
+                    emit bookmarkAdded(bookmark);
+                    break;
+                }
+
+                case BookmarkOperation::update:
+                {
+                    const auto bookmark = nx::vms::common::bookmarkFromApi(operationResult.value());
+                    d->addOrUpdateBookmarkInQueries(bookmark);
+                    emit bookmarkUpdated(bookmark);
+                    break;
+                }
+
+                case BookmarkOperation::remove:
+                    d->removeCameraBookmarkFromQueries(bookmarkId);
+                    emit bookmarkRemoved(bookmarkId);
+                    break;
+            }
         };
 
-    return d->sendRestRequest(path, model, method, std::move(localCallback)) != -1;
-}
-
-void QnCameraBookmarksManager::addAcknowledge(
-    const QnCameraBookmark& bookmark,
-    const nx::Uuid& eventRuleId,
-    OperationCallbackType callback)
-{
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
-    d->acknowledgeEvent(bookmark, eventRuleId, callback);
-
-    emit bookmarkAdded(bookmark);
-}
-
-void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback)
-{
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark");
-    d->updateCameraBookmark(bookmark, callback);
-
-    emit bookmarkUpdated(bookmark);
-}
-
-void QnCameraBookmarksManager::deleteCameraBookmark(const nx::Uuid& bookmarkId, OperationCallbackType callback)
-{
-    d->deleteCameraBookmark(bookmarkId, callback);
-
-    emit bookmarkRemoved(bookmarkId);
+    return d->sendRestRequest(path, apiBookmark, method, std::move(restCallback)) != rest::Handle();
 }
 
 rest::Handle QnCameraBookmarksManager::sendQueryRequest(
@@ -173,7 +192,8 @@ void QnCameraBookmarksManager::sendQueryTailRequest(
     d->sendQueryTailRequest(query, timePoint, callback);
 }
 
-QnCameraBookmarksQueryPtr QnCameraBookmarksManager::createQuery(const QnCameraBookmarkSearchFilter& filter)
+QnCameraBookmarksQueryPtr QnCameraBookmarksManager::createQuery(
+    const QnCameraBookmarkSearchFilter& filter)
 {
     return d->createQuery(filter);
 }

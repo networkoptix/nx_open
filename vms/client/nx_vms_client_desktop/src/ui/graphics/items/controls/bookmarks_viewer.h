@@ -9,9 +9,8 @@
 
 class HoverFocusProcessor;
 
-/// @class QnBookmarksViewer
-/// @brief Shows specified bookmarks one above another in defined position
-class QnBookmarksViewer : public QGraphicsWidget, public HelpTopicQueryable
+/** Shows specified bookmarks one above another in defined position. */
+class QnBookmarksViewer: public QGraphicsWidget, public HelpTopicQueryable
 {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
@@ -34,42 +33,32 @@ public:
     void setReadOnly(bool readonly);
 
     void setAllowExport(bool allowExport);
+    void setAllowShare(bool allowShare);
 
     virtual int helpTopicAt(const QPointF& pos) const override;
 
     QnCameraBookmarkList getDisplayedBookmarks() const;
 
 signals:
-    /// @brief Edit action callback
-    /// Closes tooltip after emittance
     void editBookmarkClicked(const QnCameraBookmark& bookmark);
-
-    /// @brief Remove action callback
-    /// Closes tooltip after emittance
     void removeBookmarkClicked(const QnCameraBookmark& bookmark);
-
-    /// @brief Tag-clicked action
-    /// Closes tooltip after emittance
     void tagClicked(const QString& tag);
-
-    /// @brief Play bookmark action
-    /// Closes tooltip after emittance
     void playBookmark(const QnCameraBookmark& bookmark);
-
-    /// @brief Export bookmark action
-    /// Closes tooltip after emittance
     void exportBookmarkClicked(const QnCameraBookmark& bookmark);
+    void shareBookmarkClicked(const QnCameraBookmark& bookmark);
 
 public slots:
-    /// @brief Set abstract location for bookmarks extraction
-    /// It can be for example timeline coordinate or a timestamp.
-    /// Location is interpreted by getBookmarksFunc/getPosFunc callbacks passed to the constructor.
+    /**
+     * Sets the abstract location used for bookmark extraction, it can be a timeline coordinate
+     * or a timestamp. The location is interpreted by the getBookmarksFunc/getPosFunc callbacks
+     * passed to the constructor.
+     */
     void setTargetLocation(qint64 location);
 
-    /// @brief updates position of bookmarks when timeline window changed
+    /** Updates position of bookmarks when timeline window changed. */
     void updateOnWindowChange();
 
-    /// @brief clears bookmarks
+    /** Clears bookmarks. */
     void resetBookmarks();
 
 public slots:

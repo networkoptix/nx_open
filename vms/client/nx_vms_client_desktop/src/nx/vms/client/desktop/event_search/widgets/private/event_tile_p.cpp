@@ -213,6 +213,20 @@ void EventTile::Private::updateIcon()
     q->ui->iconLabel->setPixmap(qnSkin->icon(iconPath, colorTheme).pixmap(20, 20));
 }
 
+void EventTile::Private::updateExtraIcon()
+{
+    if (extraIconPath.isEmpty())
+    {
+        q->ui->extraIconLabel->hide();
+        q->ui->extraIconLabel->setPixmap({});
+        return;
+    }
+
+    q->ui->extraIconLabel->show();
+    q->ui->extraIconLabel->setPixmap(qnSkin->colorizedPixmap(
+        extraIconPath, QSize(20, 20) * qApp->devicePixelRatio(), {}, qApp->devicePixelRatio()));
+}
+
 qreal EventTile::Private::getWidthOfText(const QString& text, const QLabel* label) const
 {
     return QFontMetricsF(label->font()).boundingRect(text).width();

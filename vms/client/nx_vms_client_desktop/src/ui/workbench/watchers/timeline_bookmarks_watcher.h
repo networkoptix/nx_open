@@ -61,7 +61,7 @@ private:
      */
     QnCameraBookmarksQueryPtr ensureQueryForCamera(const QnVirtualCameraResourcePtr& camera);
 
-    void updatePermissions();
+    void updateBookmarksViewerFeatures();
 
 private:
     typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;

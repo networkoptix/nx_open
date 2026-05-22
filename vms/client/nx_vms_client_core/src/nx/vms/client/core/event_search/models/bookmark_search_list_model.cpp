@@ -12,6 +12,7 @@
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/access/access_controller.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/event_search/utils/event_search_item_helper.h>
@@ -344,10 +345,12 @@ QVariant BookmarkSearchListModel::data(const QModelIndex& index, int role) const
 
         case BookmarkTagRole:
             return QVariant::fromValue(bookmark.tags);
+
         case IsSharedBookmark:
             return bookmark.shareable()
                 && bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
-                && systemContext()->featureAccess()->canUseShareBookmark();
+                && bookmarks::bookmarkSharingAvailable(systemContext());
+
         default:
             return base_type::data(index, role);
     }

@@ -13,11 +13,11 @@
 #include <nx/utils/algorithm/index_of.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/event_search/utils/bookmark_search_utils.h>
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/bookmark/bookmark_sort.h>
@@ -351,7 +351,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kCreationTime:
             return displayTime(bookmark.creationTime().count());
         case QnSearchBookmarksModel::kCreator:
-            return getVisibleBookmarkCreatorName(bookmark, systemContext());
+            return bookmarks::getVisibleBookmarkCreatorName(bookmark, systemContext());
         case QnSearchBookmarksModel::kLength:
         {
             const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs.count()));

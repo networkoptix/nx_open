@@ -69,6 +69,7 @@ private:
 
     QAction* const m_openInNewTabAction;
     QAction* const m_editBookmarkAction;
+    QAction* const m_shareBookmarkAction;
     QAction* const m_exportBookmarkAction;
     QAction* const m_exportBookmarksAction;
     QAction* const m_copyBookmarkTextAction;

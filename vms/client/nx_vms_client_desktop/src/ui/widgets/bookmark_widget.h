@@ -8,24 +8,22 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 
-namespace Ui {
-    class BookmarkWidget;
-}
+namespace Ui { class BookmarkWidget; }
 
-class QnBookmarkWidget : public QWidget {
+class QnBookmarkWidget: public QWidget
+{
     Q_OBJECT
-
-    typedef QWidget base_type;
+    using base_type = QWidget;
 
 public:
-    explicit QnBookmarkWidget(QWidget *parent = 0);
-    ~QnBookmarkWidget();
+    explicit QnBookmarkWidget(QWidget* parent = nullptr);
+    virtual ~QnBookmarkWidget() override;
 
-    const QnCameraBookmarkTagList &tags() const;
-    void setTags(const QnCameraBookmarkTagList &tags);
+    const QnCameraBookmarkTagList& tags() const;
+    void setTags(const QnCameraBookmarkTagList& tags);
 
-    void loadData(const QnCameraBookmark &bookmark);
-    void submitData(QnCameraBookmark &bookmark) const;
+    void loadData(const QnCameraBookmark& bookmark);
+    void submitData(QnCameraBookmark& bookmark) const;
 
     /** Check if entered data is valid. */
     bool isValid() const;
@@ -36,7 +34,7 @@ signals:
     bool validChanged();
 
 protected:
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 private:
     void updateTagsList();

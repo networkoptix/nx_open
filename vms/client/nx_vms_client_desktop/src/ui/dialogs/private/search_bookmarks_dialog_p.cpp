@@ -73,6 +73,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(
 
     m_openInNewTabAction{new QAction(action(menu::OpenInNewTabAction)->text(), this)},
     m_editBookmarkAction{new QAction(action(menu::EditCameraBookmarkAction)->text(), this)},
+    m_shareBookmarkAction{new QAction(action(menu::ShareBookmarkAction)->text(), this)},
     m_exportBookmarkAction{new QAction(action(menu::ExportBookmarkAction)->text(), this)},
     m_exportBookmarksAction{new QAction(action(menu::ExportBookmarksAction)->text(), this)},
     m_copyBookmarkTextAction{new QAction(action(menu::CopyBookmarkTextAction)->text(), this)},
@@ -473,6 +474,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     addActionToMenu(menu::OpenInNewTabAction, m_openInNewTabAction);
     addSeparatorToMenu();
     addActionToMenu(menu::EditCameraBookmarkAction, m_editBookmarkAction);
+    addActionToMenu(menu::ShareBookmarkAction, m_shareBookmarkAction);
     addActionToMenu(menu::ExportBookmarkAction, m_exportBookmarkAction);
     addActionToMenu(menu::ExportBookmarksAction, m_exportBookmarksAction);
     addActionToMenu(menu::CopyBookmarkTextAction, m_copyBookmarkTextAction);
@@ -492,6 +494,12 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
         [this, params]
         {
             menu()->triggerIfPossible(menu::EditCameraBookmarkAction, params);
+        });
+
+    connect(m_shareBookmarkAction, &QAction::triggered, this,
+        [this, params]
+        {
+            menu()->triggerIfPossible(menu::ShareBookmarkAction, params);
         });
 
     connect(m_removeBookmarkAction, &QAction::triggered, this,
@@ -534,6 +542,7 @@ void QnSearchBookmarksDialogPrivate::customContextMenuRequested()
     /* Disconnect action signal handlers: */
     m_openInNewTabAction->disconnect(this);
     m_editBookmarkAction->disconnect(this);
+    m_shareBookmarkAction->disconnect(this);
     m_removeBookmarksAction->disconnect(this);
     m_removeBookmarkAction->disconnect(this);
     m_exportBookmarksAction->disconnect(this);

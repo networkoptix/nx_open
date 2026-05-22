@@ -27,6 +27,7 @@
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/camera/camera_data_manager.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
@@ -956,6 +957,19 @@ ActionVisibility ModifyBookmarkCondition::check(const Parameters& parameters, Wi
 {
     if (!parameters.hasArgument(core::CameraBookmarkRole))
         return InvisibleAction;
+    return EnabledAction;
+}
+
+ActionVisibility ShareBookmarkCondition::check(
+    const Parameters& parameters,
+    WindowContext* context)
+{
+    if (!parameters.hasArgument(core::CameraBookmarkRole))
+        return InvisibleAction;
+
+    if (!core::bookmarks::bookmarkSharingAvailable(context->system()))
+        return InvisibleAction;
+
     return EnabledAction;
 }
 

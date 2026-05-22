@@ -1212,6 +1212,12 @@ enum IDType
     ExportBookmarkAction,
 
     /**
+     * Shares the given bookmark and displays the shared bookmark link dialog.
+     * If the bookmark is already shared, only displays the dialog.
+     */
+    ShareBookmarkAction,
+
+    /**
      * Exports several selected bookmarks into a single layout.
      */
     ExportBookmarksAction,

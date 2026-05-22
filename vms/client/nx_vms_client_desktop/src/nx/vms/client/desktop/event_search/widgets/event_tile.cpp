@@ -26,6 +26,7 @@
 #include <nx/vms/client/desktop/skin/font_config.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/common/html/html.h>
 #include <ui/common/palette.h>
@@ -88,17 +89,8 @@ EventTile::EventTile(QWidget* parent):
     setPaletteColor(this, QPalette::Highlight, core::colorTheme()->color("brand"));
     // Background colors are configured inside of Private::updatePalette().
 
-    auto setCloseButtonPolicy =
-        [](CloseButton* button)
-        {
-            QSizePolicy sizePolicy = button->sizePolicy();
-            sizePolicy.setRetainSizeWhenHidden(true);
-            button->setSizePolicy(sizePolicy);
-            button->setHidden(true);
-        };
-
-    setCloseButtonPolicy(ui->closeButton);
-    setCloseButtonPolicy(ui->progressCloseButton);
+    ui->closeButton->hide();
+    ui->progressCloseButton->hide();
 
     ui->mainWidget->layout()->setContentsMargins(kMarginsWithHeader);
     ui->wideHolder->layout()->setContentsMargins(kWidePreviewMarginsWithHeader);
@@ -141,6 +133,8 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->setFont(font);
     ui->nameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->nameLabel->setOpenExternalLinks(false);
+
+    ui->extraIconLabel->hide();
 
     font.setWeight(kTimestampFontWeight);
     font.setPixelSize(fontConfig()->small().pixelSize());
@@ -281,6 +275,8 @@ void EventTile::setCloseable(bool value)
 
     d->closeable = value;
 
+    WidgetUtils::setRetainSizeWhenHidden(ui->closeButton, d->closeable);
+
     d->handleStateChanged(underMouse() ? Private::State::hoverOn : Private::State::hoverOff);
 }
 
@@ -403,6 +399,20 @@ void EventTile::setIconPath(const QString& value)
 
     d->iconPath = value;
     d->updateIcon();
+}
+
+QString EventTile::extraIconPath() const
+{
+    return d->extraIconPath;
+}
+
+void EventTile::setExtraIconPath(const QString& value)
+{
+    if (d->extraIconPath == value)
+        return;
+
+    d->extraIconPath = value;
+    d->updateExtraIcon();
 }
 
 core::ImageProvider* EventTile::imageProvider() const
@@ -824,6 +834,7 @@ void EventTile::clear()
 {
     setCloseable(false);
     setIconPath({});
+    setExtraIconPath({});
     d->clearLabel(ui->nameLabel, d->titleLabelDescriptor);
     setTitleColor({});
     d->clearLabel(ui->descriptionLabel, d->descriptionLabelDescriptor);

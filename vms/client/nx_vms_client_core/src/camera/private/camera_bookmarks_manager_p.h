@@ -3,7 +3,6 @@
 #pragma once
 
 #include <functional>
-#include <optional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
@@ -19,16 +18,14 @@
 
 struct QnMultiserverRequestData;
 
-namespace nx::vms::api {
-struct BookmarkV3;
-}
+namespace nx::vms::api { struct BookmarkV3; }
 
 class QnCameraBookmarksManagerPrivate:
     public QObject,
     public nx::vms::client::core::SystemContextAware
 {
     Q_OBJECT
-    typedef QObject base_type;
+    using base_type = QObject;
 
 public:
     QnCameraBookmarksManagerPrivate(
@@ -40,20 +37,22 @@ public:
     using RawResponseType =
         std::function<void (bool, rest::Handle, QByteArray, const nx::network::http::HttpHeaders&)>;
 
-    /* Direct API section */
+    // Direct API section.
 
-    /// @brief                  Asynchronously gathers bookmarks using specified filter.
-    /// @param filter           Filter parameters.
-    /// @param callback         Callback for receiving bookmarks data.
-    /// @param executor         Callback execution thread control object.
-    /// @returns                Internal id of the request.
+    /**
+     * Asynchronously gathers bookmarks using specified filter.
+     * @param filter Filter parameters.
+     * @param callback Callback for receiving bookmarks data.
+     * @param executor Callback execution thread control object.
+     * @return Internal id of the request.
+     */
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
         BookmarksCallbackType callback, nx::utils::AsyncHandlerExecutor executor);
 
     /**
-     *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristically
-     *  extends (or shrinks) request time period to find appropriate data. Tries it maxTriesCount
-     *  times maximum.
+     * Gathers bookmarks around specified time point using usual bookmarks request. Heuristically
+     * extends (or shrinks) request time period to find appropriate data. Tries it maxTriesCount
+     * times maximum.
      */
     int getBookmarkstAroundPointHeuristic(
         const QnCameraBookmarkSearchFilter& filter,
@@ -63,33 +62,19 @@ public:
 
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 
-    /// @brief                  Add the bookmark to the camera.
-    /// @param bookmark         Target bookmark.
-    /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
+    // Queries API section.
 
-    void addExistingBookmark(const QnCameraBookmark& bookmark);
+    /** Adds or updates the bookmark in queries caches. */
+    void addOrUpdateBookmarkInQueries(const QnCameraBookmark& bookmark);
 
-    void acknowledgeEvent(
-        const QnCameraBookmark& bookmark,
-        const nx::Uuid& eventRuleId,
-        OperationCallbackType callback = OperationCallbackType());
+    /** Removes the bookmark from queries caches. */
+    void removeCameraBookmarkFromQueries(const nx::Uuid& bookmarkId);
 
-    /// @brief                  Update the existing bookmark on the camera.
-    /// @param bookmark         Target bookmark.
-    /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
-
-    /// @brief                  Delete the existing bookmark from the camera.
-    /// @param bookmarkId       Target bookmark id.
-    /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const nx::Uuid& bookmarkId, OperationCallbackType callback = OperationCallbackType());
-
-    /* Queries API section */
-
-    /// @brief                  Instantiate new search query.
-    /// @param filter           Filter parameters.
-    /// @returns                Search query that is ready to be used.
+    /**
+     * Instantiate new search query.
+     * @param filter Filter parameters.
+     * @return Search query that is ready to be used.
+     */
     QnCameraBookmarksQueryPtr createQuery(const QnCameraBookmarkSearchFilter& filter);
 
     /**
@@ -122,8 +107,6 @@ public:
         const nx::network::http::Method& method,
         RestRequestCallback&& callback);
 
-    std::optional<nx::Uuid> getServerForBookmark(const QnCameraBookmark& bookmark);
-
 private:
     void handleQueryReply(
         const QUuid& queryId,
@@ -132,54 +115,36 @@ private:
         QnCameraBookmarkList bookmarks,
         BookmarksCallbackType callback);
 
-    void handleBookmarkOperation(bool success, rest::Handle handle);
-
-    /// @brief                  Register bookmarks search query to auto-update it if needed.
-    /// @param query            Target query.
+    /**
+     * Register bookmarks search query to auto-update it if needed.
+     * @param query Target query.
+     */
     void registerQuery(const QnCameraBookmarksQueryPtr& query);
 
-    /// @brief                  Unregister bookmarks search query.
-    /// @param queryId          Target query id.
+    /**
+     * Unregister bookmarks search query.
+     * @param queryId Target query id.
+     */
     void unregisterQuery(const QUuid& queryId);
 
-    /// @brief                  Check if the single query should be updated.
-    /// @param queryId          Target query id.
-    /// @returns                True if the query is queued to update.
+    /**
+     * Check if the single query should be updated.
+     * @param queryId Target query id.
+     * @return True if the query is queued to update.
+     */
     bool isQueryUpdateRequired(const QUuid& queryId);
 
-    /// @brief                  Check if queries should be updated and update if needed.
+    /** Check if queries should be updated and update if needed. */
     void checkQueriesUpdate();
 
-    /// @brief                  Send request to update query with actual data.
+    /** Send request to update query with actual data. */
     void updateQueryAsync(const QUuid& queryId);
 
-    /** @brief                  Add the added or updated bookmark to the pending bookmarks list.
-     *  Pending bookmark is the bookmark that was created, modified or deleted on the client
-     *  but these changes haven't been reflected to queries caches.
-     *  Pending bookmarks live inside the bookmarks manager for some time to let the queries gather actual information.
+    /**
+     * Find and discard camera from all cached queries. Invalid queries will be discarded
+     * as well.
      */
-    void addUpdatePendingBookmark(const QnCameraBookmark& bookmark);
-    /// @brief                  Add removed bookmark to the pending bookmarks list.
-    void addRemovePendingBookmark(const nx::Uuid& bookmarkId);
-    /// @brief                  Merge the pending bookmarks with the given bookmarks list.
-    /// @param query            The query for with merge operation is performed. The query specifies filters and cameras list.
-    void mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList& bookmarks);
-
-    /// @brief                  Find and discard timed-out pending bookmarks.
-    void checkPendingBookmarks();
-
-    /// @brief                  Find and discard camera from all cached queries. Invalid queries will be discarded as well.
     void removeCameraFromQueries(const QnResourcePtr& resource);
-
-    void addCameraBookmarkInternal(
-        const QnCameraBookmark& bookmark,
-        const nx::Uuid& eventRuleId,
-        OperationCallbackType callback = OperationCallbackType());
-
-    int sendPostRequest(
-        const QString& path,
-        QnMultiserverRequestData& request,
-        std::optional<nx::Uuid> serverId = {});
 
     int sendGetRequest(const QString& path, QnMultiserverRequestData& request,
         RawResponseType callback);
@@ -188,24 +153,6 @@ private:
 
 private:
     QTimer* m_operationsTimer;
-
-    struct OperationInfo {
-        enum class OperationType {
-            Add,
-            Acknowledge,
-            Update,
-            Delete
-        };
-
-        OperationType operation;
-        OperationCallbackType callback;
-        nx::Uuid bookmarkId;
-
-        OperationInfo();
-        OperationInfo(OperationType operation, const nx::Uuid& bookmarkId, OperationCallbackType callback);
-    };
-
-    QMap<rest::Handle, OperationInfo> m_operations;
 
     struct QueryInfo
     {
@@ -224,25 +171,4 @@ private:
 
     /** Cached bookmarks by query. */
     QHash<QUuid, QueryInfo> m_queries;
-
-    struct PendingInfo {
-        QnCameraBookmark bookmark;
-        QElapsedTimer discardTimer;
-
-        enum Type {
-            AddBookmark,
-            RemoveBookmark
-        };
-
-        Type type;
-
-        PendingInfo(const QnCameraBookmark& bookmark, Type type);
-        PendingInfo(const nx::Uuid& bookmarkId, Type type);
-    };
-
-    /**
-     * Cache for case when we have sent getBookmarks request and THEN added/removed a bookmark
-     * locally. So when we've got reply for getBookmarks, we may fix it correspondingly.
-     */
-    QHash<nx::Uuid, PendingInfo> m_pendingBookmarks;
 };

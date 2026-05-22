@@ -367,6 +367,9 @@ void EventRibbon::Private::updateTile(int index)
     widget->setAdditionalAction(modelIndex.data(Qn::AdditionalActionRole).value<CommandActionPtr>());
     widget->setOnCloseAction(modelIndex.data(Qn::OnCloseActionRole).value<CommandActionPtr>());
     widget->setFooterEnabled(m_footersEnabled);
+    widget->setExtraIconPath(modelIndex.data(core::IsSharedBookmark).toBool()
+        ? "20x20/Solid/shared.svg?primary=light4&secondary=green"
+        : "");
 
     setHelpTopic(widget, modelIndex.data(Qn::HelpTopicIdRole).toInt());
 

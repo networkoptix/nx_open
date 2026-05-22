@@ -1074,6 +1074,12 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new RemoveBookmarksCondition())
         );
 
+    factory(ShareBookmarkAction)
+        .flags(Slider | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Share Bookmark..."))
+        .requiredTargetPermissions(Qn::Permission::ManageBookmarksPermission)
+        .condition(new ShareBookmarkCondition());
+
     factory(ExportBookmarkAction)
         .flags(Slider | SingleTarget | MultiTarget | NoTarget | WidgetTarget | ResourceTarget)
         .text(ContextMenu::tr("Export Bookmark..."))

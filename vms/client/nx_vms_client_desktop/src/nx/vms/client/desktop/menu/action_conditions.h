@@ -297,6 +297,12 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
 };
 
+class ShareBookmarkCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(const Parameters& parameters, WindowContext* context) override;
+};
+
 class RemoveBookmarksCondition: public Condition
 {
 public:

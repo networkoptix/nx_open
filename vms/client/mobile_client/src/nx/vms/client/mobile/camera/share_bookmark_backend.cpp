@@ -107,7 +107,9 @@ bool ShareBookmarkBackend::Private::updateShareParams(
     bookmark.share = shareParams;
 
     auto callback = nx::utils::guarded(q,
-        [this, handleResult, showNativeShareSheet](bool result, const api::BookmarkV3& bookmarkV3)
+        [this, handleResult, showNativeShareSheet](
+            bool result,
+            const std::optional<api::BookmarkV3>& bookmarkV3)
         {
             if (!handleResult(result))
                 return;
@@ -118,15 +120,15 @@ bool ShareBookmarkBackend::Private::updateShareParams(
             // As we created or updated bookmark - there is no need to create it next time.
             operation = QnCameraBookmarksManager::BookmarkOperation::update;
 
-            bookmark = common::bookmarkFromApi(bookmarkV3);
+            bookmark = common::bookmarkFromApi(bookmarkV3.value());
 
-            if (showNativeShareSheet && bookmark.shareable() && NX_ASSERT(!bookmarkV3.id.isEmpty()))
-                shareBookmarkLink(bookmarkV3.id);
+            if (showNativeShareSheet && bookmark.shareable() && NX_ASSERT(!bookmarkV3->id.isEmpty()))
+                shareBookmarkLink(bookmarkV3->id);
 
             emit q->bookmarkChanged();
         });
 
-    return handleResult(manager->changeBookmarkRest(operation, bookmark, std::move(callback)));
+    return handleResult(manager->submitBookmarkOperation(operation, bookmark, std::move(callback)));
 }
 
 //--------------------------------------------------------------------------------------------------

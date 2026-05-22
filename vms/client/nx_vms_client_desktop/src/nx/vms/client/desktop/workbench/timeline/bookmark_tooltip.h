@@ -18,18 +18,21 @@ public:
     explicit BookmarkTooltip(common::CameraBookmarkList bookmarks, QWidget* parent = nullptr);
 
     void setAllowExport(bool allowExport);
+    void setAllowShare(bool allowShare);
     void setReadOnly(bool readOnly);
 
     Q_INVOKABLE void onPlayClicked(int index);
     Q_INVOKABLE void onEditClicked(int index);
     Q_INVOKABLE void onExportClicked(int index);
+    Q_INVOKABLE void onShareClicked(int index);
     Q_INVOKABLE void onDeleteClicked(int index);
 
 signals:
-    void playClicked(const common::CameraBookmark& bookmark);
-    void editClicked(const common::CameraBookmark& bookmark);
-    void exportClicked(const common::CameraBookmark& bookmark);
-    void deleteClicked(const common::CameraBookmark& bookmark);
+    void playClicked(const nx::vms::common::CameraBookmark& bookmark);
+    void editClicked(const nx::vms::common::CameraBookmark& bookmark);
+    void exportClicked(const nx::vms::common::CameraBookmark& bookmark);
+    void shareClicked(const nx::vms::common::CameraBookmark& bookmark);
+    void deleteClicked(const nx::vms::common::CameraBookmark& bookmark);
     void tagClicked(const QString& tag);
 
 protected:

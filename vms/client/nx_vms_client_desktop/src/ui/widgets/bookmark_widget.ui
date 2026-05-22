@@ -10,14 +10,17 @@
     <height>192</height>
    </rect>
   </property>
-  <layout class="QFormLayout" name="mainFormLayout">
-   <property name="fieldGrowthPolicy">
-    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-   </property>
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="nameLabel">
      <property name="text">
       <string>Name</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+     </property>
+     <property name="buddy">
+      <cstring>nameInputField</cstring>
      </property>
     </widget>
    </item>
@@ -29,39 +32,54 @@
      <property name="text">
       <string>Description</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
+     </property>
      <property name="buddy">
       <cstring>descriptionTextEdit</cstring>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="nx::vms::client::desktop::TextEditField" name="descriptionTextEdit">
+    <widget class="nx::vms::client::desktop::TextEditField" name="descriptionTextEdit" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="timeoutLabel">
      <property name="text">
       <string>Timeout</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="buddy">
       <cstring>timeoutComboBox</cstring>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="2" column="1">
     <widget class="QComboBox" name="timeoutComboBox"/>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="tagsLabel">
      <property name="text">
       <string>Tags</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
      <property name="buddy">
       <cstring>tagsLineEdit</cstring>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="3" column="1">
     <widget class="QWidget" name="tagsWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="leftMargin">
@@ -86,14 +104,17 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label">
+   <item row="4" column="0">
+    <widget class="QLabel" name="popularTagsLabel">
      <property name="text">
       <string>Popular tags</string>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTop|Qt::AlignmentFlag::AlignTrailing</set>
+     </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="4" column="1">
     <widget class="QLabel" name="tagsListLabel">
      <property name="text">
       <string/>
@@ -102,7 +123,7 @@
       <bool>true</bool>
      </property>
      <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
+      <set>Qt::TextInteractionFlag::LinksAccessibleByKeyboard|Qt::TextInteractionFlag::LinksAccessibleByMouse</set>
      </property>
     </widget>
    </item>

@@ -59,6 +59,11 @@ void BookmarkTooltip::setAllowExport(bool allowExport)
     rootObject()->setProperty("allowExport", allowExport);
 }
 
+void BookmarkTooltip::setAllowShare(bool allowShare)
+{
+    rootObject()->setProperty("allowShare", allowShare);
+}
+
 void BookmarkTooltip::setReadOnly(bool readOnly)
 {
     rootObject()->setProperty("readOnly", readOnly);
@@ -80,6 +85,12 @@ void BookmarkTooltip::onExportClicked(int index)
 {
     if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
         emit exportClicked(m_bookmarks.at(index));
+}
+
+void BookmarkTooltip::onShareClicked(int index)
+{
+    if (NX_ASSERT(index >= 0 && index < (int) m_bookmarks.size()))
+        emit shareClicked(m_bookmarks.at(index));
 }
 
 void BookmarkTooltip::onDeleteClicked(int index)

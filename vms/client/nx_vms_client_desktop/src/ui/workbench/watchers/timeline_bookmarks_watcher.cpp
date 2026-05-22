@@ -15,12 +15,16 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
+#include <nx/vms/client/core/watchers/feature_access_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/resource/bookmark_filter.h>
+#include <nx/vms/common/saas/saas_service_manager.h>
+#include <nx/vms/common/saas/saas_utils.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -96,9 +100,21 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject* parent):
             [this](const QnResourcePtr& resource)
             {
                 if (resource == m_currentCamera)
-                    updatePermissions();
+                    updateBookmarksViewerFeatures();
             });
     }
+
+    connect(
+        systemContext()->featureAccess(),
+        &nx::vms::client::core::FeatureAccessWatcher::canUseShareBookmarkChanged,
+        this,
+        [this] { updateBookmarksViewerFeatures(); });
+
+    connect(
+        systemContext()->saasServiceManager(),
+        &nx::vms::common::saas::ServiceManager::saasStateChanged,
+        this,
+        [this] { updateBookmarksViewerFeatures(); });
 
     navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
 
@@ -210,16 +226,26 @@ void QnTimelineBookmarksWatcher::updateTimelineBookmarks()
     setTimelineBookmarks(m_aggregation->bookmarkList());
 }
 
-void QnTimelineBookmarksWatcher::updatePermissions()
+void QnTimelineBookmarksWatcher::updateBookmarksViewerFeatures()
 {
     if (!m_currentCamera || !navigator()->timeSlider())
         return;
 
-    navigator()->timeSlider()->bookmarksViewer()->setReadOnly(!accessController()->hasPermissions(
-        m_currentCamera, Qn::ManageBookmarksPermission));
+    const auto cameraContext = nx::vms::client::core::SystemContext::fromResource(m_currentCamera);
+    if (!NX_ASSERT(cameraContext))
+        return;
 
-    navigator()->timeSlider()->bookmarksViewer()->setAllowExport(accessController()->hasPermissions(
-        m_currentCamera, Qn::ViewFootagePermission | Qn::ExportPermission));
+    const auto canManageBookmarks = cameraContext->accessController()->hasPermissions(
+        m_currentCamera, Qn::ManageBookmarksPermission);
+
+    const auto canExportBookmarks = cameraContext->accessController()->hasPermissions(
+        m_currentCamera, Qn::ViewFootagePermission | Qn::ExportPermission);
+
+    const auto bookmarksViewer = navigator()->timeSlider()->bookmarksViewer();
+    bookmarksViewer->setReadOnly(!canManageBookmarks);
+    bookmarksViewer->setAllowExport(canExportBookmarks);
+    bookmarksViewer->setAllowShare(canManageBookmarks
+        && nx::vms::client::core::bookmarks::bookmarkSharingAvailable(systemContext()));
 }
 
 void QnTimelineBookmarksWatcher::setTimelineBookmarks(const QnCameraBookmarkList& bookmarks)
@@ -249,7 +275,7 @@ void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourceP
     m_currentCamera = camera;
     m_aggregation->clear();
     updateTimelineBookmarks();
-    updatePermissions();
+    updateBookmarksViewerFeatures();
 }
 
 QnCameraBookmarksQueryPtr QnTimelineBookmarksWatcher::ensureQueryForCamera(

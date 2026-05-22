@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <nx/utils/async_handler_executor.h>
@@ -18,33 +16,33 @@ class QnCameraBookmarksManagerPrivate;
 class NX_VMS_CLIENT_CORE_API QnCameraBookmarksManager: public QObject
 {
     Q_OBJECT
+    using base_type = QObject;
 
 public:
     QnCameraBookmarksManager(
         nx::vms::client::core::SystemContext* systemContext,
         QObject* parent = nullptr);
 
-    virtual ~QnCameraBookmarksManager();
+    virtual ~QnCameraBookmarksManager() override;
 
-     /* Direct API section */
+    // Direct API section.
 
     /**
-     * @brief Asynchronously requests bookmarks using specified filter.
+     * Asynchronously requests bookmarks using specified filter.
      * @param filter Filter parameters.
      * @param callback Callback for receiving bookmarks data.
      * @param executor Callback execution thread control object.
-     * @returns Internal id of the request.
+     * @return Internal id of the request.
      */
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter,
         BookmarksCallbackType callback,
         nx::utils::AsyncHandlerExecutor executor);
 
     /**
-     * @brief Requests bookmarks around specified central point. Calculates tail (new bookmarks
-     * over/under specified central point) and body (all other bookmarks).
-     * range).
+     * Requests bookmarks around specified central point. Calculates tail (new bookmarks over/under
+     * specified central point) and body (all other bookmarks) ranges.
      * Note that the only reasonable sort column is startTime.
-     * @param filter Filter parameters (with specified central point)
+     * @param filter Filter parameters (with specified central point).
      * @param source Currently known bookmarks. Used to calculate tail/body values.
      * @param callback Callback for receiving bookmarks data.
      * @return Internal id of the request.
@@ -54,56 +52,42 @@ public:
         const QnCameraBookmarkList& source,
         BookmarksAroundPointCallbackType&& callback);
 
-    /// @brief                  Add the bookmark to the camera.
-    /// @param bookmark         Target bookmark.
-    /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
-
-    /** Add already created bookmark, e.g. from standalone API call. */
-    void addExistingBookmark(const QnCameraBookmark& bookmark);
-
     enum class BookmarkOperation
     {
         create,
-        update
+        update,
+        remove,
     };
 
     /**
-     * @brief Creates or updates bookmark with modern REST Api. Returns updated bookmark in callback.
-     * This function does not support all underlying updates which we have in other functions in
-     * this class, for now.
+     * Creates, updates or removes bookmark. Returns the added or modified bookmark, along with the
+     * operation success result via the callback. If the operation succeeds, updates the caches of
+     * the registered queries.
+     * @param operation Specifies desired operation.
+     * @param bookmark The bookmark on which the operation is expected to be performed. A valid
+     *     bookmark is expected for any operation.
+     * @param callback The callback through which the operation result will be returned.
+     * @return true if valid arguments were provided, no issues occurred while preparing and
+     *     sending request. Returns false otherwise. Note that if false is returned, the provided
+     *     callback will never be called.
      */
-    using OperationV4Callback =
-        std::function<void (bool success, const nx::vms::api::BookmarkV3& result)>;
-    bool changeBookmarkRest(BookmarkOperation operation,
+    bool submitBookmarkOperation(BookmarkOperation operation,
         const QnCameraBookmark& bookmark,
-        OperationV4Callback&& callback);
+        OperationCallbackType&& callback = OperationCallbackType());
 
-    /// @brief                  Add the bookmark to the camera and stores record in event log
-    ///                         for the specified event.
-    /// @param bookmark         Target bookmark.
-    /// @param businessRuleId   Business rule identifier for which bookmark is created
-    /// @param callback         Callback with operation result.
-    void addAcknowledge(
-        const QnCameraBookmark& bookmark,
-        const nx::Uuid& eventRuleId,
-        OperationCallbackType callback = OperationCallbackType());
+    /**
+     * Updates caches of the registered queries for the case when a bookmark was added externally,
+     * without using bookmark manager.
+     */
+    void addExistingBookmark(const QnCameraBookmark& bookmark);
 
-    /// @brief                  Update the existing bookmark on the camera.
-    /// @param bookmark         Target bookmark.
-    /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnCameraBookmark& bookmark, OperationCallbackType callback = OperationCallbackType());
+    // Queries API section.
 
-    /// @brief                  Delete the existing bookmark from the camera.
-    /// @param bookmark         Target bookmark id.
-    /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const nx::Uuid& bookmarkId, OperationCallbackType callback = OperationCallbackType());
-
-    /* Queries API section */
-
-    /// @brief                  Instantiate new search query.
-    /// @param filter           Filter parameters.
-    /// @returns                Search query that is ready to be used.
+    /**
+     * Instantiate new search query.
+     * @param filter Filter parameters.
+     * @return Search query that is ready to be used.
+     */
     QnCameraBookmarksQueryPtr createQuery(const QnCameraBookmarkSearchFilter& filter = {});
 
     /**
@@ -111,7 +95,7 @@ public:
      * @param query Target query.
      * @param callback Callback for received bookmarks data. Will be called when data is fully
      *     loaded.
-     * #returns Request ID.
+     * @return Request ID.
      */
     rest::Handle sendQueryRequest(
         const QnCameraBookmarksQueryPtr& query,
@@ -132,14 +116,16 @@ public:
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 
 signals:
-    /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions for bookmarks which will call these signals. */
-    // So far these signals are emitted when the user does something locally.
-    /// @brief                  This signal is emitted when new bookmark was added.
+    /**
+     * Signal is emitted when new bookmark was successfully added via bookmarks manager, or when
+     * valid externally added bookmark was passed to the addExistingBookmark method.
+     */
     void bookmarkAdded(const QnCameraBookmark& bookmark);
-    /// @brief                  This signal is emitted when the bookmark was updated.
+
+    /** Signal is emitted when the bookmark was successfully updated via bookmarks manager. */
     void bookmarkUpdated(const QnCameraBookmark& bookmark);
-    /// @brief                  This signal is emitted when the bookmark was removed.
-    /// @param                  The removed bookmark GUID.
+
+    /** Signal is emitted when the bookmark was successfully removed via bookmarks manager. */
     void bookmarkRemoved(const nx::Uuid& bookmarkId);
 
 private:

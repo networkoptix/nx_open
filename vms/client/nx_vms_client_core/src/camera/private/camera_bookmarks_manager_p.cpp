@@ -39,9 +39,6 @@ static constexpr int kQueriesCheckTimeoutMs = 1000;
 /** Reserved value for invalid requests. */
 static constexpr auto kInvalidRequestId = rest::Handle();
 
-/** Cache of bookmarks we have just added or removed. */
-static constexpr int kPendingDiscardTimeoutMs = 30000;
-
 QnCameraBookmarkList::iterator findBookmark(QnCameraBookmarkList& list, const nx::Uuid& bookmarkId)
 {
     return std::find_if(list.begin(), list.end(), [&bookmarkId](const QnCameraBookmark& bookmark)
@@ -182,25 +179,6 @@ nx::network::http::HttpHeaders makeProxyToServerHeaders(const std::optional<nx::
 } // namespace
 
 /************************************************************************/
-/* OperationInfo                                                        */
-/************************************************************************/
-QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo()
-    : operation(OperationType::Add)
-    , callback()
-{
-}
-
-QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
-    OperationType operation,
-    const nx::Uuid& bookmarkId,
-    OperationCallbackType callback)
-    : operation(operation)
-    , callback(callback)
-    , bookmarkId(bookmarkId)
-{
-}
-
-/************************************************************************/
 /* QueryInfo                                                            */
 /************************************************************************/
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
@@ -215,23 +193,6 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQue
     , requestTimer()
     , requestId(kInvalidRequestId)
 {
-}
-
-/************************************************************************/
-/* PendingInfo                                                          */
-/************************************************************************/
-QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const QnCameraBookmark& bookmark, Type type)
-    : bookmark(bookmark)
-    , type(type)
-{
-    discardTimer.invalidate();
-}
-
-QnCameraBookmarksManagerPrivate::PendingInfo::PendingInfo(const nx::Uuid& bookmarkId, Type type)
-    : type(type)
-{
-    bookmark.guid = bookmarkId;
-    discardTimer.invalidate();
 }
 
 /************************************************************************/
@@ -259,7 +220,6 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
 
     m_operationsTimer->setInterval(kQueriesCheckTimeoutMs);
     m_operationsTimer->setSingleShot(false);
-    connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkPendingBookmarks);
     connect(m_operationsTimer, &QTimer::timeout, this, &QnCameraBookmarksManagerPrivate::checkQueriesUpdate);
 
     connect(resourcePool(), &QnResourcePool::resourcesRemoved, this,
@@ -271,22 +231,7 @@ QnCameraBookmarksManagerPrivate::QnCameraBookmarksManagerPrivate(
 }
 
 QnCameraBookmarksManagerPrivate::~QnCameraBookmarksManagerPrivate()
-{}
-
-std::optional<nx::Uuid> QnCameraBookmarksManagerPrivate::getServerForBookmark(
-    const QnCameraBookmark& bookmark)
 {
-    QnVirtualCameraResourcePtr camera =
-        resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
-    if (!camera)
-        return {};
-
-    QnMediaServerResourcePtr server =
-        cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs.count());
-    if (!server || server->getStatus() != nx::vms::api::ResourceStatus::online)
-        return {};
-
-    return server->getId();
 }
 
 void QnCameraBookmarksManagerPrivate::startOperationsTimer()
@@ -296,37 +241,6 @@ void QnCameraBookmarksManagerPrivate::startOperationsTimer()
         m_operationsTimer->start();
         checkQueriesUpdate();
     }
-}
-
-int QnCameraBookmarksManagerPrivate::sendPostRequest(
-    const QString& path,
-    QnMultiserverRequestData& request,
-    std::optional<nx::Uuid> serverId)
-{
-    auto serverApi = connectedServerApi();
-
-    if (!serverApi)
-        return kInvalidRequestId;
-
-    request.format = Qn::SerializationFormat::ubjson;
-
-    auto callback = [this](
-            bool success,
-            rest::Handle handle,
-            const rest::ServerConnection::ErrorOrEmpty& /*response*/)
-        {
-            handleBookmarkOperation(success, handle);
-        };
-
-    return serverApi->sendRequest<rest::ServerConnection::ErrorOrEmpty>(
-        /*helper*/ nullptr,
-        nx::network::http::Method::post,
-        path,
-        request.toParams(),
-        /*body*/ {},
-        std::move(callback),
-        this,
-        makeProxyToServerHeaders(serverId));
 }
 
 rest::Handle QnCameraBookmarksManagerPrivate::sendRestRequest(
@@ -340,12 +254,20 @@ rest::Handle QnCameraBookmarksManagerPrivate::sendRestRequest(
     if (!serverApi)
         return kInvalidRequestId;
 
+    const auto body = method == nx::network::http::Method::delete_
+        ? std::string()
+        : nx::reflect::json::serialize(bookmark);
+
+    const auto helper = systemContext()->mode() == nx::vms::client::core::SystemContext::Mode::client
+        ? systemContext()->getSessionTokenHelper()
+        : nx::vms::common::SessionTokenHelperPtr{};
+
     return serverApi->sendRequest<rest::ErrorOrData<QByteArray>>(
-        systemContext()->getSessionTokenHelper(),
+        helper,
         method,
         path,
         nx::network::rest::Params{},
-        nx::reflect::json::serialize(bookmark),
+        body,
         std::move(callback),
         this);
 }
@@ -450,133 +372,44 @@ int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(
         makeUbjsonResponseWrapper(this, callback));
 }
 
-void QnCameraBookmarksManagerPrivate::addCameraBookmark(
-    const QnCameraBookmark& bookmark,
-    OperationCallbackType callback)
+void QnCameraBookmarksManagerPrivate::addOrUpdateBookmarkInQueries(
+    const QnCameraBookmark& bookmark)
 {
-    addCameraBookmarkInternal(bookmark, nx::Uuid(), callback);
-}
-
-void QnCameraBookmarksManagerPrivate::addExistingBookmark(const QnCameraBookmark& bookmark)
-{
-    addUpdatePendingBookmark(bookmark);
-
-    const auto it = m_pendingBookmarks.find(bookmark.guid);
-    if (NX_ASSERT(it != m_pendingBookmarks.end()))
-        it->discardTimer.start();
-}
-
-void QnCameraBookmarksManagerPrivate::acknowledgeEvent(
-    const QnCameraBookmark& bookmark,
-    const nx::Uuid& eventRuleId,
-    OperationCallbackType callback)
-{
-    addCameraBookmarkInternal(bookmark, eventRuleId, callback);
-}
-
-void QnCameraBookmarksManagerPrivate::addCameraBookmarkInternal(
-    const QnCameraBookmark& bookmark,
-    const nx::Uuid& eventRuleId,
-    OperationCallbackType callback)
-{
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
-    if (!bookmark.isValid())
-        return;
-
-    const auto serverId = getServerForBookmark(bookmark);
-
-    const auto operationType = !eventRuleId.isNull()
-        ? OperationInfo::OperationType::Acknowledge
-        : OperationInfo::OperationType::Add;
-
-    auto handle = kInvalidRequestId;
-
-    if (operationType == OperationInfo::OperationType::Acknowledge)
+    for (QueryInfo& info: m_queries)
     {
-        nx::vms::common::UpdateBookmarkRequestData request(bookmark, eventRuleId);
-        handle = sendPostRequest("/ec2/bookmarks/acknowledge", request, serverId);
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
+            continue;
+
+        if (!checkBookmarkForQuery(query, bookmark))
+            continue;
+
+        auto bookmarks = query->cachedBookmarks();
+        auto it = findBookmark(bookmarks, bookmark.guid);
+        if (it != bookmarks.end())
+            bookmarks.erase(it);
+
+        it = std::lower_bound(bookmarks.begin(), bookmarks.end(), bookmark);
+        bookmarks.insert(it, bookmark);
+        query->setCachedBookmarks(std::move(bookmarks));
     }
-    else
-    {
-        nx::vms::common::UpdateBookmarkRequestData request(bookmark);
-        handle = sendPostRequest("/ec2/bookmarks/add", request, serverId);
-    }
-
-    if (handle != kInvalidRequestId)
-        m_operations[handle] = OperationInfo(operationType, bookmark.guid, std::move(callback));
-    else
-        callback(false);
-
-    addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::updateCameraBookmark(
-    const QnCameraBookmark& bookmark, OperationCallbackType callback)
+void QnCameraBookmarksManagerPrivate::removeCameraBookmarkFromQueries(const nx::Uuid& bookmarkId)
 {
-    NX_ASSERT(bookmark.isValid(), "Invalid bookmark must not be added");
-    if (!bookmark.isValid())
-        return;
-
-    auto restCallback =
-        [this](bool success, rest::Handle handle, rest::ErrorOrData<QByteArray> response)
-        {
-            NX_LOG_RESPONSE(this, success, response, "Cannot update bookmark.");
-            handleBookmarkOperation(success, handle);
-        };
-
-    auto bookmarkModel = nx::vms::common::bookmarkToApi<nx::vms::api::BookmarkV3>(
-        bookmark, getServerForBookmark(bookmark).value_or(nx::Uuid{}), /*includeDigest*/ true);
-    const auto path = nx::format("rest/v4/devices/%1/bookmarks/%2",
-        bookmarkModel.deviceId, bookmarkModel.id).toQString();
-    const auto handle = sendRestRequest(path, bookmarkModel, nx::network::http::Method::patch,
-        std::move(restCallback));
-
-    if (handle != kInvalidRequestId)
+    for (QueryInfo& info: m_queries)
     {
-        m_operations[handle] = OperationInfo(
-            OperationInfo::OperationType::Update, bookmark.guid, std::move(callback));
-    }
-    else
-    {
-        callback(false);
-    }
+        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
+        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
+            continue;
 
-    addUpdatePendingBookmark(bookmark);
-}
+        auto bookmarks = query->cachedBookmarks();
+        auto it = findBookmark(bookmarks, bookmarkId);
+        if (it == bookmarks.end())
+            continue;
 
-void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(
-    const nx::Uuid& bookmarkId,
-    OperationCallbackType callback)
-{
-    nx::vms::common::DeleteBookmarkRequestData request(bookmarkId);
-    auto handle = sendPostRequest("/ec2/bookmarks/delete", request);
-    m_operations[handle] = OperationInfo(
-        OperationInfo::OperationType::Delete,
-        bookmarkId,
-        std::move(callback));
-
-    addRemovePendingBookmark(bookmarkId);
-}
-
-void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(bool success, rest::Handle handle)
-{
-    const auto opIt = m_operations.find(handle);
-    if (opIt == m_operations.end())
-        return;
-
-    const auto operationInfo = std::move(*opIt);
-    m_operations.erase(opIt);
-
-    if (operationInfo.callback)
-        operationInfo.callback(success);
-
-    const auto bookIt = m_pendingBookmarks.find(operationInfo.bookmarkId);
-    if (bookIt != m_pendingBookmarks.end())
-    {
-        if (success)
-            m_pendingBookmarks.erase(bookIt);
-        else
-            bookIt->discardTimer.start();
+        bookmarks.erase(it);
+        query->setCachedBookmarks(std::move(bookmarks));
     }
 }
 
@@ -615,7 +448,7 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid& queryId
 
 void QnCameraBookmarksManagerPrivate::checkQueriesUpdate()
 {
-    for (auto queryId : m_queries.keys())
+    for (const auto& queryId: m_queries.keys())
     {
         bool updateRequired = isQueryUpdateRequired(queryId);
         if (!updateRequired)
@@ -784,7 +617,6 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
     {
         query->setState(QnCameraBookmarksQuery::State::actual);
         info.requestId = kInvalidRequestId;
-        mergeWithPendingBookmarks(query, bookmarks);
         NX_VERBOSE(this, "Query %1 is actual, bookmarks count %2", queryId, bookmarks.size());
         if (callback)
             callback(success, requestId, bookmarks);
@@ -820,96 +652,6 @@ QnCameraBookmarksQueryPtr QnCameraBookmarksManagerPrivate::createQuery(
         });
 
     return query;
-}
-
-void QnCameraBookmarksManagerPrivate::addUpdatePendingBookmark(const QnCameraBookmark& bookmark)
-{
-    m_pendingBookmarks.insert(bookmark.guid, PendingInfo(bookmark, PendingInfo::AddBookmark));
-    startOperationsTimer();
-
-    for (QueryInfo& info: m_queries)
-    {
-        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
-            continue;
-
-        if (!checkBookmarkForQuery(query, bookmark))
-            continue;
-
-        auto bookmarks = query->cachedBookmarks();
-        auto it = findBookmark(bookmarks, bookmark.guid);
-        if (it != bookmarks.end())
-            bookmarks.erase(it);
-
-        it = std::lower_bound(bookmarks.begin(), bookmarks.end(), bookmark);
-        bookmarks.insert(it, bookmark);
-        query->setCachedBookmarks(std::move(bookmarks));
-    }
-}
-
-void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const nx::Uuid& bookmarkId)
-{
-    m_pendingBookmarks.insert(bookmarkId, PendingInfo(bookmarkId, PendingInfo::RemoveBookmark));
-    startOperationsTimer();
-
-    for (QueryInfo& info: m_queries)
-    {
-        QnCameraBookmarksQueryPtr query = info.queryRef.toStrongRef();
-        if (!NX_ASSERT(query, "Interface does not allow query to be null"))
-            continue;
-
-        auto bookmarks = query->cachedBookmarks();
-        auto it = findBookmark(bookmarks, bookmarkId);
-        if (it == bookmarks.end())
-            continue;
-
-        bookmarks.erase(it);
-        query->setCachedBookmarks(std::move(bookmarks));
-    }
-}
-
-void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(
-    const QnCameraBookmarksQueryPtr query,
-    QnCameraBookmarkList& bookmarks)
-{
-    for (const PendingInfo& info: m_pendingBookmarks)
-    {
-        if (info.type == PendingInfo::RemoveBookmark)
-        {
-            auto it = findBookmark(bookmarks, info.bookmark.guid);
-            if (it == bookmarks.end())
-                continue;
-
-            bookmarks.erase(it);
-        }
-        else
-        {
-            if (!checkBookmarkForQuery(query, info.bookmark))
-                continue;
-
-            auto it = findBookmark(bookmarks, info.bookmark.guid);
-            if (it != bookmarks.end())
-            {
-                *it = info.bookmark;
-            }
-            else
-            {
-                it = std::lower_bound(bookmarks.begin(), bookmarks.end(), info.bookmark);
-                bookmarks.insert(it, info.bookmark);
-            }
-        }
-    }
-}
-
-void QnCameraBookmarksManagerPrivate::checkPendingBookmarks()
-{
-    for (auto it = m_pendingBookmarks.begin(); it != m_pendingBookmarks.end(); /* no inc */)
-    {
-        if (it->discardTimer.isValid() && it->discardTimer.hasExpired(kPendingDiscardTimeoutMs))
-            it = m_pendingBookmarks.erase(it);
-        else
-            ++it;
-    }
 }
 
 void QnCameraBookmarksManagerPrivate::removeCameraFromQueries(const QnResourcePtr& resource)

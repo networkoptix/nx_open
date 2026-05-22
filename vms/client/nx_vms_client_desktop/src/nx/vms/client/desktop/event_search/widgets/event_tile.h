@@ -52,6 +52,9 @@ public:
     QString iconPath() const;
     void setIconPath(const QString& value);
 
+    QString extraIconPath() const;
+    void setExtraIconPath(const QString& value);
+
     // Does not take ownership.
     core::ImageProvider* imageProvider() const;
     void setImageProvider(core::ImageProvider* value, bool forceUpdate);

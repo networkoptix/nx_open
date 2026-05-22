@@ -74,24 +74,6 @@ Item
                     color: ColorTheme.colors.light4
                     wrapMode: Text.Wrap
                 }
-
-                ColoredImage
-                {
-                    visible: control.bookmark.shareable
-                    sourcePath: "image://skin/20x20/Solid/shared.svg"
-                    sourceSize: Qt.size(20, 20)
-                    primaryColor: ColorTheme.colors.light4
-                    secondaryColor: ColorTheme.colors.green
-
-                    HoverHandler
-                    {
-                        id: hoverHandler
-                    }
-
-                    ToolTip.text: qsTr("Shared by link")
-                    ToolTip.visible: hoverHandler.hovered
-                    ToolTip.toolTip.popupType: Popup.Window
-                }
             }
 
             Text

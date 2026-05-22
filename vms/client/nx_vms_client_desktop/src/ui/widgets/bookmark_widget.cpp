@@ -6,48 +6,54 @@
 #include <chrono>
 
 #include <QtCore/QDateTime>
+#include <QtGui/QKeyEvent>
 #include <QtWidgets/QTextEdit>
-#include <QKeyEvent>
 
 #include <core/resource/camera_bookmark.h>
-
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
+#include <nx/vms/client/desktop/style/custom_style.h>
 
 using std::chrono::milliseconds;
 using namespace std::literals::chrono_literals;
 
 namespace {
-    const int defaultTimeoutIdx = 0;
-}
+
+const int defaultTimeoutIdx = 0;
+
+} // namespace
 
 using namespace nx::vms::client::desktop;
 
-QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
+QnBookmarkWidget::QnBookmarkWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::BookmarkWidget),
     m_isValid(false)
 {
     ui->setupUi(this);
 
-    connect(ui->tagsListLabel, &QLabel::linkActivated, this, [this](const QString &link) {
-        if (m_selectedTags.contains(link))
-            m_selectedTags.remove(link);
-        else
-            m_selectedTags.insert(link.trimmed());
-        ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(m_selectedTags));
-        updateTagsList();
-    });
+    ui->descriptionLabel->setContentsMargins(0, 4, 0, 0);
 
-    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text)
-    {
-        m_selectedTags.clear();
-        for(auto &tag: nx::utils::toQSet(text.split(',', Qt::SkipEmptyParts)))
-            m_selectedTags.insert(tag.trimmed());
+    connect(ui->tagsListLabel, &QLabel::linkActivated, this,
+        [this](const QString& link)
+        {
+            if (m_selectedTags.contains(link))
+                m_selectedTags.remove(link);
+            else
+                m_selectedTags.insert(link.trimmed());
+            ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(m_selectedTags));
+            updateTagsList();
+        });
 
-        updateTagsList();
-    });
+    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this,
+        [this](const QString& text)
+        {
+            m_selectedTags.clear();
+            for (auto& tag: nx::utils::toQSet(text.split(',', Qt::SkipEmptyParts)))
+                m_selectedTags.insert(tag.trimmed());
+
+            updateTagsList();
+        });
 
     const auto validator = defaultNonEmptyValidator(tr("Name cannot be empty."));
     ui->nameInputField->setValidator(validator);
@@ -62,13 +68,13 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     ui->timeoutComboBox->hide();
     ui->timeoutLabel->hide();
 
+    ui->tagsListLabel->setContextMenuPolicy(Qt::NoContextMenu);
+
     // Workaround for Shift+Tab to switch focus to previous widget.
     ui->tagsListLabel->installEventFilter(this);
-
-    ui->mainFormLayout->setAlignment(ui->tagsListLabel, Qt::AlignLeft);
 }
 
-bool QnBookmarkWidget::eventFilter(QObject *obj, QEvent *event)
+bool QnBookmarkWidget::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::KeyPress)
     {
@@ -84,18 +90,22 @@ bool QnBookmarkWidget::eventFilter(QObject *obj, QEvent *event)
     return base_type::eventFilter(obj, event);
 }
 
-QnBookmarkWidget::~QnBookmarkWidget() {}
+QnBookmarkWidget::~QnBookmarkWidget()
+{
+}
 
-const QnCameraBookmarkTagList &QnBookmarkWidget::tags() const {
+const QnCameraBookmarkTagList& QnBookmarkWidget::tags() const
+{
     return m_allTags;
 }
 
-void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
+void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList& tags)
+{
     m_allTags = tags;
     updateTagsList();
 }
 
-void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark)
+void QnBookmarkWidget::loadData(const QnCameraBookmark& bookmark)
 {
     ui->nameInputField->setText(bookmark.name);
     ui->descriptionTextEdit->setText(bookmark.description);
@@ -125,7 +135,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark)
     ui->nameInputField->setFocus();
 }
 
-void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const
+void QnBookmarkWidget::submitData(QnCameraBookmark& bookmark) const
 {
     bookmark.name = ui->nameInputField->text().trimmed();
     bookmark.description = ui->descriptionTextEdit->text().trimmed();
@@ -138,26 +148,29 @@ bool QnBookmarkWidget::isValid() const
     return ui->nameInputField->isValid() && ui->descriptionTextEdit->isValid();
 }
 
-void QnBookmarkWidget::updateTagsList() {
-    QString html("<html><body><center>%1</center></body></html>");
-    QString unusedTag("<a style=\"text-decoration:none;\" href=\"%1\">%1</a><span style=\"text-decoration:none;\"> </span>");
-    QString usedTag("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font></a><span style=\"text-decoration:none;\"> </span>");
+void QnBookmarkWidget::updateTagsList()
+{
+    static const QString kHtml("<html><body>%1</body></html>");
+    static const QString kUnusedTag("<a style=\"text-decoration:none;\" href=\"%1\">%1</a>");
+    static const QString kUsedTag("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font></a>");
+    static const QString kDelimiterTag("<span style=\"text-decoration:none;\">&nbsp;, </span>");
 
     QStringList tags;
-    for (const auto& tag : m_allTags)
+    for (const auto& tag: std::as_const(m_allTags))
     {
         if (m_selectedTags.contains(tag.name))
-            tags << usedTag.arg(tag.name.toHtmlEscaped());
+            tags << kUsedTag.arg(tag.name.toHtmlEscaped());
         else
-            tags << unusedTag.arg(tag.name.toHtmlEscaped());
+            tags << kUnusedTag.arg(tag.name.toHtmlEscaped());
     }
 
     // Disable interaction when tag list is empty to avoid invisible tabstop.
-    Qt::TextInteractionFlags flags = m_allTags.isEmpty() ? Qt::NoTextInteraction :
-        (Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse);
+    Qt::TextInteractionFlags flags = m_allTags.isEmpty()
+        ? Qt::NoTextInteraction
+        : Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse;
 
     ui->tagsListLabel->setTextInteractionFlags(flags);
-    ui->tagsListLabel->setText(html.arg(tags.join(", ")));
+    ui->tagsListLabel->setText(kHtml.arg(tags.join(kDelimiterTag)));
 
     update();
 }

@@ -2,8 +2,11 @@
 
 #pragma once
 
+#include <optional>
+
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/event_search/models/fetched_data.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 
@@ -11,7 +14,7 @@ class QnCameraBookmarksQuery;
 class QnCameraBookmarksManager;
 class QnCameraBookmarksManagerPrivate;
 
-using OperationCallbackType = std::function<void (bool)>;
+using OperationCallbackType = std::function<void (bool, const std::optional<nx::vms::api::BookmarkV3>&)>;
 using BookmarksCallbackType = std::function<void (bool, rest::Handle, QnCameraBookmarkList)>;
 using BookmarkTagsCallbackType = std::function<void (bool, rest::Handle, QnCameraBookmarkTagList)>;
 

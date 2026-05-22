@@ -12,84 +12,17 @@
 #include <ui/processors/hover_processor.h>
 #include <utils/common/delayed.h>
 
-namespace
-{
-    static constexpr int kUpdateDelay = 150;
+namespace {
 
-    static constexpr qreal kBookmarkFrameWidth = 250;
+static constexpr int kUpdateDelay = 150;
+static constexpr qreal kBookmarkFrameWidth = 250;
+static constexpr int kTooltipTailYOffset = 4;
 
-    enum
-    {
-        kTagClickedActionEventId = QEvent::User + 1,
-        kBookmarkEditActionEventId,
-        kBookmarkRemoveActionEventId,
-        kBookmarkPlayActionEventId,
-        kBookmarkExportActionEventId
-    };
-
-    static constexpr int kTooltipTailYOffset = 4;
-
-    ///
-
-    class TagActionEvent : public QEvent
-    {
-    public:
-        TagActionEvent(int eventId, const QString& tag);
-
-        virtual ~TagActionEvent();
-
-        const QString& tag() const;
-
-    private:
-        const QString m_tag;
-    };
-
-    TagActionEvent::TagActionEvent(int eventId, const QString& tag)
-        : QEvent(static_cast<QEvent::Type>(eventId)),
-        m_tag(tag)
-    {}
-
-    TagActionEvent::~TagActionEvent() {}
-
-    const QString& TagActionEvent::tag() const
-    {
-        return m_tag;
-    }
-
-    /// @class BookmarkActionEvent
-    /// @brief Stores parameters for bookmark action generation
-    class BookmarkActionEvent : public QEvent
-    {
-    public:
-        BookmarkActionEvent(int eventId, const QnCameraBookmark& bookmark);
-
-        virtual ~BookmarkActionEvent();
-
-        const QnCameraBookmark& bookmark() const;
-
-    private:
-        const QnCameraBookmark m_bookmark;
-    };
-
-    BookmarkActionEvent::BookmarkActionEvent(int eventId, const QnCameraBookmark& bookmark)
-        : QEvent(static_cast<QEvent::Type>(eventId)),
-        m_bookmark(bookmark)
-    {
-    }
-
-    BookmarkActionEvent::~BookmarkActionEvent() {}
-
-    const QnCameraBookmark& BookmarkActionEvent::bookmark() const
-    {
-        return m_bookmark;
-    }
-}
-
-///
+} // namespace
 
 using namespace nx::vms::client::desktop;
 
-class QnBookmarksViewer::Impl : public QObject
+class QnBookmarksViewer::Impl: public QObject
 {
 public:
     Impl(QWidget* tooltipParentWidget,
@@ -99,25 +32,19 @@ public:
 
     ~Impl() override;
 
-    ///
-
     bool readOnly() const;
-
     void setReadOnly(bool readonly);
 
     void setAllowExport(bool allowExport);
+    void setAllowShare(bool allowShare);
 
     void setTargetLocation(qint64 location);
 
     void updateOnWindowChange();
 
-    ///
-
     bool isHovered() const;
 
     void setTimelineHoverProcessor(HoverFocusProcessor* processor);
-
-    ///
 
     void resetBookmarks();
 
@@ -127,8 +54,6 @@ private:
     void updatePosition(const QnBookmarksViewer::PosAndBoundsPair& params);
 
     void updateBookmarks(QnCameraBookmarkList bookmarks);
-
-    bool event(QEvent* event) override;
 
     void updateLocationInternal(qint64 location);
 
@@ -147,6 +72,7 @@ private:
     QnCameraBookmarkList m_bookmarks;
     bool m_readonly;
     bool m_allowExport = false;
+    bool m_allowShare = false;
 
     typedef QScopedPointer<QTimer> QTimerPtr;
     QTimerPtr m_updateDelayedTimer;
@@ -262,8 +188,20 @@ void QnBookmarksViewer::Impl::setAllowExport(bool allowExport)
         return;
 
     m_allowExport = allowExport;
+
     if (m_bookmarkTooltip)
         m_bookmarkTooltip->setAllowExport(m_allowExport);
+}
+
+void QnBookmarksViewer::Impl::setAllowShare(bool allowShare)
+{
+    if (m_allowShare == allowShare)
+        return;
+
+    m_allowShare = allowShare;
+
+    if (m_bookmarkTooltip)
+        m_bookmarkTooltip->setAllowShare(m_allowShare);
 }
 
 void QnBookmarksViewer::Impl::updateLocationInternal(qint64 location)
@@ -363,6 +301,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
                 bookmarks, m_tooltipParentWidget);
             m_bookmarkTooltip->setReadOnly(readOnly());
             m_bookmarkTooltip->setAllowExport(m_allowExport);
+            m_bookmarkTooltip->setAllowShare(m_allowShare);
             m_bookmarkTooltip->show();
             m_bookmarkTooltip->move(1000, 300);
             if (m_timelineHoverProcessor)
@@ -372,84 +311,55 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
             m_tooltipTimer->start();
 
-            connect(
-                m_bookmarkTooltip,
-                &workbench::timeline::BookmarkTooltip::playClicked,
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::playClicked, this,
                 [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
-                    qApp->postEvent(this, new BookmarkActionEvent(
-                        kBookmarkPlayActionEventId, bookmark));
-                });
-            connect(
-                m_bookmarkTooltip,
-                &workbench::timeline::BookmarkTooltip::editClicked,
+                    emit m_owner->playBookmark(bookmark);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
+
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::editClicked, this,
                 [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
-                    qApp->postEvent(this, new BookmarkActionEvent(
-                        kBookmarkEditActionEventId, bookmark));
-                });
-            connect(
-                m_bookmarkTooltip,
-                &workbench::timeline::BookmarkTooltip::exportClicked,
+                    emit m_owner->editBookmarkClicked(bookmark);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
+
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::exportClicked, this,
                 [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
-                    qApp->postEvent(this, new BookmarkActionEvent(
-                        kBookmarkExportActionEventId, bookmark));
-                });
-            connect(
-                m_bookmarkTooltip,
-                &workbench::timeline::BookmarkTooltip::deleteClicked,
+                    emit m_owner->exportBookmarkClicked(bookmark);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
+
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::shareClicked, this,
                 [this](const nx::vms::common::CameraBookmark& bookmark)
                 {
-                    qApp->postEvent(this, new BookmarkActionEvent(
-                        kBookmarkRemoveActionEventId, bookmark));
-                });
-            connect(
-                m_bookmarkTooltip,
-                &workbench::timeline::BookmarkTooltip::tagClicked,
+                    emit m_owner->shareBookmarkClicked(bookmark);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
+
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::deleteClicked, this,
+                [this](const nx::vms::common::CameraBookmark& bookmark)
+                {
+                    emit m_owner->removeBookmarkClicked(bookmark);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
+
+            connect(m_bookmarkTooltip, &workbench::timeline::BookmarkTooltip::tagClicked, this,
                 [this](const QString& tag)
                 {
-                    qApp->postEvent(this, new TagActionEvent(kTagClickedActionEventId, tag));
-                });
+                    emit m_owner->tagClicked(tag);
+                    resetBookmarks();
+                },
+                Qt::QueuedConnection);
         }
     }
-}
-
-bool QnBookmarksViewer::Impl::event(QEvent* event)
-{
-    const int eventType = event->type();
-    switch(eventType)
-    {
-        case kTagClickedActionEventId:
-        {
-            const auto tagActionevent = static_cast<TagActionEvent*>(event);
-            emit m_owner->tagClicked(tagActionevent->tag());
-            break;
-        }
-        case kBookmarkEditActionEventId:
-        case kBookmarkRemoveActionEventId:
-        case kBookmarkPlayActionEventId:
-        case kBookmarkExportActionEventId:
-        {
-            const auto bookmarkActionEvent = static_cast<BookmarkActionEvent*>(event);
-            const auto& bookmark = bookmarkActionEvent->bookmark();
-
-            if (eventType == kBookmarkEditActionEventId)
-                emit m_owner->editBookmarkClicked(bookmark);
-            else if (eventType == kBookmarkRemoveActionEventId)
-                emit m_owner->removeBookmarkClicked(bookmark);
-            else if (eventType == kBookmarkExportActionEventId)
-                emit m_owner->exportBookmarkClicked(bookmark);
-            else
-                emit m_owner->playBookmark(bookmark);
-            break;
-        }
-        default:
-            return QObject::event(event);
-    }
-
-    resetBookmarks();
-    return true;
 }
 
 void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoundsPair& params)
@@ -503,6 +413,11 @@ void QnBookmarksViewer::setReadOnly(bool readonly)
 void QnBookmarksViewer::setAllowExport(bool allowExport)
 {
     m_impl->setAllowExport(allowExport);
+}
+
+void QnBookmarksViewer::setAllowShare(bool allowShare)
+{
+    m_impl->setAllowShare(allowShare);
 }
 
 int QnBookmarksViewer::helpTopicAt(const QPointF& /*pos*/) const

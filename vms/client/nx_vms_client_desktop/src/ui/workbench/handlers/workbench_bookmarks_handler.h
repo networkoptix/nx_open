@@ -25,4 +25,5 @@ private:
     void at_removeCameraBookmarkAction_triggered();
     void at_removeBookmarksAction_triggered();
     void at_bookmarksModeAction_triggered();
+    void at_shareCameraBookmarkAction_triggered();
 };

@@ -57,6 +57,7 @@ public:
     LabelDescriptor descriptionLabelDescriptor;
     LabelDescriptor resourceLabelDescriptor;
     QString iconPath;
+    QString extraIconPath;
     bool previewEnabled = false;
     bool obfuscationEnabled = false;
     utils::PendingOperation checkDragIsFinished;
@@ -73,6 +74,7 @@ public:
     void handleStateChanged(State state);
     void updatePalette();
     void updateIcon();
+    void updateExtraIcon();
     void closeRequested();
     qreal getWidthOfText(const QString& text, const QLabel* label) const;
     QString getElidedResourceText(const QStringList& list);
