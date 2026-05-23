@@ -399,13 +399,6 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
 </context>
 <context>
-    <name>BookmarkView</name>
-    <message>
-        <source>Shared by link</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>BookmarksPanel</name>
     <message>
         <source>No bookmarks</source>

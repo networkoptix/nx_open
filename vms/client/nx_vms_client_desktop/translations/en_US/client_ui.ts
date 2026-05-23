@@ -378,6 +378,44 @@
     </message>
 </context>
 <context>
+    <name>CameraBookmarkSharingLinkDialog</name>
+    <message>
+        <source>Share Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Sharing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CameraBookmarkSharingSettingsDialog</name>
+    <message>
+        <source>Share Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lifetime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password protection</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraCredentialsDialog</name>
     <message>
         <source>Authentication credentials</source>

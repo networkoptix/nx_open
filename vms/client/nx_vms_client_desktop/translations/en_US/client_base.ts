@@ -1149,6 +1149,10 @@
         <source>Event log...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Share Bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Deactivator</name>
@@ -2461,6 +2465,17 @@ License Key: %2</source>
         <source>%1 Running</source>
         <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraBookmarkDialog</name>
+    <message>
+        <source>Create</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create and Share...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5300,6 +5315,10 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>Delete %n bookmarks?</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Bookmarks can only be shared on an online Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -6997,6 +7016,52 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Force Motion Detection</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
+    <message>
+        <source>Never expires</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password protected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No password protection</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
+    <message>
+        <source>No password protection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in an hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in a day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expires in a month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never expires</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
