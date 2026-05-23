@@ -404,13 +404,6 @@ Vælg en Integration for at begynde at konfigurere dens parametre.</translation>
     </message>
   </context>
   <context>
-    <name>BookmarkView</name>
-    <message>
-      <source>Shared by link</source>
-      <translation>Delt af link</translation>
-    </message>
-  </context>
-  <context>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>

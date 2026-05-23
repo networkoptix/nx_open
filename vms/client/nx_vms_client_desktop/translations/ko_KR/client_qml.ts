@@ -402,13 +402,6 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
   </context>
   <context>
-    <name>BookmarkView</name>
-    <message>
-      <source>Shared by link</source>
-      <translation>링크로 공유됨</translation>
-    </message>
-  </context>
-  <context>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>

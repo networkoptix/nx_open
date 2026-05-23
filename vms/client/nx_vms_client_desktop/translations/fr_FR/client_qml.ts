@@ -404,13 +404,6 @@ Sélectionnez une intégration pour commencer à configurer ses paramètres.</tr
     </message>
   </context>
   <context>
-    <name>BookmarkView</name>
-    <message>
-      <source>Shared by link</source>
-      <translation>Partagé par lien</translation>
-    </message>
-  </context>
-  <context>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>

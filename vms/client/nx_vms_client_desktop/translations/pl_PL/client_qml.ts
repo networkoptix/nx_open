@@ -408,13 +408,6 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     </message>
   </context>
   <context>
-    <name>BookmarkView</name>
-    <message>
-      <source>Shared by link</source>
-      <translation>Udostępnione przez link</translation>
-    </message>
-  </context>
-  <context>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>

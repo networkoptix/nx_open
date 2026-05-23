@@ -402,13 +402,6 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     </message>
   </context>
   <context>
-    <name>BookmarkView</name>
-    <message>
-      <source>Shared by link</source>
-      <translation>Dibagikan melalui link</translation>
-    </message>
-  </context>
-  <context>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>

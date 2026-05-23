@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Inaktivera flertrådad avkodning om avmarkerad, aktivera automatiskt val om markerad.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Tillåt flertrådad avkodning</translation>
     </message>
   </context>
   <context>
@@ -375,6 +375,44 @@
     <message>
       <source>Refresh</source>
       <translation>Uppdatera</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraBookmarkSharingLinkDialog</name>
+    <message>
+      <source>Share Bookmark</source>
+      <translation type="unfinished">Share Bookmark</translation>
+    </message>
+    <message>
+      <source>URL</source>
+      <translation type="unfinished">URL</translation>
+    </message>
+    <message>
+      <source>Stop Sharing</source>
+      <translation type="unfinished">Stop Sharing</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation type="unfinished">Edit</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraBookmarkSharingSettingsDialog</name>
+    <message>
+      <source>Share Bookmark</source>
+      <translation type="unfinished">Share Bookmark</translation>
+    </message>
+    <message>
+      <source>Lifetime</source>
+      <translation type="unfinished">Lifetime</translation>
+    </message>
+    <message>
+      <source>Password protection</source>
+      <translation type="unfinished">Password protection</translation>
     </message>
   </context>
   <context>

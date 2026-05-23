@@ -1149,6 +1149,10 @@
       <source>Event log...</source>
       <translation>Händelselogg...</translation>
     </message>
+    <message>
+      <source>Share Bookmark...</source>
+      <translation type="unfinished">Share Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1248,7 +1252,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Korrupt inmatningsfil.</translation>
     </message>
   </context>
   <context>
@@ -2462,6 +2466,17 @@ Licensnyckel: %2</translation>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
       <translation>%1 körs</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraBookmarkDialog</name>
+    <message>
+      <source>Create</source>
+      <translation type="unfinished">Create</translation>
+    </message>
+    <message>
+      <source>Create and Share...</source>
+      <translation type="unfinished">Create and Share...</translation>
     </message>
   </context>
   <context>
@@ -5302,6 +5317,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Ta bort %n bokmärken?</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Bookmarks can only be shared on an online Server.</source>
+      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchController</name>
@@ -6242,7 +6261,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>LDAP-användare</translation>
     </message>
   </context>
   <context>
@@ -6999,6 +7018,52 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Force Motion Detection</source>
       <translation>Aktivera rörelsedetektering</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
+    <message>
+      <source>Never expires</source>
+      <translation type="unfinished">Never expires</translation>
+    </message>
+    <message>
+      <source>Expired</source>
+      <translation type="unfinished">Expired</translation>
+    </message>
+    <message>
+      <source>Expires in %1</source>
+      <translation type="unfinished">Expires in %1</translation>
+    </message>
+    <message>
+      <source>Password protected</source>
+      <translation type="unfinished">Password protected</translation>
+    </message>
+    <message>
+      <source>No password protection</source>
+      <translation type="unfinished">No password protection</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
+    <message>
+      <source>No password protection</source>
+      <translation type="unfinished">No password protection</translation>
+    </message>
+    <message>
+      <source>Expires in an hour</source>
+      <translation type="unfinished">Expires in an hour</translation>
+    </message>
+    <message>
+      <source>Expires in a day</source>
+      <translation type="unfinished">Expires in a day</translation>
+    </message>
+    <message>
+      <source>Expires in a month</source>
+      <translation type="unfinished">Expires in a month</translation>
+    </message>
+    <message>
+      <source>Never expires</source>
+      <translation type="unfinished">Never expires</translation>
     </message>
   </context>
   <context>
@@ -9220,7 +9285,7 @@ Platsens prestanda är försämrad.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Spara rapport</translation>
     </message>
   </context>
   <context>
@@ -12515,7 +12580,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>Kan inte ta bort objektet från layouten</translation>
     </message>
   </context>
   <context>
@@ -12914,7 +12979,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Enter keywords separated by space</source>
-      <translation type="unfinished">Enter keywords separated by space</translation>
+      <translation>Ange nyckelord separerade med mellanslag</translation>
     </message>
   </context>
   <context>
