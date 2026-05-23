@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Korrupt inmatningsfil.</translation>
     </message>
   </context>
   <context>
@@ -6242,7 +6242,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>LDAP-användare</translation>
     </message>
   </context>
   <context>
@@ -9208,7 +9208,7 @@ Platsens prestanda är försämrad.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Spara rapport</translation>
     </message>
   </context>
   <context>
