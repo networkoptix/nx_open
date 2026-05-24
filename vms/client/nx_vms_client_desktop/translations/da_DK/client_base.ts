@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Del Bogmærke...</translation>
     </message>
   </context>
   <context>
@@ -2472,11 +2472,11 @@ Licensnøgle: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Opret</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Opret og del...</translation>
     </message>
   </context>
   <context>
@@ -5319,7 +5319,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Bogmærker kan kun deles på en online server.</translation>
     </message>
   </context>
   <context>
@@ -7024,46 +7024,46 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Udløber aldrig</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Udløbet</translation>
     </message>
     <message>
       <source>Expires in %1</source>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Udløber om %1</translation>
     </message>
     <message>
       <source>Password protected</source>
-      <translation type="unfinished">Password protected</translation>
+      <translation>Beskyttet adgangskode</translation>
     </message>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Ingen beskyttelse af adgangskode</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Ingen beskyttelse af adgangskode</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Udløber om en time</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Udløber om en dag</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Udløber om en måned</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Udløber aldrig</translation>
     </message>
   </context>
   <context>

@@ -7256,7 +7256,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Platnost vypršela</translation>
     </message>
     <message>
       <source>Expires in %1</source>

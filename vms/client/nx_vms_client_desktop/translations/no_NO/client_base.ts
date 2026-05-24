@@ -2472,7 +2472,7 @@ Lisensnøkkel: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Opprette</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -7024,11 +7024,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Utløper aldri</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Utløpt</translation>
     </message>
     <message>
       <source>Expires in %1</source>
@@ -7036,34 +7036,34 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Password protected</source>
-      <translation type="unfinished">Password protected</translation>
+      <translation>Passordbeskyttet</translation>
     </message>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Ingen passordbeskyttelse</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Ingen passordbeskyttelse</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Utløper om en time</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Utløper om en dag</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Utløper om en måned</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Utløper aldri</translation>
     </message>
   </context>
   <context>

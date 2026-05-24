@@ -2472,7 +2472,7 @@ Clave de licencia: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Crear</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -7024,46 +7024,46 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Nunca caduca</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Expiró</translation>
     </message>
     <message>
       <source>Expires in %1</source>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Caduca el %1</translation>
     </message>
     <message>
       <source>Password protected</source>
-      <translation type="unfinished">Password protected</translation>
+      <translation>Protegido con contraseña</translation>
     </message>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Sin protección por contraseña</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Sin protección por contraseña</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Expira en una hora</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Vence en 1 día</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Expira en 1 mes</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Nunca caduca</translation>
     </message>
   </context>
   <context>

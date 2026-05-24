@@ -2446,7 +2446,7 @@ Kunci Lisensi: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Buat</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -6910,46 +6910,46 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     <name>nx::vms::client::desktop::CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Tidak pernah habis masa berlaku</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Kadaluarsa</translation>
     </message>
     <message>
       <source>Expires in %1</source>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Berakhir dalam %1</translation>
     </message>
     <message>
       <source>Password protected</source>
-      <translation type="unfinished">Password protected</translation>
+      <translation>Diproteksi kata sandi</translation>
     </message>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Tidak ada proteksi kata sandi</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>No password protection</source>
-      <translation type="unfinished">No password protection</translation>
+      <translation>Tidak ada proteksi kata sandi</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Habis masa berlaku dalam satu jam</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Habis masa berlaku dalam satu hari</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Habis masa berlaku dalam satu bulan</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Tidak pernah habis masa berlaku</translation>
     </message>
   </context>
   <context>

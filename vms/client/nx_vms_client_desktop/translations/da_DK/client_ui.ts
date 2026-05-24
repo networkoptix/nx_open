@@ -381,38 +381,38 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Del Bogmærke</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>Stop Deling</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Rediger</translation>
     </message>
   </context>
   <context>
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Del Bogmærke</translation>
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Livstid</translation>
     </message>
     <message>
       <source>Password protection</source>
-      <translation type="unfinished">Password protection</translation>
+      <translation>Beskyttelse af adgangskode</translation>
     </message>
   </context>
   <context>

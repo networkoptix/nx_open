@@ -7028,7 +7028,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Lejárt</translation>
     </message>
     <message>
       <source>Expires in %1</source>

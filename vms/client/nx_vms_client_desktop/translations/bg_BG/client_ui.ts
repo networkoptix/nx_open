@@ -397,7 +397,7 @@
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Редактиране</translation>
     </message>
   </context>
   <context>

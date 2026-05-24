@@ -7028,7 +7028,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Vençut</translation>
     </message>
     <message>
       <source>Expires in %1</source>

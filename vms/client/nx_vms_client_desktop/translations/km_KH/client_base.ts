@@ -6914,7 +6914,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Expired</translation>
     </message>
     <message>
       <source>Expires in %1</source>

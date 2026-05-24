@@ -2471,7 +2471,7 @@ License Key: %2</source>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Oluştur</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -7027,7 +7027,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Süresi Dolmuş</translation>
     </message>
     <message>
       <source>Expires in %1</source>

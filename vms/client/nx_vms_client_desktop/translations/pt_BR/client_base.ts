@@ -2472,7 +2472,7 @@ Chave de licença: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Criar</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -7028,7 +7028,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Expirado</translation>
     </message>
     <message>
       <source>Expires in %1</source>

@@ -7028,7 +7028,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Expirado</translation>
     </message>
     <message>
       <source>Expires in %1</source>

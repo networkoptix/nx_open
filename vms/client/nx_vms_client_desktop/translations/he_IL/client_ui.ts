@@ -385,7 +385,7 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>כתובת אינטרנט</translation>
     </message>
     <message>
       <source>Stop Sharing</source>
@@ -393,11 +393,11 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>סגירה</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>ערוך</translation>
     </message>
   </context>
   <context>

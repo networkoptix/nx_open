@@ -2446,7 +2446,7 @@ License Key: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>创建</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -6914,7 +6914,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>已经到期</translation>
     </message>
     <message>
       <source>Expires in %1</source>

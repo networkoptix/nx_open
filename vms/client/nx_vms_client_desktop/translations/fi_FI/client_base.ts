@@ -7028,7 +7028,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Vanhentunut</translation>
     </message>
     <message>
       <source>Expires in %1</source>

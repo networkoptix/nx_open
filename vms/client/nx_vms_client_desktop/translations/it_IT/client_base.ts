@@ -2472,7 +2472,7 @@ License Key: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Creare</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -7028,7 +7028,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Scaduta</translation>
     </message>
     <message>
       <source>Expires in %1</source>
