@@ -192,12 +192,13 @@ AdaptiveScreen
             }
             else
             {
-                resourcesScreen.contentItem = videoScreenLoader.item
-                videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
                 // Filter out all the cameras except selected to prevent ability to swipe between
                 // cameras.
-                videoScreenLoader.item.camerasModel.filterIds = [cameraResource.id]
+                videoScreenLoader.item.defaultCamerasModel.filterIds = [cameraResource.id]
+                videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
                 videoScreenLoader.item.controller.start(cameraResource, -1)
+
+                resourcesScreen.contentItem = videoScreenLoader.item
             }
         }
 

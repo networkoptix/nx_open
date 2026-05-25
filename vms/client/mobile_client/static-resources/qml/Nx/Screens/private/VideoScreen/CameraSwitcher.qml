@@ -56,7 +56,6 @@ Item
         maximumFlickVelocity: 4 * width
         cacheBuffer: width
         reuseItems: true
-
         highlightRangeMode: ListView.StrictlyEnforceRange
         preferredHighlightBegin: 0
         preferredHighlightEnd: 0
@@ -68,8 +67,11 @@ Item
         {
             id: delegateItem
 
-            readonly property var resource: model?.resource
-            readonly property var thumbnail: model?.thumbnail
+            property bool pooled: false
+            readonly property var modelData: pooled ? undefined : model
+
+            readonly property var resource: modelData?.resource ?? null
+            readonly property var thumbnail: modelData?.thumbnail ?? ""
 
             property bool controlled: delegateItem.resource === switcher.controller?.resource
             property bool screenshotSuppressed: false
@@ -100,8 +102,13 @@ Item
                 target: delegateItem.controlled ? switcher.videoItem : null
             }
 
+            ListView.onPooled: pooled = true
+
             ListView.onReused:
+            {
                 screenshotSuppressed = false
+                pooled = false
+            }
 
             onControlledChanged:
             {
@@ -156,6 +163,8 @@ Item
             const row = camerasModel.rowByResource(d.resource)
             if (row != -1)
                 listView.positionViewAtIndex(row, ListView.Beginning)
+
+            listView.currentIndex = row
         }
 
         onResourceChanged:
