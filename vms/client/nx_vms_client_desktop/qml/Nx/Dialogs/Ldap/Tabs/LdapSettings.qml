@@ -31,6 +31,8 @@ Rectangle
     property string loginAttribute
     property string groupObjectClass
     property string memberAttribute
+    property string userIdAttribute
+    property string groupIdAttribute
     property int syncIntervalS: kDefaultSyncIntervalS
     property int searchTimeoutS: kDefaultSearchTimeoutS
     property bool syncIsRunning
@@ -86,7 +88,9 @@ Rectangle
             onAccepted:
             {
                 control.loginAttribute = loginAttribute
+                control.userIdAttribute = userIdAttribute
                 control.groupObjectClass = groupObjectClass
+                control.groupIdAttribute = groupIdAttribute
                 control.memberAttribute = memberAttribute
                 control.continuousSync = continuousSync
                 control.syncIntervalS = syncIntervalS
@@ -508,9 +512,15 @@ Rectangle
                             advancedSettingsDialog.loginAttribute = control.loginAttribute
                             advancedSettingsDialog.loginAttributeAuto =
                                 control.loginAttribute == ""
+                            advancedSettingsDialog.userIdAttribute = control.userIdAttribute
+                            advancedSettingsDialog.userIdAttributeAuto =
+                                control.userIdAttribute == ""
                             advancedSettingsDialog.groupObjectClass = control.groupObjectClass
                             advancedSettingsDialog.groupObjectClassAuto =
                                 control.groupObjectClass == ""
+                            advancedSettingsDialog.groupIdAttribute = control.groupIdAttribute
+                            advancedSettingsDialog.groupIdAttributeAuto =
+                                control.groupIdAttribute == ""
                             advancedSettingsDialog.memberAttribute = control.memberAttribute
                             advancedSettingsDialog.memberAttributeAuto =
                                 control.memberAttribute == ""

@@ -235,6 +235,8 @@ struct LdapSettingsWidget::Private
         state.loginAttribute = settings.loginAttribute;
         state.groupObjectClass = settings.groupObjectClass;
         state.memberAttribute = settings.memberAttribute;
+        state.userIdAttribute = settings.userIdAttribute;
+        state.groupIdAttribute = settings.groupIdAttribute;
 
         state.preferredSyncServer = settings.preferredMasterSyncServer;
         state.isHttpDigestEnabledOnImport = settings.isHttpDigestEnabledOnImport;
@@ -283,6 +285,8 @@ struct LdapSettingsWidget::Private
         settings.loginAttribute = state.loginAttribute;
         settings.groupObjectClass = state.groupObjectClass;
         settings.memberAttribute = state.memberAttribute;
+        settings.userIdAttribute = state.userIdAttribute;
+        settings.groupIdAttribute = state.groupIdAttribute;
 
         settings.preferredMasterSyncServer = state.preferredSyncServer;
         settings.isHttpDigestEnabledOnImport = state.isHttpDigestEnabledOnImport;

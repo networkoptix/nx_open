@@ -24,8 +24,12 @@ Dialog
 
     property alias loginAttribute: loginAttributeTextField.text
     property alias loginAttributeAuto: loginAttributeTextField.auto
+    property alias userIdAttribute: userIdAttributeTextField.text
+    property alias userIdAttributeAuto: userIdAttributeTextField.auto
     property alias groupObjectClass: groupAttributeTextField.text
     property alias groupObjectClassAuto: groupAttributeTextField.auto
+    property alias groupIdAttribute: groupIdAttributeTextField.text
+    property alias groupIdAttributeAuto: groupIdAttributeTextField.auto
     property alias memberAttribute: userMembershipAttributeTextField.text
     property alias memberAttributeAuto: userMembershipAttributeTextField.auto
 
@@ -176,6 +180,20 @@ Dialog
 
         CenteredField
         {
+            text: qsTr("User ID Attribute")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            AutoTextField
+            {
+                id: userIdAttributeTextField
+                width: parent.width
+            }
+        }
+
+        CenteredField
+        {
             leftSideMargin: 180
             rightSideMargin: 0
             visible: dialog.insecureAuthEnabledBySiteSettings
@@ -245,6 +263,20 @@ Dialog
             }
         }
 
+        CenteredField
+        {
+            text: qsTr("Group ID Attribute")
+
+            leftSideMargin: 180
+            rightSideMargin: 0
+
+            AutoTextField
+            {
+                id: groupIdAttributeTextField
+                width: parent.width
+            }
+        }
+
         SectionHeader
         {
             text: qsTr("Membership")
@@ -284,7 +316,9 @@ Dialog
     function accept()
     {
         if (loginAttributeTextField.validate()
+            && userIdAttributeTextField.validate()
             && groupAttributeTextField.validate()
+            && groupIdAttributeTextField.validate()
             && userMembershipAttributeTextField.validate())
         {
             dialog.accepted()
