@@ -166,6 +166,7 @@ void WebSocketConnections::Connection::stop()
 {
     for (auto& thread: threads)
         thread.detach();
+    guards.clear();
     if (connection)
     {
         auto connectionPtr = connection.get();
