@@ -1145,7 +1145,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>ブックマークを共有...</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>作成 &amp; 共有...</translation>
     </message>
   </context>
   <context>
@@ -5270,7 +5270,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>ブックマークはオンラインサーバーでのみ共有できます。</translation>
     </message>
   </context>
   <context>
