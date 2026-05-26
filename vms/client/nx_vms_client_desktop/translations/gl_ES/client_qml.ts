@@ -74,6 +74,14 @@
       <source>Notification Language</source>
       <translation>Idioma de notificación</translation>
     </message>
+    <message>
+      <source>User ID Attribute</source>
+      <translation type="unfinished">User ID Attribute</translation>
+    </message>
+    <message>
+      <source>Group ID Attribute</source>
+      <translation type="unfinished">Group ID Attribute</translation>
+    </message>
   </context>
   <context>
     <name>AdvancedUpdateSettings</name>
