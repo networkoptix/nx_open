@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Compartir marcador...</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ Clave de licenza: %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Crear e compartir...</translation>
     </message>
   </context>
   <context>
@@ -5319,7 +5319,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Os marcadores só se poden compartir nun servidor en liña.</translation>
     </message>
   </context>
   <context>
