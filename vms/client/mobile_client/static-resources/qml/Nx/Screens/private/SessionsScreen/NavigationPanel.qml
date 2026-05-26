@@ -1,8 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
@@ -10,10 +8,6 @@ import Nx.Models
 
 import nx.vms.client.core
 
-/**
- * Left sidebar navigation component with vertical menu items (Partners, Organizations, Sites).
- * When an organization is selected in the right panel, displays its tree structure with folders.
- */
 Item
 {
     id: leftSidebar
@@ -23,11 +17,7 @@ Item
     // Public properties
     property bool hasChannelPartners: false
     property bool hasOrganizations: false
-    property alias partnerCount: navigationList.partnerCount
-    property alias organizationCount: navigationList.organizationCount
-    property alias siteCount: navigationList.siteCount
 
-    property int currentTab: OrganizationsModel.SitesTab
     property var organizationsModel: null
     property var selectedOrganizationIndex: null
     property var currentSelectedNodeId: null  // Currently selected node in the tree
@@ -40,7 +30,6 @@ Item
     property var sortedOrganizationIndex: null
 
     // Signals
-    signal tabSelected(var selectedTabValue)
     signal organizationNodeClicked(var nodeId)
 
     // Restore expanded state after model reload.
@@ -169,30 +158,12 @@ Item
         }
     }
 
-    // Navigation list (visible when no organization is selected)
-    NavigationListView
-    {
-        id: navigationList
-        anchors.fill: parent
-        visible: selectedOrganizationIndex == null
-
-        hasChannelPartners: leftSidebar.hasChannelPartners
-        hasOrganizations: leftSidebar.hasOrganizations
-        showCount: leftSidebar.searchText
-        currentTab: leftSidebar.currentTab
-
-        onTabSelected: (tab) =>
-        {
-            leftSidebar.tabSelected(tab)
-        }
-    }
-
     // Organization tree view (visible when organization is selected)
     OrganizationTreeView
     {
         id: organizationTree
+
         anchors.fill: parent
-        visible: selectedOrganizationIndex != null
 
         organizationsModel: leftSidebar.organizationsModel
         sortModel: sortModel

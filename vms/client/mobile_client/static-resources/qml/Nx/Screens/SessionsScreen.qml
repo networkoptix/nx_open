@@ -77,22 +77,14 @@ AdaptiveScreen
 
     leftPanel
     {
-        title: sessionsScreen.selectedOrganizationIndex != null ? qsTr("Resources") : ""
+        title: qsTr("Resources")
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
-        interactive: sessionsScreen.selectedOrganizationIndex != null
         item:
         {
-            if (!LayoutController.isTabletLayout)
-                return null
-
-            if (loadingIndicator.loading)
-                return navigationPanelSkeleton
-
-            if (cloudUserProfileWatcher.isOrgUser
-                && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
-                && (sessionsScreen.selectedOrganizationIndex == null
-                    || sessionsScreen.selectedOrgHasFolders))
+            if (LayoutController.isTabletLayout
+                && sessionsScreen.selectedOrganizationIndex != null
+                && sessionsScreen.selectedOrgHasFolders)
             {
                 return navigationPanel
             }
@@ -294,8 +286,7 @@ AdaptiveScreen
                     icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
                     onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
-                systemTabs.visible: !LayoutController.isTabletLayout
-                    && !loadingIndicator.visible
+                systemTabs.visible: !loadingIndicator.visible
                     && cloudUserProfileWatcher.isOrgUser
                     && (organizationsModel.hasChannelPartners
                         || organizationsModel.hasOrganizations)
@@ -443,54 +434,12 @@ AdaptiveScreen
         }
     }
 
-    Skeleton
-    {
-        id: navigationPanelSkeleton
-
-        Column
-        {
-            spacing: 8
-
-            anchors
-            {
-                left: parent.left
-                top: parent.top
-                right: parent.right
-                margins: 20
-            }
-
-            Repeater
-            {
-                model: 2
-
-                delegate: MaskItem
-                {
-                    width: parent.width
-                    height: 40
-                }
-            }
-        }
-    }
-
     NavigationPanel
     {
         id: navigationPanel
 
         hasChannelPartners: organizationsModel.hasChannelPartners
         hasOrganizations: organizationsModel.hasOrganizations
-        partnerCount: siteList.partnerCount
-        organizationCount: siteList.organizationCount
-        siteCount: siteList.siteCount
-        currentTab: sessionsScreen.selectedTab
-        onTabSelected: (selectedTabValue) =>
-        {
-            // When inside a partner, go back to root with the user-chosen tab.
-            // Pass the tab explicitly so goBack does not override it based on rootType.
-            if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState)
-                goBack(NxGlobals.invalidModelIndex(), selectedTabValue)
-            else
-                sessionsScreen.selectTabByUser(selectedTabValue)
-        }
 
         organizationsModel: organizationsModel
         searchText: siteList.searchText
@@ -600,8 +549,7 @@ AdaptiveScreen
                     color: ColorTheme.colors.dark5
                     implicitHeight: 48
                     z: 1
-                    visible: !LayoutController.isTabletLayout
-                        && !sessionsScreen.searching
+                    visible: !sessionsScreen.searching
                         && !organizationsModel.topLevelLoading
                         && cloudUserProfileWatcher.isOrgUser
                         && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
@@ -930,9 +878,7 @@ AdaptiveScreen
             readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
                 && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
                 || !organizationsModel.firstLoadAttemptFinished
-            readonly property bool topTabsVisible:
-                sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
-                    && !LayoutController.isTabletLayout
+            readonly property bool topTabsVisible: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
 
             Row
             {
@@ -1121,7 +1067,7 @@ AdaptiveScreen
             update()
     }
 
-    function goBack(index, tabOverride)
+    function goBack(index)
     {
         if (searchField.displayText)
         {
@@ -1142,9 +1088,7 @@ AdaptiveScreen
 
             if (newIndex.row === -1)
             {
-                if (tabOverride !== undefined)
-                    selectTabByUser(tabOverride)
-                else if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
+                if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
                     selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                 else if (sessionsScreen.rootType === OrganizationsModel.Organization)
                     selectTabByUser(OrganizationsModel.OrganizationsTab)
