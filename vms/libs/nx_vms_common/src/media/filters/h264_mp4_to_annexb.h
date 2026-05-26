@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////////////
 #pragma once
 
+#include <nx/media/ffmpeg/shared_memory_frame_allocator.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/video_data_packet.h>
 
@@ -24,7 +25,10 @@ public:
         const QnConstAbstractDataPacketPtr& data) override;
 
     // Returns nullptr if the video frame cannot be converted, otherwise the converted frame.
-    QnCompressedVideoDataPtr processVideoData(const QnConstCompressedVideoDataPtr& data);
+    QnCompressedVideoDataPtr processVideoData(
+        const QnConstCompressedVideoDataPtr& data,
+        bool forceSharedMemory = false,
+        const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator = {});
 
 private:
     CodecParametersConstPtr m_newContext;

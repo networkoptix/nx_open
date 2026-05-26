@@ -29,7 +29,9 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
 }
 
 QnCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
-    const QnConstCompressedVideoDataPtr& videoData)
+    const QnConstCompressedVideoDataPtr& videoData,
+    bool forceSharedMemory,
+    const nx::media::ffmpeg::FfmpegSharedMemoryAllocatorPtr& sharedMemoryAllocator)
 {
     auto codecId = videoData->compressionType;
     if (codecId != AV_CODEC_ID_H264 && codecId != AV_CODEC_ID_H265)
@@ -78,17 +80,52 @@ QnCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
         m_newContext = context;
     }
 
-    QnWritableCompressedVideoDataPtr result(new QnWritableCompressedVideoData());
-    result->QnCompressedVideoData::assign(videoData.get());
-
     const int resultDataSize = header.size() + videoData->dataSize();
-    result->m_data.resize(resultDataSize);
-    uint8_t* const resultData = (uint8_t*)result->m_data.data();
+    QnCompressedVideoDataPtr resultBase;
+    if (forceSharedMemory)
+    {
+        resultBase = createSharedMemoryCompressedVideoData(
+            resultDataSize,
+            sharedMemoryAllocator);
+        if (!resultBase)
+        {
+            NX_WARNING(
+                this,
+                "Failed to allocate %1 bytes in shared memory for AnnexB conversion",
+                resultDataSize);
+            return nullptr;
+        }
+    }
+    else
+    {
+        resultBase = QnCompressedVideoDataPtr(new QnWritableCompressedVideoData());
+    }
+
+    resultBase->QnCompressedVideoData::assign(videoData.get());
+    uint8_t* resultData = nullptr;
+    if (forceSharedMemory)
+    {
+        auto shmResult = std::dynamic_pointer_cast<QnSharedMemoryCompressedVideoData>(resultBase);
+        if (!shmResult || !shmResult->mutableData())
+        {
+            NX_WARNING(this, "Invalid shared-memory destination frame for AnnexB conversion");
+            return nullptr;
+        }
+        resultData = reinterpret_cast<uint8_t*>(shmResult->mutableData());
+    }
+    else
+    {
+        auto writableResult = std::dynamic_pointer_cast<QnWritableCompressedVideoData>(resultBase);
+        NX_ASSERT(writableResult);
+        writableResult->m_data.resize(resultDataSize);
+        resultData = reinterpret_cast<uint8_t*>(writableResult->m_data.data());
+    }
+
     memcpy(resultData, header.data(), header.size());
     memcpy(resultData + header.size(), videoData->data(), videoData->dataSize());
 
     // Replacing NALU size with {0 0 0 1}.
     nx::media::nal::convertToStartCodes(resultData + header.size(), videoData->dataSize());
-    result->context = m_newContext;
-    return result;
+    resultBase->context = m_newContext;
+    return resultBase;
 }

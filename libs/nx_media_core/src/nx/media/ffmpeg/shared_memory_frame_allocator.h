@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include <nx/media/ffmpeg/frame_info.h>
+#include <nx/utils/shm_byte_array.h>
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -90,5 +91,18 @@ NX_MEDIA_CORE_API std::string ffmpegSharedMemorySegmentNameFromFrame(const AVFra
 NX_MEDIA_CORE_API std::optional<std::uintptr_t> ffmpegSharedMemoryHandleFromAddress(
     const void* address,
     const FfmpegSharedMemoryAllocatorPtr& allocator);
+
+/**
+ * Allocate a raw SHM byte range and return it as nx::utils::ShmByteArray with proper lifetime
+ * guard for automatic deallocation.
+ *
+ * trailingZeroPadding allows reserving extra bytes after the logical payload and filling them
+ * with zeroes. This is useful for FFmpeg bitstream readers that may read past packet end within
+ * AV_INPUT_BUFFER_PADDING_SIZE.
+ */
+NX_MEDIA_CORE_API std::optional<nx::utils::ShmByteArray> allocateShmByteArrayInSharedMemory(
+    std::size_t size,
+    const FfmpegSharedMemoryAllocatorPtr& allocator,
+    std::size_t trailingZeroPadding = 0);
 
 } // namespace nx::media::ffmpeg

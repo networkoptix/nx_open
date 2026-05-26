@@ -6,7 +6,9 @@
 #include <array>
 #include <cerrno>
 #include <cstddef>
+#include <cstring>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -37,7 +39,6 @@ namespace nx::media::ffmpeg {
 
 namespace {
 
-
 using ShmHandle = std::uintptr_t;
 #if defined(_WIN32)
 using SharedMemorySegment = boost::interprocess::managed_windows_shared_memory;
@@ -50,6 +51,12 @@ using SharedMemorySegment = boost::interprocess::managed_shared_memory;
 std::once_flag gMissingBufferContextWarningOnce;
 
 constexpr std::size_t kMinSharedMemoryAlignment = 64;
+
+struct SharedMemoryBuffer
+{
+    void* data = nullptr;
+    std::uintptr_t handle = 0;
+};
 
 std::size_t sharedMemoryAlignment()
 {
@@ -400,6 +407,27 @@ int allocateSharedMemoryFrameFromLayout(
     return 0;
 }
 
+std::optional<SharedMemoryBuffer> allocateBytesInSharedMemory(
+    std::size_t size,
+    const FfmpegSharedMemoryAllocatorPtr& allocator)
+{
+    if (!allocator || size == 0)
+        return std::nullopt;
+
+    void* data = allocator->allocate(size);
+    if (!data)
+        return std::nullopt;
+
+    const auto handle = allocator->handleFromAddress(data);
+    if (!handle)
+    {
+        allocator->deallocate(data);
+        return std::nullopt;
+    }
+
+    return SharedMemoryBuffer{data, *handle};
+}
+
 } // namespace
 
 FfmpegSharedMemoryAllocatorPtr createFfmpegSharedMemoryAllocator(
@@ -588,6 +616,46 @@ std::optional<std::uintptr_t> ffmpegSharedMemoryHandleFromAddress(
         return std::nullopt;
 
     return allocator->handleFromAddress(address);
+}
+
+std::optional<nx::utils::ShmByteArray> allocateShmByteArrayInSharedMemory(
+    std::size_t size,
+    const FfmpegSharedMemoryAllocatorPtr& allocator,
+    std::size_t trailingZeroPadding)
+{
+    if (!allocator || size == 0)
+        return std::nullopt;
+
+    if (trailingZeroPadding > std::numeric_limits<std::size_t>::max() - size)
+        return std::nullopt;
+
+    const std::size_t allocationSize = size + trailingZeroPadding;
+    const auto shmBuffer = allocateBytesInSharedMemory(allocationSize, allocator);
+    if (!shmBuffer)
+        return std::nullopt;
+
+    if (trailingZeroPadding > 0)
+    {
+        std::memset(
+            static_cast<char*>(shmBuffer->data) + size,
+            0,
+            trailingZeroPadding);
+    }
+
+    std::string segmentName(allocator->segmentName());
+    auto lifetimeGuard = std::shared_ptr<void>(
+        shmBuffer->data,
+        [allocator](void* data)
+        {
+            allocator->deallocate(data);
+        });
+
+    return nx::utils::detail::makeShmByteArray(
+        shmBuffer->data,
+        size,
+        shmBuffer->handle,
+        std::move(segmentName),
+        std::move(lifetimeGuard));
 }
 
 } // namespace nx::media::ffmpeg
