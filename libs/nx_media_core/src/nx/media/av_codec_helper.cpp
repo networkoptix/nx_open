@@ -164,6 +164,7 @@ QMap<AVCodecID, QByteArray> codecToStringMap()
         {AV_CODEC_ID_PRORES, "PRORES"},
         {AV_CODEC_ID_JV, "JV"},
         {AV_CODEC_ID_DFA, "DFA"},
+        {AV_CODEC_ID_AV1, "AV1"},
         // {AV_CODEC_ID_8SVX_RAW,  "8SVX_RAW"},
 
         /* various PCM "codecs" */
