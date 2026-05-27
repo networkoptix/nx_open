@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Udostępnij zakładkę...</translation>
     </message>
   </context>
   <context>
@@ -2528,7 +2528,7 @@ Klucz licencyjny: %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Utwórz i udostępnij...</translation>
     </message>
   </context>
   <context>
@@ -5424,7 +5424,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Zakładki mogą być udostępniane tylko na serwerze online.</translation>
     </message>
   </context>
   <context>

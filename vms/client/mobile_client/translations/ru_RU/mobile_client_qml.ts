@@ -756,21 +756,6 @@
     </message>
   </context>
   <context>
-    <name>NavigationListView</name>
-    <message>
-      <source>Partners</source>
-      <translation>Партнеры</translation>
-    </message>
-    <message>
-      <source>Organizations</source>
-      <translation>Организации</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Сайты</translation>
-    </message>
-  </context>
-  <context>
     <name>Notification</name>
     <message>
       <source>Show more</source>

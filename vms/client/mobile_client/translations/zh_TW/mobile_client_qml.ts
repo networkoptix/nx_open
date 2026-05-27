@@ -753,21 +753,6 @@
     </message>
   </context>
   <context>
-    <name>NavigationListView</name>
-    <message>
-      <source>Partners</source>
-      <translation>合作夥伴</translation>
-    </message>
-    <message>
-      <source>Organizations</source>
-      <translation>組織用戶</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>站點 (Sites)</translation>
-    </message>
-  </context>
-  <context>
     <name>Notification</name>
     <message>
       <source>Show more</source>

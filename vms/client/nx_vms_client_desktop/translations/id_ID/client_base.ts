@@ -1145,7 +1145,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Bagikan Bookmark...</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@ Kunci Lisensi: %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Buat dan Bagikan...</translation>
     </message>
   </context>
   <context>
@@ -5266,7 +5266,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Bookmark hanya dapat dibagikan di server online.</translation>
     </message>
   </context>
   <context>

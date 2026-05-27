@@ -381,7 +381,7 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Bagikan Bookmark</translation>
     </message>
     <message>
       <source>URL</source>
@@ -404,7 +404,7 @@
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Bagikan Bookmark</translation>
     </message>
     <message>
       <source>Lifetime</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Password protection</source>
-      <translation type="unfinished">Password protection</translation>
+      <translation>Proteksi kata sandi</translation>
     </message>
   </context>
   <context>

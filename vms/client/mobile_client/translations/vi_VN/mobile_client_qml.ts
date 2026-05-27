@@ -753,21 +753,6 @@
     </message>
   </context>
   <context>
-    <name>NavigationListView</name>
-    <message>
-      <source>Partners</source>
-      <translation>Đối tác</translation>
-    </message>
-    <message>
-      <source>Organizations</source>
-      <translation>Tổ chức</translation>
-    </message>
-    <message>
-      <source>Sites</source>
-      <translation>Các chi nhánh</translation>
-    </message>
-  </context>
-  <context>
     <name>Notification</name>
     <message>
       <source>Show more</source>
