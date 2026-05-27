@@ -235,9 +235,8 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
     (base) \
     (omittedBaseAttributes) \
     (attributes) \
-    (attributeSupportInfo)
-NX_REFLECTION_INSTRUMENT(ExtendedScopedDescriptor,
-    nx_vms_api_analytics_ExtendedScopedDescriptor_Fields);
+    (attributeSupportInfo) \
+    (hasEverBeenSupported)
 
 struct EventTypeDescriptor: public ExtendedScopedDescriptor
 {
@@ -259,8 +258,7 @@ struct EventTypeDescriptor: public ExtendedScopedDescriptor
 };
 #define nx_vms_api_analyitcs_EventTypeDescriptor_Fields \
     nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
-    (flags) \
-    (hasEverBeenSupported)
+    (flags)
 NX_REFLECTION_INSTRUMENT(EventTypeDescriptor, nx_vms_api_analyitcs_EventTypeDescriptor_Fields);
 
 struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
@@ -290,8 +288,7 @@ struct ObjectTypeDescriptor: public ExtendedScopedDescriptor
 };
 #define nx_vms_api_analyitcs_ObjectTypeDescriptor_Fields \
     nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
-    (flags) \
-    (hasEverBeenSupported)
+    (flags)
 NX_REFLECTION_INSTRUMENT(ObjectTypeDescriptor, nx_vms_api_analyitcs_ObjectTypeDescriptor_Fields);
 
 struct ActionTypeDescriptor: BaseDescriptor
@@ -421,7 +418,6 @@ QN_FUSION_DECLARE_FUNCTIONS(Descriptors, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(DescriptorScope, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseDescriptor, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(BaseScopedDescriptor, (json), NX_VMS_API)
-QN_FUSION_DECLARE_FUNCTIONS(ExtendedScopedDescriptor, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(PluginDescriptor, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EngineDescriptor, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(GroupDescriptor, (json), NX_VMS_API)
