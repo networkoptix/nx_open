@@ -23,6 +23,16 @@ AdaptiveScreen
 
     title: feed.title
 
+    // The right (Details) panel mirrors `feed.selectedNotification`. Clear the selection whenever
+    // AdaptiveScreen closes the panel (close button, auto-close, or cross-close), otherwise
+    // `rightPanel.item` stays bound to the same `notificationDetailsItem` and a repeated tap on
+    // the same card produces no `onItemChanged` — the panel would not reopen.
+    onPanelClosed: (panel) =>
+    {
+        if (panel === rightPanel)
+            feed.selectedNotification = null
+    }
+
     contentItem: Feed
     {
         id: feed
@@ -51,8 +61,11 @@ AdaptiveScreen
             ? notificationDetailsItem
             : null
 
-        onItemChanged: rightPanel.visible = !!rightPanel.item
-        onCloseButtonClicked: feed.selectedNotification = null
+        onItemChanged:
+        {
+            if (rightPanel.item)
+                feedScreen.showPanel(rightPanel)
+        }
     }
 
     customRightControl: IconButton

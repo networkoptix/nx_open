@@ -17,6 +17,13 @@ FocusScope
 
     default property alias data: container.data
 
+    // Emitted whenever AdaptiveScreen closes a panel: the panel's close button was pressed, the
+    // auto-close logic hid it because the content area would not fit, or `showPanel()` cross-closed
+    // it to make room for the opposite panel. Consumers should release whatever state drives
+    // `panel.item` (selection, persisted visibility, etc.) — otherwise re-selecting the same
+    // entity will not retrigger `onItemChanged` and the panel will not reopen.
+    signal panelClosed(Item panel)
+
     // Whether only the contentItem is visible.
     property bool fullscreen: false
 
@@ -66,6 +73,18 @@ FocusScope
     readonly property bool hasRightPanel: rightPanel.item
 
     readonly property int spacing: 1
+
+    // Opens `panel`, cross-closing the opposite one first if the landscape layout cannot fit both
+    // with the minimum content area. Use this from screens that drive `panel.visible` imperatively
+    // (e.g. when the user selects an item and the matching panel should become visible).
+    function showPanel(panel)
+    {
+        const opposite = panel === leftPanel ? rightPanel : leftPanel
+        if (opposite.visible && !d.fitsBothPanels)
+            d.closePanel(opposite)
+
+        panel.visible = true
+    }
 
     Item
     {
@@ -195,7 +214,7 @@ FocusScope
             Layout.fillHeight: true
             visible: false
 
-            onCloseButtonClicked: visible = false
+            onCloseButtonClicked: d.closePanel(leftPanel)
 
             Binding
             {
@@ -245,7 +264,7 @@ FocusScope
             Layout.fillHeight: true
             visible: false
 
-            onCloseButtonClicked: visible = false
+            onCloseButtonClicked: d.closePanel(rightPanel)
 
             Binding
             {
@@ -289,7 +308,8 @@ FocusScope
             && root.hasLeftPanel
             && root.leftPanel.interactive
             && leftPanel.isHidden
-        onClicked: leftPanel.visible = true
+
+        onClicked: root.showPanel(leftPanel)
 
         Indicator
         {
@@ -324,7 +344,8 @@ FocusScope
             && root.hasRightPanel
             && root.rightPanel.interactive
             && rightPanel.isHidden
-        onClicked: rightPanel.visible = true
+
+        onClicked: root.showPanel(rightPanel)
 
         Indicator
         {
@@ -392,5 +413,70 @@ FocusScope
             root.customBackHandler(event.key === Qt.Key_Escape)
         else if (stackView.depth > 1)
             Workflow.popCurrentScreen()
+    }
+
+    QtObject
+    {
+        id: d
+
+        // Landscape layout width required to fit both side panels and the minimum content area.
+        readonly property int requiredLandscapeWidth: StyleHints.contentAreaMinimumWidth
+            + leftPanel.implicitWidth
+            + rightPanel.implicitWidth
+            + 2 * root.spacing
+
+        // True if the landscape layout has enough room to host both side panels with at least
+        // the minimum content area width visible between them. Independent of the panels
+        // current visibility, so `showPanel()` can use it to decide whether opening one panel
+        // must cross-close the opposite.
+        readonly property bool fitsBothPanels: landscapeLayout.width >= requiredLandscapeWidth
+
+        // Hides `panel` and notifies consumers via `panelClosed` so they can release whatever
+        // state was driving it (selection, persisted visibility, etc.).
+        function closePanel(panel)
+        {
+            panel.visible = false
+            root.panelClosed(panel)
+        }
+
+        // Hides the right panel when both panels are visible but the content area would not fit
+        // the minimum width. Triggered imperatively from the Connections below rather than via a
+        // reactive `onSomethingChanged` handler — modifying `rightPanel.visible` from a binding-
+        // change handler causes QML to detect a binding loop (the handler writes a property that
+        // the binding reads).
+        function autoCloseIfNarrow()
+        {
+            if (!LayoutController.isTabletLayout)
+                return
+
+            if (!leftPanel.visible || !rightPanel.visible)
+                return
+
+            if (landscapeLayout.width <= 0)
+                return
+
+            if (fitsBothPanels)
+                return
+
+            closePanel(rightPanel)
+        }
+    }
+
+    Connections
+    {
+        target: leftPanel
+        function onVisibleChanged() { d.autoCloseIfNarrow() }
+    }
+
+    Connections
+    {
+        target: rightPanel
+        function onVisibleChanged() { d.autoCloseIfNarrow() }
+    }
+
+    Connections
+    {
+        target: landscapeLayout
+        function onWidthChanged() { d.autoCloseIfNarrow() }
     }
 }

@@ -29,6 +29,17 @@ AdaptiveScreen
 
     property alias filterIds: camerasGrid.filterIds
 
+    // Persist `false` whenever AdaptiveScreen closes a panel (close button, auto-close, or
+    // cross-close). The matching "open → persist `true`" is handled by each panel's
+    // `onVisibleChanged` below.
+    onPanelClosed: (panel) =>
+    {
+        if (panel === leftPanel)
+            appContext.settings.resourcesPanelVisible = false
+        else if (panel === rightPanel)
+            appContext.settings.timelinePanelVisible = false
+    }
+
     fullscreen: videoScreenLoader.item?.fullscreen ?? false
 
     toolBar.controls:
@@ -117,7 +128,6 @@ AdaptiveScreen
         interactive: true
         item: resourceTreeSheet
 
-        onCloseButtonClicked: appContext.settings.resourcesPanelVisible = false
         onVisibleChanged:
         {
             if (visible && leftPanel.item)
@@ -146,7 +156,6 @@ AdaptiveScreen
             ? videoScreenLoader.item.navigatorItem
             : null
 
-        onCloseButtonClicked: appContext.settings.timelinePanelVisible = false
         onVisibleChanged:
         {
             if (visible && rightPanel.item)

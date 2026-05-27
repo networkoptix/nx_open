@@ -35,6 +35,16 @@ AdaptiveScreen
     title: contentItem.title
     longContent: contentItem !== eventSearchMenu
 
+    // The right (Details) panel mirrors `detailsLoader.item`. Clear the loader whenever
+    // AdaptiveScreen closes the panel (close button, auto-close, or cross-close), otherwise
+    // `rightPanel.item` stays bound to the same component and a repeated tap on the same row
+    // produces no `onItemChanged` — the panel would not reopen.
+    onPanelClosed: (panel) =>
+    {
+        if (panel === rightPanel)
+            detailsLoader.setSource("")
+    }
+
     function closeDetailsPanel()
     {
         if (!detailsLoader.item)
@@ -178,8 +188,13 @@ AdaptiveScreen
         menuButton.visible: !!detailsLoader.menu
         menuButton.onClicked: detailsLoader.menu.popup(rightPanel.menuButton, 0, menuButton.height)
 
-        onItemChanged: rightPanel.visible = !!rightPanel.item
-        onCloseButtonClicked: detailsLoader.setSource("")
+        onItemChanged:
+        {
+            if (rightPanel.item)
+                screen.showPanel(rightPanel)
+            // Hiding when item becomes null is handled by AdaptiveScreen's
+            // `Binding { when: !rightPanel.item; visible: false }`.
+        }
     }
 
     Loader
@@ -201,7 +216,7 @@ AdaptiveScreen
                     if (screen.contentItem === detailsLoader.item) //< Exit fullscreen.
                     {
                         screen.contentItem = searchContent
-                        screen.rightPanel.visible = true
+                        screen.showPanel(rightPanel)
                     }
                     else //< Enter fullscreen.
                     {
