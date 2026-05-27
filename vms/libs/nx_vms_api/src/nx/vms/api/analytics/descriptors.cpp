@@ -39,12 +39,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     (brief, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    ExtendedScopedDescriptor,
-    (json),
-    nx_vms_api_analytics_ExtendedScopedDescriptor_Fields,
-    (brief, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     PluginDescriptor,
     (json),
     nx_vms_api_analyitcs_PluginDescriptor_Fields,
