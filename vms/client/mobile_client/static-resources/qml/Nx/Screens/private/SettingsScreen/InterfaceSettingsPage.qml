@@ -14,10 +14,12 @@ BaseSettingsPage
 
         width: parent.width
         text: qsTr("Live Previews")
+        extraText: qsTr("Show previews in the cameras list")
+
         checkState: appContext.settings.liveVideoPreviews
             ? Qt.Checked
             : Qt.Unchecked
-        extraText: qsTr("Show previews in the cameras list")
+
         onCheckStateChanged:
             appContext.settings.liveVideoPreviews = checkState != Qt.Unchecked
     }
@@ -26,11 +28,21 @@ BaseSettingsPage
     {
         width: parent.width
         text: qsTr("Server Time")
-        checkState: appContext.settings.serverTimeMode ? Qt.Checked : Qt.Unchecked
         extraText: qsTr("Allows to show server time for the camera")
+        checkState: appContext.settings.serverTimeMode ? Qt.Checked : Qt.Unchecked
+
         onCheckStateChanged:
-        {
             appContext.settings.serverTimeMode = checkState != Qt.Unchecked
-        }
+    }
+
+    LabeledSwitch
+    {
+        width: parent.width
+        text: qsTr("Mirror Timeline")
+        extraText: qsTr("Flip the timeline for left-handed use")
+        checkState: appContext.settings.leftHandedMode ? Qt.Checked : Qt.Unchecked
+
+        onCheckStateChanged:
+            appContext.settings.leftHandedMode = checkState != Qt.Unchecked
     }
 }

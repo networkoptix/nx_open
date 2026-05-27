@@ -243,23 +243,6 @@ BaseSettingsPage
             }
         }
 
-        LabeledSwitch
-        {
-            id: leftHandedMode
-
-            width: parent.width
-            text: "Left Handed Mode"
-            checkState: appContext.settings.leftHandedMode ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged:
-            {
-                const value = checkState != Qt.Unchecked
-                if (value === appContext.settings.leftHandedMode)
-                    return
-
-                appContext.settings.leftHandedMode = value
-            }
-        }
-
         Row
         {
             spacing: 8
