@@ -45,15 +45,15 @@ int parsePpsId(const uint8_t* data, int size)
     return pps.pic_parameter_set_id;
 }
 
-void truncateMap(std::map<int, std::vector<uint8_t>>& m, int maxSize, const char* name)
+void truncateMap(std::map<int, nal::NalUnitInfo>* nals, int maxSize, const char* name)
 {
-    if (m.size() > (size_t)maxSize)
+    if (nals->size() > (size_t) maxSize)
     {
         NX_WARNING(NX_SCOPE_TAG, "Truncating %1 map from %2 to %3 entries",
-            name, m.size(), maxSize);
-        auto it = m.begin();
+            name, nals->size(), maxSize);
+        auto it = nals->begin();
         std::advance(it, maxSize);
-        m.erase(it, m.end());
+        nals->erase(it, nals->end());
     }
 }
 
@@ -156,8 +156,8 @@ std::vector<uint8_t> buildExtraDataMp4FromAnnexB(const uint8_t* data, int32_t si
 
 std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalUnits)
 {
-    std::map<int, std::vector<uint8_t>> spsMap;
-    std::map<int, std::vector<uint8_t>> ppsMap;
+    std::map<int, nal::NalUnitInfo> spsMap;
+    std::map<int, nal::NalUnitInfo> ppsMap;
     int brokenNalIndex = std::numeric_limits<int>::max();
     for (const auto& nalu: nalUnits)
     {
@@ -167,19 +167,19 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
             int id = parseSpsId(nalu.data, nalu.size);
             if (id == -1) //< Pack it anyway.
                 id = --brokenNalIndex;
-            spsMap[id] = std::vector<uint8_t>(nalu.data, nalu.data + nalu.size);
+            spsMap[id] = nalu;
         }
         else if (nalType == nuPPS)
         {
             int id = parsePpsId(nalu.data, nalu.size);
             if (id == -1) //< Pack it anyway.
                 id = --brokenNalIndex;
-            ppsMap[id] = std::vector<uint8_t>(nalu.data, nalu.data + nalu.size);
+            ppsMap[id] = nalu;
         }
     }
 
-    truncateMap(spsMap, /*MaxSpsNumber*/ 31, "SPS");
-    truncateMap(ppsMap, /*MaxPpsNumber*/ 255, "PPS");
+    truncateMap(&spsMap, /*MaxSpsNumber*/ 31, "SPS");
+    truncateMap(&ppsMap, /*MaxPpsNumber*/ 255, "PPS");
 
     if (spsMap.empty() || ppsMap.empty())
     {
@@ -193,20 +193,20 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     for(const auto& sps: spsMap)
     {
         extradataSize += sizeof(uint16_t); // Sps size.
-        extradataSize += sps.second.size(); // Sps data.
+        extradataSize += sps.second.size; // Sps data.
     }
     extradataSize += 1; // pps count
     for(const auto& pps: ppsMap)
     {
         extradataSize += sizeof(uint16_t); // Pps size.
-        extradataSize += pps.second.size(); // Pps data.
+        extradataSize += pps.second.size; // Pps data.
     }
 
     const auto& sps = spsMap.begin()->second;
     std::vector<uint8_t> extradata(extradataSize);
-    if (sps.size() < 4)
+    if (sps.size < 4)
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid SPS: %1", nx::utils::toHex(sps.data(), sps.size()));
+        NX_WARNING(NX_SCOPE_TAG, "Invalid SPS: %1", nx::utils::toHex(sps.data, sps.size));
         return std::vector<uint8_t>();
     }
 
@@ -215,9 +215,9 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     {
         // See ISO_IEC_14496-15 AVCDecoderConfigurationRecord.
         bitstream.putBits(8, 1); // Version.
-        bitstream.putBits(8, sps[1]); // Profile.
-        bitstream.putBits(8, sps[2]); // Profile compat.
-        bitstream.putBits(8, sps[3]); // Profile level.
+        bitstream.putBits(8, sps.data[1]); // Profile.
+        bitstream.putBits(8, sps.data[2]); // Profile compat.
+        bitstream.putBits(8, sps.data[3]); // Profile level.
         bitstream.putBits(8, 0xff); // 6 bits reserved(111111) + 2 bits nal size length - 1: 3(11).
 
         uint8_t numSps = uint8_t(spsMap.size()) | 0xe0;
@@ -225,14 +225,14 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
 
         for(const auto& spsData: spsMap)
         {
-            bitstream.putBits(16, spsData.second.size());
-            bitstream.putBytes(spsData.second.data(), spsData.second.size());
+            bitstream.putBits(16, spsData.second.size);
+            bitstream.putBytes(spsData.second.data, spsData.second.size);
         }
         bitstream.putBits(8, ppsMap.size()); // Number of pps.
         for(const auto& ppsData: ppsMap)
         {
-            bitstream.putBits(16, ppsData.second.size());
-            bitstream.putBytes(ppsData.second.data(), ppsData.second.size());
+            bitstream.putBits(16, ppsData.second.size);
+            bitstream.putBytes(ppsData.second.data, ppsData.second.size);
         }
         bitstream.flushBits();
     }
