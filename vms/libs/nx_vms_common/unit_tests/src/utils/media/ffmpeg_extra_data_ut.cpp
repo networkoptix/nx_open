@@ -4,6 +4,10 @@
 
 #include <nx/codec/h265/hevc_decoder_configuration_record.h>
 #include <nx/media/h264_utils.h>
+#include <nx/utils/string.h>
+
+#define ASSERT_EQ_BINARY(data1, data2, size) \
+    ASSERT_EQ(nx::utils::toHex(data1, size), nx::utils::toHex(data2, size))
 
 TEST(media, build_extradata_h264)
 {
@@ -21,11 +25,38 @@ TEST(media, build_extradata_h264)
     ASSERT_EQ(extradata.size(), 33);
     ASSERT_EQ(extradata[6], 0); // sps size first byte
     ASSERT_EQ(extradata[7], kSpsSize); // sps size second byte
-    ASSERT_EQ(memcmp(extradata.data() + 8, frameData + 4, kSpsSize), 0);
+    ASSERT_EQ_BINARY(extradata.data() + 8, frameData + 4, kSpsSize);
     ASSERT_EQ(extradata[8 + kSpsSize], 1); // pps count
     ASSERT_EQ(extradata[8 + kSpsSize + 1], 0); // pps size first byte
     ASSERT_EQ(extradata[8 + kSpsSize + 2], kPpsSize); // pps size second byte
-    ASSERT_EQ(memcmp(extradata.data() + 11 + kSpsSize, frameData + 8 + kSpsSize, kPpsSize), 0);
+    ASSERT_EQ_BINARY(extradata.data() + 11 + kSpsSize, frameData + 8 + kSpsSize, kPpsSize);
+}
+
+TEST(media, build_extradata_h264_double_sps)
+{
+    uint8_t frameData[] = {
+        0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x00, 0x29, 0xe3, 0x50, 0x14, 0x07, 0xb6, 0x02, 0xdc,
+        0x04, 0x04, 0x06, 0x90, 0x78, 0x91, 0x15,
+        0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x00, 0x29, 0xe3, 0x50, 0x14, 0x07, 0xb6, 0x02, 0xdc,
+        0x04, 0x04, 0x06, 0x90, 0x78, 0x91, 0x15, //< copy of SPS, should be rejected.
+        0x00, 0x00, 0x00, 0x01, 0x68, 0xce, 0x3c, 0x80,
+        0x00, 0x00, 0x00, 0x01, 0x68, 0xce, 0x3c, 0x80, //< copy of PPS, should be rejected.
+        0x00, 0x00, 0x00, 0x01, 0x65, 0x88, 0x84, 0x00, 0x00, 0x0c, 0x21, 0x18, 0xa0, 0x00, 0x67,
+        0xf9, 0x39, 0x39, 0x39, 0x39, 0x38, 0x8f, 0xd1, 0x1e, 0xa4, 0xe2, 0x35, 0xe9, 0x38 };
+    const int kSpsSize = 18;
+    const int kPpsSize = 4;
+
+    std::vector<uint8_t> extradata = nx::media::h264::buildExtraDataMp4FromAnnexB(
+        frameData, sizeof(frameData));
+
+    ASSERT_EQ(extradata.size(), 33);
+    ASSERT_EQ(extradata[6], 0); // sps size first byte
+    ASSERT_EQ(extradata[7], kSpsSize); // sps size second byte
+    ASSERT_EQ_BINARY(extradata.data() + 8, frameData + 4, kSpsSize);
+    ASSERT_EQ(extradata[8 + kSpsSize], 1); // pps count
+    ASSERT_EQ(extradata[8 + kSpsSize + 1], 0); // pps size first byte
+    ASSERT_EQ(extradata[8 + kSpsSize + 2], kPpsSize); // pps size second byte
+    ASSERT_EQ_BINARY(extradata.data() + 11 + kSpsSize, frameData + 12 + kSpsSize * 2, kPpsSize);
 }
 
 TEST(media, parse_extradata_h265)
@@ -53,5 +84,5 @@ TEST(media, parse_extradata_h265)
     uint8_t serializedData[sizeof(frameData)];
     ASSERT_EQ(hvcc.size(), sizeof(frameData));
     ASSERT_TRUE(hvcc.write(serializedData, sizeof(frameData)));
-    ASSERT_EQ(memcmp(serializedData, frameData, sizeof(frameData)), 0);
+    ASSERT_EQ_BINARY(serializedData, frameData, sizeof(frameData));
 }
