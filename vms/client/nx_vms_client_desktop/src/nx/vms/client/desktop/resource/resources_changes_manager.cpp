@@ -28,7 +28,6 @@
 #include <nx/vms/client/desktop/resource/rest_api_helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -69,7 +68,8 @@ ResourcesChangesManager::~ResourcesChangesManager()
 {
 }
 
-void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
+void ResourcesChangesManager::deleteResource(
+    const QnResourcePtr& resource,
     const DeleteResourceCallbackFunction& callback,
     const nx::vms::common::SessionTokenHelperPtr& helper)
 {
@@ -81,26 +81,28 @@ void ResourcesChangesManager::deleteResource(const QnResourcePtr& resource,
     if (!api)
         return;
 
-    if (const auto [_, inserted] = mDeletingResources.try_emplace(systemContext); inserted)
+    const auto [it, inserted] = m_deletingResources.try_emplace(systemContext);
+    if (inserted)
     {
-        connect(systemContext->session().get(),
-            &RemoteSession::stateChanged,
-            [this, systemContext](RemoteSession::State state)
+        connect(systemContext, &SystemContext::remoteIdChanged, this,
+            [this, systemContext](nx::Uuid serverId)
             {
-                if (state != RemoteSession::State::connected)
-                    mDeletingResources.erase(systemContext);
+                if (serverId.isNull())
+                {
+                    m_deletingResources.erase(systemContext);
+                    systemContext->disconnect(this);
+                }
             });
     }
 
-    if (!mDeletingResources[systemContext].insert(resource->getId()).second)
+    if (!it->second.insert(resource->getId()).second)
         return;
 
     auto handler =
-        [this, callback, resource](bool success,
-            rest::Handle /*requestId*/,
-            rest::ServerConnection::ErrorOrEmpty result)
+        [this, callback, resource](
+            bool success, rest::Handle /*requestId*/, rest::ServerConnection::ErrorOrEmpty result)
         {
-            mDeletingResources[SystemContext::fromResource(resource)].erase(resource->getId());
+            m_deletingResources[SystemContext::fromResource(resource)].erase(resource->getId());
             if (success)
             {
                 NX_DEBUG(this, "About to remove resource %1", resource);

@@ -17,7 +17,6 @@
 namespace nx::vms::client::core {
 
 class CertificateStorage;
-class RemoteSession;
 
 /**
  * Ensures certificate can be used to establish connection. User interaction requested if needed,

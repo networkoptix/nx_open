@@ -940,7 +940,7 @@ void Workbench::applyLoadedState()
     if (ini().enableMultiSystemTabBar)
     {
         if (const auto sessionData = mainWindow()->titleBarStateStore()->state().findSession(
-            system()->session()->sessionId()))
+            connectActionsHandler()->sessionId()))
         {
             if (!sessionData->workbenchState.isEmpty())
             {

@@ -181,6 +181,7 @@ public:
     core::LogonData logonData() const;
     QString currentUser() const;
     nx::Uuid localSystemId() const;
+    core::RemoteSession* session() const;
 
     void connectToServer(bool ignoreCachedData = false);
     void connectToKnownServer(nx::vms::client::core::RemoteConnectionPtr connection);
@@ -235,6 +236,7 @@ private:
     nx::Uuid m_localSystemId;
     session::ConnectionCallback m_initialConnectionCallback;
 
+    std::unique_ptr<core::RemoteSession> m_session;
     std::shared_ptr<core::ReconnectHelper> m_reconnectHelper;
 
     ConnectionState m_state = ConnectionState::disconnected;
@@ -283,10 +285,6 @@ Session::Private::Private(
             emit this->q->userNameChanged(this->q->userWatcher()->userName());
         });
 
-    connect(q->systemContext()->sessionTimeoutWatcher(),
-        &core::RemoteSessionTimeoutWatcher::sessionExpired,
-        q, &Session::expired);
-
     m_suspendedTimer.setInterval(2min);
     m_suspendedTimer.setSingleShot(true);
     connect(&m_suspendedTimer, &QTimer::timeout, this,  [this]() { setSuspended(true); });
@@ -305,6 +303,11 @@ QString Session::Private::currentUser() const
 nx::Uuid Session::Private::localSystemId() const
 {
     return m_localSystemId;
+}
+
+core::RemoteSession* Session::Private::session() const
+{
+    return m_session.get();
 }
 
 void Session::Private::connectToServer(bool ignoreCachedData)
@@ -382,10 +385,11 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
 
     const bool restoringConnection = wasConnected();
 
-    const auto session = std::make_shared<core::RemoteSession>(connection, q->systemContext());
+    NX_ASSERT(!m_session, "Should disconnect before creating a new session");
+    m_session = std::make_unique<core::RemoteSession>(connection, q->systemContext());
     // TODO: #ynikitenkov Here probably should be session signal handlers like reconnect processing.
 
-    connect(session.get(), &core::RemoteSession::reconnectFailed,
+    connect(m_session.get(), &core::RemoteSession::reconnectFailed,
         this, [this, cached=connection->isCached(), id=moduleInformation.cloudSystemId](
             RemoteConnectionErrorCode errorCode)
         {
@@ -404,7 +408,8 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
             executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
         });
 
-    q->systemContext()->setSession(session);
+    connect(m_session->sessionTimeoutWatcher(), &core::RemoteSessionTimeoutWatcher::sessionExpired,
+        q, &Session::expired);
 
     const auto userName = QString::fromStdString(connection->credentials().username);
 
@@ -436,7 +441,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
 void Session::Private::resetCurrentConnection()
 {
     core::RemoteConnectionFactory::destroyAsync(std::move(m_connectionProcess));
-    q->systemContext()->setSession({});
+    m_session.reset();
 
     updateConnectionState();
 }
@@ -871,7 +876,7 @@ Session::~Session()
 {
     NX_DEBUG(this, "~Session(): start: destroying session");
 
-    if (const auto remoteSession = systemContext()->session())
+    if (const auto remoteSession = d->session())
     {
         const auto& localSystemId = d->localSystemId();
         const auto& userName = d->logonData().credentials.username;

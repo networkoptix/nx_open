@@ -10,9 +10,10 @@
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/ui/dialogs/session_refresh_dialog.h>
+#include <nx/vms/client/desktop/window_context.h>
 
 namespace nx::vms::client::desktop {
 namespace {
@@ -91,8 +92,9 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
         return {};
 
     nx::network::http::AuthToken token;
-    const auto context = appContext()->currentSystemContext();
-    auto connection = context->connection();
+    // TODO: #amalov Make FreshSessionTokenHelper windows context aware.
+    const auto windowContext = appContext()->mainWindowContext();
+    const auto connection = windowContext->system()->connection();
     if (!connection)
         return {};
 
@@ -119,10 +121,10 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
         }
 
         cloudAuthData->credentials.username = qnCloudStatusWatcher->credentials().username;
-        qnCloudStatusWatcher->setAuthData(*cloudAuthData,
-            core::CloudStatusWatcher::AuthMode::update);
-        if (auto session = context->session(); session && session->connection())
-            session->updateCloudSessionToken();
+        qnCloudStatusWatcher->setAuthData(
+            *cloudAuthData, core::CloudStatusWatcher::AuthMode::update);
+
+        windowContext->connectActionsHandler()->updateCloudSessionToken();
 
         token = cloudAuthData->credentials.authToken;
     }

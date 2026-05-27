@@ -12,8 +12,6 @@
 #include <nx/vms/client/core/io_ports/io_ports_compatibility_interface.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/client/core/network/remote_session.h>
-#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/core/network/server_certificate_watcher.h>
 #include <nx/vms/client/core/network/server_primary_interface_watcher.h>
 #include <nx/vms/client/core/ptz/client_ptz_controller_pool.h>
@@ -59,17 +57,13 @@ struct SystemContext::Private
     std::unique_ptr<analytics::TaxonomyManager> taxonomyManager;
     std::unique_ptr<VideoCache> videoCache;
     std::unique_ptr<AnalyticsEventsSearchTreeBuilder> analyticsEventsSearchTreeBuilder;
-    std::unique_ptr<RemoteSessionTimeoutWatcher> sessionTimeoutWatcher;
     std::unique_ptr<TrafficRelayUrlWatcher> trafficRelayUrlWatcher;
     std::unique_ptr<FeatureAccessWatcher> featureAccessWatcher;
     std::unique_ptr<DeploymentManager> deploymentManager;
 
     mutable nx::Mutex sessionMutex;
 
-    /** Session this context belongs to. Exclusive with connection. */
-    std::shared_ptr<RemoteSession> session;
-
-    /** Connection this context belongs to. Exclusive with session. */
+    /** Connection this context belongs to. */
     RemoteConnectionPtr connection;
 
     // Should be destroyed before session/connection.

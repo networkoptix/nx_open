@@ -3,9 +3,6 @@
 #include "remote_connection_user_interaction_delegate.h"
 
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace nx::vms::client::core {
@@ -38,9 +35,6 @@ struct RemoteConnectionUserInteractionDelegate::Private
         TokenValidator validateToken,
         AskUserToAcceptCertificates askToAcceptCertificates,
         ShowCertificateError showCertificateError);
-
-    void tryShowCertificateError(
-        const TargetCertificateInfo& certificateInfo);
 };
 
 RemoteConnectionUserInteractionDelegate::Private::Private(
@@ -54,20 +48,6 @@ RemoteConnectionUserInteractionDelegate::Private::Private(
 {
 }
 
-void RemoteConnectionUserInteractionDelegate::Private::tryShowCertificateError(
-    const TargetCertificateInfo& certificateInfo)
-{
-    // Using main system context is a temporary solution while we don't have real multi-window
-    // and multi-system-context implemented.
-    if (const auto systemContext = appContext()->currentSystemContext())
-    {
-        const auto session = systemContext->session();
-        if (session && session->state() == RemoteSession::State::reconnecting)
-            return;
-    }
-
-    showCertificateError(certificateInfo);
-}
 
 //-------------------------------------------------------------------------------------------------
 // RemoteConnectionUserInteractionDelegate
@@ -104,7 +84,7 @@ bool RemoteConnectionUserInteractionDelegate::acceptNewCertificate(
                 CertificateWarning::Reason::unknownServer);
 
         case CertificateValidationLevel::strict:
-            d->tryShowCertificateError(certificateInfo);
+            d->showCertificateError(certificateInfo);
             return false;
 
         default:
@@ -127,7 +107,7 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificateAfterMismatch(
                 CertificateWarning::Reason::invalidCertificate);
 
         case CertificateValidationLevel::strict:
-            d->tryShowCertificateError(certificateInfo);
+            d->showCertificateError(certificateInfo);
             return false;
 
         default:

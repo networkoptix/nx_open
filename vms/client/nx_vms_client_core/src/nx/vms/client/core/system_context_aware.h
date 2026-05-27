@@ -24,11 +24,9 @@ namespace nx::network::http { class Credentials; }
 namespace nx::vms::client::core {
 
 class AccessController;
-class RemoteSession;
 class ServerTimeWatcher;
 class SystemContext;
 class UserWatcher;
-class RemoteSessionTimeoutWatcher;
 
 class NX_VMS_CLIENT_CORE_API SystemContextAware: public nx::vms::common::SystemContextAware
 {
@@ -63,8 +61,6 @@ public:
     QnCameraBookmarksManager* cameraBookmarksManager() const;
 
     nx::network::http::Credentials credentials() const;
-
-    std::shared_ptr<RemoteSession> session() const;
 };
 
 } // namespace nx::vms::client::desktop

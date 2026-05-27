@@ -80,6 +80,11 @@ menu::Action* WindowContextAware::action(const menu::IDType id) const
     return menu()->action(id);
 }
 
+ConnectActionsHandler* WindowContextAware::connectActionsHandler() const
+{
+    return windowContext()->connectActionsHandler();
+}
+
 MainWindow* WindowContextAware::mainWindow() const
 {
     return windowContext()->workbenchContext()->mainWindow();

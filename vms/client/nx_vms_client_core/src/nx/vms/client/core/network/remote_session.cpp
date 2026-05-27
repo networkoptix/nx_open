@@ -32,7 +32,10 @@
 #include "network_module.h"
 #include "remote_connection.h"
 #include "remote_connection_factory.h"
+#include "remote_session_timeout_watcher.h"
 #include "session_token_terminator.h"
+
+namespace nx::vms::client::core {
 
 using namespace std::chrono;
 
@@ -43,8 +46,6 @@ static constexpr auto kTokenExpirationUpdateInterval = 1min;
 
 } // namespace
 
-namespace nx::vms::client::core {
-
 struct RemoteSession::Private
 {
     RemoteSession* const q;
@@ -54,6 +55,7 @@ struct RemoteSession::Private
     State state = State::waitingPeer;
     bool stickyReconnect = false;
     std::unique_ptr<ReconnectHelper> reconnectHelper;
+    std::unique_ptr<RemoteSessionTimeoutWatcher> sessionTimeoutWatcher;
     std::chrono::microseconds sessionStartTime = qnSyncTime->currentTimePoint();
 
     /** Actual error code for the server we were connected to. */
@@ -62,13 +64,21 @@ struct RemoteSession::Private
     std::unique_ptr<CloudSessionTokenUpdater> cloudTokenUpdater;
     RemoteConnectionFactory::ProcessPtr currentConnectionProcess;
 
-    mutable nx::Mutex mutex;
     bool autoTerminate = false;
 
+    void setConnection(const RemoteConnectionPtr& connection);
     void terminateServerSessionIfNeeded();
     void updateTokenExpirationTime();
     std::chrono::microseconds age() const;
 };
+
+void RemoteSession::Private::setConnection(const RemoteConnectionPtr& connection)
+{
+    NX_ASSERT(QThread::currentThread() == qApp->thread());
+
+    this->connection = connection;
+    q->systemContext()->setConnection(connection);
+}
 
 void RemoteSession::Private::terminateServerSessionIfNeeded()
 {
@@ -106,6 +116,8 @@ std::chrono::microseconds RemoteSession::Private::age() const
     return qnSyncTime->currentTimePoint() - sessionStartTime;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 RemoteSession::RemoteSession(
     RemoteConnectionPtr connection,
     SystemContext* systemContext,
@@ -133,6 +145,11 @@ RemoteSession::RemoteSession(
     tokenExpirationTimer->start();
     d->updateTokenExpirationTime();
 
+    d->sessionTimeoutWatcher =
+        std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
+
+    d->sessionTimeoutWatcher->sessionStarted(this);
+
     connect(qnCloudStatusWatcher,
         &nx::vms::client::core::CloudStatusWatcher::refreshTokenChanged,
         this,
@@ -143,32 +160,30 @@ RemoteSession::~RemoteSession()
 {
     NX_VERBOSE(this, "Destroy current session");
 
-    close();
-
-    d->terminateServerSessionIfNeeded();
-    if (d->messageProcessor)
-        d->messageProcessor->init({});
-    d->cloudTokenUpdater.reset();
-    qnSyncTime->setTimeSyncManager({});
-
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    d->connection.reset();
-}
-
-void RemoteSession::close()
-{
-    NX_VERBOSE(this, "Close current session");
+    d->sessionTimeoutWatcher->sessionStopped();
 
     if (d->messageProcessor)
+    {
         d->messageProcessor->disconnect(this);
+        d->messageProcessor->init({});
+    }
 
-    if (auto connection = this->connection())
+    auto connection = this->connection(); //< Destroy on exit.
+
+    if (connection)
     {
         connection->messageBusConnection()->messageBus()->disconnect(this);
         connection->timeSynchronizationManager()->stop();
     }
 
     stopReconnecting();
+
+    d->terminateServerSessionIfNeeded();
+
+    d->setConnection({});
+
+    d->cloudTokenUpdater.reset();
+    qnSyncTime->setTimeSyncManager({});
 }
 
 void RemoteSession::updatePassword(const QString& newPassword)
@@ -248,10 +263,9 @@ RemoteSession::State RemoteSession::state() const
     return d->state;
 }
 
-RemoteConnectionPtr RemoteSession::connection() const
+RemoteSessionTimeoutWatcher* RemoteSession::sessionTimeoutWatcher() const
 {
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    return d->connection;
+    return d->sessionTimeoutWatcher.get();
 }
 
 void RemoteSession::setAutoTerminate(bool value)
@@ -295,11 +309,10 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     }
 
     {
-        NX_MUTEX_LOCKER lock(&d->mutex);
         if (d->connection)
             d->connection->disconnect(this);
 
-        d->connection = connection;
+        d->setConnection(connection);
     }
 
     connect(d->connection.get(),

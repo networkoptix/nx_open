@@ -134,8 +134,7 @@ WindowContext::WindowContext(QObject* parent):
 WindowContext::~WindowContext()
 {
     sessionManager()->setSuspended(true);
-    if (const auto context = mainSystemContext())
-        context->setSession({});
+
     d->sessionManager->resetSession();
 }
 

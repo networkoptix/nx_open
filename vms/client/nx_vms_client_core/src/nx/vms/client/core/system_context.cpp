@@ -72,8 +72,6 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
             d->videoCache = std::make_unique<VideoCache>(this);
             d->videoCache->setFpsLimit(ini().clientVideoCacheFpsLimit);
             d->videoCache->setCacheSize(std::chrono::milliseconds(ini().clientVideoCacheLengthMs));
-            d->sessionTimeoutWatcher =
-                std::make_unique<RemoteSessionTimeoutWatcher>(globalSettings());
             d->trafficRelayUrlWatcher = std::make_unique<TrafficRelayUrlWatcher>(this);
             d->featureAccessWatcher = std::make_unique<FeatureAccessWatcher>(this);
             d->deploymentManager = std::make_unique<DeploymentManager>(this);
@@ -139,43 +137,18 @@ nx::vms::api::ModuleInformation SystemContext::moduleInformation() const
     return {};
 }
 
-void SystemContext::setSession(std::shared_ptr<RemoteSession> session)
+void SystemContext::setConnection(RemoteConnectionPtr connection)
 {
-    const auto oldConnection = connection();
-
-    if (d->sessionTimeoutWatcher)
-        d->sessionTimeoutWatcher->sessionStopped();
-
     {
         NX_MUTEX_LOCKER lock(&d->sessionMutex);
-        NX_ASSERT(!d->connection);
 
-        // Make sure existing session will be terminated outside of the mutex.
-        std::swap(d->session, session);
+        // Make sure existing connection will be terminated outside of the mutex.
+        std::swap(d->connection, connection);
     }
 
-    if (session)
-        session->close();
-
-    if (d->session && d->sessionTimeoutWatcher)
-        d->sessionTimeoutWatcher->sessionStarted(d->session);
-
     d->initializeIoPortsInterface();
 
-    d->handleConnectionChanged(oldConnection, connection());
-}
-
-void SystemContext::setConnection(RemoteConnectionPtr value)
-{
-    const auto oldConnection = connection();
-    NX_ASSERT(!d->connection);
-    NX_ASSERT(!d->session);
-
-    d->connection = value;
-
-    d->initializeIoPortsInterface();
-
-    d->handleConnectionChanged(oldConnection, connection());
+    d->handleConnectionChanged(connection, this->connection());
 }
 
 nx::Uuid SystemContext::currentServerId() const
@@ -188,17 +161,9 @@ QnMediaServerResourcePtr SystemContext::currentServer() const
     return resourcePool()->getResourceById<QnMediaServerResource>(currentServerId());
 }
 
-std::shared_ptr<RemoteSession> SystemContext::session() const
-{
-    NX_MUTEX_LOCKER lock(&d->sessionMutex);
-    return d->session;
-}
-
 RemoteConnectionPtr SystemContext::connection() const
 {
     NX_MUTEX_LOCKER lock(&d->sessionMutex);
-    if (d->session)
-        return d->session->connection();
 
     return d->connection;
 }
@@ -372,11 +337,6 @@ AnalyticsEventsSearchTreeBuilder* SystemContext::analyticsEventsSearchTreeBuilde
 IoPortsCompatibilityInterface* SystemContext::ioPortsInterface() const
 {
     return d->ioPortsInterface.get();
-}
-
-RemoteSessionTimeoutWatcher* SystemContext::sessionTimeoutWatcher() const
-{
-    return d->sessionTimeoutWatcher.get();
 }
 
 TrafficRelayUrlWatcher* SystemContext::trafficRelayUrlWatcher() const

@@ -3,7 +3,6 @@
 #include "local_session_token_expiration_watcher.h"
 
 #include <nx/utils/log/log.h>
-#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
@@ -12,19 +11,29 @@
 namespace nx::vms::client::desktop {
 
 LocalSessionTokenExpirationWatcher::LocalSessionTokenExpirationWatcher(
-    SystemContext* context,
     QPointer<workbench::LocalNotificationsManager> notificationManager,
     QObject* parent)
     :
     QObject(parent),
-    SystemContextAware(context),
     m_notificationManager(notificationManager)
 {
-    auto sessionTimeoutWatcher = systemContext()->sessionTimeoutWatcher();
+}
+
+void LocalSessionTokenExpirationWatcher::setTimeoutWatcher(
+    core::RemoteSessionTimeoutWatcher* sessionTimeoutWatcher)
+{
+    if (m_sessionTimeoutWatcher)
+        m_sessionTimeoutWatcher->disconnect(this);
+
+    m_sessionTimeoutWatcher = sessionTimeoutWatcher;
+
+    if (!m_sessionTimeoutWatcher)
+        return;
 
     connect(
         sessionTimeoutWatcher,
         &nx::vms::client::core::RemoteSessionTimeoutWatcher::showNotification,
+        this,
         [this](std::chrono::minutes timeLeft)
         {
             if (m_notification)
@@ -36,6 +45,7 @@ LocalSessionTokenExpirationWatcher::LocalSessionTokenExpirationWatcher(
     connect(
         sessionTimeoutWatcher,
         &nx::vms::client::core::RemoteSessionTimeoutWatcher::hideNotification,
+        this,
         [this]()
         {
             NX_ASSERT(m_notification);
@@ -69,15 +79,17 @@ void LocalSessionTokenExpirationWatcher::notify(std::chrono::minutes timeLeft)
     connect(
         m_notificationManager,
         &workbench::LocalNotificationsManager::cancelRequested,
+        this,
         [this](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)
-                systemContext()->sessionTimeoutWatcher()->notificationHiddenByUser();
+                m_sessionTimeoutWatcher->notificationHiddenByUser();
         });
 
     connect(
         m_notificationManager,
         &workbench::LocalNotificationsManager::interactionRequested,
+        this,
         [this, action](nx::Uuid notificationId)
         {
             if (notificationId == m_notification)

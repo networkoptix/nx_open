@@ -105,17 +105,7 @@ public:
     nx::vms::api::ModuleInformation moduleInformation() const;
 
     /**
-     * Update remote session this Context belongs to. Current client architecture supposes one main
-     * System Context to exist through whole Application lifetime, and different Sessions are
-     * loaded into it and unloaded when session is terminated.
-     * // TODO: #sivanov Invert architecture, so Remote Session will own the System Context.
-     */
-    void setSession(std::shared_ptr<RemoteSession> session);
-
-    /**
      * Set connection which this Context should use to communicate with the corresponding System.
-     * Connection is mutually exclusive with ::setSession() and should be used for session-less
-     * Contexts only.
      */
     void setConnection(RemoteConnectionPtr connection);
 
@@ -128,11 +118,6 @@ public:
      * The server which was used to establish the Remote Session (if it is present).
      */
     QnMediaServerResourcePtr currentServer() const;
-
-    /**
-     * Remote session this context belongs to (if any).
-     */
-    std::shared_ptr<RemoteSession> session() const;
 
     /**
      * Connection which this Context should use to communicate with the corresponding System.
@@ -210,8 +195,6 @@ public:
     AnalyticsEventsSearchTreeBuilder* analyticsEventsSearchTreeBuilder() const;
 
     IoPortsCompatibilityInterface* ioPortsInterface() const;
-
-    RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
 
     TrafficRelayUrlWatcher* trafficRelayUrlWatcher() const;
 

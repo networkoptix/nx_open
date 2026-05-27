@@ -200,11 +200,6 @@ DesktopCameraStubController* SystemContext::desktopCameraStubController()
     return d->desktopCameraStubController.get();
 }
 
-std::shared_ptr<RemoteSession> SystemContext::session() const
-{
-    return std::dynamic_pointer_cast<RemoteSession>(base_type::session());
-}
-
 VideoWallOnlineScreensWatcher* SystemContext::videoWallOnlineScreensWatcher() const
 {
     return d->videoWallOnlineScreensWatcher.get();

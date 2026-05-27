@@ -8,7 +8,7 @@ namespace nx::vms::client::core {
 
 class RemoteConnection;
 using RemoteConnectionPtr = std::shared_ptr<RemoteConnection>;
-class RemoteSession;
+
 enum class RemoteConnectionErrorCode;
 
 } // namespace nx::vms::client::core

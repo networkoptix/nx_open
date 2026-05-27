@@ -31,7 +31,6 @@ class LocalImageCache;
 class LogsManagementWatcher;
 class NonEditableUsersAndGroups;
 class OtherServersManager;
-class RemoteSession;
 class RestApiHelper;
 class ServerFileCache;
 class ServerNotificationCache;
@@ -78,13 +77,6 @@ public:
      * and creates DesktopCamera layout and initial DesktopCameraPreloaderResource.
      */
     DesktopCameraStubController* desktopCameraStubController();
-
-    /**
-     * Overload of the corresponding function from core context.
-     *
-     * Remote session this context belongs to (if any).
-     */
-    std::shared_ptr<RemoteSession> session() const;
 
     BookmarkTagsWatcher* bookmarkTagWatcher() const;
     VideoWallOnlineScreensWatcher* videoWallOnlineScreensWatcher() const;

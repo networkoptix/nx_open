@@ -3,10 +3,9 @@
 #include "feature_access_watcher.h"
 
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/network/remote_session.h>
-#include <nx/vms/client/core/system_context.h>
-#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
+#include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
@@ -45,10 +44,7 @@ bool FeatureAccessWatcher::Private::isAcceptableCloudSite(const CloudSiteFilter&
     if (!context)
         return false;
 
-    const auto session = context->session();
-    const auto connection = session
-        ? session->connection()
-        : context->connection();
+    const auto connection = context->connection();
     if (!connection || !connection->connectionInfo().isCloud())
         return false;
 

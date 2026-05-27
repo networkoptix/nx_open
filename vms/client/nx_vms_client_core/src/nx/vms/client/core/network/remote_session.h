@@ -15,6 +15,8 @@
 
 namespace nx::vms::client::core {
 
+class RemoteSessionTimeoutWatcher;
+
 /**
  * Logically established connection to the System. Corresponds to the system UI: client looks like
  * logged in.
@@ -53,8 +55,6 @@ public:
         QObject* parent = nullptr);
     virtual ~RemoteSession() override;
 
-    /** Disconnect signals before destruction. */
-    void close();
 
     void updatePassword(const QString& newPassword);
     void updateBearerToken(std::string token);
@@ -65,12 +65,7 @@ public:
 
     State state() const;
 
-    /**
-     * Interface to the server we are currently connected to.
-     *
-     * Note: connection always exists, function never returns null pointer.
-     */
-    RemoteConnectionPtr connection() const;
+    RemoteSessionTimeoutWatcher* sessionTimeoutWatcher() const;
 
     /** Auto-terminate server session when destroying. */
     void setAutoTerminate(bool value);

@@ -41,11 +41,13 @@
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/data/logon_data.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
 #include <nx/vms/common/system_context.h>
@@ -217,22 +219,16 @@ StartupActionsHandler::StartupActionsHandler(QObject* parent):
     // Connect to the established session.
     if (!qnRuntime->isVideoWallMode())
     {
-        connect(context()->system(), &core::SystemContext::remoteIdChanged, this,
+        connect(windowContext(), &WindowContext::beforeSystemChanged, this,
             [this]()
             {
-                d->sessionConnection.reset();
-
-                auto session = context()->system()->session();
-                if (!session)
-                    return;
-
                 d->sessionConnection.reset(connect(
-                    session.get(),
-                    &core::RemoteSession::stateChanged,
+                    connectActionsHandler(),
+                    &ConnectActionsHandler::stateChanged,
                     this,
-                    [this](core::RemoteSession::State state)
+                    [this](ConnectActionsHandler::LogicalState state)
                     {
-                        if (state == core::RemoteSession::State::connected)
+                        if (state == ConnectActionsHandler::LogicalState::connected)
                         {
                             handleConnected();
                             // Do not re-load saved state more than once per each session.

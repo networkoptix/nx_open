@@ -61,13 +61,10 @@ ServerRemoteAccessWatcher::ServerRemoteAccessWatcher(
         this,
         &ServerRemoteAccessWatcher::updateRemoteAccessForAllServers);
 
-    if (auto session = this->systemContext()->session())
-    {
-        connect(session.get(),
-            &nx::vms::client::desktop::RemoteSession::credentialsChanged,
-            this,
-            &ServerRemoteAccessWatcher::updateRemoteAccessForAllServers);
-    }
+    connect(systemContext,
+        &nx::vms::common::SystemContext::credentialsChanged,
+        this,
+        &ServerRemoteAccessWatcher::updateRemoteAccessForAllServers);
 
     onResourcesAdded(resourcePool->servers());
 }
@@ -166,6 +163,9 @@ void ServerRemoteAccessWatcher::updateRemoteAccess(const ServerResourcePtr& serv
 
 void ServerRemoteAccessWatcher::updateRemoteAccessForAllServers()
 {
+    if (!connection())
+        return;
+
     for (auto& resource: resourcePool()->servers())
     {
         const auto server = resource.objectCast<ServerResource>();

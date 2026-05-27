@@ -41,7 +41,7 @@ constexpr auto kLastNotificationTime = 10min;
 
 struct RemoteSessionTimeoutWatcher::Private
 {
-    std::weak_ptr<RemoteSession> session;
+    QPointer<RemoteSession> session;
     std::optional<std::chrono::seconds> passwordSessionTimeoutLimit;
     std::optional<std::chrono::microseconds> passwordEnteredAt;
 
@@ -59,8 +59,7 @@ struct RemoteSessionTimeoutWatcher::Private
         return std::nullopt;
     }
 
-    std::optional<seconds> temporaryTokenRemainingTime(
-        std::shared_ptr<RemoteSession> session) const
+    std::optional<seconds> temporaryTokenRemainingTime(const RemoteSession* session) const
     {
         const QnUserResourcePtr user = session->systemContext()->userWatcher()->user();
         return user ? user->temporarySessionExpiresIn() : std::nullopt;
@@ -88,12 +87,8 @@ struct RemoteSessionTimeoutWatcher::Private
     {
         if (connection->connectionInfo().isCloud())
         {
-            auto currentSession = session.lock();
-            if (!currentSession)
-                return std::nullopt;
-
             if (useSessionTimeoutLimitForCloud && passwordSessionTimeoutLimit.has_value())
-                return duration_cast<seconds>(*passwordSessionTimeoutLimit - currentSession->age());
+                return duration_cast<seconds>(*passwordSessionTimeoutLimit - session->age());
 
             return std::nullopt;
         }
@@ -108,7 +103,7 @@ struct RemoteSessionTimeoutWatcher::Private
         return isExpired(calculateSessionRemainingTime(connection));
     }
 
-    SessionExpirationReason sessionExpirationReason(std::shared_ptr<RemoteSession> session)
+    SessionExpirationReason sessionExpirationReason(const RemoteSession* session)
     {
         if (session->connection()->connectionInfo().isCloud())
             return SessionExpirationReason::truncatedSessionToken;
@@ -150,7 +145,6 @@ RemoteSessionTimeoutWatcher::RemoteSessionTimeoutWatcher(
 
     d->timer.setInterval(kTimerInterval);
     connect(&d->timer, &QTimer::timeout, this, &RemoteSessionTimeoutWatcher::tick);
-    d->timer.start();
 }
 
 RemoteSessionTimeoutWatcher::~RemoteSessionTimeoutWatcher()
@@ -159,11 +153,7 @@ RemoteSessionTimeoutWatcher::~RemoteSessionTimeoutWatcher()
 
 void RemoteSessionTimeoutWatcher::tick()
 {
-    auto session = d->session.lock();
-    if (!session)
-        return;
-
-    auto connection = session->connection();
+    auto connection = d->session->connection();
     if (!NX_ASSERT(connection))
         return;
 
@@ -193,7 +183,7 @@ void RemoteSessionTimeoutWatcher::tick()
             emit hideNotification();
         }
 
-        emit sessionExpired(d->sessionExpirationReason(session));
+        emit sessionExpired(d->sessionExpirationReason(d->session));
         return;
     }
 
@@ -210,7 +200,7 @@ void RemoteSessionTimeoutWatcher::tick()
         ((isTimeToNotify && !notificationWasCancelled)
             || (isTimeToLastNotify && (*d->timeLeftWhenCancelled > kLastNotificationTime)));
 
-    if (const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(session);
+    if (const auto temporaryTokenRemainingTime = d->temporaryTokenRemainingTime(d->session);
         temporaryTokenRemainingTime && timeLeft)
     {
         const auto deltaTime = *temporaryTokenRemainingTime - timeLeft.value();
@@ -234,16 +224,17 @@ void RemoteSessionTimeoutWatcher::tick()
         d->timeLeftWhenCancelled.reset();
 }
 
-void RemoteSessionTimeoutWatcher::sessionStarted(std::shared_ptr<RemoteSession> session)
+void RemoteSessionTimeoutWatcher::sessionStarted(RemoteSession* session)
 {
     NX_VERBOSE(this, "Session started");
     d->session = session;
     d->passwordEnteredAt = qnSyncTime->currentTimePoint();
+    d->timer.start();
 
     // Update password expiration time if user enters password manually.
     if (NX_ASSERT(session))
     {
-        connect(session.get(),
+        connect(session,
             &RemoteSession::credentialsChanged,
             this,
             [this]()
@@ -252,13 +243,8 @@ void RemoteSessionTimeoutWatcher::sessionStarted(std::shared_ptr<RemoteSession> 
                 tick();
             });
 
-        connect(session.get(),
+        connect(session,
             &RemoteSession::tokenExpirationTimeChanged,
-            this,
-            &RemoteSessionTimeoutWatcher::tick);
-
-        connect(session->systemContext()->userWatcher(),
-            &nx::vms::client::core::UserWatcher::userChanged,
             this,
             &RemoteSessionTimeoutWatcher::tick);
 
@@ -271,7 +257,9 @@ void RemoteSessionTimeoutWatcher::sessionStopped()
     NX_VERBOSE(this, "Session stopped");
     d->passwordEnteredAt.reset();
     d->timeLeftWhenCancelled.reset();
-    d->session.reset();
+    d->timer.stop();
+    d->session.clear();
+
     if (d->notificationVisible)
     {
         d->notificationVisible = false;
@@ -281,11 +269,7 @@ void RemoteSessionTimeoutWatcher::sessionStopped()
 
 void RemoteSessionTimeoutWatcher::notificationHiddenByUser()
 {
-    auto session = d->session.lock();
-    if (!session)
-        return;
-
-    auto connection = session->connection();
+    auto connection = d->session->connection();
     if (!NX_ASSERT(connection))
         return;
 

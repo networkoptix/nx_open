@@ -39,6 +39,7 @@
 #include <utils/connection_diagnostics_helper.h>
 
 #include "../data/logon_data.h"
+#include "../logic/connect_actions_handler.h"
 #include "connection_testing_dialog.h"
 
 using namespace nx::vms::client::core;
@@ -253,8 +254,8 @@ void LoginDialog::sendTestConnectionRequest()
             }
             else
             {
-                if (auto session = system()->session())
-                    session->autoTerminateIfNeeded();
+                connectActionsHandler()->autoTerminateSessionIfNeeded();
+
                 auto connection = std::get<RemoteConnectionPtr>(result);
                 menu()->trigger(menu::ConnectAction,
                     menu::Parameters().withArgument(Qn::RemoteConnectionRole, connection));
@@ -387,8 +388,7 @@ void LoginDialog::at_testButton_clicked()
     updateFocus();
     if (requestedConnection)
     {
-        if (auto session = system()->session())
-            session->autoTerminateIfNeeded();
+        connectActionsHandler()->autoTerminateSessionIfNeeded();
         menu()->trigger(menu::ConnectAction,
             menu::Parameters().withArgument(Qn::RemoteConnectionRole, requestedConnection));
         base_type::accept();

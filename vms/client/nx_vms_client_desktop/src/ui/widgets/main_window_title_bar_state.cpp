@@ -299,11 +299,8 @@ State MainWindowTitleBarStateReducer::updateFromWorkbench(
     std::optional<SessionId> sessionId;
     if (connectionState != ConnectActionsHandler::LogicalState::disconnected)
     {
-        const std::shared_ptr<RemoteSession> session =
-            workbenchContext->system()->session();
-
-        if (session)
-            sessionId = session->sessionId();
+        if (auto id = workbenchContext->connectActionsHandler()->sessionId())
+            sessionId = std::move(id);
     }
 
     return setActiveSessionId(std::move(state), sessionId);
@@ -465,15 +462,14 @@ void MainWindowTitleBarStateStore::removeCloudSessions()
 
 void MainWindowTitleBarStateStore::saveWorkbenchState(QnWorkbenchContext* workbenchContext)
 {
-    const std::shared_ptr<RemoteSession> session =
-        workbenchContext->windowContext()->system()->session();
+    const auto sessionId = workbenchContext->connectActionsHandler()->sessionId();
 
-    if (!session)
+    if (!sessionId)
         return;
 
     WorkbenchState workbenchState;
     workbenchContext->workbench()->submit(workbenchState);
-    dispatch(&Reducer::saveWorkbenchState, session->sessionId(), workbenchState);
+    dispatch(&Reducer::saveWorkbenchState, sessionId, workbenchState);
 }
 
 } // nx::vms::client::desktop

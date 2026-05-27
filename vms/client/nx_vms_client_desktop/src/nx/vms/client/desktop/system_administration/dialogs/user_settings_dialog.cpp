@@ -54,8 +54,8 @@
 #include <nx/vms/client/desktop/system_administration/globals/user_group_request_chain.h>
 #include <nx/vms/client/desktop/system_administration/watchers/non_editable_users_and_groups.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <nx/vms/client/desktop/system_logon/logic/fresh_session_token_helper.h>
-#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/utils/ldap_status_watcher.h>
 #include <nx/vms/client/desktop/utils/rest_error_strings.h>
@@ -505,8 +505,7 @@ struct UserSettingsDialog::Private
 
         if (actualPassword)
         {
-            if (auto currentSession = q->systemContext()->session())
-                currentSession->updatePassword(*actualPassword);
+            q->connectActionsHandler()->updateSessionPassword(*actualPassword);
         }
 
         if (data)

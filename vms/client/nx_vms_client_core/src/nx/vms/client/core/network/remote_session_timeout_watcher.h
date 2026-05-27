@@ -34,12 +34,13 @@ public:
     };
 
 public:
-    RemoteSessionTimeoutWatcher(nx::vms::common::SystemSettings* globalSettings, QObject* parent = nullptr);
+    RemoteSessionTimeoutWatcher(
+        nx::vms::common::SystemSettings* globalSettings, QObject* parent = nullptr);
     virtual ~RemoteSessionTimeoutWatcher() override;
 
     void tick();
 
-    void sessionStarted(std::shared_ptr<RemoteSession> session);
+    void sessionStarted(RemoteSession* session);
     void sessionStopped();
 
     /**

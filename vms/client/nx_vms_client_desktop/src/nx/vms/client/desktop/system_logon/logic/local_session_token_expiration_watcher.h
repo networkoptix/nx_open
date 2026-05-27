@@ -8,23 +8,23 @@
 #include <QtCore/QPointer>
 
 #include <nx/utils/uuid.h>
-#include <nx/vms/client/desktop/system_context_aware.h>
-
-namespace nx::vms::client::desktop::workbench { class LocalNotificationsManager; }
+#include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
 
 namespace nx::vms::client::desktop {
 
-class SystemContext;
 
-class LocalSessionTokenExpirationWatcher: public QObject, public SystemContextAware
+namespace workbench { class LocalNotificationsManager; }
+
+class LocalSessionTokenExpirationWatcher: public QObject
 {
     Q_OBJECT
 
 public:
     LocalSessionTokenExpirationWatcher(
-        SystemContext* context,
         QPointer<workbench::LocalNotificationsManager> notificationManager,
-        QObject* parent);
+        QObject* parent = nullptr);
+
+    void setTimeoutWatcher(core::RemoteSessionTimeoutWatcher* sessionTimeoutWatcher);
 
 signals:
     void authenticationRequested();
@@ -34,6 +34,7 @@ private:
     void setNotificationTimeLeft(std::chrono::minutes timeLeft);
 
 private:
+    QPointer<core::RemoteSessionTimeoutWatcher> m_sessionTimeoutWatcher;
     QPointer<workbench::LocalNotificationsManager> m_notificationManager;
     std::optional<nx::Uuid> m_notification;
 };

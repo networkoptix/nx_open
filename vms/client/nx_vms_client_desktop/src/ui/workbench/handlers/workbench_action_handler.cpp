@@ -111,7 +111,6 @@
 #include <nx/vms/client/desktop/system_administration/widgets/advanced_system_settings_widget.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/context_current_user_watcher.h>
-#include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/system_update/advanced_update_settings_dialog.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
@@ -383,16 +382,14 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(menu::CloseAllWindowsAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = system()->session())
-                session->autoTerminateIfNeeded();
+            connectActionsHandler()->autoTerminateSessionIfNeeded();
             closeAllWindows();
         });
 
     connect(action(menu::ExitAction), &QAction::triggered, this,
         [this]()
         {
-            if (auto session = system()->session())
-                session->autoTerminateIfNeeded();
+            connectActionsHandler()->autoTerminateSessionIfNeeded();
             closeApplication();
         });
 
@@ -2889,8 +2886,7 @@ void ActionHandler::at_clientCommandRequested(
         }
         case SharedMemoryData::Command::exit:
         {
-            if (auto session = system()->session())
-                session->autoTerminateIfNeeded();
+            connectActionsHandler()->autoTerminateSessionIfNeeded();
             doCloseApplication(AppClosingMode::External);
             break;
         }

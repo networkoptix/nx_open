@@ -17,19 +17,18 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
     if (license->type() != Qn::LC_VideoWall)
         return false;
 
-    const auto currentSession = systemContext()->as<core::SystemContext>()->session();
-    if (!currentSession)
+    const auto currentServerId = systemContext()->as<core::SystemContext>()->currentServerId();
+    if (currentServerId.isNull())
         return false;
 
-    const auto& manager = currentSession->runtimeInfoManager();
-    auto commonInfo =
-        manager->items()->getItem(currentSession->connection()->moduleInformation().id);
+    const auto manager = systemContext()->runtimeInfoManager();
+    auto commonInfo = manager->items()->getItem(currentServerId);
 
     if (commonInfo.data.prematureVideoWallLicenseExpirationDate == 0)
     {
         // Runtime info is not found, but information about expiration date is also missing.
         // Assume that other servers are still waiting for the server with license to come up.
-        info = commonInfo;
+        info = std::move(commonInfo);
         return true;
     }
 
@@ -40,7 +39,7 @@ bool VideoWallLicenseValidator::overrideMissingRuntimeInfo(
         < commonInfo.data.prematureVideoWallLicenseExpirationDate;
 
     if (stillValid)
-        info = commonInfo;
+        info = std::move(commonInfo);
 
     return stillValid;
 }

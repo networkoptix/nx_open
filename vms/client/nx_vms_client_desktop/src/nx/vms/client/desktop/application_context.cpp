@@ -864,9 +864,6 @@ ApplicationContext::~ApplicationContext()
         if (auto networkModule = this->networkModule()) //< May absent in tests.
             networkModule->connectionFactory()->setUserInteractionDelegate({});
 
-        // Terminate running session if it sill exists. Session depends on common module, so we
-        // must clean all shared pointers before destroying ClientCoreModule.
-        d->mainSystemContext->setSession({});
         if (d->mainSystemContext->messageProcessor())
             d->mainSystemContext->deleteMessageProcessor();
 

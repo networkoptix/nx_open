@@ -12,6 +12,7 @@
 #include <nx/cloud/db/api/oauth_manager.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/jose/jws.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
@@ -147,22 +148,20 @@ public:
         const auto updateTokenInfoForDebugInfo =
             [this]()
             {
-                const auto session = q->session();
-                const auto token = session->connection()->credentials().authToken;
+                const auto token = q->systemContext()->credentials().authToken;
                 processToken(token, "Token: ", kTokenDebugInfoKey);
             };
 
-        // When a new session appears, this old connection will be destroyed.
-        connect(q->session().get(),
-            &RemoteSession::credentialsChanged,
-            q,
-            updateTokenInfoForDebugInfo);
+        systemConnection.reset(connect(
+            q->systemContext(), &SystemContext::credentialsChanged,
+            q, updateTokenInfoForDebugInfo));
 
         updateTokenInfoForDebugInfo();
     }
 
 public:
     QnUserResourcePtr currentUser;
+    nx::utils::ScopedConnection systemConnection;
 };
 
 UserAuthDebugInfoWatcher::UserAuthDebugInfoWatcher(QObject* parent):

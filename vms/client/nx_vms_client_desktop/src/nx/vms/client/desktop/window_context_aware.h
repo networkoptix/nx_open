@@ -22,6 +22,7 @@ class Manager;
 
 } // namespace menu
 
+class ConnectActionsHandler;
 class MainWindow;
 class SystemContext;
 class WindowContext;
@@ -52,6 +53,8 @@ public:
     menu::Manager* menu() const;
 
     menu::Action* action(const menu::IDType id) const;
+
+    ConnectActionsHandler* connectActionsHandler() const;
 
     MainWindow* mainWindow() const;
 

@@ -21,6 +21,8 @@ namespace nx::vms::client::core { struct ConnectionInfo; }
 
 namespace nx::vms::client::desktop {
 
+struct SessionId;
+
 class ConnectActionsHandler: public QObject, public WindowContextAware
 {
     Q_OBJECT
@@ -62,8 +64,13 @@ public:
     bool askDisconnectConfirmation() const;
 
     LogicalState logicalState() const;
+    SessionId sessionId() const;
 
     void reconnectToCloudIfNeeded();
+    void autoTerminateSessionIfNeeded();
+
+    bool updateSessionPassword(const QString& password);
+    bool updateCloudSessionToken();
 
 signals:
     void stateChanged(LogicalState logicalValue, QPrivateSignal);

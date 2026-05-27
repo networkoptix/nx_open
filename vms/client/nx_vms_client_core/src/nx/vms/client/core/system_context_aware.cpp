@@ -64,9 +64,4 @@ nx::network::http::Credentials SystemContextAware::credentials() const
     return systemContext()->credentials();
 }
 
-std::shared_ptr<RemoteSession> SystemContextAware::session() const
-{
-    return systemContext()->session();
-}
-
 } // namespace nx::vms::client::desktop

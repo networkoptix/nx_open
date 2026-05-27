@@ -143,6 +143,8 @@ struct ConnectActionsHandler::Private
     bool warnMessagesDisplayed = false;
     std::unique_ptr<nx::utils::TimerManager> timerManager;
     std::unique_ptr<ec2::CrashReporter> crashReporter;
+    std::unique_ptr<RemoteSession> session;
+    std::unique_ptr<LocalSessionTokenExpirationWatcher> sessionTokenExpirationWatcher;
     bool needReconnectToLastCloudSystem = false;
     // The identifier of the cloud system we last attempted to connect to. An attempt to connect
     // does not imply a successful connection, so we update the variable at the moment we send the
@@ -234,7 +236,7 @@ struct ConnectActionsHandler::Private
             *newCloudAuthData,
             core::CloudStatusWatcher::AuthMode::update);
 
-        if (auto session = q->system()->session(); session && session->connection())
+        if (session && session->connection())
         {
             session->updateCloudSessionToken();
         }
@@ -259,90 +261,14 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
         QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation).first()
             + "/settings/crashReporter");
 
-    // Videowall must not disconnect automatically as we may have not option to restart it.
-    // ACS clients display only fixed part of the archive, so they look quite safe.
-    if (qnRuntime->isDesktopMode())
-    {
-        auto sessionTimeoutWatcher = system()->sessionTimeoutWatcher();
-        connect(sessionTimeoutWatcher, &RemoteSessionTimeoutWatcher::sessionExpired, this,
-            [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
-            {
-                const auto connection = system()->connection();
-                if (!NX_ASSERT(connection))
-                    return;
-
-                if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::UpdatingCredentials)
-                    return;
-
-                if (reason == RemoteSessionTimeoutWatcher::SessionExpirationReason::sessionExpired
-                    && connection->connectionInfo().credentials.authToken.isPassword()
-                    && connection->connectionInfo().userType == vms::api::UserType::local)
-                {
-                    // Digest credentials should be cleared right after session is expired because
-                    // server does not watch it.
-                    CredentialsManager::forgetStoredPassword(
-                        ::helpers::getLocalSystemId(system()->moduleInformation()),
-                        connection->credentials().username);
-                }
-
-                const bool isTemporaryUser = connection->connectionInfo().isTemporary();
-                executeDelayedParented(
-                    [this, isTemporaryUser, reason]()
-                    {
-                        // When temporary token is used for authorization, common session token is
-                        // created and used instead. This session token can wear off earlier than
-                        // the temporary token, but for security reasons we should ask user to
-                        // re-enter temporary token manually.
-                        using SessionExpirationReason
-                            = RemoteSessionTimeoutWatcher::SessionExpirationReason;
-
-                        if (isTemporaryUser && reason == SessionExpirationReason::sessionExpired)
-                        {
-                            QnConnectionDiagnosticsHelper::showTemporaryUserReAuthMessage(
-                                mainWindowWidget());
-                        }
-                        else
-                        {
-                            auto errorCode = RemoteConnectionErrorCode::sessionExpired;
-
-                            if (reason == SessionExpirationReason::temporaryTokenExpired)
-                                errorCode = RemoteConnectionErrorCode::temporaryTokenExpired;
-                            else if (reason == SessionExpirationReason::truncatedSessionToken)
-                                errorCode = RemoteConnectionErrorCode::truncatedSessionToken;
-
-                            d->handleWSError(errorCode);
-
-                            if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
-                            {
-                                d->reconnectToCloudIfNeeded();
-                                return;
-                            }
-
-                            QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
-                                this->windowContext(),
-                                errorCode,
-                                /*moduleInformation*/ {},
-                                appContext()->version()
-                            );
-                        }
-                    },
-                    this);
-
-                disconnectFromServer(DisconnectFlag::Force);
-            });
-    }
-
     connect(this, &ConnectActionsHandler::stateChanged, this,
         &ConnectActionsHandler::updatePreloaderVisibility);
 
-    auto sessionTokenExpirationWatcher =
-        new LocalSessionTokenExpirationWatcher(
-            system(),
-            windowContext->localNotificationsManager(),
-            this);
+    d->sessionTokenExpirationWatcher = std::make_unique<LocalSessionTokenExpirationWatcher>(
+        windowContext->localNotificationsManager());
 
     connect(
-        sessionTokenExpirationWatcher,
+        d->sessionTokenExpirationWatcher.get(),
         &LocalSessionTokenExpirationWatcher::authenticationRequested,
         this,
         [this]()
@@ -461,8 +387,7 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
     connect(action(menu::DisconnectMainMenuAction), &QAction::triggered, this,
         [this]()
         {
-            const std::shared_ptr<RemoteSession> session = mainWindow()->system()->session();
-            if (!NX_ASSERT(session,
+            if (!NX_ASSERT(d->session,
                 "Disconnect action should be not available when Client is not connected."))
             {
                 return;
@@ -471,11 +396,11 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
             if (qnRuntime->isDesktopMode() && ini().enableMultiSystemTabBar)
             {
                 if (askDisconnectConfirmation())
-                    mainWindow()->titleBarStateStore()->removeSession(session->sessionId());
+                    mainWindow()->titleBarStateStore()->removeSession(sessionId());
                 return;
             }
 
-            session->autoTerminateIfNeeded();
+            autoTerminateSessionIfNeeded();
             at_disconnectAction_triggered();
         });
 
@@ -597,6 +522,14 @@ bool ConnectActionsHandler::askDisconnectConfirmation() const
 ConnectActionsHandler::LogicalState ConnectActionsHandler::logicalState() const
 {
     return d->logicalState;
+}
+
+SessionId ConnectActionsHandler::sessionId() const
+{
+    if (d->session)
+        return d->session->sessionId();
+
+    return {};
 }
 
 void ConnectActionsHandler::setupConnectTimeoutTimer(milliseconds timeout)
@@ -760,13 +693,15 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
     if (!NX_ASSERT(connection))
         return;
 
+    NX_ASSERT(!d->session, "Should disconnect before creating a new session");
+
     NX_INFO(this, "Establish connection to %1 as %2", connection->address(),
         connection->credentials().username);
 
     emit windowContext()->beforeSystemChanged();
 
     setState(LogicalState::connecting);
-    const auto session = std::make_shared<desktop::RemoteSession>(connection, system());
+    auto session = std::make_unique<desktop::RemoteSession>(connection, system());
 
     session->setStickyReconnect(appContext()->localSettings()->stickReconnectToServer());
     LogonData logonData = connection->createLogonData();
@@ -833,6 +768,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                     this);
             }
         });
+
     connect(session.get(), &RemoteSession::reconnectingToServer, this,
         [this](const QnMediaServerResourcePtr& server)
         {
@@ -888,6 +824,80 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         &ConnectActionsHandler::at_reconnectAction_triggered,
         Qt::QueuedConnection);
 
+    connect(session->sessionTimeoutWatcher(), &RemoteSessionTimeoutWatcher::sessionExpired, this,
+        [this](RemoteSessionTimeoutWatcher::SessionExpirationReason reason)
+        {
+            // Videowall must not disconnect automatically as we may have not option to restart it.
+            // ACS clients display only fixed part of the archive, so they look quite safe.
+            if (!qnRuntime->isDesktopMode())
+                return;
+
+            const auto connection = system()->connection();
+            if (!NX_ASSERT(connection))
+                return;
+
+            if (qnCloudStatusWatcher->status() == core::CloudStatusWatcher::UpdatingCredentials)
+                return;
+
+            if (reason == RemoteSessionTimeoutWatcher::SessionExpirationReason::sessionExpired
+                && connection->connectionInfo().credentials.authToken.isPassword()
+                && connection->connectionInfo().userType == vms::api::UserType::local)
+            {
+                // Digest credentials should be cleared right after session is expired because
+                // server does not watch it.
+                CredentialsManager::forgetStoredPassword(
+                    ::helpers::getLocalSystemId(system()->moduleInformation()),
+                    connection->credentials().username);
+            }
+
+            const bool isTemporaryUser = connection->connectionInfo().isTemporary();
+            executeDelayedParented(
+                [this, isTemporaryUser, reason]()
+                {
+                    // When temporary token is used for authorization, common session token is
+                    // created and used instead. This session token can wear off earlier than
+                    // the temporary token, but for security reasons we should ask user to
+                    // re-enter temporary token manually.
+                    using SessionExpirationReason
+                        = RemoteSessionTimeoutWatcher::SessionExpirationReason;
+
+                    if (isTemporaryUser && reason == SessionExpirationReason::sessionExpired)
+                    {
+                        QnConnectionDiagnosticsHelper::showTemporaryUserReAuthMessage(
+                            mainWindowWidget());
+                    }
+                    else
+                    {
+                        auto errorCode = RemoteConnectionErrorCode::sessionExpired;
+
+                        if (reason == SessionExpirationReason::temporaryTokenExpired)
+                            errorCode = RemoteConnectionErrorCode::temporaryTokenExpired;
+                        else if (reason == SessionExpirationReason::truncatedSessionToken)
+                            errorCode = RemoteConnectionErrorCode::truncatedSessionToken;
+
+                        d->handleWSError(errorCode);
+
+                        if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken)
+                        {
+                            d->reconnectToCloudIfNeeded();
+                            return;
+                        }
+
+                        QnConnectionDiagnosticsHelper::showConnectionErrorMessage(
+                            this->windowContext(),
+                            errorCode,
+                            /*moduleInformation*/ {},
+                            appContext()->version()
+                        );
+                    }
+                },
+                this);
+
+            disconnectFromServer(DisconnectFlag::Force);
+        });
+
+    d->sessionTokenExpirationWatcher->setTimeoutWatcher(session->sessionTimeoutWatcher());
+
     if (ini().enableMultiSystemTabBar)
     {
         mainWindow()->titleBarStateStore()->addSession(
@@ -895,7 +905,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
                 session->sessionId(), serverModuleInformation, logonData));
     }
 
-    system()->setSession(session);
+    d->session = std::move(session);
 
     const auto welcomeScreen = mainWindow()->welcomeScreen();
     if (welcomeScreen) // Welcome Screen exists in the desktop mode only.
@@ -906,7 +916,7 @@ void ConnectActionsHandler::establishConnection(RemoteConnectionPtr connection)
         appContext()->localSettings()->restoreUserSessionData()
             && (!mainWindow()->titleBarStateStore()
                 || !mainWindow()->titleBarStateStore()->state().hasWorkbenchState()),
-        session->sessionId(),
+        sessionId(),
         logonData);
 }
 
@@ -1241,8 +1251,8 @@ void ConnectActionsHandler::at_connectAction_triggered()
             // Login dialog sets auto-terminate if needed. If user cancelled the disconnect,
             // we should restore status-quo to make sure session won't be terminated
             // unconditionally.
-            if (auto session = system()->session())
-                session->setAutoTerminate(false);
+            if (d->session)
+                d->session->setAutoTerminate(false);
             return;
         }
     }
@@ -1404,11 +1414,9 @@ void ConnectActionsHandler::at_disconnectAction_triggered()
 
     NX_DEBUG(this, "Disconnect action triggered");
 
-    const std::shared_ptr<RemoteSession> session = system()->session();
-    if (!session)
+    const auto sessionId = this->sessionId();
+    if (!sessionId)
         return;
-
-    const SessionId sessionId = session->sessionId();
 
     if (!disconnectFromServer(flags))
         return;
@@ -1591,7 +1599,7 @@ bool ConnectActionsHandler::disconnectFromServer(DisconnectFlags flags)
 
     d->currentConnectionProcess.reset();
     statisticsModule()->certificates()->resetScenario();
-    system()->setSession({});
+    d->session.reset();
 
     // Get ready for the next connection.
     d->warnMessagesDisplayed = false;
@@ -1712,6 +1720,32 @@ void ConnectActionsHandler::reportServerSelectionFailure()
 void ConnectActionsHandler::reconnectToCloudIfNeeded()
 {
     d->reconnectToCloudIfNeeded();
+}
+
+void ConnectActionsHandler::autoTerminateSessionIfNeeded()
+{
+    if (d->session)
+        d->session->autoTerminateIfNeeded();
+}
+
+bool ConnectActionsHandler::updateSessionPassword(const QString& password)
+{
+    if (!d->session)
+        return false;
+
+    d->session->updatePassword(password);
+
+    return true;
+}
+
+bool ConnectActionsHandler::updateCloudSessionToken()
+{
+    if (!d->session)
+        return false;
+
+    d->session->updateCloudSessionToken();
+
+    return true;
 }
 
 } // namespace nx::vms::client::desktop

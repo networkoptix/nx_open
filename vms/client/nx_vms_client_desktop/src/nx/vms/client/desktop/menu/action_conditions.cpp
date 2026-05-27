@@ -1720,9 +1720,9 @@ ActionVisibility ReachableServerCondition::check(
     if (!server)
         return InvisibleAction;
 
-    const auto currentSession = context->system()->session();
+    const auto currentServerId = context->system()->currentServerId();
 
-    if (!currentSession || server->getId() == currentSession->connection()->moduleInformation().id)
+    if (currentServerId.isNull() || server->getId() == currentServerId)
         return InvisibleAction;
 
     if (!appContext()->moduleDiscoveryManager()->getEndpoint(server->getId()))

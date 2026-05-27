@@ -113,11 +113,10 @@ void SystemTabBarStateHandler::handleStateChanged(const State& state)
     action(menu::ResourcesModeAction)->setChecked(
         !state.homeTabActive && state.layoutNavigationVisible);
 
-    const std::shared_ptr<RemoteSession> session = appContext()->currentSystemContext()->session();
-
     if (state.activeSessionId)
     {
-        if (!session || session->sessionId() != *state.activeSessionId)
+        if (const auto sessionId = connectActionsHandler()->sessionId();
+            !sessionId || sessionId != *state.activeSessionId)
         {
             const std::optional<State::SessionData>& sessionData =
                 state.findSession(*state.activeSessionId);
@@ -126,11 +125,10 @@ void SystemTabBarStateHandler::handleStateChanged(const State& state)
                 connectToSystem(*sessionData);
         }
     }
-    else if (appContext()->mainWindowContext()->connectActionsHandler()->logicalState()
+    else if (connectActionsHandler()->logicalState()
         != ConnectActionsHandler::LogicalState::disconnected)
     {
-        if (session)
-            session->autoTerminateIfNeeded();
+        connectActionsHandler()->autoTerminateSessionIfNeeded();
 
         menu()->trigger(menu::DisconnectAction);
     }

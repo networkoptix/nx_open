@@ -90,7 +90,7 @@ signals:
     void resourceDeletingFailed(const QnResourceList &resources);
 
 private:
-    std::map<SystemContext*, std::unordered_set<Uuid>> mDeletingResources;
+    std::map<SystemContext*, std::unordered_set<Uuid>> m_deletingResources;
 };
 
 } // namespace nx::vms::client::desktop
