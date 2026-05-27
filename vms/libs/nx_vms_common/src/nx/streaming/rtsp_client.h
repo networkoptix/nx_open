@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <memory>
 #include <optional>
 #include <vector>
@@ -35,6 +36,16 @@ class QnRtspClient;
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
+
+// Describes the RTSP interleaved frame header layout for semantic field access and sizeof().
+struct FrameHeader
+{
+    std::uint8_t marker; //< '$'
+    std::uint8_t channelId; //< RTP/RTCP channel id.
+    std::uint16_t payloadSize; //< Big-endian payload size.
+};
+
+static_assert(sizeof(FrameHeader) == 4);
 
 // Return message size or 0 if no message found. Delimeters: '$' or '\r\n\r\n'.
 NX_VMS_COMMON_API int64_t nextRtspMessage(const uint8_t* data, int64_t size, int maxChannelNumber);
@@ -136,6 +147,7 @@ public:
     static const QByteArray kGetParameterCommand;
     static const QByteArray kPauseCommand;
     static const QByteArray kTeardownCommand;
+    static constexpr int kResponseBufferLength = 1024 * 65;
 
     enum class DateTimeFormat
     {
@@ -294,6 +306,8 @@ public:
     * @param maxDataSize maximum buffer size
     * @return amount of read bytes
     */
+    // REFACTORME: #skolesnik Remove duplicated framing logic between readBinaryResponse()
+    // overloads and unify the invocation model, preferably around std::span for raw buffers.
     int readBinaryResponse(quint8 *data, int maxDataSize);
 
     /*
@@ -368,9 +382,6 @@ private:
     QString parseContentBase(const QString& buffer);
     void setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
     CameraDiagnostics::Result parseErrorResponse(const nx::network::rtsp::RtspResponse& response);
-
-private:
-    enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
     Config m_config;
 

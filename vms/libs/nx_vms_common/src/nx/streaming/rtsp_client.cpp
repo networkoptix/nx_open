@@ -359,7 +359,7 @@ QnRtspClient::QnRtspClient(
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
 {
-    m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
+    m_responseBuffer = new quint8[kResponseBufferLength];
     m_responseBufferLen = 0;
     m_tcpConnectionTimeout = kDefaultTcpConnectionTimeout;
 }
@@ -1257,14 +1257,22 @@ bool QnRtspClient::readAndProcessTextData()
     if (!m_tcpSock)
         return false;
 
-    if (m_responseBufferLen >= RTSP_BUFFER_LEN)
+    if (m_responseBufferLen >= kResponseBufferLength)
     {
         NX_DEBUG(this, "Failed to read text interleaved packet(buffer overflow), buffer size: %1",
             m_responseBufferLen);
+        // NOTE: #skolesnik. The buffer contains data that never became a complete RTSP text
+        // message and does not align to a valid '$' interleaved frame. nextRtspMessage() keeps
+        // reporting "need more data", so nothing is consumed and retrying would hit the same full
+        // buffer again. Drop the unrecoverable buffered bytes and keep the current socket open so
+        // the next read can process subsequent input from the stream.
+        m_responseBufferLen = 0;
         return false;
     }
 
-    int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+    const int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen,
+        /*bufSize*/ std::min<int>(1024, kResponseBufferLength - m_responseBufferLen),
+        /*readSome*/ true);
     if (bytesRead <= 0)
     {
         NX_DEBUG(this, "Failed to read text interleaved packet, length: %1", m_responseBufferLen);
@@ -1290,12 +1298,17 @@ bool QnRtspClient::readAndProcessTextData()
 
 int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
 {
+    constexpr int frameHeaderSize = sizeof(FrameHeader);
+
     if (!m_tcpSock)
         return 0;
     while (m_tcpSock->isConnected())
     {
-        while (m_responseBufferLen < 4) {
-            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+        while (m_responseBufferLen < frameHeaderSize)
+        {
+            const int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen,
+                /*bufSize*/ frameHeaderSize - m_responseBufferLen,
+                /*readSome*/ true);
             if (bytesRead <= 0)
                 return bytesRead;
             m_responseBufferLen += bytesRead;
@@ -1307,10 +1320,14 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
         if (!readAndProcessTextData())
             return -1;
     }
-    int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
+
+    if (m_responseBufferLen < frameHeaderSize || '$' != m_responseBuffer[0])
+        return 0;
+
+    const int dataLen = (m_responseBuffer[2] << 8) + m_responseBuffer[3] + frameHeaderSize;
     if (maxDataSize < dataLen)
         return -2; // not enough buffer
-    int copyLen = qMin(dataLen, m_responseBufferLen);
+    const int copyLen = std::min<int>(dataLen, m_responseBufferLen);
     memcpy(data, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)
         memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
@@ -1318,7 +1335,7 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        const int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
         if (bytesRead <= 0)
             return bytesRead;
         dataRestLen -= bytesRead;
@@ -1341,13 +1358,18 @@ quint8* QnRtspClient::prepareDemuxedData(std::vector<nx::utils::ByteArray*>& dem
 
 int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxedData, int& channelNumber)
 {
+    constexpr int frameHeaderSize = sizeof(FrameHeader);
+
     if (!m_tcpSock)
         return 0;
 
     while (m_tcpSock->isConnected())
     {
-        while (m_responseBufferLen < 4) {
-            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+        while (m_responseBufferLen < frameHeaderSize)
+        {
+            const int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen,
+                /*bufSize*/ frameHeaderSize - m_responseBufferLen,
+                /*readSome*/ true);
             if (bytesRead <= 0)
                 return bytesRead;
             m_responseBufferLen += bytesRead;
@@ -1362,8 +1384,11 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
         }
     }
 
-    int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
-    int copyLen = qMin(dataLen, m_responseBufferLen);
+    if (m_responseBufferLen < frameHeaderSize || '$' != m_responseBuffer[0])
+        return 0;
+
+    const int dataLen = (m_responseBuffer[2] << 8) + m_responseBuffer[3] + frameHeaderSize;
+    const int copyLen = qMin(dataLen, m_responseBufferLen);
     channelNumber = m_responseBuffer[1];
     quint8* data = prepareDemuxedData(demuxedData, channelNumber, dataLen);
 
@@ -1375,7 +1400,7 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
 
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        const int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
         if (bytesRead <= 0)
             return bytesRead;
 
@@ -1418,7 +1443,7 @@ bool QnRtspClient::readTextResponse(QByteArray& response)
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (needMoreData) {
-            int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+            int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, kResponseBufferLength - m_responseBufferLen), true);
             if (bytesRead <= 0)
             {
                 if( bytesRead == 0 )
@@ -1437,7 +1462,7 @@ bool QnRtspClient::readTextResponse(QByteArray& response)
         }
         if (m_responseBuffer[0] == '$') {
             // binary data
-            quint8 tmpData[RTSP_BUFFER_LEN];
+            quint8 tmpData[kResponseBufferLength];
             int bytesRead = readBinaryResponse(tmpData, sizeof(tmpData)); // skip binary data
             if (bytesRead < 0)
             {
@@ -1475,10 +1500,10 @@ bool QnRtspClient::readTextResponse(QByteArray& response)
             }
             needMoreData = true;
         }
-        if (m_responseBufferLen == RTSP_BUFFER_LEN)
+        if (m_responseBufferLen == kResponseBufferLength)
         {
             NX_DEBUG(this, "RTSP response from %1 has exceeded max response size (%2)",
-                m_tcpSock->getForeignAddress(), RTSP_BUFFER_LEN);
+                m_tcpSock->getForeignAddress(), kResponseBufferLength);
             return false;
         }
     }
