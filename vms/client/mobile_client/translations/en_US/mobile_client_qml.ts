@@ -676,6 +676,14 @@
         <source>Allows to show server time for the camera</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Mirror Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip the timeline for left-handed use</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InvalidOrChangedCertificateDialog</name>
