@@ -156,7 +156,7 @@ QString LabelFormatter::htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
     QColor primaryColor, QColor secondaryColor) const
 {
     static const auto kTwoLineTemplate =
-        u"<p style='margin-right: %3px; line-height: %4px;'>%1<br>%2</p>"_qs;
+        u"<p style='margin-left: %3px; margin-right: %3px; line-height: %4px;'>%1<br>%2</p>"_qs;
 
     static const auto kDateTemplate =
         u"<span style='font-size: 11px; color: %2;'>%1</span>"_qs;
@@ -167,7 +167,7 @@ QString LabelFormatter::htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
     const auto dt = QDateTime::fromMSecsSinceEpoch(timeMs, timeZone);
 
     const auto timeStr = d->amPm
-         ? nx::format(d->timeLocale.toString(dt, u"h:mm:ss %1AP%2"_qs),
+         ? nx::format(d->timeLocale.toString(dt, u"h:mm:ss%1 AP%2"_qs),
              u"<span style='font-size: 8px;'>"_qs,
              u"</span>"_qs).toQString()
          : d->timeLocale.toString(dt, u"HH:mm:ss"_qs);
@@ -175,7 +175,7 @@ QString LabelFormatter::htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
     return nx::format(kTwoLineTemplate,
         nx::format(kTimeTemplate, isolateLtr(timeStr), primaryColor.name(), d->amPm ? 12 : 14),
         nx::format(kDateTemplate, d->dayMonthShortYear(dt), secondaryColor.name()),
-        /*right padding*/ d->amPm ? 2 : 4,
+        /*right padding*/ d->amPm ? 4 : 6,
         /*line height*/ d->amPm ? 14 : 11);
 }
 
