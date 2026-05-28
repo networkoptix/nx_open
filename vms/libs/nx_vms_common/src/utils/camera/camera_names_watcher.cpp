@@ -5,7 +5,6 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <common/common_module.h>
 
 using namespace nx::vms::common;
 

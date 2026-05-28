@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
 using namespace std::chrono;

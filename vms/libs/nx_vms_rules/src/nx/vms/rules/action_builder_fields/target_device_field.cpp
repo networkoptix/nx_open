@@ -3,7 +3,6 @@
 #include "target_device_field.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
 
 #include "../manifest.h"

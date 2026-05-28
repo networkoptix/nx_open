@@ -10,7 +10,6 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::client::desktop::resources::search_helper {

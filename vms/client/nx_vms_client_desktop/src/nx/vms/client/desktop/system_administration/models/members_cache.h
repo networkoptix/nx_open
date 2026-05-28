@@ -6,7 +6,6 @@
 
 #include <nx/vms/client/desktop/resource_properties/user/utils/access_subject_editing_context.h>
 #include <nx/vms/client/desktop/system_administration/globals/user_settings_global.h>
-#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop {
 

@@ -4,7 +4,6 @@
 
 #include <api/common_message_processor.h>
 #include <nx/utils/async_handler_executor.h>
-#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 

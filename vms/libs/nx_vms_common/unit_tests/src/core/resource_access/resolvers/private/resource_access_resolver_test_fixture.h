@@ -3,7 +3,6 @@
 #include <QtTest/QSignalSpy>
 
 #include <core/resource_access/access_rights_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::core::access {

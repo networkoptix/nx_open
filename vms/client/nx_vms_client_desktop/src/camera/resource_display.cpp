@@ -14,7 +14,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/common/application_context.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/long_runable_cleanup.h>
 #include <utils/common/util.h>
 

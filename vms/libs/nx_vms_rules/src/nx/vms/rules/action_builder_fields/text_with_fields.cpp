@@ -3,7 +3,6 @@
 #include "text_with_fields.h"
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/event_parameter_helper.h>
 #include <nx/vms/rules/utils/openapi_doc.h>
 

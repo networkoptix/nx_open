@@ -12,7 +12,6 @@
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/common/system_context.h>
 
 #include "../../data/resource_tree_globals.h"
 

@@ -17,7 +17,6 @@
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/common/system_context.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
 #include "desktop_resource.h"

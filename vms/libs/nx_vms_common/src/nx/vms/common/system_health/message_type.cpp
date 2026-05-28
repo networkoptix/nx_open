@@ -3,7 +3,6 @@
 #include "message_type.h"
 
 #include <nx/vms/common/saas/saas_utils.h>
-#include <nx/vms/common/system_context.h>
 
 namespace {
 

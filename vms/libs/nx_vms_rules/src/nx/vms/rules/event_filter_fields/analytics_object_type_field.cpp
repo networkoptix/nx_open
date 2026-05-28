@@ -3,7 +3,6 @@
 #include "analytics_object_type_field.h"
 
 #include <nx/analytics/taxonomy/helpers.h>
-#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::rules {
 

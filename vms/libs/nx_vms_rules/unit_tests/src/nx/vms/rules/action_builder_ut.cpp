@@ -10,7 +10,6 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_fields/optional_time_field.h>
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>

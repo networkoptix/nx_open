@@ -24,7 +24,6 @@
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/basic_action.h>

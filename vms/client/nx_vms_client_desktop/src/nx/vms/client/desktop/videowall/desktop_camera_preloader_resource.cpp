@@ -3,7 +3,6 @@
 #include "desktop_camera_preloader_resource.h"
 
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/id.h>
 
 namespace nx::vms::client::desktop {

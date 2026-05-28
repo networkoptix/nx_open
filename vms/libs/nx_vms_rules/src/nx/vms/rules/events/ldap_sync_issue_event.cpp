@@ -6,7 +6,6 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/json_functions.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/icon.h>
 #include <nx/vms/rules/utils/event_details.h>

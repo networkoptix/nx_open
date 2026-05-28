@@ -5,7 +5,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/test_support/resource/resource_pool_test_helper.h>
 #include <nx/vms/rules/aggregated_event.h>
 #include <nx/vms/rules/initializer.h>

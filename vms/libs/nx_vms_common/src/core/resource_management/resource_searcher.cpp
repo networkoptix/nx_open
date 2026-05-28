@@ -6,7 +6,6 @@
 #include <core/resource/resource_type.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/http_types.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 
 using namespace nx::vms::common;

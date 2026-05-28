@@ -48,7 +48,6 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/statistics/modules/certificate_statistics_module.h>
 #include <ui/widgets/main_window.h>

@@ -6,7 +6,6 @@
 #include <licensing/license.h>
 #include <nx/branding.h>
 #include <nx/vms/api/types/connection_types.h>
-#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/synctime.h>
 

@@ -8,7 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/metatypes.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/utils/event.h>
 
 #include "aggregated_event.h"

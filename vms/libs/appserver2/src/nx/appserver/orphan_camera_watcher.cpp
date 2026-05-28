@@ -11,7 +11,6 @@
 #include <nx/kit/debug.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
-#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 

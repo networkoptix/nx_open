@@ -15,7 +15,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/common/resource/server_host_priority.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
 using namespace nx::vms::common;

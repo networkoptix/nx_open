@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/action_builder_field_validators/text_with_fields_validator.h>
 #include <nx/vms/rules/action_builder_fields/text_with_fields.h>

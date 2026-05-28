@@ -31,7 +31,6 @@
 #include <nx/vms/common/intercom/utils.h>
 #include <nx/vms/common/resource/camera_resource_stub.h>
 #include <nx/vms/common/showreel/showreel_manager.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
 #include <utils/common/id.h>

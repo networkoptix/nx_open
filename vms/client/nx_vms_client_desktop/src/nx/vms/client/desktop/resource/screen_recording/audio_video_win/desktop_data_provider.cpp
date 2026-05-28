@@ -31,7 +31,6 @@ extern "C" {
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <transcoding/audio_encoder.h>
 #include <utils/common/synctime.h>
