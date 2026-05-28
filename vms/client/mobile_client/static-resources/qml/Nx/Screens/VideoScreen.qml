@@ -692,7 +692,11 @@ Page
             readonly property real contentMargin: 12
             readonly property real availableWidth: navigationBar.width - contentMargin * 2
 
-            component ExpandCollapseAnimation: NumberAnimation { duration: 150 }
+            component ExpandCollapseAnimation: NumberAnimation
+            {
+                duration: 150
+                easing.type: Easing.OutCubic
+            }
 
             anchors.verticalCenter: navigationBar.verticalCenter
             anchors.horizontalCenter: navigationBar.horizontalCenter
@@ -711,7 +715,10 @@ Page
                     id: calendarButton
 
                     icon.source: "image://skin/24x24/Solid/calendar.svg"
-                    enabled: d.hasArchive
+                    enabled: d.hasArchive && !speedControl.expanded
+                    opacity: speedControl.expanded ? 0 : 1
+
+                    Behavior on opacity { ExpandCollapseAnimation {} }
 
                     onClicked:
                         calendarPanel.open()
@@ -735,9 +742,13 @@ Page
 
                         enabled: d.hasArchive
                             && navigationBar.hasChunkNavigation
+                            && !speedControl.expanded
                             && NxGlobals.isValidTime(controller.prevChunkMs)
 
-                        opacity: navigationBar.hasChunkNavigation ? 1 : 0
+                        opacity: (navigationBar.hasChunkNavigation && !speedControl.expanded)
+                            ? 1 : 0
+
+                        Behavior on opacity { ExpandCollapseAnimation {} }
 
                         onClicked:
                             controller.jumpToPreviousChunk()
@@ -775,9 +786,13 @@ Page
                         {
                             id: speedControl
 
-                            expandedWidth: navigationBarContent.availableWidth
-                                - playPauseButton.width
-                                - playBar.spacing
+                            readonly property int kPrefferedWidth: 277
+
+                            expandedWidth: Math.min(
+                                navigationBarContent.availableWidth
+                                    - playPauseButton.width
+                                    - playBar.spacing,
+                                kPrefferedWidth)
 
                             forced1x: controller.playingLive
                             paused: !controller.playing
@@ -814,8 +829,12 @@ Page
 
                         enabled: d.hasArchive && navigationBar.hasChunkNavigation
                             && !controller.playingLive
+                            && !speedControl.expanded
 
-                        opacity: navigationBar.hasChunkNavigation ? 1 : 0
+                        opacity: (navigationBar.hasChunkNavigation && !speedControl.expanded)
+                            ? 1 : 0
+
+                        Behavior on opacity { ExpandCollapseAnimation {} }
 
                         onClicked:
                             controller.jumpToNextChunk()
@@ -830,6 +849,10 @@ Page
                     Layout.preferredHeight: 44
 
                     visible: actionSheet.hasActions
+                    enabled: !speedControl.expanded
+                    opacity: speedControl.expanded ? 0 : 1
+
+                    Behavior on opacity { ExpandCollapseAnimation {} }
                 }
             }
         }
