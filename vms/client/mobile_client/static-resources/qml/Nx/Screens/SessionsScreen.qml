@@ -963,6 +963,16 @@ AdaptiveScreen
         }
     }
 
+    Connections
+    {
+        target: windowContext.sessionManager
+
+        function onSessionStoppedManually()
+        {
+            appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
+        }
+    }
+
     QtObject
     {
         id: d
