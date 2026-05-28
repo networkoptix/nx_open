@@ -126,12 +126,14 @@ void DatagramPipeline::onBytesRead(
 void DatagramPipeline::sendOutNextMessage()
 {
     OutgoingMessageContext& msgCtx = m_sendQueue.front();
-
-    using namespace std::placeholders;
-    m_socket->sendToAsync(
-        &msgCtx.serializedMessage,
-        msgCtx.destinationEndpoint,
-        std::bind(&DatagramPipeline::messageSent, this, _1, _2, _3));
+    m_socket->sendToAsync(&msgCtx.serializedMessage, msgCtx.destinationEndpoint,
+        // After takeSocket() this class instance is destroyed but this handler can still be called
+        // because UDPSocket::sendToAsync() can do post() with the call of this handler.
+        [this, guard = m_asyncSendGuard.sharedGuard()](auto&&... args)
+        {
+            if (auto lock = guard->lock())
+                messageSent(std::forward<decltype(args)>(args)...);
+        });
 }
 
 void DatagramPipeline::messageSent(
