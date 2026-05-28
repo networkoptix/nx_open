@@ -538,7 +538,7 @@ Page
         }
 
         width: parent?.width ?? 800
-        height: width / (16.0 / 9.0)
+        height: Math.min(width / (16.0 / 9.0), (parent?.height ?? 600))
 
         visible: video.shown
 
