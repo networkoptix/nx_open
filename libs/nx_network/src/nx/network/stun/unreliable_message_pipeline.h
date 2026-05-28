@@ -11,6 +11,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/network/connection_server/base_protocol_message_types.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
@@ -80,6 +81,7 @@ private:
     nx::Buffer m_readBuffer;
     std::deque<OutgoingMessageContext> m_sendQueue;
     nx::utils::InterruptionFlag m_terminationFlag;
+    nx::utils::AsyncOperationGuard m_asyncSendGuard;
 
     virtual void stopWhileInAioThread() override;
 
