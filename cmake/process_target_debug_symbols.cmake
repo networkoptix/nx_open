@@ -92,3 +92,17 @@ function(nx_process_windows_target_debug_symbols target)
         WORKING_DIRECTORY "${DEBUG_OUTPUT_DIR}"
         COMMENT "Generating debug symbols for ${target}")
 endfunction()
+
+function(nx_process_target_debug_symbols target)
+    if(NOT CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        return()
+    endif()
+
+    if(APPLE)
+        nx_process_macos_target_debug_symbols(${target})
+    elseif(LINUX OR ANDROID)
+        nx_process_linux_target_debug_symbols(${target})
+    elseif(WINDOWS)
+        nx_process_windows_target_debug_symbols(${target})
+    endif()
+endfunction()

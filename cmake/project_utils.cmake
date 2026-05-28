@@ -172,15 +172,7 @@ function(nx_add_target name type)
         endif()
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        if(APPLE)
-            nx_process_macos_target_debug_symbols(${name})
-        elseif(LINUX OR ANDROID)
-            nx_process_linux_target_debug_symbols(${name})
-        elseif(WINDOWS)
-            nx_process_windows_target_debug_symbols(${name})
-        endif()
-    endif()
+    nx_process_target_debug_symbols(${name})
 
     if((NX_NO_WERROR AND NX_WERROR) OR
         (NX_NO_WERROR AND NOT "${NX_WERROR_IF}" STREQUAL "") OR

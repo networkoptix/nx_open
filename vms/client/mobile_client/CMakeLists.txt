@@ -194,6 +194,8 @@ endif()
 
 target_link_libraries(mobile_client PRIVATE mobile_client_library)
 
+nx_process_target_debug_symbols(mobile_client)
+
 add_dependencies(mobile_client mobile_client_external_resources)
 
 nx_make_target_translatable(mobile_client COMPONENTS "mobile")
