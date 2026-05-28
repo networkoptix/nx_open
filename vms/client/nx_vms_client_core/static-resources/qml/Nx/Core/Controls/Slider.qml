@@ -40,6 +40,9 @@ QtQuickControls.Slider
 
     padding: 2
 
+    layer.enabled: opacity < 1
+    layer.smooth: true
+
     background: Rectangle
     {
         id: groove
