@@ -800,6 +800,9 @@ Page
                             color: playBar.backgroundColor
                             radius: playBar.roundingRadius
 
+                            LayoutMirroring.enabled: false
+                            LayoutMirroring.childrenInherit: true
+
                             onMoved:
                             {
                                 if (pausable)

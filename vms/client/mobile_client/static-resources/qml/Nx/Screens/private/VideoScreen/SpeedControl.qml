@@ -56,6 +56,7 @@ Rectangle
 
         enabled: !speedControl.expanded
         suppressDisabledState: true
+        anchors.left: speedControl.left
         width: 60
 
         Binding on backgroundColor
