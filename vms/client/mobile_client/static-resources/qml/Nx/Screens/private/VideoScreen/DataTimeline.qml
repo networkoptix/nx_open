@@ -829,10 +829,7 @@ Rectangle
 
             function updatePosition(y)
             {
-                if (kineticScroll.state === KineticAnimation.Stopped && !active)
-                    return
-
-                if (draggingTimeMarker)
+                if (active && draggingTimeMarker)
                 {
                     // Don't let the time marker go outside of the window, except for Live.
                     const minPos = timeline.windowAtLive ? 0 : 0.5
@@ -840,7 +837,7 @@ Rectangle
                     timeScale.setPosition(
                         Math.max(minPos, Math.min(timeScale.height - 1, y)))
                 }
-                else if (draggingTimeline)
+                else if (kineticScroll.state === KineticAnimation.Running || draggingTimeline)
                 {
                     timeScale.setStartTimeMs(startTimeMs + (timeScale.millisecondsPerPixel
                         * (y - kineticScroll.startPosition.y)))
@@ -891,6 +888,7 @@ Rectangle
                     case PointerDevice.UngrabPassive:
                     case PointerDevice.CancelGrabPassive:
                     {
+                        draggingTimeline = false
                         draggingTimeMarker = false
                         break
                     }
@@ -904,9 +902,6 @@ Rectangle
 
             onPositionChanged: (position) =>
                 dragHandler.updatePosition(position.y)
-
-            onStopped:
-                dragHandler.draggingTimeline = false
         }
 
         // Zooms the timeline.
