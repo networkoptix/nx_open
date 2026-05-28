@@ -307,9 +307,10 @@ const QMap<QString, ItemDescriptor>& Engine::events() const
 
 std::optional<ItemDescriptor> Engine::eventDescriptor(const QString& eventId) const
 {
-    return m_eventDescriptors.contains(eventId)
-        ? std::optional<ItemDescriptor>(m_eventDescriptors.value(eventId))
-        : std::nullopt;
+    if (const auto it = m_eventDescriptors.find(eventId); it != m_eventDescriptors.end())
+        return it.value();
+
+    return {};
 }
 
 Group Engine::eventGroups() const
@@ -432,9 +433,10 @@ const QMap<QString, ItemDescriptor>& Engine::actions() const
 
 std::optional<ItemDescriptor> Engine::actionDescriptor(const QString& actionId) const
 {
-    return m_actionDescriptors.contains(actionId)
-        ? std::optional<ItemDescriptor>(m_actionDescriptors.value(actionId))
-        : std::nullopt;
+    if (const auto it = m_actionDescriptors.find(actionId); it != m_actionDescriptors.end())
+        return it.value();
+
+    return {};
 }
 
 bool Engine::registerEventField(const QString& type, const EventFieldConstructor& ctor)
@@ -595,17 +597,12 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const api::EventFilter& se
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const QString& eventType) const
 {
-    if (!m_eventDescriptors.contains(eventType))
-    {
-        NX_ERROR(
-            this,
-            "Failed to build event filter as an event descriptor for the %1 event is not registered",
-            eventType);
+    if (const auto it = m_eventDescriptors.find(eventType); it != m_eventDescriptors.end())
+        return buildEventFilter(it.value());
 
-        return {};
-    }
+    NX_ERROR(this, "Cannot build event filter, descriptor not registered: %1", eventType);
 
-    return buildEventFilter(m_eventDescriptors.value(eventType));
+    return {};
 }
 
 std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& descriptor) const
@@ -683,17 +680,12 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const api::ActionBuild
 
 std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const QString& actionType) const
 {
-    if (!m_actionDescriptors.contains(actionType))
-    {
-        NX_ERROR(
-            this,
-            "Failed to build action builder as action descriptor for the %1 action is not registered",
-            actionType);
+    if (const auto it = m_actionDescriptors.find(actionType); it != m_actionDescriptors.end())
+        return buildActionBuilder(it.value());
 
-        return {};
-    }
+    NX_ERROR(this, "Cannot build action builder, descriptor not registered: %1", actionType);
 
-    return buildActionBuilder(m_actionDescriptors.value(actionType));
+    return {};
 }
 
 bool Engine::registerEventFieldValidator(const QString& fieldType, FieldValidatorPtr validator)
