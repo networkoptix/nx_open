@@ -16,11 +16,11 @@ namespace nx::analytics::taxonomy {
 
 struct InheritanceTestExpectedData
 {
-    QString id;
-    QString name;
-    QString base;
-    std::set<QString> derivedTypes;
-    std::set<QString> directDerivedTypes;
+    std::string id;
+    std::string name;
+    std::string base;
+    std::set<std::string> derivedTypes;
+    std::set<std::string> directDerivedTypes;
 };
 #define InheritanceTestExpectedData_Fields \
     (id) \
@@ -33,12 +33,12 @@ NX_REFLECTION_INSTRUMENT(InheritanceTestExpectedData, InheritanceTestExpectedDat
 
 struct ScopeInfo
 {
-    QString engineId;
-    QString engineName;
-    QString groupId;
-    QString groupName;
-    QString integrationId;
-    QString integrationName;
+    std::string engineId;
+    std::string engineName;
+    std::string groupId;
+    std::string groupName;
+    std::string integrationId;
+    std::string integrationName;
 };
 #define ScopeInfo_Fields \
     (engineId) \
@@ -60,8 +60,8 @@ NX_REFLECTION_INSTRUMENT(ScopeInfo, ScopeInfo_Fields);
 
 struct ScopeTestExpectedData
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
     std::set<ScopeInfo> scopeInfo;
 };
 #define ScopeTestExpectedData_Fields \
@@ -73,8 +73,8 @@ NX_REFLECTION_INSTRUMENT(ScopeTestExpectedData, ScopeTestExpectedData_Fields);
 
 struct FlagTestExpectedData
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
     bool liveOnly = false;
     bool nonIndexable = false;
 };
@@ -89,7 +89,7 @@ NX_REFLECTION_INSTRUMENT(FlagTestExpectedData, FlagTestExpectedData_Fields);
 class ObjectTypeTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &m_testData));
     }
@@ -103,7 +103,7 @@ protected:
 
     void makeSureSupportedAttributesAreCorrect()
     {
-        std::map<QString, std::set<QString>> supportedAttributesByTypeId;
+        std::map<std::string, std::set<std::string>> supportedAttributesByTypeId;
         for (const auto& [descriptorId, descriptor] : m_testData.descriptors.objectTypeDescriptors)
         {
             for (const auto& [attributeName, _] : descriptor.attributeSupportInfo)
@@ -116,13 +116,13 @@ protected:
 
     void makeSureReachableTypesAreCorrect()
     {
-        std::set<QString> expectedResult;
+        std::set<std::string> expectedResult;
 
         const QJsonArray array = m_testData.fullData["nonReachableTypes"].toArray();
         const QByteArray arrayAsBytes = QJsonDocument(array).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::set<QString>>(arrayAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::set<std::string>>(arrayAsBytes.toStdString());
 
         expectedResult = deserializationResult;
 
@@ -133,13 +133,13 @@ protected:
 
     void makeSureInheritanceIsCorrect()
     {
-        std::map<QString, InheritanceTestExpectedData> expectedData;
+        std::map<std::string, InheritanceTestExpectedData> expectedData;
 
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, InheritanceTestExpectedData>>(obectAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::map<std::string, InheritanceTestExpectedData>>(obectAsBytes.toStdString());
 
         expectedData = deserializationResult;
 
@@ -157,19 +157,19 @@ protected:
             ASSERT_EQ(expected.name, objectType->name());
 
             const ObjectType* base = objectType->base();
-            if (!expected.base.isEmpty())
+            if (!expected.base.empty())
                 ASSERT_EQ(expected.base, base->id());
             else
                 ASSERT_EQ(base, nullptr);
 
             const std::vector<ObjectType*> directDerivedTypes = objectType->derivedTypes();
-            std::set<QString> directDerivedTypeIds;
+            std::set<std::string> directDerivedTypeIds;
             for (const ObjectType* directDerivedType:  directDerivedTypes)
                 directDerivedTypeIds.insert(directDerivedType->id());
 
             ASSERT_EQ(directDerivedTypeIds, expected.directDerivedTypes);
 
-            std::set<QString> allDerivedTypeIds =
+            std::set<std::string> allDerivedTypeIds =
                 getAllDerivedTypeIds(m_result.state.get(), objectType->id());
 
             ASSERT_EQ(allDerivedTypeIds, expected.derivedTypes);
@@ -178,13 +178,13 @@ protected:
 
     void makeSureScopesAreCorrect()
     {
-        std::map<QString, ScopeTestExpectedData> expectedData;
+        std::map<std::string, ScopeTestExpectedData> expectedData;
 
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, ScopeTestExpectedData>>(obectAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::map<std::string, ScopeTestExpectedData>>(obectAsBytes.toStdString());
 
         expectedData = deserializationResult;
 
@@ -247,13 +247,13 @@ protected:
 
     void makeSureFlagsAreCorrect()
     {
-        std::map<QString, FlagTestExpectedData> expectedData;
+        std::map<std::string, FlagTestExpectedData> expectedData;
 
         const QJsonObject object = m_testData.fullData["result"].toObject();
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, FlagTestExpectedData>>(obectAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::map<std::string, FlagTestExpectedData>>(obectAsBytes.toStdString());
 
         expectedData = deserializationResult;
 
@@ -277,19 +277,19 @@ protected:
 private:
     void verifySupportedAttributesAreCorrect(
         const ObjectType* objectType,
-        const std::map<QString, std::set<QString>> supportedAttributesByTypeId)
+        const std::map<std::string, std::set<std::string>> supportedAttributesByTypeId)
     {
         const auto it = supportedAttributesByTypeId.find(objectType->id());
         ASSERT_EQ(
-            it == supportedAttributesByTypeId.cend() ? std::set<QString>() : it->second,
+            it == supportedAttributesByTypeId.cend() ? std::set<std::string>() : it->second,
             allAttributePaths(objectType));
     }
 
-    std::set<QString> allAttributePaths(
+    std::set<std::string> allAttributePaths(
         const ObjectType* objectType,
-        const QString& prefix = QString())
+        const std::string& prefix = std::string())
     {
-        std::set<QString> result;
+        std::set<std::string> result;
         for (const AbstractAttribute* attribute : objectType->supportedAttributes())
         {
             result.insert(prefix + attribute->name());
@@ -297,7 +297,7 @@ private:
             if (attribute->type() != AbstractAttribute::Type::object)
                 continue;
 
-            std::set<QString> nestedAttributes = allAttributePaths(
+            std::set<std::string> nestedAttributes = allAttributePaths(
                 attribute->objectType(), prefix + attribute->name() + ".");
 
             result.insert(nestedAttributes.begin(), nestedAttributes.end());
@@ -306,9 +306,9 @@ private:
         return result;
     }
 
-    std::set<QString> nonReachableTypeIds(const std::shared_ptr<AbstractState>& state)
+    std::set<std::string> nonReachableTypeIds(const std::shared_ptr<AbstractState>& state)
     {
-        std::set<QString> result;
+        std::set<std::string> result;
         for (const ObjectType* objectType : state->objectTypes())
         {
             if (!objectType->isReachable())

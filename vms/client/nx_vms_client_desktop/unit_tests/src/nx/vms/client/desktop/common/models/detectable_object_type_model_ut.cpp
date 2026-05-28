@@ -2,6 +2,8 @@
 
 #include <QtTest/QAbstractItemModelTester>
 
+#include <string>
+
 #include <nx/analytics/taxonomy/object_type.h>
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/vms/client/core/analytics/taxonomy/object_type.h>
@@ -69,19 +71,21 @@ protected:
         descriptors.objectTypeDescriptors.clear();
         for (const QString& objectTypeId: inputData.objectTypes)
         {
-            const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeId);
+            const auto objectTypeIdString = objectTypeId.toStdString();
+            const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeIdString);
             EXPECT_FALSE(itr == commonDescriptors.objectTypeDescriptors.cend());
 
-            descriptors.objectTypeDescriptors[objectTypeId] = itr->second;
+            descriptors.objectTypeDescriptors[objectTypeIdString] = itr->second;
         }
 
         for (const auto& [objectTypeId, attributeSupportInfo]: inputData.attributeSupportInfo)
         {
-            descriptors.objectTypeDescriptors[objectTypeId].attributeSupportInfo =
+            const auto objectTypeIdString = objectTypeId.toStdString();
+            descriptors.objectTypeDescriptors[objectTypeIdString].attributeSupportInfo =
                 toDescriptorAttributeSupportInfo(attributeSupportInfo);
 
             if (!attributeSupportInfo.empty())
-                descriptors.objectTypeDescriptors[objectTypeId].hasEverBeenSupported = true;
+                descriptors.objectTypeDescriptors[objectTypeIdString].hasEverBeenSupported = true;
         }
 
         return descriptors;
@@ -99,14 +103,14 @@ protected:
     }
 
 private:
-    static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
+    static std::map<std::string, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
         const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
     {
-        std::map<QString, std::set<nx::Uuid>> result;
+        std::map<std::string, std::set<nx::Uuid>> result;
         for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
         {
             for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)
-                result[attributeName].insert(engineId);
+                result[attributeName.toStdString()].insert(engineId);
         }
 
         return result;

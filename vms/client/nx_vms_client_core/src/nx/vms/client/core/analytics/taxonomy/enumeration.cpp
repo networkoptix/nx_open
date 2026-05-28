@@ -42,10 +42,8 @@ std::vector<QString> Enumeration::items() const
     std::set<QString> mergedItems;
     for (const AbstractEnumType* enumType: d->enumTypes)
     {
-        std::vector<QString> enumTypeItems = enumType->items();
-        mergedItems.insert(
-            std::make_move_iterator(enumTypeItems.begin()),
-            std::make_move_iterator(enumTypeItems.end()));
+        for (const auto& item: enumType->items())
+            mergedItems.insert(QString::fromStdString(item));
     }
 
     d->cachedItems = std::vector<QString>(

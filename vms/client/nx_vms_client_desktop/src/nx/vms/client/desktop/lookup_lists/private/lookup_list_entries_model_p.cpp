@@ -70,7 +70,7 @@ QVariant LookupListEntriesModel::Private::objectFormatter(const QString& value)
 QVariant LookupListEntriesModel::Private::getDisplayValue(
     const QString& attributeName, const QString& value) const
 {
-    if (data->rawData().objectTypeId.isEmpty())
+    if (data->rawData().objectTypeId.empty())
         return value; //< Generic Model.
 
     auto it = formatterByAttributeName.find(attributeName);
@@ -214,7 +214,7 @@ void LookupListEntriesModel::Private::initAttributeFunctions()
         return;
 
     const ObjectType* objectType =
-        taxonomy->objectTypeById(data->rawData().objectTypeId);
+        taxonomy->objectTypeById(QString::fromStdString(data->rawData().objectTypeId));
 
     if (objectType == nullptr)
         return;

@@ -17,7 +17,7 @@ AbstractGroup* Scope::group() const
     return m_group;
 }
 
-QString Scope::provider() const
+std::string Scope::provider() const
 {
     return m_provider;
 }
@@ -42,7 +42,7 @@ void Scope::setGroup(Group* group)
     m_group = group;
 }
 
-void Scope::setProvider(const QString& provider)
+void Scope::setProvider(const std::string& provider)
 {
     m_provider = provider;
 }

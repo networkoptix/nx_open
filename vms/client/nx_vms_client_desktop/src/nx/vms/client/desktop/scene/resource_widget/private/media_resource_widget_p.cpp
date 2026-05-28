@@ -499,7 +499,7 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
         compatibleEngines,
         [&](const nx::Uuid& engineId)
         {
-            const auto engine = taxonomy->engineById(engineId.toString(QUuid::WithBraces));
+            const auto engine = taxonomy->engineById(engineId.toStdString(QUuid::WithBraces));
             // Engine can be absent for cross-system Cameras.
             return engine && taxonomyManager->isEngineRelevant(engine);
         });

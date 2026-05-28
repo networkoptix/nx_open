@@ -2,13 +2,15 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/plugin.h>
 
 namespace nx::vms::rules {
 
-static const QString kIntegrationActionTypePrefix = "integration.";
+inline constexpr std::string_view kIntegrationActionTypePrefix = "integration.";
 
 class NX_VMS_RULES_API IntegrationActionInitializer:
     public nx::vms::common::SystemContextAware, public Plugin

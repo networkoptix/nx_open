@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QString>
+#include <string>
 
 #include <nx/reflect/enum_instrument.h>
 #include <nx/utils/json/flags.h>
@@ -49,23 +49,23 @@ NX_REFLECTION_ENUM_CLASS(ManifestErrorType,
 Q_DECLARE_FLAGS(ManifestErrorTypes, ManifestErrorType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ManifestErrorTypes)
 
-NX_VMS_API QString toString(ManifestErrorType errorType);
+NX_VMS_API std::string toString(ManifestErrorType errorType);
 
 struct ManifestError
 {
     ManifestError() = default;
 
-    ManifestError(ManifestErrorType errorType, QString additionalInfo = QString()):
+    ManifestError(ManifestErrorType errorType, std::string additionalInfo = std::string()):
         errorType(errorType),
         additionalInfo(additionalInfo)
     {
     }
 
     ManifestErrorType errorType = ManifestErrorType::noError;
-    QString additionalInfo;
+    std::string additionalInfo;
 };
 
-NX_VMS_API QString toString(ManifestError manifestError);
+NX_VMS_API std::string toString(ManifestError manifestError);
 
 struct ListManifestErrorTypes
 {
@@ -74,7 +74,7 @@ struct ListManifestErrorTypes
     ManifestErrorType duplicatedId;
     ManifestErrorType duplicatedName;
 
-    QString listEntryTypeName;
+    std::string listEntryTypeName;
 };
 
 struct EntryFieldManifestErrorTypes
@@ -82,7 +82,7 @@ struct EntryFieldManifestErrorTypes
     ManifestErrorType emptyField;
     ManifestErrorType duplicatedField;
 
-    QString listEntryTypeName;
+    std::string listEntryTypeName;
 };
 
 } // nx::vms::api::analytics

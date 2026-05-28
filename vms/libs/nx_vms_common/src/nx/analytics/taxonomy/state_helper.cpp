@@ -12,16 +12,16 @@ using nx::vms::common::AnalyticsEngineResourcePtr;
 
 template<typename EntityType>
 using SupportedEntityTypesFetcher =
-    std::function<std::map<QString, EntityType*>(const QnVirtualCameraResourcePtr&)>;
+    std::function<std::map<std::string, EntityType*>(const QnVirtualCameraResourcePtr&)>;
 
 using SupportedEntityTypeIdsFetcher =
-    std::function<std::map<nx::Uuid, std::set<QString>>(const QnVirtualCameraResourcePtr&)>;
+    std::function<std::map<nx::Uuid, std::set<std::string>>(const QnVirtualCameraResourcePtr&)>;
 
 template<typename EntityType>
-using EntityTypeFetcher = std::function<EntityType*(const QString&)>;
+using EntityTypeFetcher = std::function<EntityType*(const std::string&)>;
 
 using EngineEntityTypeIdsFetcher =
-    std::function<std::set<QString>(const AnalyticsEngineResourcePtr&)>;
+    std::function<std::set<std::string>(const AnalyticsEngineResourcePtr&)>;
 
 //--------------------------------------------------------------------------------------------------
 
@@ -38,8 +38,8 @@ bool operator<(const ScopedEntity<Entity>& first, const ScopedEntity<Entity>& se
 
 template<typename EntityType>
 void intersect(
-    std::map<QString, EntityType*>* inOutFirst,
-    const std::map<QString, EntityType*>& second)
+    std::map<std::string, EntityType*>* inOutFirst,
+    const std::map<std::string, EntityType*>& second)
 {
     for (auto it = inOutFirst->begin(); it != inOutFirst->end();)
     {
@@ -53,18 +53,18 @@ void intersect(
 //--------------------------------------------------------------------------------------------------
 
 template<typename EntityType>
-std::map<QString, EntityType*> supportedEntityTypes(
+std::map<std::string, EntityType*> supportedEntityTypes(
     const QnVirtualCameraResourcePtr& device,
     SupportedEntityTypeIdsFetcher supportedEntityTypeIdsFetcher,
     EntityTypeFetcher<EntityType> entityTypeFetcher)
 {
-    std::map<QString, EntityType*> result;
+    std::map<std::string, EntityType*> result;
 
     const auto entityTypeIdsByEngine = supportedEntityTypeIdsFetcher(device);
 
     for (const auto& [engineId, entityTypeIds]: entityTypeIdsByEngine)
     {
-        for (const QString& entityTypeId: entityTypeIds)
+        for (const std::string& entityTypeId: entityTypeIds)
         {
             if (EntityType* const entityType = entityTypeFetcher(entityTypeId))
                 result.emplace(entityTypeId, entityType);
@@ -86,11 +86,11 @@ std::set<ScopedEntity<EntityType>> supportedScopedEntityTypes(
     for (const auto& [engineId, entityTypeIds]: supportedEntityTypeIdsFetcher(device))
     {
         ScopedEntity<EntityType> scopedEntityType;
-        scopedEntityType.engine = taxonomyState->engineById(engineId.toString(QUuid::WithBraces));
+        scopedEntityType.engine = taxonomyState->engineById(engineId.toStdString(QUuid::WithBraces));
         if (!scopedEntityType.engine)
             continue;
 
-        for (const QString& entityTypeId: entityTypeIds)
+        for (const std::string& entityTypeId: entityTypeIds)
         {
             EntityType* const entityType = entityTypeFetcher(entityTypeId);
             if (!entityType)
@@ -187,7 +187,7 @@ std::vector<EngineScope<EntityType>> supportedEntityTypeTreeIntersection(
 //--------------------------------------------------------------------------------------------------
 
 template<typename EntityType>
-std::map<QString, EntityType*> compatibleEntityTypes(
+std::map<std::string, EntityType*> compatibleEntityTypes(
     const QnVirtualCameraResourcePtr& device,
     SupportedEntityTypesFetcher<EntityType> supportedEntityTypesFetcher,
     EngineEntityTypeIdsFetcher engineEntityTypeIdsFetcher,
@@ -197,7 +197,7 @@ std::map<QString, EntityType*> compatibleEntityTypes(
     if (compatibleEngines.empty())
         return {};
 
-    std::map<QString, EntityType*> result;
+    std::map<std::string, EntityType*> result;
     for (const auto& engine: compatibleEngines)
     {
         const bool engineIsEnabled = device->enabledAnalyticsEngines().contains(engine->getId());
@@ -207,8 +207,8 @@ std::map<QString, EntityType*> compatibleEntityTypes(
         }
         else
         {
-            const std::set<QString> entityTypeIds = engineEntityTypeIdsFetcher(engine);
-            for (const QString& entityTypeId: entityTypeIds)
+            const std::set<std::string> entityTypeIds = engineEntityTypeIdsFetcher(engine);
+            for (const std::string& entityTypeId: entityTypeIds)
             {
                 EntityType* entityType = entityTypeFetcher(entityTypeId);
                 if (entityType)
@@ -233,21 +233,21 @@ std::set<ScopedEntity<EntityType>> compatibleScopedEntityTypes(
     {
         ScopedEntity<EntityType> scopedEntityType;
         scopedEntityType.engine =
-            taxonomyState->engineById(engine->getId().toString(QUuid::WithBraces));
+            taxonomyState->engineById(engine->getId().toStdString(QUuid::WithBraces));
         if (!scopedEntityType.engine)
             continue;
 
         const bool engineIsEnabled = device->enabledAnalyticsEngines().contains(engine->getId());
         auto supportedEntityTypesByEngine = supportedEntityTypeIdsFetcher(device);
 
-        const std::set<QString> entityTypeIds = engineIsEnabled || engine->isDeviceDependent()
+        const std::set<std::string> entityTypeIds = engineIsEnabled || engine->isDeviceDependent()
             ? supportedEntityTypesByEngine[engine->getId()]
             : engineEntityTypeIdsFetcher(engine);
 
         if (entityTypeIds.empty())
             continue;
 
-        for (const QString& entityTypeId: entityTypeIds)
+        for (const std::string& entityTypeId: entityTypeIds)
         {
             EntityType* entityType = entityTypeFetcher(entityTypeId);
             if (!entityType)
@@ -255,7 +255,7 @@ std::set<ScopedEntity<EntityType>> compatibleScopedEntityTypes(
 
             scopedEntityType.entityType = entityType;
 
-            const QString engineId = engine->getId().toString(QUuid::WithBraces);
+            const std::string engineId = engine->getId().toStdString(QUuid::WithBraces);
             for (const auto& scope: entityType->scopes())
             {
                 const AbstractEngine* taxonomyEngine = scope.engine();
@@ -451,32 +451,32 @@ StateHelper::StateHelper(std::shared_ptr<AbstractState> state):
     NX_ASSERT(m_state);
 }
 
-std::map<QString, EventType*> StateHelper::supportedEventTypes(
+std::map<std::string, EventType*> StateHelper::supportedEventTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedEntityTypes<EventType>(
         device,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
-        [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
+        [this](const std::string& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
 
-std::map<QString, EventType*> StateHelper::supportedEventTypeUnion(
+std::map<std::string, EventType*> StateHelper::supportedEventTypeUnion(
     const QnVirtualCameraResourceList& devices) const
 {
-    std::map<QString, EventType*> result;
+    std::map<std::string, EventType*> result;
     for (const QnVirtualCameraResourcePtr& device: devices)
         result.merge(supportedEventTypes(device));
 
     return result;
 }
 
-std::map<QString, EventType*> StateHelper::supportedEventTypeIntersection(
+std::map<std::string, EventType*> StateHelper::supportedEventTypeIntersection(
     const QnVirtualCameraResourceList& devices) const
 {
     if (devices.empty())
         return {};
 
-    std::map<QString, EventType*> result = supportedEventTypes(devices[0]);
+    std::map<std::string, EventType*> result = supportedEventTypes(devices[0]);
     for (int i = 1; i < devices.size(); ++i)
         intersect(&result, supportedEventTypes(devices[i]));
 
@@ -492,7 +492,7 @@ std::vector<EngineScope<EventType>> StateHelper::supportedEventTypeTreeUnion(
         m_state,
         additionalEntities,
         [&](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
-        [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
+        [this](const std::string& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
 
 std::vector<EngineScope<EventType>> StateHelper::supportedEventTypeTreeIntersection(
@@ -504,38 +504,38 @@ std::vector<EngineScope<EventType>> StateHelper::supportedEventTypeTreeIntersect
         m_state,
         additionalEntities,
         [&](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
-        [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
+        [this](const std::string& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
 
 //--------------------------------------------------------------------------------------------------
 
-std::map<QString, EventType*> StateHelper::compatibleEventTypes(
+std::map<std::string, EventType*> StateHelper::compatibleEventTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return compatibleEntityTypes<EventType>(
         device,
         [this](const QnVirtualCameraResourcePtr& device) { return supportedEventTypes(device); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->eventTypeIds(); },
-        [this](const QString& objectTypeId) { return m_state->eventTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->eventTypeById(objectTypeId); });
 }
 
-std::map<QString, EventType*> StateHelper::compatibleEventTypeUnion(
+std::map<std::string, EventType*> StateHelper::compatibleEventTypeUnion(
     const QnVirtualCameraResourceList& devices) const
 {
-    std::map<QString, EventType*> result;
+    std::map<std::string, EventType*> result;
     for (const QnVirtualCameraResourcePtr& device: devices)
         result.merge(compatibleEventTypes(device));
 
     return result;
 }
 
-std::map<QString, EventType*> StateHelper::compatibleEventTypeIntersection(
+std::map<std::string, EventType*> StateHelper::compatibleEventTypeIntersection(
     const QnVirtualCameraResourceList& devices) const
 {
     if (devices.empty())
         return {};
 
-    std::map<QString, EventType*> result = compatibleEventTypes(devices[0]);
+    std::map<std::string, EventType*> result = compatibleEventTypes(devices[0]);
     for (int i = 1; i < devices.size(); ++i)
         intersect(&result, compatibleEventTypes(devices[i]));
 
@@ -552,7 +552,7 @@ std::vector<EngineScope<EventType>> StateHelper::compatibleEventTypeTreeUnion(
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->eventTypeIds(); },
-        [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
+        [this](const std::string& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
 
 std::vector<EngineScope<EventType>> StateHelper::compatibleEventTypeTreeIntersection(
@@ -565,37 +565,37 @@ std::vector<EngineScope<EventType>> StateHelper::compatibleEventTypeTreeIntersec
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedEventTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->eventTypeIds(); },
-        [this](const QString& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
+        [this](const std::string& eventTypeId) { return m_state->eventTypeById(eventTypeId); });
 }
 
 //--------------------------------------------------------------------------------------------------
 
-std::map<QString, ObjectType*> StateHelper::supportedObjectTypes(
+std::map<std::string, ObjectType*> StateHelper::supportedObjectTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return supportedEntityTypes<ObjectType>(
         device,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
-std::map<QString, ObjectType*> StateHelper::supportedObjectTypeUnion(
+std::map<std::string, ObjectType*> StateHelper::supportedObjectTypeUnion(
     const QnVirtualCameraResourceList& devices) const
 {
-    std::map<QString, ObjectType*> result;
+    std::map<std::string, ObjectType*> result;
     for (const QnVirtualCameraResourcePtr& device: devices)
         result.merge(supportedObjectTypes(device));
 
     return result;
 }
 
-std::map<QString, ObjectType*> StateHelper::supportedObjectTypeIntersection(
+std::map<std::string, ObjectType*> StateHelper::supportedObjectTypeIntersection(
     const QnVirtualCameraResourceList& devices) const
 {
     if (devices.empty())
         return {};
 
-    std::map<QString, ObjectType*> result = supportedObjectTypes(devices[0]);
+    std::map<std::string, ObjectType*> result = supportedObjectTypes(devices[0]);
     for (int i = 1; i < devices.size(); ++i)
         intersect(&result, supportedObjectTypes(devices[i]));
 
@@ -611,7 +611,7 @@ std::vector<EngineScope<ObjectType>> StateHelper::supportedObjectTypeTreeUnion(
         m_state,
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
 std::vector<EngineScope<ObjectType>> StateHelper::supportedObjectTypeTreeIntersection(
@@ -623,38 +623,38 @@ std::vector<EngineScope<ObjectType>> StateHelper::supportedObjectTypeTreeInterse
         m_state,
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
 //--------------------------------------------------------------------------------------------------
 
-std::map<QString, ObjectType*> StateHelper::compatibleObjectTypes(
+std::map<std::string, ObjectType*> StateHelper::compatibleObjectTypes(
     const QnVirtualCameraResourcePtr& device) const
 {
     return compatibleEntityTypes<ObjectType>(
         device,
         [this](const QnVirtualCameraResourcePtr& device) { return supportedObjectTypes(device); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->objectTypeIds(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
-std::map<QString, ObjectType*> StateHelper::compatibleObjectTypeUnion(
+std::map<std::string, ObjectType*> StateHelper::compatibleObjectTypeUnion(
     const QnVirtualCameraResourceList& devices) const
 {
-    std::map<QString, ObjectType*> result;
+    std::map<std::string, ObjectType*> result;
     for (const QnVirtualCameraResourcePtr& device: devices)
         result.merge(compatibleObjectTypes(device));
 
     return result;
 }
 
-std::map<QString, ObjectType*> StateHelper::compatibleObjectTypeIntersection(
+std::map<std::string, ObjectType*> StateHelper::compatibleObjectTypeIntersection(
     const QnVirtualCameraResourceList& devices) const
 {
     if (devices.empty())
         return {};
 
-    std::map<QString, ObjectType*> result = compatibleObjectTypes(devices[0]);
+    std::map<std::string, ObjectType*> result = compatibleObjectTypes(devices[0]);
     for (int i = 1; i < devices.size(); ++i)
         intersect(&result, compatibleObjectTypes(devices[i]));
 
@@ -671,7 +671,7 @@ std::vector<EngineScope<ObjectType>> StateHelper::compatibleObjectTypeTreeUnion(
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->objectTypeIds(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
 std::vector<EngineScope<ObjectType>> StateHelper::compatibleObjectTypeTreeIntersection(
@@ -684,7 +684,7 @@ std::vector<EngineScope<ObjectType>> StateHelper::compatibleObjectTypeTreeInters
         additionalEntities,
         [](const QnVirtualCameraResourcePtr& device) { return device->supportedObjectTypes(); },
         [](const AnalyticsEngineResourcePtr& engine) { return engine->objectTypeIds(); },
-        [this](const QString& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
+        [this](const std::string& objectTypeId) { return m_state->objectTypeById(objectTypeId); });
 }
 
 } // namespace nx::analytics::taxonomy

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QString>
+
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 #include <nx/analytics/taxonomy/attribute.h>
 #include <nx/analytics/taxonomy/attribute_resolver.h>
@@ -20,9 +22,9 @@ class NX_VMS_COMMON_API AbstractObjectEventType: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString id READ id CONSTANT)
-    Q_PROPERTY(QString name READ name CONSTANT)
-    Q_PROPERTY(QString iconSource READ icon CONSTANT)
+    Q_PROPERTY(QString id READ idAsQString CONSTANT)
+    Q_PROPERTY(QString name READ nameAsQString CONSTANT)
+    Q_PROPERTY(QString iconSource READ iconAsQString CONSTANT)
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractAttribute*> attributes
         READ attributes CONSTANT)
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractAttribute*> supportedAttributes
@@ -38,9 +40,9 @@ public:
 
     AbstractObjectEventType(): QObject() {}
 
-    virtual QString id() const = 0;
-    virtual QString name() const = 0;
-    virtual QString icon() const = 0;
+    virtual const std::string& id() const = 0;
+    virtual const std::string& name() const = 0;
+    virtual const std::string& icon() const = 0;
     virtual std::vector<AbstractAttribute*> baseAttributes() const = 0;
     virtual std::vector<AbstractAttribute*> ownAttributes() const = 0;
     virtual std::vector<AbstractAttribute*> attributes() const = 0;
@@ -48,6 +50,11 @@ public:
     virtual std::vector<AbstractAttribute*> supportedOwnAttributes() const = 0;
     virtual bool hasEverBeenSupported() const = 0;
     virtual bool isReachable() const = 0;
+
+private:
+    QString idAsQString() const;
+    QString nameAsQString() const;
+    QString iconAsQString() const;
 };
 
 template <typename DerivedType, typename DescriptorType>
@@ -57,7 +64,7 @@ public:
     BaseObjectEventType(
         EntityType entityType,
         DescriptorType& descriptor,
-        QString typeName,
+        std::string typeName,
         AbstractResourceSupportProxy* resourceSupportProxy)
         :
         AbstractObjectEventType(),
@@ -68,9 +75,9 @@ public:
         {
         }
 
-    virtual QString id() const override;
-    virtual QString name() const override;
-    virtual QString icon() const override;
+    virtual const std::string& id() const override;
+    virtual const std::string& name() const override;
+    virtual const std::string& icon() const override;
     virtual std::vector<AbstractAttribute*> baseAttributes() const override;
     virtual std::vector<AbstractAttribute*> ownAttributes() const override;
     virtual std::vector<AbstractAttribute*> attributes() const override;
@@ -111,7 +118,7 @@ protected:
     std::vector<AbstractAttribute*> m_ownAttributes;
     std::vector<Scope> m_scopes;
 
-    QString m_typeName;
+    std::string m_typeName;
     bool m_isReachable = false;
     bool m_isResolved = false;
     bool m_areSupportedAttributesResolved = false;

@@ -61,7 +61,7 @@ public:
     StateHelper(std::shared_ptr<AbstractState> state);
 
     /** @return Map of supported Event types indexed by the Event type id. */
-    std::map<QString, EventType*> supportedEventTypes(
+    std::map<std::string, EventType*> supportedEventTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -69,7 +69,7 @@ public:
      *     Calculated as a union of maps of supported Event types of particular devices from the
      *     set.
      */
-    std::map<QString, EventType*> supportedEventTypeUnion(
+    std::map<std::string, EventType*> supportedEventTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -77,7 +77,7 @@ public:
      *     Calculated as an intersection of maps of supported Event types of particular devices
      *     from the set.
      */
-    std::map<QString, EventType*> supportedEventTypeIntersection(
+    std::map<std::string, EventType*> supportedEventTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -103,7 +103,7 @@ public:
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of compatible Event types indexed by the Event type id. */
-    std::map<QString, EventType*> compatibleEventTypes(
+    std::map<std::string, EventType*> compatibleEventTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -111,7 +111,7 @@ public:
      *     Calculated as a union of maps of compatible Event types of particular devices from the
      *     set.
      */
-    std::map<QString, EventType*> compatibleEventTypeUnion(
+    std::map<std::string, EventType*> compatibleEventTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -119,7 +119,7 @@ public:
      *     Calculated as an intersection of maps of compatible Event types of particular devices
      *     from the set.
      */
-    std::map<QString, EventType*> compatibleEventTypeIntersection(
+    std::map<std::string, EventType*> compatibleEventTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -145,7 +145,7 @@ public:
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of supported Object types indexed by the Object type id. */
-    std::map<QString, ObjectType*> supportedObjectTypes(
+    std::map<std::string, ObjectType*> supportedObjectTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -153,7 +153,7 @@ public:
      *     Calculated as a union of maps of supported Object types of particular devices from the
      *     set.
      */
-    std::map<QString, ObjectType*> supportedObjectTypeUnion(
+    std::map<std::string, ObjectType*> supportedObjectTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -161,7 +161,7 @@ public:
      *     Calculated as an intersection of maps of supported Object types of particular devices
      *     from the set.
      */
-    std::map<QString, ObjectType*> supportedObjectTypeIntersection(
+    std::map<std::string, ObjectType*> supportedObjectTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -187,7 +187,7 @@ public:
     //----------------------------------------------------------------------------------------------
 
     /** @return Map of compatible Object types indexed by the Object type id. */
-    std::map<QString, ObjectType*> compatibleObjectTypes(
+    std::map<std::string, ObjectType*> compatibleObjectTypes(
         const QnVirtualCameraResourcePtr& device) const;
 
     /**
@@ -195,7 +195,7 @@ public:
      *     Calculated as a union of maps of compatible Object types of particular devices from the
      *     set.
      */
-    std::map<QString, ObjectType*> compatibleObjectTypeUnion(
+    std::map<std::string, ObjectType*> compatibleObjectTypeUnion(
         const QnVirtualCameraResourceList& device) const;
 
     /**
@@ -203,7 +203,7 @@ public:
      *     Calculated as an intersection of maps of compatible Object types of particular devices
      *     from the set.
      */
-    std::map<QString, ObjectType*> compatibleObjectTypeIntersection(
+    std::map<std::string, ObjectType*> compatibleObjectTypeIntersection(
         const QnVirtualCameraResourceList& device) const;
 
     /**

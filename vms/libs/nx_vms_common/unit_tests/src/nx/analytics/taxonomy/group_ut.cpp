@@ -16,7 +16,7 @@ namespace nx::analytics::taxonomy {
 class GroupTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
@@ -28,7 +28,9 @@ protected:
         auto [deserializationResult, result] =
             nx::reflect::json::deserialize<std::map<QString, GroupDescriptor>>(objectAsBytes.toStdString());
 
-        m_expectedData = deserializationResult;
+        m_expectedData.clear();
+        for (const auto& [k, v] : deserializationResult)
+            m_expectedData.emplace(k.toStdString(), v);
 
         ASSERT_TRUE(result.success);
 
@@ -59,7 +61,7 @@ protected:
 
 private:
     Descriptors m_descriptors;
-    std::map<QString, GroupDescriptor> m_expectedData;
+    std::map<std::string, GroupDescriptor> m_expectedData;
     StateCompiler::Result m_result;
 };
 

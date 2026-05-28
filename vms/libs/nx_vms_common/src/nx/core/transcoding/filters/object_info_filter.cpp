@@ -12,6 +12,7 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/media/ffmpeg/frame_info.h>
 #include <nx/utils/math/fuzzy.h>
+#include <nx/utils/string.h>
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/utils/geometry.h>
 #include <nx/vms/common/utils/object_painter_helper.h>
@@ -121,23 +122,23 @@ std::optional<nx::common::metadata::ObjectMetadataPacket> objectDataPacketFromMe
         QByteArray::fromRawData(compressedMetadata->data(), int(compressedMetadata->dataSize())));
 }
 
-QString objectDescription(const nx::common::metadata::Attributes attributes)
+std::string objectDescription(const nx::common::metadata::Attributes attributes)
 {
-    QStringList result;
+    std::vector<std::string> result;
     result.reserve(kMaxAttributesCount + 1);
 
     int i = 0;
     for (const auto& attribute: attributes)
     {
-        result.append(QString("%1\t%2").arg(attribute.name, attribute.value));
+        result.emplace_back(QString("%1\t%2").arg(attribute.name, attribute.value).toStdString());
         if (i++ >= kMaxAttributesCount)
         {
-            result.append("...");
+            result.emplace_back("...");
             break;
         }
     }
 
-    return result.join("\n");
+    return nx::utils::join(result, "\n");
 }
 
 bool objectRectIsValid(const QRectF& rect)
@@ -218,20 +219,21 @@ std::shared_ptr<QTextDocument> ObjectInfoFilter::buildDescription(
     if (iter != m_descriptions.end())
         return iter->second;
 
-    QString description;
+    std::string description;
     const auto objectType = m_settings.taxonomyState
         ? m_settings.taxonomyState->objectTypeById(objectMetadata.typeId)
         : nullptr;
-    const QString title = objectType ? objectType->name() : QString();
+    const std::string title = objectType ? objectType->name() : std::string();
 
     description = title;
-    if (!title.isEmpty() && !objectMetadata.attributes.empty())
+    if (!title.empty() && !objectMetadata.attributes.empty())
         description += "\n";
 
     description += objectDescription(objectMetadata.attributes);
 
     // Font.
-    std::shared_ptr<QTextDocument> doc = std::make_shared<QTextDocument>(description);
+    std::shared_ptr<QTextDocument> doc = std::make_shared<QTextDocument>(
+        QString::fromStdString(description));
     const int pixelSize = std::max(kMinTextHeight, height / kMaxTextLinesInFrame);
     QFont font("Roboto");
     font.setBold(true);
@@ -328,7 +330,7 @@ void ObjectInfoFilter::updateImage(QImage& image)
             oldFramesObjectsSet.erase(objectMetadata.trackId);
 
             if (!objectRectIsValid(objectMetadata.boundingBox)
-                || !m_settings.typeSettings.contains(objectMetadata.typeId))
+                || !m_settings.typeSettings.contains(QString::fromStdString(objectMetadata.typeId)))
             {
                 continue;
             }

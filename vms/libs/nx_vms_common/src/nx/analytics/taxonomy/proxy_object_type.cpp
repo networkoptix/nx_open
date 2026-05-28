@@ -10,10 +10,10 @@ namespace nx::analytics::taxonomy {
 
 ProxyObjectType::ProxyObjectType(
     ObjectType* proxiedObjectType,
-    std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
+    std::map<std::string, AttributeSupportInfoTree> attributeSupportInfoTree,
     AbstractResourceSupportProxy* resourceSupportProxy,
-    QString prefix,
-    QString rootParentTypeId,
+    std::string prefix,
+    std::string rootParentTypeId,
     EntityType rootEntityType)
     :
     ObjectType(proxiedObjectType->descriptor(), resourceSupportProxy),
@@ -26,17 +26,17 @@ ProxyObjectType::ProxyObjectType(
 {
 }
 
-QString ProxyObjectType::id() const
+const std::string& ProxyObjectType::id() const
 {
     return m_proxiedObjectType->id();
 }
 
-QString ProxyObjectType::name() const
+const std::string& ProxyObjectType::name() const
 {
     return m_proxiedObjectType->name();
 }
 
-QString ProxyObjectType::icon() const
+const std::string& ProxyObjectType::icon() const
 {
     return m_proxiedObjectType->icon();
 }

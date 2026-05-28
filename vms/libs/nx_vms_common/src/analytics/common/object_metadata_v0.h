@@ -8,7 +8,7 @@ namespace nx::common::metadata {
 
 struct ObjectMetadataV0
 {
-    QString typeId;
+    std::string typeId;
     nx::Uuid trackId;
     QRectF boundingBox;
     Attributes attributes;

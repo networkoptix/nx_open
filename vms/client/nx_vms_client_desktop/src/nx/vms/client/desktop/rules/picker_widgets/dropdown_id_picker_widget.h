@@ -203,14 +203,15 @@ protected:
     {
         DropdownIdPickerWidgetBase<vms::rules::AnalyticsEventTypeField, QnTreeComboBox>::updateUi();
 
+        const auto typeId = m_field->typeId();
         m_analyticsSdkEventModel->loadFromCameras(
-            getCameras(), m_engineId, m_field->typeId());
+            getCameras(), m_engineId, typeId);
 
         const auto analyticsModel = m_comboBox->model();
         auto items = analyticsModel->match(
             analyticsModel->index(0, 0),
             AnalyticsEventModel::EventTypeIdRole,
-            /*value*/ QVariant::fromValue(m_field->typeId()),
+            /*value*/ QVariant::fromValue(typeId),
             /*hits*/ 1,
             Qt::MatchExactly | Qt::MatchRecursive);
 
@@ -228,12 +229,12 @@ private:
 
         if (!m_analyticsSdkEventModel->isValid())
         {
-            m_field->setTypeId({});
+            m_field->setTypeId(QString{});
             m_engineId = {};
             return;
         }
 
-        if (m_field->typeId().isNull())
+        if (m_field->typeId().isEmpty())
         {
             const auto analyticsModel = m_comboBox->model();
             const auto selectableItems = analyticsModel->match(

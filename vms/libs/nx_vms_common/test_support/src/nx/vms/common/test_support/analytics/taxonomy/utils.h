@@ -15,7 +15,7 @@ struct NX_VMS_COMMON_TEST_SUPPORT_API TestData
 };
 
 NX_VMS_COMMON_TEST_SUPPORT_API bool loadDescriptorsTestData(
-    const QString& filePath, TestData* outTestData);
+    const std::string& filePath, TestData* outTestData);
 
 NX_VMS_COMMON_TEST_SUPPORT_API bool makeDescriptorsTestData(
     std::string_view body, TestData* outTestData);

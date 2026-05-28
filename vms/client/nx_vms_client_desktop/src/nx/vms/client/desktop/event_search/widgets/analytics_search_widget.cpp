@@ -444,7 +444,7 @@ void AnalyticsSearchWidget::Private::setupEngineSelection()
         {
             const auto engine = engineById(m_analyticsSetup->engine());
             if (engine)
-                m_engineSelectionButton->setText(engine->name());
+                m_engineSelectionButton->setText(QString::fromStdString(engine->name()));
 
             m_engineSelectionButton->setState(engine
                 ? SelectableTextButton::State::unselected
@@ -547,13 +547,14 @@ void AnalyticsSearchWidget::Private::updateTaxonomy()
         relevantEngines,
         [this](AbstractEngine* left, AbstractEngine* right)
         {
-            return m_collator.compare(left->name(), right->name()) < 0;
+            return m_collator.compare(QString::fromStdString(left->name()),
+                QString::fromStdString(right->name())) < 0;
         });
 
     for (const auto& engine: relevantEngines)
     {
         const nx::Uuid id(engine->id());
-        addEngineMenuAction(m_engineMenu, engine->name(), id);
+        addEngineMenuAction(m_engineMenu, QString::fromStdString(engine->name()), id);
 
         if (!currentSelectionStillAvailable && currentSelection == id)
             currentSelectionStillAvailable = true;

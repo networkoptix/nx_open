@@ -12,16 +12,17 @@ namespace nx::analytics::taxonomy {
 
 Engine::Engine(EngineDescriptor engineDescriptor, QObject* parent):
     AbstractEngine(parent),
-    m_descriptor(std::move(engineDescriptor))
+    m_descriptor(std::move(engineDescriptor)),
+    m_id(m_descriptor.id.toStdString(QUuid::WithBraces))
 {
 }
 
-QString Engine::id() const
+const std::string& Engine::id() const
 {
-    return m_descriptor.id.toString(QUuid::WithBraces);
+    return m_id;
 }
 
-QString Engine::name() const
+const std::string& Engine::name() const
 {
     return m_descriptor.name;
 }

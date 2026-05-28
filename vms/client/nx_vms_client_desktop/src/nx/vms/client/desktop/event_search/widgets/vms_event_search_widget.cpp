@@ -340,10 +340,11 @@ void VmsEventSearchWidget::Private::updateAnalyticsMenu()
                 // Leaf node - event type.
                 if (node->nodeType == NodeType::eventType)
                 {
-                    addMenuAction(parent, node->text, kAnalyticsEventType, node->entityId);
+                    const auto entityId = node->entityId;
+                    addMenuAction(parent, node->text, kAnalyticsEventType, entityId);
 
                     if (!currentSelectionStillAvailable
-                        && currentSelection == node->entityId)
+                        && currentSelection == entityId)
                     {
                         currentSelectionStillAvailable = true;
                     }

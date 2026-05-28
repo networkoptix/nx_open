@@ -94,7 +94,7 @@ void LookupListsModel::setObjectTypeId(std::optional<QString> type)
         for (const auto& list: systemContext()->lookupListManager()->lookupLists())
         {
             if (nx::vms::common::LookupListManager::typeCompatibleWithList(
-                    analyticsTaxonomyState().get(), list, m_objectTypeId.value()))
+                    analyticsTaxonomyState().get(), list, m_objectTypeId.value().toStdString()))
             {
                 m_lookupLists.emplace_back(list.id, list.name);
             }

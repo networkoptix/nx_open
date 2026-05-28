@@ -15,11 +15,11 @@ namespace nx::analytics::taxonomy {
 
 struct EnumTypeTestExpectedData
 {
-    QString id;
-    QString name;
-    QString base;
-    std::vector<QString> items;
-    std::vector<QString> ownItems;
+    std::string id;
+    std::string name;
+    std::string base;
+    std::vector<std::string> items;
+    std::vector<std::string> ownItems;
 };
 #define EnumTypeTestExpectedData_Fields \
     (id) \
@@ -33,7 +33,7 @@ NX_REFLECTION_INSTRUMENT(EnumTypeTestExpectedData, EnumTypeTestExpectedData_Fiel
 class EnumTypeTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
@@ -43,7 +43,7 @@ protected:
         const QByteArray objectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, EnumTypeTestExpectedData>>(objectAsBytes.toStdString());
+            nx::reflect::json::deserialize<std::map<std::string, EnumTypeTestExpectedData>>(objectAsBytes.toStdString());
 
         m_expectedData = deserializationResult;
 
@@ -88,7 +88,7 @@ private:
     void makeSureBaseIsCorrect(const AbstractEnumType* enumType)
     {
         const EnumTypeTestExpectedData& expectedData = m_expectedData[enumType->id()];
-        if (expectedData.base.isEmpty())
+        if (expectedData.base.empty())
             ASSERT_EQ(enumType->base(), nullptr);
         else
             ASSERT_EQ(enumType->base()->id(), expectedData.base);
@@ -106,7 +106,7 @@ private:
 
 private:
     Descriptors m_descriptors;
-    std::map<QString, EnumTypeTestExpectedData> m_expectedData;
+    std::map<std::string, EnumTypeTestExpectedData> m_expectedData;
     StateCompiler::Result m_result;
 };
 

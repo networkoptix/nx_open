@@ -33,7 +33,7 @@ ObjectDisplaySettings::ObjectDisplaySettings()
 
 QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 {
-    if (const auto settingsIt = m_settingsMap.find(objectTypeId);
+    if (const auto settingsIt = m_settingsMap.find(objectTypeId.toStdString());
         settingsIt != m_settingsMap.end() && settingsIt->second.color.isValid())
     {
         return settingsIt->second.color;
@@ -41,7 +41,7 @@ QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 
     // Color not found - select random color and update settings.
     m_settingsMap = appContext()->coreSettings()->detectedObjectSettings();
-    auto& settings = m_settingsMap[objectTypeId];
+    auto& settings = m_settingsMap[objectTypeId.toStdString()];
     settings.color = nx::utils::random::choice(core::colorTheme()->colors("detectedObject"));
     appContext()->coreSettings()->detectedObjectSettings = m_settingsMap;
 
@@ -77,7 +77,7 @@ QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::ObjectMeta
         return paletteEntry->second;
     }
 
-    return objectColor(object.typeId);
+    return objectColor(QString::fromStdString(object.typeId));
 }
 
 std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttributes(

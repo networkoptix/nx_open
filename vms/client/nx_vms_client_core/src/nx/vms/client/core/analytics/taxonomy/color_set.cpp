@@ -56,8 +56,11 @@ QString ColorSet::color(const QString& item) const
 
 void ColorSet::addColorType(nx::analytics::taxonomy::AbstractColorType* colorType)
 {
-    for (const QString& colorName: colorType->items())
-        d->colorByName[colorName] = colorType->color(colorName);
+    for (const std::string& colorName: colorType->items())
+    {
+        d->colorByName[QString::fromStdString(colorName)] = QString::fromStdString(
+            colorType->color(colorName));
+    }
 }
 
 } // namespace nx::vms::client::core::analytics::taxonomy

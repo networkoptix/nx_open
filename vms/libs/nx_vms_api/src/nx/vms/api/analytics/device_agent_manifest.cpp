@@ -23,7 +23,7 @@ public:
     template<typename Entity, typename FieldValueGetter, typename ErrorMaker>
     void process(
         std::vector<ManifestError>* inOutErrorList,
-        const QList<Entity>& entityList,
+        const std::vector<Entity>& entityList,
         FieldValueGetter fieldValueGetter,
         ErrorMaker errorMaker)
     {
@@ -33,13 +33,13 @@ public:
         for (const auto& entity: entityList)
         {
             const auto fieldValue = fieldValueGetter(entity);
-            if (fieldValue.isEmpty() && !m_isEmptyFieldDetected
+            if (fieldValue.empty() && !m_isEmptyFieldDetected
                 && m_manifestErrorTypes.emptyField != ManifestErrorType::noError)
             {
                 inOutErrorList->emplace_back(m_manifestErrorTypes.emptyField);
                 m_isEmptyFieldDetected = true;
             }
-            else if (!fieldValue.isEmpty())
+            else if (!fieldValue.empty())
             {
                 const bool isDuplicate =
                     m_processedFields.find(fieldValue) != m_processedFields.cend();
@@ -66,15 +66,15 @@ public:
 
 private:
     bool m_isEmptyFieldDetected = false;
-    std::set<QString> m_processedFields;
-    std::set<QString> m_processedFieldDuplicates;
+    std::set<std::string> m_processedFields;
+    std::set<std::string> m_processedFieldDuplicates;
     EntryFieldManifestErrorTypes m_manifestErrorTypes;
 };
 
 template<typename ListOfTypes, typename FieldValueGetter>
 void validateSupportedTypesByField(
     std::vector<ManifestError>* outErrorList,
-    const QList<QString>& supportedTypeList,
+    const std::vector<std::string>& supportedTypeList,
     const ListOfTypes&  declaredTypeList,
     const EntryFieldManifestErrorTypes& entryFieldManifestErrorTypes,
     FieldValueGetter fieldValueGetter)
@@ -88,33 +88,28 @@ void validateSupportedTypesByField(
         outErrorList,
         supportedTypeList,
         [](const auto& entry) { return entry; },
-        [](ManifestErrorType errorType, const QString& entryTypeName, const QString& entryId)
+        [](ManifestErrorType errorType, const std::string& entryTypeName, const std::string& entryId)
         {
-            return ManifestError(errorType, nx::format("%1 id %2").args(
-                entryTypeName,
-                nx::kit::utils::toString(entryId)));
+            return ManifestError(errorType, nx::format("%1 id %2", entryTypeName, entryId)
+                .toStdString());
         });
 
     listProcessor.process(
         outErrorList,
         declaredTypeList,
         fieldValueGetter,
-        [](ManifestErrorType errorType, const QString& entryTypeName, const auto& entry)
+        [](ManifestErrorType errorType, const std::string& entryTypeName, const auto& entry)
         {
-            return ManifestError(
-                errorType,
-                nx::format("%1 id %2, %3 name %4").args(
-                    entryTypeName,
-                    nx::kit::utils::toString(entry.id),
-                    entryTypeName,
-                    nx::kit::utils::toString(entry.name)));
+            return ManifestError(errorType, nx::format(
+                "%1 id %2, %3 name %4", entryTypeName, entry.id, entryTypeName, entry.name)
+                    .toStdString());
         });
 }
 
 template<typename ListOfTypes>
 void validateSupportedTypes(
     std::vector<ManifestError>* outErrorList,
-    const QList<QString>& supportedTypeList,
+    const std::vector<std::string>& supportedTypeList,
     const ListOfTypes& declaredTypeList,
     const ListManifestErrorTypes& manifestErrorTypes)
 {
@@ -173,7 +168,7 @@ std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManife
 
     validateSupportedTypes(
         &result,
-        QList<QString>(),
+        std::vector<std::string>(),
         deviceAgentManifest.groups,
         {
             ManifestErrorType::emptyGroupId,

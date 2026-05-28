@@ -10,7 +10,7 @@ TestResourceSupportProxy::TestResourceSupportProxy()
 
 bool TestResourceSupportProxy::isEntityTypeSupported(
     EntityType /*entityType*/,
-    const QString& /*entityTypeId*/,
+    const std::string& /*entityTypeId*/,
     nx::Uuid /*deviceId*/,
     nx::Uuid /*engineId*/) const
 {
@@ -19,8 +19,8 @@ bool TestResourceSupportProxy::isEntityTypeSupported(
 
 bool TestResourceSupportProxy::isEntityTypeAttributeSupported(
     EntityType /*entityType*/,
-    const QString& /*entityTypeId*/,
-    const QString& /*fullAttributeName*/,
+    const std::string& /*entityTypeId*/,
+    const std::string& /*fullAttributeName*/,
     nx::Uuid /*deviceId*/,
     nx::Uuid /*engineId*/) const
 {

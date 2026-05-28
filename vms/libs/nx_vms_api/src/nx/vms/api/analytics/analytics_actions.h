@@ -31,7 +31,7 @@ struct NX_VMS_API RequestAvailableAnalyticsActions
     /**%apidoc
      * Id of an Object type to which an Action should be applicable.
      */
-    QString objectTypeId;
+    std::string objectTypeId;
 };
 #define RequestAvailableAnalyticsActions_Fields (serverId)(engineId)(objectTypeId)
 QN_FUSION_DECLARE_FUNCTIONS(RequestAvailableAnalyticsActions, (json), NX_VMS_API)

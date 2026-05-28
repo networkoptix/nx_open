@@ -89,9 +89,9 @@ bool lessByTimestamp(
     return metadataTimestamp(left) < metadataTimestamp(right);
 }
 
-std::set<QString> convertToSet(const QString& id)
+std::set<std::string> convertToSet(const QString& id)
 {
-    return id.isEmpty() ? std::set<QString>{} : std::set<QString>{id};
+    return id.isEmpty() ? std::set<std::string>{} : std::set<std::string>{id.toStdString()};
 }
 
 } // namespace
@@ -354,7 +354,8 @@ void AnalyticsSearchListModel::Private::updateAttributes(nx::analytics::db::Obje
         {
             const AbstractAttribute* taxonomyAttribute =
                 q->systemContext()->analyticsAttributeHelper()->findAttribute(
-                    attribute.name, {track.objectTypeId});
+                    attribute.name,
+                    QVector<QString>{QString::fromStdString(track.objectTypeId)});
 
             if (taxonomyAttribute && taxonomyAttribute->type() == AbstractAttribute::Type::number)
             {
@@ -388,7 +389,7 @@ const nx::analytics::taxonomy::ObjectType*
         return nullptr;
 
     const auto state = watcher->state();
-    return state ? state->objectTypeById(objectTypeId) : nullptr;
+    return state ? state->objectTypeById(objectTypeId.toStdString()) : nullptr;
 }
 
 QString AnalyticsSearchListModel::Private::iconPath(const QString& objectTypeId) const
@@ -397,7 +398,7 @@ QString AnalyticsSearchListModel::Private::iconPath(const QString& objectTypeId)
     const auto objectType = objectTypeById(objectTypeId);
 
     return objectType
-        ? iconManager->iconPath(objectType->icon())
+        ? iconManager->iconPath(QString::fromStdString(objectType->icon()))
         : iconManager->fallbackIconPath();
 }
 
@@ -448,10 +449,10 @@ QString AnalyticsSearchListModel::Private::engineName(
     if (!taxonomyState)
         return {};
 
-    if (const auto engine =
-        taxonomyState->engineById(track.analyticsEngineId.toString(QUuid::WithBraces)))
+    if (const auto engine = taxonomyState->engineById(
+        track.analyticsEngineId.toStdString(QUuid::WithBraces)))
     {
-        return engine->name();
+        return QString::fromStdString(engine->name());
     }
 
     return {};
@@ -853,8 +854,11 @@ void AnalyticsSearchListModel::Private::processMetadata()
             // ---------
             // New track
 
-            if (!item.position || !isAcceptedObjectType(item.position->typeId))
+            if (!item.position
+                || !isAcceptedObjectType(QString::fromStdString(item.position->typeId)))
+            {
                 continue;
+            }
 
             ObjectTrack newTrack;
             newTrack.id = item.trackId;
@@ -1374,11 +1378,14 @@ QString AnalyticsSearchListModel::combinedTextFilter() const
     if (!freeText.isEmpty())
         attributesText.append(" " + freeText);
 
-    const auto set = convertToSet(selectedObjectType());
+    QVector<QString> objectTypeIds;
+    if (const auto objectType = selectedObjectType(); !objectType.isEmpty())
+        objectTypeIds.push_back(objectType);
+
     return analytics::taxonomy::makeEnumValuesExact(
         attributesText,
         systemContext()->analyticsAttributeHelper(),
-        {set.begin(), set.end()});
+        objectTypeIds);
 }
 
 TextScope AnalyticsSearchListModel::textSearchScope() const
@@ -1578,18 +1585,19 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
             const auto fallbackTitle =
                 [typeId = track.objectTypeId]()
                 {
-                    return QString("<%1>").arg(typeId.isEmpty() ? tr("Unknown track") : typeId);
+                    return QString("<%1>").arg(
+                        typeId.empty() ? tr("Unknown track") : QString::fromStdString(typeId));
                 };
 
-            const auto objectType = d->objectTypeById(track.objectTypeId);
-            return objectType ? objectType->name() : fallbackTitle();
+            const auto objectType = d->objectTypeById(QString::fromStdString(track.objectTypeId));
+            return objectType ? QString::fromStdString(objectType->name()) : fallbackTitle();
         }
 
         case HasExternalBestShotRole:
             return d->externalBestShotTracks.contains(track.id);
 
         case DecorationPathRole:
-            return d->iconPath(track.objectTypeId);
+            return d->iconPath(QString::fromStdString(track.objectTypeId));
 
         case Qt::DecorationRole:
         {
@@ -1606,7 +1614,7 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
                 return {};
 
             return QVariant::fromValue(systemContext()->analyticsAttributeHelper()->
-                preprocessAttributes(track.objectTypeId, track.attributes));
+                preprocessAttributes(QString::fromStdString(track.objectTypeId), track.attributes));
         }
 
         case TimestampRole:
@@ -1646,7 +1654,7 @@ QVariant AnalyticsSearchListModel::data(const QModelIndex& index, int role) cons
             return track.title && track.title->hasImage;
 
         case ObjectTypeIdRole:
-            return track.objectTypeId;
+            return QString::fromStdString(track.objectTypeId);
 
         case DurationRole:
             return QVariant::fromValue(objectDuration(track));

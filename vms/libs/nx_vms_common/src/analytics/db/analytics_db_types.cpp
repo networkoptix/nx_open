@@ -256,7 +256,7 @@ bool Filter::matchText(const TextMatcher* textMatcher,
     const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
     const auto objectTypeName = objectTypeDictionary.idToName(track.objectTypeId);
-    if (objectTypeName && textMatcher->matchText(*objectTypeName))
+    if (objectTypeName && textMatcher->matchText(QString::fromStdString(*objectTypeName)))
         return true;
 
     return textMatcher->matchAttributes(track.attributes);
@@ -358,15 +358,15 @@ void serializeToUrlQuery(const Filter& filter, nx::UrlQuery& urlQuery)
     urlQuery = nx::UrlQuery(paramList->toUrlQuery());
 }
 
-std::set<QString> addDerivedTypeIds(
+std::set<std::string> addDerivedTypeIds(
     const nx::analytics::taxonomy::AbstractStateWatcher* stateWatcher,
     const QList<QString>& objectTypeIdsFromUser)
 {
     using namespace nx::analytics::taxonomy;
 
-    std::set<QString> parentObjectTypeIds;
+    std::set<std::string> parentObjectTypeIds;
     for (const auto& objectTypeId: objectTypeIdsFromUser)
-        parentObjectTypeIds.insert(objectTypeId);
+        parentObjectTypeIds.insert(objectTypeId.toStdString());
 
     if (!NX_ASSERT(stateWatcher, "Unable to access the analytics taxonomy state watcher"))
         return parentObjectTypeIds;
@@ -375,13 +375,13 @@ std::set<QString> addDerivedTypeIds(
     if (!NX_ASSERT(state, "Unable to access the analytics taxonomy state"))
         return parentObjectTypeIds;
 
-    std::set<QString> result = parentObjectTypeIds;
-    for (const QString& objectTypeId: parentObjectTypeIds)
+    std::set<std::string> result = parentObjectTypeIds;
+    for (const auto& objectTypeId: parentObjectTypeIds)
     {
-        const std::set<QString> derivedObjectTypeIds =
+        const auto derivedObjectTypeIds =
             getAllDerivedTypeIds(state.get(), objectTypeId);
-
-        result.insert(derivedObjectTypeIds.cbegin(), derivedObjectTypeIds.cend());
+        for (auto it = derivedObjectTypeIds.cbegin(); it != derivedObjectTypeIds.cend(); ++it)
+            result.insert(*it);
     }
 
     return result;
@@ -407,14 +407,16 @@ bool deserializeFromParams(
             filter->deviceIds.insert(uuid);
     }
 
+    const auto& objectTypeIds = params.values("objectTypeId");
     if (taxonomyStateWatcher)
     {
-        filter->objectTypeId = addDerivedTypeIds(taxonomyStateWatcher, params.values("objectTypeId"));
+        filter->objectTypeId = addDerivedTypeIds(taxonomyStateWatcher,
+            objectTypeIds);
     }
     else
     {
-        for (const auto& objectTypeId: params.values("objectTypeId"))
-            filter->objectTypeId.insert(objectTypeId);
+        for (const QString& v : objectTypeIds)
+            filter->objectTypeId.insert(v.toStdString());
     }
 
     if (params.contains(lit("objectTrackId")))

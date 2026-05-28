@@ -125,11 +125,11 @@ std::optional<nx::vms::api::json::ValueOrArray<QString>> typeList(const QString&
     return type;
 }
 
-nx::vms::api::analytics::EventTypeId analyticsEventTypeId(const QModelIndex& index)
+QString analyticsEventTypeId(const QModelIndex& index)
 {
     return index.isValid()
-        ? index.data(AnalyticsEventTypeIdRole).value<nx::vms::api::analytics::EventTypeId>()
-        : nx::vms::api::analytics::EventTypeId();
+        ? index.data(AnalyticsEventTypeIdRole).toString()
+        : QString();
 }
 
 QModelIndex analyticsEventsRoot(QStandardItemModel* model)
@@ -390,12 +390,12 @@ void EventLogDialog::updateAnalyticsEvents()
     const auto selectedAnalyticsEventTypeId =
         selectedEventType == nx::vms::api::EventType::analyticsSdkEvent
             ? analyticsEventTypeId(selectedIndex)
-            : nx::vms::api::analytics::EventTypeId();
+            : QString();
 
     item->removeRows(0, item->rowCount());
     createAnalyticsEventTree(item);
 
-    if (!selectedAnalyticsEventTypeId.isNull())
+    if (!selectedAnalyticsEventTypeId.isEmpty())
     {
         // Only select current item.
         QSignalBlocker signalBlocker(ui->eventComboBox);
@@ -588,7 +588,7 @@ void EventLogDialog::updateData()
         !instantOnly && !analyticsTypeId.isEmpty())
     {
         const auto taxonomy = systemContext()->analyticsTaxonomyState();
-        const auto analyticsType = taxonomy->eventTypeById(analyticsTypeId);
+        const auto analyticsType = taxonomy->eventTypeById(analyticsTypeId.toStdString());
         instantOnly = analyticsType && !analyticsType->isStateDependent();
     }
 
@@ -599,7 +599,7 @@ void EventLogDialog::updateData()
 
     const auto analyticsEventTypeId = (eventType == kAnalyticsEventType)
         ? desktop::analyticsEventTypeId(ui->eventComboBox->currentModelIndex())
-        : nx::vms::api::analytics::EventTypeId();
+        : QString();
 
     const auto order =
         ui->gridEvents->horizontalHeader()->sortIndicatorSection() == EventLogModel::DateTimeColumn
@@ -632,7 +632,7 @@ void EventLogDialog::updateData()
 void EventLogDialog::query(
     const QnTimePeriod& period,
     const QString& eventType,
-    const nx::vms::api::analytics::EventTypeId& analyticsEventTypeId,
+    const QString& analyticsEventTypeId,
     const QString& actionType,
     const QString& text,
     Qt::SortOrder order)
@@ -837,12 +837,12 @@ void EventLogDialog::setEventType(const QString& value)
         ui->eventComboBox->setCurrentIndex(found.first());
 }
 
-void EventLogDialog::setAnalyticsEventType(nx::vms::api::analytics::EventTypeId value)
+void EventLogDialog::setAnalyticsEventType(const QString& eventTypeId)
 {
     const QModelIndexList indices = m_eventTypesModel->match(
         m_eventTypesModel->index(0, 0),
         AnalyticsEventTypeIdRole,
-        /*value*/ QVariant::fromValue(value),
+        /*value*/ QVariant::fromValue(eventTypeId),
         /*hits*/ 1,
         Qt::MatchExactly | Qt::MatchRecursive);
 

@@ -4,6 +4,8 @@
 
 #include <QtCore/QFile>
 
+#include <string>
+
 #include <nx/analytics/taxonomy/state_compiler.h>
 #include <nx/reflect/json/deserializer.h>
 #include <nx/reflect/json/serializer.h>
@@ -14,14 +16,14 @@ using namespace nx::vms::client::desktop::analytics::taxonomy;
 
 namespace nx::vms::client::desktop {
 
-static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
+static std::map<std::string, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
     const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
 {
-    std::map<QString, std::set<nx::Uuid>> result;
+    std::map<std::string, std::set<nx::Uuid>> result;
     for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
     {
         for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)
-            result[attributeName].insert(engineId);
+            result[attributeName.toStdString()].insert(engineId);
     }
 
     return result;
@@ -34,17 +36,19 @@ nx::vms::api::analytics::Descriptors prepareDescriptors(
     descriptors.objectTypeDescriptors.clear();
     for (const QString& objectTypeId: inputData.objectTypes)
     {
-        const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeId);
-        descriptors.objectTypeDescriptors[objectTypeId] = itr->second;
+        const auto objectTypeIdString = objectTypeId.toStdString();
+        const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeIdString);
+        descriptors.objectTypeDescriptors[objectTypeIdString] = itr->second;
     }
 
     for (const auto& [objectTypeId, attributeSupportInfo]: inputData.attributeSupportInfo)
     {
-        descriptors.objectTypeDescriptors[objectTypeId].attributeSupportInfo =
+        const auto objectTypeIdString = objectTypeId.toStdString();
+        descriptors.objectTypeDescriptors[objectTypeIdString].attributeSupportInfo =
             toDescriptorAttributeSupportInfo(attributeSupportInfo);
 
         if (!attributeSupportInfo.empty())
-            descriptors.objectTypeDescriptors[objectTypeId].hasEverBeenSupported = true;
+            descriptors.objectTypeDescriptors[objectTypeIdString].hasEverBeenSupported = true;
     }
 
     return descriptors;

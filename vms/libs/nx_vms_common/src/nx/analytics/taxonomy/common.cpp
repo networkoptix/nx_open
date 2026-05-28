@@ -4,15 +4,15 @@
 
 namespace nx::analytics::taxonomy {
 
-const QString kIntegerAttributeSubtype("integer");
-const QString kFloatAttributeSubtype("float");
+const std::string kIntegerAttributeSubtype("integer");
+const std::string kFloatAttributeSubtype("float");
 
-const QString kPluginDescriptorTypeName("Plugin");
-const QString kEngineDescriptorTypeName("Engine");
-const QString kGroupDescriptorTypeName("Group");
-const QString kEnumTypeDescriptorTypeName("Enum Type");
-const QString kColorTypeDescriptorTypeName("Color Type");
-const QString kObjectTypeDescriptorTypeName("Object Type");
-const QString kEventTypeDescriptorTypeName("Event Type");
+const std::string kPluginDescriptorTypeName("Plugin");
+const std::string kEngineDescriptorTypeName("Engine");
+const std::string kGroupDescriptorTypeName("Group");
+const std::string kEnumTypeDescriptorTypeName("Enum Type");
+const std::string kColorTypeDescriptorTypeName("Color Type");
+const std::string kObjectTypeDescriptorTypeName("Object Type");
+const std::string kEventTypeDescriptorTypeName("Event Type");
 
 } // namespace nx::analytics::taxonomy

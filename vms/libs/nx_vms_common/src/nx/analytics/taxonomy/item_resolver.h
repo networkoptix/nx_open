@@ -20,9 +20,9 @@ public:
         // @return true if item is valid.
         using ResolveItem = std::function<bool(Item* inOutItem, ErrorHandler* errorHandler)>;
 
-        QString typeName;
-        QString typeId;
-        QString baseTypeId;
+        std::string typeName;
+        std::string typeId;
+        std::string baseTypeId;
         std::vector<Item>* ownItems;
         std::vector<ItemId>* baseItemIds;
         std::vector<ItemId> availableBaseItemIds;
@@ -40,7 +40,7 @@ public:
 
     void resolve()
     {
-        if (!m_context.baseItemIds->empty() && m_context.baseTypeId.isEmpty())
+        if (!m_context.baseItemIds->empty() && m_context.baseTypeId.empty())
         {
             m_errorHandler->handleError(
                 ProcessingError{

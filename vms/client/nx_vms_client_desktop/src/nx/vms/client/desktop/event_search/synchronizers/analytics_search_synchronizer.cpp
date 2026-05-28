@@ -349,7 +349,10 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
     m_filter.referenceBestShotId = m_analyticsSetup->referenceTrackId();
 
     auto convertToSet =
-        [](const QString& id){ return id.isEmpty() ? std::set<QString>{} : std::set<QString>{id}; };
+        [](const QString& id)
+        {
+            return id.isEmpty() ? std::set<std::string>{} : std::set<std::string>{id.toStdString()};
+        };
     const auto objectType = m_analyticsSetup->objectType();
     m_filter.objectTypeId = convertToSet(objectType);
 
@@ -518,7 +521,7 @@ void AnalyticsSearchSynchronizer::updateEngineIdFromSettings()
         return;
 
     if (system()->taxonomyManager()->currentTaxonomy()->engineById(
-            engineId.toString(QUuid::WithBraces)))
+            engineId.toStdString(QUuid::WithBraces)))
     {
         m_analyticsSetup->setEngine(engineId);
     }

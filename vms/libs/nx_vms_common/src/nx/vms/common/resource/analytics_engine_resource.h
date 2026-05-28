@@ -37,10 +37,10 @@ public:
 
     AnalyticsPluginResourcePtr plugin() const;
 
-    virtual std::set<QString> eventTypeIds() const;
-    virtual std::set<QString> objectTypeIds() const;
+    virtual std::set<std::string> eventTypeIds() const;
+    virtual std::set<std::string> objectTypeIds() const;
 
-    QList<nx::vms::api::analytics::ObjectAction> supportedObjectActions() const;
+    std::vector<nx::vms::api::analytics::ObjectAction> supportedObjectActions() const;
 
     /**
      * Device-dependent Engines are always running on a Device and cannot be disabled by the user.

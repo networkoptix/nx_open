@@ -28,19 +28,19 @@ void AttributeResolver::resolve()
 
 void AttributeResolver::resolveOmittedBaseAttributes()
 {
-    if (m_context.baseTypeId.isEmpty() && !m_context.omittedBaseAttributeNames->empty())
+    if (m_context.baseTypeId.empty() && !m_context.omittedBaseAttributeNames->empty())
     {
         m_errorHandler->handleError(
             ProcessingError{NX_FMT(
                 "%1 %2: omitted attribute list is not empty but there is no base type",
                 m_context.typeName, m_context.typeId)});
 
-        *m_context.omittedBaseAttributeNames = std::vector<QString>();
+        *m_context.omittedBaseAttributeNames = std::vector<std::string>();
     }
 
-    std::set<QString> uniqueOmittedBaseAttributeNames;
-    std::vector<QString> omittedBaseAttributeNames;
-    for (const QString& omittedBaseAttributeName : *m_context.omittedBaseAttributeNames)
+    std::set<std::string> uniqueOmittedBaseAttributeNames;
+    std::vector<std::string> omittedBaseAttributeNames;
+    for (const std::string& omittedBaseAttributeName : *m_context.omittedBaseAttributeNames)
     {
         if (contains(uniqueOmittedBaseAttributeNames, omittedBaseAttributeName))
         {
@@ -72,13 +72,13 @@ void AttributeResolver::resolveOmittedBaseAttributes()
 
 void AttributeResolver::fillAttributeCandidateList(
     const std::vector<AttributeDescription>& attributes,
-    const std::map<QString, std::vector<AttributeDescription>>& attributeLists,
+    const std::map<std::string, std::vector<AttributeDescription>>& attributeLists,
     std::vector<AttributeDescription>* outAttributeCandidateList,
-    const std::set<QString>& uniqueAttributeListIds)
+    const std::set<std::string>& uniqueAttributeListIds)
 {
     for (const AttributeDescription& attribute: attributes)
     {
-        if (!attribute.attributeList || attribute.attributeList->isEmpty())
+        if (!attribute.attributeList || attribute.attributeList->empty())
         {
             outAttributeCandidateList->push_back(attribute);
         }
@@ -106,7 +106,7 @@ void AttributeResolver::fillAttributeCandidateList(
             const std::vector<AttributeDescription> attributeList =
                 attributeLists.at(*attribute.attributeList);
 
-            std::set<QString> currentUniqueAttributeListIds = uniqueAttributeListIds;
+            std::set<std::string> currentUniqueAttributeListIds = uniqueAttributeListIds;
             currentUniqueAttributeListIds.insert(*attribute.attributeList);
             fillAttributeCandidateList(
                 attributeList,
@@ -119,8 +119,8 @@ void AttributeResolver::fillAttributeCandidateList(
 
 void AttributeResolver::resolveOwnAttributes()
 {
-    std::set<QString> uniqueAttributeNames;
-    std::set<QString> conditionalAttributeNames;
+    std::set<std::string> uniqueAttributeNames;
+    std::set<std::string> conditionalAttributeNames;
     std::vector<AttributeDescription> ownAttributes;
 
     std::vector<AttributeDescription> attributeCandidates;
@@ -128,11 +128,11 @@ void AttributeResolver::resolveOwnAttributes()
         *m_context.ownAttributes,
         m_context.internalState->attributeListById,
         &attributeCandidates,
-        std::set<QString>());
+        std::set<std::string>());
 
     for (AttributeDescription& attribute: attributeCandidates)
     {
-        if (attribute.name.isEmpty())
+        if (attribute.name.empty())
         {
             m_errorHandler->handleError(
                 ProcessingError{NX_FMT(
@@ -142,13 +142,13 @@ void AttributeResolver::resolveOwnAttributes()
             continue;
         }
 
-        if (attribute.condition && !attribute.condition->isEmpty())
+        if (attribute.condition && !attribute.condition->empty())
             conditionalAttributeNames.insert(attribute.name);
 
         if (uniqueAttributeNames.contains(attribute.name)
             && (!conditionalAttributeNames.contains(attribute.name)
                 || !attribute.condition
-                || attribute.condition->isEmpty()))
+                || attribute.condition->empty()))
         {
             m_errorHandler->handleError(
                 ProcessingError{NX_FMT(
@@ -162,7 +162,7 @@ void AttributeResolver::resolveOwnAttributes()
         AbstractAttribute* baseAttribute =
             (baseAttributeItr != m_baseAttributeByName.cend()) ? baseAttributeItr->second : nullptr;
 
-        if (baseAttribute && !baseAttribute->condition().isEmpty())
+        if (baseAttribute && !baseAttribute->condition().empty())
         {
             m_errorHandler->handleError(
                 ProcessingError{NX_FMT(
@@ -237,7 +237,7 @@ Attribute* AttributeResolver::resolveOwnAttribute(
         }
         default:
         {
-            const QString errorDetails = NX_FMT("%1 %2: unknown attribute type (%3)",
+            const auto errorDetails = NX_FMT("%1 %2: unknown attribute type (%3)",
                 m_context.typeName, m_context.typeId, (int) type);
 
             m_errorHandler->handleError(ProcessingError{errorDetails});
@@ -252,7 +252,7 @@ Attribute* AttributeResolver::tryToDeduceTypeFromSubtype(
     nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
     const AbstractAttribute* baseAttribute)
 {
-    const QString& subtypeId = inOutAttributeDescription->subtype.value_or(QString());
+    const std::string& subtypeId = inOutAttributeDescription->subtype.value_or(std::string());
 
     const EnumType* enumType = m_context.internalState->getTypeById<EnumType>(subtypeId);
     const ColorType* colorType = m_context.internalState->getTypeById<ColorType>(subtypeId);
@@ -324,10 +324,10 @@ bool AttributeResolver::resolveNumericSubtype(
     nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
     const AbstractAttribute* baseAttribute)
 {
-    const QString subtype = inOutAttributeDescription->subtype.value_or(QString());
-    const QString baseAttributeSubtype = baseAttribute ? baseAttribute->subtype() : QString();
+    const std::string subtype = inOutAttributeDescription->subtype.value_or(std::string());
+    const std::string baseAttributeSubtype = baseAttribute ? baseAttribute->subtype() : std::string();
 
-    if (!subtype.isEmpty())
+    if (!subtype.empty())
     {
         if (subtype != kIntegerAttributeSubtype && subtype != kFloatAttributeSubtype)
         {
@@ -340,7 +340,7 @@ bool AttributeResolver::resolveNumericSubtype(
             inOutAttributeDescription->subtype.reset();
         }
         else if (baseAttribute
-            && !baseAttributeSubtype.isEmpty()
+            && !baseAttributeSubtype.empty()
             && baseAttributeSubtype != subtype)
         {
             m_errorHandler->handleError(
@@ -420,10 +420,10 @@ bool AttributeResolver::resolveUnit(
     nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
     const AbstractAttribute* baseAttribute)
 {
-    if (!baseAttribute || baseAttribute->unit().isEmpty())
+    if (!baseAttribute || baseAttribute->unit().empty())
         return true;
 
-    const QString baseAttributeUnit = baseAttribute->unit();
+    const std::string baseAttributeUnit = baseAttribute->unit();
 
     if (inOutAttributeDescription->unit == baseAttributeUnit)
         return true;
@@ -441,7 +441,7 @@ bool AttributeResolver::resolveUnit(
 Attribute* AttributeResolver::resolveEnumerationAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
-    const QString enumId = inOutAttributeDescription->subtype.value_or(QString());
+    const std::string enumId = inOutAttributeDescription->subtype.value_or(std::string());
     EnumType* enumType = m_context.internalState->getTypeById<EnumType>(enumId);
     if (!enumType)
     {
@@ -459,7 +459,7 @@ Attribute* AttributeResolver::resolveEnumerationAttribute(
 Attribute* AttributeResolver::resolveColorAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
-    const QString colorTypeId = inOutAttributeDescription->subtype.value_or(QString());
+    const std::string colorTypeId = inOutAttributeDescription->subtype.value_or(std::string());
     ColorType* colorType = m_context.internalState->getTypeById<ColorType>(colorTypeId);
     if (!colorType)
     {
@@ -478,7 +478,7 @@ Attribute* AttributeResolver::resolveColorAttribute(
 Attribute* AttributeResolver::resolveObjectAttribute(
     AttributeDescription* inOutAttributeDescription, const AbstractAttribute* /*baseAttribute*/)
 {
-    const QString objectTypeId = inOutAttributeDescription->subtype.value_or(QString());
+    const std::string objectTypeId = inOutAttributeDescription->subtype.value_or(std::string());
     ObjectType* objectType = m_context.internalState->getTypeById<ObjectType>(objectTypeId);
     if (!objectType)
     {

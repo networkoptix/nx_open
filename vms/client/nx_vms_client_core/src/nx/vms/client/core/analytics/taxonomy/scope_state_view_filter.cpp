@@ -22,7 +22,7 @@ ScopeStateViewFilter::ScopeStateViewFilter(
     AbstractStateViewFilter(parent),
     d(new Private{engine, devices})
 {
-    QStringList ids = {engine ? engine->id() : ""};
+    QStringList ids = {engine ? QString::fromStdString(engine->id()) : ""};
 
     for (const nx::Uuid& id: devices)
         ids.push_back(id.toString(QUuid::WithBraces));

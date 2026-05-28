@@ -17,12 +17,12 @@ EnumType::EnumType(
 {
 }
 
-QString EnumType::id() const
+const std::string& EnumType::id() const
 {
     return m_descriptor.id;
 }
 
-QString EnumType::name() const
+const std::string& EnumType::name() const
 {
     return m_descriptor.name;
 }
@@ -32,15 +32,15 @@ AbstractEnumType* EnumType::base() const
     return m_base;
 }
 
-std::vector<QString> EnumType::ownItems() const
+std::vector<std::string> EnumType::ownItems() const
 {
     return m_descriptor.items;
 }
 
-std::vector<QString> EnumType::items() const
+std::vector<std::string> EnumType::items() const
 {
     // TODO: Cache all this stuff.
-    std::vector<QString> result = m_descriptor.baseItems;
+    std::vector<std::string> result = m_descriptor.baseItems;
     result.insert(result.end(), m_descriptor.items.begin(), m_descriptor.items.end());
 
     return result;
@@ -56,7 +56,7 @@ void EnumType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHan
     if (m_resolved)
         return;
 
-    if (m_descriptor.base && !m_descriptor.base->isEmpty())
+    if (m_descriptor.base && !m_descriptor.base->empty())
     {
         m_base = inOutInternalState->getTypeById<EnumType>(*m_descriptor.base);
         if (NX_ASSERT(m_base, "Enum Type %1: unable to find base (%2)",
@@ -66,7 +66,7 @@ void EnumType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHan
         }
     }
 
-    ItemResolver<QString, QString>::Context context;
+    ItemResolver<std::string, std::string>::Context context;
 
     context.typeId = m_descriptor.id;
     context.typeName = kEnumTypeDescriptorTypeName;
@@ -78,12 +78,12 @@ void EnumType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHan
         context.availableBaseItemIds = m_base->items();
     }
 
-    context.getId = [](const QString& item) { return item; };
+    context.getId = [](const std::string& item) { return item; };
     context.resolveItem =
-        [](QString* /*inOutItem*/, ErrorHandler* /*errorHandler*/) { return true; };
+        [](std::string* /*inOutItem*/, ErrorHandler* /*errorHandler*/) { return true; };
 
 
-    ItemResolver<QString, QString> itemResolver(std::move(context), errorHandler);
+    ItemResolver<std::string, std::string> itemResolver(std::move(context), errorHandler);
     itemResolver.resolve();
 
     m_resolved = true;

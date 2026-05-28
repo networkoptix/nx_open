@@ -18,19 +18,19 @@ public:
         nx::vms::api::analytics::ColorTypeDescriptor colorTypeDescriptor,
         QObject* parent);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual AbstractColorType* base() const override;
 
-    virtual std::vector<QString> baseItems() const override;
+    virtual std::vector<std::string> baseItems() const override;
 
-    virtual std::vector<QString> ownItems() const override;
+    virtual std::vector<std::string> ownItems() const override;
 
-    virtual std::vector<QString> items() const override;
+    virtual std::vector<std::string> items() const override;
 
-    virtual QString color(const QString& item) const override;
+    virtual std::string color(const std::string& item) const override;
 
     virtual nx::vms::api::analytics::ColorTypeDescriptor serialize() const override;
 
@@ -44,9 +44,9 @@ private:
     nx::vms::api::analytics::ColorTypeDescriptor m_descriptor;
     ColorType* m_base = nullptr;
 
-    std::map<QString, QString> m_colorByName;
-    std::vector<QString> m_cachedOwnItems;
-    std::set<QString> m_cachedBaseColorTypeNames;
+    std::map<std::string, std::string> m_colorByName;
+    std::vector<std::string> m_cachedOwnItems;
+    std::set<std::string> m_cachedBaseColorTypeNames;
 
     bool m_resolved = false;
 };

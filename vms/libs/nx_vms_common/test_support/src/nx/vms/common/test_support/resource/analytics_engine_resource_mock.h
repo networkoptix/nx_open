@@ -12,20 +12,20 @@ class NX_VMS_COMMON_TEST_SUPPORT_API AnalyticsEngineResourceMock:
 public:
     virtual bool isDeviceDependent() const override;
 
-    virtual std::set<QString> eventTypeIds() const override;
+    virtual std::set<std::string> eventTypeIds() const override;
 
-    virtual std::set<QString> objectTypeIds() const override;
+    virtual std::set<std::string> objectTypeIds() const override;
 
     void setIsDeviceDependent(bool value);
 
-    void setAnalyticsEventTypeIds(std::set<QString> eventTypeIds);
+    void setAnalyticsEventTypeIds(std::set<std::string> eventTypeIds);
 
-    void setAnalyticsObjectTypeIds(std::set<QString> objectTypeIds);
+    void setAnalyticsObjectTypeIds(std::set<std::string> objectTypeIds);
 
 private:
     bool m_isDeviceDependent = false;
-    std::set<QString> m_eventTypeIds;
-    std::set<QString> m_objectTypeIds;
+    std::set<std::string> m_eventTypeIds;
+    std::set<std::string> m_objectTypeIds;
 };
 
 using AnalyticsEngineResourceMockPtr = QnSharedResourcePointer<AnalyticsEngineResourceMock>;

@@ -108,7 +108,7 @@ bool TextLookupField::match(const QVariant& eventValue) const
             if (lookupList.id.isNull())
                 return false;
 
-            if (!NX_ASSERT(lookupList.objectTypeId.isEmpty(), "Supports only generic lists"))
+            if (!NX_ASSERT(lookupList.objectTypeId.empty(), "Supports only generic lists"))
                 return false;
 
             m_list = QStringList{};

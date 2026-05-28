@@ -41,7 +41,7 @@ public:
     void setEventDevices(const UuidSet& ids);
     void setActionType(const QString& value);
     void setEventType(const QString& value);
-    void setAnalyticsEventType(nx::vms::api::analytics::EventTypeId value);
+    void setAnalyticsEventType(const QString& value);
     void setText(const QString& text);
 
 protected:
@@ -88,7 +88,7 @@ private:
     void query(
         const QnTimePeriod& period,
         const QString& eventType,
-        const nx::vms::api::analytics::EventTypeId& analyticsEventTypeId,
+        const QString& analyticsEventTypeId,
         const QString& actionType,
         const QString& text,
         Qt::SortOrder order);

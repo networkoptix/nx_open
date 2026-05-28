@@ -168,7 +168,7 @@ struct TextWithFieldsPicker::Private: public QObject
         const auto model = new EventParametersModel(
             EventParameterHelper::instance()->getVisibleEventParameters(currentEventData.eventId,
                 q->common::SystemContextAware::systemContext(),
-                currentEventData.objectType,
+                currentEventData.objectType.toStdString(),
                 currentEventData.eventState,
                 collectAttributeNames(currentEventData.objectType)));
         completer->setModel(model);

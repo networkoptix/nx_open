@@ -12,9 +12,9 @@ class Group: public AbstractGroup
 public:
     Group(nx::vms::api::analytics::GroupDescriptor groupDescriptor, QObject* parent);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual nx::vms::api::analytics::GroupDescriptor serialize() const override;
 

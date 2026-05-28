@@ -137,7 +137,7 @@ struct ObjectMetadata: BaseMetadata
     /**%apidoc Object type.
      * %example car
      */
-    QString typeId;
+    std::string typeId;
 
     /**%apidoc Metadata attributes. */
     std::vector<Attribute> attributes;

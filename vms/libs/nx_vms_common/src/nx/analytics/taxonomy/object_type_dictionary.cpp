@@ -12,7 +12,7 @@ ObjectTypeDictionary::ObjectTypeDictionary(AbstractStateWatcher* taxonomyWatcher
 {
 }
 
-std::optional<QString> ObjectTypeDictionary::idToName(const QString& id) const
+std::optional<std::string> ObjectTypeDictionary::idToName(const std::string& id) const
 {
     const auto state = m_taxonomyWatcher ? m_taxonomyWatcher->state() : nullptr;
     const auto objectType = state ? state->objectTypeById(id) : nullptr;

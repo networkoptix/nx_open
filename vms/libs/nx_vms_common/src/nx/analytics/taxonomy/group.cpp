@@ -12,12 +12,12 @@ Group::Group(GroupDescriptor groupDescriptor, QObject* parent):
 {
 }
 
-QString Group::id() const
+const std::string& Group::id() const
 {
     return m_descriptor.id;
 }
 
-QString Group::name() const
+const std::string& Group::name() const
 {
     return m_descriptor.name;
 }

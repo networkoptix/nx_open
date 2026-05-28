@@ -30,7 +30,7 @@ EngineStateViewFilter::~EngineStateViewFilter()
 QString EngineStateViewFilter::id() const
 {
     if (d->engine)
-        return d->engine->id();
+        return QString::fromStdString(d->engine->id());
 
     return QString();
 }
@@ -38,7 +38,7 @@ QString EngineStateViewFilter::id() const
 QString EngineStateViewFilter::name() const
 {
     if (d->engine)
-        return d->engine->name();
+        return QString::fromStdString(d->engine->name());
 
     return QString();
 }

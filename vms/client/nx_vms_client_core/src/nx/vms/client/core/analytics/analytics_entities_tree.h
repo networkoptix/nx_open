@@ -34,9 +34,6 @@ public:
     struct Node
     {
         using EntityTypeId = QString;
-        static_assert(std::is_same<nx::vms::api::analytics::GroupId, EntityTypeId>::value);
-        static_assert(std::is_same<nx::vms::api::analytics::EventTypeId, EntityTypeId>::value);
-        static_assert(std::is_same<nx::vms::api::analytics::ObjectTypeId, EntityTypeId>::value);
 
         const NodeType nodeType;
         QWeakPointer<Node> parent;

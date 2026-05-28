@@ -17,7 +17,7 @@ namespace nx::analytics::taxonomy {
 class IntegrationTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
@@ -27,7 +27,7 @@ protected:
         const QByteArray obectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, PluginDescriptor>>(obectAsBytes.toStdString());
+            nx::reflect::json::deserialize<decltype(m_expectedData)>(obectAsBytes.toStdString());
 
         m_expectedData = deserializationResult;
 
@@ -60,7 +60,7 @@ protected:
 
 private:
     Descriptors m_descriptors;
-    std::map<QString, PluginDescriptor> m_expectedData;
+    std::map<std::string, PluginDescriptor> m_expectedData;
     StateCompiler::Result m_result;
 };
 

@@ -51,10 +51,10 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
     {
         EntityType* entity = nullptr;
         if constexpr (std::is_same_v<EventType, EntityType>)
-            entity = state->eventTypeById(unresolved.entityId);
+            entity = state->eventTypeById(unresolved.entityId.toStdString());
 
         if constexpr (std::is_same_v<ObjectType, EntityType>)
-            entity = state->objectTypeById(unresolved.entityId);
+            entity = state->objectTypeById(unresolved.entityId.toStdString());
 
         if (!entity)
             continue;
@@ -65,7 +65,7 @@ std::vector<ScopedEntity<EntityType>> resolveEntities(
                 engine
                 && allowedEngines.contains(nx::Uuid(engine->id()))
                 && (unresolved.engineId.isNull()
-                    || engine->id() == unresolved.engineId.toString(QUuid::WithBraces)))
+                    || engine->id() == unresolved.engineId.toStdString(QUuid::WithBraces)))
             {
                 result.push_back(ScopedEntity<EntityType>(engine, scope.group(), entity));
             }
@@ -81,7 +81,7 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<EventType>>& eventType
 
     for (const EngineScope<EventType>& engineScope: eventTypeTree)
     {
-        auto engine = makeNode(NodeType::engine, root, engineScope.engine->name());
+        auto engine = makeNode(NodeType::engine, root, QString::fromStdString(engineScope.engine->name()));
         const nx::Uuid engineId(engineScope.engine->id());
         engine->engineId = engineId;
         root->children.push_back(engine);
@@ -93,9 +93,9 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<EventType>>& eventType
             const AbstractGroup* taxonomyGroup = groupScope.group;
             if (taxonomyGroup)
             {
-                auto group = makeNode(NodeType::group, parentNode, taxonomyGroup->name());
+                auto group = makeNode(NodeType::group, parentNode, QString::fromStdString(taxonomyGroup->name()));
                 group->engineId = engineId;
-                group->entityId = taxonomyGroup->id();
+                group->entityId = QString::fromStdString(taxonomyGroup->id());
                 engine->children.push_back(group);
                 parentNode = group;
             }
@@ -106,9 +106,9 @@ NodePtr buildEventTypesTree(const std::vector<EngineScope<EventType>>& eventType
                     continue;
 
                 auto eventType = makeNode(
-                    NodeType::eventType, parentNode, taxonomyEventType->name());
+                    NodeType::eventType, parentNode, QString::fromStdString(taxonomyEventType->name()));
                 eventType->engineId = engineId;
-                eventType->entityId = taxonomyEventType->id();
+                eventType->entityId = QString::fromStdString(taxonomyEventType->id());
                 parentNode->children.push_back(eventType);
             }
         }
@@ -360,14 +360,15 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
 {
     using namespace nx::vms::event;
 
-    QSet<api::analytics::EventTypeId> actuallyUsedEventTypes;
+    QSet<QString> actuallyUsedEventTypes;
     const auto engine = systemContext()->vmsRulesEngine();
     for (const auto& [_, rule]: engine->rules())
     {
         for (const auto& filter: rule->eventFiltersByType(kAnalyticsEventType))
         {
-            actuallyUsedEventTypes.insert(
-                filter->fieldByType<rules::AnalyticsEventTypeField>()->typeId());
+            auto eventType = filter->fieldByType<rules::AnalyticsEventTypeField>()->typeId();
+            if (!eventType.isEmpty())
+                actuallyUsedEventTypes.insert(eventType);
         }
     }
 

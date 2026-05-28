@@ -41,10 +41,10 @@ public:
 
     virtual AnalyticsEntitiesByEngine supportedObjectTypes(
         bool filterByEngines = true) const override;
-    void setSupportedObjectTypes(const QMap<nx::Uuid, std::set<QString>>& supportedObjectTypes);
+    void setSupportedObjectTypes(const QMap<nx::Uuid, std::set<std::string>>& supportedObjectTypes);
 
     virtual AnalyticsEntitiesByEngine supportedEventTypes() const override;
-    void setSupportedEventTypes(const QMap<nx::Uuid, std::set<QString>>& eventTypesByEngine);
+    void setSupportedEventTypes(const QMap<nx::Uuid, std::set<std::string>>& eventTypesByEngine);
 
     virtual std::set<nx::Uuid> enabledAnalyticsEngines() const override;
     void setEnabledAnalyticsEngines(std::set<nx::Uuid> engines);

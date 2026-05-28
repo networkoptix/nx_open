@@ -9,4 +9,14 @@ namespace nx::vms::api {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LookupListData, (ubjson) (json), LookupListData_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LookupListModel, (json), LookupListModel_Fields)
 
+QString LookupListData::objectTypeIdAsQString() const
+{
+    return QString::fromStdString(objectTypeId);
+}
+
+void LookupListData::setObjectTypeId(const QString& objectTypeIdValue)
+{
+    objectTypeId = objectTypeIdValue.toStdString();
+}
+
 } // namespace nx::vms::api

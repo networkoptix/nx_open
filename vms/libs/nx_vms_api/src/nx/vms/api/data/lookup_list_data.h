@@ -37,7 +37,7 @@ struct NX_VMS_API LookupListData: IdData
      * ID of type of objects which are stored in the list.
      * %example nx.base.Vehicle
      */
-    QString objectTypeId;
+    std::string objectTypeId;
 
     /**%apidoc
      * All potential attribute names in user-defined order (column headers actually). Can contain
@@ -67,10 +67,13 @@ struct NX_VMS_API LookupListData: IdData
     bool operator==(const LookupListData& other) const = default;
 
 private:
+    QString objectTypeIdAsQString() const;
+    void setObjectTypeId(const QString& objectTypeId);
+
     Q_GADGET
     Q_PROPERTY(nx::Uuid id MEMBER id)
     Q_PROPERTY(QString name MEMBER name)
-    Q_PROPERTY(QString objectTypeId MEMBER objectTypeId)
+    Q_PROPERTY(QString objectTypeId READ objectTypeIdAsQString WRITE setObjectTypeId)
     Q_PROPERTY(std::vector<QString> attributeNames MEMBER attributeNames)
     Q_PROPERTY(std::vector<std::map<QString, QString>> entries MEMBER entries)
 };

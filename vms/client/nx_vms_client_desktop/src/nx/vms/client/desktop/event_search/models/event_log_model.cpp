@@ -797,7 +797,7 @@ QString EventLogModel::eventType(int row) const
         : QString();
 }
 
-vms::api::analytics::EventTypeId EventLogModel::analyticsEventType(int row) const
+QString EventLogModel::analyticsEventType(int row) const
 {
     if (!m_index->isValidRow(row))
         return {};

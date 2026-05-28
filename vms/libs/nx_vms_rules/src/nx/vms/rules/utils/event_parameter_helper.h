@@ -41,7 +41,7 @@ public:
     EventParametersNames getVisibleEventParameters(
         const QString& eventType,
         common::SystemContext* systemContext,
-        const QString& objectTypeField,
+        const std::string& objectTypeField,
         State eventState = State::none,
         const QStringList& externallyCalculatedAttributes = {});
 

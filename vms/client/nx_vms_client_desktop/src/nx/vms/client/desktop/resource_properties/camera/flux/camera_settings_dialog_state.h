@@ -2,7 +2,10 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
+#include <set>
+#include <string>
 
 #include <QtCore/QList>
 
@@ -76,7 +79,7 @@ struct SingleCameraProperties
     std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
 
     /** Camera's supported object types, not filtered by engines. */
-    std::map<nx::Uuid, std::set<QString>> supportedAnalyicsObjectTypes;
+    std::map<nx::Uuid, std::set<std::string>> supportedAnalyicsObjectTypes;
 };
 
 NX_REFLECTION_INSTRUMENT(SingleCameraProperties,

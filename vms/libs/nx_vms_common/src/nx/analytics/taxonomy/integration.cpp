@@ -13,12 +13,12 @@ Integration::Integration(
 {
 }
 
-QString Integration::id() const
+const std::string& Integration::id() const
 {
     return m_descriptor.id;
 }
 
-QString Integration::name() const
+const std::string& Integration::name() const
 {
     return m_descriptor.name;
 }

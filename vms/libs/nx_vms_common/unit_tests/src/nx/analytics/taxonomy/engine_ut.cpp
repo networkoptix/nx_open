@@ -18,8 +18,8 @@ namespace nx::analytics::taxonomy {
 
 struct EngineTestExpectedData
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
     EngineCapabilities capabilities;
     std::optional<PluginDescriptor> plugin;
 };
@@ -34,7 +34,7 @@ NX_REFLECTION_INSTRUMENT(EngineTestExpectedData, EngineTestExpectedData_Fields);
 class EngineTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
@@ -44,7 +44,7 @@ protected:
         const QByteArray objectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, EngineTestExpectedData>>(
+            nx::reflect::json::deserialize<decltype(m_expectedData)>(
                 objectAsBytes.toStdString());
 
         m_expectedData = deserializationResult;
@@ -104,7 +104,7 @@ protected:
 
 private:
     Descriptors m_descriptors;
-    std::map<QString, EngineTestExpectedData> m_expectedData;
+    std::map<std::string, EngineTestExpectedData> m_expectedData;
     StateCompiler::Result m_result;
 };
 

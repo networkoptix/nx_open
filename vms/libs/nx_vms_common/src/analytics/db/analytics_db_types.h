@@ -149,7 +149,7 @@ struct ObjectTrack
     nx::Uuid deviceId;
 
     /**%apidoc Id of an Object Type of the last received Object Metadata in the Track. */
-    QString objectTypeId;
+    std::string objectTypeId;
 
     /**%apidoc
      * Aggregated Attributes of all Object Metadata items in the Track. The aggregation rules are:
@@ -232,7 +232,7 @@ struct NX_VMS_COMMON_API Filter
     /** If empty, any device is matched. */
     std::set<nx::Uuid> deviceIds;
 
-    std::set<QString> objectTypeId;
+    std::set<std::string> objectTypeId;
 
     nx::Uuid objectTrackId;
 
@@ -381,7 +381,7 @@ NX_VMS_COMMON_API void serializeToUrlQuery(const Filter& filter, nx::UrlQuery& u
 NX_VMS_COMMON_API ::std::ostream& operator<<(::std::ostream& os, const Filter& filter);
 NX_VMS_COMMON_API QString toString(const Filter& filter);
 
-NX_VMS_COMMON_API std::set<QString> addDerivedTypeIds(
+NX_VMS_COMMON_API std::set<std::string> addDerivedTypeIds(
     const nx::analytics::taxonomy::AbstractStateWatcher* stateWatcher,
     const QList<QString>& objectTypeIdsFromUser);
 

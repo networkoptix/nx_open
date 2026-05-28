@@ -15,9 +15,9 @@ namespace nx::analytics::taxonomy {
 
 struct ColorTypeTestExpectedData
 {
-    QString id;
-    QString name;
-    QString base;
+    std::string id;
+    std::string name;
+    std::string base;
     std::vector<ColorItem> items;
     std::vector<ColorItem> ownItems;
 };
@@ -33,7 +33,7 @@ NX_REFLECTION_INSTRUMENT(ColorTypeTestExpectedData, EnumTypeTestExpectedData_Fie
 class ColorTypeTest: public ::testing::Test
 {
 protected:
-    void givenDescriptors(const QString& filePath)
+    void givenDescriptors(const std::string& filePath)
     {
         TestData testData;
         ASSERT_TRUE(loadDescriptorsTestData(filePath, &testData));
@@ -43,7 +43,7 @@ protected:
         const QByteArray objectAsBytes = QJsonDocument(object).toJson();
 
         auto [deserializationResult, result] =
-            nx::reflect::json::deserialize<std::map<QString, ColorTypeTestExpectedData>>(objectAsBytes.toStdString());
+            nx::reflect::json::deserialize<decltype(m_expectedData)>(objectAsBytes.toStdString());
 
         m_expectedData = deserializationResult;
 
@@ -88,7 +88,7 @@ private:
     void makeSureBaseIsCorrect(const AbstractColorType* colorType)
     {
         const ColorTypeTestExpectedData& expectedData = m_expectedData[colorType->id()];
-        if (expectedData.base.isEmpty())
+        if (expectedData.base.empty())
             ASSERT_EQ(colorType->base(), nullptr);
         else
             ASSERT_EQ(colorType->base()->id(), expectedData.base);
@@ -111,10 +111,10 @@ private:
     void verifyColorItems(
         const AbstractColorType* colorType,
         const std::vector<ColorItem>& expectedColorItems,
-        const std::vector<QString>& colorItems)
+        const std::vector<std::string>& colorItems)
     {
-        std::map<QString, QString> colorCodeByName;
-        for (const QString& colorName: colorItems)
+        std::map<std::string, std::string> colorCodeByName;
+        for (const auto& colorName: colorItems)
             colorCodeByName[colorName] = colorType->color(colorName);
 
         ASSERT_EQ(colorCodeByName.size(), expectedColorItems.size());
@@ -127,7 +127,7 @@ private:
 
 private:
     Descriptors m_descriptors;
-    std::map<QString, ColorTypeTestExpectedData> m_expectedData;
+    std::map<std::string, ColorTypeTestExpectedData> m_expectedData;
     StateCompiler::Result m_result;
 };
 

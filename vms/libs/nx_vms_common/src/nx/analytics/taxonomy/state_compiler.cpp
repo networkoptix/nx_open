@@ -50,10 +50,16 @@ static InternalState makeInitialInternalState(
     InternalState internalState;
 
     for (auto& [id, descriptor]: descriptors.pluginDescriptors)
-        internalState.integrationById[id] = new Integration(std::move(descriptor), resourceSupportProxy);
+    {
+        internalState.integrationById[id] = new Integration(
+            std::move(descriptor), resourceSupportProxy);
+    }
 
     for (auto& [id, descriptor]: descriptors.engineDescriptors)
-        internalState.engineById[id.toString(QUuid::WithBraces)] = new Engine(std::move(descriptor), resourceSupportProxy);
+    {
+        internalState.engineById[id.toStdString(QUuid::WithBraces)] = new Engine(
+            std::move(descriptor), resourceSupportProxy);
+    }
 
     for (auto& [id, descriptor]: descriptors.groupDescriptors)
         internalState.groupById[id] = new Group(std::move(descriptor), resourceSupportProxy);

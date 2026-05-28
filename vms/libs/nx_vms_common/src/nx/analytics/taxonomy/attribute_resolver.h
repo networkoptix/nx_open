@@ -18,14 +18,14 @@ class AttributeResolver
 public:
     struct Context
     {
-        QString typeName;
-        QString typeId;
-        QString baseTypeId;
+        std::string typeName;
+        std::string typeId;
+        std::string baseTypeId;
 
         QObject* owner = nullptr;
 
         std::vector<nx::vms::api::analytics::AttributeDescription>* ownAttributes = nullptr;
-        std::vector<QString>* omittedBaseAttributeNames = nullptr;
+        std::vector<std::string>* omittedBaseAttributeNames = nullptr;
         std::vector<AbstractAttribute*>* resolvedOwnAttributes = nullptr;
 
         std::vector<AbstractAttribute*> baseAttributes;
@@ -85,10 +85,10 @@ private:
     void fillAttributeCandidateList(
         const std::vector<nx::vms::api::analytics::AttributeDescription>& attributes,
         const std::map<
-            QString /*attributeListId*/,
+            std::string /*attributeListId*/,
             std::vector<nx::vms::api::analytics::AttributeDescription>>& attributeLists,
         std::vector<nx::vms::api::analytics::AttributeDescription>* outAttributeCandidateList,
-        const std::set<QString>& uniqueAttributeListIds);
+        const std::set<std::string>& uniqueAttributeListIds);
 
     Attribute* tryToDeduceTypeFromSubtype(
         nx::vms::api::analytics::AttributeDescription* inOutAttributeDescription,
@@ -97,7 +97,7 @@ private:
 private:
     Context m_context;
     ErrorHandler* m_errorHandler = nullptr;
-    std::map<QString, AbstractAttribute*> m_baseAttributeByName;
+    std::map<std::string, AbstractAttribute*> m_baseAttributeByName;
 };
 
 } // namespace nx::analytics::taxonomy

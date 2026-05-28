@@ -44,7 +44,7 @@ ValidationResult TextLookupFieldValidator::validity(
                 tr("List with the given id '%1' does not exist").arg(fieldValue)};
         }
 
-        if (!lookupList.objectTypeId.isEmpty())
+        if (!lookupList.objectTypeId.empty())
         {
             return {
                 QValidator::State::Invalid,

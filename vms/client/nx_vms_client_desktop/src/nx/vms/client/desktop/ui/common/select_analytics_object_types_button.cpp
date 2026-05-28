@@ -32,13 +32,14 @@ void SelectAnalyticsObjectTypesButton::setSelectedObjectTypes(
     else if (ids.size() == 1)
     {
         const nx::analytics::taxonomy::ObjectType* objectType =
-            context->analyticsTaxonomyState()->objectTypeById(ids[0]);
+            context->analyticsTaxonomyState()->objectTypeById(ids[0].toStdString());
 
         const QString iconPath =
-            core::analytics::IconManager::instance()->absoluteIconPath(objectType->icon());
+            core::analytics::IconManager::instance()->absoluteIconPath(
+                QString::fromStdString(objectType->icon()));
 
         setIcon(QIcon(iconPath));
-        setText(objectType->name());
+        setText(QString::fromStdString(objectType->name()));
     }
     else
     {

@@ -78,11 +78,12 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
 
         for (const auto& [actionId, actionDescriptor]: actionById)
         {
-            const auto name = actionDescriptor.name;
+            const auto name = QString::fromStdString(actionDescriptor.name);
             menu->addAction<std::function<void()>>(name, nx::utils::guarded(this,
                 [this, engineId = engineId, actionId = actionDescriptor.id, track, cameraResource]()
                 {
-                    emit this->pluginActionRequested(engineId, actionId, track, cameraResource);
+                    emit this->pluginActionRequested(engineId, QString::fromStdString(actionId),
+                        track, cameraResource);
                 }));
         }
     }
@@ -140,7 +141,7 @@ void AnalyticsSearchListModel::addCreateNewListAction(
             menu::Parameters parameters;
             parameters.setArguments(
                 {{Qn::LookupListEntryRole, QVariant::fromValue(entry)},
-                    {Qn::AnalyticsObjectTypeIdRole, objectTypeId}});
+                    {Qn::AnalyticsObjectTypeIdRole, QString::fromStdString(objectTypeId)}});
             appContext()->mainWindowContext()->menu()->triggerForced(
                 menu::OpenEditLookupListsDialogAction, parameters);
         });

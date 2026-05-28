@@ -40,10 +40,10 @@ struct ObjectActionRequirements
 
 struct ObjectAction
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
 
-    QList<QString> supportedObjectTypeIds;
+    std::vector<std::string> supportedObjectTypeIds;
     /**%apidoc[opt] */
     QJsonObject parametersModel;
     /**%apidoc[opt] */

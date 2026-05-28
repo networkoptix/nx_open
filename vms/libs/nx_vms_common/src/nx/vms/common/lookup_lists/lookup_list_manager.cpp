@@ -110,9 +110,9 @@ void LookupListManager::remove(const nx::Uuid& id)
 
 bool LookupListManager::typeCompatibleWithList(nx::analytics::taxonomy::AbstractState* state,
     const nx::vms::api::LookupListData& lookupList,
-    const QString& typeId)
+    const std::string& typeId)
 {
-    return lookupList.objectTypeId.isEmpty()
+    return lookupList.objectTypeId.empty()
         || isTypeOrSubtypeOf(state, typeId, lookupList.objectTypeId);
 }
 

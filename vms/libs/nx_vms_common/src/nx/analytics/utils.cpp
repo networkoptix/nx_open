@@ -13,9 +13,9 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
-std::set<QString> supportedEventTypeIdsFromManifest(const DeviceAgentManifest& manifest)
+std::set<std::string> supportedEventTypeIdsFromManifest(const DeviceAgentManifest& manifest)
 {
-    std::set<QString> result(
+    std::set<std::string> result(
         manifest.supportedEventTypeIds.begin(),
         manifest.supportedEventTypeIds.end());
 
@@ -24,16 +24,16 @@ std::set<QString> supportedEventTypeIdsFromManifest(const DeviceAgentManifest& m
 
     for (const auto& entityType: manifest.supportedTypes)
     {
-        if (!entityType.eventTypeId.isEmpty())
+        if (!entityType.eventTypeId.empty())
             result.insert(entityType.eventTypeId);
     }
 
     return result;
 }
 
-std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& manifest)
+std::set<std::string> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& manifest)
 {
-    std::set<QString> result(
+    std::set<std::string> result(
         manifest.supportedObjectTypeIds.begin(),
         manifest.supportedObjectTypeIds.end());
 
@@ -42,7 +42,7 @@ std::set<QString> supportedObjectTypeIdsFromManifest(const DeviceAgentManifest& 
 
     for (const auto& entityType: manifest.supportedTypes)
     {
-        if (!entityType.objectTypeId.isEmpty())
+        if (!entityType.objectTypeId.empty())
             result.insert(entityType.objectTypeId);
     }
 
@@ -61,7 +61,7 @@ bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server)
 }
 
 nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
-    const QString& integrationActionId, const QnResourcePool* resourcePool)
+    const std::string& integrationActionId, const QnResourcePool* resourcePool)
 {
     const auto engines = resourcePool->getResources<nx::vms::common::AnalyticsEngineResource>();
     auto it = std::ranges::find_if(engines,
@@ -79,7 +79,7 @@ nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
 }
 
 std::optional<IntegrationAction> findIntegrationActionDescriptorById(
-    const QString& integrationActionId,
+    const std::string& integrationActionId,
     const nx::vms::common::AnalyticsEngineResourceList& engines)
 {
     for (const auto& engine : engines)

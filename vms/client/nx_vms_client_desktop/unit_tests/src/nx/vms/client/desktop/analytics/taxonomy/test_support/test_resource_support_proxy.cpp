@@ -13,17 +13,18 @@ TestResourceSupportProxy::TestResourceSupportProxy(
 
 bool TestResourceSupportProxy::isEntityTypeSupported(
     nx::analytics::taxonomy::EntityType entityType,
-    const QString& entityTypeId,
+    const std::string& entityTypeId,
     nx::Uuid deviceId,
     nx::Uuid engineId) const
 {
     if (entityType != nx::analytics::taxonomy::EntityType::objectType)
         return false;
 
-    if (!m_typeSupportInfo.contains(entityTypeId))
+    const auto qEntityTypeId = QString::fromStdString(entityTypeId);
+    if (!m_typeSupportInfo.contains(qEntityTypeId))
         return false;
 
-    const auto& attributeSupportInfo = m_typeSupportInfo.at(entityTypeId);
+    const auto& attributeSupportInfo = m_typeSupportInfo.at(qEntityTypeId);
     if (!engineId.isNull())
     {
         for (const auto& [attributeName, supportInfo]: attributeSupportInfo)
@@ -61,23 +62,25 @@ bool TestResourceSupportProxy::isEntityTypeSupported(
 
 bool TestResourceSupportProxy::isEntityTypeAttributeSupported(
     nx::analytics::taxonomy::EntityType entityType,
-    const QString& entityTypeId,
-    const QString& fullAttributeName,
+    const std::string& entityTypeId,
+    const std::string& fullAttributeName,
     nx::Uuid deviceId,
     nx::Uuid engineId) const
 {
     if (entityType != nx::analytics::taxonomy::EntityType::objectType)
         return false;
 
-    if (!m_typeSupportInfo.contains(entityTypeId))
+    const auto qEntityTypeId = QString::fromStdString(entityTypeId);
+    if (!m_typeSupportInfo.contains(qEntityTypeId))
         return false;
 
-    const auto& attributeSupportInfo = m_typeSupportInfo.at(entityTypeId);
+    const auto& attributeSupportInfo = m_typeSupportInfo.at(qEntityTypeId);
 
-    if (!attributeSupportInfo.contains(fullAttributeName))
+    const auto qFullAttributeName = QString::fromStdString(fullAttributeName);
+    if (!attributeSupportInfo.contains(qFullAttributeName))
         return false;
 
-    const auto& supportInfo = attributeSupportInfo.at(fullAttributeName);
+    const auto& supportInfo = attributeSupportInfo.at(qFullAttributeName);
 
     if (!engineId.isNull())
     {

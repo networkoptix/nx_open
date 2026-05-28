@@ -19,7 +19,7 @@ class EventType;
 namespace details {
 
 template<typename Map>
-typename Map::mapped_type typeById(Map* typeMap, const QString& typeId)
+typename Map::mapped_type typeById(Map* typeMap, const std::string& typeId)
 {
     if (auto itr = typeMap->find(typeId); itr != typeMap->cend())
         return itr->second;
@@ -31,19 +31,19 @@ typename Map::mapped_type typeById(Map* typeMap, const QString& typeId)
 
 struct InternalState
 {
-    std::map<QString, Integration*> integrationById;
-    std::map<QString, Engine*> engineById;
-    std::map<QString, Group*> groupById;
-    std::map<QString, EnumType*> enumTypeById;
-    std::map<QString, ColorType*> colorTypeById;
-    std::map<QString, ObjectType*> objectTypeById;
-    std::map<QString, EventType*> eventTypeById;
+    std::map<std::string, Integration*> integrationById;
+    std::map<std::string, Engine*> engineById;
+    std::map<std::string, Group*> groupById;
+    std::map<std::string, EnumType*> enumTypeById;
+    std::map<std::string, ColorType*> colorTypeById;
+    std::map<std::string, ObjectType*> objectTypeById;
+    std::map<std::string, EventType*> eventTypeById;
     std::map<
-        QString,
+        std::string,
         std::vector<nx::vms::api::analytics::AttributeDescription>> attributeListById;
 
     template<typename Type>
-    Type* getTypeById(const QString& id) const
+    Type* getTypeById(const std::string& id) const
     {
         if constexpr (std::is_same_v<Type, Integration>)
             return details::typeById(&integrationById, id);

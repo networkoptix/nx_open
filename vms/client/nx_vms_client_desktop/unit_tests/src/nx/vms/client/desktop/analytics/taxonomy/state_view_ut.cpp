@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <memory>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -151,14 +152,15 @@ protected:
     }
 
 private:
-    static std::map<QString, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
+    static std::map<std::string, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
         const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
     {
-        std::map<QString, std::set<nx::Uuid>> result;
+        std::map<std::string, std::set<nx::Uuid>> result;
         for (const auto& [attributeName, supportInfoByEngineAndDevice]: inputDataAttributeSupportInfo)
         {
+            const auto attributeNameStd = attributeName.toStdString();
             for (const auto& [engineId, deviceIds]: supportInfoByEngineAndDevice)
-                result[attributeName].insert(engineId);
+                result[attributeNameStd].insert(engineId);
         }
 
         return result;
@@ -172,19 +174,21 @@ private:
         descriptors.objectTypeDescriptors.clear();
         for (const QString& objectTypeId: inputData.objectTypes)
         {
-            const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeId);
+            const auto objectTypeIdString = objectTypeId.toStdString();
+            const auto itr = commonDescriptors.objectTypeDescriptors.find(objectTypeIdString);
             EXPECT_FALSE(itr == commonDescriptors.objectTypeDescriptors.cend());
 
-            descriptors.objectTypeDescriptors[objectTypeId] = itr->second;
+            descriptors.objectTypeDescriptors[objectTypeIdString] = itr->second;
         }
 
         for (const auto& [objectTypeId, attributeSupportInfo]: inputData.attributeSupportInfo)
         {
-            descriptors.objectTypeDescriptors[objectTypeId].attributeSupportInfo =
+            const auto objectTypeIdString = objectTypeId.toStdString();
+            descriptors.objectTypeDescriptors[objectTypeIdString].attributeSupportInfo =
                 toDescriptorAttributeSupportInfo(attributeSupportInfo);
 
             if (!attributeSupportInfo.empty())
-                descriptors.objectTypeDescriptors[objectTypeId].hasEverBeenSupported = true;
+                descriptors.objectTypeDescriptors[objectTypeIdString].hasEverBeenSupported = true;
         }
 
         return descriptors;

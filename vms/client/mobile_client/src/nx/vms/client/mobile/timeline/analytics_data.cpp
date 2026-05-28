@@ -43,7 +43,7 @@ std::shared_ptr<AbstractState> taxonomyState(core::SystemContext* systemContext)
 
 ObjectType* objectTypeById(
     const std::shared_ptr<AbstractState>& taxonomy,
-    const QString& objectTypeId)
+    const std::string& objectTypeId)
 {
     return taxonomy ? taxonomy->objectTypeById(objectTypeId) : nullptr;
 }
@@ -55,7 +55,11 @@ std::tuple<ObjectType*, QString> trackInfo(
     const auto objectType = objectTypeById(taxonomy, track.objectTypeId);
     auto name = track.title.value_or(Title{}).text;
     if (name.isEmpty())
-        name = objectType ? objectType->name() : AbstractObjectData::tr("Unknown Object");
+    {
+        name = objectType
+            ? QString::fromStdString(objectType->name())
+            : AbstractObjectData::tr("Unknown Object");
+    }
 
     return {objectType, name};
 }
@@ -65,7 +69,7 @@ QString iconPath(ObjectType* objectType)
     const auto iconManager = core::analytics::IconManager::instance();
 
     return objectType
-        ? iconManager->iconPath(objectType->icon())
+        ? iconManager->iconPath(QString::fromStdString(objectType->icon()))
         : iconManager->fallbackIconPath();
 }
 
@@ -83,7 +87,7 @@ std::tuple<QStringList /*names*/, QStringList /*iconPaths*/> objectTypeInfos(
     {
         const auto objectType = objectTypeById(taxonomy, track.objectTypeId);
         const auto path = iconPath(objectType);
-        const auto name = objectType ? objectType->name() : "";
+        const auto name = objectType ? QString::fromStdString(objectType->name()) : "";
 
         if (!alreadyAddedNames.contains(name) && names.size() < limit)
         {
@@ -109,7 +113,7 @@ core::analytics::AttributeList preprocessAttributes(
     const ObjectTrackEx& track)
 {
     return systemContext->analyticsAttributeHelper()->
-        preprocessAttributes(track.objectTypeId, track.attributes);
+        preprocessAttributes(QString::fromStdString(track.objectTypeId), track.attributes);
 }
 
 std::optional<seconds> thumbnailExpirationInterval(const ObjectTrackEx& track)

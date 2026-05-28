@@ -26,12 +26,14 @@ bool AnalyticsEventTypeField::match(const QVariant& value) const
     if (eventTypeId.isEmpty() || !taxonomyState)
         return false;
 
-    const auto eventType = taxonomyState->eventTypeById(eventTypeId);
+    const auto eventTypeIdString = eventTypeId.toStdString();
+    const auto eventType = taxonomyState->eventTypeById(eventTypeIdString);
     if (!eventType)
         return false;
 
+    const auto typeIdString = m_typeId.toStdString();
     return (eventTypeId == m_typeId)
-        || nx::analytics::taxonomy::eventBelongsToGroup(eventType, m_typeId);
+        || nx::analytics::taxonomy::eventBelongsToGroup(eventType, typeIdString);
 }
 
 QString AnalyticsEventTypeField::typeId() const

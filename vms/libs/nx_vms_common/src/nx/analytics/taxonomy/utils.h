@@ -24,18 +24,14 @@ bool contains(const Container& container, const Item& item)
 struct AttributeSupportInfoTree
 {
     std::set<nx::Uuid> supportByEngine;
-    std::map<QString /*attributeName*/, AttributeSupportInfoTree> nestedAttributeSupportInfo;
+    std::map<std::string /*attributeName*/, AttributeSupportInfoTree> nestedAttributeSupportInfo;
 };
-
-std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
-    const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo);
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo,
+    std::map<std::string, std::set<nx::Uuid /*engineId*/>> supportInfo,
     AbstractResourceSupportProxy* resourceSupportProxy,
-    QString rootParentTypeId,
+    const std::string& rootParentTypeId,
     EntityType rootEntityType);
 
 AbstractAttribute::Type fromDescriptorAttributeType(
@@ -46,14 +42,14 @@ nx::vms::api::analytics::AttributeType toDescriptorAttributeType(
 
 NX_VMS_COMMON_API bool eventBelongsToGroup(
     const EventType* eventType,
-    const QString& groupId);
+    const std::string& groupId);
 
-QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId);
+std::string maybeUnscopedExtendedObjectTypeId(const std::string& scopedExtendedObjectTypeId);
 
-NX_VMS_COMMON_API QList<QString> getAttributesNames(
-    const AbstractState* taxonomyState, const QString& objectId);
+NX_VMS_COMMON_API std::vector<std::string> getAttributesNames(
+    const AbstractState* taxonomyState, const std::string& objectId);
 
 NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
-    const AbstractState* taxonomyState, const QString& objectTypeId, const QString& name);
+    const AbstractState* taxonomyState, const std::string& objectTypeId, const std::string& name);
 
 } // namespace nx::analytics::taxonomy

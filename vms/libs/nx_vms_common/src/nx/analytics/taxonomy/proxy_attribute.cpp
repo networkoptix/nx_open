@@ -10,8 +10,8 @@ ProxyAttribute::ProxyAttribute(
     AbstractAttribute* attribute,
     AttributeSupportInfoTree attributeSupportInfoTree,
     AbstractResourceSupportProxy* resourceSupportProxy,
-    QString prefix,
-    QString rootParentTypeId,
+    std::string prefix,
+    std::string rootParentTypeId,
     EntityType rootEntityType)
     :
     AbstractAttribute(attribute),
@@ -41,12 +41,13 @@ ProxyAttribute::~ProxyAttribute()
 {
 }
 
-QString ProxyAttribute::name() const
+const std::string& ProxyAttribute::name() const
 {
     if (NX_ASSERT(m_proxiedAttribute))
         return m_proxiedAttribute->name();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 AbstractAttribute::Type ProxyAttribute::type() const
@@ -57,12 +58,13 @@ AbstractAttribute::Type ProxyAttribute::type() const
     return Type::undefined;
 }
 
-QString ProxyAttribute::subtype() const
+const std::string& ProxyAttribute::subtype() const
 {
     if (NX_ASSERT(m_proxiedAttribute))
         return m_proxiedAttribute->subtype();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 AbstractEnumType* ProxyAttribute::enumType() const
@@ -92,12 +94,13 @@ AbstractColorType* ProxyAttribute::colorType() const
     return nullptr;
 }
 
-QString ProxyAttribute::unit() const
+const std::string& ProxyAttribute::unit() const
 {
     if (NX_ASSERT(m_proxiedAttribute))
         return m_proxiedAttribute->unit();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 QVariant ProxyAttribute::minValue() const
@@ -131,12 +134,13 @@ bool ProxyAttribute::isSupported(nx::Uuid engineId, nx::Uuid deviceId) const
         m_rootEntityType, m_rootParentTypeId, m_prefix + m_proxiedAttribute->name(), deviceId, engineId);
 }
 
-QString ProxyAttribute::condition() const
+const std::string& ProxyAttribute::condition() const
 {
     if (NX_ASSERT(m_proxiedAttribute))
         return m_proxiedAttribute->condition();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 } // namespace nx::analytics::taxonomy

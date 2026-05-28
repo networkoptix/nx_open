@@ -25,7 +25,7 @@ struct SubstitutionContext
     std::optional<ItemDescriptor> manifest;
 
     nx::vms::rules::State state;
-    QString objectTypeId;
+    std::string objectTypeId;
     // TODO: #vbutkevich. Remove once the server can collect all attributes for objectType.
     QStringList attributes;
 };

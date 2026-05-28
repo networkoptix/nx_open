@@ -29,7 +29,7 @@ static void engineFiltersFromObjectType(
         if (!taxonomyEngine)
             continue;
 
-        const QString engineId = taxonomyEngine->id();
+        const QString engineId = QString::fromStdString(taxonomyEngine->id());
         if (inOutEngineFilterById->find(engineId) == inOutEngineFilterById->cend())
         {
             inOutEngineFilterById->emplace(

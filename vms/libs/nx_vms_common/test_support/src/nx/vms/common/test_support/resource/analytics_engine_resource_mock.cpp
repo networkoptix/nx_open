@@ -9,12 +9,12 @@ bool AnalyticsEngineResourceMock::isDeviceDependent() const
     return m_isDeviceDependent;
 }
 
-std::set<QString> AnalyticsEngineResourceMock::eventTypeIds() const
+std::set<std::string> AnalyticsEngineResourceMock::eventTypeIds() const
 {
     return m_eventTypeIds;
 }
 
-std::set<QString> AnalyticsEngineResourceMock::objectTypeIds() const
+std::set<std::string> AnalyticsEngineResourceMock::objectTypeIds() const
 {
     return m_objectTypeIds;
 }
@@ -24,12 +24,12 @@ void AnalyticsEngineResourceMock::setIsDeviceDependent(bool value)
     m_isDeviceDependent = value;
 }
 
-void AnalyticsEngineResourceMock::setAnalyticsEventTypeIds(std::set<QString> eventTypeIds)
+void AnalyticsEngineResourceMock::setAnalyticsEventTypeIds(std::set<std::string> eventTypeIds)
 {
     m_eventTypeIds = std::move(eventTypeIds);
 }
 
-void AnalyticsEngineResourceMock::setAnalyticsObjectTypeIds(std::set<QString> objectTypeIds)
+void AnalyticsEngineResourceMock::setAnalyticsObjectTypeIds(std::set<std::string> objectTypeIds)
 {
     m_objectTypeIds = std::move(objectTypeIds);
 }

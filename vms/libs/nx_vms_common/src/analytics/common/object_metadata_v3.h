@@ -15,7 +15,7 @@ NX_REFLECTION_ENUM_CLASS(ObjectMetadataTypeV3,
 
 struct ObjectMetadataV3
 {
-    QString typeId;
+    std::string typeId;
     nx::Uuid trackId;
     QRectF boundingBox;
     std::vector<Attribute> attributes;

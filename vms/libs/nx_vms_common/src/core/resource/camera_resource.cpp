@@ -108,7 +108,7 @@ QString calculateHostAddress(const QString& url)
 }
 
 using ManifestItemIdsFetcher =
-    std::function<std::set<QString>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
+    std::function<std::set<std::string>(const nx::vms::api::analytics::DeviceAgentManifest&)>;
 using AnalyticsEntitiesByEngine = QnVirtualCameraResource::AnalyticsEntitiesByEngine;
 using AnalyzedStreamIndexMap = QMap<nx::Uuid, nx::vms::api::StreamIndex>;
 
@@ -132,8 +132,8 @@ QPointF storedPtzPanTiltSensitivity(const QnVirtualCameraResource& camera)
 /**
  * Utility function to filter only those entities, which are supported by the provided engines.
  */
-std::map<nx::Uuid, std::set<QString>> filterByEngineIds(
-    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const std::set<nx::Uuid>& engineIds)
+std::map<nx::Uuid, std::set<std::string>> filterByEngineIds(
+    std::map<nx::Uuid, std::set<std::string>> entitiesByEngine, const std::set<nx::Uuid>& engineIds)
 {
     std::erase_if(entitiesByEngine,
         [&engineIds](const auto& i) { return !engineIds.contains(i.first); });

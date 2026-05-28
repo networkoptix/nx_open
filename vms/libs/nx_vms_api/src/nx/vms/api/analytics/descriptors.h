@@ -3,9 +3,8 @@
 #pragma once
 
 #include <set>
+#include <string>
 #include <type_traits>
-
-#include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/kit/utils.h>
@@ -27,8 +26,8 @@ namespace nx::vms::api::analytics {
 struct DescriptorScope
 {
     nx::Uuid engineId;
-    QString groupId;
-    QString provider;
+    std::string groupId;
+    std::string provider;
     mutable bool hasTypeEverBeenSupportedInThisScope = false;
 
     bool operator==(const DescriptorScope& other) const = default;
@@ -40,7 +39,7 @@ struct DescriptorScope
 
     bool isNull() const
     {
-        return engineId.isNull() && groupId.isEmpty() && provider.isEmpty();
+        return engineId.isNull() && groupId.empty() && provider.empty();
     }
 };
 #define nx_vms_api_analytics_DescriptorScope_Fields (engineId)\
@@ -86,8 +85,8 @@ DescriptorScope scopeFromItem(nx::Uuid engineId, T item)
 
 struct BaseDescriptor
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
 
     BaseDescriptor() = default;
     BaseDescriptor(NamedItem namedItem):
@@ -96,7 +95,7 @@ struct BaseDescriptor
     {
     }
 
-    BaseDescriptor(QString id, QString name):
+    BaseDescriptor(std::string id, std::string name):
         id(std::move(id)),
         name(std::move(name))
     {
@@ -120,7 +119,7 @@ struct BaseScopedDescriptor: BaseDescriptor
             scopes.insert(std::move(scope));
     }
 
-    BaseScopedDescriptor(DescriptorScope scope, QString id, QString name):
+    BaseScopedDescriptor(DescriptorScope scope, std::string id, std::string name):
         BaseDescriptor(std::move(id), std::move(name))
     {
         if (!scope.isNull())
@@ -139,7 +138,7 @@ NX_REFLECTION_INSTRUMENT(BaseScopedDescriptor, nx_vms_api_analytics_BaseScopedDe
 struct PluginDescriptor: BaseDescriptor
 {
     PluginDescriptor() = default;
-    PluginDescriptor(QString id, QString name):
+    PluginDescriptor(std::string id, std::string name):
         BaseDescriptor(std::move(id), std::move(name))
     {
     }
@@ -152,15 +151,15 @@ NX_REFLECTION_INSTRUMENT(PluginDescriptor, nx_vms_api_analyitcs_PluginDescriptor
 struct EngineDescriptor
 {
     nx::Uuid id;
-    QString name;
-    QString pluginId;
+    std::string name;
+    std::string pluginId;
     EngineCapabilities capabilities;
 
     EngineDescriptor() = default;
     EngineDescriptor(
         nx::Uuid id,
-        QString name,
-        QString pluginId,
+        std::string name,
+        std::string pluginId,
         const EngineManifest& engineManifest)
         :
         id(std::move(id)),
@@ -222,11 +221,11 @@ struct ExtendedScopedDescriptor: public BaseScopedDescriptor
 
     bool operator==(const ExtendedScopedDescriptor& other) const = default;
 
-    QString icon;
-    std::optional<QString> base;
-    std::vector<QString> omittedBaseAttributes;
+    std::string icon;
+    std::optional<std::string> base;
+    std::vector<std::string> omittedBaseAttributes;
     std::vector<AttributeDescription> attributes;
-    std::map<QString /*attributeName*/, std::set<EngineId>> attributeSupportInfo;
+    std::map<std::string /*attributeName*/, std::set<EngineId>> attributeSupportInfo;
     bool hasEverBeenSupported = false;
 };
 #define nx_vms_api_analytics_ExtendedScopedDescriptor_Fields \
@@ -306,7 +305,7 @@ struct ActionTypeDescriptor: BaseDescriptor
 
     bool operator==(const ActionTypeDescriptor& other) const = default;
 
-    QList<QString> supportedObjectTypeIds;
+    std::vector<std::string> supportedObjectTypeIds;
     QJsonObject parametersModel;
     analytics::ObjectActionRequirements requirements;
 };
@@ -330,9 +329,9 @@ struct EnumTypeDescriptor: public BaseDescriptor
 
     bool operator==(const EnumTypeDescriptor& other) const = default;
 
-    std::optional<QString> base;
-    std::vector<QString> baseItems;
-    std::vector<QString> items;
+    std::optional<std::string> base;
+    std::vector<std::string> baseItems;
+    std::vector<std::string> items;
 };
 #define nx_vms_api_analytics_EnumTypeDescriptor_Fields \
     nx_vms_api_analytics_BaseDescriptor_Fields \
@@ -354,8 +353,8 @@ struct ColorTypeDescriptor: public BaseDescriptor
 
     bool operator==(const ColorTypeDescriptor& other) const = default;
 
-    std::optional<QString> base;
-    std::vector<QString> baseItems;
+    std::optional<std::string> base;
+    std::vector<std::string> baseItems;
     std::vector<ColorItem> items;
 };
 #define nx_vms_api_analytics_ColorTypeDescriptor_Fields \
@@ -382,7 +381,7 @@ using AttributeListMap = std::map<AttributeListId, AttributesWithId>;
 
 using ScopedEventTypeIds = std::map<EngineId, std::map<GroupId, std::set<EventTypeId>>>;
 using ScopedObjectTypeIds = std::map<EngineId, std::map<GroupId, std::set<ObjectTypeId>>>;
-using ScopedEntityTypeIds = std::map<EngineId, std::map<GroupId, std::set<QString>>>;
+using ScopedEntityTypeIds = std::map<EngineId, std::map<GroupId, std::set<std::string>>>;
 
 using ActionTypeDescriptorMap = std::map<EngineId, std::map<ActionTypeId, ActionTypeDescriptor>>;
 

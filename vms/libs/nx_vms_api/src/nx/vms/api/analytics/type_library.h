@@ -10,28 +10,28 @@ namespace nx::vms::api::analytics {
 struct NX_VMS_API TypeLibrary
 {
     /**%apidoc[opt] */
-    QList<AnalyticsEventType> eventTypes;
+    std::vector<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt] */
-    QList<ObjectType> objectTypes;
+    std::vector<ObjectType> objectTypes;
 
     /**%apidoc[opt] */
-    QList<Group> groups;
+    std::vector<Group> groups;
 
     /**%apidoc[opt] */
-    QList<EnumType> enumTypes;
+    std::vector<EnumType> enumTypes;
 
     /**%apidoc[opt] */
-    QList<ColorType> colorTypes;
+    std::vector<ColorType> colorTypes;
 
     /**%apidoc[opt] */
-    QList<HiddenExtendedType> extendedObjectTypes;
+    std::vector<HiddenExtendedType> extendedObjectTypes;
 
     /**%apidoc[opt] */
-    QList<HiddenExtendedType> extendedEventTypes;
+    std::vector<HiddenExtendedType> extendedEventTypes;
 
     /**%apidoc[opt] */
-    QList<AttributesWithId> attributeLists;
+    std::vector<AttributesWithId> attributeLists;
 
     bool operator==(const TypeLibrary& other) const = default;
 };

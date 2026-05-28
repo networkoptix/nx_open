@@ -61,7 +61,7 @@ public:
                 for (const auto attribute: objectType->attributes())
                 {
                     const auto path = pathPrefix + QVector<AbstractAttribute*>({attribute});
-                    const auto name = namePrefix + attribute->name();
+                    const auto name = namePrefix + QString::fromStdString(attribute->name());
                     attributePathByName[name.toLower()] = path;
 
                     if (attribute->type() == AbstractAttribute::Type::object)
@@ -69,7 +69,7 @@ public:
                 }
             });
 
-        if (const auto objectType = taxonomy->objectTypeById(objectTypeId))
+        if (const auto objectType = taxonomy->objectTypeById(objectTypeId.toStdString()))
             addAttributes(objectType);
 
         return attributeLookup.insert(objectTypeId, attributePathByName).value();
@@ -87,11 +87,15 @@ public:
 
     static QColor findColor(AbstractColorType* colorType, const QString& color)
     {
-        const std::vector<QString> items = colorType->items();
+        const std::vector<std::string> items = colorType->items();
         const auto item = std::find_if(items.begin(), items.end(),
-            [color](const QString& item){ return item.toLower() == color.toLower(); });
+            [color](const std::string& item)
+            {
+                return QString::fromStdString(item).toLower() == color.toLower();
+            });
 
-        return item != items.end() ? QColor(colorType->color(*item)) : QColor::fromString(color);
+        return item != items.end() ? QColor(QString::fromStdString(colorType->color(*item))) :
+            QColor::fromString(color);
     }
 
     QVector<QString> objectTypeIds() const
@@ -104,7 +108,7 @@ public:
 
         QVector<QString> result;
         for (const ObjectType* objectType: taxonomy->objectTypes())
-            result.append(objectType->id());
+            result.append(QString::fromStdString(objectType->id()));
 
         return result;
     }
@@ -177,7 +181,7 @@ AttributeList AttributeHelper::preprocessAttributes(
 
         QStringList nameParts;
         for (const auto attribute: path)
-            nameParts.push_back(attribute->name());
+            nameParts.push_back(QString::fromStdString(attribute->name()));
 
         const QString name = nameParts.join(' ');
 

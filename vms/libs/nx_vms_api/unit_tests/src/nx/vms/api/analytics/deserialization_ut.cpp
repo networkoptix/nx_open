@@ -107,7 +107,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<QString> dependentAttributeItems;
+            std::vector<std::string> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -147,7 +147,7 @@ TEST(Analytics, Deserialization)
         })json";
 
 
-        const auto checkVariant = [](const std::variant<ItemObject,QString>& objectVariant) {
+        const auto checkVariant = [](const std::variant<ItemObject, std::string>& objectVariant) {
             ASSERT_TRUE(std::holds_alternative<ItemObject>(objectVariant));
 
             const ItemObject& object = std::get<ItemObject>(objectVariant);
@@ -161,7 +161,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<QString> dependentAttributeItems;
+            std::vector<std::string> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -204,8 +204,8 @@ TEST(Analytics, Deserialization)
 
         const auto checkVectorOfItems = [](const std::vector<Item>& items) {
             ASSERT_EQ(items.size(), 2);
-            ASSERT_TRUE(std::holds_alternative<QString>(items[0]));
-            ASSERT_EQ(std::get<QString>(items[0]), "China noname");
+            ASSERT_TRUE(std::holds_alternative<std::string>(items[0]));
+            ASSERT_EQ(std::get<std::string>(items[0]), "China noname");
             ASSERT_TRUE(std::holds_alternative<ItemObject>(items[1]));
 
             const ItemObject& object = std::get<ItemObject>(items[1]);
@@ -218,7 +218,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<QString> dependentAttributeItems;
+            std::vector<std::string> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");
@@ -264,8 +264,8 @@ TEST(Analytics, Deserialization)
 
             auto items = *attribute.items;
             ASSERT_EQ(items.size(), 2);
-            ASSERT_TRUE(std::holds_alternative<QString>(items[0]));
-            ASSERT_EQ(std::get<QString>(items[0]), "China noname");
+            ASSERT_TRUE(std::holds_alternative<std::string>(items[0]));
+            ASSERT_EQ(std::get<std::string>(items[0]), "China noname");
             ASSERT_TRUE(std::holds_alternative<ItemObject>(items[1]));
 
             ItemObject& object = std::get<ItemObject>(items[1]);
@@ -278,7 +278,7 @@ TEST(Analytics, Deserialization)
             ASSERT_EQ(dependentAttribute.type, AttributeType::enumeration);
             ASSERT_EQ(dependentAttribute.name, "model");
             ASSERT_NE(dependentAttribute.items, std::nullopt);
-            std::vector<QString> dependentAttributeItems;
+            std::vector<std::string> dependentAttributeItems;
             dependentAttributeItems.push_back("model1");
             dependentAttributeItems.push_back("model2");
             dependentAttributeItems.push_back("model3");

@@ -23,19 +23,19 @@ void validateListByField(
         return;
 
     bool isEmptyFieldDetected = false;
-    std::set<QString> processedFields;
-    std::set<QString> processedFieldDuplicates;
+    std::set<std::string> processedFields;
+    std::set<std::string> processedFieldDuplicates;
 
     for (const auto& entry: list)
     {
         const auto fieldValue = fieldValueGetter(entry);
-        if (fieldValue.isEmpty() && !isEmptyFieldDetected
+        if (fieldValue.empty() && !isEmptyFieldDetected
             && entryFieldErrorTypes.emptyField != ManifestErrorType::noError)
         {
-            outErrorList->emplace_back(entryFieldErrorTypes.emptyField, QString());
+            outErrorList->emplace_back(entryFieldErrorTypes.emptyField, std::string());
             isEmptyFieldDetected = true;
         }
-        else if (!fieldValue.isEmpty())
+        else if (!fieldValue.empty())
         {
             const bool isDuplicate = processedFields.find(fieldValue) != processedFields.cend();
             const bool isDuplicateAlreadyProcessed =
@@ -45,11 +45,11 @@ void validateListByField(
             {
                 outErrorList->emplace_back(
                     entryFieldErrorTypes.duplicatedField,
-                    nx::format("%1 id %2, %3 name %4").args(
+                    nx::format("%1 id %2, %3 name %4",
                         entryFieldErrorTypes.listEntryTypeName,
-                        nx::kit::utils::toString(entry.id),
+                        entry.id,
                         entryFieldErrorTypes.listEntryTypeName,
-                        nx::kit::utils::toString(entry.name)));
+                        entry.name).toStdString());
 
                 processedFieldDuplicates.insert(fieldValue);
             }

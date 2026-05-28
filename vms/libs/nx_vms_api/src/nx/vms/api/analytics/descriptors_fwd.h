@@ -6,16 +6,16 @@
 
 namespace nx::vms::api::analytics {
 
-using ActionTypeId = QString;
-using AttributeListId = QString;
-using ColorTypeId = QString;
+using ActionTypeId = std::string;
+using AttributeListId = std::string;
+using ColorTypeId = std::string;
 using DeviceId = nx::Uuid;
 using EngineId = nx::Uuid;
-using EnumTypeId = QString;
-using EventTypeId = QString;
-using GroupId = QString;
-using ManifestItemId = QString;
-using ObjectTypeId = QString;
-using PluginId = QString;
+using EnumTypeId = std::string;
+using EventTypeId = std::string;
+using GroupId = std::string;
+using ManifestItemId = std::string;
+using ObjectTypeId = std::string;
+using PluginId = std::string;
 
 } // namespace nx::vms::api::analytics

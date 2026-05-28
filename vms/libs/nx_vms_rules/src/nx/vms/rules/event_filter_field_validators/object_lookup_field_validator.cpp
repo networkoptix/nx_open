@@ -48,7 +48,7 @@ ValidationResult ObjectLookupFieldValidator::validity(
         if (!nx::vms::common::LookupListManager::typeCompatibleWithList(
                 context->analyticsTaxonomyState().get(),
                 lookupList,
-                analyticsObjectTypeField->value()))
+                analyticsObjectTypeField->value().toStdString()))
         {
             return {
                 QValidator::State::Invalid,

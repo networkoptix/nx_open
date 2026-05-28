@@ -29,8 +29,8 @@ namespace nx::analytics::taxonomy {
 
 struct SupportInfo
 {
-    std::map<QString /*eventTypeId*/ , std::set<QString /*attributeName*/>> eventTypeSupport;
-    std::map<QString /*objectTypeId*/, std::set<QString /*attributeName*/>> objectTypeSupport;
+    std::map<std::string /*eventTypeId*/ , std::set<std::string /*attributeName*/>> eventTypeSupport;
+    std::map<std::string /*objectTypeId*/, std::set<std::string /*attributeName*/>> objectTypeSupport;
 };
 
 SupportInfo extractSupportInfo(
@@ -39,25 +39,25 @@ SupportInfo extractSupportInfo(
 {
     SupportInfo result;
 
-    for (const QString& eventTypeId: deviceAgentManifest.supportedEventTypeIds)
-        result.eventTypeSupport[eventTypeId] = std::set<QString>();
+    for (const std::string& eventTypeId: deviceAgentManifest.supportedEventTypeIds)
+        result.eventTypeSupport[eventTypeId] = std::set<std::string>();
 
-    for (const QString& objectTypeId: deviceAgentManifest.supportedObjectTypeIds)
-        result.objectTypeSupport[objectTypeId] = std::set<QString>();
+    for (const std::string& objectTypeId: deviceAgentManifest.supportedObjectTypeIds)
+        result.objectTypeSupport[objectTypeId] = std::set<std::string>();
 
     for (const auto& supportedType: deviceAgentManifest.supportedTypes)
     {
-        if (supportedType.objectTypeId.isEmpty() && !supportedType.eventTypeId.isEmpty())
+        if (supportedType.objectTypeId.empty() && !supportedType.eventTypeId.empty())
         {
             result.eventTypeSupport[supportedType.eventTypeId] =
-                std::set<QString>(
+                std::set<std::string>(
                     supportedType.attributes.begin(),
                     supportedType.attributes.end());
         }
-        else if (!supportedType.objectTypeId.isEmpty() && supportedType.eventTypeId.isEmpty())
+        else if (!supportedType.objectTypeId.empty() && supportedType.eventTypeId.empty())
         {
             result.objectTypeSupport[supportedType.objectTypeId] =
-                std::set<QString>(
+                std::set<std::string>(
                     supportedType.attributes.begin(),
                     supportedType.attributes.end());
         }
@@ -68,9 +68,9 @@ SupportInfo extractSupportInfo(
         {
             for (const auto& type: types)
             {
-                target->emplace(type.id, std::set<QString>());
-                if (auto base = type.base.value_or(QString()); !base.isEmpty())
-                    target->emplace(std::move(base), std::set<QString>());
+                target->emplace(type.id, std::set<std::string>());
+                if (auto base = type.base.value_or(std::string()); !base.empty())
+                    target->emplace(std::move(base), std::set<std::string>());
             }
         };
     addBaseTypesForDeprecated(&result.eventTypeSupport, deviceAgentManifest.eventTypes);
@@ -81,10 +81,10 @@ SupportInfo extractSupportInfo(
         {
             for (const auto& type: types)
             {
-                if (auto base = type.base.value_or(QString()); !base.isEmpty())
+                if (auto base = type.base.value_or(std::string()); !base.empty())
                 {
                     if (target->contains(type.id))
-                        target->emplace(std::move(base), std::set<QString>());
+                        target->emplace(std::move(base), std::set<std::string>());
                 }
             }
         };
@@ -165,7 +165,7 @@ struct ResourceSupportProxy::Private:
         }
     }
 
-    bool isEventTypeSupported(const QString& eventTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
+    bool isEventTypeSupported(const std::string& eventTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
     {
         if (!NX_ASSERT(!deviceId.isNull()))
             return false;
@@ -182,7 +182,7 @@ struct ResourceSupportProxy::Private:
         return supportInfoCache[deviceId][engineId].eventTypeSupport.contains(eventTypeId);
     }
 
-    bool isObjectTypeSupported(const QString& objectTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
+    bool isObjectTypeSupported(const std::string& objectTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
     {
         if (!NX_ASSERT(!deviceId.isNull()))
             return false;
@@ -202,20 +202,20 @@ struct ResourceSupportProxy::Private:
         // maybeUnscopedExtendedObjectTypeId().
         if (objectTypeSupport.contains(objectTypeId))
             return true;
-        const QString extendedObjectTypeId = maybeUnscopedExtendedObjectTypeId(objectTypeId);
+        const std::string extendedObjectTypeId = maybeUnscopedExtendedObjectTypeId(objectTypeId);
         return objectTypeSupport.contains(extendedObjectTypeId);
     }
 
     bool isEventTypeAttributeSupported(
-        const QString& eventTypeId,
-        const QString& fullAttributeName,
+        const std::string& eventTypeId,
+        const std::string& fullAttributeName,
         nx::Uuid deviceId,
         nx::Uuid engineId) const
     {
         if (!isEventTypeSupported(eventTypeId, deviceId, engineId))
             return false;
 
-        const std::set<QString>& supportedAttributes =
+        const std::set<std::string>& supportedAttributes =
             supportInfoCache[deviceId][engineId].eventTypeSupport[eventTypeId];
 
         const auto it = std::lower_bound(
@@ -226,19 +226,19 @@ struct ResourceSupportProxy::Private:
         if (it == supportedAttributes.cend())
             return false;
 
-        return *it == fullAttributeName || it->startsWith(fullAttributeName + ".");
+        return *it == fullAttributeName || it->starts_with(fullAttributeName + ".");
     }
 
     bool isObjectTypeAttributeSupported(
-        const QString& objectTypeId,
-        const QString& fullAttributeName,
+        const std::string& objectTypeId,
+        const std::string& fullAttributeName,
         nx::Uuid deviceId,
         nx::Uuid engineId) const
     {
         if (!isObjectTypeSupported(objectTypeId, deviceId, engineId))
             return false;
 
-        const std::set<QString>& supportedAttributes =
+        const std::set<std::string>& supportedAttributes =
             supportInfoCache[deviceId][engineId].objectTypeSupport[objectTypeId];
 
         const auto it = std::lower_bound(
@@ -249,7 +249,7 @@ struct ResourceSupportProxy::Private:
         if (it == supportedAttributes.cend())
             return false;
 
-        return *it == fullAttributeName || it->startsWith(fullAttributeName + ".");
+        return *it == fullAttributeName || it->starts_with(fullAttributeName + ".");
     }
 };
 
@@ -263,7 +263,7 @@ ResourceSupportProxy::~ResourceSupportProxy()
 }
 
 bool ResourceSupportProxy::isEntityTypeSupported(
-    EntityType entityType, const QString& entityTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
+    EntityType entityType, const std::string& entityTypeId, nx::Uuid deviceId, nx::Uuid engineId) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
 
@@ -302,8 +302,8 @@ bool ResourceSupportProxy::isEntityTypeSupported(
 
 bool ResourceSupportProxy::isEntityTypeAttributeSupported(
     EntityType entityType,
-    const QString& entityTypeId,
-    const QString& fullAttributeName,
+    const std::string& entityTypeId,
+    const std::string& fullAttributeName,
     nx::Uuid deviceId,
     nx::Uuid engineId) const
 {

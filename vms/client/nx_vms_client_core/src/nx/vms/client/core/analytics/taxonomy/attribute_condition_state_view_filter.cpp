@@ -61,12 +61,12 @@ bool AttributeConditionStateViewFilter::matches(
     if (d->baseFilter && !d->baseFilter->matches(attribute))
         return false;
 
-    const QString condition = attribute->condition();
-    if (condition.isEmpty())
+    const auto& condition = attribute->condition();
+    if (condition.empty())
         return true;
 
     nx::analytics::db::TextMatcher textMatcher;
-    textMatcher.parse(condition);
+    textMatcher.parse(QString::fromStdString(condition));
     return textMatcher.matchAttributes(d->attributeValues);
 }
 

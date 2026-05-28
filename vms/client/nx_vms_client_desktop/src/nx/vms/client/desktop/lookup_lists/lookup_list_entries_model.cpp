@@ -96,7 +96,7 @@ QVariant LookupListEntriesModel::data(const QModelIndex& index, int role) const
 
         case ObjectTypeIdRole:
         {
-            return d->data->rawData().objectTypeId;
+            return QString::fromStdString(d->data->rawData().objectTypeId);
         }
 
         case AttributeNameRole:

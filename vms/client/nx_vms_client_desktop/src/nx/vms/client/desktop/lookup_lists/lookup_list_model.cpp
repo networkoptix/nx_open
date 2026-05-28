@@ -83,16 +83,17 @@ void LookupListModel::setAttributeNames(QList<QString> value)
 
 bool LookupListModel::isGeneric() const
 {
-    return m_data.objectTypeId.isEmpty();
+    return m_data.objectTypeId.empty();
 }
 
 void LookupListModel::setObjectTypeId(const QString& objectTypeId)
 {
-    if (objectTypeId == m_data.objectTypeId)
+    auto objectTypeIdStd = objectTypeId.toStdString();
+    if (objectTypeIdStd == m_data.objectTypeId)
         return;
 
     const bool previousIsGenericValue = isGeneric();
-    m_data.objectTypeId = objectTypeId;
+    m_data.objectTypeId = std::move(objectTypeIdStd);
     emit objectTypeIdChanged();
     if (previousIsGenericValue != isGeneric())
         emit isGenericChanged();
@@ -100,7 +101,7 @@ void LookupListModel::setObjectTypeId(const QString& objectTypeId)
 
 QString LookupListModel::objectTypeId() const
 {
-    return m_data.objectTypeId;
+    return QString::fromStdString(m_data.objectTypeId);
 }
 
 QString LookupListModel::name() const

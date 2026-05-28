@@ -94,10 +94,10 @@ QString AnalyticsEvent::analyticsEventCaption(common::SystemContext* context) co
         context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId());
 
     const auto eventType = camera && camera->systemContext()
-        ? camera->systemContext()->analyticsTaxonomyState()->eventTypeById(m_eventTypeId)
+        ? camera->systemContext()->analyticsTaxonomyState()->eventTypeById(m_eventTypeId.toStdString())
         : nullptr;
 
-    return eventType ? eventType->name() : tr("Analytics Event");
+    return eventType ? QString::fromStdString(eventType->name()) : tr("Analytics Event");
 }
 
 QString AnalyticsEvent::extendedCaption(common::SystemContext* context,

@@ -69,16 +69,16 @@ std::set<nx::Uuid> propagateOwnSupport(AttributeSupportInfoTree* inOutAttributeS
     return inOutAttributeSupportInfoTree->supportByEngine;
 }
 
-std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
+std::map<std::string, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo)
+    std::map<std::string, std::set<nx::Uuid /*engineId*/>> supportInfo)
 {
-    std::map<QString, AttributeSupportInfoTree> result;
+    std::map<std::string, AttributeSupportInfoTree> result;
 
     std::vector<AbstractAttribute*> objectTypeAttributes;
     for (AbstractAttribute* attribute: attributes)
     {
-        const QString& attributeName = attribute->name();
+        const std::string& attributeName = attribute->name();
         if (auto it = supportInfo.find(attributeName); it != supportInfo.cend())
         {
             result[attributeName].supportByEngine = std::move(it->second);
@@ -97,13 +97,13 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
         if (!NX_ASSERT(objectType))
             continue;
 
-        const QString prefix = objectTypeAttribute->name() + ".";
+        const std::string prefix = objectTypeAttribute->name() + ".";
         auto lowerBoundIt = supportInfo.lower_bound(prefix);
 
-        std::map<QString, std::set<nx::Uuid>> nestedSupportInfo;
-        while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.startsWith(prefix))
+        std::map<std::string, std::set<nx::Uuid>> nestedSupportInfo;
+        while (lowerBoundIt != supportInfo.cend() && lowerBoundIt->first.starts_with(prefix))
         {
-            nestedSupportInfo[lowerBoundIt->first.mid(prefix.length())] =
+            nestedSupportInfo[lowerBoundIt->first.substr(prefix.length())] =
                 supportInfo[lowerBoundIt->first];
             ++lowerBoundIt;
         }
@@ -123,12 +123,12 @@ std::map<QString, AttributeSupportInfoTree> buildAttributeSupportInfoTree(
 
 std::vector<AbstractAttribute*> makeSupportedAttributes(
     const std::vector<AbstractAttribute*>& attributes,
-    std::map<QString, std::set<nx::Uuid /*engineId*/>> supportInfo,
+    std::map<std::string, std::set<nx::Uuid /*engineId*/>> supportInfo,
     AbstractResourceSupportProxy* resourceSupportProxy,
-    QString rootParentTypeId,
+    const std::string& rootParentTypeId,
     EntityType rootEntityType)
 {
-    std::map<QString, AttributeSupportInfoTree> supportInfoTree =
+    std::map<std::string, AttributeSupportInfoTree> supportInfoTree =
         buildAttributeSupportInfoTree(attributes, std::move(supportInfo));
 
     std::vector<AbstractAttribute*> result;
@@ -138,7 +138,7 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
             attribute,
             std::move(supportInfoTree[attribute->name()]),
             resourceSupportProxy,
-            /*prefix*/ QString(),
+            /*prefix*/ std::string(),
             rootParentTypeId,
             rootEntityType));
     }
@@ -146,7 +146,7 @@ std::vector<AbstractAttribute*> makeSupportedAttributes(
     return result;
 }
 
-bool eventBelongsToGroup(const EventType* eventType, const QString& groupId)
+bool eventBelongsToGroup(const EventType* eventType, const std::string& groupId)
 {
     for (const auto& scope: eventType->scopes())
     {
@@ -161,19 +161,19 @@ bool eventBelongsToGroup(const EventType* eventType, const QString& groupId)
     return false;
 };
 
-QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QString& objectId)
+std::vector<std::string> getAttributesNames(const AbstractState* taxonomyState, const std::string& objectId)
 {
-    QList<QString> result;
-    std::function<void(const ObjectType*, QString)> addAttributesRecursive =
-        [&](const ObjectType* objectType, const QString& prefix)
+    std::vector<std::string> result;
+    std::function<void(const ObjectType*, std::string)> addAttributesRecursive =
+        [&](const ObjectType* objectType, const std::string& prefix)
         {
             if (!objectType)
                 return;
 
             for (const auto& attribute: objectType->attributes())
             {
-                const QString attributeName =
-                    prefix.isEmpty() ? attribute->name() : prefix + "." + attribute->name();
+                const std::string attributeName =
+                    prefix.empty() ? attribute->name() : prefix + "." + attribute->name();
 
                 result.push_back(attributeName);
 
@@ -187,10 +187,10 @@ QList<QString> getAttributesNames(const AbstractState* taxonomyState, const QStr
 }
 
 NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
-    const AbstractState* taxonomyState, const QString& objectTypeId, const QString& name)
+    const AbstractState* taxonomyState, const std::string& objectTypeId, const std::string& name)
 {
     auto findAttribute = nx::utils::y_combinator(
-        [](auto findAttribute, const ObjectType* objectType, const QString& name)
+        [](auto findAttribute, const ObjectType* objectType, const std::string& name)
             -> AbstractAttribute*
         {
             if (!objectType)
@@ -198,18 +198,18 @@ NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
 
             for (AbstractAttribute* attribute: objectType->attributes())
             {
-                const QString& attributeName = attribute->name();
+                const std::string& attributeName = attribute->name();
 
                 if (attributeName == name)
                     return attribute;
 
                 if (attribute->type() == AbstractAttribute::Type::object
-                    && name.startsWith(attributeName)
+                    && name.starts_with(attributeName)
                     && name.size() > attributeName.size()
                     && name[attributeName.size()] == '.')
                 {
                     AbstractAttribute* result = findAttribute(
-                        attribute->objectType(), name.mid(attributeName.size() + 1));
+                        attribute->objectType(), name.substr(attributeName.size() + 1));
 
                     if (result)
                         return result;
@@ -229,13 +229,12 @@ NX_VMS_COMMON_API AbstractAttribute* findAttributeByName(
 // evaporated in the phase of compiling the taxonomy. Currently there is a tech debt which
 // prevents this - the manifests are accessed by the Client directly through Resource Properties,
 // which should be fixed in the first place.
-QString maybeUnscopedExtendedObjectTypeId(const QString& scopedExtendedObjectTypeId)
+std::string maybeUnscopedExtendedObjectTypeId(const std::string& scopedExtendedObjectTypeId)
 {
-    if (!scopedExtendedObjectTypeId.contains("$"))
-        return scopedExtendedObjectTypeId;
-
-    QStringList parts = scopedExtendedObjectTypeId.split("$");
-    return parts.last();
+    const auto pos = scopedExtendedObjectTypeId.rfind('$');
+    return pos == std::string::npos
+        ? scopedExtendedObjectTypeId
+        : scopedExtendedObjectTypeId.substr(pos + 1);
 }
 
 } // namespace nx::analytics::taxonomy

@@ -74,10 +74,10 @@ const SubstitutionDoc kDefaultDeviceNameDoc = {.text = kDefaultDeviceNameText,
 
 EventParameterHelper::EventParametersNames getAttributesParameters(
     common::SystemContext*,
-    const QString& objectTypeId,
+    const std::string& objectTypeId,
     const QStringList& externallyCalculatedAttributes)
 {
-    if (objectTypeId.isEmpty())
+    if (objectTypeId.empty())
         return {};
 
     EventParameterHelper::EventParametersNames result;
@@ -556,7 +556,7 @@ QString EventParameterHelper::getHtmlDescription(bool skipHidden)
 EventParameterHelper::EventParametersNames EventParameterHelper::getVisibleEventParameters(
     const QString& eventType,
     common::SystemContext* systemContext,
-    const QString& objectTypeId,
+    const std::string& objectTypeId,
     State eventState,
     const QStringList& attributes)
 {

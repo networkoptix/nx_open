@@ -17,9 +17,9 @@ public:
     Engine(nx::vms::api::analytics::EngineDescriptor engineDescriptor,
         QObject* parent);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual AbstractIntegration* integration() const override;
 
@@ -31,6 +31,7 @@ public:
 
 private:
     nx::vms::api::analytics::EngineDescriptor m_descriptor;
+    std::string m_id;
     Integration* m_integration = nullptr;
 };
 

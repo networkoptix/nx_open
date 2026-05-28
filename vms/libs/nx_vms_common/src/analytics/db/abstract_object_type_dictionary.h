@@ -17,7 +17,7 @@ public:
      * NOTE: This function is not expected to block.
      * Doing so may degrade analytics DB performance significantly.
      */
-    virtual std::optional<QString> idToName(const QString& id) const = 0;
+    virtual std::optional<std::string> idToName(const std::string& id) const = 0;
 };
 
 } // namespace nx::analytics::db

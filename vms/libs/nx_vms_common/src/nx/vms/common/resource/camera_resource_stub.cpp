@@ -17,8 +17,8 @@ struct CameraResourceStub::Private
     Qn::LicenseType licenseType = Qn::LicenseType::LC_Count; //< TODO: #sivanov Replace with optional.
     std::optional<bool> hasDualStreaming;
 
-    QMap<nx::Uuid, std::set<QString>> supportedObjectTypes;
-    QMap<nx::Uuid, std::set<QString>> supportedEventTypes;
+    QMap<nx::Uuid, std::set<std::string>> supportedObjectTypes;
+    QMap<nx::Uuid, std::set<std::string>> supportedEventTypes;
 
     std::optional<std::set<nx::Uuid>> enabledAnalyticsEngines;
     std::optional<nx::vms::common::AnalyticsEngineResourceList> compatibleAnalyticsEngineResources;
@@ -168,7 +168,7 @@ nx::vms::common::AnalyticsEngineResourceList
     return base_type::compatibleAnalyticsEngineResources();
 }
 
-std::map<nx::Uuid, std::set<QString>> CameraResourceStub::supportedObjectTypes(
+std::map<nx::Uuid, std::set<std::string>> CameraResourceStub::supportedObjectTypes(
     bool filterByEngines) const
 {
     return !d->supportedObjectTypes.empty()
@@ -176,7 +176,7 @@ std::map<nx::Uuid, std::set<QString>> CameraResourceStub::supportedObjectTypes(
         : base_type::supportedObjectTypes(filterByEngines);
 }
 
-std::map<nx::Uuid, std::set<QString>> CameraResourceStub::supportedEventTypes() const
+std::map<nx::Uuid, std::set<std::string>> CameraResourceStub::supportedEventTypes() const
 {
     return !d->supportedEventTypes.empty()
         ? d->supportedEventTypes.toStdMap()
@@ -184,14 +184,14 @@ std::map<nx::Uuid, std::set<QString>> CameraResourceStub::supportedEventTypes() 
 }
 
 void CameraResourceStub::setSupportedObjectTypes(
-    const QMap<nx::Uuid, std::set<QString>>& supportedObjectTypes)
+    const QMap<nx::Uuid, std::set<std::string>>& supportedObjectTypes)
 {
     d->supportedObjectTypes = supportedObjectTypes;
     emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
 }
 
 void CameraResourceStub::setSupportedEventTypes(
-    const QMap<nx::Uuid, std::set<QString>>& supportedObjectTypes)
+    const QMap<nx::Uuid, std::set<std::string>>& supportedObjectTypes)
 {
     d->supportedEventTypes = supportedObjectTypes;
     emit compatibleEventTypesMaybeChanged(toSharedPointer(this));

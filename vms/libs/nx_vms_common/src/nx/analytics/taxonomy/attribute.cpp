@@ -57,7 +57,7 @@ Attribute::Attribute(
     NX_ASSERT(m_attributeDescription.type == nx::vms::api::analytics::AttributeType::color);
 }
 
-QString Attribute::name() const
+const std::string& Attribute::name() const
 {
     return m_attributeDescription.name;
 }
@@ -67,16 +67,19 @@ AbstractAttribute::Type Attribute::type() const
     return fromDescriptorAttributeType(m_attributeDescription.type);
 }
 
-QString Attribute::subtype() const
+const std::string& Attribute::subtype() const
 {
     if (m_attributeDescription.type == AttributeType::number
-        && (!m_attributeDescription.subtype || m_attributeDescription.subtype->isEmpty())
+        && (!m_attributeDescription.subtype || m_attributeDescription.subtype->empty())
         && m_base)
     {
         return m_base->subtype();
     }
 
-    return m_attributeDescription.subtype.value_or(QString());
+    static const std::string kEmptyString;
+    return m_attributeDescription.subtype
+        ? *m_attributeDescription.subtype
+        : kEmptyString;
 }
 
 AbstractEnumType* Attribute::enumType() const
@@ -121,15 +124,16 @@ AbstractColorType* Attribute::colorType() const
     return m_colorType;
 }
 
-QString Attribute::unit() const
+const std::string& Attribute::unit() const
 {
-    if (m_attributeDescription.unit && !m_attributeDescription.unit->isEmpty())
+    if (m_attributeDescription.unit && !m_attributeDescription.unit->empty())
         return *m_attributeDescription.unit;
 
     if (m_base)
         return m_base->unit();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 QVariant Attribute::minValue() const
@@ -159,9 +163,12 @@ bool Attribute::isSupported(nx::Uuid /*engineId*/, nx::Uuid /*deviceId*/) const
     return false;
 }
 
-QString Attribute::condition() const
+const std::string& Attribute::condition() const
 {
-    return m_attributeDescription.condition.value_or(QString());
+    static const std::string kEmptyString;
+    return m_attributeDescription.condition
+        ? *m_attributeDescription.condition
+        : kEmptyString;
 }
 
 void Attribute::setBaseAttribute(AbstractAttribute* attribute)

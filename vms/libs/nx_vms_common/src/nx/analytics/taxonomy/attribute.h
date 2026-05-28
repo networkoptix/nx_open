@@ -30,11 +30,11 @@ public:
         AbstractColorType* colorType,
         QObject* parent = nullptr);
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual Type type() const override;
 
-    virtual QString subtype() const override;
+    virtual const std::string& subtype() const override;
 
     virtual AbstractEnumType* enumType() const override;
 
@@ -42,7 +42,7 @@ public:
 
     virtual AbstractColorType* colorType() const override;
 
-    virtual QString unit() const override;
+    virtual const std::string& unit() const override;
 
     virtual QVariant minValue() const override;
 
@@ -50,7 +50,7 @@ public:
 
     virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const override;
 
-    virtual QString condition() const override;
+    virtual const std::string& condition() const override;
 
     void setBaseAttribute(AbstractAttribute* attribute);
 

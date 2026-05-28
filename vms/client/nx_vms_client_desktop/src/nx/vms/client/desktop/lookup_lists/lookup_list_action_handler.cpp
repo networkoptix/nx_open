@@ -363,7 +363,7 @@ void LookupListActionHandler::openLookupListEditDialog()
         appContext()->qmlEngine()->clearComponentCache();
 
     LookupListData data;
-    data.objectTypeId = params.argument(Qn::AnalyticsObjectTypeIdRole).toString();
+    data.objectTypeId = params.argument(Qn::AnalyticsObjectTypeIdRole).toString().toStdString();
     data.id = nx::Uuid::createUuid();
     auto sourceModel = new LookupListModel(data);
 

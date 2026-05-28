@@ -9,14 +9,29 @@ using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
+QString AbstractObjectEventType::idAsQString() const
+{
+    return QString::fromStdString(id());
+}
+
+QString AbstractObjectEventType::nameAsQString() const
+{
+    return QString::fromStdString(name());
+}
+
+QString AbstractObjectEventType::iconAsQString() const
+{
+    return QString::fromStdString(icon());
+}
+
 template <typename DerivedType, typename DescriptorType>
-QString BaseObjectEventType<DerivedType, DescriptorType>::id() const
+const std::string& BaseObjectEventType<DerivedType, DescriptorType>::id() const
 {
     return m_descriptor.id;
 }
 
 template <typename DerivedType, typename DescriptorType>
-QString BaseObjectEventType<DerivedType, DescriptorType>::name() const
+const std::string& BaseObjectEventType<DerivedType, DescriptorType>::name() const
 {
     if (m_descriptor.isSupposedToMimicBaseType() && NX_ASSERT(m_base))
         return m_base->name();
@@ -25,15 +40,16 @@ QString BaseObjectEventType<DerivedType, DescriptorType>::name() const
 }
 
 template <typename DerivedType, typename DescriptorType>
-QString BaseObjectEventType<DerivedType, DescriptorType>::icon() const
+const std::string& BaseObjectEventType<DerivedType, DescriptorType>::icon() const
 {
-    if (!m_descriptor.icon.isEmpty())
+    if (!m_descriptor.icon.empty())
         return m_descriptor.icon;
 
     if (m_base)
         return m_base->icon();
 
-    return QString();
+    static const std::string kEmptyString;
+    return kEmptyString;
 }
 
 template <typename DerivedType, typename DescriptorType>
@@ -69,7 +85,7 @@ std::vector<AbstractAttribute*> BaseObjectEventType<DerivedType, DescriptorType>
     // This code is executed only when compiling the State.
     std::vector<AbstractAttribute*> baseAttributes = m_base->attributes();
 
-    const std::set<QString> omittedBaseAttributeIds{
+    const std::set<std::string> omittedBaseAttributeIds{
         m_descriptor.omittedBaseAttributes.cbegin(),
         m_descriptor.omittedBaseAttributes.cend()};
 
@@ -114,7 +130,7 @@ std::vector<AbstractAttribute*> BaseObjectEventType<DerivedType, DescriptorType>
     }
 
     // This code is executed only when compiling the State.
-    std::map<QString, AbstractAttribute*> ownAttributes;
+    std::map<std::string, AbstractAttribute*> ownAttributes;
     for (AbstractAttribute* ownAttribute: m_ownAttributes)
         ownAttributes[ownAttribute->name()] = ownAttribute;
 
@@ -256,7 +272,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(
         if (!scope.engineId.isNull())
         {
             if (Engine* engine =
-                inOutInternalState->getTypeById<Engine>(scope.engineId.toString(QUuid::WithBraces)))
+                inOutInternalState->getTypeById<Engine>(scope.engineId.toStdString(QUuid::WithBraces)))
             {
                 taxonomyScope.setEngine(engine);
             }
@@ -272,7 +288,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveScopes(
             }
         }
 
-        if (!scope.groupId.isEmpty())
+        if (!scope.groupId.empty())
         {
             if (Group* group = inOutInternalState->getTypeById<Group>(scope.groupId);
                 group)
@@ -311,7 +327,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolve(InternalState* in
     if (m_isResolved)
         return;
 
-    if (m_descriptor.base && !m_descriptor.base->isEmpty())
+    if (m_descriptor.base && !m_descriptor.base->empty())
     {
         m_base = inOutInternalState->getTypeById<DerivedType>(*m_descriptor.base);
         if (NX_ASSERT(m_base, "%1 %2: unable to find base (%3)",
@@ -327,7 +343,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolve(InternalState* in
     context.internalState = inOutInternalState;
     context.typeName = m_typeName;
     context.typeId = m_descriptor.id;
-    context.baseTypeId = m_base ? m_base->id() : QString();
+    context.baseTypeId = m_base ? m_base->id() : std::string();
     context.ownAttributes = &m_descriptor.attributes;
     context.omittedBaseAttributeNames = &m_descriptor.omittedBaseAttributes;
     if (m_base)
@@ -350,7 +366,7 @@ void BaseObjectEventType<DerivedType, DescriptorType>::resolveSupportedAttribute
     InternalState* /*inOutInternalState*/, ErrorHandler* /*errorHandler*/)
 {
     // At this point all attributes of all types are resolved but support info is not set yet.
-    std::map<QString, AbstractAttribute*> ownAttributes;
+    std::map<std::string, AbstractAttribute*> ownAttributes;
     for (AbstractAttribute* ownAttribute: m_ownAttributes)
         ownAttributes[ownAttribute->name()] = ownAttribute;
 

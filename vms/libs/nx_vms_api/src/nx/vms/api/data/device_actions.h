@@ -57,7 +57,7 @@ struct NX_VMS_API AnalyticsFilterBase
     std::string storageId;
 
     // TODO: #mshevchenko Why 'Id' and not `Ids`? And why not `nx::analytics::ObjectTypeId`?
-    std::vector<QString> objectTypeId;
+    std::vector<std::string> objectTypeId;
 
     nx::Uuid objectTrackId;
 

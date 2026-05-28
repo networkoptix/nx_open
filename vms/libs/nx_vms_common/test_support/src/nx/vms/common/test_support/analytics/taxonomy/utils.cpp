@@ -11,9 +11,9 @@
 
 namespace nx::analytics::taxonomy {
 
-bool loadDescriptorsTestData(const QString& filePath, TestData* outTestData)
+    bool loadDescriptorsTestData(const std::string& filePath, TestData* outTestData)
 {
-    QFile file(filePath);
+    QFile file(QString::fromStdString(filePath));
     if (!file.open(QFile::ReadOnly))
         return false;
 

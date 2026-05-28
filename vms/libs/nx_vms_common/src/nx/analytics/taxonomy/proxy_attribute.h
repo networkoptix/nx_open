@@ -23,17 +23,17 @@ public:
         AbstractAttribute* attribute,
         AttributeSupportInfoTree attributeSupportInfoTree,
         AbstractResourceSupportProxy* resourceSupportProxy,
-        QString prefix,
-        QString rootParentTypeId,
+        std::string prefix,
+        std::string rootParentTypeId,
         EntityType rootEntityType);
 
     virtual ~ProxyAttribute() override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual Type type() const override;
 
-    virtual QString subtype() const override;
+    virtual const std::string& subtype() const override;
 
     virtual AbstractEnumType* enumType() const override;
 
@@ -41,7 +41,7 @@ public:
 
     virtual AbstractColorType* colorType() const override;
 
-    virtual QString unit() const override;
+    virtual const std::string& unit() const override;
 
     virtual QVariant minValue() const override;
 
@@ -49,14 +49,14 @@ public:
 
     virtual bool isSupported(nx::Uuid engineId, nx::Uuid deviceId) const override;
 
-    virtual QString condition() const override;
+    virtual const std::string& condition() const override;
 
 private:
     AbstractAttribute* m_proxiedAttribute = nullptr;
     std::unique_ptr<ProxyObjectType> m_proxyObjectType;
     std::set<nx::Uuid> m_supportByEngine;
-    QString m_prefix;
-    QString m_rootParentTypeId;
+    std::string m_prefix;
+    std::string m_rootParentTypeId;
     EntityType m_rootEntityType;
     AbstractResourceSupportProxy* m_resourceSupportProxy = nullptr;
 };

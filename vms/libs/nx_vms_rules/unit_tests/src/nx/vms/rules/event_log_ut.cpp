@@ -212,8 +212,8 @@ Analytics Event at Entrance (10.0.0.1)
 TEST_F(EventLogTest, event_analyticsObject)
 {
     static const nx::Uuid kEngine2Id = nx::Uuid::createUuid();
-    static const QString kObjectTypeId1 = "nx.LicensePlate";
-    static const QString kObjectTypeId2 = "nx.Face";
+    static const std::string kObjectTypeId1 = "nx.LicensePlate";
+    static const std::string kObjectTypeId2 = "nx.Face";
 
     static constexpr auto kExpectedSourceText = "Entrance (10.0.0.1)";
     static constexpr auto kExpectedSourceIcon = ResourceType::device;
@@ -228,7 +228,7 @@ Object detected at Entrance (10.0.0.1)
         makeTimestamp("15:46:29"),
         kCamera1Id,
         kEngine1Id,
-        kObjectTypeId1,
+        QString::fromStdString(kObjectTypeId1),
         /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));
@@ -238,7 +238,7 @@ Object detected at Entrance (10.0.0.1)
         makeTimestamp("15:48:30"),
         kCamera1Id,
         kEngine2Id,
-        kObjectTypeId2, //< TODO: sivanov Probably fixed in UI.
+        QString::fromStdString(kObjectTypeId2), //< TODO: sivanov Probably fixed in UI.
         /*objectTrackId*/ nx::Uuid::createUuid(),
         nx::common::metadata::Attributes()
     ));

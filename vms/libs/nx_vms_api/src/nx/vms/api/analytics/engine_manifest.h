@@ -56,23 +56,23 @@ struct NX_VMS_API EngineManifest
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" section instead.
      */
-    QList<AnalyticsEventType> eventTypes;
+    std::vector<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" section instead.
      */
-    QList<ObjectType> objectTypes;
+    std::vector<ObjectType> objectTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" section instead.
      */
-    QList<Group> groups;
+    std::vector<Group> groups;
 
     /**%apidoc[opt] */
-    QList<ObjectAction> objectActions;
+    std::vector<ObjectAction> objectActions;
 
     /**%apidoc[opt] */
-    QList<IntegrationAction> integrationActions;
+    std::vector<IntegrationAction> integrationActions;
 
 
     /**%apidoc[opt] */
@@ -86,7 +86,7 @@ struct NX_VMS_API EngineManifest
      * At this case plugin should provide vectorization model name.
      * List of supported vectorization models can be read via UtilityProvider.
      */
-    QString vectorizationModel;
+    std::string vectorizationModel;
 
     bool operator==(const EngineManifest& other) const = default;
 };

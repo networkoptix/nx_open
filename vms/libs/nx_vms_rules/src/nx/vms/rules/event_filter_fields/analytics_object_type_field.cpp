@@ -19,7 +19,7 @@ AnalyticsObjectTypeField::AnalyticsObjectTypeField(
 bool AnalyticsObjectTypeField::match(const QVariant& eventValue) const
 {
     return nx::analytics::taxonomy::isTypeOrSubtypeOf(
-        analyticsTaxonomyState().get(), value(), eventValue.toString());
+        analyticsTaxonomyState().get(), value().toStdString(), eventValue.toString().toStdString());
 }
 
 QJsonObject AnalyticsObjectTypeField::openApiDescriptor(const QVariantMap& properties)

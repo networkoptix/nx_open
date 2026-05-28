@@ -49,19 +49,19 @@ public:
 
     virtual std::vector<EventType*> rootEventTypes() const = 0;
 
-    virtual ObjectType* objectTypeById(const QString& objectTypeId) const = 0;
+    virtual ObjectType* objectTypeById(const std::string& objectTypeId) const = 0;
 
-    virtual EventType* eventTypeById(const QString& eventTypeId) const = 0;
+    virtual EventType* eventTypeById(const std::string& eventTypeId) const = 0;
 
-    virtual AbstractIntegration* integrationById(const QString& integrationId) const = 0;
+    virtual AbstractIntegration* integrationById(const std::string& integrationId) const = 0;
 
-    virtual AbstractEngine* engineById(const QString& engineId) const = 0;
+    virtual AbstractEngine* engineById(const std::string& engineId) const = 0;
 
-    virtual AbstractGroup* groupById(const QString& groupId) const = 0;
+    virtual AbstractGroup* groupById(const std::string& groupId) const = 0;
 
-    virtual AbstractEnumType* enumTypeById(const QString& enumTypeId) const = 0;
+    virtual AbstractEnumType* enumTypeById(const std::string& enumTypeId) const = 0;
 
-    virtual AbstractColorType* colorTypeById(const QString& colorTypeId) const = 0;
+    virtual AbstractColorType* colorTypeById(const std::string& colorTypeId) const = 0;
 
     virtual nx::vms::api::analytics::Descriptors serialize() const = 0;
 

@@ -102,11 +102,18 @@ static constexpr auto kUrlDetailName = "url";
  */
 static constexpr auto kUserIdDetailName = "userId";
 
-template <class T>
+template<typename T>
 void insertIfNotEmpty(QVariantMap& map, const QString& key, const T& value)
 {
     if (!value.isEmpty())
         map.insert(key, value);
+}
+
+template<>
+inline void insertIfNotEmpty<std::string>(QVariantMap& map, const QString& key, const std::string& value)
+{
+    if (!value.empty())
+        map.insert(key, QString::fromStdString(value));
 }
 
 inline void insertIfValid(QVariantMap& map, const QString& key, const QVariant& value)

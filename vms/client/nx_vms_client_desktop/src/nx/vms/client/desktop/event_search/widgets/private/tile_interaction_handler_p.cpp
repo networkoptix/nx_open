@@ -348,13 +348,13 @@ void TileInteractionHandler::executePluginAction(
         return;
 
     const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext);
-    const auto actionDescriptor = descriptorManager.descriptor(actionTypeId);
+    const auto actionDescriptor = descriptorManager.descriptor(actionTypeId.toStdString());
     if (!actionDescriptor)
         return;
 
     api::AnalyticsAction actionData;
     actionData.engineId = engineId;
-    actionData.actionId = actionDescriptor->id;
+    actionData.actionId = QString::fromStdString(actionDescriptor->id);
     actionData.objectTrackId = track.id;
     actionData.timestampUs = std::chrono::microseconds(track.firstAppearanceTimeUs);
     actionData.deviceId = toString(camera->getId());

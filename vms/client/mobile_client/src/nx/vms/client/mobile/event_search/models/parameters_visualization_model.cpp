@@ -136,8 +136,8 @@ void ParametersVisualizationModel::Private::addPluginFilterValue(Items& result)
             if (!analyticsSetup)
                 return {};
 
-            const auto selectedEngineId = analyticsSetup->engine().toString(QUuid::WithBraces);
-            if (selectedEngineId.isEmpty())
+            const auto selectedEngineId = analyticsSetup->engine().toStdString(QUuid::WithBraces);
+            if (selectedEngineId.empty())
                 return {};
 
             const auto currentContext = q->mainSystemContext();
@@ -147,7 +147,7 @@ void ParametersVisualizationModel::Private::addPluginFilterValue(Items& result)
             const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
             const auto engine = taxonomy->engineById(selectedEngineId);
             return engine
-                ? engine->name()
+                ? QString::fromStdString(engine->name())
                 : QString{};
         }();
 
@@ -172,9 +172,12 @@ void ParametersVisualizationModel::Private::addObjectTypeFilterValue(Items& resu
                 return {};
 
             const auto taxonomy = currentContext->taxonomyManager()->currentTaxonomy();
-            const auto objectType = taxonomy->objectTypeById(filterModel->selectedObjectType());
+            const auto objectType =
+                taxonomy->objectTypeById(filterModel->selectedObjectType().toStdString());
             return objectType
-                ? Item{objectType->name(), objectType->icon()}
+                ? Item{
+                    QString::fromStdString(objectType->name()),
+                    QString::fromStdString(objectType->icon())}
                 : Item{};
         }();
 

@@ -54,7 +54,7 @@ public:
     QnResourceList resourcesForPlayback(const QModelIndex& index) const;
 
     QString eventType(int row) const;
-    nx::vms::api::analytics::EventTypeId analyticsEventType(int row) const;
+    QString analyticsEventType(int row) const;
     std::chrono::milliseconds eventTimestamp(int row) const;
     QString actionType(int row) const;
 

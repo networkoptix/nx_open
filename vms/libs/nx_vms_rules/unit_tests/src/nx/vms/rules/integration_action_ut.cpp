@@ -86,7 +86,7 @@ public:
 
 protected:
     void addPluginWithIntegrationAction(
-        const QList<nx::vms::api::analytics::IntegrationAction>& integrationActions)
+        const std::vector<nx::vms::api::analytics::IntegrationAction>& integrationActions)
     {
         nx::vms::api::analytics::EngineManifest engineManifest;
         engineManifest.integrationActions = integrationActions;
@@ -114,7 +114,7 @@ protected:
 TEST_F(IntegrationActionsTest, initialize)
 {
     // Check registering Integration Action with valid descriptor.
-    const QString validIntegrationActionId1 = "test.action1";
+    const std::string validIntegrationActionId1 = "test.action1";
     const nx::vms::api::analytics::IntegrationAction validIntegrationActionDescriptor1{
         .id = validIntegrationActionId1,
         .name = "Valid Integration Action",
@@ -123,12 +123,14 @@ TEST_F(IntegrationActionsTest, initialize)
     addPluginWithIntegrationAction({validIntegrationActionDescriptor1});
 
     actionInitializer->initialize(engine.get());
-    ASSERT_TRUE(engine->actions().contains("integration." + validIntegrationActionId1));
+    ASSERT_TRUE(engine->actions().contains(QString::fromStdString(
+        "integration." + validIntegrationActionId1)));
     ASSERT_EQ(engine->actions().size(), 2);
 
     // Check unregistering Integration Action on deinitialize.
     actionInitializer->deinitialize();
-    ASSERT_FALSE(engine->actions().contains("integration." + validIntegrationActionId1));
+    ASSERT_FALSE(engine->actions().contains(QString::fromStdString(
+        "integration." + validIntegrationActionId1)));
 
     // Non-dynamic actions should be still present.
     ASSERT_EQ(engine->actions().size(), 1);
@@ -136,7 +138,7 @@ TEST_F(IntegrationActionsTest, initialize)
     // Integration Action having field descriptor with unknown type can't be registered.
     QList<nx::vms::api::analytics::FieldModel> fieldsWithUnknownType{kIntegrationActionFields};
     fieldsWithUnknownType.append({.type = "unknown", .fieldName = "Unknown"});
-    const QString invalidIntegrationActionId1 = "test.action2";
+    const std::string invalidIntegrationActionId1 = "test.action2";
     const nx::vms::api::analytics::IntegrationAction invalidIntegrationActionDescriptor1{
         .id = invalidIntegrationActionId1,
         .name = "Duplicated Integration Action",
@@ -145,12 +147,13 @@ TEST_F(IntegrationActionsTest, initialize)
     addPluginWithIntegrationAction({invalidIntegrationActionDescriptor1});
 
     actionInitializer->initialize(engine.get());
-    ASSERT_FALSE(engine->actions().contains("integration." + invalidIntegrationActionId1));
+    ASSERT_FALSE(engine->actions().contains(QString::fromStdString(
+        "integration." + invalidIntegrationActionId1)));
 
     // Integration Action having field descriptors with duplicated names can't be registered.
     QList<nx::vms::api::analytics::FieldModel> duplicatedFields{kIntegrationActionFields};
     duplicatedFields.append({.type = "flag", .fieldName = "Flag"});
-    const QString invalidIntegrationActionId2 = "test.action";
+    const std::string invalidIntegrationActionId2 = "test.action";
     const nx::vms::api::analytics::IntegrationAction invalidIntegrationActionDescriptor2{
         .id = invalidIntegrationActionId2,
         .name = "Invalid Integration Action",
@@ -159,10 +162,12 @@ TEST_F(IntegrationActionsTest, initialize)
     addPluginWithIntegrationAction({invalidIntegrationActionDescriptor2});
 
     actionInitializer->initialize(engine.get());
-    ASSERT_FALSE(engine->actions().contains("integration." + invalidIntegrationActionId2));
+    ASSERT_FALSE(engine->actions().contains(QString::fromStdString(
+        "integration." + invalidIntegrationActionId2)));
 
     // Integration Action with valid descriptor should still be present.
-    ASSERT_TRUE(engine->actions().contains("integration." + validIntegrationActionId1));
+    ASSERT_TRUE(engine->actions().contains(QString::fromStdString(
+        "integration." + validIntegrationActionId1)));
     ASSERT_EQ(engine->actions().size(), 2);
 }
 

@@ -2,6 +2,8 @@
 
 #include "integration_action_initializer.h"
 
+#include <string>
+
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/integration_action.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -20,10 +22,10 @@ namespace {
         for (const auto& fieldModel: integrationAction.fields)
         {
             nx::vms::rules::FieldDescriptor descriptor{
-                .type = fieldModel.type,
-                .fieldName = fieldModel.fieldName,
-                .displayName = nx::TranslatableString(fieldModel.displayName),
-                .description = fieldModel.description,
+                .type = QString::fromStdString(fieldModel.type),
+                .fieldName = QString::fromStdString(fieldModel.fieldName),
+                .displayName = nx::TranslatableString(QString::fromStdString(fieldModel.displayName)),
+                .description = QString::fromStdString(fieldModel.description),
                 .properties = fieldModel.properties.toVariantMap(),
             };
             fieldDescriptors.append(std::move(descriptor));
@@ -31,8 +33,8 @@ namespace {
 
         return nx::vms::rules::ItemDescriptor{
             .id = actionId,
-            .displayName = nx::TranslatableString(integrationAction.name),
-            .description = integrationAction.description,
+            .displayName = nx::TranslatableString(QString::fromStdString(integrationAction.name)),
+            .description = QString::fromStdString(integrationAction.description),
             .flags =
             {
                 nx::vms::rules::ItemFlag::dynamic,
@@ -67,7 +69,8 @@ void IntegrationActionInitializer::registerActions() const
     {
         for (auto& actionDescriptor: engine->manifest().integrationActions)
         {
-            const QString actionType = kIntegrationActionTypePrefix + actionDescriptor.id;
+            const auto actionType = QString::fromStdString(
+                std::string(kIntegrationActionTypePrefix) + actionDescriptor.id);
             m_engine->registerAction(
                 itemDescriptorFromIntegrationAction(actionType, actionDescriptor),
                 [actionType, fields = actionDescriptor.fields]
@@ -79,7 +82,7 @@ void IntegrationActionInitializer::registerActions() const
                     // explicit field descriptors from the manifest instead and remove this code.
                     for (const auto& field: fields)
                     {
-                        const auto fieldName = field.fieldName.toStdString();
+                        const auto& fieldName = field.fieldName;
                         action->setProperty(fieldName.c_str(), "");
                     }
                     return action;

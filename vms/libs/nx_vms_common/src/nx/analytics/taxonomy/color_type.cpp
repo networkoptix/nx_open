@@ -2,6 +2,8 @@
 
 #include "color_type.h"
 
+#include <regex>
+
 #include <nx/analytics/taxonomy/item_resolver.h>
 
 #include <nx/analytics/taxonomy/internal_state.h>
@@ -25,12 +27,12 @@ ColorType::ColorType(
 {
 }
 
-QString ColorType::id() const
+const std::string& ColorType::id() const
 {
     return m_descriptor.id;
 }
 
-QString ColorType::name() const
+const std::string& ColorType::name() const
 {
     return m_descriptor.name;
 }
@@ -40,38 +42,38 @@ AbstractColorType* ColorType::base() const
     return m_base;
 }
 
-std::vector<QString> ColorType::baseItems() const
+std::vector<std::string> ColorType::baseItems() const
 {
-    std::vector<QString> result;
+    std::vector<std::string> result;
     if (!m_base)
         return result;
 
-    for (const QString& baseColorName: m_descriptor.baseItems)
+    for (const std::string& baseColorName: m_descriptor.baseItems)
     {
-        QString baseItem = m_base->color(baseColorName);
-        if (!baseItem.isEmpty())
+        std::string baseItem = m_base->color(baseColorName);
+        if (!baseItem.empty())
             result.push_back(baseItem);
     }
 
     return result;
 }
 
-std::vector<QString> ColorType::ownItems() const
+std::vector<std::string> ColorType::ownItems() const
 {
     return m_cachedOwnItems;
 }
 
-std::vector<QString> ColorType::items() const
+std::vector<std::string> ColorType::items() const
 {
     // TODO: Cache all this stuff.
-    std::vector<QString> result = m_descriptor.baseItems;
+    std::vector<std::string> result = m_descriptor.baseItems;
     for (const ColorItem& ownItem: m_descriptor.items)
         result.push_back(ownItem.name);
 
     return result;
 }
 
-QString ColorType::color(const QString& item) const
+std::string ColorType::color(const std::string& item) const
 {
     const auto it = m_colorByName.find(item);
     if (it != m_colorByName.cend())
@@ -80,7 +82,7 @@ QString ColorType::color(const QString& item) const
     if (m_base && m_cachedBaseColorTypeNames.find(item) != m_cachedBaseColorTypeNames.cend())
         return m_base->color(item);
 
-    return QString();
+    return std::string();
 }
 
 nx::vms::api::analytics::ColorTypeDescriptor ColorType::serialize() const
@@ -93,7 +95,7 @@ void ColorType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHa
     if (m_resolved)
         return;
 
-    if (m_descriptor.base && !m_descriptor.base->isEmpty())
+    if (m_descriptor.base && !m_descriptor.base->empty())
     {
         m_base = inOutInternalState->getTypeById<ColorType>(*m_descriptor.base);
         if (NX_ASSERT(m_base, "Color Type %1: unable to find base (%2)",
@@ -103,7 +105,7 @@ void ColorType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHa
         }
     }
 
-    ItemResolver<ColorItem, QString>::Context context;
+    ItemResolver<ColorItem, std::string>::Context context;
 
     context.typeId = m_descriptor.id;
     context.typeName = kColorTypeDescriptorTypeName;
@@ -122,7 +124,7 @@ void ColorType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHa
             return resolveItem(inOutColorItem, errorHandler);
         };
 
-    ItemResolver<ColorItem, QString> itemResolver(std::move(context), errorHandler);
+    ItemResolver<ColorItem, std::string> itemResolver(std::move(context), errorHandler);
     itemResolver.resolve();
 
     for (const ColorItem& colorItem: m_descriptor.items)
@@ -131,7 +133,7 @@ void ColorType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHa
         m_cachedOwnItems.push_back(colorItem.name);
     }
 
-    for (const QString& baseItemName: m_descriptor.baseItems)
+    for (const std::string& baseItemName: m_descriptor.baseItems)
         m_cachedBaseColorTypeNames.insert(baseItemName);
 
     m_resolved = true;
@@ -139,7 +141,7 @@ void ColorType::resolve(InternalState* inOutInternalState, ErrorHandler* errorHa
 
 bool ColorType::resolveItem(ColorItem* inOutColorItem, ErrorHandler* errorHandler)
 {
-    if (!inOutColorItem->rgb.startsWith("#"))
+    if (!inOutColorItem->rgb.starts_with("#"))
     {
         errorHandler->handleError(
             ProcessingError{NX_FMT(
@@ -161,8 +163,9 @@ bool ColorType::resolveItem(ColorItem* inOutColorItem, ErrorHandler* errorHandle
         return false;
     }
 
-    QRegularExpression hexColorRegexp("^#([0-9a-fA-F]{3}){1,2}$");
-    if (!hexColorRegexp.match(inOutColorItem->rgb).hasMatch())
+    static const std::regex kHexColorRegex(R"(^#([0-9a-fA-F]{3}){1,2}$)",
+        std::regex_constants::ECMAScript);
+    if (!std::regex_match(inOutColorItem->rgb, kHexColorRegex))
     {
         errorHandler->handleError(
             ProcessingError{NX_FMT(

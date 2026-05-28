@@ -4,6 +4,7 @@
 
 #include <map>
 #include <set>
+#include <string>
 
 #include <nx/analytics/taxonomy/abstract_resource_support_proxy.h>
 
@@ -22,14 +23,14 @@ public:
 
     virtual bool isEntityTypeSupported(
         nx::analytics::taxonomy::EntityType entityType,
-        const QString& entityTypeId,
+        const std::string& entityTypeId,
         nx::Uuid deviceId,
         nx::Uuid engineId) const override;
 
     virtual bool isEntityTypeAttributeSupported(
         nx::analytics::taxonomy::EntityType entityType,
-        const QString& entityTypeId,
-        const QString& fullAttributeName,
+        const std::string& entityTypeId,
+        const std::string& fullAttributeName,
         nx::Uuid deviceId,
         nx::Uuid engineId) const override;
 

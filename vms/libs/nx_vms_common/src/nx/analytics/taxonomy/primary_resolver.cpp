@@ -28,9 +28,9 @@ struct HasOmittedBaseItems<
     std::void_t<decltype(std::declval<T>().omittedBaseItems)>>: std::true_type {};
 
 template<typename Descriptor>
-std::optional<ProcessingError> validateId(const Descriptor& descriptor, const QString& typeName)
+std::optional<ProcessingError> validateId(const Descriptor& descriptor, const std::string& typeName)
 {
-    if (descriptor.id.isEmpty())
+    if (descriptor.id.empty())
     {
         return ProcessingError{nx::format("%1: id can't be an empty string", typeName)};
     }
@@ -41,7 +41,7 @@ std::optional<ProcessingError> validateId(const Descriptor& descriptor, const QS
 
     try
     {
-        if (std::regex_match(descriptor.id.toStdString(), kIdRegex))
+        if (std::regex_match(descriptor.id, kIdRegex))
             return std::nullopt; //< Valid.
     }
     catch (const std::regex_error&)
@@ -60,7 +60,7 @@ std::optional<ProcessingError> validateFlags(const Descriptor& descriptor)
     if constexpr (std::is_same_v<Descriptor, ObjectTypeDescriptor>)
     {
         if (descriptor.flags.testFlag(ObjectTypeFlag::hiddenDerivedType) &&
-            (!descriptor.base || descriptor.base->isEmpty()))
+            (!descriptor.base || descriptor.base->empty()))
         {
             return ProcessingError{nx::format(
                 "%1: \"hiddenDerivedType\" flag is available only for derived types. The \"base\" "
@@ -73,7 +73,7 @@ std::optional<ProcessingError> validateFlags(const Descriptor& descriptor)
 
 template<typename DescriptorMap>
 void filterInvalidDescriptors(
-    const QString& descriptorTypeName,
+    const std::string& descriptorTypeName,
     DescriptorMap* inOutDescriptorMap,
     ErrorHandler* errorHandler)
 {
@@ -97,22 +97,22 @@ void filterInvalidDescriptors(
 
 template<typename DescriptorMap>
 void resolveInheritance(
-    const QString& descriptorTypeName,
+    const std::string& descriptorTypeName,
     DescriptorMap* inOutDescriptorMap,
     ErrorHandler* errorHandler)
 {
     using Descriptor = typename DescriptorMap::mapped_type;
 
-    std::set<QString> processedDescriptorIds;
+    std::set<std::string> processedDescriptorIds;
     for (auto& [id, descriptor] : *inOutDescriptorMap)
     {
         if (processedDescriptorIds.find(id) != processedDescriptorIds.cend())
             continue;
 
         auto* currentDescriptor = &descriptor;
-        std::set<QString> bases;
+        std::set<std::string> bases;
 
-        if (currentDescriptor->base && currentDescriptor->base->isEmpty())
+        if (currentDescriptor->base && currentDescriptor->base->empty())
             currentDescriptor->base.reset();
 
         while (currentDescriptor->base)

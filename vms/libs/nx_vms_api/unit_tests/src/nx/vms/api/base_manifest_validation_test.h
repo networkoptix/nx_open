@@ -9,24 +9,28 @@
 
 namespace nx::vms::api::analytics {
 
-inline QList<QString> makeStrings(const QString& prefix)
+inline std::vector<std::string> makeStrings(const std::string& prefix)
 {
-    QList<QString> result;
-    for (int i = 0; i < 10; ++i)
-        result.push_back(prefix + QString::number(i));
+    std::vector<std::string> result;
+    const int stringCount = 10;
+    result.reserve(stringCount);
+    for (int i = 0; i < stringCount; ++i)
+        result.push_back(prefix + std::to_string(i));
 
     return result;
 }
 
 template<typename Entry>
-QList<Entry> makeEntries(const QString& entryTypeName)
+std::vector<Entry> makeEntries(const std::string& entryTypeName)
 {
-    QList<Entry> result;
-    for (int i = 0; i < 10; ++i)
+    std::vector<Entry> result;
+    const int entryCount = 10;
+    result.reserve(entryCount);
+    for (int i = 0; i < entryCount; ++i)
     {
         Entry eventType;
-        eventType.id = "testId" + entryTypeName + QString::number(i);
-        eventType.name = entryTypeName + " test name " + QString::number(i);
+        eventType.id = std::string("testId") + entryTypeName + std::to_string(i);
+        eventType.name = entryTypeName + " test name " + std::to_string(i);
         result.push_back(eventType);
     }
 
@@ -35,14 +39,14 @@ QList<Entry> makeEntries(const QString& entryTypeName)
 
 template<typename Entry, typename TransformationFunc>
 void transformSomeEntries(
-    QList<Entry>* inOutEntries,
-    qsizetype numberOfEntriesToTransform,
+    std::vector<Entry>* inOutEntries,
+    int numberOfEntriesToTransform,
     TransformationFunc transformationFunc)
 {
     if (!NX_ASSERT(inOutEntries))
         return;
 
-    for (qsizetype i = 0; i < std::min(inOutEntries->size(), numberOfEntriesToTransform); ++i)
+    for (int i = 0; i < std::min((int)inOutEntries->size(), numberOfEntriesToTransform); ++i)
         transformationFunc(&(*inOutEntries)[i]);
 }
 

@@ -122,14 +122,15 @@ EventDurationType getEventDurationType(
     if (const auto analyticsEventTypeField =
         eventFilter->fieldByName<AnalyticsEventTypeField>(utils::kEventTypeIdFieldName))
     {
-        if (analyticsEventTypeField->typeId().isNull())
+        const auto typeId = analyticsEventTypeField->typeId();
+        if (typeId.isEmpty())
             return result;
 
         const auto taxonomyState = engine->systemContext()->analyticsTaxonomyState();
         if (!NX_ASSERT(taxonomyState))
             return result;
 
-        const auto eventType = taxonomyState->eventTypeById(analyticsEventTypeField->typeId());
+        const auto eventType = taxonomyState->eventTypeById(typeId.toStdString());
         if (eventType)
         {
             result = eventType->isStateDependent()
@@ -138,7 +139,7 @@ EventDurationType getEventDurationType(
         }
         else
         {
-            result = eventGroupDuration(taxonomyState, analyticsEventTypeField->typeId());
+            result = eventGroupDuration(taxonomyState, typeId);
         }
     }
 

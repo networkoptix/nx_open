@@ -36,19 +36,19 @@ public:
 
     virtual std::vector<EventType*> rootEventTypes() const override;
 
-    virtual ObjectType* objectTypeById(const QString& objectTypeId) const override;
+    virtual ObjectType* objectTypeById(const std::string& objectTypeId) const override;
 
-    virtual EventType* eventTypeById(const QString& eventTypeById) const override;
+    virtual EventType* eventTypeById(const std::string& eventTypeById) const override;
 
-    virtual AbstractIntegration* integrationById(const QString& integrationId) const override;
+    virtual AbstractIntegration* integrationById(const std::string& integrationId) const override;
 
-    virtual AbstractEngine* engineById(const QString& engineId) const override;
+    virtual AbstractEngine* engineById(const std::string& engineId) const override;
 
-    virtual AbstractGroup* groupById(const QString& groupId) const override;
+    virtual AbstractGroup* groupById(const std::string& groupId) const override;
 
-    virtual AbstractEnumType* enumTypeById(const QString& enumTypeId) const override;
+    virtual AbstractEnumType* enumTypeById(const std::string& enumTypeId) const override;
 
-    virtual AbstractColorType* colorTypeById(const QString& colorTypeId) const override;
+    virtual AbstractColorType* colorTypeById(const std::string& colorTypeId) const override;
 
     virtual nx::vms::api::analytics::Descriptors serialize() const override;
 

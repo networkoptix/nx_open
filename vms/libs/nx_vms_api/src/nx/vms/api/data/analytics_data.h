@@ -391,7 +391,7 @@ struct NX_VMS_API ObjectTrackV4
     nx::Uuid deviceId;
 
     /**%apidoc Id of an Object Type of the last received Object Metadata in the Track. */
-    QString objectTypeId;
+    std::string objectTypeId;
 
     std::chrono::milliseconds startTimeMs;
 
@@ -529,7 +529,7 @@ struct ObjectTrackFilter: IdData, ObjectTrackFilterFreeText
     /**%apidoc[opt]:stringArray
      * If present, only Object Tracks of the specified type(s) will be considered for search.
      */
-    json::ValueOrArray<QString> objectTypeId;
+    json::ValueOrArray<std::string> objectTypeId;
 
     /**%apidoc
      * Start of the time period to search within, in milliseconds since epoch (1970-01-01 00:00, UTC).

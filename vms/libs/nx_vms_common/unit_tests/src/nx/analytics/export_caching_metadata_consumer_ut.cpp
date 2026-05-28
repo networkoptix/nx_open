@@ -46,7 +46,7 @@ void motionsEQ(const QnConstMetaDataV1Ptr& data, const QnConstMetaDataV1Ptr& rec
 }
 
 common::metadata::ObjectMetadata prepareObject(
-    const QString& typeId,
+    const std::string& typeId,
     nx::Uuid uuid,
     QRect boundingBox)
 {

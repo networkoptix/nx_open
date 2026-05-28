@@ -37,32 +37,32 @@ struct NX_VMS_API DeviceAgentManifest
     /**%apidoc[opt]
      * %deprecated Use "supportedTypes" field instead.
      */
-    QList<QString> supportedEventTypeIds;
+    std::vector<std::string> supportedEventTypeIds;
 
     /**%apidoc[opt]
      * %deprecated Use "supportedTypes" field instead.
      */
-    QList<QString> supportedObjectTypeIds;
+    std::vector<std::string> supportedObjectTypeIds;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
-    QList<AnalyticsEventType> eventTypes;
+    std::vector<AnalyticsEventType> eventTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" and "supportedTypes" fields instead.
      */
-    QList<ObjectType> objectTypes;
+    std::vector<ObjectType> objectTypes;
 
     /**%apidoc[opt]
      * %deprecated Use "typeLibrary" field instead.
      */
-    QList<Group> groups;
+    std::vector<Group> groups;
 
     QJsonValue deviceAgentSettingsModel; /**<%apidoc[proprietary] */
 
     /**%apidoc[opt] */
-    QList<TypeSupportInfo> supportedTypes;
+    std::vector<TypeSupportInfo> supportedTypes;
 
     /**%apidoc[opt] */
     TypeLibrary typeLibrary;

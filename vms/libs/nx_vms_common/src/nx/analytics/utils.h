@@ -32,11 +32,11 @@ std::map<QString, Descriptor> fromManifestItemListsToDescriptorMap(
 }
 
 template<typename Item>
-std::set<QString> fromManifestItemListToIds(
-    const std::vector<const QList<Item>*>& itemLists)
+std::set<std::string> fromManifestItemListToIds(
+    const std::vector<const std::vector<Item>*>& itemLists)
 {
-    std::set<QString> result;
-    for (const QList<Item>* const itemList: itemLists)
+    std::set<std::string> result;
+    for (const std::vector<Item>* const itemList: itemLists)
     {
         for (const auto& item: *itemList)
             result.insert(item.id);
@@ -132,18 +132,18 @@ std::optional<Descriptor> fetchDescriptor(taxonomy::DescriptorContainer* contain
  */
 NX_VMS_COMMON_API bool serverHasActiveObjectEngines(const QnMediaServerResourcePtr& server);
 
-NX_VMS_COMMON_API std::set<QString> supportedObjectTypeIdsFromManifest(
+NX_VMS_COMMON_API std::set<std::string> supportedObjectTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-NX_VMS_COMMON_API std::set<QString> supportedEventTypeIdsFromManifest(
+NX_VMS_COMMON_API std::set<std::string> supportedEventTypeIdsFromManifest(
     const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
 NX_VMS_COMMON_API nx::vms::common::AnalyticsEngineResourcePtr findEngineByIntegrationActionId(
-    const QString& integrationActionId, const QnResourcePool* resourcePool);
+    const std::string& integrationActionId, const QnResourcePool* resourcePool);
 
 using IntegrationAction = nx::vms::api::analytics::IntegrationAction;
 NX_VMS_COMMON_API std::optional<IntegrationAction> findIntegrationActionDescriptorById(
-    const QString& integrationActionId,
+    const std::string& integrationActionId,
     const nx::vms::common::AnalyticsEngineResourceList& engines);
 
 } // namespace nx::analytics

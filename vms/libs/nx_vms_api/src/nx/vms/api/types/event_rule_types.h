@@ -327,7 +327,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 struct NX_VMS_API AnalyticsTrackContext
 {
     /** All object types which were detected during the track. */
-    QString objectTypeId;
+    std::string objectTypeId;
 };
 
 } // namespace nx::vms::api

@@ -4,8 +4,6 @@
 
 #include <vector>
 
-#include <QtCore/QString>
-
 #include <nx/analytics/taxonomy/abstract_attribute.h>
 #include <nx/analytics/taxonomy/base_object_event_type.h>
 #include <nx/analytics/taxonomy/scope.h>

@@ -157,7 +157,7 @@ QVariant TaxonomyManager::objectTypeById(const QString& objectTypeId) const
 {
     const auto taxonomy = currentTaxonomy();
     return taxonomy
-        ? QVariant::fromValue(taxonomy->objectTypeById(objectTypeId))
+        ? QVariant::fromValue(taxonomy->objectTypeById(objectTypeId.toStdString()))
         : QVariant();
 }
 

@@ -14,10 +14,10 @@ namespace nx::vms::api::analytics {
 
 struct FieldModel
 {
-    QString type;
-    QString fieldName;
-    QString displayName;
-    QString description;
+    std::string type;
+    std::string fieldName;
+    std::string displayName;
+    std::string description;
     QJsonObject properties;
 
     bool operator==(const FieldModel& other) const = default;
@@ -29,9 +29,9 @@ NX_REFLECTION_INSTRUMENT(FieldModel, FieldModel_Fields)
 
 struct IntegrationAction
 {
-    QString id;
-    QString name;
-    QString description;
+    std::string id;
+    std::string name;
+    std::string description;
     bool isInstant;
     QList<FieldModel> fields;
 

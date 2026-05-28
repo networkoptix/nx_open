@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API ObjectTypeDictionary:
     Q_OBJECT
 public:
     explicit ObjectTypeDictionary(AbstractStateWatcher* taxonomyWatcher, QObject* parent = nullptr);
-    virtual std::optional<QString> idToName(const QString& id) const override;
+    virtual std::optional<std::string> idToName(const std::string& id) const override;
 
 private:
     const QPointer<AbstractStateWatcher> m_taxonomyWatcher;

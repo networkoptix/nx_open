@@ -58,7 +58,8 @@ nx::analytics::taxonomy::ObjectType* AnalyticsObjectEvent::objectTypeById(
         context->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId());
 
     return camera && camera->systemContext()
-        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(m_objectTypeId)
+        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(
+            m_objectTypeId.toStdString())
         : nullptr;
 }
 
@@ -76,7 +77,7 @@ QVariantMap AnalyticsObjectEvent::details(
 
     const auto objectType = objectTypeById(context);
     utils::insertIfNotEmpty(
-        result, utils::kCustomIconDetailName, objectType ? objectType->icon() : QString());
+        result, utils::kCustomIconDetailName, objectType ? objectType->icon() : std::string());
     utils::insertClientAction(result, nx::vms::rules::ClientAction::previewCameraOnTime);
 
     return result;
@@ -85,7 +86,7 @@ QVariantMap AnalyticsObjectEvent::details(
 QString AnalyticsObjectEvent::analyticsObjectCaption(common::SystemContext* context) const
 {
     const auto objectType = objectTypeById(context);
-    return objectType ? objectType->name() : tr("Object detected");
+    return objectType ? QString::fromStdString(objectType->name()) : tr("Object detected");
 }
 
 QString AnalyticsObjectEvent::extendedCaption(common::SystemContext* context,

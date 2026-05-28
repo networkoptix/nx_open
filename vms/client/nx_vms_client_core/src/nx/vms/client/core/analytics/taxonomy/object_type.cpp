@@ -67,7 +67,7 @@ void ObjectType::addObjectType(const nx::analytics::taxonomy::ObjectType* object
     if (!NX_ASSERT(objectType))
         return;
 
-    d->additionalObjectTypes[objectType->id()] = objectType;
+    d->additionalObjectTypes[QString::fromStdString(objectType->id())] = objectType;
 }
 
 std::vector<QString> ObjectType::typeIds() const
@@ -77,7 +77,7 @@ std::vector<QString> ObjectType::typeIds() const
 
     d->cachedTypeIds = std::vector<QString>();
     if (objectTypeMatchesFilter(d->filter, d->mainObjectType))
-        d->cachedTypeIds->push_back(d->mainObjectType->id());
+        d->cachedTypeIds->push_back(QString::fromStdString(d->mainObjectType->id()));
 
     for (const auto& [objectTypeId, objectType]: d->additionalObjectTypes)
     {
@@ -90,7 +90,7 @@ std::vector<QString> ObjectType::typeIds() const
 
 QString ObjectType::mainTypeId() const
 {
-    return d->mainObjectType->id();
+    return QString::fromStdString(d->mainObjectType->id());
 }
 
 std::vector<QString> ObjectType::fullSubtreeTypeIds() const
@@ -131,13 +131,13 @@ QStringList ObjectType::fullTreeTypeIdsIncludingBaseIfNeeded() const
 
 QString ObjectType::id() const
 {
-    return d->mainObjectType->id();
+    return QString::fromStdString(d->mainObjectType->id());
 }
 
 QString ObjectType::name() const
 {
     if (NX_ASSERT(d->mainObjectType))
-        return d->mainObjectType->name();
+        return QString::fromStdString(d->mainObjectType->name());
 
     return QString();
 }
@@ -145,7 +145,7 @@ QString ObjectType::name() const
 QString ObjectType::icon() const
 {
     if (NX_ASSERT(d->mainObjectType))
-        return d->mainObjectType->icon();
+        return QString::fromStdString(d->mainObjectType->icon());
 
     return QString();
 }

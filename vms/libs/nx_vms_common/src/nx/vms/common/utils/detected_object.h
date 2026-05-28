@@ -19,6 +19,6 @@ struct DetectedObjectSettings
 };
 NX_REFLECTION_INSTRUMENT(DetectedObjectSettings, (color))
 
-using DetectedObjectSettingsMap = std::unordered_map<QString, DetectedObjectSettings>;
+using DetectedObjectSettingsMap = std::unordered_map<std::string, DetectedObjectSettings>;
 
 } // namespace nx::vms::common

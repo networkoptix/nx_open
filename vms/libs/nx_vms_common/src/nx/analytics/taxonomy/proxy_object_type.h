@@ -14,17 +14,17 @@ class ProxyObjectType: public ObjectType
 public:
     ProxyObjectType(
         ObjectType* proxiedObjectType,
-        std::map<QString, AttributeSupportInfoTree> attributeSupportInfoTree,
+        std::map<std::string, AttributeSupportInfoTree> attributeSupportInfoTree,
         AbstractResourceSupportProxy* resourceSupportProxy,
-        QString prefix,
-        QString rootParentTypeId,
+        std::string prefix,
+        std::string rootParentTypeId,
         EntityType rootEntityType);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
-    virtual QString icon() const override;
+    virtual const std::string& icon() const override;
 
     virtual ObjectType* base() const override;
 
@@ -56,12 +56,12 @@ public:
 
 private:
     ObjectType* m_proxiedObjectType = nullptr;
-    mutable std::map<QString, AttributeSupportInfoTree> m_attributeSupportInfoTree;
+    mutable std::map<std::string, AttributeSupportInfoTree> m_attributeSupportInfoTree;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedAttributes;
     mutable std::optional<std::vector<AbstractAttribute*>> m_supportedOwnAttributes;
     AbstractResourceSupportProxy* m_resourceSupportProxy;
-    QString m_prefix;
-    QString m_rootParentTypeId;
+    std::string m_prefix;
+    std::string m_rootParentTypeId;
     EntityType m_rootEntityType;
 };
 

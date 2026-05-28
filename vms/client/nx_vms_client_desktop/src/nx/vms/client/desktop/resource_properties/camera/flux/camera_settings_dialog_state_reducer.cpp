@@ -598,8 +598,9 @@ CameraSettingsTab fixupSelectedTab(const State& state)
 /**
  * Utility function to filter only those entities, which are supported by the provided engines.
  */
-std::map<nx::Uuid, std::set<QString>> filterByEngineIds(
-    std::map<nx::Uuid, std::set<QString>> entitiesByEngine, const std::set<nx::Uuid>& engineIds)
+std::map<nx::Uuid, std::set<std::string>> filterByEngineIds(
+    std::map<nx::Uuid, std::set<std::string>> entitiesByEngine,
+    const std::set<nx::Uuid>& engineIds)
 {
     std::erase_if(entitiesByEngine,
         [&engineIds](const auto& i) { return !engineIds.contains(i.first); });
@@ -853,8 +854,8 @@ State loadSingleCameraProperties(
         singleCamera->streamInfo(StreamIndex::secondary).getResolution();
     singleProperties.restreamingUrl = singleCamera->vmsCloudUrl().toString();
 
-    singleProperties.supportedAnalyicsObjectTypes = singleCamera->supportedObjectTypes(
-        /*filterByEngines*/ false);
+    singleProperties.supportedAnalyicsObjectTypes =
+        singleCamera->supportedObjectTypes(/*filterByEngines*/ false);
 
     const auto macAddress = singleCamera->getMAC();
     singleProperties.macAddress = macAddress.isNull() ? QString() : macAddress.toString();

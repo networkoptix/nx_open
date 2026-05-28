@@ -66,23 +66,23 @@ AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
         .dynamicCast<AnalyticsPluginResource>();
 }
 
-std::set<QString> AnalyticsEngineResource::eventTypeIds() const
+std::set<std::string> AnalyticsEngineResource::eventTypeIds() const
 {
     const auto engineManifest = manifest();
-    return analytics::fromManifestItemListToIds(std::vector<const QList<AnalyticsEventType>*>{
+    return analytics::fromManifestItemListToIds(std::vector<const std::vector<AnalyticsEventType>*>{
         &engineManifest.eventTypes,
         &engineManifest.typeLibrary.eventTypes});
 }
 
-std::set<QString> AnalyticsEngineResource::objectTypeIds() const
+std::set<std::string> AnalyticsEngineResource::objectTypeIds() const
 {
     const auto engineManifest = manifest();
-    return analytics::fromManifestItemListToIds(std::vector<const QList<ObjectType>*>{
+    return analytics::fromManifestItemListToIds(std::vector<const std::vector<ObjectType>*>{
         &engineManifest.objectTypes,
         &engineManifest.typeLibrary.objectTypes});
 }
 
-QList<nx::vms::api::analytics::ObjectAction>
+std::vector<nx::vms::api::analytics::ObjectAction>
     AnalyticsEngineResource::supportedObjectActions() const
 {
     return manifest().objectActions;

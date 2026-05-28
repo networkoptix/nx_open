@@ -16,10 +16,10 @@ using namespace nx::vms::api::analytics;
 
 struct TestCaseData
 {
-    QString objectType;
-    QString attribute;
+    std::string objectType;
+    std::string attribute;
     bool shouldBeFound = true;
-    QString expectedName;
+    std::string expectedName;
 };
 NX_REFLECTION_INSTRUMENT(TestCaseData, (objectType)(attribute)(shouldBeFound)(expectedName))
 
@@ -58,8 +58,8 @@ public:
         if (test.shouldBeFound)
         {
             ASSERT_NE(attribute, nullptr);
-            QString expectedName = test.expectedName;
-            if (expectedName.isEmpty())
+            auto expectedName = test.expectedName;
+            if (expectedName.empty())
                 expectedName = test.attribute;
             ASSERT_EQ(expectedName, attribute->name());
         }

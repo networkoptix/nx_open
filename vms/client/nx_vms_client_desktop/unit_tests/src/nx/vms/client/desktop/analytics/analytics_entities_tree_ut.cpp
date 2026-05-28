@@ -66,7 +66,7 @@ void PrintTo(TreeComparator comparator, ::std::ostream* os)
         {
             *os << offset << "[" << nx::reflect::toString(node->nodeType) << "]"
                 << node->text.toStdString()
-                << " (" << node->entityId.toStdString() << ")" << std::endl;
+                << " (" << node->entityId << ")" << std::endl;
             for (auto child: node->children)
                 printNode(child, offset + "    ");
         });

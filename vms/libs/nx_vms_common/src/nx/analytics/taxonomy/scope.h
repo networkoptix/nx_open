@@ -17,7 +17,7 @@ public:
 
     AbstractGroup* group() const;
 
-    QString provider() const;
+    std::string provider() const;
 
     bool hasTypeEverBeenSupportedInThisScope() const;
 
@@ -28,14 +28,14 @@ public:
 
     void setGroup(Group* group);
 
-    void setProvider(const QString& provider);
+    void setProvider(const std::string& provider);
 
     void setHasTypeEverBeenSupportedInThisScope(bool hasTypeEverBeenSupportedInThisScope);
 
 private:
     Engine* m_engine = nullptr;
     Group* m_group = nullptr;
-    QString m_provider;
+    std::string m_provider;
     bool m_hasTypeEverBeenSupportedInThisScope = false;
 };
 

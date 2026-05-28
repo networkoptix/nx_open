@@ -26,7 +26,7 @@ ResultMap serializeEntityMap(const EntityMap& entityMap)
         using KeyType =
             typename std::remove_cv_t<std::remove_reference_t<typename ResultMap::key_type>>;
 
-        if constexpr (std::is_same_v<KeyType, QString>)
+        if constexpr (std::is_same_v<KeyType, std::string>)
             result[id] = entity->serialize();
         else
             result[nx::Uuid::fromStringSafe(id)] = entity->serialize();
@@ -181,38 +181,38 @@ std::vector<EventType*> State::rootEventTypes() const
     return m_cachedRootEventType;
 }
 
-ObjectType* State::objectTypeById(const QString& objectTypeId) const
+ObjectType* State::objectTypeById(const std::string& objectTypeId) const
 {
     return m_internalState.getTypeById<ObjectType>(objectTypeId);
 }
 
-EventType* State::eventTypeById(const QString& eventTypeId) const
+EventType* State::eventTypeById(const std::string& eventTypeId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<EventType>(eventTypeId);
 }
 
-AbstractIntegration* State::integrationById(const QString& integrationId) const
+AbstractIntegration* State::integrationById(const std::string& integrationId) const
 {
     return m_internalState.getTypeById<Integration>(integrationId);
 }
 
-AbstractEngine* State::engineById(const QString& engineId) const
+AbstractEngine* State::engineById(const std::string& engineId) const
 {
     return m_internalState.getTypeById<Engine>(engineId);
 }
 
-AbstractGroup* State::groupById(const QString& groupId) const
+AbstractGroup* State::groupById(const std::string& groupId) const
 {
     return m_internalState.getTypeById<Group>(groupId);
 }
 
-AbstractEnumType* State::enumTypeById(const QString& enumTypeId) const
+AbstractEnumType* State::enumTypeById(const std::string& enumTypeId) const
 {
     return m_internalState.getTypeById<EnumType>(enumTypeId);
 }
 
-AbstractColorType* State::colorTypeById(const QString& colorTypeId) const
+AbstractColorType* State::colorTypeById(const std::string& colorTypeId) const
 {
     return m_internalState.getTypeById<ColorType>(colorTypeId);
 }

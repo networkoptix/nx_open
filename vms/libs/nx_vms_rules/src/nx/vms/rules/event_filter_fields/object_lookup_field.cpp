@@ -42,7 +42,7 @@ bool checkForListEntries(
         return false;
 
     // Lookup list is Generic one.
-    if (lookupList.objectTypeId.isEmpty())
+    if (lookupList.objectTypeId.empty())
     {
         for (const auto& attribute: attributes)
         {

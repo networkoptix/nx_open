@@ -17,15 +17,15 @@ public:
         nx::vms::api::analytics::EnumTypeDescriptor enumTypeDescriptor,
         QObject* parent);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual AbstractEnumType* base() const override;
 
-    virtual std::vector<QString> ownItems() const override;
+    virtual std::vector<std::string> ownItems() const override;
 
-    virtual std::vector<QString> items() const override;
+    virtual std::vector<std::string> items() const override;
 
     virtual nx::vms::api::analytics::EnumTypeDescriptor serialize() const override;
 

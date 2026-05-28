@@ -6,7 +6,7 @@
 
 namespace nx::vms::api::analytics {
 
-QString toString(ManifestErrorType errorType)
+std::string toString(ManifestErrorType errorType)
 {
     switch (errorType)
     {
@@ -63,10 +63,10 @@ QString toString(ManifestErrorType errorType)
     }
 }
 
-QString toString(ManifestError manifestError)
+std::string toString(ManifestError manifestError)
 {
     return "Manifest error: " + toString(manifestError.errorType)
-        + (manifestError.additionalInfo.isEmpty()
+        + (manifestError.additionalInfo.empty()
             ? ""
             : (". Details: " + manifestError.additionalInfo));
 }

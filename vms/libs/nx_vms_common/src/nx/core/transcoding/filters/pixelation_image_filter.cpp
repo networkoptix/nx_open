@@ -162,7 +162,7 @@ CLVideoDecoderOutputPtr PixelationImageFilter::updateImage(
         for (const auto& objectMetadata: metadata->objectMetadataList)
         {
             auto [_, newTrackId] = usedTrackIds.insert(objectMetadata.trackId);
-            if (newTrackId && m_settings.contains(objectMetadata.typeId))
+            if (newTrackId && m_settings.contains(QString::fromStdString(objectMetadata.typeId)))
             {
                 QRect box = {
                     (int)(objectMetadata.boundingBox.x() * w),

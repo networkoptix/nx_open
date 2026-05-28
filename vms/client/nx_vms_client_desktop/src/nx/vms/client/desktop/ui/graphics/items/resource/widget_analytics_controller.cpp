@@ -339,11 +339,11 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
     const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
     const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
     const auto objectType = state ? state->objectTypeById(objectMetadata.typeId) : nullptr;
-    const QString title = objectType ? objectType->name() : QString();
+    const QString title = objectType ? QString::fromStdString(objectType->name()) : QString();
 
     const auto visibleAttributes = settings->visibleAttributes(objectMetadata);
     const QString description = objectDescription(systemContext()->analyticsAttributeHelper()->
-        preprocessAttributes(objectMetadata.typeId, visibleAttributes));
+        preprocessAttributes(QString::fromStdString(objectMetadata.typeId), visibleAttributes));
 
     objectInfo.description = title;
     if (!title.isEmpty() && !description.isEmpty())
@@ -401,12 +401,16 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 
         auto pixSetting = systemContext()->globalSettings()->pixelationSettings();
         if (!accessController()->hasGlobalPermissions(GlobalPermission::viewUnredactedVideo)
-            && (pixSetting.contains(objectInfo.rawData.typeId)))
+            && (pixSetting.contains(QString::fromStdString(objectInfo.rawData.typeId))))
         {
             const auto watcher = systemContext()->analyticsTaxonomyStateWatcher();
             const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
-            const auto objectType = state ? state->objectTypeById(objectInfo.rawData.typeId) : nullptr;
-            const QString title = objectType ? objectType->name() : QString();
+            const auto objectType = state
+                ? state->objectTypeById(objectInfo.rawData.typeId)
+                : nullptr;
+            const QString title = objectType
+                ? QString::fromStdString(objectType->name())
+                : QString();
             areaInfo.text = title;
             areaInfo.hoverText = title;
         }

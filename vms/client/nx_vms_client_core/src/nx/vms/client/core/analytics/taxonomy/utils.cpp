@@ -49,12 +49,12 @@ Attribute* mergeNumericAttributes(
 
     auto attribute = new Attribute(parent);
     attribute->type = Attribute::Type::number;
-    attribute->name = taxonomyAttributes[0]->name();
+    attribute->name = QString::fromStdString(taxonomyAttributes[0]->name());
 
     struct AttributeData
     {
-        QString subtype;
-        QString unit;
+        std::string subtype;
+        std::string unit;
         QVariant minValue;
         QVariant maxValue;
     };
@@ -77,7 +77,7 @@ Attribute* mergeNumericAttributes(
             attributeData.subtype = nx::analytics::taxonomy::kFloatAttributeSubtype;
 
         if (taxonomyAttribute->unit() != attributeData.unit)
-            attributeData.unit = QString();
+            attributeData.unit.clear();
 
         if (!attributeData.minValue.isNull())
         {
@@ -94,10 +94,10 @@ Attribute* mergeNumericAttributes(
         }
     }
 
-    attribute->subtype = attributeData.subtype;
+    attribute->subtype = QString::fromStdString(attributeData.subtype);
     attribute->minValue = attributeData.minValue;
     attribute->maxValue = attributeData.maxValue;
-    attribute->unit = attributeData.unit;
+    attribute->unit = QString::fromStdString(attributeData.unit);
 
     return attribute;
 }
@@ -111,7 +111,7 @@ Attribute* mergeColorTypeAttributes(
 
     auto attribute = new Attribute(parent);
     attribute->type = Attribute::Type::colorSet;
-    attribute->name = taxonomyAttributes[0]->name();
+    attribute->name = QString::fromStdString(taxonomyAttributes[0]->name());
 
     auto colorSet = new ColorSet(parent);
     for (const nx::analytics::taxonomy::AbstractAttribute* taxonomyAttribute: taxonomyAttributes)
@@ -138,7 +138,7 @@ Attribute* mergeEnumTypeAttributes(
 
     auto attribute = new Attribute(parent);
     attribute->type = Attribute::Type::enumeration;
-    attribute->name = taxonomyAttributes[0]->name();
+    attribute->name = QString::fromStdString(taxonomyAttributes[0]->name());
 
     auto enumeration = new Enumeration(parent);
     for (const nx::analytics::taxonomy::AbstractAttribute* taxonomyAttribute: taxonomyAttributes)
@@ -165,7 +165,7 @@ Attribute* mergeObjectTypeAttributes(
         return nullptr;
 
     auto attribute = new Attribute(parent);
-    attribute->name = taxonomyAttributes[0]->name();
+    attribute->name = QString::fromStdString(taxonomyAttributes[0]->name());
     attribute->type = Attribute::Type::attributeSet;
 
     auto attributeSet = new AttributeSet(filter, parent);
@@ -198,7 +198,7 @@ Attribute* wrapAttribute(
     QObject* parent)
 {
     auto attribute = new Attribute(parent);
-    attribute->name = taxonomyAttribute->name();
+    attribute->name = QString::fromStdString(taxonomyAttribute->name());
     attribute->type = fromTaxonomyAttributeType(taxonomyAttribute->type());
     return attribute;
 }
@@ -269,13 +269,13 @@ std::vector<Attribute*> resolveAttributes(
         for (const nx::analytics::taxonomy::AbstractAttribute* attribute:
             objectType->supportedAttributes())
         {
-            if (!attribute->condition().isEmpty())
-                conditions.insert(attribute->condition()); //< Save condition before filtering.
+            if (!attribute->condition().empty())
+                conditions.insert(QString::fromStdString(attribute->condition())); //< Save condition before filtering.
 
             if (filter && !filter->matches(attribute))
                 continue;
 
-            const QString attributeName = attribute->name();
+            const QString attributeName = QString::fromStdString(attribute->name());
             if (attributesToMerge.find(attributeName) == attributesToMerge.cend())
                 orderedAttributeNames.push_back(attributeName);
 

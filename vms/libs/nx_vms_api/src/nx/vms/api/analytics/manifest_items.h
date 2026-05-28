@@ -3,8 +3,7 @@
 #pragma once
 
 #include <optional>
-
-#include <QtCore/QString>
+#include <string>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/reflect/enum_instrument.h>
@@ -16,8 +15,8 @@ namespace nx::vms::api::analytics {
 
 struct NamedItem
 {
-    QString id;
-    QString name;
+    std::string id;
+    std::string name;
 
     bool operator==(const NamedItem& other) const = default;
 };
@@ -26,9 +25,9 @@ NX_REFLECTION_INSTRUMENT(NamedItem, NamedItem_Fields);
 
 struct NamedItemWithOptionalName
 {
-    QString id;
+    std::string id;
     /**%apidoc[opt] */
-    QString name;
+    std::string name;
 
     bool operator==(const NamedItemWithOptionalName& other) const = default;
 };
@@ -39,11 +38,11 @@ NX_REFLECTION_INSTRUMENT(NamedItemWithOptionalName,
 struct EnumType: public NamedItem
 {
     /**%apidoc[opt] */
-    std::optional<QString> base;
+    std::optional<std::string> base;
     /**%apidoc[opt] */
-    std::vector<QString> baseItems;
+    std::vector<std::string> baseItems;
     /**%apidoc[opt] */
-    std::vector<QString> items;
+    std::vector<std::string> items;
 };
 #define EnumType_Fields NamedItem_Fields (base)(baseItems)(items)
 NX_REFLECTION_INSTRUMENT(EnumType, EnumType_Fields);
@@ -51,9 +50,9 @@ NX_REFLECTION_INSTRUMENT(EnumType, EnumType_Fields);
 struct ColorItem
 {
     /**%apidoc[opt] */
-    QString name;
+    std::string name;
     /**%apidoc[opt] */
-    QString rgb;
+    std::string rgb;
 
     bool operator==(const ColorItem& other) const = default;
 };
@@ -62,9 +61,9 @@ NX_REFLECTION_INSTRUMENT(ColorItem, ColorItem_Fields);
 
 struct ColorType: public NamedItem
 {
-    std::optional<QString> base;
+    std::optional<std::string> base;
     /**%apidoc[opt] */
-    std::vector<QString> baseItems;
+    std::vector<std::string> baseItems;
     /**%apidoc[opt] */
     std::vector<ColorItem> items;
 };
@@ -124,10 +123,10 @@ constexpr auto nxReflectVisitAllEnumItems(AttributeType*, Visitor&& visitor)
 struct AttributeDescriptionCommon
 {
     /**%apidoc[opt] */
-    QString name;
+    std::string name;
     std::optional<AttributeType> type; /**< Can be omitted for Enum and Color attributes. */
-    std::optional<QString> subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
-    std::optional<QString> unit; /**< Only for Number. Can be empty. */
+    std::optional<std::string> subtype; /**< One of: empty, a Name, "integer" or "float" for Numbers. */
+    std::optional<std::string> unit; /**< Only for Number. Can be empty. */
 
     /**%apidoc:integer */
     std::optional<double> minValue; /**< Only for Number. */
@@ -135,14 +134,14 @@ struct AttributeDescriptionCommon
     /**%apidoc:integer */
     std::optional<double> maxValue; /**< Only for Number. */
 
-    std::optional<QString> attributeList; /**< If not empty, all other fields are ignored. */
+    std::optional<std::string> attributeList; /**< If not empty, all other fields are ignored. */
 
     /**
      * Condition string that defines whether this Attribute makes sense for the Object or Event
      * Type depending on values of the other Attributes. Uses the same syntax as in the Object
      * Search panel.
      */
-    std::optional<QString> condition;
+    std::optional<std::string> condition;
 
     AttributeDescriptionCommon()
     {
@@ -163,7 +162,7 @@ struct AttributeDescriptionCommon
 
 struct DependentAttributeDescription : AttributeDescriptionCommon
 {
-    std::optional<std::vector<QString>> items; /**< Only for Enums. */
+    std::optional<std::vector<std::string>> items; /**< Only for Enums. */
 
     bool operator==(const DependentAttributeDescription& other) const = default;
 };
@@ -174,7 +173,7 @@ struct DependentAttributeDescription : AttributeDescriptionCommon
 struct ItemObject
 {
     /**%apidoc[opt] */
-    QString value;
+    std::string value;
     /**%apidoc[opt] */
     std::vector<DependentAttributeDescription> dependentAttributes;
 
@@ -184,11 +183,11 @@ struct ItemObject
     (value) \
     (dependentAttributes)
 
-using Item = std::variant<ItemObject, QString>;
+using Item = std::variant<ItemObject, std::string>;
 
 struct AttributeDescription : AttributeDescriptionCommon
 {
-    std::optional<std::vector<std::variant<ItemObject, QString>>> items; /**< Only for Enums. */
+    std::optional<std::vector<std::variant<ItemObject, std::string>>> items; /**< Only for Enums. */
 
     bool operator==(const AttributeDescription& other) const = default;
 
@@ -203,7 +202,7 @@ struct AttributeDescription : AttributeDescriptionCommon
         {
             std::vector<Item> convertedItems;
             for (const auto& item : *dep.items)
-                convertedItems.emplace_back(QString(item));
+                convertedItems.emplace_back(item);
             items = std::move(convertedItems);
         }
     }
@@ -221,11 +220,11 @@ NX_REFLECTION_INSTRUMENT(AttributeDescription, AttributeDescription_Fields);
 struct ExtendedTypeCommon
 {
     /**%apidoc[opt] */
-    QString icon; //< internal id or empty.
+    std::string icon; //< internal id or empty.
     /**%apidoc[opt] */
-    std::optional<QString> base;
+    std::optional<std::string> base;
     /**%apidoc[opt] */
-    std::vector<QString> omittedBaseAttributes;
+    std::vector<std::string> omittedBaseAttributes;
     /**%apidoc[opt] */
     std::vector<AttributeDescription> attributes;
 
@@ -282,9 +281,9 @@ struct AnalyticsEventType: public ExtendedType
     /**%apidoc[opt] */
     EventTypeFlags flags = EventTypeFlag::noFlags;
     /**%apidoc[opt] */
-    QString groupId;
+    std::string groupId;
     /**%apidoc[opt] */
-    QString provider;
+    std::string provider;
 
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };
@@ -319,7 +318,7 @@ constexpr auto nxReflectVisitAllEnumItems(ObjectTypeFlag*, Visitor&& visitor)
 struct ObjectType: public ExtendedTypeWithOptionalName
 {
     /**%apidoc[opt] */
-    QString provider;
+    std::string provider;
     /**%apidoc[opt] */
     ObjectTypeFlags flags;
 
@@ -330,7 +329,7 @@ NX_REFLECTION_INSTRUMENT(ObjectType, ObjectType_Fields);
 
 struct HiddenExtendedType
 {
-    QString id;
+    std::string id;
     std::vector<AttributeDescription> attributes;
 
     bool operator==(const HiddenExtendedType& other) const = default;
@@ -340,7 +339,7 @@ NX_REFLECTION_INSTRUMENT(HiddenExtendedType, HiddenExtendedType_Fields);
 
 struct AttributesWithId
 {
-    QString id;
+    std::string id;
     std::vector<AttributeDescription> attributes;
 
     bool operator==(const AttributesWithId& other) const = default;
@@ -360,11 +359,11 @@ NX_REFLECTION_INSTRUMENT(Group, Group_Fields);
 struct TypeSupportInfo
 {
     /**%apidoc[opt] */
-    QString eventTypeId; //< eventTypeId and objectTypeId can't be non-empty at the same time.
+    std::string eventTypeId; //< eventTypeId and objectTypeId can't be non-empty at the same time.
     /**%apidoc[opt] */
-    QString objectTypeId;
+    std::string objectTypeId;
     /**%apidoc[opt] */
-    std::vector<QString> attributes;
+    std::vector<std::string> attributes;
 
     bool operator==(const TypeSupportInfo& other) const = default;
 };

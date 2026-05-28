@@ -14,9 +14,9 @@ public:
         nx::vms::api::analytics::PluginDescriptor pluginDescriptor,
         QObject* parent);
 
-    virtual QString id() const override;
+    virtual const std::string& id() const override;
 
-    virtual QString name() const override;
+    virtual const std::string& name() const override;
 
     virtual nx::vms::api::analytics::PluginDescriptor serialize() const override;
 

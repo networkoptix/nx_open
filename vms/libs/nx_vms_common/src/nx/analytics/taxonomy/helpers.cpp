@@ -6,7 +6,7 @@ namespace nx::analytics::taxonomy {
 
 static void getAllDerivedTypeIds(
     const ObjectType* objectType,
-    std::set<QString>* inOutResult)
+    std::set<std::string>* inOutResult)
 {
     for (const auto* derivedType: objectType->derivedTypes())
     {
@@ -15,9 +15,9 @@ static void getAllDerivedTypeIds(
     }
 }
 
-std::set<QString> getAllDerivedTypeIds(const AbstractState* state, const QString& typeId)
+std::set<std::string> getAllDerivedTypeIds(const AbstractState* state, const std::string& typeId)
 {
-    std::set<QString> result;
+    std::set<std::string> result;
 
     const ObjectType* rootObjectType = state->objectTypeById(typeId);
     if (!rootObjectType)
@@ -28,9 +28,9 @@ std::set<QString> getAllDerivedTypeIds(const AbstractState* state, const QString
     return result;
 }
 
-std::set<QString> getAllBaseTypeIds(const AbstractState* state, const QString& typeId)
+std::set<std::string> getAllBaseTypeIds(const AbstractState* state, const std::string& typeId)
 {
-    std::set<QString> result;
+    std::set<std::string> result;
     const auto* objectType = state->objectTypeById(typeId);
     if (!objectType)
         return result;
@@ -41,7 +41,7 @@ std::set<QString> getAllBaseTypeIds(const AbstractState* state, const QString& t
     return result;
 }
 
-bool isBaseType(const AbstractState* state, const QString& baseTypeId, const QString& derivedTypeId)
+bool isBaseType(const AbstractState* state, const std::string& baseTypeId, const std::string& derivedTypeId)
 {
     const auto* objectType = state->objectTypeById(derivedTypeId);
     if (!objectType)
@@ -56,7 +56,7 @@ bool isBaseType(const AbstractState* state, const QString& baseTypeId, const QSt
     return false;
 }
 
-bool isTypeOrSubtypeOf(AbstractState* state, const QString& typeId, const QString& targetTypeId)
+bool isTypeOrSubtypeOf(AbstractState* state, const std::string& typeId, const std::string& targetTypeId)
 {
     return targetTypeId == typeId || isBaseType(state, typeId, targetTypeId);
 }

@@ -791,7 +791,7 @@ public:
      */
     void setCompatibleAnalyticsEngines(const std::set<nx::Uuid>& engines);
 
-    using AnalyticsEntitiesByEngine = std::map<nx::Uuid, std::set<QString>>;
+    using AnalyticsEntitiesByEngine = std::map<nx::Uuid, std::set<std::string>>;
 
     /**
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
@@ -992,8 +992,8 @@ private:
     nx::utils::CachedValue<std::set<nx::Uuid>> m_cachedUserEnabledAnalyticsEngines;
     nx::utils::CachedValue<std::set<nx::Uuid>> m_cachedCompatibleAnalyticsEngines;
     nx::utils::CachedValue<DeviceAgentManifestMap> m_cachedDeviceAgentManifests;
-    nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedEventTypes;
-    nx::utils::CachedValue<std::map<nx::Uuid, std::set<QString>>> m_cachedSupportedObjectTypes;
+    nx::utils::CachedValue<std::map<nx::Uuid, std::set<std::string>>> m_cachedSupportedEventTypes;
+    nx::utils::CachedValue<std::map<nx::Uuid, std::set<std::string>>> m_cachedSupportedObjectTypes;
     mutable nx::Lockable<std::map<nx::Uuid, nx::vms::api::StreamIndex>> m_cachedAnalyzedStreamIndex;
     nx::utils::CachedValue<CameraMediaStreams> m_cachedMediaStreams;
     nx::utils::CachedValue<int> m_cachedBackupMegapixels;

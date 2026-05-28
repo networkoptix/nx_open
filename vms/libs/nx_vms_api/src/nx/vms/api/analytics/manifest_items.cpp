@@ -11,6 +11,11 @@ bool operator==(const AnalyticsEventType& lh, const AnalyticsEventType& rh)
     return lh.id == rh.id;
 }
 
+inline size_t qHash(const std::string& key) noexcept
+{
+    return qHash(QByteArrayView(key.data(), static_cast<qsizetype>(key.size())));
+}
+
 size_t qHash(const AnalyticsEventType& eventType)
 {
     return qHash(eventType.id);

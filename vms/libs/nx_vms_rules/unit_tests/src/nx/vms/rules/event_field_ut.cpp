@@ -106,7 +106,7 @@ protected:
         lookupList.id = id;
         lookupList.attributeNames = std::move(attributes);
         lookupList.entries = std::move(entries);
-        lookupList.objectTypeId = isGeneric ? QString() : "nx.test.type";
+        lookupList.objectTypeId = isGeneric ? std::string() : "nx.test.type";
 
         systemContext()->lookupListManager()->initialize({std::move(lookupList)});
 

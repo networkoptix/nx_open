@@ -28,10 +28,14 @@ std::map<ActionTypeId, ActionTypeDescriptor> retrieveActionTypeDescriptors(
     std::map<ActionTypeId, ActionTypeDescriptor> result;
     for (const auto& actionType: engineManifest.objectActions)
     {
-        if (!actionType.supportedObjectTypeIds.empty()
-            && !actionType.supportedObjectTypeIds.contains(objectTypeId))
+        if (!actionType.supportedObjectTypeIds.empty())
         {
-            continue;
+            const auto containsIt = std::find(
+                actionType.supportedObjectTypeIds.begin(),
+                actionType.supportedObjectTypeIds.end(),
+                objectTypeId);
+            if (containsIt == actionType.supportedObjectTypeIds.end())
+                continue;
         }
 
         ActionTypeDescriptor descriptor(engineId, actionType);
