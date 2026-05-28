@@ -4,12 +4,11 @@
 
 #include <deque>
 
-#include <QtCore/QMutexLocker>
-
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_video_decoder.h"
 #include "frame_metadata.h"
@@ -37,8 +36,6 @@ struct FrameBasicInfo
     QSize size;
     AVCodecID codec = AV_CODEC_ID_NONE;
 };
-
-static QMutex mutex;
 
 } // namespace
 
@@ -90,6 +87,7 @@ public:
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
     RenderContextSynchronizerPtr renderContextSynchronizer;
+    mutable nx::Mutex mutex;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(
@@ -221,7 +219,7 @@ bool SeamlessVideoDecoder::decode(
     FrameBasicInfo frameInfo(frame);
     bool isSimilarParams;
     {
-        QMutexLocker lock(&mutex);
+        NX_MUTEX_LOCKER lock(&d->mutex);
         isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
         if (!frameInfo.size.isEmpty())
             isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
@@ -276,7 +274,7 @@ bool SeamlessVideoDecoder::decode(
         d->sar = 1.0;
 
         {
-            QMutexLocker lock(&mutex);
+            NX_MUTEX_LOCKER lock(&d->mutex);
             d->prevFrameInfo = frameInfo;
             d->currentCodecParameters = frame->context;
         }
@@ -345,21 +343,21 @@ int SeamlessVideoDecoder::currentFrameNumber() const
 QSize SeamlessVideoDecoder::currentResolution() const
 {
     Q_D(const SeamlessVideoDecoder);
-    QMutexLocker lock(&mutex);
+    NX_MUTEX_LOCKER lock(&d->mutex);
     return d->prevFrameInfo.size;
 }
 
 AVCodecID SeamlessVideoDecoder::currentCodec() const
 {
     Q_D(const SeamlessVideoDecoder);
-    QMutexLocker lock(&mutex);
+    NX_MUTEX_LOCKER lock(&d->mutex);
     return d->prevFrameInfo.codec;
 }
 
 AbstractVideoDecoder* SeamlessVideoDecoder::currentDecoder() const
 {
     Q_D(const SeamlessVideoDecoder);
-    QMutexLocker lock(&mutex);
+    NX_MUTEX_LOCKER lock(&d->mutex);
     return d->videoDecoder.get();
 }
 

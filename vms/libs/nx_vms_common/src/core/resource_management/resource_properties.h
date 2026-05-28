@@ -67,5 +67,5 @@ private:
     using QnResourcePropertyList = QMap<QString, QString>;
     QMap<nx::Uuid, QnResourcePropertyList> m_items;
     QMap<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
-    mutable nx::Mutex m_mutex;
+    mutable nx::ReadWriteLock m_mutex;
 };

@@ -66,11 +66,6 @@ static constexpr int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static constexpr int kDefaultMaxTextureSize = 2048;
 
-// Player will go to the invalid state if no data is received within this timeout.
-static constexpr int kGotDataTimeoutMs = 1000 * 30;
-
-// Periodic tasks timer interval
-static constexpr int kPeriodicTasksTimeoutMs = 1000;
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -193,9 +188,6 @@ public:
     // Timer for delayed call to presentNextFrame().
     QTimer* const execTimer;
 
-    // Timer for misc periodic tasks
-    QTimer* const miscTimer;
-
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs = AV_NOPTS_VALUE;
 
@@ -233,9 +225,6 @@ public:
 
     // Protects access to videoGeometry.
     mutable QMutex videoGeometryMutex;
-
-    // Interval since last time player got some data
-    QElapsedTimer gotDataTimer;
 
     // Turn on / turn off audio.
     bool isAudioEnabled = true;
@@ -293,7 +282,7 @@ public:
 
     VideoFramePtr scaleFrame(const VideoFramePtr& videoFrame);
 
-    void doPeriodicTasks();
+
     void log(const QString& message) const;
     void clearCurrentFrame();
     void configureMetadataForReader();
@@ -309,14 +298,10 @@ Player::Private::Private(Player* parent):
     base_type(parent),
     q(parent),
     execTimer(new QTimer(this)),
-    miscTimer(new QTimer(this)),
     renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer())
 {
     connect(execTimer, &QTimer::timeout, this, &Private::presentNextFrame);
     execTimer->setSingleShot(true);
-
-    connect(miscTimer, &QTimer::timeout, this, &Private::doPeriodicTasks);
-    miscTimer->start(kPeriodicTasksTimeoutMs);
 }
 
 void Player::Private::setState(State value)
@@ -325,7 +310,6 @@ void Player::Private::setState(State value)
         return;
 
     NX_DEBUG(this, "State changed: %1", value);
-    gotDataTimer.restart();
     state = value;
     if (state == State::Playing)
         setError(Error::NoError);
@@ -333,35 +317,6 @@ void Player::Private::setState(State value)
     emit q->playbackStateChanged();
 }
 
-void Player::Private::doPeriodicTasks()
-{
-    if (state == State::Playing)
-    {
-        if (dataConsumer)
-        {
-            auto audio = dataConsumer->audioOutput();
-
-            if (q->isAudioOnlyMode() && audio && dataConsumer->isAudioEnabled())
-                setPosition(usecToMsec(audio->playbackPositionUsec()));
-
-            if (audio && audio->currentBufferSizeUsec() > 0)
-            {
-                gotDataTimer.restart();
-                return;
-            }
-        }
-
-        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
-        {
-            if (mediaStatus != MediaStatus::EndOfMedia)
-            {
-                log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
-                setMediaStatus(MediaStatus::NoMedia);
-                q->stop();
-            }
-        }
-    }
-}
 
 void Player::Private::setMediaStatus(MediaStatus status)
 {
@@ -444,7 +399,10 @@ void Player::Private::at_gotAudioFrame()
 
     auto audioOutput = dataConsumer->audioOutput();
     if (q->isAudioOnlyMode() && audioOutput && dataConsumer->isAudioEnabled())
+    {
         setMediaStatus(MediaStatus::Loaded);
+        setPosition(usecToMsec(audioOutput->playbackPositionUsec()));
+    }
 }
 
 void Player::Private::at_gotVideoFrame()
@@ -461,8 +419,6 @@ void Player::Private::at_gotVideoFrame()
     videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
         return;
-
-    gotDataTimer.restart();
 
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
 
@@ -617,8 +573,6 @@ void Player::Private::presentNextFrame()
 
     if (!videoFrameToRender)
         return;
-
-    gotDataTimer.restart();
 
     if (!videoFrameToRender->isValid())
     {

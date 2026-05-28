@@ -343,6 +343,7 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     {
         // We do not rely on Mac OS OpenGL implementation-related throttling.
         // Otherwise all animations go faster.
+        // Also avoids threaded render loop races with frequent VideoOutput lifecycle changes.
         qputenv("QSG_RENDER_LOOP", "basic");
     }
 

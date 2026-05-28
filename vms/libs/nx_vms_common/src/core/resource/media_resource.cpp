@@ -55,8 +55,6 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
     const QnAbstractStreamDataProvider* dataProvider)
 {
-    NX_MUTEX_LOCKER lock(&m_layoutMutex);
-
     if (dataProvider)
     {
         QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
@@ -71,6 +69,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
     }
     else
     {
+        NX_MUTEX_LOCKER lock(&m_layoutMutex);
         if (m_cachedLayout != strVal || !m_customVideoLayout)
         {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
