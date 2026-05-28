@@ -11,7 +11,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/delayed.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 

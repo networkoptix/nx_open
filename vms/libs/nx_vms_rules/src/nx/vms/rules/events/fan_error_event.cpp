@@ -3,7 +3,6 @@
 #include "fan_error_event.h"
 
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/system_context.h>
 
 #include "../event_filter_fields/source_server_field.h"
 #include "../group.h"

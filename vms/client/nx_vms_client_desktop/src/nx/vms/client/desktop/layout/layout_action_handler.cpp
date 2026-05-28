@@ -51,7 +51,6 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx_ec/abstract_ec_connection.h>

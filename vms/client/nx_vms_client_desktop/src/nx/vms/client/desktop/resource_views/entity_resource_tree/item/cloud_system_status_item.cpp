@@ -13,7 +13,6 @@
 #include <nx/vms/client/core/system_finder/system_description.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::client::desktop::entity_resource_tree {
 

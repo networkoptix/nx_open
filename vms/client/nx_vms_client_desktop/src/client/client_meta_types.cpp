@@ -106,7 +106,6 @@
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
-#include <nx/vms/common/system_context.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/weak_graphics_item_pointer.h>

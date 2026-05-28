@@ -13,7 +13,6 @@
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/site_health_message.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_health/message_type.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/delayed.h>

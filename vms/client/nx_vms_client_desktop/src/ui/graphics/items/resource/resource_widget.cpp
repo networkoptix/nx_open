@@ -44,7 +44,6 @@
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/license/license_usage_watcher.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/license/usage_helper.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/cursor_cache.h>

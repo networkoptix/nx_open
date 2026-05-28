@@ -15,7 +15,6 @@
 #include <nx/utils/general_macros.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/common/checked_cast.h>
 
 #include "private/resource_pool_p.h"

@@ -18,7 +18,6 @@
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/client/desktop/window_context.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/widgets/main_window.h>

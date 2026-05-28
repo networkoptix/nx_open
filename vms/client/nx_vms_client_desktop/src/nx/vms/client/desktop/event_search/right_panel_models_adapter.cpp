@@ -69,7 +69,6 @@
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/migration_utils.h>
 #include <nx/vms/rules/strings.h>
 #include <ui/workbench/workbench_context.h>

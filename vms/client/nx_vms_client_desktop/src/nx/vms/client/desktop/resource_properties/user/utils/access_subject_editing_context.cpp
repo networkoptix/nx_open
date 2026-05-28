@@ -26,7 +26,6 @@
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/core/system_context.h>
-#include <nx/vms/common/system_context.h>
 
 #include "proxy_access_rights_manager.h"
 
