@@ -88,16 +88,11 @@ AbstractTimelineController
         function onPositioningChanged()
         {
             if (timeline.positioning)
-            {
                 controller.preview()
-            }
+            else if (timeline.positionAtLive)
+                controller.playLive()
             else if (controller.playing)
-            {
-                if (timeline.positionAtLive)
-                    controller.playLive()
-                else
-                    controller.play()
-            }
+                controller.play()
         }
     }
 }
