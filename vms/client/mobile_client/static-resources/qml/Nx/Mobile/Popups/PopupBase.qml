@@ -20,6 +20,7 @@ Popup
     property alias icon: icon.source
     property alias title: title.text
     property var messages: []
+    property int messagesTextAlignment: Text.AlignLeft
     property alias buttonBoxButtons: buttonBox.data
 
     parent: mainWindow.contentItem
@@ -127,6 +128,7 @@ Popup
                             text: modelData
                             width: parent.width
                             visible: text
+                            horizontalAlignment: control.messagesTextAlignment
                         }
                     }
                 }

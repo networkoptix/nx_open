@@ -8,6 +8,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
+import Nx.Mobile.Popups
 import Nx.Ui
 
 Rectangle
@@ -180,7 +181,13 @@ Rectangle
             objectName: "logoutButton"
             iconSource: "image://skin/24x24/Outline/logout.svg"
             screenId: Controller.UnknownScreen
-            onClicked: windowContext.sessionManager.stopSessionByUser()
+            onClicked:
+            {
+                if (LayoutController.isTabletLayout)
+                    Workflow.openDialog("../Mobile/Popups/LogoutConfirmationPopup.qml")
+                else
+                    windowContext.sessionManager.stopSessionByUser()
+            }
         }
     }
 
