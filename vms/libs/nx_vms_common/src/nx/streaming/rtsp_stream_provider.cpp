@@ -24,6 +24,7 @@
 #include <nx/rtp/parsers/rtp_parser.h>
 #include <nx/rtp/parsers/simpleaudio_rtp_parser.h>
 #include <nx/rtp/rtp.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_metadata_parser.h>
 #include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
 #include <nx/utils/log/log.h>
@@ -140,16 +141,16 @@ void RtspStreamProvider::clearKeyData(int channelNum)
 
 bool RtspStreamProvider::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 {
-    if ((size_t)m_gotKeyDataInfo.size() <= mediaData->channelNumber)
-    {
-        size_t oldSize = m_gotKeyDataInfo.size();
-        m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
-        for (size_t i = oldSize; i < m_gotKeyDataInfo.size(); ++i)
-            m_gotKeyDataInfo[i] = false;
-    }
-
     if (mediaData->dataType == QnAbstractMediaData::VIDEO)
     {
+        if (mediaData->channelNumber >= CL_MAX_CHANNEL_NUMBER)
+        {
+            NX_VERBOSE(this, "Ignore packet, too big channel number: %1", mediaData);
+            return false;
+        }
+
+        if (m_gotKeyDataInfo.size() <= mediaData->channelNumber)
+            m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
         if (mediaData->flags & AV_PKT_FLAG_KEY)
             m_gotKeyDataInfo[mediaData->channelNumber] = true;
         return m_gotKeyDataInfo[mediaData->channelNumber];
@@ -313,6 +314,7 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
             QnAbstractMediaDataPtr result = parser->nextData(rtcpReport);
             if (!result)
                 continue;
+
             if (track.timeHelper)
             {
                 result->timestamp = track.timeHelper->getTime(
@@ -329,8 +331,12 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
             result->channelNumber = track.logicalChannelNum;
             if (result->dataType == QnAbstractMediaData::VIDEO)
             {
-                result->channelNumber =
-                    std::min(result->channelNumber, (quint32) m_numberOfVideoChannels - 1);
+                if (result->channelNumber >= m_numberOfVideoChannels)
+                {
+                    NX_DEBUG(this, "Incorrect channel number: %1, total number of channels: %2",
+                        result->channelNumber, m_numberOfVideoChannels);
+                    result->channelNumber = 0;
+                }
             }
             else if (result->dataType == QnAbstractMediaData::AUDIO && !m_audioLayout)
             {
@@ -941,13 +947,13 @@ void RtspStreamProvider::createTrackParsers()
         {
             trackInfo.timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(
                 track.sdpMedia.mediaType, timeHelperKey(), m_timeOffset);
-        }
 
-        // Force camera time for NVR archives
-        if (m_role == Qn::ConnectionRole::CR_Archive)
-            trackInfo.timeHelper->setTimePolicy(nx::streaming::rtp::TimePolicy::forceCameraTime);
-        else
-            trackInfo.timeHelper->setTimePolicy(getTimePolicy());
+            // Force camera time for NVR archives
+            if (m_role == Qn::ConnectionRole::CR_Archive)
+                trackInfo.timeHelper->setTimePolicy(rtp::TimePolicy::forceCameraTime);
+            else
+                trackInfo.timeHelper->setTimePolicy(getTimePolicy());
+        }
 
         if (track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Video)
             trackInfo.logicalChannelNum = logicalVideoNum++;
@@ -1209,7 +1215,7 @@ CameraDiagnostics::Result RtspStreamProvider::registerMulticastAddressesIfNeeded
     return CameraDiagnostics::NoErrorResult();
 }
 
-int RtspStreamProvider::numberOfVideoChannels() const
+uint32_t RtspStreamProvider::numberOfVideoChannels() const
 {
     return m_RtpSession.getTrackCount(nx::rtp::Sdp::MediaType::Video);
 }
@@ -1226,7 +1232,7 @@ std::string RtspStreamProvider::timeHelperKey() const
 
 // ------------------------- RtspResourceStreamProvider -------------------
 
-int RtspResourceStreamProvider::numberOfVideoChannels() const
+uint32_t RtspResourceStreamProvider::numberOfVideoChannels() const
 {
     if (!m_resource->allowRtspVideoLayout())
         return 1;
@@ -1242,7 +1248,7 @@ void RtspResourceStreamProvider::at_numberOfVideoChannelsChanged()
         QString newVideoLayout;
         m_customVideoLayout = QnCustomResourceVideoLayoutPtr(
             new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
-        for (int i = 0; i < m_numberOfVideoChannels; ++i)
+        for (uint32_t i = 0; i < m_numberOfVideoChannels; ++i)
             m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
 
         newVideoLayout = m_customVideoLayout->toString();

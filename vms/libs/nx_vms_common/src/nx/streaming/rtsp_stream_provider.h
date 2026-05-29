@@ -162,7 +162,7 @@ protected:
         std::chrono::microseconds timestamp,
         nx::vms::api::EventReason reasonCode,
         const nx::vms::rules::NetworkIssueInfo& info);
-    virtual int numberOfVideoChannels() const;
+    virtual uint32_t numberOfVideoChannels() const;
     virtual void at_numberOfVideoChannelsChanged() {}
     virtual bool isRtcpReportsForced() const;
     virtual std::string timeHelperKey() const;
@@ -226,7 +226,7 @@ protected:
     QString m_logName;
 
     std::vector<nx::utils::ByteArray*> m_demuxedData;
-    int m_numberOfVideoChannels;
+    uint32_t m_numberOfVideoChannels;
     bool m_ignoreRtcpReports = false;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
@@ -279,7 +279,7 @@ public:
 protected:
     QnVirtualCameraResourcePtr resource() const { return m_resource; }
     void updateTimePolicy();
-    virtual int numberOfVideoChannels() const override;
+    virtual uint32_t numberOfVideoChannels() const override;
     virtual void at_numberOfVideoChannelsChanged() override;
     virtual bool isRtcpReportsForced() const override;
     virtual std::string timeHelperKey() const override;

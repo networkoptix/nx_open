@@ -294,7 +294,7 @@ public:
     void setProxySocket(std::unique_ptr<nx::network::AbstractStreamSocket> proxySocket);
 
     QStringList getSdpByType(nx::rtp::Sdp::MediaType mediaType) const;
-    int getTrackCount(nx::rtp::Sdp::MediaType mediaType) const;
+    uint32_t getTrackCount(nx::rtp::Sdp::MediaType mediaType) const;
 
     // Control what media streams will be opened during setup. All types enabled by default
     void setMediaTypeEnabled(nx::rtp::Sdp::MediaType mediaType, bool enabled);

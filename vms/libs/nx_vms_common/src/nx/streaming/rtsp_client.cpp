@@ -803,9 +803,9 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     return result;
 }
 
-int QnRtspClient::getTrackCount(nx::rtp::Sdp::MediaType mediaType) const
+uint32_t QnRtspClient::getTrackCount(nx::rtp::Sdp::MediaType mediaType) const
 {
-    int result = 0;
+    uint32_t result = 0;
     for (const auto& track: m_sdpTracks)
     {
         if (track.sdpMedia.mediaType == mediaType)
