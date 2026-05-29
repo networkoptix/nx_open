@@ -677,11 +677,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>タイムラインを反転する</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>左利き用にタイムラインを反転する</translation>
     </message>
   </context>
   <context>

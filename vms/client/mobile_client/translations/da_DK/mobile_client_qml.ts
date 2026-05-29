@@ -678,11 +678,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Spejl Tidslinje</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>Vend tidslinjen for venstrehåndet brug</translation>
     </message>
   </context>
   <context>
