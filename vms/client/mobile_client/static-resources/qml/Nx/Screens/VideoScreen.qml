@@ -201,8 +201,10 @@ Page
             {
                 case Timeline.ObjectsLoader.ObjectsType.motion:
                     return CommonGlobals.MotionContent
+
                 case Timeline.ObjectsLoader.ObjectsType.analytics:
                     return CommonGlobals.AnalyticsContent
+
                 default:
                     return CommonGlobals.RecordingContent
             }
@@ -974,7 +976,23 @@ Page
 
                     ControlButton
                     {
-                        icon.source: "image://skin/24x24/Outline/eye_view.svg"
+                        icon.source:
+                        {
+                            switch (timeline.objectsType)
+                            {
+                                case Timeline.ObjectsLoader.ObjectsType.motion:
+                                    return "image://skin/24x24/Outline/motion.svg"
+
+                                case Timeline.ObjectsLoader.ObjectsType.bookmarks:
+                                    return "image://skin/24x24/Outline/bookmark.svg"
+
+                                case Timeline.ObjectsLoader.ObjectsType.analytics:
+                                    return "image://skin/24x24/Outline/object.svg"
+                            }
+
+                            console.assert(false, `Unknown objectsType (${timeline.objectsType})`)
+                            return "image://skin/24x24/Outline/eye_view.svg"
+                        }
 
                         onClicked:
                             objectsTypeSheet.open()
