@@ -162,22 +162,27 @@ public:
 
     ~AndroidVideoDecoderPrivate()
     {
-        javaDecoder.callMethod<void>("releaseDecoder");
+        if (javaDecoder.isValid())
+            javaDecoder.callMethod<void>("releaseDecoder");
     }
 
     void releaseSurface()
     {
-        javaDecoder.callMethod<void>("releaseSurface", "()V");
+        if (javaDecoder.isValid())
+            javaDecoder.callMethod<void>("releaseSurface", "()V");
     }
 
     void updateTexImage()
     {
-        javaDecoder.callMethod<void>("updateTexImage");
+        if (javaDecoder.isValid())
+            javaDecoder.callMethod<void>("updateTexImage");
     }
 
     QMatrix4x4 getTransformMatrix()
     {
         QMatrix4x4 matrix;
+        if (!javaDecoder.isValid())
+            return matrix;
 
         QJniEnvironment env;
         jfloatArray array = env->NewFloatArray(16);
@@ -194,6 +199,13 @@ public:
             {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V",
                 reinterpret_cast<void*>(nx::media::fillInputBuffer)}
         };
+
+        if (!javaDecoder.isValid())
+        {
+            NX_WARNING(typeid(AndroidVideoDecoderPrivate),
+                "QnVideoDecoder instance is not available, skipping native method registration");
+            return;
+        }
 
         QJniEnvironment env;
         jclass objectClass = env->GetObjectClass(javaDecoder.object<jobject>());
@@ -416,6 +428,19 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
     {
         QJniObject jCodecName = QJniObject::fromString(codecMimeType);
         QJniObject javaDecoder("com/nxvms/mobile/media/QnVideoDecoder");
+
+        // Qt aborts if callMethod is called on an invalid QJniObject, so this guard is required.
+        // Construction can fail when the calling thread's class loader cannot resolve app classes
+        // (e.g. native worker threads before the Java class loader is fully set up). The codec
+        // entry is intentionally not inserted on failure so the next call retries.
+        if (!javaDecoder.isValid())
+        {
+            NX_WARNING(typeid(AndroidVideoDecoderPrivate),
+                "Failed to create QnVideoDecoder for codec %1, will retry on the next frame",
+                codecMimeType);
+            return;
+        }
+
         jint maxWidth = javaDecoder.callMethod<jint>(
             "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>(
@@ -423,7 +448,7 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
         const QSize maxSize{maxWidth, maxHeight};
         if (maxSize.isEmpty())
         {
-            // NOTE: Zeros come from JNI in case the Java class was not loaded due to some issue.
+            // NOTE: Zeros here mean the decoder reported no supported resolution for this codec.
             NX_WARNING(typeid(AndroidVideoDecoderPrivate),
                 nx::format("ERROR: Android Video Decoder failed to report max resolution for codec %1")
                 .arg(codecMimeType));
@@ -455,7 +480,7 @@ bool AndroidVideoDecoder::isCompatible(
     QSize maxSize;
     {
         QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
-        maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
+        maxSize = AndroidVideoDecoderPrivate::maxResolutions.value(codec);
     }
     if (maxSize.isEmpty())
         return false;
@@ -479,7 +504,7 @@ QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
     AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(codec);
 
     QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
-    return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
+    return AndroidVideoDecoderPrivate::maxResolutions.value(codec);
 }
 
 int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, VideoFramePtr* result)
@@ -514,6 +539,12 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, V
             NX_DEBUG(this, "Failed to initialize decoder, waiting for key frame");
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
         }
+        if (!d->javaDecoder.isValid())
+        {
+            NX_WARNING(this, "QnVideoDecoder instance is not available, cannot initialize HW decoder");
+            return -1;
+        }
+
         d->fboManager.init(d->frameSize);
 
         glGenTextures(1, &d->textureId);
