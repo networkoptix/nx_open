@@ -24,6 +24,7 @@ Column
         attribute && attribute.type === Attribute.Type.attributeSet
 
     readonly property OptionSelector selector: content.item
+    readonly property string labelText: (parentPropertyName ? parentPropertyName + " → " : "") + (attribute ? attribute.name : "")
 
     signal selectorClicked
 
@@ -75,9 +76,7 @@ Column
         {
             target: content.item
             property: "text"
-            value: control.parentPropertyName
-                ? `${control.parentPropertyName} \u2192 ${(control.attribute && control.attribute.name)}`
-                : (control.attribute && control.attribute.name)
+            value: control.labelText
         }
 
         Binding
@@ -107,6 +106,14 @@ Column
             property: "subpropertyParent"
             when: content.item && content.item.hasOwnProperty("subpropertyParent")
             value: control
+        }
+
+        Binding
+        {
+            target: content.item
+            property: "parentPropertyName"
+            when: content.item && content.item.hasOwnProperty("parentPropertyName")
+            value: control.labelText
         }
     }
 

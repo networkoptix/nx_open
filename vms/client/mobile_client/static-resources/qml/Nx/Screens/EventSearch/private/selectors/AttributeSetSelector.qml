@@ -18,7 +18,7 @@ OptionSelector
 
     property Attribute attribute: null
     property Item subpropertyParent: null
-    property string parentPropertyName: text
+    property string parentPropertyName
 
     property alias nestedValue: nestedAttributes.value
 
