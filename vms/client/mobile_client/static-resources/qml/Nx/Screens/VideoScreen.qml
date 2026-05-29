@@ -77,10 +77,9 @@ Page
 
             PropertyChanges
             {
-                cameraSwitcher.height: Math.min(cameraSwitcher.width / (16.0 / 9.0),
-                    modernVideoScreen.height - modernVideoScreen.toolBar.height - bottomBar.height)
-
-                cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
+                cameraSwitcher.height: navigationBar.y
+                cameraSwitcher.y: 0
+                cameraSwitcher.backgroundColor: modernVideoScreen.backgroundColor
 
                 bottomBar.color: ColorTheme.colors.dark6
                 fullscreenControlsOverlay.visible: false
