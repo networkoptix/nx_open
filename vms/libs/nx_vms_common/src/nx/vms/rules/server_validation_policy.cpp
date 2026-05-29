@@ -18,6 +18,20 @@ QString QnBuzzerPolicy::infoText()
     return tr("Servers that support buzzer");
 }
 
+//-------------------------------------------------------------------------------------------------
+
+bool QnOnlineServerPolicy::isServerValid(const QnMediaServerResourcePtr& server)
+{
+    return server && server->isOnline();
+}
+
+QString QnOnlineServerPolicy::infoText()
+{
+    return tr("Online servers");
+}
+
+//-------------------------------------------------------------------------------------------------
+
 bool QnPoeOverBudgetPolicy::isServerValid(const QnMediaServerResourcePtr& server)
 {
     if (!server)

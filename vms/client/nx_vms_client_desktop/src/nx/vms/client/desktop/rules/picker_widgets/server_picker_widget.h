@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/skin/resource_icon_cache.h>
-#include <nx/vms/client/core/skin/skin.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
-#include <nx/vms/rules/action_builder_fields/target_devices_field.h>
+#include <nx/vms/rules/action_builder_fields/target_server_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/event_filter_fields/source_server_field.h>
 
@@ -48,10 +45,37 @@ public:
 };
 
 template<typename Policy>
-class TargetServerPicker: public ServerPickerWidgetBase<vms::rules::TargetServersField, Policy>
+class TargetServersPicker: public ServerPickerWidgetBase<vms::rules::TargetServersField, Policy>
 {
 public:
     using ServerPickerWidgetBase<vms::rules::TargetServersField, Policy>::ServerPickerWidgetBase;
+};
+
+template<typename Policy>
+class TargetServerPicker: public ResourcePickerWidgetBase<vms::rules::TargetServerField>
+{
+    using base = ResourcePickerWidgetBase<vms::rules::TargetServerField>;
+
+public:
+    using base::base;
+
+protected:
+    BASE_COMMON_USINGS
+
+    void onSelectButtonClicked() override
+    {
+        auto callback = nx::utils::guarded(this,
+            [this](bool success, nx::Uuid selectedServer)
+            {
+                if (success)
+                    m_field->setValue(selectedServer);
+            });
+
+        ServerSelectionDialog::selectServer(
+            m_field->value(), Policy::isServerValid, Policy::infoText(), std::move(callback), this);
+
+        base::onSelectButtonClicked();
+    }
 };
 
 } // namespace nx::vms::client::desktop::rules

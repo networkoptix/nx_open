@@ -18,6 +18,7 @@
 #include "action_builder_field_validators/target_device_field_validator.h"
 #include "action_builder_field_validators/target_layout_field_validator.h"
 #include "action_builder_field_validators/target_server_field_validator.h"
+#include "action_builder_field_validators/target_servers_field_validator.h"
 #include "action_builder_field_validators/target_single_device_field_validator.h"
 #include "action_builder_field_validators/target_user_field_validator.h"
 #include "action_builder_field_validators/text_with_fields_validator.h"
@@ -140,6 +141,7 @@ void Initializer::registerFields() const
     registerActionField<SoundField>();
     registerActionField<StreamQualityField>();
     registerActionField<TargetDevicesField>();
+    registerActionField<TargetServerField>();
     registerActionField<TargetServersField>();
     registerActionField<TargetUsersField>(systemContext());
     registerActionField<TextWithFields>(systemContext());
@@ -172,7 +174,8 @@ void Initializer::registerFieldValidators() const
     registerActionFieldValidator<SoundField, SoundFieldValidator>();
     registerActionFieldValidator<TargetDevicesField, TargetDeviceFieldValidator>();
     registerActionFieldValidator<TargetLayoutsField, TargetLayoutFieldValidator>();
-    registerActionFieldValidator<TargetServersField, TargetServerFieldValidator>();
+    registerActionFieldValidator<TargetServerField, TargetServerFieldValidator>();
+    registerActionFieldValidator<TargetServersField, TargetServersFieldValidator>();
     registerActionFieldValidator<TargetDeviceField, TargetSingleDeviceFieldValidator>();
     registerActionFieldValidator<TargetUsersField, TargetUserFieldValidator>();
     registerActionFieldValidator<TextWithFields, TextWithFieldsValidator>();

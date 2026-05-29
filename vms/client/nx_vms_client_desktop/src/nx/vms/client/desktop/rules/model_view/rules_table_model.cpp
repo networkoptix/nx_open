@@ -564,7 +564,7 @@ QVariant RulesTableModel::sourceServerData(const ConstRulePtr& rule, int role) c
             return vms::rules::Strings::selectServer();
 
         if (sourceServerField->acceptAll())
-            return tr("Any Server");
+            return Strings::anyServer();
 
         if (resources.isEmpty())
             return tr("No source");
@@ -719,7 +719,7 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         if (useSource)
         {
             return resources.empty()
-                ? tr("Source camera")
+                ? Strings::sourceCamera()
                 : tr("Source and %n more Cameras", "Numerus: placeholder for more items",
                     static_cast<int>(resources.size()));
         }

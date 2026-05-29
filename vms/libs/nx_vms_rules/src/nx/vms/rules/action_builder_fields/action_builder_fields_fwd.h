@@ -26,6 +26,7 @@ class TargetDeviceField;
 class TargetDevicesField;
 class TargetLayoutField;
 class TargetLayoutsField;
+class TargetServerField;
 class TargetServersField;
 class TargetUsersField;
 class TextFormatter;

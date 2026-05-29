@@ -19,6 +19,7 @@ class NX_VMS_RULES_API HttpAction: public nx::vms::rules::BasicAction
     Q_CLASSINFO("type", "http")
 
     FIELD(std::chrono::microseconds, interval, setInterval)
+    FIELD(nx::Uuid, serverId, setServerId)
     Q_PROPERTY(QString url READ url WRITE setUrl)
     Q_PROPERTY(QList<KeyValueObject> headers READ headers WRITE setHeaders)
     Q_PROPERTY(QString content READ content WRITE setContent)

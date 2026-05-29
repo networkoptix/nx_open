@@ -7,6 +7,7 @@
 #include "../action_builder_fields/http_headers_field.h"
 #include "../action_builder_fields/http_method_field.h"
 #include "../action_builder_fields/optional_time_field.h"
+#include "../action_builder_fields/target_server_field.h"
 #include "../action_builder_fields/text_with_fields.h"
 #include "../strings.h"
 #include "../utils/event_details.h"
@@ -24,8 +25,11 @@ const ItemDescriptor& HttpAction::manifest()
         .displayName = NX_DYNAMIC_TRANSLATABLE(tr("HTTP(S) Request")),
         .description = "Send HTTP(S) request.",
         .executionTargets = ExecutionTarget::servers,
-        .targetServers = TargetServers::currentServer,
+        .targetServers = TargetServers::resourceOwner,
         .fields = {
+            makeFieldDescriptor<TargetServerField>(utils::kServerIdFieldName,
+                Strings::at(),
+                {"If not set, current server will be used."}),
             makeFieldDescriptor<TextWithFields>("url",
                 NX_DYNAMIC_TRANSLATABLE(tr("URL")),
                 {},
@@ -60,7 +64,8 @@ const ItemDescriptor& HttpAction::manifest()
                 TimeFieldProperties{
                     .value = std::chrono::minutes(1),
                     .maximumValue = std::chrono::days(24855)}.toVariantMap())
-        }
+        },
+        .resources = {{utils::kServerIdFieldName, {ResourceType::server, {}, {}, FieldFlag::target}}},
     };
     return kDescriptor;
 }

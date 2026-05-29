@@ -10,6 +10,7 @@
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
+#include <nx/vms/rules/action_builder_fields/target_server_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
@@ -23,6 +24,7 @@ std::pair<QIcon, QIcon::Mode> attentionIcon();
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutField* field);
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDevicesField* field);
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetLayoutsField* field);
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServerField* field);
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field);
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetDeviceField* field);
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(

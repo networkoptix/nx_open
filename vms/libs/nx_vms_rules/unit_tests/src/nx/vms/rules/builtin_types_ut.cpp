@@ -406,6 +406,7 @@ TEST_F(BuiltinTypesTest, BuiltinActions)
     testActionFieldRegistration<SoundField>();
     testActionFieldRegistration<StreamQualityField>();
     testActionFieldRegistration<TargetDevicesField>();
+    testActionFieldRegistration<TargetServerField>();
     testActionFieldRegistration<TargetServersField>();
     testActionFieldRegistration<TargetUsersField>(systemContext());
     testActionFieldRegistration<TextWithFields>(systemContext());

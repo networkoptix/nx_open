@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <core/resource/resource_fwd.h>
@@ -19,6 +20,7 @@ class ServerSelectionDialog: public QnSessionAwareButtonBoxDialog
 
 public:
     using ServerFilter = std::function<bool(const QnMediaServerResourcePtr&)>;
+    using SelectServerCallback = std::function<void(bool success, nx::Uuid selectedServer)>;
 
     static bool selectServers(
         UuidSet& selectedServers,
@@ -26,11 +28,19 @@ public:
         const QString& infoMessage,
         QWidget* parent);
 
+    static void selectServer(
+        nx::Uuid selectedServer,
+        ServerFilter filterFunctor,
+        const QString& infoMessage,
+        SelectServerCallback callback,
+        QWidget* parent);
+
 private:
     ServerSelectionDialog(
         const UuidSet& selectedServersIds,
         ServerFilter filterFunctor,
         const QString& infoMessage,
+        bool multiSelect,
         QWidget* parent = nullptr);
 
     virtual ~ServerSelectionDialog() override;

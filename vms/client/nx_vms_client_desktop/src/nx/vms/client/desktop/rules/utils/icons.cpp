@@ -13,7 +13,6 @@
 #include <nx/vms/client/core/skin/resource_icon_cache.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::client::desktop::rules {
@@ -94,6 +93,22 @@ std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rule
         return getIcon(resources.first(), QIcon::Mode::Selected);
 
     return getIcon(ResourceIconCache::Layout, QIcon::Mode::Disabled);
+}
+
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(
+    SystemContext* context, vms::rules::TargetServerField* field)
+{
+    const auto id = field->value();
+
+    if (id.isNull())
+        return getIcon(ResourceIconCache::Server, QIcon::Mode::Normal);
+
+    const auto server =
+        context->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (server)
+        return getIcon(server, QIcon::Mode::Selected);
+
+    return getIcon(ResourceIconCache::Server, QIcon::Mode::Disabled);
 }
 
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field)

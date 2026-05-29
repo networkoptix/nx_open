@@ -24,7 +24,6 @@
 #include "http_headers_picker_widget.h"
 #include "http_parameters_picker_widget.h"
 #include "input_port_picker_widget.h"
-#include "string_selection_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
 #include "object_lookup_picker_widget.h"
@@ -39,6 +38,7 @@
 #include "source_user_picker_widget.h"
 #include "state_picker_widget.h"
 #include "stream_quality_picker_widget.h"
+#include "string_selection_picker_widget.h"
 #include "target_layout_picker_widget.h"
 #include "target_user_picker_widget.h"
 #include "text_lookup_picker_widget.h"
@@ -139,12 +139,22 @@ PickerWidget* createTargetDevicePicker(
 PickerWidget* createTargetServerPicker(
     Field* field, SystemContext* context, ParamsWidget* parent)
 {
+    const auto targetServerField = dynamic_cast<TargetServerField*>(field);
+    if (!NX_ASSERT(targetServerField, "TargetServerField is expected here"))
+        return {};
+
+    return createPickerImpl<TargetServerPicker<QnOnlineServerPolicy>>(field, context, parent);
+}
+
+PickerWidget* createTargetServersPicker(
+    Field* field, SystemContext* context, ParamsWidget* parent)
+{
     const auto targetServerField = dynamic_cast<TargetServersField*>(field);
     if (!NX_ASSERT(targetServerField, "TargetServersField is expected here"))
         return {};
 
     if (targetServerField->properties().validationPolicy == kHasBuzzerValidationPolicy)
-        return createPickerImpl<TargetServerPicker<QnBuzzerPolicy>>(field, context, parent);
+        return createPickerImpl<TargetServersPicker<QnBuzzerPolicy>>(field, context, parent);
 
     NX_ASSERT(false, "Must not be here");
     return {};
@@ -310,8 +320,11 @@ PickerWidget* createActionFieldWidget(
     if (fieldId == utils::type<TargetDevicesField>())
         return createTargetDevicePicker(field, context, parent);
 
-    if (fieldId == utils::type<TargetServersField>())
+    if (fieldId == utils::type<TargetServerField>())
         return createTargetServerPicker(field, context, parent);
+
+    if (fieldId == utils::type<TargetServersField>())
+        return createTargetServersPicker(field, context, parent);
 
     if (fieldId == utils::type<TargetDeviceField>())
         return createSingleTargetCameraPicker(field, context, parent);

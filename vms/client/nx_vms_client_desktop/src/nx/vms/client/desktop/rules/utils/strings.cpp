@@ -17,6 +17,7 @@
 #include <nx/vms/rules/action_builder_fields/target_devices_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layout_field.h>
 #include <nx/vms/rules/action_builder_fields/target_layouts_field.h>
+#include <nx/vms/rules/action_builder_fields/target_server_field.h>
 #include <nx/vms/rules/action_builder_fields/target_servers_field.h>
 #include <nx/vms/rules/action_builder_fields/target_users_field.h>
 #include <nx/vms/rules/actions/bookmark_action.h>
@@ -62,7 +63,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetDevi
     if (field->useSource())
     {
         if (resources.empty())
-            return sourceCameraString();
+            return sourceCamera();
 
         return tr("Source and %n more Cameras", "Numerus: placeholder for more items",
             static_cast<int>(resources.size()));
@@ -85,6 +86,21 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetLayo
     return number(ResourceType::layout, resources);
 }
 
+QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServerField* field)
+{
+    const auto id = field->value();
+
+    if (id.isNull())
+        return sourceServer();
+
+    const auto server =
+        context->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (!server)
+        return selectString();
+
+    return getName({server});
+}
+
 QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServersField* field)
 {
     const auto resources =
@@ -96,7 +112,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::TargetServ
     if (field->useSource())
     {
         if (resources.empty())
-            return tr("Source Server");
+            return sourceServer();
 
         return tr("Source Server and %n Servers", "", static_cast<int>(resources.size()));
     }
@@ -108,7 +124,7 @@ QString Strings::selectButtonText(
     SystemContext* context, vms::rules::TargetDeviceField* field)
 {
     if (field->useSource())
-        return sourceCameraString();
+        return sourceCamera();
 
     if (field->id().isNull())
         return selectString();
@@ -163,7 +179,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::SourceServ
         return selectString();
 
     if (field->acceptAll())
-        return tr("Any Server");
+        return anyServer();
 
     return getName(resources);
 }
@@ -245,7 +261,7 @@ QString Strings::selectString()
     return tr("Select");
 }
 
-QString Strings::sourceCameraString()
+QString Strings::sourceCamera()
 {
     return tr("Source camera");
 }
@@ -273,6 +289,16 @@ QString Strings::in()
 QString Strings::allUsers()
 {
     return tr("All Users");
+}
+
+QString Strings::anyServer()
+{
+    return tr("Any Server");
+}
+
+QString Strings::sourceServer()
+{
+    return tr("Source Server");
 }
 
 QString Strings::targetRecipientsString(
