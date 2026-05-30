@@ -11025,6 +11025,14 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
       <source>There are no suitable servers</source>
       <translation>Der er ingen egnede servere</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12865,10 +12873,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kilde kamera</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Ingen destination</translation>
     </message>
@@ -12894,10 +12898,6 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
     <message>
       <source>Any Camera</source>
       <translation>Ethvert kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Enhver Server</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

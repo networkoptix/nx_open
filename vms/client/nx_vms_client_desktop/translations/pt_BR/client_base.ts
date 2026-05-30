@@ -11026,6 +11026,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>There are no suitable servers</source>
       <translation>Não há servidores compatíveis</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12867,10 +12875,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Câmera de origem</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation type="unfinished">No target</translation>
     </message>
@@ -12896,10 +12900,6 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     <message>
       <source>Any Camera</source>
       <translation>Qualquer câmera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Qualquer servidor</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

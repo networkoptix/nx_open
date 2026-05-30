@@ -11025,6 +11025,14 @@ Fäst inte detta certifikat om du gjordet ändra %2 server SSL-certifikat.</tran
       <source>There are no suitable servers</source>
       <translation>Det finns inga kompatibla servrar</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12867,10 +12875,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Källkamera</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Inget mål</translation>
     </message>
@@ -12896,10 +12900,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Any Camera</source>
       <translation>Valfri kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Vilken server som helst</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

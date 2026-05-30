@@ -10865,6 +10865,14 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <source>There are no suitable servers</source>
       <translation>Không có máy chủ phù hợp</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12687,10 +12695,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Máy ảnh nguồn</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Không có đích đến</translation>
     </message>
@@ -12715,10 +12719,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>Any Camera</source>
       <translation>Tất cả camera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Bất kỳ máy chủ nào</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

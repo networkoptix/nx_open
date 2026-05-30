@@ -10870,6 +10870,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>There are no suitable servers</source>
       <translation>適切なサーバーがありません</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12690,10 +12698,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>ソースカメラ</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>対象がありません</translation>
     </message>
@@ -12718,10 +12722,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Any Camera</source>
       <translation>すべてのカメラ</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>すべてのサーバー</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

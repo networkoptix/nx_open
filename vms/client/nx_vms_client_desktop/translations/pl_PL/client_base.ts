@@ -11346,6 +11346,14 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <source>There are no suitable servers</source>
       <translation>Brak odpowiednich serwerów</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation type="unfinished">Source Server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation type="unfinished">Select Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -13226,10 +13234,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kamera źródłowa</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation type="unfinished">No target</translation>
     </message>
@@ -13257,10 +13261,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>Any Camera</source>
       <translation>Dowolna kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Dowolny serwer</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
