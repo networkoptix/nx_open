@@ -1226,6 +1226,9 @@ Page
                             Qt.LandscapeOrientation)
                     }
                 }
+
+                // To block camera swipe if the button is dragged.
+                DragHandler { target: null }
             }
         }
 

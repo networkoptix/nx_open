@@ -389,6 +389,9 @@ Item
 
             controller.speed = speedControl.speed
         }
+
+        // To block camera swipe if the speed control is dragged.
+        DragHandler { target: null }
     }
 
     MouseArea
