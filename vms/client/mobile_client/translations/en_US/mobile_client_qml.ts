@@ -731,6 +731,22 @@
     </message>
 </context>
 <context>
+    <name>LogoutConfirmationPopup</name>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to disconnect from %1?</source>
+        <comment>%1 is a system name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MenuScreen</name>
     <message>
         <source>App Settings</source>
