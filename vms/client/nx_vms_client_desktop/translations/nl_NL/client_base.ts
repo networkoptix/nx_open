@@ -12830,7 +12830,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige Server</translation>
+      <translation>Een willekeurige server</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
