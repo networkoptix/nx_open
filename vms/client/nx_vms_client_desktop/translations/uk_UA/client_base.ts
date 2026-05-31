@@ -13154,7 +13154,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Будь-який Cервер</translation>
+      <translation>Будь-який Сервер</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

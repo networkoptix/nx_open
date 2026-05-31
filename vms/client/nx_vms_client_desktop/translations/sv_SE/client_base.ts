@@ -12787,7 +12787,7 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Vilken server som helst</translation>
+      <translation>Någon Server</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

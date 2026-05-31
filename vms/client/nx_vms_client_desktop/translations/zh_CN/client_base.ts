@@ -12600,7 +12600,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Any Server</source>
-      <translation>所有服务器</translation>
+      <translation>任何服务器</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
