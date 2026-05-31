@@ -11027,11 +11027,11 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Kilde Server</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Vælg Server</translation>
     </message>
   </context>
   <context>

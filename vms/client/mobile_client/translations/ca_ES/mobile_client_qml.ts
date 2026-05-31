@@ -734,7 +734,7 @@
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Desconnecta</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
@@ -743,7 +743,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>

@@ -11028,11 +11028,11 @@ Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Servidor fonte</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Selecciona un servidor</translation>
     </message>
   </context>
   <context>

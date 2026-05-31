@@ -11027,11 +11027,11 @@ No fije este certificado si no modificó el certificado SSL del servidor %2.</tr
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Servidor de origen</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Seleccionar servidor</translation>
     </message>
   </context>
   <context>

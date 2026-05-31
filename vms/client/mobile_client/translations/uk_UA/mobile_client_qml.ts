@@ -736,7 +736,7 @@
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Відключити</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
@@ -745,7 +745,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Скасувати</translation>
     </message>
   </context>
   <context>

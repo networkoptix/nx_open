@@ -1284,7 +1284,7 @@
     <name>nx::vms::rules::TargetServerFieldValidator</name>
     <message>
       <source>Select online server</source>
-      <translation type="unfinished">Select online server</translation>
+      <translation>Vælg online server</translation>
     </message>
   </context>
   <context>

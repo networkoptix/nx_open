@@ -733,7 +733,7 @@
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>断开连接</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
@@ -742,7 +742,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
