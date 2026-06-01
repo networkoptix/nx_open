@@ -738,7 +738,7 @@
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Are you sure you want to disconnect from %1?</translation>
+      <translation>%1 から切断してもよろしいですか?</translation>
     </message>
     <message>
       <source>Cancel</source>

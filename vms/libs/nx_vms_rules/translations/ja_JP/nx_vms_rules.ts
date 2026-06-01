@@ -1270,7 +1270,7 @@
     <name>nx::vms::rules::TargetServerFieldValidator</name>
     <message>
       <source>Select online server</source>
-      <translation type="unfinished">Select online server</translation>
+      <translation>オンラインサーバーを選択</translation>
     </message>
   </context>
   <context>
