@@ -539,6 +539,7 @@ AdaptiveScreen
 
                     implicitHeight: 36
                     placeholderText: qsTr("Search")
+                    visible: siteList.count !== 0
                 }
 
                 Rectangle
