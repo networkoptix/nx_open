@@ -57,8 +57,6 @@ public:
 
     virtual ~SystemContext() override;
 
-    QnAvailableCamerasWatcher* availableCamerasWatcher() const;
-
     QnResourceDiscoveryManager* resourceDiscoveryManager() const;
 
     core::TwoWayAudioController* twoWayAudioController() const;
@@ -68,6 +66,8 @@ public:
     nx::client::mobile::EventRulesWatcher* eventRulesWatcher() const;
 
     // Invokables.
+
+    Q_INVOKABLE QnAvailableCamerasWatcher* availableCamerasWatcher() const;
 
     Q_INVOKABLE nx::vms::client::core::EventSearchModelAdapter* createSearchModel(bool analyticsMode);
 

@@ -31,6 +31,7 @@ ActionButtonsPanel 1.0 ActionButtonsPanel.qml
 ActivityPreloader 1.0 ActivityPreloader.qml
 SearchEdit 1.0 SearchEdit.qml
 PreloaderOverlay 1.0 PreloaderOverlay.qml
+PreviewSlider 1.0 PreviewSlider.qml
 ScreenNavigationBar 1.0 ScreenNavigationBar.qml
 MenuButtonItem 1.0 MenuButtonItem.qml
 SnackBar 1.0 SnackBar.qml

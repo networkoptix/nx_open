@@ -288,21 +288,13 @@ Item
 
                     onClicked:
                     {
-                        if (LayoutController.isTabletLayout)
-                        {
-                            feed.selectedNotification = {
-                                "id": model.id,
-                                "title": model.title,
-                                "description": model.description,
-                                "image": model.image,
-                                "time": model.time,
-                                "url": model.url
-                            }
-                        }
-                        else
-                        {
-                            if (model.url)
-                                windowContext.uriHandler.handleUrl(model.url)
+                        feed.selectedNotification = {
+                            "id": model.id,
+                            "title": model.title,
+                            "description": model.description,
+                            "image": model.image,
+                            "time": model.time,
+                            "url": model.url
                         }
 
                         feedState.setViewed(model.id, true)

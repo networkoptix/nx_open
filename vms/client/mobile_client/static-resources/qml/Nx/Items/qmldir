@@ -12,6 +12,7 @@ IssueLabel 1.0 IssueLabel.qml
 LoginButton 1.0 LoginButton.qml
 Panel 1.0 Panel.qml
 Placeholder 1.0 Placeholder.qml
+Preview 1.0 Preview.qml
 ProxyItem 1.0 ProxyItem.qml
 ResourceTreeItem 1.0 ResourceTreeItem.qml
 SessionCredentialsEditor 1.0 SessionCredentialsEditor.qml

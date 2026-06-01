@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Nx.Controls
 import Nx.Core
 import Nx.Items
+import Nx.Mobile.Controls
 import Nx.Ui
 
 import nx.vms.client.mobile
@@ -33,12 +34,7 @@ AdaptiveScreen
             feed.selectedNotification = null
     }
 
-    contentItem: Feed
-    {
-        id: feed
-
-        feedState: feedScreen.feedState
-    }
+    contentItem: feed
 
     leftPanel
     {
@@ -68,6 +64,20 @@ AdaptiveScreen
         }
     }
 
+    customLeftControl: ToolBarButton
+    {
+        id: backButton
+
+        anchors.centerIn: parent
+        visible: feedScreen.contentItem === notificationDetailsItem
+        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+
+        onClicked:
+        {
+            feedScreen.contentItem = feed
+        }
+    }
+
     customRightControl: IconButton
     {
         id: filterButton
@@ -78,9 +88,24 @@ AdaptiveScreen
 
         indicator.visible: feed.filtered
 
-        visible: !LayoutController.isTabletLayout && d.canFilter
+        visible: !LayoutController.isTabletLayout && d.canFilter && feedScreen.contentItem === feed
 
         onClicked: feed.openFilterMenu()
+    }
+
+    Feed
+    {
+        id: feed
+
+        feedState: feedScreen.feedState
+
+        onSelectedNotificationChanged:
+        {
+            if (LayoutController.isTabletLayout)
+                return
+
+            feedScreen.contentItem = notificationDetailsItem
+        }
     }
 
     Item
@@ -125,113 +150,38 @@ AdaptiveScreen
         }
     }
 
-    Item
+    NotificationDetailsItem
     {
         id: notificationDetailsItem
 
-        MouseArea
+        notification: feed.selectedNotification
+
+        onFullscreenButtonClicked:
         {
-            anchors.fill: parent
+            feedScreen.fullscreen = !feedScreen.fullscreen
 
-            onClicked:
+            if (LayoutController.isTabletLayout)
             {
-                const url = feed.selectedNotification?.url
-                if (url)
-                    windowContext.uriHandler.handleUrl(url)
-            }
-        }
-
-        Image //< TODO: It must be player here if there is something to view.
-        {
-            id: notificationDetailImage
-
-            width: parent.width
-            height: 180
-
-            visible: status != Image.Null
-            fillMode: Image.PreserveAspectCrop
-
-            source: feed.selectedNotification?.image ?? ""
-
-            Rectangle
-            {
-                anchors.fill: parent
-
-                visible: notificationDetailImage.status != Image.Ready
-                color: ColorTheme.colors.dark8
-
-                Text
+                if (feedScreen.contentItem === notificationDetailsItem) //< Exit fullscreen.
                 {
-                    anchors.centerIn: parent
-
-                    visible: notificationDetailImage.status === Image.Error
-                    text: qsTr("No data")
-                    font.pixelSize: 12
-                    color: ColorTheme.colors.dark17
+                    feedScreen.contentItem = feed
+                    feedScreen.rightPanel.visible = true
+                }
+                else //< Enter fullscreen.
+                {
+                    feedScreen.contentItem = notificationDetailsItem
                 }
             }
-        }
-
-        Flickable
-        {
-            id: notificationDetailsFlickable
-
-            anchors.fill: parent
-            anchors.margins: 20
-            anchors.topMargin: 20 + (notificationDetailImage.visible ? notificationDetailImage.height : 0)
-
-            contentHeight: notificationDetailsColumn.implicitHeight
-            clip: true
-
-            Connections
+            else
             {
-                target: feed
-
-                function onSelectedNotificationChanged()
+                if (CoreUtils.isMobilePlatform())
                 {
-                    notificationDetailsFlickable.contentY = 0
+                    windowContext.ui.windowHelpers.setScreenOrientation(
+                        LayoutController.isPortrait ? Qt.LandscapeOrientation : Qt.PortraitOrientation)
                 }
-            }
-
-            ColumnLayout
-            {
-                id: notificationDetailsColumn
-
-                width: parent.width
-                spacing: 16
-
-                Text
+                else
                 {
-                    Layout.fillWidth: true
-
-                    text: feed.selectedNotification?.title ?? ""
-                    visible: !!text
-                    font.pixelSize: 18
-                    color: ColorTheme.colors.light4
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    Layout.fillWidth: true
-
-                    text: feed.selectedNotification?.description ?? ""
-                    visible: !!text
-                    font.pixelSize: 16
-                    color: ColorTheme.colors.light10
-                    wrapMode: Text.WordWrap
-                }
-
-                Text
-                {
-                    Layout.fillWidth: true
-
-                    font.pixelSize: 14
-                    font.capitalization: Font.AllUppercase
-                    font.weight: Font.Medium
-
-                    color: ColorTheme.colors.light16
-                    text: feed.selectedNotification?.time ?? ""
+                    [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
                 }
             }
         }

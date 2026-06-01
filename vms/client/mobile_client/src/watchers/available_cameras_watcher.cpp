@@ -6,8 +6,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
+
+#include <algorithm>
 
 #include "available_cameras_watcher_p.h"
 
@@ -112,6 +115,27 @@ QnVirtualCameraResourceList QnAvailableCamerasWatcher::availableCameras() const
         return QnVirtualCameraResourceList();
 
     return d->watcher->cameras().values();
+}
+
+QnResource* QnAvailableCamerasWatcher::getCamera(const QString& id) const
+{
+    Q_D(const QnAvailableCamerasWatcher);
+
+    if (!d->watcher)
+        return nullptr;
+
+    const auto cameras = d->watcher->cameras().values();
+    const auto resultIt = std::ranges::find_if(
+        cameras,
+        [id = nx::Uuid{id}](const auto& camera)
+        {
+            return camera->getId() == id;
+        });
+
+    if (resultIt == cameras.cend())
+        return nullptr;
+
+    return nx::vms::client::core::withCppOwnership(resultIt->get());
 }
 
 bool QnAvailableCamerasWatcher::compatibilityMode() const

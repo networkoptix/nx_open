@@ -49,6 +49,7 @@
 #include <ui/timeline/timeline.h>
 #include <utils/developer_settings_helper.h>
 #include <utils/mobile_app_info.h>
+#include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_system_information_watcher.h>
 #include <watchers/network_interface_watcher.h>
 
@@ -80,6 +81,9 @@ void registerQmlTypes()
     qmlRegisterUncreatableType<core::UserWatcher>(
         "nx.vms.client.core", 1, 0, "UserWatcher",
         "Use UserWatcher instance from the System Context");
+    qmlRegisterUncreatableType<QnAvailableCamerasWatcher>(
+        "nx.vms.client.core", 1, 0, "QnAvailableCamerasWatcher",
+        "Use QnAvailableCamerasWatcher instance from the System Context");
 
     qmlRegisterType<QnSystemsModel>("Nx.Models", 1, 0, "SystemsModel");
     qmlRegisterType<QnMobileClientUiController>("Nx.Mobile", 1, 0, "Controller");

@@ -35,10 +35,10 @@ Page
     property QnCameraListModel camerasModel: null
     required property Timeline.AbstractObjectData objectData
     required property Resource resource
-    readonly property alias showControls: d.showControls
+    readonly property alias fullscreenLayout: preview.fullscreenLayout
     readonly property Menu menu: menu.available ? menu : null
-    property bool hasNext: false
-    property bool hasPrevious: false
+    property alias hasNext: preview.hasNext
+    property alias hasPrevious: preview.hasPrevious
 
     signal fullscreenButtonClicked
     signal searchRequested(string text)
@@ -50,180 +50,25 @@ Page
 
     clip: false
 
-    states:
-    [
-        State
-        {
-            name: "portrait"
-            when: d.portraitOrientation
-
-            AnchorChanges
-            {
-                target: panel
-
-                anchors.left: preview.left
-                anchors.right: preview.right
-                anchors.top: preview.bottom
-            }
-
-            PropertyChanges
-            {
-                panelPlaybackControls.visible: true
-                previewTimestamp.visible: true
-                previewOrientationButton.visible: true
-
-                panel.transparent: false
-
-                playPauseButton.rounded: false
-                playPauseButton.icon.width: 24
-                playPauseButton.icon.height: 24
-                playPauseButton.Layout.preferredWidth: 44
-                playPauseButton.Layout.preferredHeight: 44
-
-                previousButton.rounded: false
-                previousButton.icon.width: 24
-                previousButton.icon.height: 24
-
-                nextButton.rounded: false
-                nextButton.icon.width: 24
-                nextButton.icon.height: 24
-
-                playbackControls.spacing: 8
-            }
-        },
-        State
-        {
-            name: "landscape"
-            when: !d.portraitOrientation
-
-            AnchorChanges
-            {
-                target: panel
-
-                anchors.left: preview.left
-                anchors.right: preview.right
-                anchors.bottom: preview.bottom
-            }
-
-            PropertyChanges
-            {
-                centralPlaybackControls.visible: true
-                panelTimestamp.visible: true
-                panelOrientationButton.visible: true
-
-                panel.transparent: true
-
-                playPauseButton.rounded: true
-                playPauseButton.icon.width: 64
-                playPauseButton.icon.height: 64
-                playPauseButton.Layout.preferredWidth: 64
-                playPauseButton.Layout.preferredHeight: 64
-
-                previousButton.rounded: true
-                previousButton.icon.width: 32
-                previousButton.icon.height: 32
-
-                nextButton.rounded: true
-                nextButton.icon.width: 32
-                nextButton.icon.height: 32
-
-                playbackControls.spacing: 44
-            }
-        }
-    ]
-
-    component ControlButton: MobileControls.Button
-    {
-        property bool rounded: false
-        property bool transparent: rounded
-
-        implicitWidth: 44
-        implicitHeight: 44
-
-        type: MobileControls.Button.Type.Interface
-        icon.width: 24
-        icon.height: 24
-
-        radius: rounded ? width / 2 : 6
-        backgroundColor: ColorTheme.transparent(parameters.colors[state], transparent ? 0.5 : 1.0)
-        foregroundColor: transparent ? ColorTheme.colors.light1 : parameters.textColors[state]
-    }
-
-    Rectangle
-    {
-        color: ColorTheme.colors.dark3
-        anchors.fill: preview
-    }
-
-    AudioController
-    {
-        id: audioController
-
-        resource: preview.resource
-        serverSessionManager: windowContext.sessionManager
-    }
-
-    MediaPlaybackInterruptor
-    {
-        player: preview.player
-        interruptOnInactivity: CoreUtils.isMobilePlatform()
-    }
-
-    IntervalPreview
+    Preview
     {
         id: preview
-
-        audioEnabled: audioController.audioEnabled
 
         width: parent.width
         height:
         {
-            if (!d.portraitOrientation)
-                return eventDetailsScreen.height
+            if (d.portraitOrientation)
+                return heightForWidth(width)
 
-            const realWidth =
-                function()
-                {
-                    if (!preview.isReady)
-                        return width / 16 * 9
-
-                    return videoRotation === 0 || videoRotation === 180
-                        ? width / videoAspectRatio
-                        : width * videoAspectRatio
-                }()
-
-            const maxHeight = (eventDetailsScreen.height - panel.height) / 2
-            return Math.min(realWidth, maxHeight)
+            return eventDetailsScreen.height
         }
+        fullscreenLayout: !d.portraitOrientation
+        activePage: eventDetailsScreen.activePage
 
-        clip: true
-        scalable: true
-        hasPreloader: true
-        aspectRatio: 0 //< No forced aspect ratio.
-        active: true
-        autoplay: false
-        autoRepeat: false
-        color: "transparent"
-
-        onClicked: d.showControls = !d.showControls
-
-        Image
-        {
-            y: parent.height - height + 1
-            width: parent.width
-            height: 56
-
-            source: lp("/images/timeline_gradient.png")
-            opacity: d.hasControls ? 1 : 0
-            visible: d.portraitOrientation && opacity > 0
-        }
-    }
-
-    VideoDummy
-    {
-        anchors.fill: preview
-        visible: preview.cannotDecryptMedia
-        state: "cannotDecryptMedia"
+        onNext: eventDetailsScreen.nextClicked()
+        onPrevious: eventDetailsScreen.previousClicked()
+        onShowFullscreen: eventDetailsScreen.fullscreenButtonClicked()
+        onShowOnCamera: d.goToCamera()
     }
 
     GridLayout
@@ -234,7 +79,7 @@ Page
         property bool horizontal: width / height > kHorizontalLayoutRatio
             && attributeTable.attributes.length > 0
 
-        anchors.top: panel.bottom
+        anchors.top: preview.bottom
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -462,397 +307,57 @@ Page
         }
     }
 
-    LayoutItemProxy
-    {
-        id: centralPlaybackControls
-
-        anchors.centerIn: preview
-
-        target: playbackControls
-        opacity: d.hasControls && !preview.cannotDecryptMedia ? 1.0 : 0.0
-        enabled: opacity > 0
-    }
-
-    LayoutItemProxy
-    {
-        id: previewTimestamp
-
-        anchors.left: preview.left
-        anchors.bottom: preview.bottom
-        anchors.margins: 20
-
-        target: timestampText
-    }
-
-    LayoutItemProxy
-    {
-        id: previewOrientationButton
-
-        anchors.right: preview.right
-        anchors.bottom: preview.bottom
-        anchors.rightMargin: 8
-        anchors.bottomMargin: 10
-
-        target: orientationModeButton
-    }
-
-    Rectangle
-    {
-        id: panel
-
-        property bool transparent: false
-        color: transparent ? "transparent" : ColorTheme.colors.dark6
-
-        visible: d.hasControls
-        height: 68
-
-        RowLayout
-        {
-            id: panelLayout
-
-            anchors.fill: parent
-            anchors.margins: 12
-
-            spacing: 8
-
-            LayoutItemProxy
-            {
-                id: panelTimestamp
-
-                target: timestampText
-                Layout.fillWidth: true
-                Layout.preferredWidth: panel.width
-            }
-
-            ControlButton
-            {
-                id: repeatButton
-
-                checkable: true
-                checked: preview.autoRepeat
-                transparent: panel.transparent
-                visible: !preview.cannotDecryptMedia
-                icon.source: "image://skin/24x24/Solid/repeat.svg"
-                Layout.fillWidth: true
-                Layout.minimumWidth: implicitWidth
-
-                onClicked:
-                {
-                    preview.autoRepeat = checked
-                    preview.autoplay = checked
-                }
-            }
-
-            LayoutItemProxy
-            {
-                id: panelPlaybackControls
-
-                target: playbackControls
-                Layout.fillWidth: true
-                Layout.minimumWidth: implicitWidth
-            }
-
-            ControlButton
-            {
-                id: goToCameraButton
-
-                visible: !preview.cannotDecryptMedia
-                transparent: panel.transparent
-                icon.source: "image://skin/24x24/Outline/show_on_layout.svg"
-                Layout.fillWidth: true
-                Layout.minimumWidth: implicitWidth
-
-                onClicked: d.goToCamera()
-            }
-
-            LayoutItemProxy
-            {
-                id: panelOrientationButton
-
-                target: orientationModeButton
-                Layout.fillWidth: true
-                Layout.minimumWidth: implicitWidth
-            }
-        }
-    }
-
-    RowLayout
-    {
-        id: playbackControls
-
-        spacing: 8
-
-        ControlButton
-        {
-            id: previousButton
-
-            icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
-            enabled: eventDetailsScreen.hasPrevious
-
-            Layout.fillWidth: true
-
-            onClicked: eventDetailsScreen.previousClicked()
-        }
-
-        ControlButton
-        {
-            id: playPauseButton
-
-            icon.source: preview.playingPlayerState && !preview.cannotDecryptMedia
-                ? "image://skin/24x24/Outline/pause.svg"
-                : "image://skin/24x24/Outline/play_small.svg"
-            enabled: !preview.cannotDecryptMedia
-
-            Layout.fillWidth: true
-
-            onClicked:
-            {
-                if (preview.playingPlayerState)
-                {
-                    preview.preview()
-                    return
-                }
-
-                preview.play(slider.value == slider.to
-                    ? preview.startTimeMs
-                    : preview.position)
-            }
-        }
-
-        ControlButton
-        {
-            id: nextButton
-
-            icon.source: "image://skin/24x24/Outline/chunk_future.svg"
-            enabled: eventDetailsScreen.hasNext
-
-            Layout.fillWidth: true
-
-            onClicked: eventDetailsScreen.nextClicked()
-        }
-    }
-
-    ControlButton
-    {
-        id: orientationModeButton
-
-        width: 48
-        height: 48
-        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
-        enabled: opacity > 0
-        transparent: true
-
-        icon.source: d.portraitOrientation
-            ? "image://skin/24x24/Outline/fullscreen_view_mode.svg"
-            : "image://skin/24x24/Outline/exit_fullscreen_mode.svg"
-        icon.width: 24
-        icon.height: 24
-
-        onClicked: eventDetailsScreen.fullscreenButtonClicked()
-    }
-
-    Text
-    {
-        id: timestampText
-
-        font.pixelSize: 16
-        font.weight: Font.Medium
-        color: ColorTheme.colors.light4
-        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
-
-        text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
-    }
-
-    Rectangle
-    {
-        id: bottomNavigationArea
-
-        y: parent.height
-        x: -windowParams.leftMargin
-        height: windowParams.bottomMargin
-        width: parent.width + windowParams.leftMargin + windowParams.rightMargin
-        color: ColorTheme.colors.dark1
-    }
-
-    Slider
-    {
-        id: slider
-
-        property bool playerWasPlaying: false
-
-        visible: opacity > 0 && !preview.cannotDecryptMedia
-        opacity: d.hasControls ? 1 : 0
-
-        x: panel.x
-        y: panel.y - slider.height + (slider.height - sliderBackground.height) / 2
-        width: panel.width
-        height: 36
-        leftPadding: 12
-        rightPadding: 12
-
-        from: preview.startTimeMs
-        to: preview.startTimeMs + preview.durationMs
-
-        readonly property real handlePosition:
-            slider.visualPosition * (slider.width - slider.leftPadding - slider.rightPadding)
-                + slider.leftPadding - handle.width / 2
-
-        handle: Rectangle
-        {
-            id: handle
-            width: 24
-            height: 24
-
-            x: slider.handlePosition
-            anchors.verticalCenter: slider.verticalCenter
-
-            radius: 12
-            color: ColorTheme.colors.dark14
-
-            border.width: 4
-            border.color: ColorTheme.colors.light4
-        }
-
-        background: Rectangle
-        {
-            id: sliderBackground
-
-            width: parent.width
-            height: 4
-            color: ColorTheme.colors.dark14
-            anchors.verticalCenter: slider.verticalCenter
-
-            Rectangle
-            {
-                width: slider.handlePosition
-                height: parent.height
-                color: ColorTheme.colors.brand
-            }
-        }
-
-        onValueChanged:
-        {
-            if (!pressed && value == to && !preview.autoRepeat)
-                preview.preview()
-        }
-
-        onPressedChanged:
-        {
-            if (pressed)
-            {
-                playerWasPlaying = preview.playingPlayerState
-                preview.preview()
-            }
-            else if (playerWasPlaying && value != to)
-            {
-                CoreUtils.executeLater(function()
-                {
-                    preview.play(preview.position)
-                }, this)
-            }
-        }
-
-        Connections
-        {
-            target: slider
-            enabled: slider.pressed
-
-            function onValueChanged()
-            {
-                preview.setPosition(slider.value)
-            }
-        }
-
-        Binding
-        {
-            target: slider
-            when: !slider.pressed
-            property: "value"
-            value: preview.atEnd ? slider.to : preview.position
-        }
-    }
-
     onResourceChanged: d.updateCurrentEvent()
     onObjectDataChanged: d.updateCurrentEvent()
-
-    Binding
-    {
-        target: d
-        property: "hasControls"
-        value: d.portraitOrientation || d.showControls
-    }
 
     QtObject
     {
         id: d
 
         readonly property bool portraitOrientation: eventDetailsScreen.width < eventDetailsScreen.height
-        onPortraitOrientationChanged: d.hasControls = true
-
-        property bool hasControls: true
-
-        property bool showControls: true
-        property int exclusionAreaY: eventDetailsScreen.activePage
-            ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
-            : 0
 
         function updateCurrentEvent()
         {
             if (!objectData)
             {
-                preview.resource = null
-                preview.startTimeMs = 0
-                preview.durationMs = 0
-                preview.setPosition(0)
+                preview.interval.resource = null
+                preview.interval.startTimeMs = 0
+                preview.interval.durationMs = 0
+                preview.interval.setPosition(0)
                 return
             }
 
-            preview.stop()
+            preview.interval.stop()
 
             if (!eventDetailsScreen.resource)
                 return;
 
-            preview.resource = eventDetailsScreen.resource
+            preview.interval.resource = eventDetailsScreen.resource
 
             const paddingTimeMs = eventDetailsScreen.isAnalyticsDetails
                 ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
                 : 0
-            preview.startTimeMs =
+            preview.interval.startTimeMs =
                 objectData.startTimeMs - paddingTimeMs
-            preview.durationMs =
+            preview.interval.durationMs =
                 objectData.durationMs + paddingTimeMs * 2
-            preview.setPosition(preview.startTimeMs)
-            slider.value = preview.startTimeMs
+            preview.interval.setPosition(preview.interval.startTimeMs)
 
-            preview.play(preview.startTimeMs) //< Loads the stream anyway.
-        }
-
-        function updateStatusBarVisibility()
-        {
-            if (d.hasControls)
-                windowContext.ui.windowHelpers.exitFullscreen()
-            else
-                windowContext.ui.windowHelpers.enterFullscreen()
+            preview.interval.play(preview.interval.startTimeMs) //< Loads the stream anyway.
         }
 
         function goToCamera()
         {
-            Workflow.openVideoScreen(preview.resource, undefined, slider.from, camerasModel,
+            Workflow.openVideoScreen(
+                preview.interval.resource,
+                undefined,
+                preview.interval.startTimeMs,
+                camerasModel,
                 eventDetailsScreen.isAnalyticsDetails
                     ? Timeline.ObjectsLoader.ObjectsType.analytics
                     : Timeline.ObjectsLoader.ObjectsType.bookmarks,
                 /*isAuxiliary*/ true)
         }
-
-        function updateGestureExclusionArea()
-        {
-            windowContext.ui.windowHelpers.setGestureExclusionArea(
-                d.exclusionAreaY, slider.height * Screen.devicePixelRatio)
-        }
-
-        onHasControlsChanged: updateStatusBarVisibility()
-
-        onExclusionAreaYChanged: updateGestureExclusionArea()
     }
 
     Menu
@@ -867,13 +372,13 @@ Page
         {
             id: downloadButton
 
-            enabled: action.enabled && !preview.cannotDecryptMedia
+            enabled: action.enabled && !preview.interval.cannotDecryptMedia
 
             action: DownloadMediaAction
             {
-                resource: preview.resource
-                positionMs: preview.startTimeMs
-                durationMs: preview.durationMs
+                resource: preview.interval.resource
+                positionMs: preview.interval.startTimeMs
+                durationMs: preview.interval.durationMs
             }
         }
 
@@ -887,11 +392,5 @@ Page
                 analyticsMode: eventDetailsScreen.isAnalyticsDetails
             }
         }
-    }
-
-    Component.onCompleted:
-    {
-        d.updateStatusBarVisibility()
-        d.updateGestureExclusionArea()
     }
 }

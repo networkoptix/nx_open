@@ -31,7 +31,7 @@ AdaptiveScreen
     property QnCameraListModel camerasModel: null
     property alias analyticsSearchMode: screenController.analyticsSearchMode
 
-    fullscreenToolBar: detailsLoader.item?.showControls ?? false
+    fullscreenToolBar: detailsLoader.item?.fullscreenLayout ?? false
     title: contentItem.title
     longContent: contentItem !== eventSearchMenu
 

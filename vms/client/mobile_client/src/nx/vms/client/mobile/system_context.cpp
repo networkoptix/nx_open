@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/event_search/models/event_search_model_adapter.h>
 #include <nx/vms/client/core/event_search/utils/analytics_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/bookmark_search_setup.h>
+#include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/resource/resource_processor.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource_searcher.h>
 #include <nx/vms/client/core/two_way_audio/two_way_audio_controller.h>
@@ -200,7 +201,7 @@ SystemContext::~SystemContext()
 
 QnAvailableCamerasWatcher* SystemContext::availableCamerasWatcher() const
 {
-    return d->availableCamerasWatcher.get();
+    return core::withCppOwnership(d->availableCamerasWatcher.get());
 }
 
 QnResourceDiscoveryManager* SystemContext::resourceDiscoveryManager() const

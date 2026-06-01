@@ -26,6 +26,8 @@ public:
 
     QnVirtualCameraResourceList availableCameras() const;
 
+    Q_INVOKABLE QnResource* getCamera(const QString& id) const;
+
     bool compatibilityMode() const;
     void setCompatibilityMode(bool compatibilityMode);
 
