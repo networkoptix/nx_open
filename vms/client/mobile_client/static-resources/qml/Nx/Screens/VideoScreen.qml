@@ -621,14 +621,29 @@ Page
         implicitHeight: childrenRect.height
     }
 
-    NxDotPreloader
+    Rectangle
     {
-        anchors.centerIn: cameraSwitcher
-        color: ColorTheme.colors.light16
-        dotRadius: 6
-        spacing: 8
+        id: videoPreloaderShade
 
-        running: controller.preloaderRequired
+        anchors.fill: cameraSwitcher
+
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
+        opacity: controller.preloaderRequired ? 1 : 0
+        visible: opacity > 0
+
+        Behavior on opacity { NumberAnimation { duration: 250 }}
+
+        NxDotPreloader
+        {
+            id: videoPreloader
+
+            anchors.centerIn: parent
+            color: ColorTheme.colors.light10
+            dotRadius: 6
+            spacing: 8
+
+            running: videoPreloaderShade.opacity > 0
+        }
     }
 
     FullscreenControlsOverlay
