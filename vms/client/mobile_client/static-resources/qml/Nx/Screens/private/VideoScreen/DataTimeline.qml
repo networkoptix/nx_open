@@ -756,7 +756,7 @@ Rectangle
                 text:
                 {
                     if (timeline.positionAtLive)
-                        return qsTr("Live")
+                        return "Live"
 
                     if (timeMarker.isOutside)
                     {
