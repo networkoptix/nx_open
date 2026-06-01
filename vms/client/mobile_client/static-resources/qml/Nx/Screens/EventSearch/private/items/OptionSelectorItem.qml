@@ -97,6 +97,8 @@ Item
 
                     if (item.hasOwnProperty("searchEdit"))
                         item.searchEdit = searchEdit
+                    else
+                        searchEdit.visible = false
 
                     if (item.hasOwnProperty("selector"))
                         item.selector = optionSelectorItem.selector
