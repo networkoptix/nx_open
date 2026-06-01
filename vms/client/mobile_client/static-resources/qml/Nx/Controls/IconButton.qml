@@ -55,10 +55,10 @@ Control
 
     implicitWidth: compact
         ? contentItem.implicitWidth
-        : Math.max(d.minTouchSize, contentItem.implicitWidth)
+        : Math.max(d.minTouchSize, contentItem.implicitWidth + leftPadding + rightPadding)
     implicitHeight: compact
         ? contentItem.implicitHeight
-        : Math.max(d.minTouchSize, contentItem.implicitHeight)
+        : Math.max(d.minTouchSize, contentItem.implicitHeight + topPadding + bottomPadding)
 
     icon.color: checkable && checked
         ? checkedIconColor
