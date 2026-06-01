@@ -458,7 +458,7 @@ Page
             }
         }
 
-        PtzPanel
+        DeprecatedPtzPanel
         {
             id: ptzPanel
 

@@ -179,7 +179,7 @@ Page
                 video.doubleClickZoom: false
                 cameraSwitcher.height: modernVideoScreen.height
 
-                fullscreenControlsOverlay.visible: true
+                fullscreenControlsOverlay.visible: !d.ptzMode
                 navigatorProxyItem.visible: false
                 navigationBar.visible: false
                 modernVideoScreen.header.visible: false
@@ -226,7 +226,7 @@ Page
             if (offline)
             {
                 offlineStatusDelay.restart()
-                ptzSheet.ptz.moveOnTapMode = false
+                ptz.reset()
             }
             else
             {
@@ -463,7 +463,7 @@ Page
             id: ptzMenuItem
 
             text: qsTr("PTZ Mode")
-            visible: ptzSheet.available
+            visible: ptz.available
             height: visible ? implicitHeight : 0
 
             enabled: controller.playingLive
@@ -472,8 +472,10 @@ Page
 
             onTriggered:
             {
-                d.mode = VideoScreenUtils.VideoScreenMode.Ptz
-                video.to1xScale()
+                if (!d.ptzMode)
+                    d.mode = VideoScreenUtils.VideoScreenMode.Ptz
+                else
+                    d.mode = VideoScreenUtils.VideoScreenMode.Navigation
             }
         }
 
@@ -893,7 +895,7 @@ Page
             objectsType: modernVideoScreen.selectedObjectsType
 
             interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
-                && !ptzSheet.opened && !actionSheet.opened && !downloadMediaSheet.opened
+                && !ptz.active && !actionSheet.opened && !downloadMediaSheet.opened
 
             timeZone: video.resourceHelper.timeZone
 
@@ -1268,93 +1270,44 @@ Page
             }
         }
 
-        PtzSheet
+        Ptz
         {
-            id: ptzSheet
+            id: ptz
 
-            preloaders.parent: video
-            preloaders.height: video.fitSize ? video.fitSize.height : 0
-            preloaders.x: (cameraSwitcher.width - preloaders.width) / 2
-            preloaders.y: (cameraSwitcher.height - preloaders.height) / 3
-
-            controller.resource: controller.resource
+            targetVideo: video
+            resource: controller.resource
             customRotation: controller.resourceHelper.customRotation
 
+            active: d.ptzMode
+            overlayStyle: d.fullscreen
             opacity: d.controlsOpacity
-            visible: opacity > 0 && d.ptzMode
 
-            onClosed:
-                d.mode = VideoScreenUtils.VideoScreenMode.Navigation
-
-            ptz.onMoveOnTapModeChanged:
+            onActiveChanged:
             {
-                if (ptz.moveOnTapMode)
-                {
-                    moveOnTapOverlay.open()
-                    video.fitToBounds()
-                }
-                else
-                {
-                    moveOnTapOverlay.close()
-                }
+                if (active)
+                    video.to1xScale()
             }
 
-            Overlay.modeless: Item {}
+            onMoveOnTapModeChanged:
+            {
+                if (moveOnTapMode)
+                    video.fitToBounds()
+            }
+
+            onClosed: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
         }
 
         CustomPopupDimmer
         {
             id: ptzSheetDimmer
 
-            popup: ptzSheet
+            popup: ptz.sheet
             parent: modernVideoScreen.contentItem
 
             anchors.top: (parent === modernVideoScreen.contentItem) ? navigationBar.top : undefined
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-        }
-
-        PtzViewportMovePreloader
-        {
-            id: preloader
-
-            parent: modernVideoScreen
-            visible: false
-        }
-
-        MoveOnTapOverlay
-        {
-            id: moveOnTapOverlay
-
-            x: -windowParams.leftMargin
-            width: modernVideoScreen.width
-            height: parent.height
-            parent: modernVideoScreen
-            opacity: ptzSheet.opened ? 0.0 : 1.0
-
-            onClicked:
-            {
-                if (controller.resourceHelper.fisheyeParams.enabled || !video)
-                    return
-
-                var mapped = contentItem.mapToItem(video, pos.x, pos.y)
-                var data = video.getMoveViewportData(mapped)
-                if (!data)
-                    return
-
-                ptzSheet.ptz.moveViewport(data.viewport, data.aspect)
-                preloader.pos = contentItem.mapToItem(preloader.parent, pos.x, pos.y)
-                preloader.visible = true
-            }
-
-            onVisibleChanged:
-            {
-                if (moveOnTapOverlay.visible)
-                    return
-
-                ptzSheet.ptz.moveOnTapMode = false
-            }
         }
     }
 

@@ -18,19 +18,51 @@ Control
 {
     id: control
 
-    property PtzController controller
+    property alias preloaders: preloadersPanel
+
+    readonly property PtzController controller: PtzController
+    {
+        property bool supportsPresets: capabilities & PtzAPI.Capability.presets
+        property bool supportsMoveOnTap: capabilities & PtzAPI.Capability.viewport
+    }
 
     property alias customRotation: joystick.customRotation
+    property alias moveOnTapMode: moveOnTapButton.checked
     readonly property alias joystick: joystick
 
-    readonly property alias zoomInPressed: zoomControl.zoomInPressed
-    readonly property alias zoomOutPressed: zoomControl.zoomOutPressed
-    readonly property alias moveDirection: joystick.direction
-    readonly property alias focusInPressed: focusControl.focusInPressed
-    readonly property alias focusOutPressed: focusControl.focusOutPressed
+    function moveViewport(viewportRect, aspect)
+    {
+        controller.viewportMove(aspect, viewportRect, 1)
+    }
 
-    signal autoFocusClicked()
-    signal moveOnTapClicked()
+    PreloadersPanel
+    {
+        id: preloadersPanel
+
+        focusPressed: focusControl.focusInPressed || focusControl.focusOutPressed
+        zoomInPressed: zoomControl.zoomInPressed
+        zoomOutPressed: zoomControl.zoomOutPressed
+        moveDirection: joystick.direction
+        customRotation: control.customRotation
+
+        Connections
+        {
+            target: focusControl
+            function onAutoFocusClicked()
+            {
+                preloadersPanel.showCommonPreloader()
+            }
+        }
+        Connections
+        {
+            target: presets
+
+            function onSelected()
+            {
+                preloadersPanel.showCommonPreloader()
+            }
+        }
+    }
 
     contentItem: ColumnLayout
     {
@@ -52,11 +84,7 @@ Control
                 supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
                 onFocusInPressedChanged: moveFocus(focusInPressed, 1)
                 onFocusOutPressedChanged: moveFocus(focusOutPressed, -1)
-                onAutoFocusClicked:
-                {
-                    controller.setAutoFocus()
-                    control.autoFocusClicked()
-                }
+                onAutoFocusClicked: controller.setAutoFocus()
 
                 Layout.alignment: Qt.AlignBottom
 
@@ -107,6 +135,8 @@ Control
                     visible: controller.supportsMoveOnTap
                     radius: width / 2
                     padding: 0
+                    checkable: true
+                    checked: false
 
                     type: Button.Type.LightInterface
                     foregroundColor: ColorTheme.colors.light4
@@ -114,8 +144,6 @@ Control
                     icon.source: "image://skin/24x24/Outline/re_centre.svg"
                     icon.width: 24
                     icon.height: 24
-
-                    onClicked: control.moveOnTapClicked()
                 }
 
                 Joystick
@@ -184,6 +212,56 @@ Control
                         directionFilterTimer.value = direction
                         directionFilterTimer.restart()
                     }
+                }
+            }
+        }
+
+        Rectangle
+        {
+            color: ColorTheme.colors.dark12
+            implicitHeight: 1
+            Layout.fillWidth: true
+            Layout.topMargin: 20
+            Layout.leftMargin: -20
+            Layout.rightMargin: -20
+        }
+
+        Presets
+        {
+            id: presets
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 64
+            Layout.leftMargin: -20
+            Layout.rightMargin: -20
+
+            resource: controller && controller.resource
+            currentIndex: controller.activePresetIndex
+            visible: controller.presetsCount && controller.supportsPresets
+
+            Timer
+            {
+                id: skipIndexChangedNotificationTimer
+
+                interval: 10000
+            }
+
+            onSelected: (index) =>
+            {
+                if (currentIndex == -1)
+                    return
+
+                controller.setPresetByIndex(index)
+                skipIndexChangedNotificationTimer.restart()
+            }
+
+            Connections
+            {
+                target: controller
+                function onActivePresetIndexChanged()
+                {
+                    if (!skipIndexChangedNotificationTimer.running)
+                        presets.currentIndex = controller.activePresetIndex
                 }
             }
         }
