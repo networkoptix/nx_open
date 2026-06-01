@@ -25,6 +25,7 @@
 #include "target_devices_field.h"
 #include "target_layout_field.h"
 #include "target_layouts_field.h"
+#include "target_server_field.h"
 #include "target_servers_field.h"
 #include "target_users_field.h"
 #include "text_field.h"

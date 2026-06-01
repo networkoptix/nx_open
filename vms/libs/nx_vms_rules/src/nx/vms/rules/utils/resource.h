@@ -44,7 +44,7 @@ NX_VMS_RULES_API QnVirtualCameraResourceList cameras(
     const common::SystemContext* context);
 
 template <class T>
-UuidList fieldResourceIds(const T& entity, std::string_view fieldName)
+UuidList fieldResourceIds(const T& entity, std::string_view fieldName, bool removeNull = true)
 {
     const auto value = entity->property(fieldName.data());
 
@@ -58,7 +58,8 @@ UuidList fieldResourceIds(const T& entity, std::string_view fieldName)
     else if (value.template canConvert<nx::Uuid>())
         result.emplace_back(value.template value<nx::Uuid>());
 
-    result.removeAll({});
+    if (removeNull)
+        result.removeAll({});
 
     return result;
 }

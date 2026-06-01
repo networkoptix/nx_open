@@ -140,12 +140,22 @@ PickerWidget* createTargetDevicePicker(
 PickerWidget* createTargetServerPicker(
     Field* field, SystemContext* context, ParamsWidget* parent)
 {
+    const auto targetServerField = dynamic_cast<TargetServerField*>(field);
+    if (!NX_ASSERT(targetServerField, "TargetServerField is expected here"))
+        return {};
+
+    return createPickerImpl<TargetServerPicker<QnOnlineServerPolicy>>(field, context, parent);
+}
+
+PickerWidget* createTargetServersPicker(
+    Field* field, SystemContext* context, ParamsWidget* parent)
+{
     const auto targetServerField = dynamic_cast<TargetServersField*>(field);
     if (!NX_ASSERT(targetServerField, "TargetServersField is expected here"))
         return {};
 
     if (targetServerField->properties().validationPolicy == kHasBuzzerValidationPolicy)
-        return createPickerImpl<TargetServerPicker<QnBuzzerPolicy>>(field, context, parent);
+        return createPickerImpl<TargetServersPicker<QnBuzzerPolicy>>(field, context, parent);
 
     NX_ASSERT(false, "Must not be here");
     return {};
@@ -317,8 +327,11 @@ PickerWidget* createActionFieldWidget(
     if (fieldId == utils::type<TargetDevicesField>())
         return createTargetDevicePicker(field, context, parent);
 
-    if (fieldId == utils::type<TargetServersField>())
+    if (fieldId == utils::type<TargetServerField>())
         return createTargetServerPicker(field, context, parent);
+
+    if (fieldId == utils::type<TargetServersField>())
+        return createTargetServersPicker(field, context, parent);
 
     if (fieldId == utils::type<TargetDeviceField>())
         return createSingleTargetCameraPicker(field, context, parent);

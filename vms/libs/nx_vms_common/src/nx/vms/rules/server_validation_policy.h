@@ -15,6 +15,15 @@ public:
     static QString infoText();
 };
 
+class NX_VMS_COMMON_API QnOnlineServerPolicy
+{
+    Q_DECLARE_TR_FUNCTIONS(QnOnlineServerPolicy)
+
+public:
+    static bool isServerValid(const QnMediaServerResourcePtr& server);
+    static QString infoText();
+};
+
 class NX_VMS_COMMON_API QnPoeOverBudgetPolicy
 {
     Q_DECLARE_TR_FUNCTIONS(QnPoeOverBudgetPolicy)

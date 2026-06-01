@@ -22,6 +22,7 @@ public:
     static QString selectButtonText(SystemContext* context, vms::rules::TargetLayoutsField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::TargetDevicesField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::TargetLayoutField* field);
+    static QString selectButtonText(SystemContext* context, vms::rules::TargetServerField* field);
     static QString selectButtonText(SystemContext* context, vms::rules::TargetServersField* field);
     static QString selectButtonText(
         SystemContext* context, vms::rules::TargetDeviceField* field);
@@ -35,13 +36,15 @@ public:
     static QString eventLevelDisplayString(api::EventLevel eventLevel);
     static QString autoValue();
     static QString selectString();
-    static QString sourceCameraString();
+    static QString sourceCamera();
     static QString devModeInfoTitle();
 
     static QString isListed();
     static QString isNotListed();
     static QString in();
     static QString allUsers();
+    static QString anyServer();
+    static QString sourceServer();
 
     static QString targetRecipientsString(
         const QnUserResourceList& users,

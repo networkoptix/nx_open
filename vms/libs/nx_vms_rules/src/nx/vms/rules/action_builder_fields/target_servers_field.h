@@ -8,7 +8,7 @@ namespace nx::vms::rules {
 
 constexpr auto kHasBuzzerValidationPolicy = "hasBuzzer";
 
-/** Displayed as device selection button and "Use source" checkbox. */
+/** Displayed as server selection button and "Use source" checkbox. */
 class NX_VMS_RULES_API TargetServersField: public ResourceFilterActionField
 {
     Q_OBJECT

@@ -92,6 +92,22 @@ std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rule
     return getIcon(QnResourceIconCache::Layout, QIcon::Mode::Disabled);
 }
 
+std::pair<QIcon, QIcon::Mode> selectButtonIcon(
+    SystemContext* context, vms::rules::TargetServerField* field)
+{
+    const auto id = field->value();
+
+    if (id.isNull())
+        return getIcon(QnResourceIconCache::Server, QIcon::Mode::Normal);
+
+    const auto server =
+        context->resourcePool()->getResourceById<QnMediaServerResource>(id);
+    if (server)
+        return getIcon(server, QIcon::Mode::Selected);
+
+    return getIcon(QnResourceIconCache::Server, QIcon::Mode::Disabled);
+}
+
 std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rules::TargetServersField* field)
 {
     const auto resources =
