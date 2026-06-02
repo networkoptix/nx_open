@@ -936,9 +936,9 @@ TEST_F(EventLogTest, event_storageIssue)
     static constexpr auto kExpectedSourceText = "Server1 (localhost)";
     static constexpr auto kExpectedSourceIcon = ResourceType::server;
     static constexpr auto kExpectedDescriptionTooltip = R"(
-Storage Issue at Server1 (localhost)
+Storage I/O Error at Server1 (localhost)
 15:46:29
-  System disk "C" is almost full.
+  I/O error has occurred at disk E.
 15:48:30
   I/O error has occurred at disk D.
 )";
@@ -946,8 +946,8 @@ Storage Issue at Server1 (localhost)
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
         makeTimestamp("15:46:29"),
         kServerId,
-        nx::vms::api::EventReason::systemStorageFull,
-        /*reasonText*/ "C"));
+        nx::vms::api::EventReason::storageIoError,
+        /*reasonText*/ "disk E"));
 
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
         makeTimestamp("15:48:30"),

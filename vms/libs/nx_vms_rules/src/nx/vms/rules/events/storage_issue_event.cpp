@@ -23,6 +23,11 @@ StorageIssueEvent::StorageIssueEvent(
 {
 }
 
+QString StorageIssueEvent::aggregationKey() const
+{
+    return utils::makeKey(m_serverId.toSimpleString(), QString::number((int) m_reason));
+}
+
 QVariantMap StorageIssueEvent::details(
     common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
@@ -47,8 +52,48 @@ QVariantMap StorageIssueEvent::details(
 QString StorageIssueEvent::extendedCaption(common::SystemContext* context,
     Qn::ResourceInfoLevel detailLevel) const
 {
+    using nx::vms::api::EventReason;
     const auto resourceName = Strings::resource(context, serverId(), detailLevel);
-    return tr("Storage Issue at %1").arg(resourceName);
+
+    switch (m_reason)
+    {
+        case EventReason::storageIoError:
+            return tr("Storage I/O Error at %1").arg(resourceName);
+
+        case EventReason::storageTooSlow:
+            return tr("Storage Too Slow at %1").arg(resourceName);
+
+        case EventReason::storageFull:
+            return tr("Storage Disk Full at %1").arg(resourceName);
+
+        case EventReason::systemStorageFull:
+            return tr("System Disk Almost Full at %1").arg(resourceName);
+
+        case EventReason::metadataStorageOffline:
+            return tr("Analytics Storage Offline at %1").arg(resourceName);
+
+        case EventReason::metadataStorageFull:
+            return tr("Analytics Storage Almost Full at %1").arg(resourceName);
+
+        case EventReason::metadataStoragePermissionDenied:
+            return tr("Analytics Storage Permission Error at %1").arg(resourceName);
+
+        case EventReason::encryptionFailed:
+            return tr("Storage Encryption Failed at %1").arg(resourceName);
+
+        case EventReason::raidStorageError:
+            return tr("RAID Storage Error at %1").arg(resourceName);
+
+        case EventReason::backupFailedSourceFileError:
+            return tr("Archive Backup Failed at %1").arg(resourceName);
+
+        case EventReason::none: //< Special case for unit tests.
+            return {};
+
+        default:
+            NX_ASSERT(0, "Unexpected reason: %1", m_reason);
+            return {};
+    }
 }
 
 QString StorageIssueEvent::extendedReasonText() const
@@ -97,7 +142,7 @@ QString StorageIssueEvent::extendedReasonText() const
             return {};
 
         default:
-            NX_ASSERT(0, "Unexpected reason");
+            NX_ASSERT(0, "Unexpected reason: %1", m_reason);
             return {};
     }
 }

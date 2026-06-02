@@ -1393,11 +1393,11 @@ TEST_F(NotificationActionsTest, event_storageIssue_C112755)
         descriptionWithSourceTag(kExpectedDescription, "Server1");
 
     static constexpr auto kExpectedTooltip = R"(
-Storage Issue at Server1
+System Disk Almost Full at Server1
 15:46:29
   System disk "C" is almost full.
 15:48:30
-  I/O error has occurred at disk D.
+  System disk "D" is almost full.
 )";
 
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
@@ -1409,8 +1409,8 @@ Storage Issue at Server1
     givenEvent(QSharedPointer<StorageIssueEvent>::create(
         makeTimestamp("15:48:30"),
         kServerId,
-        nx::vms::api::EventReason::storageIoError,
-        /*reasonText*/ "disk D"));
+        nx::vms::api::EventReason::systemStorageFull,
+        /*reasonText*/ "D"));
 
     thenNotificationIs(
         kExpectedCaption, kExpectedDescription, kExpectedPushDescription, kExpectedTooltip);

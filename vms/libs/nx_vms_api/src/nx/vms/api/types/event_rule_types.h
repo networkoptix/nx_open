@@ -30,11 +30,12 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     serverStarted = 5,
     localDbFailure = 900,
 
-    // Storage Failure event
+    // Storage Issue event
     storageIoError = 6,
     storageTooSlow = 7,
     storageFull = 8,
     systemStorageFull = 9,
+    backupFailedSourceFileError = 13,
     metadataStorageOffline = 1010,
     metadataStorageFull = 1011,
     raidStorageError = 1012,
@@ -49,9 +50,6 @@ NX_REFLECTION_ENUM_CLASS(EventReason,
     failedToCompleteSyncWithLdap = 26,
     noLdapUsersAfterSync = 27,
     someUsersNotFoundInLdap = 28,
-
-    // Backup Finished event & Storage Failure event
-    backupFailedSourceFileError = 13,
 
     // Saas Issue event.
     notEnoughLocalRecordingServices = 29,

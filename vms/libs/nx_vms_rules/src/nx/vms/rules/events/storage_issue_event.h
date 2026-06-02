@@ -25,7 +25,7 @@ public:
         nx::vms::api::EventReason reason,
         const QString& reasonText);
 
-    virtual QString aggregationKey() const override { return m_serverId.toSimpleString(); }
+    virtual QString aggregationKey() const override;
     virtual QVariantMap details(
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel) const override;
