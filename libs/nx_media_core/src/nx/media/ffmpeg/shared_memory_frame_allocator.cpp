@@ -31,6 +31,8 @@ extern "C" {
 #include <libavutil/imgutils.h>
 } // extern "C"
 
+#include <bit>
+
 #include <nx/ranges/std_compat.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
@@ -61,11 +63,13 @@ struct SharedMemoryBuffer
 std::size_t sharedMemoryAlignment()
 {
     // FFmpeg codecs may use wide SIMD loads on decoded planes. Keep SHM allocations aligned to
-    // at least av_cpu_max_align() and never below 64 bytes.
+    // at least av_cpu_max_align(), rounded up to a power of two for manual align-up arithmetic,
+    // and never below 64 bytes.
     const std::size_t ffmpegAlignment = std::max<std::size_t>(
         static_cast<std::size_t>(av_cpu_max_align()),
         alignof(std::max_align_t));
-    return std::max(ffmpegAlignment, kMinSharedMemoryAlignment);
+    // Guarantees a power of 2 result.
+    return std::bit_ceil(std::max(ffmpegAlignment, kMinSharedMemoryAlignment));
 }
 
 struct AvFrameDeleter
@@ -114,10 +118,15 @@ public:
         if (!m_segment)
             return nullptr;
 
-        void* ptr = nullptr;
+        // Do not use Boost allocate_aligned(): since Boost 1.88 it transiently reserves about
+        // twice the requested size while carving out the aligned block, so multi-megabyte video
+        // frames exhaust the segment long before it is actually full. Emulate aligned allocation
+        // on top of plain allocate(), which only needs `size + alignment - 1` bytes.
+        const std::size_t alignment = sharedMemoryAlignment();
+        void* base = nullptr;
         try
         {
-            ptr = m_segment->allocate_aligned(size, sharedMemoryAlignment());
+            base = m_segment->allocate(size + alignment - 1);
         }
         catch (const boost::interprocess::bad_alloc&)
         {
@@ -130,8 +139,11 @@ public:
             return nullptr;
         }
 
+        void* const ptr = reinterpret_cast<void*>(
+            (reinterpret_cast<std::uintptr_t>(base) + alignment - 1) & ~(alignment - 1));
+
         // Track active blocks for diagnostics and to reject invalid deallocation calls.
-        m_allocations[ptr] = size;
+        m_allocations[ptr] = Allocation{size, base};
         logAllocationStatsLocked("New block allocated");
         return ptr;
     }
@@ -157,10 +169,12 @@ public:
             return;
         }
 
-        // Remove tracking first, then release memory back to the segment.
+        // Remove tracking first, then release memory back to the segment. The segment knows the
+        // block by its unaligned base address, not by the aligned pointer handed out to callers.
+        void* const base = it->second.base;
         m_allocations.erase(it);
         logAllocationStatsLocked("Block de-allocated");
-        m_segment->deallocate(ptr);
+        m_segment->deallocate(base);
     }
 
     bool contains(const void* ptr) const override
@@ -190,7 +204,7 @@ private:
 
         const std::size_t totalAllocatedSize =
             nx::ranges::fold_left(
-                m_allocations | std::views::values,
+                m_allocations | std::views::values | std::views::transform(&Allocation::size),
                 std::size_t{0},
                 std::plus<>{});
 
@@ -204,9 +218,16 @@ private:
     }
 
 private:
+    struct Allocation
+    {
+        std::size_t size = 0;
+        void* base = nullptr; //< Unaligned address as returned by the segment allocator.
+    };
+
+private:
     const std::string m_segmentName;
     std::unique_ptr<SharedMemorySegment> m_segment;
-    std::map<void*, std::size_t> m_allocations;
+    std::map<void*, Allocation> m_allocations;
     mutable std::mutex m_mutex;
 };
 
