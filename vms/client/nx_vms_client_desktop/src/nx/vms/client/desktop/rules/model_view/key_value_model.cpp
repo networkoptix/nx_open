@@ -4,6 +4,8 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/vms/rules/strings.h>
+
 namespace nx::vms::client::desktop::rules {
 
 KeyValueModel::KeyValueModel(QList<vms::rules::KeyValueObject> keyValueList, QObject* parent):
@@ -69,7 +71,7 @@ QVariant KeyValueModel::headerData(int section, Qt::Orientation orientation, int
         case KeyColumn:
             return tr("Key");
         case ValueColumn:
-            return tr("Value");
+            return nx::vms::rules::Strings::value();
         default:
             return {};
     }

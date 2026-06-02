@@ -107,6 +107,7 @@ public:
     static QString selectCamera(common::SystemContext* context, bool allowMultipleSelection = true);
     static QString noSuitableServers(QValidator::State state);
     static QString fieldValueMustBeProvided(const QString& fieldName);
+    static QString value();
     static QString layoutCanOnlyBeShownToOwner(const QString& ownerName);
     static QString usersHaveNoAccessToLayout(bool allUsersWithoutAccess);
     static QString camerasWereRemoved(common::SystemContext* context, int count = 1);

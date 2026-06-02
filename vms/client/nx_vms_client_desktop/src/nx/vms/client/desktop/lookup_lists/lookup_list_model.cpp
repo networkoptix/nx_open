@@ -10,13 +10,11 @@
 #include <nx/vms/rules/event_filter_fields/object_lookup_field.h>
 #include <nx/vms/rules/event_filter_fields/text_lookup_field.h>
 #include <nx/vms/rules/rule.h>
+#include <nx/vms/rules/strings.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
-
-static const QString kDefaultAttributeName(
-    LookupListModel::tr("Value", "A value of some attribute"));
 
 void renameColumnName(nx::vms::api::LookupListData& data)
 {
@@ -45,7 +43,7 @@ LookupListModel::LookupListModel(nx::vms::api::LookupListData data, QObject* par
     m_data(std::move(data))
 {
     if (isGeneric() && m_data.attributeNames.empty())
-        m_data.attributeNames.push_back(kDefaultAttributeName);
+        m_data.attributeNames.push_back(nx::vms::rules::Strings::value());
 }
 
 LookupListModel::~LookupListModel()

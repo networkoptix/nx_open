@@ -452,6 +452,11 @@ QString Strings::fieldValueMustBeProvided(const QString& fieldName)
         .arg(fieldName);
 }
 
+QString Strings::value()
+{
+    return tr("Value", "A value of some attribute");
+}
+
 QString Strings::layoutCanOnlyBeShownToOwner(const QString& ownerName)
 {
     return tr("Chosen local layout can only be shown to its owner %1").arg(ownerName);

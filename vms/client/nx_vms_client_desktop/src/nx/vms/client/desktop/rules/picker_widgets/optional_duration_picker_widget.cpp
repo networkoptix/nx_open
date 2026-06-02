@@ -5,6 +5,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QSpinBox>
 
+#include <nx/vms/rules/strings.h>
 #include <nx/vms/rules/utils/field.h>
 #include <ui/common/read_only.h>
 #include <ui/widgets/common/elided_label.h>
@@ -49,7 +50,7 @@ OptionalDurationPicker::OptionalDurationPicker(
     else if (fieldDescriptor->fieldName == vms::rules::utils::kPlaybackTimeFieldName)
         m_label->setText(tr("For"));
     else
-        m_label->setText(tr("Value"));
+        m_label->setText(nx::vms::rules::Strings::value());
 
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Minutes);
     m_timeDurationWidget->addDurationSuffix(QnTimeStrings::Suffix::Hours);
