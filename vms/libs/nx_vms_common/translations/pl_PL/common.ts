@@ -1019,7 +1019,7 @@
     <name>QnOnlineServerPolicy</name>
     <message>
       <source>Online servers</source>
-      <translation type="unfinished">Online servers</translation>
+      <translation>Serwery online</translation>
     </message>
   </context>
   <context>

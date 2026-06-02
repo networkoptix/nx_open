@@ -255,13 +255,6 @@
     </message>
   </context>
   <context>
-    <name>DataTimeline</name>
-    <message>
-      <source>Live</source>
-      <translation>Наживо</translation>
-    </message>
-  </context>
-  <context>
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
@@ -570,10 +563,6 @@
       <source>Details</source>
       <translation>Подробиці</translation>
     </message>
-    <message>
-      <source>No data</source>
-      <translation>Немає даних</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -769,6 +758,13 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapBanner</name>
+    <message>
+      <source>Tap anywhere on video to center view there</source>
+      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+    </message>
+  </context>
+  <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
@@ -777,6 +773,13 @@
     <message>
       <source>CANCEL</source>
       <translation>СКАСУВАТИ</translation>
+    </message>
+  </context>
+  <context>
+    <name>MoveOnTapPage</name>
+    <message>
+      <source>Tap anywhere on video to center view there</source>
+      <translation type="unfinished">Tap anywhere on video to center view there</translation>
     </message>
   </context>
   <context>
@@ -900,10 +903,36 @@
     </message>
   </context>
   <context>
+    <name>PresetSwitch</name>
+    <message>
+      <source>Select Preset</source>
+      <translation type="unfinished">Select Preset</translation>
+    </message>
+  </context>
+  <context>
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
       <translation type="unfinished">Select Preset</translation>
+    </message>
+  </context>
+  <context>
+    <name>Ptz</name>
+    <message>
+      <source>PTZ</source>
+      <translation type="unfinished">PTZ</translation>
+    </message>
+    <message>
+      <source>Cancel Re-Centering</source>
+      <translation type="unfinished">Cancel Re-Centering</translation>
+    </message>
+    <message>
+      <source>PTZ Presets</source>
+      <translation>PTZ позиції</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
