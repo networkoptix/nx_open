@@ -49,9 +49,6 @@ ListView
         sectionProperty: "section"
     }
 
-    leftMargin: 20
-    rightMargin: 20
-
     header: Item
     {
         id: headerItem
@@ -66,7 +63,7 @@ ListView
         }
 
         width: parent.width
-        height: 8
+        height: 0
 
         states:
         [
@@ -81,7 +78,7 @@ ListView
                 PropertyChanges
                 {
                     cloudColumn.visible: true
-                    headerItem.height: 8 + cloudColumn.height
+                    headerItem.height: cloudColumn.height
                 }
             },
             State
@@ -94,7 +91,7 @@ ListView
                 PropertyChanges
                 {
                     cloudColumn.visible: false
-                    headerItem.height: 8
+                    headerItem.height: 0
                 }
             },
             State
@@ -108,7 +105,7 @@ ListView
                 PropertyChanges
                 {
                     cloudColumn.visible: true
-                    headerItem.height: 8 + cloudColumn.height
+                    headerItem.height: cloudColumn.height
                 }
             }
         ]
@@ -119,7 +116,6 @@ ListView
             spacing: 12
             visible: false
             width: parent.width
-            y: 12
 
             Text
             {
@@ -189,7 +185,7 @@ ListView
     footer: Item
     {
         width: parent.width
-        height: 16
+        height: LayoutController.isTablet ? 20 : 16
     }
 
     property string searchText: ""
@@ -249,6 +245,8 @@ ListView
             ? sectionTextParts[2]
             : ""
 
+        readonly property bool isFirstSection: y === 0
+
         width: parent.width
         spacing: 12
 
@@ -258,6 +256,8 @@ ListView
 
             visible: placeholderDescription
             Layout.alignment: Qt.AlignHCenter
+            Layout.topMargin: 16
+            Layout.bottomMargin: 28
 
             imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10"
             text: qsTr("Nothing Found")
@@ -268,7 +268,7 @@ ListView
         {
             id: titleText
 
-            Layout.topMargin: 24
+            Layout.topMargin: sectionItem.isFirstSection ? 0 : 24
             Layout.fillWidth: true
 
             color: ColorTheme.colors.light4
@@ -285,7 +285,9 @@ ListView
             id: descriptionText
 
             visible: text
-            Layout.topMargin: sectionTitle ? 0 : (siteList.cellsInRow == 1 ? 16 : 24)
+            Layout.topMargin: sectionTitle
+                ? 0
+                : (sectionItem.isFirstSection ? 0 : (siteList.cellsInRow == 1 ? 16 : 24))
             Layout.bottomMargin: 8
             Layout.fillWidth: true
 

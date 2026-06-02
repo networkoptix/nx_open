@@ -463,227 +463,237 @@ AdaptiveScreen
     {
         id: sessionsScreenContent
 
-        Breadcrumb
+        property bool currentRootLoading: false
+        property bool waitingForLastOpened: appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
+            && appGlobalState.lastOpenedNodeId !== undefined
+        readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
+            && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
+            || !organizationsModel.firstLoadAttemptFinished
+
+        ColumnLayout
         {
-            id: breadcrumb
-
-            readonly property bool canBeShown: !LayoutController.isTabletLayout
-                && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-                && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
-
-            width: parent.width
-            visible: false
-
-            model:
-            {
-                if (!canBeShown || !visible)
-                    return []
-
-                const start = linearizationListModel.sourceRoot?.parent
-                if (!start || start === NxGlobals.invalidModelIndex())
-                    return []
-
-                let data = []
-                for (let node = start; node && node.row !== -1; node = node.parent)
-                {
-                    data.push({
-                        name: accessor.getData(node, "display"),
-                        nodeId: accessor.getData(node, "nodeId")
-                    })
-                }
-
-                return data.reverse()
-            }
-
-            onItemClicked: (nodeId) => goBack(organizationsModel.indexFromNodeId(nodeId))
-
-            onCanBeShownChanged:
-            {
-                if (!canBeShown)
-                    visible = false
-            }
-
-            Connections
-            {
-                target: sessionsScreen.toolBar
-
-                function onToolBarClicked()
-                {
-                    if (breadcrumb.canBeShown)
-                        breadcrumb.visible = !breadcrumb.visible
-                }
-            }
-        }
-
-        HorizontalSlide
-        {
-            id: siteListContainer
-
             anchors.fill: parent
-            anchors.topMargin: 20 + (breadcrumb.visible ? breadcrumb.height : 0)
+            anchors.topMargin: breadcrumb.visible ? 0 : (LayoutController.isTablet ? 20 : 8)
+            spacing: LayoutController.isTablet ? 20 : 16
 
-            visible: !loadingIndicator.visible
-
-            ColumnLayout
+            Breadcrumb
             {
-                anchors.fill: parent
-                spacing: 20
+                id: breadcrumb
 
-                SearchEdit
+                readonly property bool canBeShown: !LayoutController.isTabletLayout
+                    && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+                    && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
+
+                Layout.fillWidth: true
+
+                visible: false
+
+                model:
                 {
-                    id: searchField
+                    if (!canBeShown || !visible)
+                        return []
 
-                    Layout.fillWidth: true
-                    Layout.leftMargin: 20
-                    Layout.rightMargin: 20
+                    const start = linearizationListModel.sourceRoot?.parent
+                    if (!start || start === NxGlobals.invalidModelIndex())
+                        return []
 
-                    implicitHeight: 36
-                    placeholderText: qsTr("Search")
-                    visible: siteList.count !== 0
+                    let data = []
+                    for (let node = start; node && node.row !== -1; node = node.parent)
+                    {
+                        data.push({
+                            name: accessor.getData(node, "display"),
+                            nodeId: accessor.getData(node, "nodeId")
+                        })
+                    }
+
+                    return data.reverse()
                 }
 
-                Rectangle
+                onItemClicked: (nodeId) => goBack(organizationsModel.indexFromNodeId(nodeId))
+
+                onCanBeShownChanged:
                 {
-                    id: systemTabs
+                    if (!canBeShown)
+                        visible = false
+                }
 
-                    Layout.fillWidth: true
-                    color: ColorTheme.colors.dark5
-                    implicitHeight: 48
-                    z: 1
-                    visible: !sessionsScreen.searching
-                        && !organizationsModel.topLevelLoading
-                        && cloudUserProfileWatcher.isOrgUser
-                        && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
+                Connections
+                {
+                    target: sessionsScreen.toolBar
 
-                    readonly property var selectedTab:
+                    function onToolBarClicked()
                     {
-                        if (partnersTabButton.checked)
-                            return OrganizationsModel.ChannelPartnersTab
+                        if (breadcrumb.canBeShown)
+                            breadcrumb.visible = !breadcrumb.visible
+                    }
+                }
+            }
 
-                        if (organizationsTabButton.checked)
-                            return OrganizationsModel.OrganizationsTab
+            SearchEdit
+            {
+                id: searchField
 
-                        return OrganizationsModel.SitesTab
+                Layout.fillWidth: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+
+                implicitHeight: 36
+                placeholderText: qsTr("Search")
+                visible: !sessionsScreenContent.loading && siteList.count !== 0
+            }
+
+            Rectangle
+            {
+                id: systemTabs
+
+                Layout.fillWidth: true
+                Layout.preferredHeight: 48
+
+                color: ColorTheme.colors.dark5
+                z: 1
+                visible: !sessionsScreen.searching
+                    && !organizationsModel.topLevelLoading
+                    && cloudUserProfileWatcher.isOrgUser
+                    && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
+
+                readonly property var selectedTab:
+                {
+                    if (partnersTabButton.checked)
+                        return OrganizationsModel.ChannelPartnersTab
+
+                    if (organizationsTabButton.checked)
+                        return OrganizationsModel.OrganizationsTab
+
+                    return OrganizationsModel.SitesTab
+                }
+
+                Row
+                {
+                    id: systemTabsRow
+
+                    spacing: 0
+                    x: 20
+                    y: 4
+
+                    height: visible ? implicitHeight : 0
+
+                    NavigationButton
+                    {
+                        id: partnersTabButton
+
+                        text: qsTr("Partners") + (sessionsScreen.searching ? " (%1)".arg(siteList.partnerCount) : "")
+                        visible: organizationsModel.hasChannelPartners
+                        checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
+                        onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                     }
 
-                    Row
+                    NavigationButton
                     {
-                        id: systemTabsRow
+                        id: organizationsTabButton
 
-                        spacing: 0
-                        x: 20
-                        y: 4
-
-                        height: visible ? implicitHeight : 0
-
-                        NavigationButton
-                        {
-                            id: partnersTabButton
-
-                            text: qsTr("Partners") + (sessionsScreen.searching ? " (%1)".arg(siteList.partnerCount) : "")
-                            visible: organizationsModel.hasChannelPartners
-                            checked: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
-                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
-                        }
-
-                        NavigationButton
-                        {
-                            id: organizationsTabButton
-
-                            text: qsTr("Organizations") + (sessionsScreen.searching ? " (%1)".arg(siteList.organizationCount) : "")
-                            visible: organizationsModel.hasOrganizations
-                            checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
-                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
-                        }
-
-                        NavigationButton
-                        {
-                            id: sitesTabButton
-
-                            text: qsTr("Sites") + (sessionsScreen.searching ? " (%1)".arg(siteList.siteCount) : "")
-                            checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
-                            onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
-                        }
+                        text: qsTr("Organizations") + (sessionsScreen.searching ? " (%1)".arg(siteList.organizationCount) : "")
+                        visible: organizationsModel.hasOrganizations
+                        checked: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
+                        onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
                     }
 
-                    function updateCheckedState()
+                    NavigationButton
                     {
-                        if (organizationsModel.topLevelLoading)
+                        id: sitesTabButton
+
+                        text: qsTr("Sites") + (sessionsScreen.searching ? " (%1)".arg(siteList.siteCount) : "")
+                        checked: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
+                        onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
+                    }
+                }
+
+                function updateCheckedState()
+                {
+                    if (organizationsModel.topLevelLoading)
+                        return
+
+                    const savedTab = appGlobalState.lastSelectedOrgTab
+                    if (savedTab !== -1)
+                    {
+                        const savedAvailable =
+                            (savedTab === OrganizationsModel.ChannelPartnersTab
+                                && organizationsModel.hasChannelPartners)
+                            || (savedTab === OrganizationsModel.OrganizationsTab
+                                && organizationsModel.hasOrganizations)
+                            || (savedTab === OrganizationsModel.SitesTab)
+
+
+                        if (savedAvailable)
+                        {
+                            sessionsScreen.selectedTab = savedTab
                             return
-
-                        const savedTab = appGlobalState.lastSelectedOrgTab
-                        if (savedTab !== -1)
-                        {
-                            const savedAvailable =
-                                (savedTab === OrganizationsModel.ChannelPartnersTab
-                                    && organizationsModel.hasChannelPartners)
-                                || (savedTab === OrganizationsModel.OrganizationsTab
-                                    && organizationsModel.hasOrganizations)
-                                || (savedTab === OrganizationsModel.SitesTab)
-
-
-                            if (savedAvailable)
-                            {
-                                sessionsScreen.selectedTab = savedTab
-                                return
-                            }
-                        }
-
-                        if (cloudUserProfileWatcher.isOrgUser)
-                        {
-                            if (organizationsModel.hasChannelPartners)
-                            {
-                                sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
-                                return
-                            }
-                            if (organizationsModel.hasOrganizations)
-                            {
-                                sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
-                                return
-                            }
-                        }
-
-                        sessionsScreen.selectedTab = OrganizationsModel.SitesTab
-                    }
-
-                    Connections
-                    {
-                        target: organizationsModel
-                        function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
-                        function onHasChannelPartnersChanged() { systemTabs.updateCheckedState() }
-                        function onHasOrganizationsChanged() { systemTabs.updateCheckedState() }
-                    }
-
-                    Connections
-                    {
-                        target: cloudUserProfileWatcher
-                        function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
-                    }
-
-                    Connections
-                    {
-                        target: appContext.cloudStatusWatcher
-                        function onStatusChanged()
-                        {
-                            if (appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut)
-                                appGlobalState.lastSelectedOrgTab = -1
                         }
                     }
 
-                    Connections
+                    if (cloudUserProfileWatcher.isOrgUser)
                     {
-                        target: sessionsScreen
-                        function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                        if (organizationsModel.hasChannelPartners)
+                        {
+                            sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
+                            return
+                        }
+                        if (organizationsModel.hasOrganizations)
+                        {
+                            sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
+                            return
+                        }
+                    }
+
+                    sessionsScreen.selectedTab = OrganizationsModel.SitesTab
+                }
+
+                Connections
+                {
+                    target: organizationsModel
+                    function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
+                    function onHasChannelPartnersChanged() { systemTabs.updateCheckedState() }
+                    function onHasOrganizationsChanged() { systemTabs.updateCheckedState() }
+                }
+
+                Connections
+                {
+                    target: cloudUserProfileWatcher
+                    function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
+                }
+
+                Connections
+                {
+                    target: appContext.cloudStatusWatcher
+                    function onStatusChanged()
+                    {
+                        if (appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut)
+                            appGlobalState.lastSelectedOrgTab = -1
                     }
                 }
 
+                Connections
+                {
+                    target: sessionsScreen
+                    function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                }
+            }
+
+            HorizontalSlide
+            {
+                id: siteListContainer
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.leftMargin: 20
+                Layout.rightMargin: 20
+
+                visible: !loadingIndicator.visible
 
                 SiteList
                 {
                     id: siteList
 
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    anchors.fill: parent
                     visible: !loadingIndicator.visible
                     siteModel: linearizationListModel
                     hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
@@ -740,128 +750,128 @@ AdaptiveScreen
                             goInto(organizationsModel.indexFromNodeId(nodeId))
                     }
                 }
-            }
 
-            Placeholder
-            {
-                id: emptyListPlaceholder
-                objectName: "emptyListPlaceholder"
-
-                visible: siteList.count == 0 && !loadingIndicator.visible
-
-                property bool isAdministrator: false
-
-                readonly property var textData:
+                Placeholder
                 {
-                    const kNoSites = qsTr("No Sites")
+                    id: emptyListPlaceholder
+                    objectName: "emptyListPlaceholder"
 
-                    if (sessionsScreen.searching)
+                    visible: siteList.count == 0 && !loadingIndicator.visible
+
+                    property bool isAdministrator: false
+
+                    readonly property var textData:
                     {
-                        return {
-                            imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10",
-                            text: qsTr("Nothing found"),
-                            description: qsTr("Try changing the search parameters")
-                        }
-                    }
-                    if ((sessionsScreen.state === "loggedIn"
-                            && organizationsTabButton.checked
-                            && cloudUserProfileWatcher.isOrgUser)
-                        || (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-                            && rootType == OrganizationsModel.ChannelPartner))
-                    {
-                        return {
-                            imageSource: "image://skin/64x64/Outline/no_organization.svg?primary=light10",
-                            text: qsTr("No Organizations"),
-                            description:
-                                qsTr("Create an organization in the Cloud Portal to access it here")
-                        }
-                    }
-                    if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-                        && rootType == OrganizationsModel.Organization)
-                    {
-                        if (accessor.getData(sessionsScreen.rootIndex, "isAccessDenied") ?? false)
+                        const kNoSites = qsTr("No Sites")
+
+                        if (sessionsScreen.searching)
                         {
                             return {
-                                imageSource: "image://skin/64x64/Outline/no_access.svg?primary=light10",
-                                text: qsTr("Access to Resources Denied"),
-                                description: qsTr("The resources in this organization are not "
-                                    + "available to your permission group"),
+                                imageSource: "image://skin/64x64/Outline/notfound.svg?primary=light10",
+                                text: qsTr("Nothing found"),
+                                description: qsTr("Try changing the search parameters")
+                            }
+                        }
+                        if ((sessionsScreen.state === "loggedIn"
+                                && organizationsTabButton.checked
+                                && cloudUserProfileWatcher.isOrgUser)
+                            || (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+                                && rootType == OrganizationsModel.ChannelPartner))
+                        {
+                            return {
+                                imageSource: "image://skin/64x64/Outline/no_organization.svg?primary=light10",
+                                text: qsTr("No Organizations"),
+                                description:
+                                    qsTr("Create an organization in the Cloud Portal to access it here")
+                            }
+                        }
+                        if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+                            && rootType == OrganizationsModel.Organization)
+                        {
+                            if (accessor.getData(sessionsScreen.rootIndex, "isAccessDenied") ?? false)
+                            {
+                                return {
+                                    imageSource: "image://skin/64x64/Outline/no_access.svg?primary=light10",
+                                    text: qsTr("Access to Resources Denied"),
+                                    description: qsTr("The resources in this organization are not "
+                                        + "available to your permission group"),
+                                }
+                            }
+
+                            return {
+                                imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
+                                text: kNoSites,
+                                description: qsTr("Connect a site to the organization to access it here"),
+                                buttonText: isAdministrator ? qsTr("How to connect?") : "",
+                                buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
+                                clickHandler: () => { cloudConnectionHelp.open() }
+                            }
+                        }
+                        if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
+                            && rootType == OrganizationsModel.Folder)
+                        {
+                            return {
+                                imageSource: "image://skin/64x64/Outline/openfolder.svg?primary=light10",
+                                text: qsTr("Folder is empty"),
+                                description: ""
+                            }
+                        }
+                        if (sessionsScreen.state === "loggedOut")
+                        {
+                            return {
+                                imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
+                                text: kNoSites,
+                                description: qsTr("No accessible sites were found. " +
+                                    "Log in into the cloud account or connect to a local server"),
+                                buttonText: qsTr("Log In"),
+                                buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
+                                clickHandler: () => { Workflow.openCloudLoginScreen() }
                             }
                         }
 
                         return {
                             imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
                             text: kNoSites,
-                            description: qsTr("Connect a site to the organization to access it here"),
-                            buttonText: isAdministrator ? qsTr("How to connect?") : "",
-                            buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
-                            clickHandler: () => { cloudConnectionHelp.open() }
-                        }
-                    }
-                    if (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-                        && rootType == OrganizationsModel.Folder)
-                    {
-                        return {
-                            imageSource: "image://skin/64x64/Outline/openfolder.svg?primary=light10",
-                            text: qsTr("Folder is empty"),
-                            description: ""
-                        }
-                    }
-                    if (sessionsScreen.state === "loggedOut")
-                    {
-                        return {
-                            imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
-                            text: kNoSites,
                             description: qsTr("No accessible sites were found. " +
-                                "Log in into the cloud account or connect to a local server"),
-                            buttonText: qsTr("Log In"),
-                            buttonIconSource: "image://skin/24x24/Outline/cloud.svg?primary=dark1",
-                            clickHandler: () => { Workflow.openCloudLoginScreen() }
+                                "Request access to existing sites or connect to a local server"),
                         }
                     }
 
-                    return {
-                        imageSource: "image://skin/64x64/Outline/nosite.svg?primary=light10",
-                        text: kNoSites,
-                        description: qsTr("No accessible sites were found. " +
-                            "Request access to existing sites or connect to a local server"),
+                    anchors.centerIn: parent
+                    imageSource: textData.imageSource
+                    text: textData.text
+                    description: textData.description
+                    buttonText: textData.buttonText || ""
+                    buttonIcon.source: textData.buttonIconSource || ""
+                    onButtonClicked: textData.clickHandler()
+                }
+
+                IconButton
+                {
+                    id: customConnectionButton
+
+                    visible: localSitesVisible && !searching && !organizationsModel.topLevelLoading
+
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    anchors.bottomMargin: 20
+                    anchors.rightMargin: 20
+
+                    icon.source: "image://skin/24x24/Outline/plus.svg?primary=dark1"
+                    icon.width: 24
+                    icon.height: 24
+                    padding: 16
+
+                    TapHandler
+                    {
+                        onTapped: siteConnectionSheet.connectToSite()
                     }
-                }
 
-                anchors.centerIn: parent
-                imageSource: textData.imageSource
-                text: textData.text
-                description: textData.description
-                buttonText: textData.buttonText || ""
-                buttonIcon.source: textData.buttonIconSource || ""
-                onButtonClicked: textData.clickHandler()
-            }
-
-            IconButton
-            {
-                id: customConnectionButton
-
-                visible: localSitesVisible && !searching && !organizationsModel.topLevelLoading
-
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.bottomMargin: 20
-                anchors.rightMargin: 20
-
-                icon.source: "image://skin/24x24/Outline/plus.svg?primary=dark1"
-                icon.width: 24
-                icon.height: 24
-                padding: 16
-
-                TapHandler
-                {
-                    onTapped: siteConnectionSheet.connectToSite()
-                }
-
-                background: Rectangle
-                {
-                    color: ColorTheme.colors.light10
-                    radius: 16
+                    background: Rectangle
+                    {
+                        color: ColorTheme.colors.light10
+                        radius: 16
+                    }
                 }
             }
         }
@@ -871,14 +881,8 @@ AdaptiveScreen
             id: loadingIndicator
 
             anchors.fill: parent
-            visible: loading && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
+            visible: sessionsScreenContent.loading && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
 
-            property bool currentRootLoading: false
-            property bool waitingForLastOpened: appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
-                && appGlobalState.lastOpenedNodeId !== undefined
-            readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
-                && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
-                || !organizationsModel.firstLoadAttemptFinished
             readonly property bool topTabsVisible: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
 
             Row
@@ -991,7 +995,7 @@ AdaptiveScreen
                 || NxGlobals.fromPersistent(sessionsScreen.rootIndex)
                     === NxGlobals.invalidModelIndex()
 
-            loadingIndicator.currentRootLoading =
+            sessionsScreenContent.currentRootLoading =
                 !isCurrentRootInvalid
                 && accessor.getData(sessionsScreen.rootIndex, "isLoading")
 
