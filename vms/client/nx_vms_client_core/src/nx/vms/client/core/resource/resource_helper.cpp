@@ -22,6 +22,9 @@ ResourceHelper::ResourceHelper(QObject* parent):
 
 void ResourceHelper::setResource(const QnResourcePtr& value)
 {
+    if (m_resource == value)
+        return;
+
     m_connections.reset();
 
     m_resource = value;

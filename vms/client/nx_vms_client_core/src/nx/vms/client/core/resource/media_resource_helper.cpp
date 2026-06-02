@@ -266,6 +266,9 @@ void MediaResourceHelper::Private::handleResourceChanged()
         return;
     }
 
+    if (cameraResource == camera)
+        return;
+
     if (camera)
         camera->disconnect(this);
 
