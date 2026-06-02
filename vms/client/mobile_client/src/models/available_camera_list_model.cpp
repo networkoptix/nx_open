@@ -268,10 +268,18 @@ void QnAvailableCameraListModelPrivate::addCamera(
         this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
     connect(resource.get(), &QnResource::propertyChanged,
         this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
-    connect(resource.get(), &QnResource::nameChanged,
-            this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
-    connect(resource.get(), &QnResource::statusChanged,
-            this, &QnAvailableCameraListModelPrivate::handleResourceChanged);
+    connect(resource.get(), &QnResource::nameChanged, this,
+        [this](const QnResourcePtr& changedResource)
+        {
+            Q_Q(QnAvailableCameraListModel);
+            q->refreshResource(changedResource, ResourceNameRole);
+        });
+    connect(resource.get(), &QnResource::statusChanged, this,
+        [this](const QnResourcePtr& changedResource, Qn::StatusChangeReason)
+        {
+            Q_Q(QnAvailableCameraListModel);
+            q->refreshResource(changedResource, ResourceStatusRole);
+        });
 
     const auto row = resources.size();
 
