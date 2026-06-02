@@ -165,6 +165,33 @@ AdaptiveScreen
         onClicked: screenController.clearFilters()
     }
 
+    TextButton // TODO: Should be right control, but tool bar does not work well with wide buttons. Need to refactor tool bar.
+    {
+        id: clearButton
+
+        parent: screen.toolBar
+        anchors.right: parent.right
+        anchors.rightMargin: 20
+        anchors.verticalCenter: parent.verticalCenter
+
+        text: qsTr("Reset")
+        visible: !LayoutController.isTabletLayout
+            && screen.contentItem === optionSelectorItem
+            && !!optionSelectorItem.selector
+            && !optionSelectorItem.selector.isDefaultValue
+
+        onClicked:
+        {
+            optionSelectorItem.clear()
+            if (optionSelectorItem.closesOnApply)
+            {
+                optionSelectorItem.apply()
+                screenController.updateIfRequired()
+                screen.contentItem = filtersItem
+            }
+        }
+    }
+
     overlayItem: searchCanceller
     contentItem: customResourceId ? searchContent : eventSearchMenu
 
