@@ -12,7 +12,10 @@ QtObject
     readonly property int headerHeight: 64
 
     // Width of the side panels on tablet layout.
-    property int panelWidth: appContext.settings.sidePanelWidth
+    readonly property int panelWidth: appContext.settings.sidePanelWidth
+
+    // Width of the sheet on tablet layout. By design is unified with the side panel width.
+    readonly property int sheetWidth: panelWidth
 
     // Minimum width of the content area between the side panels on tablet layout. If a panel
     // would push the content area below this threshold, the auto-close logic in AdaptiveScreen

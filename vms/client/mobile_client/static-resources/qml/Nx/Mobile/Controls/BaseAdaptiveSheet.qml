@@ -25,7 +25,7 @@ Drawer
 
     x: (parent.width - width) / 2
     edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
-    width: LayoutController.isPortrait ? Math.min(parent.width, 640) : 400
+    width: LayoutController.isPortrait ? Math.min(parent.width, 640) : StyleHints.sheetWidth
     height:
     {
         if (!LayoutController.isPortrait)

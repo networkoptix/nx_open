@@ -444,7 +444,7 @@ AdaptiveScreen
         parent: screen.leftPanel
         x: screen.leftPanel.width + screen.spacing
         height: screen.leftPanel.height
-        width: 330
+        width: StyleHints.sheetWidth
         closePolicy: Controls.Popup.CloseOnPressOutsideParent | Controls.Popup.CloseOnEscape
         visible: false
         modal: false

@@ -221,7 +221,7 @@ private:
         QN_DECLARE_RW_PROPERTY(
             int,
             sidePanelWidth, setSidePanelWidth,
-            SidePanelWidth, 330)
+            SidePanelWidth, 360)
 
     QN_END_PROPERTY_STORAGE()
 
