@@ -11271,6 +11271,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
       <source>There are no suitable servers</source>
       <translation type="unfinished">There are no suitable servers</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Zdrojový server</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Vyberte Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -13160,10 +13168,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Zdrojová kamera</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation type="unfinished">No target</translation>
     </message>
@@ -13191,10 +13195,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Any Camera</source>
       <translation>Jakákoliv kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Jakýkoli server</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

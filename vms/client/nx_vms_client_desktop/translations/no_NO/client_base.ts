@@ -10946,6 +10946,14 @@ Ikke fest dette sertifikatet hvis du ikke har endret %2 Server SSL-sertifikat.</
       <source>There are no suitable servers</source>
       <translation>Det finnes ingen passende servere</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Kildeserver</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Velg servere</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12794,10 +12802,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kildekamera</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Ingen mål</translation>
     </message>
@@ -12823,10 +12827,6 @@ Vi anbefaler at du ikke åpner denne nettsiden. Hvis du forstår risikoen, kan d
     <message>
       <source>Any Camera</source>
       <translation>Hvilket som helst kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Enhver server</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

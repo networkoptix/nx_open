@@ -10949,6 +10949,14 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <source>There are no suitable servers</source>
       <translation>Il n'y a pas de serveurs appropriés</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Serveur source</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Sélectionner un serveur</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12799,10 +12807,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Source Caméra</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Aucune cible</translation>
     </message>
@@ -12828,10 +12832,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Any Camera</source>
       <translation>N’importe quelle caméra</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>N’importe quel serveur</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

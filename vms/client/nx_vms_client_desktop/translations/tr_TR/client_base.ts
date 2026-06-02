@@ -10945,6 +10945,14 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>There are no suitable servers</source>
       <translation>Uygun sunucu yok</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Kaynak Sunucu</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Sunucuları seçin</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12792,10 +12800,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kaynak Kamera</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Hedef yok</translation>
     </message>
@@ -12821,10 +12825,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>Any Camera</source>
       <translation>Herhangi bir kamera</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Herhangi bir sunucu</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

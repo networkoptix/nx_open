@@ -10788,6 +10788,14 @@ Jangan sematkan sertifikat ini jika Anda tidak memodifikasi %2 Sertifikat SSL se
       <source>There are no suitable servers</source>
       <translation>Tidak ada server yang cocok</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Server Sumber</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Pilih Server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12617,10 +12625,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Kamera source</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Tidak ada target</translation>
     </message>
@@ -12645,10 +12649,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Any Camera</source>
       <translation>Kamera Apa Pun</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Server Mana pun</translation>
     </message>
     <message>
       <source>Select at least one layout</source>

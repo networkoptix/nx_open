@@ -1320,6 +1320,13 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::rules::TargetServerFieldValidator</name>
+    <message>
+      <source>Select online server</source>
+      <translation>Wybierz serwer online</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>

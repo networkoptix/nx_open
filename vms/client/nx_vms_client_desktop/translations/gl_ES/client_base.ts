@@ -10949,6 +10949,14 @@ Non fixes este certificado se non modificaches o Certificado SSL do servidor %2.
       <source>There are no suitable servers</source>
       <translation>Non hai servidores axeitados</translation>
     </message>
+    <message>
+      <source>Source Server</source>
+      <translation>Servidor fonte</translation>
+    </message>
+    <message>
+      <source>Select Server</source>
+      <translation>Selecciona un servidor</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -12798,10 +12806,6 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
       </translation>
     </message>
     <message>
-      <source>Source camera</source>
-      <translation>Cámara fonte</translation>
-    </message>
-    <message>
       <source>No target</source>
       <translation>Sen obxectivo</translation>
     </message>
@@ -12827,10 +12831,6 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     <message>
       <source>Any Camera</source>
       <translation>Calquera cámara</translation>
-    </message>
-    <message>
-      <source>Any Server</source>
-      <translation>Calquera servidor</translation>
     </message>
     <message>
       <source>Select at least one layout</source>
