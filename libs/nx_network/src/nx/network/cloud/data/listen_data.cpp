@@ -16,6 +16,7 @@ void ListenRequest::serializeAttributes(nx::network::stun::Message* const messag
     message->newAttribute<stun::extension::attrs::SystemId>(systemId);
     message->newAttribute<stun::extension::attrs::ServerId>(serverId);
     message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->newAttribute<stun::extension::attrs::Customization>(customization);
 }
 
 bool ListenRequest::parseAttributes(const nx::network::stun::Message& message)
@@ -29,6 +30,8 @@ bool ListenRequest::parseAttributes(const nx::network::stun::Message& message)
     {
         cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
     }
+
+    readStringAttributeValue<stun::extension::attrs::Customization>(message, &customization);
 
     return
         readStringAttributeValue<stun::extension::attrs::SystemId>(message, &systemId) &&

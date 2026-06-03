@@ -9,7 +9,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "connection_mediator_url_fetcher.h"
 #include "mediator/api/mediator_api_http_paths.h"
 #include "mediator_endpoint_provider.h"
 #include "mediator_stun_client.h"
@@ -61,7 +60,8 @@ void MediatorConnector::mockupCloudModulesXmlUrl(
 }
 
 void MediatorConnector::mockupMediatorAddress(
-    const MediatorAddress& mediatorAddress)
+    const MediatorAddress& mediatorAddress,
+    std::optional<std::string_view> stunHttpTunnelPath)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
@@ -78,7 +78,8 @@ void MediatorConnector::mockupMediatorAddress(
         m_mediatorEndpointProvider->mockupMediatorAddress(mediatorAddress);
     }
 
-    establishTcpConnectionToMediatorAsync();
+    establishTcpConnectionToMediatorAsync(
+        stunHttpTunnelPath ? *stunHttpTunnelPath : api::kStunOverHttpTunnelPath);
 }
 
 void MediatorConnector::setSystemCredentials(std::optional<SystemCredentials> value)
@@ -166,13 +167,13 @@ void MediatorConnector::stopWhileInAioThread()
         m_mediatorEndpointProvider->pleaseStopSync();
 }
 
-void MediatorConnector::establishTcpConnectionToMediatorAsync()
+void MediatorConnector::establishTcpConnectionToMediatorAsync(std::string_view stunHttpTunnelPath)
 {
     NX_ASSERT(m_mediatorEndpointProvider->mediatorAddress());
 
     auto createStunTunnelUrl =
         nx::network::url::Builder(m_mediatorEndpointProvider->mediatorAddress()->tcpUrl)
-            .appendPath(api::kStunOverHttpTunnelPath).toUrl();
+            .appendPath(stunHttpTunnelPath).toUrl();
 
     m_stunClient->connect(
         createStunTunnelUrl,

@@ -25,6 +25,7 @@ struct NX_NETWORK_API ListenRequest:
     std::string systemId;
     std::string serverId;
     CloudConnectVersion cloudConnectVersion = kCurrentCloudConnectVersion;
+    std::string customization;
 
     ListenRequest();
 

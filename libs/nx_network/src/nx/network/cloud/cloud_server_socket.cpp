@@ -2,6 +2,7 @@
 
 #include "cloud_server_socket.h"
 
+#include <nx/branding.h>
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
@@ -591,6 +592,8 @@ void CloudServerSocket::issueRegistrationRequest()
     listenRequestData.systemId = cloudCredentials->systemId;
     listenRequestData.serverId = cloudCredentials->serverId;
     listenRequestData.cloudConnectVersion = m_cloudConnectVersion;
+    listenRequestData.customization = nx::branding::customization().toStdString();
+
     m_mediatorConnection->listen(
         std::move(listenRequestData),
         std::bind(&CloudServerSocket::onListenRequestCompleted, this, _1, _2));

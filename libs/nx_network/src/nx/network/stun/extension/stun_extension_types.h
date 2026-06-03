@@ -145,6 +145,7 @@ enum AttributeType
     duration,
     tunnelConnectResponseTime,
     mediatorResponseTime,
+    customization,
 
 
     systemErrorCode = stun::attrs::userDefined + 0x500,
@@ -342,6 +343,8 @@ struct NX_NETWORK_API MediatorResponseTime : stun::attrs::Int64Attribute
     MediatorResponseTime(StdChronoDuration value) :
         stun::attrs::Int64Attribute(TYPE, value.count()) {}
 };
+
+using Customization = StringAttribute<AttributeType::customization>;
 
 } // namespace attrs
 

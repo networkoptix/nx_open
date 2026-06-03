@@ -82,8 +82,12 @@ public:
     /**
      * Injects mediator url.
      * As a result, no mediator url resolution will happen.
+     * @param stunHttpTunnelPath optional override for the STUN HTTP tunnel request path. Default
+     * value if none is given is /stun_tunnel_auth.
      */
-    void mockupMediatorAddress(const MediatorAddress& mediatorAddress);
+    void mockupMediatorAddress(
+        const MediatorAddress& mediatorAddress,
+        std::optional<std::string_view> stunHttpTunnelPath = std::nullopt);
 
     void setSystemCredentials(std::optional<SystemCredentials> value);
 
@@ -125,7 +129,7 @@ private:
 
     virtual void stopWhileInAioThread() override;
 
-    void establishTcpConnectionToMediatorAsync();
+    void establishTcpConnectionToMediatorAsync(std::string_view stunHttpTunnelPath);
 };
 
 } // namespace nx::hpm::api
