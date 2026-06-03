@@ -873,6 +873,7 @@ bool Player::Private::initDataProvider()
     dataConsumer->setAllowHardwareAcceleration(allowHardwareAcceleration);
     dataConsumer->setAllowSoftwareDecoderFallback(allowSoftwareDecoderFallback);
     updateAudio();
+    archiveReader->setSpeed(speed);
 
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<Private>(this)]()
