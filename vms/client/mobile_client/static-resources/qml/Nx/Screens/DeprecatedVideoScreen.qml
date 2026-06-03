@@ -428,7 +428,7 @@ Page
             y: needOffset ? -header.height : 0
             x: -windowParams.leftMargin
             width: mainWindow.width
-            height: mainWindow.height - (needOffset ? 0 : header.height)
+            height: mainWindow.height - navigator.height - (needOffset ? 0 : header.height)
 
             visible: active
             active: d.cameraWarningVisible
@@ -438,11 +438,11 @@ Page
                 VideoDummy
                 {
                     readonly property bool onlyCompactTitleIsVisible:
-                        compact && title != "" && description == "" && buttonText == ""
+                        videoScreen.height < 540 && !!text && !action
 
                     rightPadding: 8 + windowParams.rightMargin
                     leftPadding: 8 + windowParams.leftMargin
-                    compact: videoScreen.height < 540
+                    backgroundColor: videoScreen.backgroundColor
                     state: controller.dummyState
 
                     MouseArea
@@ -452,7 +452,7 @@ Page
                         onClicked: toggleUi()
                     }
 
-                    onButtonClicked:
+                    onLogInClicked:
                         controller.resourceHelper.cloudAuthorize()
                 }
             }

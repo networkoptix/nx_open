@@ -1,15 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Controls
 
-import Nx.Core
-import Nx.Core.Controls
-import Nx.Items
-import Nx.Ui
-
-DummyMessage
+VideoPlaceholder
 {
-    id: dummyMessage
+    id: control
+
+    signal logInClicked()
 
     state: ""
 
@@ -19,9 +17,10 @@ DummyMessage
             name: ""
             PropertyChanges
             {
-                target: dummyMessage
-                title: ""
-                image: ""
+                target: control
+                type: VideoPlaceholder.Info
+                text: ""
+                imageSource: ""
             }
         },
         State
@@ -29,9 +28,10 @@ DummyMessage
             name: "serverOffline"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Server offline")
-                image: lp("/images/alert_server_offline.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Offline")
+                imageSource: "image://skin/48x48/Outline/error.svg"
             }
         },
         State
@@ -39,10 +39,11 @@ DummyMessage
             name: "needsCloudAuthorization"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Information required")
-                image: lp("/images/alert_locked.png")
-                buttonText: qsTr("Log In")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Information required")
+                imageSource: "image://skin/48x48/Outline/lock.svg"
+                action: logInAction
             }
         },
         State
@@ -50,9 +51,10 @@ DummyMessage
             name: "is2FaDisabled"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("2FA Disabled")
-                image: lp("/images/alert_camera_offline.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("2FA disabled")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         },
         State
@@ -60,9 +62,10 @@ DummyMessage
             name: "cameraUnauthorized"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Authentication required")
-                image: lp("/images/alert_locked.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Unauthorized")
+                imageSource: "image://skin/48x48/Outline/lock.svg"
             }
         },
         State
@@ -70,9 +73,10 @@ DummyMessage
             name: "cameraOffline"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Camera offline")
-                image: lp("/images/alert_camera_offline.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Offline")
+                imageSource: "image://skin/48x48/Outline/error.svg"
             }
         },
         State
@@ -80,9 +84,10 @@ DummyMessage
             name: "videoLoadingFailed"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Cannot load video")
-                image: lp("/images/alert_alert.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Cannot load video")
+                imageSource: "image://skin/48x48/Outline/error.svg"
             }
         },
         State
@@ -90,9 +95,10 @@ DummyMessage
             name: "noVideoStreams"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Cannot play any video stream")
-                image: lp("/images/alert_alert.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Cannot play any video stream")
+                imageSource: "image://skin/48x48/Outline/error.svg"
             }
         },
         State
@@ -100,9 +106,10 @@ DummyMessage
             name: "noLicenses"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Not enough licenses")
-                image: lp("/images/alert_license.png")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Not enough licenses")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         },
         State
@@ -110,13 +117,10 @@ DummyMessage
             name: "defaultPasswordAlert"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Password required")
-                image: lp("/images/alert_alert.png")
-                description: qsTr(
-                    "Set password on this camera using %1 client or camera web-page to view video",
-                    "%1 is the short desktop client name (like 'Nx Witness')")
-                    .arg(appContext.appInfo.productName());
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Password required")
+                imageSource: "image://skin/48x48/Outline/lock.svg"
             }
         },
         State
@@ -124,8 +128,10 @@ DummyMessage
             name: "audioOnlyMode"
             PropertyChanges
             {
-                target: dummyMessage
-                image: lp("/images/alert_sound.png")
+                target: control
+                type: VideoPlaceholder.Info
+                text: ""
+                imageSource: "image://skin/48x48/Outline/sound.svg"
             }
         },
         State
@@ -133,10 +139,10 @@ DummyMessage
             name: "oldFirmwareAlert"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Unsupported firmware version")
-                image: lp("/images/alert_alert.png")
-                description: qsTr("Please update firmware")
+                target: control
+                type: VideoPlaceholder.Error
+                text: qsTr("Unsupported")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         },
         State
@@ -144,9 +150,10 @@ DummyMessage
             name: "tooManyConnections"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Too many connections")
-                image: lp("/images/alert_alert.png")
+                target: control
+                type: VideoPlaceholder.Info
+                text: qsTr("Too many connections")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         },
         State
@@ -154,11 +161,10 @@ DummyMessage
             name: "cannotDecryptMedia"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("Archive encrypted")
-                description: qsTr("Enter the encryption password on the Desktop Client "
-                    + "to decrypt this archive, or ask your site administrator for help.")
-                image: lp("/images/alert_archive_encrypted.svg")
+                target: control
+                type: VideoPlaceholder.Info
+                text: qsTr("Archive encrypted")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         },
         State
@@ -166,14 +172,10 @@ DummyMessage
             name: "ioModuleWarning"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("I/O interface not supported yet")
-                description: qsTr(
-                    "In this app I/O module can be used as a sound input device only."
-                    + " To use it as a control module, please use desktop version of %1",
-                    "%1 is the short desktop client name (like 'Nx Witness')")
-                    .arg(appContext.appInfo.productName())
-                image: lp("/images/alert_io.png")
+                target: control
+                type: VideoPlaceholder.Info
+                text: qsTr("I/O interface not supported yet")
+                imageSource: "image://skin/48x48/Outline/sound.svg"
             }
         },
         State
@@ -181,8 +183,10 @@ DummyMessage
             name: "ioModuleAudioPlaying"
             PropertyChanges
             {
-                target: dummyMessage
-                image: lp("/images/alert_sound.png")
+                target: control
+                type: VideoPlaceholder.Info
+                text: ""
+                imageSource: "image://skin/48x48/Outline/sound.svg"
             }
         },
         State
@@ -190,9 +194,19 @@ DummyMessage
             name: "noLiveStream"
             PropertyChanges
             {
-                target: dummyMessage
-                title: qsTr("No live stream")
+                target: control
+                type: VideoPlaceholder.Info
+                text: qsTr("No live stream")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
         }
     ]
+
+    Action
+    {
+        id: logInAction
+
+        text: qsTr("Log In")
+        onTriggered: control.logInClicked()
+    }
 }

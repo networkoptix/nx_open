@@ -10,4 +10,5 @@ SavedConnectionScreen 1.0 SavedConnectionScreen.qml
 SessionsScreen 1.0 SessionsScreen.qml
 SettingsScreen 1.0 SettingsScreen.qml
 VideoDummy 1.0 VideoDummy.qml
+VideoPlaceholder 1.0 VideoPlaceholder.qml
 VideoScreen 1.0 VideoScreen.qml

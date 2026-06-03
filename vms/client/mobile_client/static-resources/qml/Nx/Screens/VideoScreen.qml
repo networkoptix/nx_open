@@ -1278,11 +1278,9 @@ Page
                 {
                     rightPadding: 8 + windowParams.rightMargin
                     leftPadding: 8 + windowParams.leftMargin
-                    compact: cameraSwitcher.height < 200
-                    centered: true
                     state: controller.dummyState
 
-                    onButtonClicked:
+                    onLogInClicked:
                         controller.resourceHelper.cloudAuthorize()
                 }
             }

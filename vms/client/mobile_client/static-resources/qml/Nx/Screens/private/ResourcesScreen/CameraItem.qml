@@ -10,6 +10,7 @@ import Nx.Core.Items
 import Nx.Core.Controls
 import Nx.Items
 import Nx.Mobile
+import Nx.Screens
 import Nx.Settings
 
 import nx.vms.api
@@ -40,18 +41,31 @@ Control
         property int status: { API.ResourceStatus.offline }
 
         readonly property bool offline: status == API.ResourceStatus.offline
-        readonly property bool showThumbnailDummy: offline
-            || status == API.ResourceStatus.undefined
-            || needsCloudAuthorization
-            || unauthorized
-            || hasDefaultPassword
-            || hasOldFirmware
-            || ioModule
+        readonly property bool showThumbnailDummy:
+            dummyState !== "" || status == API.ResourceStatus.undefined
+
         readonly property bool unauthorized: status == API.ResourceStatus.unauthorized
         readonly property bool needsCloudAuthorization: mediaResourceHelper.needsCloudAuthorization
         readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
         readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
         readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
+
+        readonly property string dummyState:
+        {
+            if (needsCloudAuthorization)
+                return "needsCloudAuthorization"
+            if (unauthorized)
+                return "cameraUnauthorized"
+            if (hasDefaultPassword)
+                return "defaultPasswordAlert"
+            if (hasOldFirmware)
+                return "oldFirmwareAlert"
+            if (offline)
+                return "cameraOffline"
+            if (ioModule)
+                return "ioModuleWarning"
+            return ""
+        }
     }
 
     MediaResourceHelper
@@ -94,6 +108,8 @@ Control
 
             Item
             {
+                id: thumbnailContent
+
                 width: parent.width
                 height:
                 {
@@ -215,64 +231,14 @@ Control
     {
         id: dummyComponent
 
-        Column
+        VideoDummy
         {
-            width: thumbnailContainer.width
-            leftPadding: 8
-            rightPadding: 8
-            property real availableWidth: width - leftPadding - rightPadding
+            width: thumbnailContent.width
+            height: thumbnailContent.height
 
-            scale: thumbnailContainer.height < height
-                ? thumbnailContainer.height / height
-                : 1
+            state: d.dummyState
 
-            Image
-            {
-                anchors.horizontalCenter: parent.horizontalCenter
-                source:
-                {
-                    if (d.unauthorized || d.needsCloudAuthorization)
-                        return lp("/images/camera_locked.png")
-                    if (d.hasDefaultPassword || d.hasOldFirmware)
-                        return lp("/images/camera_alert.png")
-                    if (d.offline)
-                        return lp("/images/camera_offline.png")
-                    if (d.ioModule)
-                        return lp("/images/preview_io.svg")
-                    return ""
-                }
-            }
-
-            Text
-            {
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.availableWidth - 32
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                text:
-                {
-                    if (d.needsCloudAuthorization)
-                        return qsTr("Information required")
-                    if (d.unauthorized)
-                        return qsTr("Authentication required")
-                    if (d.hasDefaultPassword)
-                        return qsTr("Password required")
-                    if (d.hasOldFirmware)
-                        return qsTr("Unsupported firmware version")
-                    if (d.offline)
-                        return qsTr("Offline")
-                    if (d.ioModule)
-                        return qsTr("I/O module")
-                    return ""
-                }
-
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                font.pixelSize: 14
-                font.weight: Font.Normal
-                color: ColorTheme.colors.light1
-            }
+            onLogInClicked: mediaResourceHelper.cloudAuthorize()
         }
     }
 
@@ -368,11 +334,16 @@ Control
                 id: videoThumbnail
 
                 anchors.fill: parent
-                source: mediaPlayer.audioOnlyMode
-                    ? lp("/images/alert_sound.png")
-                    : cameraItem.thumbnail
+                source: cameraItem.thumbnail
                 fillMode: Qt.KeepAspectRatio
-                visible: !video.visible && status === Image.Ready
+                visible: !video.visible && status === Image.Ready && !mediaPlayer.audioOnlyMode
+            }
+
+            VideoDummy
+            {
+                anchors.fill: parent
+                state: "audioOnlyMode"
+                visible: !video.visible && mediaPlayer.audioOnlyMode
             }
 
             Watermark
