@@ -13,7 +13,7 @@ Rectangle
 
     // Selected speed. Speeds are internally rounded to the nearest power of two.
     property real speed: 1
-    readonly property real effectiveSpeed: (pausable && paused) ? 0 : (forced1x ? 1 : speed)
+    readonly property real effectiveSpeed: effectivePaused ? 0 : (forced1x ? 1 : speed)
 
     property alias displayedText: speedButton.text
 
@@ -25,10 +25,12 @@ Rectangle
 
     // Whether the control is locked to the 1x speed. Used in live playback mode.
     property bool forced1x: false
+    property bool disabledWhenForced1x: false
 
     // Whether the control supports 0x speed position when paused.
     property bool pausable: true
     property bool paused: false
+    readonly property bool effectivePaused: pausable && paused
 
     // Whether the control supports negative speeds.
     property bool reversible: true
@@ -97,9 +99,10 @@ Rectangle
             id: speedSlider
 
             property bool updating: false
+            property real sliderSpeed: speedControl.effectivePaused ? 0 : speedControl.speed
 
             opacity: (speedControl.enabled && !enabled) ? 0.3 : 1.0
-            enabled: !speedControl.forced1x
+            enabled: !(speedControl.forced1x && speedControl.disabledWhenForced1x)
 
             Layout.alignment: Qt.AlignVCenter
             Layout.fillWidth: true
@@ -110,6 +113,7 @@ Rectangle
             stepSize: 1
             snapMode: Slider.SnapOnRelease
             grooveHighlight: Slider.FillingFromZero
+            value: speedToValue(sliderSpeed)
 
             /**
              * JS object with speed to slider value conversion parameters:
@@ -188,6 +192,12 @@ Rectangle
                 return -(2.0 ** (-value - 1 + parameters.minExponent))
             }
 
+            onSliderSpeedChanged:
+            {
+                if (!updating)
+                    value = speedToValue(sliderSpeed)
+            }
+
             onMoved:
             {
                 speedSlider.updating = true
@@ -217,15 +227,9 @@ Rectangle
         }
     }
 
-    onPausedChanged:
+    onEffectivePausedChanged:
     {
-        if (!paused && speed == 0)
+        if (!effectivePaused && speed == 0)
             speed = 1
-    }
-
-    onEffectiveSpeedChanged:
-    {
-        if (!speedSlider.updating)
-            speedSlider.value = speedSlider.speedToValue(effectiveSpeed)
     }
 }

@@ -823,17 +823,7 @@ Page
                             LayoutMirroring.childrenInherit: true
 
                             onMoved:
-                            {
-                                if (pausable)
-                                {
-                                    if (speed == 0)
-                                        controller.pause()
-                                    else
-                                        controller.play()
-                                }
-
-                                controller.speed = speedControl.speed
-                            }
+                                controller.setSpeed(speed)
                         }
 
                         onEnabledChanged:

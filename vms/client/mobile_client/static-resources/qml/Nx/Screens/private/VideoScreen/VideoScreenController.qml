@@ -23,8 +23,7 @@ NxObject
     property bool forceVideoPause: false
     property bool tryFixVirtualCameraPosition: true
 
-    property alias speed: mediaPlayer.speed
-
+    readonly property alias speed: mediaPlayer.speed
     readonly property alias playing: d.playing
     readonly property bool playingLive: d.playing && mediaPlayer.liveMode
     readonly property alias audioController: audioController
@@ -133,6 +132,7 @@ NxObject
         id: d
 
         property bool playing: false
+        property real desiredSpeed: 1.0
 
         property real lastPosition: -1
         property bool waitForLastPosition: false
@@ -146,10 +146,13 @@ NxObject
 
         function currentPosition()
         {
-            if (mediaPlayer.liveMode)
-                return d.playing ? -1 : (new Date()).getTime()
+            return (mediaPlayer.liveMode && d.playing) ? -1 : mediaPlayer.position
+        }
 
-            return mediaPlayer.position
+        onDesiredSpeedChanged:
+        {
+            if (!controller.playingLive)
+                mediaPlayer.speed = d.desiredSpeed
         }
     }
 
@@ -316,6 +319,7 @@ NxObject
     function playLive(suppressSavePosition)
     {
         d.playing = true
+        mediaPlayer.speed = 1.0
         mediaPlayer.playLive()
         if (!suppressSavePosition)
             d.savePosition()
@@ -341,6 +345,7 @@ NxObject
 
     function setPosition(position, save)
     {
+        mediaPlayer.speed = (position === -1) ? 1.0 : d.desiredSpeed
         mediaPlayer.position = position
         if (save)
             d.savePosition()
@@ -351,6 +356,18 @@ NxObject
     {
         timelineController.setTimelinePosition(position, immediate)
         setPosition(position, save)
+    }
+
+    function setSpeed(speed)
+    {
+        if (speed === 0 || (speed < 0 && mediaPlayer.speed > 0))
+            pause()
+
+        if (speed !== 0)
+        {
+            d.desiredSpeed = speed
+            play()
+        }
     }
 
     function jumpToNextChunk()

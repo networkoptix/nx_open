@@ -384,18 +384,8 @@ Item
         forced1x: controller.playingLive
         paused: !controller.playing
 
-        onMoved:
-        {
-            if (speedControl.pausable)
-            {
-                if (speedControl.speed == 0)
-                    controller.pause()
-                else
-                    controller.play()
-            }
-
-            controller.speed = speedControl.speed
-        }
+        onMoved: 
+            controller.setSpeed(speed)
 
         // To block camera swipe if the speed control is dragged.
         DragHandler { target: null }
