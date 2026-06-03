@@ -1225,10 +1225,6 @@
 <context>
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
-        <source>Storage Issue at %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Storage Issue</source>
         <translation></translation>
     </message>
@@ -1271,6 +1267,46 @@
     <message>
         <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Storage I/O Error at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Too Slow at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Disk Full at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Disk Almost Full at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics Storage Offline at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics Storage Almost Full at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics Storage Permission Error at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Encryption Failed at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAID Storage Error at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Backup Failed at %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
