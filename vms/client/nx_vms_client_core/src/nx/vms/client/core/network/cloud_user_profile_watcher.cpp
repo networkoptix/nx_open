@@ -10,10 +10,7 @@
 #include <nx/cloud/db/api/account_manager.h>
 #include <nx/cloud/db/client/cdb_connection.h>
 #include <nx/cloud/db/client/cdb_request_path.h>
-#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/coro/task_utils.h>
-#include <nx/utils/coro/when_all.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/network/cloud_api.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
@@ -27,7 +24,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr auto kErrorRetryDelay = 5s;
-static constexpr auto kUpdateDelay = 20s;
+static constexpr auto kUpdateDelay = 100s;
 
 // Converts QImage to data URL, encoding as PNG in base64.
 QUrl imageToUrl(const QImage& image)
@@ -129,13 +126,9 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
             "status",
             [](auto value) { return value == CloudStatusWatcher::Online; });
 
-        auto [accountData, channelPartnerList] = co_await whenAll(
-            cloudGet<nx::cloud::db::api::AccountData>(
-                m_statusWatcher,
-                nx::cloud::db::kAccountSelfPath),
-            cloudGet<ChannelPartnerList>(
-                m_statusWatcher,
-                "/partners/api/v2/channel_partners/"));
+        auto accountData = co_await cloudGet<nx::cloud::db::api::AccountData>(
+            m_statusWatcher,
+            nx::cloud::db::kAccountSelfPath);
 
         if (!accountData)
         {

@@ -19,7 +19,7 @@ namespace {
 using namespace std::chrono;
 
 static constexpr auto kErrorRetryDelay = 5s;
-static constexpr auto kUpdateDelay = 20s;
+static constexpr auto kUpdateDelay = 100s;
 static constexpr size_t kMaxConcurrentRequests = 10;
 static constexpr int kMaximumPageSize = 1000;
 
