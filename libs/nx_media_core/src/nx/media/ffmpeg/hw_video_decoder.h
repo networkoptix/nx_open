@@ -57,6 +57,12 @@ public:
     bool receiveFrame(CLVideoDecoderOutputPtr* const outFrame);
     int currentFrameNumber() const;
 
+    // Returns true and clears the flag when a hardware decoder was found for the codec but could
+    // not be allocated due to resource exhaustion (as opposed to the codec simply having no HW
+    // path on this platform). Consuming clears the flag so it fires exactly once per failure event
+    // rather than on every subsequent packet while the decoder runs in SW fallback.
+    bool consumeHardwareResourceFailed();
+
 private:
     bool initialize(const QnConstCompressedVideoDataPtr& frame);
     bool initializeHardware(const QnConstCompressedVideoDataPtr& frame);
@@ -66,6 +72,7 @@ private:
     AVHWDeviceType m_type;
     InitFunc m_initFunc;
     bool m_hardwareMode = true;
+    bool m_hardwareResourceFailed = false;
     AVCodecContext* m_decoderContext = nullptr;
     AVBufferRef* m_hwDeviceContext = nullptr;
     AVPixelFormat m_targetPixelFormat = AV_PIX_FMT_NONE;

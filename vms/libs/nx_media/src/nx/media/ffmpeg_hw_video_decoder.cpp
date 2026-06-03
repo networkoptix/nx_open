@@ -2,6 +2,9 @@
 
 #include "ffmpeg_hw_video_decoder.h"
 
+#include <atomic>
+#include <chrono>
+
 #include <QtGui/rhi/qrhi.h>
 #include <QtMultimedia/QVideoFrameFormat>
 
@@ -19,6 +22,50 @@
 namespace nx::media {
 
 namespace {
+
+// Process-wide back-off for hardware video decoder allocation failures.
+//
+// When the device runs out of HW codec slots (Android ResourceManager reports C2_NO_MEMORY /
+// "Failed to query component interface for required system resources"), two feedback loops drive
+// a retry storm that freezes or stutters the UI:
+//
+//  1. Stream-parameter changes (RTSP reconnects, periodic SPS/PPS refresh, bandwidth-driven
+//     resolution switches) cause SeamlessVideoDecoder to re-enable HW acceleration and recreate
+//     the decoder. Under exhaustion every such event immediately fails and falls back to SW,
+//     but the next parameter change retriggers the whole cycle - producing hundreds of
+//     codec create/destroy pairs per minute for a static layout.
+//
+//  2. Layout scrolling brings new cameras into view, each starting a fresh SeamlessVideoDecoder
+//     with HW enabled. Without a back-off every new camera spends time failing HW init before
+//     reaching SW, introducing per-camera latency that accumulates into visible jank.
+//
+// While the back-off is armed, isCompatible() returns false so the decoder registry routes all
+// new and retrying decoders directly to SW. The cooldown is short enough that HW is re-probed
+// once the load drops - no fixed per-device codec limit is required.
+constexpr std::chrono::milliseconds kHardwareExhaustionCooldown(5000);
+std::atomic<int64_t> g_hardwareAvailableAtMs{0};
+
+int64_t steadyNowMs()
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+bool isHardwareTemporarilyUnavailable()
+{
+    return steadyNowMs() < g_hardwareAvailableAtMs.load(std::memory_order_relaxed);
+}
+
+void noteHardwareDecoderFailure()
+{
+    g_hardwareAvailableAtMs.store(
+        steadyNowMs() + kHardwareExhaustionCooldown.count(), std::memory_order_relaxed);
+}
+
+void noteHardwareDecoderSuccess()
+{
+    g_hardwareAvailableAtMs.store(0, std::memory_order_relaxed);
+}
 
 AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
 {
@@ -165,6 +212,9 @@ bool FfmpegHwVideoDecoder::isCompatible(
     if (!allowHardwareAcceleration)
         return false;
 
+    if (isHardwareTemporarilyUnavailable())
+        return false;
+
     const auto maxSize = FfmpegHwVideoDecoder::maxResolution(codec);
     if (!maxSize.isEmpty()
         && (resolution.width() > maxSize.width() || resolution.height() > maxSize.height()))
@@ -193,6 +243,7 @@ bool FfmpegHwVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packe
         }
     }
 
+    const bool firstPacket = !d->decoder;
     if (!d->decoder)
     {
         d->initContext(compressedVideoData);
@@ -200,7 +251,18 @@ bool FfmpegHwVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packe
             return false;
     }
 
-    return d->decoder->sendPacket(compressedVideoData);
+    const bool ok = d->decoder->sendPacket(compressedVideoData);
+
+    if (d->videoApi)
+    {
+        if (d->decoder->consumeHardwareResourceFailed())
+            noteHardwareDecoderFailure();
+        else if (firstPacket && ok && d->decoder->hardwareDecoder())
+            noteHardwareDecoderSuccess();
+        // Natural SW fallback (codec has no HW path on this platform) does not arm the back-off.
+    }
+
+    return ok;
 }
 
 bool FfmpegHwVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
