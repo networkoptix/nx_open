@@ -19,6 +19,7 @@ OptionSelector
     property Attribute attribute: null
     property Item subpropertyParent: null
     property string parentPropertyName
+    signal selectorClicked(OptionSelector selector)
 
     property alias nestedValue: nestedAttributes.value
 
@@ -47,5 +48,7 @@ OptionSelector
         attributes: control.value && control.attribute && control.attribute.attributeSet
             ? control.attribute.attributeSet.attributes
             : null
+
+        onSelectorClicked: (selector) => control.selectorClicked(selector)
     }
 }

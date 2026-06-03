@@ -26,7 +26,7 @@ Column
     readonly property OptionSelector selector: content.item
     readonly property string labelText: (parentPropertyName ? parentPropertyName + " → " : "") + (attribute ? attribute.name : "")
 
-    signal selectorClicked
+    signal selectorClicked(OptionSelector selector)
 
     spacing: 4
 
@@ -133,7 +133,12 @@ Column
 
             function onClicked()
             {
-                control.selectorClicked()
+                control.selectorClicked(content.item)
+            }
+
+            function onSelectorClicked(selector)
+            {
+                control.selectorClicked(selector)
             }
         }
 

@@ -38,7 +38,7 @@ Column
             width: (parent && parent.width) ?? 0
             attribute: modelData
 
-            onSelectorClicked: control.selectorClicked(selector)
+            onSelectorClicked: (selector) => control.selectorClicked(selector)
 
             Component.onCompleted: value = d.getSelectorValue(
                 control.value, (attribute && attribute.name) ?? "", control.unselectedValue)
