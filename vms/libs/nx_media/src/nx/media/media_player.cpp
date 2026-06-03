@@ -1129,6 +1129,14 @@ double Player::speed() const
 
 void Player::setSpeed(double value)
 {
+    // In position(), lastSeekTimeMs acts as a directional anchor to prevent position jumping when
+    // coarse (intra-GOP) frames arrive after a seek.
+    // When the speed sign flips, lastSeekTimeMs switches role (floor <--> ceiling in position()).
+    // Reanchor it to the current displayed position (computed with the old speed) so position()
+    // remains continuous across the direction change.
+    if ((d->speed < 0) != (value < 0))
+        d->lastSeekTimeMs = position();
+
     d->speed = value;
     if (d->dataConsumer)
     {
