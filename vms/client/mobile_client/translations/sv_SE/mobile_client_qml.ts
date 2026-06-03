@@ -53,15 +53,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Du har inte behörighet att visa arkivet</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Du har ingen inspelad video i arkivet</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>Tidslinjen laddas...</translation>
     </message>
   </context>
   <context>
@@ -577,11 +577,11 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>-5 sec</source>
-      <translation type="unfinished">-5 sec</translation>
+      <translation>-5 sek</translation>
     </message>
     <message>
       <source>+5 sec</source>
-      <translation type="unfinished">+5 sec</translation>
+      <translation>+5 sek</translation>
     </message>
   </context>
   <context>
@@ -667,11 +667,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Spegla tidslinje</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>Vänd tidslinjen för vänsterhänt användning</translation>
     </message>
   </context>
   <context>
@@ -728,7 +728,7 @@
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Are you sure you want to disconnect from %1?</translation>
+      <translation>Är du säker på att du vill koppla bort från %1?</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -759,7 +759,7 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Tryck var som helst på video för att centrera vyn där</translation>
     </message>
   </context>
   <context>
@@ -777,7 +777,7 @@
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Tryck var som helst på video för att centrera vyn där</translation>
     </message>
   </context>
   <context>
@@ -859,27 +859,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Inga bokmärken</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Inga objekt</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Ingen rörelse</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Inga bokmärken har skapats på denna tidslinje</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Inga objekt har upptäckts på denna tidslinje</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Ingen rörelse har detekterats på denna tidslinje</translation>
     </message>
   </context>
   <context>
@@ -904,7 +904,7 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Välj förinställning</translation>
     </message>
   </context>
   <context>
@@ -918,11 +918,11 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Avbryt omcentrering</translation>
     </message>
     <message>
       <source>PTZ Presets</source>
@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -945,7 +945,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Avbryt omcentrering</translation>
     </message>
   </context>
   <context>
@@ -1083,15 +1083,15 @@
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Inga enheter</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Inga enheter hittades på denna layout</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Inga enheter hittades på denna webbplats. Lägg till enheter med skrivbordsklienten eller begär åtkomst till befintliga enheter</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -1666,11 +1666,11 @@
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Kamerainformation</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Gå till Live för att aktivera mjuka utlösare</translation>
     </message>
   </context>
   <context>

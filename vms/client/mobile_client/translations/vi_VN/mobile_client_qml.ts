@@ -903,7 +903,7 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Chọn thiết lập sẵn</translation>
     </message>
   </context>
   <context>
@@ -917,7 +917,7 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -929,7 +929,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Hủy bỏ</translation>
     </message>
   </context>
   <context>

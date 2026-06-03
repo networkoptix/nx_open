@@ -759,7 +759,7 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Toca en cualquier parte del video para centrar la vista</translation>
     </message>
   </context>
   <context>
@@ -777,7 +777,7 @@
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Toca en cualquier parte del video para centrar la vista</translation>
     </message>
   </context>
   <context>
@@ -904,7 +904,7 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Elegir Preset</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>

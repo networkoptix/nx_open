@@ -666,11 +666,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Mirror Timeline</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>Balikkan timeline untuk penggunaan tangan kiri</translation>
     </message>
   </context>
   <context>
@@ -727,7 +727,7 @@
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Are you sure you want to disconnect from %1?</translation>
+      <translation>Apakah Anda yakin ingin memutuskan koneksi dari %1?</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -758,7 +758,7 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Ketuk di mana saja pada video untuk memusatkan tampilan di sana.</translation>
     </message>
   </context>
   <context>
@@ -776,7 +776,7 @@
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Ketuk di mana saja pada video untuk memusatkan tampilan di sana.</translation>
     </message>
   </context>
   <context>
@@ -903,7 +903,7 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Pilih Preset</translation>
     </message>
   </context>
   <context>
@@ -917,11 +917,11 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Batalkan Pemusatan Ulang</translation>
     </message>
     <message>
       <source>PTZ Presets</source>
@@ -929,7 +929,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>

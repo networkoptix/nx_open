@@ -904,7 +904,7 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Урьдчилсан тохиргоог сонгох</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -930,7 +930,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>

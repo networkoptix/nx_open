@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Dela bokmärke...</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ Licensnyckel: %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Skapa och dela...</translation>
     </message>
   </context>
   <context>
@@ -5319,7 +5319,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Bokmärken kan bara delas på en onlineserver.</translation>
     </message>
   </context>
   <context>
