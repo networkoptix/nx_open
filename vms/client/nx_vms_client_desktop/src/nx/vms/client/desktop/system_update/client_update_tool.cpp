@@ -280,8 +280,9 @@ void ClientUpdateTool::setServerUrl(
     const core::LogonData& logonData,
     nx::vms::common::AbstractCertificateVerifier* certificateVerifier)
 {
-    const auto serverId =
-        NX_ASSERT(logonData.expectedServerId) ? *logonData.expectedServerId : nx::Uuid();
+    const auto serverId = logonData.expectedServerId;
+    if (!NX_ASSERT(!serverId.isNull()))
+        return;
 
     // If downloading a new client version in the process of system update, use existing audit ID.
     // Otherwise (e.g. connecting to the incompatible system from the Welcome Screen or Login

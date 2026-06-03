@@ -227,19 +227,19 @@ std::string Settings::systemAuthenticationCache(const QString& systemId)
     return {};
 }
 
-std::optional<nx::Uuid> Settings::preferredCloudServer(const QString& systemId)
+nx::Uuid Settings::preferredCloudServer(const QString& systemId)
 {
     const auto preferredServers = preferredCloudServers();
     const auto iter = std::find_if(preferredServers.cbegin(), preferredServers.cend(),
         [&systemId](const auto& item) { return item.systemId == systemId; });
 
     if (iter == preferredServers.cend())
-        return std::nullopt;
+        return {};
 
     return iter->serverId;
 }
 
-void Settings::setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId)
+void Settings::setPreferredCloudServer(const QString& systemId, nx::Uuid serverId)
 {
     static constexpr int kMaxStoredPreferredCloudServers = 100;
 

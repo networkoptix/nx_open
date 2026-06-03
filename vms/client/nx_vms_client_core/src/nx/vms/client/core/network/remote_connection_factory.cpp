@@ -89,7 +89,7 @@ std::optional<std::string> publicKey(const std::string& pem)
     return chain[0].publicKey();
 };
 
-std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInformationV1>& info)
+nx::Uuid deductServerId(const std::vector<nx::vms::api::ServerInformationV1>& info)
 {
     if (info.size() == 1)
         return info.begin()->id;
@@ -100,7 +100,7 @@ std::optional<nx::Uuid> deductServerId(const std::vector<nx::vms::api::ServerInf
             return server.id;
     }
 
-    return std::nullopt;
+    return {};
 }
 
 nx::Url mainServerUrl(const QSet<QString>& remoteAddresses, int port)
@@ -237,8 +237,8 @@ struct RemoteConnectionFactory::Private
         NX_DEBUG(this, "User name: %1, type: %2",
             context->logonData.credentials.username, context->logonData.userType);
 
-        if (context->expectedServerId())
-            NX_DEBUG(this, "Expect Server ID %1.", *context->expectedServerId());
+        if (!context->expectedServerId().isNull())
+            NX_DEBUG(this, "Expect Server ID %1.", context->expectedServerId());
         else
             NX_DEBUG(this, "Server ID is not known.");
 
@@ -284,7 +284,7 @@ struct RemoteConnectionFactory::Private
         context->moduleInformation = reply.moduleInformation;
 
         // Check whether actual server id matches the one we expected to get (if any).
-        if (context->expectedServerId()
+        if (!context->expectedServerId().isNull()
             && context->expectedServerId() != context->moduleInformation.id)
         {
             context->setError(RemoteConnectionErrorCode::unexpectedServerId);
@@ -320,7 +320,7 @@ struct RemoteConnectionFactory::Private
             return;
         }
 
-        if (!context->expectedServerId())
+        if (context->expectedServerId().isNull())
         {
             // Try to deduct server id for the 5.1 Systems or Systems with one server.
             context->logonData.expectedServerId = deductServerId(reply.serversInfo);
@@ -335,7 +335,7 @@ struct RemoteConnectionFactory::Private
 
     void ensureExpectedServerId(ContextPtr context)
     {
-        if (!context || context->expectedServerId())
+        if (!context || !context->expectedServerId().isNull())
             return;
 
         // We can connect to 5.0 System without knowing actual server id, so we need to get it.
@@ -352,7 +352,7 @@ struct RemoteConnectionFactory::Private
         if (!context)
             return;
 
-        if (!NX_ASSERT(context->expectedServerId()))
+        if (!NX_ASSERT(!context->expectedServerId().isNull()))
         {
             context->setError(RemoteConnectionErrorCode::internalError);
             return;
@@ -361,14 +361,14 @@ struct RemoteConnectionFactory::Private
         auto currentServerIt = std::find_if(
             context->serversInfo.cbegin(),
             context->serversInfo.cend(),
-            [id = *context->expectedServerId()](const auto& server) { return server.id == id; });
+            [id = context->expectedServerId()](const auto& server) { return server.id == id; });
 
         if (currentServerIt == context->serversInfo.cend())
         {
             NX_WARNING(
                 this,
                 "Server info list does not contain Server %1.",
-                *context->expectedServerId());
+                context->expectedServerId());
             context->setError(RemoteConnectionErrorCode::networkContentError);
             return;
         }

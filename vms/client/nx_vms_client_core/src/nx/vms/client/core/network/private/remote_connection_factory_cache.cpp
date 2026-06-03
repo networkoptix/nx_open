@@ -12,8 +12,6 @@
 #include <nx/vms/client/core/utils/log_strings_format.h>
 #include <utils/common/synctime.h>
 
-using namespace nx::vms::client::core;
-
 namespace nx::vms::client::core {
 
 // Cached data stored for each cloud system. Used to speedup connection process.
@@ -123,21 +121,27 @@ bool RemoteConnectionFactoryCache::fillContext(
         return false;
     }
 
-    // Reuse server list from the previous connection.
-    const auto serverIt = std::find_if(customData.serversInfo.begin(), customData.serversInfo.end(),
-        [&customData](const auto& server)
-        {
-            return server.id == customData.expectedServerId;
-        });
+    constexpr auto byServerId = &nx::vms::api::ServerInformationV1::id;
+
+    // Try to find expected server first.
+    auto serverIt = std::ranges::find(
+        customData.serversInfo, context->logonData.expectedServerId, byServerId);
+
+    // Try to find previously saved server.
+    if (serverIt == customData.serversInfo.end())
+    {
+        serverIt = std::ranges::find(
+            customData.serversInfo, customData.expectedServerId, byServerId);
+    }
 
     if (serverIt == customData.serversInfo.end())
         return false;
 
-    // Make sure that we check the server certificate.
-    if (serverIt->certificatePem.empty())
+    // Check cached server info validity.
+    if (!NX_ASSERT(!serverIt->id.isNull()) || serverIt->certificatePem.empty())
         return false;
 
-    context->logonData.expectedServerId = customData.expectedServerId;
+    context->logonData.expectedServerId = serverIt->id;
     context->serversInfo = customData.serversInfo;
 
     context->handshakeCertificateChain =

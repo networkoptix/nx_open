@@ -403,7 +403,7 @@ void Session::Private::connectToKnownServer(nx::vms::client::core::RemoteConnect
             {
                 m_logonData->address = network::SocketAddress(id.toStdString());
             }
-            m_logonData->expectedServerId = std::nullopt;
+            m_logonData->expectedServerId = {};
 
             executeLater([this](){ connectToServer(/* ignoreCachedData */ true); }, this);
         });

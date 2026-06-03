@@ -124,10 +124,10 @@ public:
     void setCloudAuthData(const CloudAuthData& value);
 
     /** Adapter for the preferredCloudServers property. */
-    std::optional<nx::Uuid> preferredCloudServer(const QString& systemId);
+    nx::Uuid preferredCloudServer(const QString& systemId);
 
     /** Adapter for the preferredCloudServers property. */
-    void setPreferredCloudServer(const QString& systemId, const nx::Uuid& serverId);
+    void setPreferredCloudServer(const QString& systemId, nx::Uuid serverId);
 
     void setSystemAuthenticationCache(const QString& systemId, std::string cache);
     std::string systemAuthenticationCache(const QString& systemId);

@@ -383,7 +383,7 @@ void WelcomeScreen::connectToLocalSystem(
 
     connectToSystemInternal(
         systemId,
-        serverId.isEmpty() ? std::nullopt : std::optional{nx::Uuid::fromStringSafe(serverId)},
+        serverId.isEmpty() ? nx::Uuid() : nx::Uuid::fromStringSafe(serverId),
         nx::network::SocketAddress(url.host(), url.port()),
         nx::network::http::PasswordCredentials{userName.toStdString(), password.toStdString()},
         storePassword);
@@ -408,7 +408,7 @@ void WelcomeScreen::connectToLocalSystemUsingSavedPassword(
 
     connectToSystemInternal(
         systemId,
-        serverId.isEmpty() ? std::nullopt : std::optional{nx::Uuid::fromStringSafe(serverId)},
+        serverId.isEmpty() ? nx::Uuid() : nx::Uuid::fromStringSafe(serverId),
         nx::network::SocketAddress::fromUrl(url),
         credentials.value_or(network::http::Credentials{}),
         storePassword);
@@ -510,7 +510,7 @@ void WelcomeScreen::createSystemModel()
 
 void WelcomeScreen::connectToSystemInternal(
     const QString& systemId, //< Actually that's a tile id.
-    const std::optional<nx::Uuid>& serverId,
+    nx::Uuid serverId,
     const nx::network::SocketAddress& address,
     const nx::network::http::Credentials& credentials,
     bool storePassword,

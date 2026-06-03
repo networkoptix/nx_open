@@ -363,11 +363,11 @@ ConnectActionsHandler::ConnectActionsHandler(WindowContext* windowContext, QObje
                     actionParameters.argument<LogonData>(Qn::LogonDataRole);
                 const auto welcomeScreen = mainWindow()->welcomeScreen();
                 if (NX_ASSERT(welcomeScreen)
-                    && NX_ASSERT(logonData.expectedServerId))
+                    && NX_ASSERT(!logonData.expectedServerId.isNull()))
                 {
                     welcomeScreen->setupFactorySystem(
                         logonData.address,
-                        logonData.expectedServerId.value());
+                        logonData.expectedServerId);
                 }
             }
         });

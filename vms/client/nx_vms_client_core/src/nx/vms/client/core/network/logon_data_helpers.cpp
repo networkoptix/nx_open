@@ -69,11 +69,11 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
     }
 
     result.expectedServerId = appContext()->coreSettings()->preferredCloudServer(system->id());
-    if (result.expectedServerId)
+    if (!result.expectedServerId.isNull())
     {
-        if (system->isReachableServer(result.expectedServerId.value()))
+        if (system->isReachableServer(result.expectedServerId))
         {
-            url = system->getServerHost(result.expectedServerId.value());
+            url = system->getServerHost(result.expectedServerId);
             if (NX_ASSERT(!url.isEmpty()))
             {
                 NX_DEBUG(NX_SCOPE_TAG, "Choosing stored preferred cloud server %1 (%2)",
@@ -82,7 +82,7 @@ std::optional<LogonData> cloudLogonData(const SystemDescriptionPtr& system, bool
         }
         else if (systemHasInitialServerOnly)
         {
-            url.setHost(helpers::serverCloudHost(system->id(), result.expectedServerId.value()));
+            url.setHost(helpers::serverCloudHost(system->id(), result.expectedServerId));
             NX_DEBUG(NX_SCOPE_TAG, "Trying to connect to stored preferred cloud server %1 (%2)",
                 result.expectedServerId, url);
         }

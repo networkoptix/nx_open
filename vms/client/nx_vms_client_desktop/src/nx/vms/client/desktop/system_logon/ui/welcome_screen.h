@@ -168,7 +168,7 @@ private:
     void createSystemModel();
     void connectToSystemInternal(
         const QString& systemId,
-        const std::optional<nx::Uuid>& serverId,
+        nx::Uuid serverId,
         const nx::network::SocketAddress& address,
         const nx::network::http::Credentials& credentials,
         bool storePassword,
