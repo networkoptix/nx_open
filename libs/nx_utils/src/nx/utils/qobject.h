@@ -92,4 +92,6 @@ void NX_UTILS_API watchOnPropertyChanges(
     QObject* receiver,
     const QMetaMethod& receiverMetaMethod);
 
+void NX_UTILS_API resetProperties(QObject* object);
+
 } // namespace nx::utils

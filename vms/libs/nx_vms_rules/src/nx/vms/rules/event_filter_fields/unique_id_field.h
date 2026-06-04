@@ -12,13 +12,14 @@ class NX_VMS_RULES_API UniqueIdField: public EventFilterField
     Q_OBJECT
     Q_CLASSINFO("type", "uniqueId")
 
-    Q_PROPERTY(nx::Uuid id READ id WRITE setId)
+    Q_PROPERTY(nx::Uuid id READ id WRITE setId RESET resetId)
 
 public:
     using EventFilterField::EventFilterField;
 
     nx::Uuid id() const;
     void setId(nx::Uuid id);
+    void resetId();
 
     bool match(const QVariant& eventValue) const override;
     static QJsonObject openApiDescriptor(const QVariantMap& properties);

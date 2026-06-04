@@ -95,7 +95,6 @@ std::pair<QString, QJsonValue> toApi(
     return {kIdRenamer.toApi(fieldName), asObject};
 }
 
-
 template <class T>
 bool fromApi(std::map<QString, QJsonValue>&& fieldMap, T* target, QString* error)
 {
@@ -370,7 +369,7 @@ std::optional<nx::vms::api::rules::Rule> fromApi(
     const auto stateField = filter->fieldByName<StateField>(utils::kStateFieldName);
     if (stateField && !stateField->properties().visible)
     {
-        // This is the special case when the state filed (See `Soft Trigger` event) must be adjusted
+        // This is the special case when the state field (See `Soft Trigger` event) must be adjusted
         // accordingly the current action.
         if (nx::vms::rules::isProlonged(engine, builder.get()))
             stateField->setValue(vms::api::rules::State::none);

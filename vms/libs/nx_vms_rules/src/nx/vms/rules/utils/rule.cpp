@@ -2,7 +2,11 @@
 
 #include "rule.h"
 
+#include <nx/utils/qobject.h>
+
+#include "../action_builder.h"
 #include "../action_builder_field.h"
+#include "../event_filter.h"
 #include "../event_filter_field.h"
 #include "../manifest.h"
 
@@ -17,6 +21,17 @@ ValidationResult visibleFieldsValidity(const Rule* rule, common::SystemContext* 
         };
 
     return rule->validity(context, filter, filter); //< Check only visible fields.
+}
+
+void resetFieldProperties(Rule* rule)
+{
+    for (auto* filter: rule->eventFilters())
+        for (auto* field: filter->fields())
+            nx::utils::resetProperties(field);
+
+    for (auto* builder: rule->actionBuilders())
+        for (auto* field: builder->fields())
+            nx::utils::resetProperties(field);
 }
 
 } // namespace nx::vms::rules::utils

@@ -21,4 +21,18 @@ void watchOnPropertyChanges(
     }
 }
 
+void NX_UTILS_API resetProperties(QObject* object)
+{
+    const auto meta = object->metaObject();
+    static const auto start =
+        QObject::staticMetaObject.propertyOffset() + QObject::staticMetaObject.propertyCount();
+
+    for (int i = start; i < meta->propertyCount(); ++i)
+    {
+        const auto property = meta->property(i);
+        if (property.isResettable())
+            property.reset(object);
+    }
+}
+
 } // namespace nx::utils

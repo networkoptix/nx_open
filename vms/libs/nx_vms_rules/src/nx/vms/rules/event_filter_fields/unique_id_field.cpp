@@ -19,6 +19,11 @@ void UniqueIdField::setId(nx::Uuid id)
     m_id = id;
 }
 
+void UniqueIdField::resetId()
+{
+    m_id = {};
+}
+
 bool UniqueIdField::match(const QVariant& eventValue) const
 {
     return eventValue.value<nx::Uuid>() == m_id;

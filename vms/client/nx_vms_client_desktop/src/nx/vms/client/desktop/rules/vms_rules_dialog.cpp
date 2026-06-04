@@ -15,6 +15,7 @@
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/unique_id_field.h>
 #include <nx/vms/rules/utils/api.h>
+#include <nx/vms/rules/utils/rule.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -103,8 +104,9 @@ void VmsRulesDialog::duplicateRule(nx::Uuid id)
         return;
 
     clone->setId(nx::Uuid::createUuid()); //< Change id to prevent rule override on save request.
-    if (auto uniqueIdField = clone->eventFilters().at(0)->fieldByType<vms::rules::UniqueIdField>())
-        uniqueIdField->setId(nx::Uuid::createUuid()); //< Fix field uniqueness after cloning. TODO: #mmalofeev fix this workaround.
+
+    // Fix field uniqueness after cloning.
+    nx::vms::rules::utils::resetFieldProperties(clone.get());
 
     showEditRuleDialog(std::move(clone), /*isNew*/ false);
 }

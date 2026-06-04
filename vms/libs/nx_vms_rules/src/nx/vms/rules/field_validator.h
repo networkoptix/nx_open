@@ -34,7 +34,7 @@ class NX_VMS_RULES_API FieldValidator: public QObject
 public:
     explicit FieldValidator(QObject* parent = nullptr);
 
-    /** Checks filed validity based on the filed validation policy. */
+    /** Checks field validity based on the field validation policy. */
     virtual ValidationResult validity(
         const Field* field, const Rule* rule, common::SystemContext* context) const = 0;
 };
