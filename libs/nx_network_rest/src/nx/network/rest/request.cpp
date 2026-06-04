@@ -489,6 +489,7 @@ Request::SystemAccessGuard::SystemAccessGuard(UserAccessData* userAccessData):
     m_userAccessData(userAccessData), m_origin(std::move(*userAccessData))
 {
     *userAccessData = kSystemAccess;
+    userAccessData->setToken(m_origin.token(), m_origin.siteDuration(), m_origin.issued());
 }
 
 Request::SystemAccessGuard::~SystemAccessGuard()
