@@ -1270,43 +1270,43 @@
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>Lagrings-I/O-fel vid %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>Lagring för långsam vid %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>Lagringsdisken är full vid %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>Systemdisken är nästan full vid %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>Analyslagring offline vid %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>Analyslagring nästan full vid %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>Fel på behörighetsfel för Analytics-lagring vid %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>Lagringskryptering misslyckades vid %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>RAID-lagringsfel vid %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>Säkerhetskopiering av arkiv misslyckades vid %1</translation>
     </message>
   </context>
   <context>

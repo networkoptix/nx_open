@@ -1248,7 +1248,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Fichier source corrompu.</translation>
     </message>
   </context>
   <context>
@@ -2027,23 +2027,23 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Impossible de vider le cache du moteur web</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Veuillez fermer toutes les pages web et réessayer.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Les fichiers peuvent être verrouillés par un autre processus.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Cache du moteur web partiellement vidé</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Certains fichiers peuvent être verrouillés par un autre processus.</translation>
     </message>
   </context>
   <context>
@@ -2073,7 +2073,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>interne</translation>
     </message>
   </context>
   <context>
@@ -2412,7 +2412,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Cette action a été effectuée par un plugin.</translation>
     </message>
   </context>
   <context>
@@ -6242,7 +6242,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Utilisateurs LDAP</translation>
     </message>
   </context>
   <context>
@@ -9208,7 +9208,7 @@ Les performances du client sont dégradées.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Enregistrer Rapport</translation>
     </message>
   </context>
   <context>

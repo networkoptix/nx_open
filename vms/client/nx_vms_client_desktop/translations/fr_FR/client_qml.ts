@@ -76,11 +76,11 @@
     </message>
     <message>
       <source>User ID Attribute</source>
-      <translation type="unfinished">User ID Attribute</translation>
+      <translation>Attribut ID de l'utilisateur</translation>
     </message>
     <message>
       <source>Group ID Attribute</source>
-      <translation type="unfinished">Group ID Attribute</translation>
+      <translation>Attribut ID de groupe</translation>
     </message>
   </context>
   <context>

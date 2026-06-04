@@ -937,7 +937,7 @@
     <name>QnOnlineServerPolicy</name>
     <message>
       <source>Online servers</source>
-      <translation type="unfinished">Online servers</translation>
+      <translation>Servidores en liña</translation>
     </message>
   </context>
   <context>
