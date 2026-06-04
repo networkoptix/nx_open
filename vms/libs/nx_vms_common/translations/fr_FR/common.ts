@@ -1941,15 +1941,15 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Délai d'expiration de l'envoi du socket lors de la diffusion de données multimédias par le serveur (secondes).</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Origin.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+      <translation>En-tête HTTP: Access-Control-Allow-Origin.</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Credentials.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
+      <translation>En-tête HTTP: Access-Control-Allow-Credentials.</translation>
     </message>
   </context>
 </TS>
