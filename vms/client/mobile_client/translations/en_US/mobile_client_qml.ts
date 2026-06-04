@@ -118,33 +118,6 @@
     </message>
 </context>
 <context>
-    <name>CameraItem</name>
-    <message>
-        <source>Authentication required</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Password required</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unsupported firmware version</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>I/O module</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Information required</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>CameraSettingsScreen</name>
     <message>
         <source>Camera Settings</source>
@@ -1552,31 +1525,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server offline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Authentication required</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera offline</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Not enough licenses</source>
         <translation></translation>
     </message>
     <message>
         <source>Password required</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unsupported firmware version</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Please update firmware</source>
         <translation></translation>
     </message>
     <message>
@@ -1588,25 +1541,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-        <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>No live stream</source>
         <translation></translation>
     </message>
     <message>
-        <source>Set password on this camera using %1 client or camera web-page to view video</source>
-        <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Archive encrypted</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
         <translation></translation>
     </message>
     <message>
@@ -1618,8 +1557,20 @@
         <translation></translation>
     </message>
     <message>
-        <source>2FA Disabled</source>
-        <translation></translation>
+        <source>Offline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2FA disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unauthorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
