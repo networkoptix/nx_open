@@ -1130,6 +1130,9 @@ double Player::speed() const
 
 void Player::setSpeed(double value)
 {
+    if (qFuzzyEquals(d->speed, value))
+        return;
+
     // In position(), lastSeekTimeMs acts as a directional anchor to prevent position jumping when
     // coarse (intra-GOP) frames arrive after a seek.
     // When the speed sign flips, lastSeekTimeMs switches role (floor <--> ceiling in position()).
@@ -1144,6 +1147,8 @@ void Player::setSpeed(double value)
         d->dataConsumer->setPlaySpeed(value);
         d->updateAudio();
         d->archiveReader->setSpeed(value);
+        d->lastVideoPtsMs.reset();
+        d->at_hurryUp();
     }
 
     emit speedChanged();
