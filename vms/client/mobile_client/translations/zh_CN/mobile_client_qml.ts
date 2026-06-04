@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation>需要密码</translation>
+      <translation>要求输入密码</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation>离线</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>I/O module</source>

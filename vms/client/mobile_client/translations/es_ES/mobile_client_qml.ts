@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>Password required</source>
-      <translation>Contraseña requerida</translation>
+      <translation>Se requiere contraseña</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation>Desconectado</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>I/O module</source>
