@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>Krever innlogging</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>Passord kreves</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Firmware på kamera er ikke støttet</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Frakoblet</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I / O-modul</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation>Informasjon påkrevd</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1552,32 +1525,12 @@
       <translation>Kan ikke spille noen videostrøm</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>Server frakoblet</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>Autentisering er påkrevd</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>Kamera frakoblet</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>Ikke nok lisenser</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>Passord kreves</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Firmware på kamera er ikke støttet</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>Vennligst oppdater firmware</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1588,26 +1541,12 @@
       <translation>I / O-grensesnittet støttes ikke ennå</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>I denne appen kan I / O-modulen kun brukes som lydinngangsenhet. For å bruke det som en kontrollmodul, bruk desktopversjonen av %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>Ingen live stream</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Angi passord på dette kameraet ved å bruke %1 klient eller kameraets webside for å se video</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>Arkiv kryptert</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation>Skriv inn krypteringspassordet på skrivebordsklienten for å dekryptere dette arkivet, eller be nettstedadministratoren om hjelp.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1618,8 +1557,20 @@
       <translation>Logg inn</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation>2FA deaktivert</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>需要身份验证</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>需要密码</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>不支持的固件版本</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>离线</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I/O 模块</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1551,32 +1524,12 @@
       <translation>无法播放任何视频流</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>服务器离线</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>需要身份验证</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>摄像机离线</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>没有足够的授权數量</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>要求输入密码</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>不支持的固件版本</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>请更新固件</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1587,26 +1540,12 @@
       <translation>I / O接口尚未支持</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>在这个应用程序中，I / O模组只能用作声音输入。要将其用作控制模组，请使用桌面应用版本 %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>没有实时流</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>请使用%1 客户端对该台摄像机设置密码或透过摄像机的网页版来观看视频</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>存档加密</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1617,8 +1556,20 @@
       <translation>登录</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

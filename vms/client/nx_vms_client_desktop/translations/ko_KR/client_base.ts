@@ -9212,14 +9212,6 @@ Site performance is degraded.</source>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>값</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12622,10 +12614,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Key</source>
       <translation>키</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>값</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12647,10 +12635,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>For</source>
       <translation>을 위한</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>값</translation>
     </message>
   </context>
   <context>

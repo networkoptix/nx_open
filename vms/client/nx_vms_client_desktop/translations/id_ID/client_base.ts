@@ -9212,14 +9212,6 @@ Performa Site menurun.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Nilai</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12624,10 +12616,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
       <source>Key</source>
       <translation>Kunci</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Nilai</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12649,10 +12637,6 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>For</source>
       <translation>Untuk</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Nilai</translation>
     </message>
   </context>
   <context>

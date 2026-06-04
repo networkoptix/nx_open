@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>인증이 필요합니다</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>패스워드가 필요합니다.</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>지원되지 않는 펌웨어 버전</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>오프라인</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>Io장치</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation>필요한 정보</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1551,32 +1524,12 @@
       <translation>비디오 스트림을 재생할 수 없습니다.</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>서버 오프라인</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>인증이 필요합니다</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>오프 라인 카메라</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>라이선스가 충분하지 않습니다.</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>패스워드가 필요합니다.</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>지원되지 않는 펌웨어 버전</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>펌웨어를 업데이트하십시오.</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1587,26 +1540,12 @@
       <translation>아직 지원 되지 않는 I/O 인터페이스</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>이 응용 프로그램에서는 I / O 모듈은 사운드 입력 장치로만 사용할 수 있습니다. 제어 모듈로 사용하려면 데스크톱 버전 %1사용하십시오.</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>라이브 스트림 없음</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>비디오를 보기 위해서는 %1 클라이언트 또는 카메라 웹 페이지를 사용하여 이 카메라의 암호를 설정하십시요</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>아카이브 암호화</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation>이 아카이브를 해독하려면 데스크톱 클라이언트에서 암호화 비밀번호를 입력하거나 사이트 관리자에게 도움을 요청하세요.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1617,8 +1556,20 @@
       <translation>로그인</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation>2FA 비활성화 됨</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

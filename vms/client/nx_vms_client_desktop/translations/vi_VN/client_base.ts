@@ -9212,14 +9212,6 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Giá trị</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12624,10 +12616,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
       <source>Key</source>
       <translation>Khóa</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Giá trị</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12649,10 +12637,6 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     <message>
       <source>For</source>
       <translation>Dành cho</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Giá trị</translation>
     </message>
   </context>
   <context>

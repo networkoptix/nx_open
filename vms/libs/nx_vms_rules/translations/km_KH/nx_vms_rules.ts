@@ -327,6 +327,11 @@
         <numerusform>Selected layouts were removed</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <comment>A value of some attribute</comment>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

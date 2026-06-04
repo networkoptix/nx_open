@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>Kimlik doğrulaması gerekli</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>Şifre gerekli</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Desteklenmeyen ürün yazılımı sürümü</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Çevrimdışı</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I/O modül</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1552,32 +1525,12 @@
       <translation>Herhangi bir video akışı oynatılamıyor</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>Sunucu Çevrimdışı</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>Kimlik doğrulaması gerekli</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>Kamera çevrimdışı</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>Yeterli lisans yok</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>Şifre gerekli</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Desteklenmeyen yazılım versiyonu</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>Lütfen firmware'i güncelleyin</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1588,26 +1541,12 @@
       <translation>G / Ç arayüzü henüz desteklenmiyor</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Bu uygulamada I / O modülü sadece bir ses girişi aygıtı olarak kullanılabilir. Bir kontrol modülü olarak kullanmak için lütfen %1masaüstü sürümünü kullanın</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>Canlı yayın yok</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Video izlemek için %1 istemci veya kamera web sayfasını kullanarak bu kamerada şifre belirleyin</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>Arşiv şifreli</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1618,8 +1557,20 @@
       <translation>Oturum Aç</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

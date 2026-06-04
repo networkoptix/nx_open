@@ -9637,14 +9637,6 @@ Wydajność witryny jest obniżona.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Wartość</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -13160,10 +13152,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
       <source>Key</source>
       <translation>Klucz</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Wartość</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -13185,10 +13173,6 @@ Zalecamy, aby nie otwierać tej strony internetowej. Jeśli rozumiesz ryzyko, mo
     <message>
       <source>For</source>
       <translation>Dla</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Wartość</translation>
     </message>
   </context>
   <context>

@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>נדרש אימות</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>נדרשת סיסמה</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>גרסת קושחה לא נתמכת</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>לא מקוון</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1554,32 +1527,12 @@
       <translation>לא ניתן להציג אף זרם וידאו</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>השרת במצב לא מקוון</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>נדרש אימות</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>המצלמה לא זמינה</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>אין מספיק רישיונות</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>נדרשת סיסמה</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>גרסת קושחה לא נתמכת</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>אנא עדכן קושחה</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1590,26 +1543,12 @@
       <translation>עדיין לא נתמך ממשק קלט / פלט</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>ניתן להשתמש במודול קלט / פלט של אפליקציה זו כמכשיר קלט קול בלבד. כדי להשתמש בו כמודול בקרה, אנא השתמש בגירסת שולחן העבודה של %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>אין שידור חי</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>הגדר סיסמה במצלמה זו באמצעות קליינט %1 או דף אינטרנט של המצלמה לצפייה בוידאו</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation type="unfinished">Archive encrypted</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1620,8 +1559,20 @@
       <translation>התחבר</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

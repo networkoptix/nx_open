@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>Autenticación necesaria</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>Contraseña requerida</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Versión de firmware no compatible</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Desconectado</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>Módulo E/S</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation>Se requiere más información</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1552,32 +1525,12 @@
       <translation>No se puede reproducir ninguna secuencia de vídeo</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>Servidor desconectado</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>Autentificación requerida</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>Cámara fuera de línea</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>No hay suficientes licencias</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>Se requiere contraseña</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Versión de firmware no compatible</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>Por favor actualice el firmware</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1588,26 +1541,12 @@
       <translation>La interfaz de E/S aún no es compatible</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>En esta aplicación, el módulo de E/S solo se puede utilizar como dispositivo de entrada de sonido. Para usarlo como un módulo de control, usa la versión de escritorio de %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>No hay transmisión en vivo</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Establezca la contraseña en esta cámara usando %1 cliente o página web de la cámara para ver el video</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation type="unfinished">Archive encrypted</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1618,8 +1557,20 @@
       <translation>Iniciar sesión</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation>2FA Deshabilitado</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

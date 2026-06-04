@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>要認証</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>パスワードが必要です</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>サポートされていないファームウェアバージョンです</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>オフライン</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I/Oモジュール</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation>情報が必要です</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1551,32 +1524,12 @@
       <translation>いずれの映像ストリームも再生できません</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>サーバーオフライン</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>要認証</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>カメラオフライン</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>ライセンスが不足しています</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>パスワードが必要です</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>サポートされていないファームウェアバージョンです</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>ファームウェアを更新してください</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1587,26 +1540,12 @@
       <translation>I/O インターフェースはまだサポートされていません</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>このアプリケーションでは、I/Oモジュールは音声入力デバイスとしてのみ使用できます。コントロールモジュールとして使用するには、%1 のデスクトップ版を使用してください。</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>ライブストリームなし</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>映像を表示するには、 %1 クライアントまたはカメラの Web ページを使用して、このカメラにパスワードを設定してください。</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>アーカイブは暗号化されています</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation>このアーカイブを復号するには、デスクトップクライアントに暗号化パスワードを入力するか、サイト管理者にお問い合わせください。</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1617,8 +1556,20 @@
       <translation>ログイン</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation>二要素認証が無効です</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

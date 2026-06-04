@@ -139,11 +139,11 @@
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Désactiver le décodage multi-thread si non coché, activer la sélection automatique si coché.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Autoriser le décodage multi-threads</translation>
     </message>
   </context>
   <context>
@@ -381,7 +381,7 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Partager le signet</translation>
     </message>
     <message>
       <source>URL</source>
@@ -404,7 +404,7 @@
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Partager le signet</translation>
     </message>
     <message>
       <source>Lifetime</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Password protection</source>
-      <translation type="unfinished">Password protection</translation>
+      <translation>Protection par mot de passe</translation>
     </message>
   </context>
   <context>
@@ -1034,7 +1034,7 @@
     <name>ExportMetadataSettingsWidget</name>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Métadonnées</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1046,7 +1046,7 @@
     </message>
     <message>
       <source>Object type</source>
-      <translation type="unfinished">Object type</translation>
+      <translation>Type d'objet</translation>
     </message>
     <message>
       <source>Has attributes</source>
@@ -1054,7 +1054,7 @@
     </message>
     <message>
       <source>Display attributes</source>
-      <translation type="unfinished">Display attributes</translation>
+      <translation>Afficher les attributs</translation>
     </message>
     <message>
       <source>Delete</source>

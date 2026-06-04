@@ -9353,14 +9353,6 @@ Site performance is degraded.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Değer</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12798,10 +12790,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
       <source>Key</source>
       <translation>Anahtar</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Değer</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12823,10 +12811,6 @@ Bu web sayfasını açmamanızı öneririz. Riskleri anlıyorsanız web sayfası
     <message>
       <source>For</source>
       <translation>İçin</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Değer</translation>
     </message>
   </context>
   <context>

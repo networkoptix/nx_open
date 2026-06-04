@@ -1151,7 +1151,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Partager le signet...</translation>
     </message>
   </context>
   <context>
@@ -1252,7 +1252,7 @@
     </message>
     <message>
       <source>Corrupted input file.</source>
-      <translation type="unfinished">Corrupted input file.</translation>
+      <translation>Fichier source corrompu.</translation>
     </message>
   </context>
   <context>
@@ -2031,23 +2031,23 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Impossible de vider le cache du moteur web</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Veuillez fermer toutes les pages web et réessayer.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Les fichiers peuvent être verrouillés par un autre processus.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Cache du moteur web partiellement vidé</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Certains fichiers peuvent être verrouillés par un autre processus.</translation>
     </message>
   </context>
   <context>
@@ -2077,7 +2077,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>internal</source>
-      <translation type="unfinished">internal</translation>
+      <translation>interne</translation>
     </message>
   </context>
   <context>
@@ -2416,7 +2416,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Cette action a été effectuée par un plugin.</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ Clé de licence : %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Créer et partager...</translation>
     </message>
   </context>
   <context>
@@ -5319,7 +5319,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Les favoris ne peuvent être partagés que sur un serveur en ligne.</translation>
     </message>
   </context>
   <context>
@@ -6261,7 +6261,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Utilisateurs LDAP</translation>
     </message>
   </context>
   <context>
@@ -8511,15 +8511,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Add Metadata</source>
-      <translation type="unfinished">Add Metadata</translation>
+      <translation>Ajouter des métadonnées</translation>
     </message>
     <message>
       <source>Reset metadata settings</source>
-      <translation type="unfinished">Reset metadata settings</translation>
+      <translation>Réinitialiser les paramètres de métadonnées</translation>
     </message>
     <message>
       <source>Metadata</source>
-      <translation type="unfinished">Metadata</translation>
+      <translation>Métadonnées</translation>
     </message>
   </context>
   <context>
@@ -9285,7 +9285,7 @@ Les performances du client sont dégradées.</translation>
     </message>
     <message>
       <source>Save Report</source>
-      <translation type="unfinished">Save Report</translation>
+      <translation>Enregistrer Rapport</translation>
     </message>
   </context>
   <context>
@@ -9351,14 +9351,6 @@ Les performances du client sont dégradées.</translation>
     <message>
       <source>Export List</source>
       <translation>Exporter la liste</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Valeur</translation>
     </message>
   </context>
   <context>
@@ -12590,7 +12582,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Cannot remove item from the layout</source>
-      <translation type="unfinished">Cannot remove item from the layout</translation>
+      <translation>Impossible de supprimer l'élément de la mise en page</translation>
     </message>
   </context>
   <context>
@@ -12805,10 +12797,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
       <source>Key</source>
       <translation>Clé</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Valeur</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12830,10 +12818,6 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>For</source>
       <translation>Pour</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Valeur</translation>
     </message>
   </context>
   <context>
@@ -12981,7 +12965,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     </message>
     <message>
       <source>Enter keywords separated by space</source>
-      <translation type="unfinished">Enter keywords separated by space</translation>
+      <translation>Saisissez les mots-clés séparés par un espace</translation>
     </message>
   </context>
   <context>

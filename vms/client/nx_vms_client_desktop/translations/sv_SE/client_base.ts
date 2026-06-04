@@ -9354,14 +9354,6 @@ Platsens prestanda är försämrad.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Värde</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12803,10 +12795,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
       <source>Key</source>
       <translation>Nyckel</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Värde</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12828,10 +12816,6 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>For</source>
       <translation>För</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Värde</translation>
     </message>
   </context>
   <context>

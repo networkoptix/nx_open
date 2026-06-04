@@ -327,6 +327,11 @@
         <numerusform>선택된 레이아웃이 제거되었습니다</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Value</source>
+      <comment>A value of some attribute</comment>
+      <translation type="unfinished">Value</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::rules::AcknowledgeAction</name>

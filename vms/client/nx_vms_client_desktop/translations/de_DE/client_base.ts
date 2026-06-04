@@ -9354,14 +9354,6 @@ Site performance is degraded.</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::LookupListModel</name>
-    <message>
-      <source>Value</source>
-      <comment>A value of some attribute</comment>
-      <translation>Wert</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
@@ -12804,10 +12796,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
       <source>Key</source>
       <translation>Schlüssel</translation>
     </message>
-    <message>
-      <source>Value</source>
-      <translation>Wert</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::ObjectLookupPicker</name>
@@ -12829,10 +12817,6 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>For</source>
       <translation>Für</translation>
-    </message>
-    <message>
-      <source>Value</source>
-      <translation>Wert</translation>
     </message>
   </context>
   <context>

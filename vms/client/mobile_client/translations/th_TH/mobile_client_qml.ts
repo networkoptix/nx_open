@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>จำเป็นต้องระบุตัวตนผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>กรุณาใส่รหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>เวอร์ชันเฟิร์มแวร์ที่ไม่สนับสนุน</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>ออฟไลน์</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>I/O โมดูล</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation type="unfinished">Information required</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -1551,32 +1524,12 @@
       <translation>ไม่สามารถเล่นวิดีโอสตรีมใดก็ได้</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>จำเป็นต้องระบุตัวตนผู้ใช้</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>ใบอนุญาตไม่เพียงพอ</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>กรุณาใส่รหัสผ่าน</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>เวอร์ชันเฟิร์มแวร์ที่ไม่สนับสนุน</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>กรุณาอัพเดทเฟิร์มแวร์</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1587,26 +1540,12 @@
       <translation>ส่วนติดต่อ I / O ไม่ได้รับการสนับสนุน</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>ใน app นี้ สามารถใช้โมดูล I/O เป็นอุปกรณ์อินพุตเสียงเท่านั้น เพื่อใช้เป็นควบคุมโมดูล โปรดใช้เดสก์ท็อปรุ่นของ %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>ไม่มีสตรีมภาพปัจจุบัน</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>ตั้งรหัสผ่านในกล้องนี้ใช้ %1 ไคลเอ็นต์หรือกล้องหน้าเว็บเพื่อดูวิดีโอ</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>การเข้ารหัสถูกเก็บถาวร</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation type="unfinished">Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1617,8 +1556,20 @@
       <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation type="unfinished">2FA Disabled</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>

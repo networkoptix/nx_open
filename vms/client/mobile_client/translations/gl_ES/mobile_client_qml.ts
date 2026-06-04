@@ -118,33 +118,6 @@
     </message>
   </context>
   <context>
-    <name>CameraItem</name>
-    <message>
-      <source>Authentication required</source>
-      <translation>Autenticación requirida</translation>
-    </message>
-    <message>
-      <source>Password required</source>
-      <translation>Contrasinal requirido</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Versión de firmware non compatible</translation>
-    </message>
-    <message>
-      <source>Offline</source>
-      <translation>Sen conexión</translation>
-    </message>
-    <message>
-      <source>I/O module</source>
-      <translation>Módulo E/S (I/O)</translation>
-    </message>
-    <message>
-      <source>Information required</source>
-      <translation>Información requirida</translation>
-    </message>
-  </context>
-  <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
@@ -667,11 +640,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Liña de tempo espellada</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>Inverter a liña de tempo para uso por persoas zurdas</translation>
     </message>
   </context>
   <context>
@@ -728,7 +701,7 @@
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Are you sure you want to disconnect from %1?</translation>
+      <translation>Seguro que queres desconectarte de %1?</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1552,32 +1525,12 @@
       <translation>Non se pode reproducir ningún fluxo de vídeo</translation>
     </message>
     <message>
-      <source>Server offline</source>
-      <translation>Servidor sen conexión</translation>
-    </message>
-    <message>
-      <source>Authentication required</source>
-      <translation>Autenticación requirida</translation>
-    </message>
-    <message>
-      <source>Camera offline</source>
-      <translation>Cámara sen conexión</translation>
-    </message>
-    <message>
       <source>Not enough licenses</source>
       <translation>Non hai licenzas suficientes</translation>
     </message>
     <message>
       <source>Password required</source>
       <translation>Contrasinal requirido</translation>
-    </message>
-    <message>
-      <source>Unsupported firmware version</source>
-      <translation>Versión de firmware non compatible</translation>
-    </message>
-    <message>
-      <source>Please update firmware</source>
-      <translation>Actualiza o firmware, por favor</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1588,26 +1541,12 @@
       <translation>A interface de I/O (E/S) aínda non é compatible</translation>
     </message>
     <message>
-      <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Nesta aplicación, o módulo de I/O (E/S) só se pode usar como dispositivo de entrada de son. Para usalo como módulo de control, utiliza a versión de escritorio de %1</translation>
-    </message>
-    <message>
       <source>No live stream</source>
       <translation>Non hai emisión en directo</translation>
     </message>
     <message>
-      <source>Set password on this camera using %1 client or camera web-page to view video</source>
-      <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation>Establece o contrasinal desta cámara usando o cliente %1 ou a páxina web da cámara para ver o vídeo</translation>
-    </message>
-    <message>
       <source>Archive encrypted</source>
       <translation>Arquivo cifrado</translation>
-    </message>
-    <message>
-      <source>Enter the encryption password on the Desktop Client to decrypt this archive, or ask your site administrator for help.</source>
-      <translation>Introduce o contrasinal de cifrado no cliente de escritorio para descifrar este arquivo ou solicita axuda ao administrador do sitio.</translation>
     </message>
     <message>
       <source>Information required</source>
@@ -1618,8 +1557,20 @@
       <translation>Iniciar sesión</translation>
     </message>
     <message>
-      <source>2FA Disabled</source>
-      <translation>2FA desactivado</translation>
+      <source>Offline</source>
+      <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+      <source>2FA disabled</source>
+      <translation type="unfinished">2FA disabled</translation>
+    </message>
+    <message>
+      <source>Unauthorized</source>
+      <translation type="unfinished">Unauthorized</translation>
+    </message>
+    <message>
+      <source>Unsupported</source>
+      <translation type="unfinished">Unsupported</translation>
     </message>
   </context>
   <context>
