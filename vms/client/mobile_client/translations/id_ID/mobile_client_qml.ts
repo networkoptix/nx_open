@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation>Offline</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>I/O module</source>
