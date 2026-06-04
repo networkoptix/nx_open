@@ -384,12 +384,38 @@ AdaptiveScreen
         }
 
         view: view
-        refreshPreloader: Preloader
+
+        refreshPreloader: Skeleton
         {
             id: refreshPreloader
 
             parent: searchContent
-            anchors.centerIn: parent
+
+            anchors.fill: parent
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            anchors.topMargin: LayoutController.isTabletLayout ? 16 : 52
+
+            ColumnLayout
+            {
+                anchors.fill: parent
+                spacing: LayoutController.isTablet ? 12 : 8
+
+                Repeater
+                {
+                    model: 8
+
+                    Rectangle
+                    {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: LayoutController.isTablet ? 209 : 92 //< Keep in sync with EventSearchItem height.
+
+                        radius: 8
+                        color: "white"
+                        antialiasing: false
+                    }
+                }
+            }
         }
     }
 
@@ -567,7 +593,7 @@ AdaptiveScreen
             rightMargin: 20
 
             clip: true
-            spacing: 12
+            spacing: LayoutController.isTablet ? 12 : 8
 
             boundsBehavior: Flickable.DragAndOvershootBounds
 
