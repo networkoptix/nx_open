@@ -396,7 +396,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Nuage</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Local</source>

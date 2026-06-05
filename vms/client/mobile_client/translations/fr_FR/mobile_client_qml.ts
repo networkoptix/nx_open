@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Hors ligne</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -1021,7 +1021,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Nuage</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
