@@ -28,6 +28,7 @@ public:
     QString lastErrorStr() const;
     virtual bool canAcceptData() const override;
     virtual bool needConfigureProvider() const override;
+    virtual AudioLayoutConstPtr getAudioLayout() const override;
     void clearUnprocessedData() override {};
     const nx::vms::client::core::DesktopDataProviderBase* owner() const { return m_owner;  }
 

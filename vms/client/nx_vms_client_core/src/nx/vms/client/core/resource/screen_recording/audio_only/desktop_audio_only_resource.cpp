@@ -16,12 +16,6 @@ bool DesktopAudioOnlyResource::hasVideo(const QnAbstractStreamDataProvider* /*da
     return false;
 }
 
-AudioLayoutConstPtr DesktopAudioOnlyResource::getAudioLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
-{
-    return nullptr;
-}
-
 QnAbstractStreamDataProvider* DesktopAudioOnlyResource::createDataProvider(
     Qn::ConnectionRole /*role*/)
 {

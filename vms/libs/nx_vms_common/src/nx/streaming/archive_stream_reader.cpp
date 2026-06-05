@@ -239,7 +239,7 @@ bool QnArchiveStreamReader::hasVideo() const
     return *m_hasVideo;
 }
 
-AudioLayoutConstPtr QnArchiveStreamReader::getDPAudioLayout() const
+AudioLayoutConstPtr QnArchiveStreamReader::getAudioLayout() const
 {
     if (!m_audioLayout.has_value())
     {

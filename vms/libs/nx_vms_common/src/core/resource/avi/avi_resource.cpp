@@ -143,15 +143,6 @@ bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) c
     return *m_hasVideo;
 }
 
-AudioLayoutConstPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
-{
-    const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
-    if (archiveReader)
-        return archiveReader->getDPAudioLayout();
-
-    return QnMediaResource::getAudioLayout();
-}
-
 void QnAviResource::setStorage(const QnStorageResourcePtr& storage)
 {
     m_storage = storage;

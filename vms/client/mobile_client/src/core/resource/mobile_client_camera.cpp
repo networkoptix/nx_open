@@ -13,12 +13,6 @@ QnConstResourceVideoLayoutPtr QnMobileClientCamera::getVideoLayout(
     return QnMediaResource::getVideoLayout();
 }
 
-AudioLayoutConstPtr QnMobileClientCamera::getAudioLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
-{
-    return QnMediaResource::getAudioLayout();
-}
-
 QnAbstractStreamDataProvider* QnMobileClientCamera::createDataProvider(Qn::ConnectionRole /*role*/)
 {
     return nullptr;

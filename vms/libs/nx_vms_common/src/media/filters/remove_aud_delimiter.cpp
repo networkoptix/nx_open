@@ -25,11 +25,6 @@ inline int h265NalType(const uint8_t* nal)
     return int((nal[0] >> 1) & 0x3F);
 }
 
-uint32_t readBe32(const uint8_t* p)
-{
-    return (uint32_t(p[0]) << 24) | (uint32_t(p[1]) << 16) | (uint32_t(p[2]) << 8) | uint32_t(p[3]);
-}
-
 } // namespace
 
 QnConstAbstractDataPacketPtr H2645RemoveAudDelimiter::processData(const QnConstAbstractDataPacketPtr& data)

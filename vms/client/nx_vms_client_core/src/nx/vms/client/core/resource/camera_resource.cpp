@@ -98,15 +98,6 @@ QnConstResourceVideoLayoutPtr CameraResource::getVideoLayout(
     return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }
 
-AudioLayoutConstPtr CameraResource::getAudioLayout(
-    const QnAbstractStreamDataProvider* dataProvider) const
-{
-    if (const auto archive = dynamic_cast<const QnArchiveStreamReader*>(dataProvider))
-        return archive->getDPAudioLayout();
-
-    return QnMediaResource::getAudioLayout();
-}
-
 QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionRole role)
 {
     NX_ASSERT(role == Qn::CR_Default);

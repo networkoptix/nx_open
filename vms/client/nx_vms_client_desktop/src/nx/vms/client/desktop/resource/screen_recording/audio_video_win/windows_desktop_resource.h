@@ -14,10 +14,7 @@ public:
     WindowsDesktopResource();
 
     virtual bool isRendererSlow() const override;
-    virtual AudioLayoutConstPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
-
     virtual QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role) override;
-
     bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 };
 

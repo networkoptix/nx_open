@@ -28,6 +28,4 @@ private:
 
     QnCompressedVideoDataPtr removeAuxFromMp4Format(
         const QnConstCompressedVideoDataPtr& videoData);
-
-    CodecParametersConstPtr m_newContext;
 };

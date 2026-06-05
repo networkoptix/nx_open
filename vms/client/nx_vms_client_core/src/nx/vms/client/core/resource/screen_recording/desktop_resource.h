@@ -27,8 +27,6 @@ public:
     void disconnectFromServer();
 
     virtual bool isRendererSlow() const = 0;
-    virtual AudioLayoutConstPtr getAudioLayout(
-        const QnAbstractStreamDataProvider* dataProvider) const override;
 
     static QString calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId);
 

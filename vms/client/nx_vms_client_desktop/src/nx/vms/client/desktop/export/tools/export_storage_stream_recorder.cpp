@@ -318,7 +318,8 @@ bool ExportStorageStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md
         else
             videoLayout = m_mediaDevice->getVideoLayout(m_mediaProvider);
         setVideoLayout(videoLayout);
-        setAudioLayout(m_mediaDevice->getAudioLayout(m_mediaProvider));
+        if (m_mediaProvider)
+            setAudioLayout(m_mediaProvider->getAudioLayout());
         setHasVideo(m_mediaDevice->hasVideo(m_mediaProvider));
     }
 

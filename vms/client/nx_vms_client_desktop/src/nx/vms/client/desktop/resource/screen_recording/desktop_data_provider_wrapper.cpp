@@ -44,6 +44,11 @@ bool DesktopDataProviderWrapper::canAcceptData() const
     return true;
 }
 
+AudioLayoutConstPtr DesktopDataProviderWrapper::getAudioLayout() const
+{
+    return nullptr;
+}
+
 } // namespace nx::vms::client::desktop
 
 #endif // !defined(Q_OS_WIN)

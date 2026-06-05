@@ -185,7 +185,7 @@ bool NovMediaExport::saveData(const QnConstAbstractMediaDataPtr& md)
             || (md->context && !m_audioCodecParameters->isEqual(*md->context)))
         {
             NX_DEBUG(this, "New audio codec parameters: %1", md->context->toString());
-            setAudioLayout(m_mediaDevice->getAudioLayout(m_mediaProvider));
+            setAudioLayout(m_mediaProvider->getAudioLayout());
             if (m_fileOpened)
             {
                 NX_DEBUG(this, "Audio codec parameters have changed. Close file");

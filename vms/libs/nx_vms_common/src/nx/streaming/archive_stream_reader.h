@@ -64,7 +64,7 @@ public:
     virtual bool isSingleShotMode() const override;
 
     virtual QnConstResourceVideoLayoutPtr getDPVideoLayout() const;
-    virtual AudioLayoutConstPtr getDPAudioLayout() const;
+    virtual AudioLayoutConstPtr getAudioLayout() const;
     virtual bool hasVideo() const override;
     void renameFileOnDestroy(const QString& newFileName);
     //void jumpWithMarker(qint64 usec, bool findIFrame, int marker);

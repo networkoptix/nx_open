@@ -75,17 +75,6 @@ void DesktopResource::disconnectFromServer()
     NX_DEBUG(this, "Desktop camera connection closed");
 }
 
-AudioLayoutConstPtr DesktopResource::getAudioLayout(
-    const QnAbstractStreamDataProvider* dataProvider) const
-{
-    auto desktopProvider = dynamic_cast<DesktopDataProviderBase*>(
-        const_cast<QnAbstractStreamDataProvider*>(dataProvider));
-    if (desktopProvider)
-        return desktopProvider->getAudioLayout();
-
-    return nullptr;
-}
-
 QString DesktopResource::calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId)
 {
     return moduleId.toString(QUuid::WithBraces) + userId.toString(QUuid::WithBraces);

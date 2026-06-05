@@ -39,8 +39,6 @@ public:
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
         const QnAbstractStreamDataProvider* dataProvider = nullptr) override;
-    virtual AudioLayoutConstPtr getAudioLayout(
-        const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 

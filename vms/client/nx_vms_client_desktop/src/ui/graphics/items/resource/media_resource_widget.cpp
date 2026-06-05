@@ -3629,7 +3629,7 @@ bool QnMediaResourceWidget::hasAudio() const
     if (d->camera)
         return d->camera->hasAudio();
 
-    if (d->mediaResource) // Handle local files.
+    if (d->display()->dataProvider()) // Handle local files.
     {
         // TODO #lbusygin: Something like this needs to be done with the archive: if the audio
         // on the camera is disabled, it will not play from the archive.
@@ -3637,7 +3637,7 @@ bool QnMediaResourceWidget::hasAudio() const
         if (aviResource && aviResource->isEmbedded())
             return true; //< in NOV files audio can start in any random moment.
 
-        if (auto audioLayout = d->mediaResource->getAudioLayout(d->display()->dataProvider()))
+        if (auto audioLayout = d->display()->dataProvider()->getAudioLayout())
             return !audioLayout->tracks().empty();
     }
 

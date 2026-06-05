@@ -79,13 +79,6 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
     }
 }
 
-static AudioLayoutConstPtr audioLayout(new AudioLayout());
-AudioLayoutConstPtr QnMediaResource::getAudioLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
-{
-    return audioLayout;
-}
-
 void QnMediaResource::initMediaResource()
 {
     addFlags(Qn::media);

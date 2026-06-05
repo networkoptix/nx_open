@@ -45,6 +45,7 @@ public:
     Qn::ConnectionRole getRole() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
+    virtual AudioLayoutConstPtr getAudioLayout() const { return nullptr; }
     virtual bool hasVideo() const { return true; }
     virtual bool needConfigureProvider() const;
     virtual void startIfNotRunning() { start(); }

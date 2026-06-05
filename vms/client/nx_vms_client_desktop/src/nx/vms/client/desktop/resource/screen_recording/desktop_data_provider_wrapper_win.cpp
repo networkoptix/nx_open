@@ -46,6 +46,11 @@ bool DesktopDataProviderWrapper::needConfigureProvider() const
     return false;
 }
 
+AudioLayoutConstPtr DesktopDataProviderWrapper::getAudioLayout() const
+{
+    return m_owner->getAudioLayout();
+}
+
 void DesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 {
     const auto media = dynamic_cast<QnAbstractMediaData*>(data.get());

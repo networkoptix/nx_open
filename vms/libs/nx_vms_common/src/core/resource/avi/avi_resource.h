@@ -31,7 +31,6 @@ public:
     virtual QString toString() const;
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
-    virtual AudioLayoutConstPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
     void setStorage(const QnStorageResourcePtr& storage);
     QnStorageResourcePtr getStorage() const;

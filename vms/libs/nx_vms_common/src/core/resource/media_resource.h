@@ -36,7 +36,6 @@ public:
 
     // resource can use DataProvider for addition info (optional)
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr);
-    virtual AudioLayoutConstPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = nullptr) const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider = nullptr) const = 0;
 
     virtual nx::vms::api::dewarping::MediaData getDewarpingParams() const;

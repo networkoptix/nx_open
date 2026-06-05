@@ -8,7 +8,7 @@ class MockStreamParser: public nx::rtp::StreamParser
 {
 public:
     virtual void setSdpInfo(const nx::rtp::Sdp::Media&) override {};
-    virtual QnAbstractMediaDataPtr nextData() override { return nullptr; };
+    virtual QnAbstractMediaDataPtr nextData() override { return nullptr; }
     virtual nx::rtp::Result processData(
         const nx::rtp::RtpHeader&, quint8*, int, int, bool&) override { return true; }
     virtual void clear() override {};

@@ -12,8 +12,6 @@ class NX_VMS_CLIENT_CORE_API DesktopAudioOnlyResource: public DesktopResource
 
 public:
     virtual bool isRendererSlow() const override;
-    virtual AudioLayoutConstPtr getAudioLayout(
-        const QnAbstractStreamDataProvider* dataProvider) const override;
 
     bool hasVideo(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
