@@ -131,8 +131,8 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
     m_endDateTimeUs = mediaData->timestamp;
     if (m_startDateTimeUs == (int64_t)AV_NOPTS_VALUE)
         m_startDateTimeUs = mediaData->timestamp;
-    m_isAudioPresent = m_audioLayout && !m_audioLayout->tracks().empty() && isAudioRecorded();
-    const auto audioLayout = m_isAudioPresent ? m_audioLayout : AudioLayoutConstPtr();
+
+    const auto audioLayout = isAudioRecorded() ? m_audioLayout : AudioLayoutConstPtr();
     auto metaData = prepareMetaData(mediaData, m_videoLayout);
     if (!doPrepareToStart(mediaData, m_videoLayout, audioLayout, metaData))
         return false;
@@ -333,11 +333,6 @@ void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
     m_bofDateTimeUs = bof;
     m_eofDateTimeUs = eof;
     m_lastProgress = -1;
-}
-
-bool QnStreamRecorder::isAudioPresent() const
-{
-    return m_isAudioPresent;
 }
 
 int64_t QnStreamRecorder::startTimeUs() const

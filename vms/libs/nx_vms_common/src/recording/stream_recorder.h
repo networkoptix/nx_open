@@ -39,7 +39,6 @@ public:
     void close();
     qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
     void setProgressBounds(qint64 bof, qint64 eof);
-    bool isAudioPresent() const;
     int64_t packetCount() const;
     int64_t startTimeUs() const;
 
@@ -91,7 +90,6 @@ private:
 protected:
     bool m_firstTime = true;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
-    bool m_isAudioPresent = false;
     QnResourcePtr m_resource;
     const QnMediaResourcePtr m_mediaDevice;
     bool m_fileOpened = false;
