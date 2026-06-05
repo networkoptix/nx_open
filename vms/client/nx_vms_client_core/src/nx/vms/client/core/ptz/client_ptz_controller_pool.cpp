@@ -31,7 +31,6 @@ void ControllerPool::registerResource(const QnResourcePtr &resource)
         [this](const QnVirtualCameraResourcePtr& camera)
         {
             updateController(camera);
-            cacheCameraPresets(camera);
 
             if (auto controller = this->controller(camera))
                 emit controller->changed(nx::vms::common::ptz::DataField::capabilities);

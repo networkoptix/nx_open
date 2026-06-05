@@ -368,7 +368,12 @@ void CachingPtzController::initialize()
 
     connect(resource().get(), &QnResource::statusChanged, this, safeInitialize);
     connect(resource().get(), &QnResource::parentIdChanged, this, safeInitialize);
-    initializeInternal();
+
+    // Do not bootstrap the cache eagerly by calling initializeInternal here: on a system with
+    // many PTZ cameras this would fire GetDataPtzCommand for every camera at once on login,
+    // saturating the HTTP client pool and stalling user-initiated PTZ commands by tens of
+    // seconds. Data is fetched lazily on first access via getData/getPresets/getTours and
+    // refreshed on statusChanged.
 }
 
 template<class T>
