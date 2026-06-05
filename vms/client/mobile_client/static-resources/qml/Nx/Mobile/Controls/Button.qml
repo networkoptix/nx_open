@@ -51,6 +51,7 @@ T.AbstractButton
 
     icon.width: 20
     icon.height: 20
+    icon.color: foregroundColor
 
     background: Rectangle
     {
@@ -98,7 +99,7 @@ T.AbstractButton
                 name: control.icon.name
                 sourcePath: control.icon.source
                 sourceSize: Qt.size(control.icon.width, control.icon.height)
-                primaryColor: control.foregroundColor
+                primaryColor: control.icon.color
                 visible: content.hasIcon
 
                 anchors.verticalCenter: parent.verticalCenter
