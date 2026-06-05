@@ -1558,7 +1558,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Desconectado</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>No autorizado</translation>
     </message>
     <message>
       <source>Unsupported</source>

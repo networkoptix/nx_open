@@ -1562,7 +1562,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>غير مُتصل</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>غير مصرح به</translation>
     </message>
     <message>
       <source>Unsupported</source>

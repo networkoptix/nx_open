@@ -1382,7 +1382,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Nuage</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1558,7 +1558,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Hors ligne</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Non autorisé</translation>
     </message>
     <message>
       <source>Unsupported</source>

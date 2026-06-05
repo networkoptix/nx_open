@@ -1560,7 +1560,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Поза мережею</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1568,7 +1568,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Неавторизований</translation>
     </message>
     <message>
       <source>Unsupported</source>

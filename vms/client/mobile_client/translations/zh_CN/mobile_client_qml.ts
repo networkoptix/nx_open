@@ -1557,7 +1557,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>离线</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1565,7 +1565,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>未经身分检证</translation>
     </message>
     <message>
       <source>Unsupported</source>
