@@ -110,12 +110,16 @@ struct NX_VMS_API LoginSessionFilter
 
     // Only works for /rest/v4+.
     /**%apidoc[opt]
-     * User to read sessions for (requires administrator permissions), empty means current user,
-     * explicit `*` means all users in the Site.
+     * User to read sessions for (requires administrator permissions). Explicit `*` means all users
+     * in the Site. If not specified the user that issued the token from the authorization headers is used.
      */
     std::string username;
 
-    /**%apidoc[opt] Target server, entire Site if not specified. */
+    // Only works for /rest/v4+.
+    /**%apidoc[opt]
+     * Server to request sessions from. If not specified, sessions are collected from all
+     * accessible Servers of the Site.
+     */
     nx::Uuid serverId;
 };
 #define LoginSessionFilter_Fields (token)(setCookie)(setSession)(username)(serverId)

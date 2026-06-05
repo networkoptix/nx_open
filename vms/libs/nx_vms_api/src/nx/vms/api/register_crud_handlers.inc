@@ -48,19 +48,21 @@ static void registerLoginRestHandlers(
      * %ingroup Login
      * %struct LoginSessionFilter
      * %param[unused] username
+     * %param[unused] serverId
      * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_strict,_with
      * %param[ref] _local
      * %permissions Authorization is not required.
      * %return:{LoginSession}
      *
      **%apidoc GET /rest/v{1-3}/login/sessions
-     * Retrieves the session information about all sessions known to this Server.
+     * Retrieves the session information about all sessions known to Server.
      * <p>
      * <b>ATTENTION:</b> The session information from the remote sources (other Servers or the
      * Cloud) may be inaccurate and/or incomplete.
      * </p>
      * %caption Get all login Sessions
      * %ingroup Login
+     * %param[opt]:uuid serverId Server to request sessions from. This Server if not specified.
      * %param[ref] _filter,_format,_stripDefault,_keepDefault,_language,_pretty,_strict,_ticket,_with
      * %param[ref] _local
      * %permissions Administrator with a fresh session.
