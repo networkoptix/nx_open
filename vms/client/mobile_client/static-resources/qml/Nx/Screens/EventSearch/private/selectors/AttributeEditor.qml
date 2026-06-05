@@ -75,21 +75,8 @@ Column
         Binding
         {
             target: content.item
-            property: "text"
-            value: control.labelText
-        }
-
-        Binding
-        {
-            target: content.item
             property: "descriptionText"
-            value:
-            {
-                if (!content.item)
-                    return ""
-
-                return control.attribute?.name || ""
-            }
+            value: control.labelText
         }
 
         Binding
