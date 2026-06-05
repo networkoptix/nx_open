@@ -62,7 +62,7 @@ class NX_MEDIA_API Player: public QObject
     /**
      * Last video frame position (msec).
      */
-    Q_PROPERTY(qint64 displayedPosition READ displayedPosition NOTIFY positionChanged)
+    Q_PROPERTY(qint64 displayedPosition READ displayedPosition NOTIFY displayedPositionChanged)
 
     /**
      * Playback speed factor. For example '2' - mean 2x play speed.
@@ -329,6 +329,7 @@ signals:
     void resourceChanged();
     void videoSurfaceChanged();
     void positionChanged();
+    void displayedPositionChanged();
     void playbackFinished();
     void mediaStatusChanged();
     void reconnectOnPlayChanged();

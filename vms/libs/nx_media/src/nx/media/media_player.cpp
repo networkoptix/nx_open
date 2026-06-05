@@ -152,6 +152,10 @@ public:
     // Playback speed.
     double speed = 1.0;
 
+    // Last displayed frame timestamp.
+    // Unlike dataConsumer, holds actual timestamp for live frames, not DATETIME_NOW.
+    std::optional<qint64> displayedPositionMs;
+
     // Video surface list to render. Holds QT property value.
     QMap<int, QPointer<QVideoSink>> videoSurfaces;
 
@@ -592,15 +596,22 @@ void Player::Private::presentNextFrame()
         isHwAccelerated = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_HWDecodingUsed);
         codecName = metadata.codecName;
         videoSurface->setVideoFrame(*scaleFrame(videoFrameToRender));
+
         if (dataConsumer)
         {
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
+
         if (metadata.displayHint != DisplayHint::obsolete)
             setPosition(videoFrameToRender->startTime());
+
         setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
+
+        displayedPositionMs = videoFrameToRender->startTime();
+        emit q->displayedPositionChanged();
     }
+
     videoFrameToRender.reset();
 
     // Calculate next time to render.
@@ -1054,7 +1065,7 @@ qint64 Player::position() const
 
 qint64 Player::displayedPosition() const
 {
-    return d->lastVideoPtsMs.value_or(-1);
+    return d->displayedPositionMs.value_or(-1);
 }
 
 Player::AutoJumpPolicy Player::autoJumpPolicy() const
@@ -1237,6 +1248,9 @@ void Player::stop()
         d->setMediaStatus(MediaStatus::NoMedia);
 
     d->clearVideoOutput();
+
+    d->displayedPositionMs.reset();
+    emit displayedPositionChanged();
 
     NX_DEBUG(this, "stop() END");
 }
