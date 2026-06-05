@@ -311,6 +311,9 @@ Page
         property bool restorePortraitScreenOrientation: false
         property bool fullscreen: false
 
+        readonly property bool hasChunkNavigation:
+            modernVideoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
+
         Connections
         {
             target: LayoutController
@@ -658,6 +661,7 @@ Page
             controller.mediaPlayer.displayedPosition, timeline.timeZone)
 
         showPlaybackControls: d.hasArchive
+        hasChunkNavigation: d.hasChunkNavigation
 
         actionsButtonEnabled: controller.playingLive
         actionsButtonVisible: actionSheet.hasActions
@@ -699,9 +703,6 @@ Page
         color: LayoutController.isTabletLayout && !modernVideoScreen.activePage
             ? "transparent"
             : ColorTheme.colors.dark4
-
-        readonly property bool hasChunkNavigation:
-            modernVideoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
 
         Item
         {
@@ -759,11 +760,11 @@ Page
                         icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
 
                         enabled: d.hasArchive
-                            && navigationBar.hasChunkNavigation
+                            && d.hasChunkNavigation
                             && !speedControl.expanded
                             && NxGlobals.isValidTime(controller.prevChunkMs)
 
-                        opacity: (navigationBar.hasChunkNavigation && !speedControl.expanded)
+                        opacity: (d.hasChunkNavigation && !speedControl.expanded)
                             ? 1 : 0
 
                         Behavior on opacity { ExpandCollapseAnimation {} }
@@ -848,12 +849,11 @@ Page
 
                         icon.source: "image://skin/24x24/Outline/chunk_future.svg"
 
-                        enabled: d.hasArchive && navigationBar.hasChunkNavigation
+                        enabled: d.hasArchive && d.hasChunkNavigation
                             && !controller.playingLive
                             && !speedControl.expanded
 
-                        opacity: (navigationBar.hasChunkNavigation && !speedControl.expanded)
-                            ? 1 : 0
+                        opacity: (d.hasChunkNavigation && !speedControl.expanded) ? 1 : 0
 
                         Behavior on opacity { ExpandCollapseAnimation {} }
 

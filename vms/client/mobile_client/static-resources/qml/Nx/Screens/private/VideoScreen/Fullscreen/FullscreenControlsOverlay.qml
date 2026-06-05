@@ -15,6 +15,7 @@ Item
 
     property VideoScreenController controller
     property bool showPlaybackControls: true
+    property bool hasChunkNavigation: true
     property alias cameraTitle: cameraTitleLabel.text
     property alias cameraTimestampText: cameraTimestampLabel.text
 
@@ -250,6 +251,9 @@ Item
                 foregroundColor: ColorTheme.colors.light4
                 backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
                 icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
+                visible: control.hasChunkNavigation
+                enabled: NxGlobals.isValidTime(controller.prevChunkMs)
+                opacity: enabled ? 1 : 0.3
 
                 onClicked: controller.jumpToPreviousChunk()
             }
@@ -287,6 +291,9 @@ Item
                 foregroundColor: ColorTheme.colors.light4
                 backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
                 icon.source: "image://skin/24x24/Outline/chunk_future.svg"
+                visible: control.hasChunkNavigation
+                enabled: !controller.playingLive
+                opacity: enabled ? 1 : 0.3
 
                 onClicked: controller.jumpToNextChunk()
             }
