@@ -1256,43 +1256,43 @@
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>Error Storage I/O di %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>Storage Terlalu Lambat di %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>Storage Disk Penuh di %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>Disk Sistem Hampir Penuh di %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>Storage Analitik Offline di %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>Storage Analitik Hampir Penuh di %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>Error Izin Storage Analitik di %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>Enkripsi Storage Gagal di %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>Error Storage RAID di %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>Backup Archive Gagal pada %1</translation>
     </message>
   </context>
   <context>
