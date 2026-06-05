@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Nuage</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Local</source>
