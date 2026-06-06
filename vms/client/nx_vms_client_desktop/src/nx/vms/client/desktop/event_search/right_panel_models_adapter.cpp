@@ -32,6 +32,7 @@
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_context.h>
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/event_search/event_search_globals.h>
@@ -562,6 +563,35 @@ void RightPanelModelsAdapter::showOnLayout(int row)
             doubleClick(index.row());
         },
         this);
+}
+
+void RightPanelModelsAdapter::createBookmark(int row)
+{
+    if (!NX_ASSERT(row >= 0))
+        return;
+
+    const auto itemIndex = index(row, 0);
+
+    const auto resource = base_type::data(itemIndex, core::ResourceRole).value<QnResourcePtr>();
+    const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
+
+    const auto objectTrackData = itemIndex.data(core::ObjectTrackRole);
+    if (objectTrackData.isNull())
+        return;
+
+    const auto objectTrack = objectTrackData.value<nx::analytics::db::ObjectTrack>();
+
+    if (const auto bookmark =
+        core::bookmarks::bookmarkFromObjectTrack(objectTrack, camera))
+    {
+        const auto parameters = menu::Parameters(camera).withArgument(
+            core::CameraBookmarkRole, bookmark.value());
+
+        appContext()->mainWindowContext()->menu()->triggerForced(
+            menu::AddCameraBookmarkAction, parameters);
+    }
 }
 
 void RightPanelModelsAdapter::showEventLog()

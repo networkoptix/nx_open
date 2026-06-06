@@ -10,6 +10,7 @@
 #include <nx/analytics/action_type_descriptor_manager.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -89,6 +90,25 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
     }
 
     menu->addSeparator();
+
+    if (ResourceAccessManager::hasPermissions(cameraResource, Qn::ManageBookmarksPermission))
+    {
+        const auto createBookmarkAction = new QAction(tr("Create Bookmark..."), menu.get());
+        connect(createBookmarkAction, &QAction::triggered, this,
+            [cameraResource, track]()
+            {
+                if (const auto bookmark =
+                    core::bookmarks::bookmarkFromObjectTrack(track, cameraResource))
+                {
+                    const auto parameters = menu::Parameters(cameraResource).withArgument(
+                        core::CameraBookmarkRole, bookmark.value());
+
+                    appContext()->mainWindowContext()->menu()->triggerForced(
+                        menu::AddCameraBookmarkAction, parameters);
+                }
+            });
+        menu->addAction(createBookmarkAction);
+    }
 
     if (ResourceAccessManager::hasPermissions(cameraResource, Qn::ReadWriteSavePermission)
         && !track.attributes.empty()) //< Adding track without attributes to list is prohibited.

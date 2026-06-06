@@ -24,6 +24,7 @@
 #include <nx/vms/client/core/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/client/core/animation/kinetic_animation.h>
 #include <nx/vms/client/core/application_context.h>
+#include <nx/vms/client/core/bookmarks/bookmark_constants.h>
 #include <nx/vms/client/core/camera/buttons/abstract_camera_button_controller.h>
 #include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
@@ -217,6 +218,7 @@ void registerQmlTypesInternal()
     EventSearch::registerQmlTypes();
     ResourceIdentificationThumbnail::registerQmlType();
     AnalyticsSearchSetup::registerQmlType();
+    bookmarks::BookmarkConstants::registerQmlType();
     BookmarkSearchSetup::registerQmlType();
     TextFilterSetup::registerQmlType();
     MediaPlayer::registerQmlTypes();

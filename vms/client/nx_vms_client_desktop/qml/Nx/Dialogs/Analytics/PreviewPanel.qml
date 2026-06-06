@@ -32,11 +32,18 @@ Rectangle
     signal nextClicked()
     signal findSimilarClicked(string trackId)
     signal showOnLayoutClicked()
+    signal createBookmarkClicked()
     signal close()
 
     signal searchRequested(var attribute)
 
     color: ColorTheme.colors.dark8
+
+    AccessHelper
+    {
+        id: accessHelper
+        resource: selectedItem?.previewResource
+    }
 
     Behavior on x
     {
@@ -508,36 +515,60 @@ Rectangle
         width: parent.width
         height: 52
 
-        Button
+        RowLayout
         {
-            visible: previewPanel.showDevControls && previewPanel.selectedItem.hasTitleImage
-
-            anchors.left: parent.left
+            anchors.fill: parent
             anchors.leftMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
-
-            enabled: !!previewPanel.selectedItem
-
-            text: qsTr("Find similar")
-
-            onClicked:
-                previewPanel.findSimilarClicked(previewPanel.selectedItem.trackId)
-        }
-
-        Button
-        {
-            anchors.right: parent.right
             anchors.rightMargin: 12
-            anchors.verticalCenter: parent.verticalCenter
 
-            isAccentButton: true
+            spacing: 8
 
-            enabled: !!previewPanel.selectedItem
+            ImageButton
+            {
+                visible: accessHelper.canEditBookmarks
 
-            text: qsTr("Show on Layout")
+                implicitWidth: 28
+                implicitHeight: 28
+                Layout.alignment: Qt.AlignVCenter
 
-            onClicked:
-                previewPanel.showOnLayoutClicked()
+                enabled: !!previewPanel.selectedItem
+
+                icon.source: "image://skin/20x20/Outline/bookmark_add.svg?primary=light16"
+                icon.width: 20
+                icon.height: 20
+
+                onClicked: previewPanel.createBookmarkClicked()
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Button
+            {
+                visible: previewPanel.showDevControls && (previewPanel.selectedItem?.hasTitleImage ?? false)
+
+                Layout.alignment: Qt.AlignVCenter
+
+                enabled: !!previewPanel.selectedItem
+
+                text: qsTr("Find similar")
+
+                onClicked:
+                    previewPanel.findSimilarClicked(previewPanel.selectedItem.trackId)
+            }
+
+            Button
+            {
+                Layout.alignment: Qt.AlignVCenter
+
+                isAccentButton: true
+
+                enabled: !!previewPanel.selectedItem
+
+                text: qsTr("Show on Layout")
+
+                onClicked:
+                    previewPanel.showOnLayoutClicked()
+            }
         }
     }
 

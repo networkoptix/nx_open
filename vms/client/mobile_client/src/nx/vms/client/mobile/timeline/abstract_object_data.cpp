@@ -11,12 +11,12 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/bookmarks/bookmark_constants.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
-#include <nx/vms/client/mobile/camera/details/bookmark_constants.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::mobile {
@@ -64,7 +64,7 @@ common::CameraBookmark AbstractObjectData::convertToBookmark() const
             }(),
         .startTimeMs = milliseconds(startTimeMs()),
         .durationMs = milliseconds(std::max<qint64>(durationMs(), kMinDurationMs)),
-        .tags = { detail::BookmarkConstants::objectBasedTagName() },
+        .tags = { core::bookmarks::BookmarkConstants::objectBasedTagName() },
         .cameraId = camera->getId(),
     };
 }

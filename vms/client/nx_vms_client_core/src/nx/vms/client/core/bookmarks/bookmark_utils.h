@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <analytics/db/analytics_db_types.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/url.h>
@@ -34,7 +35,7 @@ bool NX_VMS_CLIENT_CORE_API bookmarkSharingAvailable(SystemContext* context);
 
 /**
  * @return Sharing parameters for non-interactive share actions: 1 day expiration time, no password
- * protection.
+ *     protection.
  */
 common::BookmarkShareableParams NX_VMS_CLIENT_CORE_API defaultBookmarkSharingParams();
 
@@ -57,6 +58,15 @@ std::optional<nx::Url> NX_VMS_CLIENT_CORE_API getBookmarkSharingLink(
  */
 bool NX_VMS_CLIENT_CORE_API sharedBookmarkAccessible(const common::CameraBookmark& bookmark,
     SystemContext* context);
+
+/**
+ * @return Camera bookmark structure initialized with data obtained from analytics object track,
+ *     nullopt if invalid arguments were provided. Initialization of the creatorId and
+ *     creationTimeStampMs fields is the responsibility of the caller.
+ */
+std::optional<common::CameraBookmark> NX_VMS_CLIENT_CORE_API bookmarkFromObjectTrack(
+    const nx::analytics::db::ObjectTrack& track,
+    const QnVirtualCameraResourcePtr& camera);
 
 } // namespace bookmarks
 } // namespace nx::vms::client::core

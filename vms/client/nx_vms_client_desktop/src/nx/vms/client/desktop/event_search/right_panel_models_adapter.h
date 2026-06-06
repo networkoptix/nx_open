@@ -157,6 +157,8 @@ public:
 
     Q_INVOKABLE void showOnLayout(int row);
 
+    Q_INVOKABLE void createBookmark(int row);
+
     QVector<RightPanel::VmsEventGroup> eventGroups() const;
     QAbstractItemModel* analyticsEvents() const;
 

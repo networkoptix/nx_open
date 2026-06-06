@@ -13,11 +13,15 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
+#include <nx/vms/client/core/bookmarks/bookmark_constants.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/feature_access_watcher.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
 #include <nx/vms/common/bookmark/bookmark_facade.h>
@@ -27,6 +31,11 @@
 
 namespace nx::vms::client::core {
 namespace bookmarks {
+
+struct BookmarkUtilsStrings
+{
+    Q_DECLARE_TR_FUNCTIONS(nx::vms::client::core::bookmarks::BookmarkUtilsStrings)
+};
 
 QString getVisibleBookmarkCreatorName(
     const QnCameraBookmark& bookmark,
@@ -121,6 +130,86 @@ bool sharedBookmarkAccessible(const common::CameraBookmark& bookmark, SystemCont
         && bookmark.shareable()
         && bookmark.bookmarkMatchesFilter(api::BookmarkShareFilter::shared
             | api::BookmarkShareFilter::accessible);
+}
+
+std::optional<common::CameraBookmark> bookmarkFromObjectTrack(
+    const nx::analytics::db::ObjectTrack& track,
+    const QnVirtualCameraResourcePtr& camera)
+{
+    using namespace std::chrono;
+    using namespace std::chrono_literals;
+
+    static constexpr auto kMinBookmarkDuration = 8000ms;
+
+    if (!NX_ASSERT(camera))
+        return {};
+
+    const auto systemContext = camera->systemContext()
+        ? camera->systemContext()->as<core::SystemContext>()
+        : nullptr;
+
+    if (!systemContext)
+        return {};
+
+    const auto startTime = duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
+    const auto duration = duration_cast<milliseconds>(microseconds(
+        track.lastAppearanceTimeUs - track.firstAppearanceTimeUs));
+
+    const auto getBookmarkName =
+        [systemContext, &track]()
+        {
+            if (track.title.has_value() && !track.title->text.isEmpty())
+                return track.title->text;
+
+            const auto taxonomyState = systemContext->analyticsTaxonomyStateWatcher()
+                ? systemContext->analyticsTaxonomyStateWatcher()->state()
+                : nullptr;
+
+            const auto objectType = taxonomyState
+                ? taxonomyState->objectTypeById(track.objectTypeId)
+                : nullptr;
+
+            return objectType
+                ? QString::fromStdString(objectType->name())
+                : BookmarkUtilsStrings::tr("Unknown Object");
+        };
+
+    const auto getBookmarkDescription =
+        [systemContext, &track, &camera, startTime]()
+        {
+            static const QString kLineTemplate("%1: %2");
+
+            QStringList resultLines;
+
+            const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+                startTime.count(), nx::vms::client::core::ServerTimeWatcher::timeZone(camera));
+            resultLines.append(dateTime.toString());
+            resultLines.append(kLineTemplate.arg(BookmarkUtilsStrings::tr("Camera"),
+                camera->getName()));
+
+            const auto attributeList = systemContext->analyticsAttributeHelper()->
+                preprocessAttributes(QString::fromStdString(track.objectTypeId), track.attributes);
+
+            for (const auto& attribute: attributeList)
+            {
+                resultLines.append(kLineTemplate.arg(attribute.displayedName,
+                    attribute.displayedValues.join(", ")));
+            }
+
+            return resultLines.join("\n");
+        };
+
+    nx::vms::common::CameraBookmark result;
+
+    result.guid = nx::Uuid::createUuid();
+    result.cameraId = camera->getId();
+    result.startTimeMs = startTime;
+    result.durationMs = std::max(duration, kMinBookmarkDuration);
+    result.tags = { BookmarkConstants::objectBasedTagName() };
+    result.name = getBookmarkName();
+    result.description = getBookmarkDescription();
+
+    return result;
 }
 
 } // namespace bookmarks

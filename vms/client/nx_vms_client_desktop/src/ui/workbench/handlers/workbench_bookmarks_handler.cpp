@@ -208,16 +208,25 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     if (!NX_ASSERT(camera && camera->systemContext()))
         return;
 
-    const auto timePeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-
     QnCameraBookmark bookmark;
+    if (parameters.hasArgument(nx::vms::client::core::CameraBookmarkRole))
+    {
+        bookmark = parameters.argument<QnCameraBookmark>(
+            nx::vms::client::core::CameraBookmarkRole);
+    }
+    else
+    {
+        const auto timePeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+        // This should be assigned before loading data to the dialog.
+        bookmark.guid = nx::Uuid::createUuid();
+        bookmark.name = tr("Bookmark");
+        bookmark.startTimeMs = timePeriod.startTime();
+        bookmark.durationMs = timePeriod.duration();
+        bookmark.cameraId = camera->getId();
+    }
 
-    // This should be assigned before loading data to the dialog.
-    bookmark.guid = nx::Uuid::createUuid();
-    bookmark.name = tr("Bookmark");
-    bookmark.startTimeMs = timePeriod.startTime();
-    bookmark.durationMs = timePeriod.duration();
-    bookmark.cameraId = camera->getId();
+    // Bookmark created from the timeline.
+    const auto toggleBookmarksMode = parameters.hasArgument(Qn::TimePeriodRole);
 
     auto dialog = createSelfDestructingDialog<QnCameraBookmarkDialog>(
         QnCameraBookmarkDialog::Mode::create,
@@ -228,7 +237,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
     dialog->loadData(bookmark);
 
     connect(dialog, &QnCameraBookmarkDialog::accepted, this,
-        [this, camera, dialog, bookmark = std::move(bookmark)]() mutable
+        [this, camera, dialog, toggleBookmarksMode, bookmark = std::move(bookmark)]() mutable
         {
             bookmark.creatorId = workbenchContext()->user()->getId();
             bookmark.creationTimeStampMs = qnSyncTime->value();
@@ -238,14 +247,15 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
                 return;
 
             auto callback = nx::utils::guarded(this,
-                [this, sharingRequested = dialog->sharingRequested(), camera](
+                [this, toggleBookmarksMode, sharingRequested = dialog->sharingRequested(), camera](
                     bool success,
                     const std::optional<nx::vms::api::BookmarkV3>& apiBookmark)
                 {
                     if (!success)
                         return;
 
-                    action(menu::BookmarksModeAction)->setChecked(true);
+                    if (toggleBookmarksMode)
+                        action(menu::BookmarksModeAction)->setChecked(true);
 
                     const auto bookmark = nx::vms::common::bookmarkFromApi(apiBookmark.value());
                     if (sharingRequested && bookmark.shareable())

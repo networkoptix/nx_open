@@ -950,6 +950,12 @@ Window
             onFindSimilarClicked: (trackId) =>
                 eventModel.analyticsSetup.referenceTrackId = NxGlobals.uuid(trackId)
 
+            onCreateBookmarkClicked:
+            {
+                if (selection.index.valid)
+                    eventModel.createBookmark(selection.index.row)
+            }
+
             onShowOnLayoutClicked:
                 d.showSelectionOnLayout()
 

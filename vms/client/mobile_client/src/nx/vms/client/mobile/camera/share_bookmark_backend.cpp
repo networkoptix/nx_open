@@ -33,8 +33,6 @@
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 
-#include "details/bookmark_constants.h"
-
 namespace nx::vms::client::mobile {
 
 using namespace std::chrono;
@@ -136,13 +134,6 @@ bool ShareBookmarkBackend::Private::updateShareParams(
 void ShareBookmarkBackend::registerQmlType()
 {
     qmlRegisterType<ShareBookmarkBackend>("nx.vms.client.mobile", 1, 0, "ShareBookmarkBackend");
-
-    qmlRegisterSingletonType<detail::BookmarkConstants>(
-        "nx.vms.client.mobile", 1, 0, "BookmarkConstants",
-        [](QQmlEngine*, QJSEngine*) -> QObject*
-        {
-            return new detail::BookmarkConstants();
-        });
 }
 
 ShareBookmarkBackend::ShareBookmarkBackend(QObject* parent):

@@ -4,9 +4,10 @@
 
 #include <QtCore/QObject>
 
-namespace nx::vms::client::mobile::detail {
+namespace nx::vms::client::core {
+namespace bookmarks {
 
-class BookmarkConstants: public QObject
+class NX_VMS_CLIENT_CORE_API BookmarkConstants: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString objectBasedTagName
@@ -17,6 +18,9 @@ public:
     BookmarkConstants(QObject* parent = nullptr);
 
     static QString objectBasedTagName();
+
+    static void registerQmlType();
 };
 
-} // namespace nx::vms::client::mobile::detail
+} // namespace bookmarks
+} // namespace nx::vms::client::core
