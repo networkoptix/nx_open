@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR" sourcelanguage="en">
+<TS version="2.1" language="lt_LT" sourcelanguage="en">
   <context>
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Désactivé par l'horaire</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation>Actions</translation>
+      <translation type="unfinished">Actions</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Désactivé selon l'horaire</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Speak...</source>
@@ -31,25 +31,25 @@
     <name>AnalyticSelectors</name>
     <message>
       <source>ADVANCED SEARCH</source>
-      <translation>RECHERCHE AVANCÉE</translation>
+      <translation type="unfinished">ADVANCED SEARCH</translation>
     </message>
   </context>
   <context>
     <name>AppInfoPage</name>
     <message>
       <source>About</source>
-      <translation>À propos</translation>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation>Indisponible</translation>
+      <translation type="unfinished">Not Available</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation>Aucune Archive</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
@@ -68,80 +68,80 @@
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
-      <translation>Présent</translation>
+      <translation type="unfinished">Present</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation>Absence</translation>
+      <translation type="unfinished">Absent</translation>
     </message>
   </context>
   <context>
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation>Fonctionnalités bêta</translation>
+      <translation type="unfinished">Beta Features</translation>
     </message>
     <message>
       <source>Video Download</source>
-      <translation>Télécharger la vidéo</translation>
+      <translation type="unfinished">Video Download</translation>
     </message>
     <message>
       <source>Download video to this device</source>
-      <translation>Télécharger la vidéo sur cet appareil</translation>
+      <translation type="unfinished">Download video to this device</translation>
     </message>
     <message>
       <source>Optimize Network</source>
-      <translation>Optimiser le réseau</translation>
+      <translation type="unfinished">Optimize Network</translation>
     </message>
     <message>
       <source>Apply network optimization methods</source>
-      <translation>Appliquer les méthodes d'optimisation du réseau</translation>
+      <translation type="unfinished">Apply network optimization methods</translation>
     </message>
     <message>
       <source>Parallel Decoding</source>
-      <translation>Décodage parallèle</translation>
+      <translation type="unfinished">Parallel Decoding</translation>
     </message>
     <message>
       <source>Use multiple decoders to improve performance</source>
-      <translation>Utiliser plusieurs décodeurs pour améliorer les performances</translation>
+      <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
   </context>
   <context>
     <name>BooleanSelector</name>
     <message>
       <source>Yes</source>
-      <translation>Oui</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Non</translation>
+      <translation type="unfinished">No</translation>
     </message>
   </context>
   <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
-      <translation>Paramètres Caméra</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation>Audio</translation>
+      <translation type="unfinished">Audio</translation>
     </message>
     <message>
       <source>Change Quality</source>
-      <translation>Changer qualité</translation>
+      <translation type="unfinished">Change Quality</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>Unknown video quality</comment>
-      <translation>Inconnu</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
   <context>
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation>Partenaire de distribution</translation>
+      <translation type="unfinished">Channel Partner</translation>
     </message>
   </context>
   <context>
@@ -149,143 +149,143 @@
     <message>
       <source>Log in to the site in %1</source>
       <comment>%1 is the desktop client name (like &apos;Nx Witness Client&apos;)</comment>
-      <translation>Se connecter au site dans %1</translation>
+      <translation type="unfinished">Log in to the site in %1</translation>
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation>Suivez les étapes de l'assistant</translation>
+      <translation type="unfinished">Follow the steps of wizard</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;pas connecté&lt;/a&gt; à %1</translation>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Cliquez sur &quot;Connecter le site à %1&quot; dans l'onglet %1 de l'administration du site.</translation>
+      <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;connecté&lt;/a&gt; à %1</translation>
+      <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;connected&lt;/a&gt; to %1</translation>
     </message>
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>Se connecter à %1 par le compte du propriétaire du site</translation>
+      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
-      <translation>Ouvrez la page des paramètres du site et cliquez sur &quot;changez&quot; lien à côté du nom du propriétaire</translation>
+      <translation type="unfinished">Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</translation>
     </message>
   </context>
   <context>
     <name>ComboBox</name>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Se connecter à un serveur</translation>
+      <translation type="unfinished">Connect to Server</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Supprimer</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation>Adresses serveurs et autres connexions resteront enregistrées. Pour supprimer les informations de connexions, vous devez supprimer toutes connexions sauvegardées.</translation>
+      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Supprimer connexion?</translation>
+      <translation type="unfinished">Delete connection?</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation>Entrez l’adresse serveur</translation>
+      <translation type="unfinished">Enter server address</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation>Supprimer connexion &quot;%1&quot;?</translation>
+      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
-      <translation>Le champ Identifiant ne peut pas être vide</translation>
+      <translation type="unfinished">Login field cannot be empty</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
-      <translation>Le champ mot de passe ne peut pas être vide</translation>
+      <translation type="unfinished">Password field cannot be empty</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation>Aucune donnée de mouvement pour cette caméra</translation>
+      <translation type="unfinished">No motion data for this camera</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation>Aucun mouvement trouvé dans la zone sélectionnée</translation>
+      <translation type="unfinished">No motion found in the selected area</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation>Aucun mouvement trouvé dans la zone visible</translation>
+      <translation type="unfinished">No motion found in the visible area</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation>Aucune Archive</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>DIRECT</translation>
+      <translation type="unfinished">LIVE</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation>Zone</translation>
+      <translation type="unfinished">Area</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Paramètres Caméra</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objets</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation>Appuyez et maintenez enfoncé pour sélectionner une zone</translation>
+      <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation>Activez d'abord la recherche de mouvement pour sélectionner une zone</translation>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Zone personnalisée invalide. Veuillez dessiner une zone correcte.</translation>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
-      <translation>Aperçu</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>Search by attribute</source>
@@ -293,72 +293,72 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Paramètres développeur</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
-      <translation>Copier l'ID du client</translation>
+      <translation type="unfinished">Copy Client ID</translation>
     </message>
     <message>
       <source>Copy log ID</source>
-      <translation>Copier l'ID du journal</translation>
+      <translation type="unfinished">Copy log ID</translation>
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Forcer le plantage</translation>
+      <translation type="unfinished">Force Crash</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Niveau Journal</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
     <name>DeviceSelector</name>
     <message>
       <source>Device</source>
-      <translation>Périphérique</translation>
+      <translation type="unfinished">Device</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation>Oui</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Non</translation>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Abandonner</translation>
+      <translation type="unfinished">Abort</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Réessayer</translation>
+      <translation type="unfinished">Retry</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connecter</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
   </context>
   <context>
@@ -366,14 +366,14 @@
     <message>
       <source>Enter your %1 account password to connect to the Site</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Entrez votre mot de passe de compte %1 pour vous connecter au Site</translation>
+      <translation type="unfinished">Enter your %1 account password to connect to the Site</translation>
     </message>
   </context>
   <context>
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation>Télécharger</translation>
+      <translation type="unfinished">Download</translation>
     </message>
   </context>
   <context>
@@ -381,68 +381,70 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation>
-        <numerusform>%n minute</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message>
       <source>Download next</source>
-      <translation>Télécharger le suivant</translation>
+      <translation type="unfinished">Download next</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>EventSearchMenu</name>
     <message>
       <source>Looking for</source>
-      <translation>À la recherche de</translation>
+      <translation type="unfinished">Looking for</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objets</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
     <name>EventSearchScreen</name>
     <message>
       <source>Objects</source>
-      <translation>Objets</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>Aucun objet</translation>
+      <translation type="unfinished">No objects</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation>Aucun signet</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Essayez de changer les filtres ou de configurer la détection des objets dans les paramètres du plugin caméra</translation>
+      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
     </message>
     <message>
       <source>Try changing the filters to display the results</source>
-      <translation>Essayez de changer les filtres pour afficher les résultats</translation>
+      <translation type="unfinished">Try changing the filters to display the results</translation>
     </message>
     <message>
       <source>Filters</source>
-      <translation>Filtres</translation>
+      <translation type="unfinished">Filters</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Détails</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Reset All</source>
@@ -450,100 +452,100 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation>Réinitialiser</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>
     <name>Feed</name>
     <message>
       <source>Notifications Off</source>
-      <translation>Notifications désactivées</translation>
+      <translation type="unfinished">Notifications Off</translation>
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Les notifications sont actuellement désactivées pour cette application. Pour activer les notifications, utilisez les paramètres de votre téléphone</translation>
+      <translation type="unfinished">Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
-      <translation>Vous avez désactivé les notifications push pour ce site. Pour les activer, allez à la page Paramètres.</translation>
+      <translation type="unfinished">You disabled push notifications for this site. To enable them, go to the Settings page.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Paramètres</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>No Notifications</source>
-      <translation>Aucune notification</translation>
+      <translation type="unfinished">No Notifications</translation>
     </message>
     <message>
       <source>No push notifications were found.</source>
-      <translation>Aucune notification push n'a été trouvée.</translation>
+      <translation type="unfinished">No push notifications were found.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Rien trouvé</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation>Essayez de modifier les paramètres de recherche</translation>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
     <message>
       <source>No New Notifications</source>
-      <translation>Aucune nouvelle notification</translation>
+      <translation type="unfinished">No New Notifications</translation>
     </message>
     <message>
       <source>No new push notifications were found, but you can view your full notification history.</source>
-      <translation>Aucune nouvelle notification push n'a été trouvée, mais vous pouvez consulter l'historique complet de vos notifications.</translation>
+      <translation type="unfinished">No new push notifications were found, but you can view your full notification history.</translation>
     </message>
     <message>
       <source>View All</source>
-      <translation>Voir tout</translation>
+      <translation type="unfinished">View All</translation>
     </message>
     <message>
       <source>Unviewed</source>
-      <translation>Non consulté</translation>
+      <translation type="unfinished">Unviewed</translation>
     </message>
     <message>
       <source>Viewed</source>
-      <translation>Consulté</translation>
+      <translation type="unfinished">Viewed</translation>
     </message>
     <message>
       <source>All</source>
-      <translation>Tout</translation>
+      <translation type="unfinished">All</translation>
     </message>
     <message>
       <source>Feed</source>
-      <translation>Flux</translation>
+      <translation type="unfinished">Feed</translation>
     </message>
   </context>
   <context>
     <name>FeedScreen</name>
     <message>
       <source>Unviewed</source>
-      <translation>Non consulté</translation>
+      <translation type="unfinished">Unviewed</translation>
     </message>
     <message>
       <source>All</source>
-      <translation>Tout</translation>
+      <translation type="unfinished">All</translation>
     </message>
     <message>
       <source>Period</source>
-      <translation>Période</translation>
+      <translation type="unfinished">Period</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation>Détails</translation>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
     <name>FiltersItem</name>
     <message>
       <source>Search Filters</source>
-      <translation>Filtres de recherche</translation>
+      <translation type="unfinished">Search Filters</translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation>Partagé uniquement</translation>
+      <translation type="unfinished">Shared Only</translation>
     </message>
   </context>
   <context>
@@ -561,78 +563,78 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation>Comment ça fonctionne</translation>
+      <translation type="unfinished">How it works</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation>Continuer</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
-      <translation>Ne plus afficher cette fenêtre</translation>
+      <translation type="unfinished">Do not show this window again</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Inconnue</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Haute-Res</translation>
+      <translation type="unfinished">Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Basse-Res</translation>
+      <translation type="unfinished">Lo-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation>ImageClé + Basse-Res</translation>
+      <translation type="unfinished">Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation>Perso-Res</translation>
+      <translation type="unfinished">Custom-Res</translation>
     </message>
     <message>
       <source>%1 fps</source>
       <comment>%1 is a count of frames per second</comment>
-      <translation>%1 ips</translation>
+      <translation type="unfinished">%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
       <comment>%1 is a mebgabits per second</comment>
-      <translation>%1 Mbps</translation>
+      <translation type="unfinished">%1 Mbps</translation>
     </message>
   </context>
   <context>
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation>Interface</translation>
+      <translation type="unfinished">Interface</translation>
     </message>
     <message>
       <source>Live Previews</source>
-      <translation>Aperçus en direct</translation>
+      <translation type="unfinished">Live Previews</translation>
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Afficher les aperçus dans la liste des caméras</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Heure Serveur</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
@@ -651,26 +653,26 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation>Se connecter quand même</translation>
+      <translation type="unfinished">Connect Anyway</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Ouvrir</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Open external link in browser?</source>
-      <translation>Ouvrir un lien externe dans le navigateur ?</translation>
+      <translation type="unfinished">Open external link in browser?</translation>
     </message>
   </context>
   <context>
@@ -678,25 +680,25 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Impossible de se connecter à %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Connexion</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Connecter</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
   </context>
   <context>
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation>Déconnecter</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
@@ -705,27 +707,27 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>MenuScreen</name>
     <message>
       <source>App Settings</source>
-      <translation>Paramètres de l'application</translation>
+      <translation type="unfinished">App Settings</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Déconnecter</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation>Connecté en tant que %1</translation>
+      <translation type="unfinished">Logged in as %1</translation>
     </message>
     <message>
       <source>Add Server</source>
-      <translation>Ajouter un serveur</translation>
+      <translation type="unfinished">Add Server</translation>
     </message>
   </context>
   <context>
@@ -739,11 +741,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation>Appuyez sur l’image pour positionner votre caméra</translation>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation>ANNULER</translation>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>
@@ -757,63 +759,63 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation>Afficher plus</translation>
+      <translation type="unfinished">Show more</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation>Aucune donnée</translation>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation>Afficher</translation>
+      <translation type="unfinished">View</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objets</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Mouvement</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation>N'importe quel</translation>
+      <translation type="unfinished">Any</translation>
     </message>
   </context>
   <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
-      <translation>Mot de passe</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
-      <translation>Le champ mot de passe ne peut pas être vide</translation>
+      <translation type="unfinished">Password field cannot be empty</translation>
     </message>
   </context>
   <context>
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Performance</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
-      <translation>Accélération matérielle</translation>
+      <translation type="unfinished">Hardware Acceleration</translation>
     </message>
     <message>
       <source>Can improve performance and battery life</source>
@@ -859,39 +861,39 @@
     <name>PluginSelector</name>
     <message>
       <source>Plugin</source>
-      <translation>Plugin</translation>
+      <translation type="unfinished">Plugin</translation>
     </message>
   </context>
   <context>
     <name>PresetSheet</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>Préréglages PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation>Sélectionner le préréglage</translation>
+      <translation type="unfinished">Select Preset</translation>
     </message>
   </context>
   <context>
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation>Sélectionner le préréglage</translation>
+      <translation type="unfinished">Select Preset</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -899,18 +901,18 @@
     </message>
     <message>
       <source>PTZ Presets</source>
-      <translation>Préréglages PTZ</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>PtzSheet</name>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -925,15 +927,15 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation>Sites</translation>
+      <translation type="unfinished">Sites</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation>Notifications</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Fait</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -941,106 +943,106 @@
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
-      <translation>Les notifications sont désactivées dans les paramètres de l'appareil</translation>
+      <translation type="unfinished">Notifications are turned off in the device settings</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation>Tous les Sites</translation>
+      <translation type="unfinished">All Sites</translation>
     </message>
     <message>
       <source>Selected Sites</source>
-      <translation>Sites sélectionnés</translation>
+      <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
       <source>SELECT</source>
-      <translation>SÉLECTIONNER</translation>
+      <translation type="unfinished">SELECT</translation>
     </message>
     <message>
       <source>At least one site has to be selected</source>
-      <translation>Au moins un site doit être sélectionné</translation>
+      <translation type="unfinished">At least one site has to be selected</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation>Oui</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Non</translation>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Enregistrer les modifications ?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation>Qualité vidéo</translation>
+      <translation type="unfinished">Video Quality</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Inconnue</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation>Vitesse maximale</translation>
+      <translation type="unfinished">Highest speed</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation>Meilleure qualité</translation>
+      <translation type="unfinished">Best quality</translation>
     </message>
     <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation>Transcodage n'est pas pris en charge pour cette caméra.</translation>
+      <translation type="unfinished">Transcoding is not supported for this camera.</translation>
     </message>
     <message>
       <source>Transcoding is disabled by the Server.</source>
-      <translation>Le transcodage est désactivé par le serveur.</translation>
+      <translation type="unfinished">Transcoding is disabled by the Server.</translation>
     </message>
     <message>
       <source>Transcoding is not supported for Servers with version lower than 3.0.</source>
-      <translation>Le transcodage n'est pas pris en charge pour les serveurs dont la version est inférieure à 3.0.</translation>
+      <translation type="unfinished">Transcoding is not supported for Servers with version lower than 3.0.</translation>
     </message>
   </context>
   <context>
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation>A partir de</translation>
+      <translation type="unfinished">From</translation>
     </message>
     <message>
       <source>To</source>
-      <translation>À</translation>
+      <translation type="unfinished">To</translation>
     </message>
   </context>
   <context>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Type</source>
-      <translation>Type</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation>Sous-type</translation>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Rien trouvé</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
-      <translation>Chargement...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>Connexion...</translation>
+      <translation type="unfinished">Connecting...</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
@@ -1048,7 +1050,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation>Ressources</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -1068,28 +1070,28 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation>Tous Périphériques</translation>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>
     <name>RestartRequiredPopup</name>
     <message>
       <source>Please restart the app to apply changes</source>
-      <translation>Veuillez redémarrer l'application pour appliquer les modifications</translation>
+      <translation type="unfinished">Please restart the app to apply changes</translation>
     </message>
   </context>
   <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Recherche</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Sécurité</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -1097,7 +1099,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Se connecter automatiquement aux serveurs</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -1105,11 +1107,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Garder</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Supprimer</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -1117,81 +1119,81 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Recommandé</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
-      <translation>Votre confirmation sera demandée pour épingler les certificats auto-signés</translation>
+      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificates</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation>Stricte</translation>
+      <translation type="unfinished">Strict</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
-      <translation>Connecter uniquement les serveurs avec des certificats publics</translation>
+      <translation type="unfinished">Connect only servers with public certificates</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Login</source>
-      <translation>Identifiant</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Mot de passe</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation>Hôtes</translation>
+      <translation type="unfinished">Hosts</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Utilisateurs</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Host: Port</source>
-      <translation>Hôte : Port</translation>
+      <translation type="unfinished">Host: Port</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation>Rien trouvé</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Recherche</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Organizations</source>
-      <translation>Organisations</translation>
+      <translation type="unfinished">Organizations</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation>Sites</translation>
+      <translation type="unfinished">Sites</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation>Essayez de modifier les paramètres de recherche</translation>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation>Aucune organisation</translation>
+      <translation type="unfinished">No Organizations</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Connexion</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation>Partenaires</translation>
+      <translation type="unfinished">Partners</translation>
     </message>
     <message>
       <source>No Sites</source>
-      <translation>Aucun site</translation>
+      <translation type="unfinished">No Sites</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -1199,7 +1201,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation>Le dossier est vide</translation>
+      <translation type="unfinished">Folder is empty</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
@@ -1231,92 +1233,92 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation>Ressources</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Paramètres</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
   </context>
   <context>
     <name>ShareAction</name>
     <message>
       <source>Shared</source>
-      <translation>Partagé</translation>
+      <translation type="unfinished">Shared</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation>Partager</translation>
+      <translation type="unfinished">Share</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
-      <translation>Le partage ouvre la nouvelle boîte de dialogue de signet pour générer un lien de lecture après avoir défini les options de partage</translation>
+      <translation type="unfinished">Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</translation>
     </message>
     <message>
       <source>Bookmark created</source>
-      <translation>Signet créé</translation>
+      <translation type="unfinished">Bookmark created</translation>
     </message>
     <message>
       <source>Cannot share bookmark</source>
-      <translation>Impossible de partager le signet</translation>
+      <translation type="unfinished">Cannot share bookmark</translation>
     </message>
   </context>
   <context>
     <name>ShareBookmarkSheet</name>
     <message>
       <source>New Bookmark</source>
-      <translation>Nouveau signet</translation>
+      <translation type="unfinished">New Bookmark</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation>Nom</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Description</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation>Protéger avec un mot de passe (facultatif)</translation>
+      <translation type="unfinished">Protect with Password (optional)</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Create &amp; Share</source>
-      <translation>Créer et partager</translation>
+      <translation type="unfinished">Create &amp; Share</translation>
     </message>
     <message>
       <source>Save &amp; Share</source>
-      <translation>Enregistrer et partager</translation>
+      <translation type="unfinished">Save &amp; Share</translation>
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation>Expire dans une heure</translation>
+      <translation type="unfinished">Expires in an hour</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation>Expire dans un jour</translation>
+      <translation type="unfinished">Expires in a day</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation>Expire dans un mois</translation>
+      <translation type="unfinished">Expires in a month</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation>N’expire jamais</translation>
+      <translation type="unfinished">Never expires</translation>
     </message>
     <message>
       <source>Shared link options</source>
-      <translation>Options de liens partagés</translation>
+      <translation type="unfinished">Shared link options</translation>
     </message>
     <message>
       <source>Sharing</source>
-      <translation>Partage en cours</translation>
+      <translation type="unfinished">Sharing</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1328,42 +1330,42 @@
     </message>
     <message>
       <source>Expiration</source>
-      <translation>Expiration</translation>
+      <translation type="unfinished">Expiration</translation>
     </message>
   </context>
   <context>
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation>Se connecter au site</translation>
+      <translation type="unfinished">Connect to Site</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Identifiant</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Mot de passe</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connecter</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation>Entrez l’adresse serveur</translation>
+      <translation type="unfinished">Enter server address</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
-      <translation>Le champ Identifiant ne peut pas être vide</translation>
+      <translation type="unfinished">Login field cannot be empty</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
-      <translation>Le champ mot de passe ne peut pas être vide</translation>
+      <translation type="unfinished">Password field cannot be empty</translation>
     </message>
     <message>
       <source>Host:Port</source>
@@ -1374,19 +1376,19 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Rien trouvé</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation>Essayez de modifier les paramètres de recherche</translation>
+      <translation type="unfinished">Try changing the search parameters</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Cloud</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Connexion</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Log In to Cloud</source>
@@ -1397,31 +1399,31 @@
     <name>SiteListItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBLE</translation>
+      <translation type="unfinished">INCOMPATIBLE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>HORS LIGNE</translation>
+      <translation type="unfinished">OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>INACCESSIBLE</translation>
+      <translation type="unfinished">UNREACHABLE</translation>
     </message>
     <message>
       <source>NEW</source>
-      <translation>NOUVEAU</translation>
+      <translation type="unfinished">NEW</translation>
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation>SUSPENDU</translation>
+      <translation type="unfinished">SUSPENDED</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation>ARRETER</translation>
+      <translation type="unfinished">SHUTDOWN</translation>
     </message>
     <message>
       <source>PENDING</source>
-      <translation>EN ATTENTE</translation>
+      <translation type="unfinished">PENDING</translation>
     </message>
   </context>
   <context>
@@ -1432,33 +1434,33 @@
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
-      <translation>Les sites en état de suspension ou d'arrêt ne sont pas disponibles</translation>
+      <translation type="unfinished">Sites in the Suspended or Shutdown state are not available</translation>
     </message>
   </context>
   <context>
     <name>SslCertificateDialogBase</name>
     <message>
       <source>Common name</source>
-      <translation>Nom commun</translation>
+      <translation type="unfinished">Common name</translation>
     </message>
     <message>
       <source>Issued by</source>
-      <translation>Émis par</translation>
+      <translation type="unfinished">Issued by</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Expire</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation>Empreintes digitales</translation>
+      <translation type="unfinished">Fingerprints</translation>
     </message>
   </context>
   <context>
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
@@ -1466,99 +1468,99 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 Compte</translation>
+      <translation type="unfinished">%1 Account</translation>
     </message>
     <message>
       <source>Log out</source>
-      <translation>Déconnexion</translation>
+      <translation type="unfinished">Log out</translation>
     </message>
     <message>
       <source>Open %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Ouvrir %1</translation>
+      <translation type="unfinished">Open %1</translation>
     </message>
   </context>
   <context>
     <name>TimeSelector</name>
     <message>
       <source>Period</source>
-      <translation>Période</translation>
+      <translation type="unfinished">Period</translation>
     </message>
   </context>
   <context>
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Open account settings</source>
-      <translation>Ouvrir les paramètres du compte</translation>
+      <translation type="unfinished">Open account settings</translation>
     </message>
   </context>
   <context>
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Annuler</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation>Continuer</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fermer</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Cannot load video</source>
-      <translation>Impossible de charger la vidéo</translation>
+      <translation type="unfinished">Cannot load video</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation>Impossible de lire un flux vidéo</translation>
+      <translation type="unfinished">Cannot play any video stream</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>Pas assez de licences</translation>
+      <translation type="unfinished">Not enough licenses</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation>Mot de passe requis</translation>
+      <translation type="unfinished">Password required</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation>Trop de connexions</translation>
+      <translation type="unfinished">Too many connections</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation>Interface I/O n'est pas encore supportée</translation>
+      <translation type="unfinished">I/O interface not supported yet</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation>Aucun flux en direct</translation>
+      <translation type="unfinished">No live stream</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
-      <translation>Archive chiffrée</translation>
+      <translation type="unfinished">Archive encrypted</translation>
     </message>
     <message>
       <source>Information required</source>
-      <translation>Informations requises</translation>
+      <translation type="unfinished">Information required</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Connexion</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation>Hors ligne</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1566,7 +1568,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>Non autorisé</translation>
+      <translation type="unfinished">Unauthorized</translation>
     </message>
     <message>
       <source>Unsupported</source>
@@ -1577,27 +1579,27 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation>Zone</translation>
+      <translation type="unfinished">Area</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation>Appuyez et maintenez enfoncé pour sélectionner une zone</translation>
+      <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Zone personnalisée invalide. Veuillez dessiner une zone correcte.</translation>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Paramètres Caméra</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Signets</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objets</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>PTZ Mode</source>
@@ -1629,11 +1631,11 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Impossible de connecter à %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>
-      <translation>Connexion perdue. Reconnexion...</translation>
+      <translation type="unfinished">Connection lost. Reconnecting...</translation>
     </message>
   </context>
 </TS>
