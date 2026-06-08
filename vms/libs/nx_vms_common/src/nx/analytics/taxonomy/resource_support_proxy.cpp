@@ -126,8 +126,8 @@ struct ResourceSupportProxy::Private:
     {
         static const QStringList kRelatedKeys = {
             api::device_properties::kDeviceAgentManifestsKey,
-            api::device_properties::kCompatibleAnalyticsEnginesProperty,
-            api::device_properties::kUserEnabledAnalyticsEnginesProperty,
+            api::device_properties::kCompatibleAnalyticsEngines,
+            api::device_properties::kUserEnabledAnalyticsEngines,
         };
 
         if (!kRelatedKeys.contains(key))

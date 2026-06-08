@@ -184,10 +184,10 @@ void extractParametersToFields(DeviceModelV3Base* m)
 
     const ExtractParameterToField<DeviceModelV3Base> extractToModel{&m->parameters, m};
 
-    extractToModel(device_properties::kCompatibleAnalyticsEnginesProperty, &DeviceModelV3Base::compatibleAnalyticsEngineIds);
+    extractToModel(device_properties::kCompatibleAnalyticsEngines, &DeviceModelV3Base::compatibleAnalyticsEngineIds);
     extractToModel(device_properties::kMediaCapabilities, &DeviceModelV3Base::mediaCapabilities);
     extractToModel(device_properties::kStreamUrls, &DeviceModelV3Base::streamUrls);
-    extractToModel(device_properties::kUserEnabledAnalyticsEnginesProperty, &DeviceModelV3Base::userEnabledAnalyticsEngineIds);
+    extractToModel(device_properties::kUserEnabledAnalyticsEngines, &DeviceModelV3Base::userEnabledAnalyticsEngineIds);
 
     if (const auto it = m->parameters.find(device_properties::kMediaStreams); it != m->parameters.end())
     {
@@ -324,7 +324,7 @@ void moveFieldsToParameters(DeviceModelV3Base* m)
     const MapFieldToParameter<DeviceModelV3Base> mapToModel{&m->parameters, *m};
 
     mapToModel(device_properties::kStreamUrls, &DeviceModelV3Base::streamUrls);
-    mapToModel(device_properties::kUserEnabledAnalyticsEnginesProperty,
+    mapToModel(device_properties::kUserEnabledAnalyticsEngines,
         &DeviceModelV3Base::userEnabledAnalyticsEngineIds);
 }
 

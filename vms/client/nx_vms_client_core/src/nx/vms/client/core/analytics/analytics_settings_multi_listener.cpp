@@ -93,7 +93,7 @@ void AnalyticsSettingsMultiListener::Private::resubscribe()
 void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
     const QnResourcePtr& /*resource*/, const QString& key)
 {
-    if (key == camera->kCompatibleAnalyticsEnginesProperty
+    if (key == api::device_properties::kCompatibleAnalyticsEngines
         && listenPolicy == ListenPolicy::allEngines)
     {
          const auto newCompatibleEngines = camera->compatibleAnalyticsEngines();
@@ -103,7 +103,7 @@ void AnalyticsSettingsMultiListener::Private::handleDevicePropertyChanged(
              resubscribe();
          }
     }
-    else if (key == camera->kUserEnabledAnalyticsEnginesProperty
+    else if (key == api::device_properties::kUserEnabledAnalyticsEngines
         && listenPolicy == ListenPolicy::enabledEngines)
     {
         const auto newEnabledEngines = camera->enabledAnalyticsEngines();

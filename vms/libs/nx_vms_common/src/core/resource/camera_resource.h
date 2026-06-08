@@ -60,8 +60,6 @@ public:
     static nx::Uuid makeCameraIdFromPhysicalId(const QString& physicalId);
     static QString intercomSpecificPortName();
 
-    static const QString kCompatibleAnalyticsEnginesProperty;
-    static const QString kUserEnabledAnalyticsEnginesProperty;
     // This property kept here only because of statistics filtering.
     static const QString kAnalyzedStreamIndexes;
     static const QString kVirtualCameraIgnoreTimeZone;

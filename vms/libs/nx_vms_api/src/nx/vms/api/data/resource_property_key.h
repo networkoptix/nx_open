@@ -63,7 +63,7 @@ namespace device_properties {
 
 inline const QString kAnalog = "analog";
 inline const QString kCameraCapabilities= "cameraCapabilities";
-inline const QString kCompatibleAnalyticsEnginesProperty = "compatibleAnalyticsEngines";
+inline const QString kCompatibleAnalyticsEngines = "compatibleAnalyticsEngines";
 inline const QString kConfigurationalPtzCapabilities = "configurationalPtzCapabilities";
 inline const QString kCredentials = "credentials";
 inline const QString kDefaultCredentials = "defaultCredentials";
@@ -75,7 +75,7 @@ inline const QString kPtzCapabilitiesAddedByUser = "ptzCapabilitiesAddedByUser";
 inline const QString kPtzCapabilitiesUserIsAllowedToModify = "ptzCapabilitiesUserIsAllowedToModify";
 inline const QString kPtzPanTiltSensitivity = "ptzPanTiltSensitivity";
 inline const QString kStreamUrls = "streamUrls";
-inline const QString kUserEnabledAnalyticsEnginesProperty = "userEnabledAnalyticsEngines";
+inline const QString kUserEnabledAnalyticsEngines = "userEnabledAnalyticsEngines";
 inline const QString kUserPreferredPtzPresetType = "userPreferredPtzPresetType";
 
 /// Used in Desktop, but from `QnResourcePtr`.
