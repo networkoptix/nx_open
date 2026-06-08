@@ -417,7 +417,12 @@ void ConnectTilesProxyModel::setLoggedToCloud(bool isLogged)
 void ConnectTilesProxyModel::setFilterWildcard(const QString& filterWildcard)
 {
     if (d->visibilityModel)
-        d->visibilityModel->setFilterWildcard(filterWildcard);
+    {
+        if (filterWildcard.isEmpty())
+            d->visibilityModel->setFilterFixedString({});
+        else
+            d->visibilityModel->setFilterWildcard(filterWildcard);
+    }
 
     if (!filterWildcard.isEmpty())
     {
