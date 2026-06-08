@@ -186,9 +186,9 @@ function openCameraSettingsScreen(mediaPlayer, audioSupported, audioController)
 // to go back to the previous screen.
 // When the search screen is opened from the navigation bar it must replace all the items in stack,
 // otherwise (e.g. when opened from video screen) it must be pushed onto the stack.
-function openEventSearchScreen(push, selectedResourceId, camerasModel, analyticsSearchMode)
+function openEventSearchScreen(push, selectedResourceId, camerasModel, analyticsSearchMode, searchText)
 {
-    if (hasScreenInStack("eventSearchScreen"))
+    if (!searchText && hasScreenInStack("eventSearchScreen"))
         popScreens(3) //< Pop video, event details, screen.
 
     let properties = {}
@@ -200,6 +200,9 @@ function openEventSearchScreen(push, selectedResourceId, camerasModel, analytics
 
     if (analyticsSearchMode)
         properties['analyticsSearchMode'] = analyticsSearchMode
+
+    if (searchText)
+        properties['searchText'] = searchText
 
     if (push)
         stackView.push(Qt.resolvedUrl("../Screens/EventSearch/EventSearchScreen.qml"), properties)

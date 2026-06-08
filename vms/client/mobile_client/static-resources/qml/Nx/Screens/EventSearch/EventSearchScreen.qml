@@ -30,6 +30,7 @@ AdaptiveScreen
     property var customResourceId: null
     property QnCameraListModel camerasModel: null
     property alias analyticsSearchMode: screenController.analyticsSearchMode
+    property alias searchText: searchField.text
 
     fullscreenToolBar: detailsLoader.item?.fullscreenLayout ?? false
     title: contentItem.title
@@ -270,10 +271,12 @@ AdaptiveScreen
 
             function onSearchRequested(text)
             {
-                searchField.text = text
-
-                if (LayoutController.isPortrait)
-                    screen.closeDetailsPanel()
+                Workflow.openEventSearchScreen(
+                    /*push*/ true,
+                    screen.customResourceId,
+                    screen.camerasModel,
+                    screen.analyticsSearchMode,
+                    /*searchText*/ text)
             }
         }
     }
@@ -818,6 +821,9 @@ AdaptiveScreen
 
     Component.onCompleted:
     {
+        if (screen.searchText)
+            screen.contentItem = searchContent
+
         if (customResourceId)
         {
             screenController.searchSetup.selectedCamerasIds = [customResourceId]
