@@ -37,8 +37,9 @@
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 #if QT_CONFIG(vulkan)
-#include <QtGui/QVulkanInstance>
-#include <QtGui/private/qvulkandefaultinstance_p.h>
+    #include <QtGui/QVulkanInstance>
+    #include <QtGui/private/qvulkandefaultinstance_p.h>
+    #include <QtGui/rhi/qrhi.h>
 #endif
 
 #include <client/client_module.h>
@@ -294,6 +295,31 @@ void setGraphicsSettingsEarly(const QnStartupParameters& startupParams)
     }
 }
 
+#if QT_CONFIG(vulkan)
+    bool probeVulkanRhi()
+    {
+        QVulkanInstance* instance = QVulkanDefaultInstance::instance();
+        if (!instance)
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Vulkan probe: no default Vulkan instance");
+            return false;
+        }
+
+        // A native window makes QRhi also validate presentation support, not just device
+        // creation, which can succeed on systems that cannot present to the display.
+        QWindow window;
+        window.setSurfaceType(QSurface::VulkanSurface);
+        window.setVulkanInstance(instance);
+        window.create();
+
+        QRhiVulkanInitParams params;
+        params.inst = instance;
+        params.window = &window;
+
+        return QRhi::probe(QRhi::Vulkan, &params);
+    }
+#endif
+
 // This function is called AFTER QApplication is created.
 void setGraphicsSettings()
 {
@@ -352,7 +378,23 @@ void setGraphicsSettings()
             if (appContext()->runtimeSettings()->graphicsApi() == GraphicsApi::autoselect)
                 graphicsApi = GraphicsApi::opengl;
         }
+    }
 
+    #if QT_CONFIG(vulkan)
+        // Fall back to OpenGL if a working Vulkan QRhi cannot be created.
+        if (graphicsApi == GraphicsApi::vulkan && !probeVulkanRhi())
+        {
+            NX_WARNING(NX_SCOPE_TAG,
+                "Vulkan QRhi probe failed (gpu::selectDevice picked: %1); "
+                "falling back to OpenGL",
+                gpuInfo.name);
+
+            graphicsApi = GraphicsApi::opengl;
+        }
+    #endif
+
+    if (nx::build_info::isLinux())
+    {
         // Workaround for a crash within Chromium rendering due to graphic driver issue.
         if (gpuInfo.name.toLower().contains("intel") || gpuInfo.name.toLower().contains("vmware"))
         {
