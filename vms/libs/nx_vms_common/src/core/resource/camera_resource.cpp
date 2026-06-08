@@ -209,11 +209,6 @@ nx::vms::api::StreamIndex analyzedStreamIndexInternal(
 
 } // namespace
 
-const QString QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty(
-    "compatibleAnalyticsEngines");
-
-const QString QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty(
-    "userEnabledAnalyticsEngines");
 
 const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
     "analyzedStreamIndexes");
@@ -366,13 +361,13 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             return QJson::deserialized<std::set<nx::Uuid>>(
-                getProperty(kUserEnabledAnalyticsEnginesProperty).toUtf8());
+                getProperty(nx::vms::api::device_properties::kUserEnabledAnalyticsEngines).toUtf8());
         }),
     m_cachedCompatibleAnalyticsEngines(
         [this]
         {
             return QJson::deserialized<std::set<nx::Uuid>>(
-                getProperty(kCompatibleAnalyticsEnginesProperty).toUtf8());
+                getProperty(nx::vms::api::device_properties::kCompatibleAnalyticsEngines).toUtf8());
         }),
     m_cachedDeviceAgentManifests([this] { return deviceAgentManifests(); }),
     m_cachedSupportedEventTypes(
@@ -2852,7 +2847,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
     {
         emit ptzCapabilitiesChanged(::toSharedPointer(this));
     }
-    else if (key == kUserEnabledAnalyticsEnginesProperty)
+    else if (key == api::device_properties::kUserEnabledAnalyticsEngines)
     {
         m_cachedUserEnabledAnalyticsEngines.reset();
         m_cachedSupportedEventTypes.reset();
@@ -2861,7 +2856,7 @@ void QnVirtualCameraResource::emitPropertyChanged(
         emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
         emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
     }
-    else if (key == kCompatibleAnalyticsEnginesProperty)
+    else if (key == api::device_properties::kCompatibleAnalyticsEngines)
     {
         m_cachedCompatibleAnalyticsEngines.reset();
         m_cachedSupportedEventTypes.reset();
@@ -2941,7 +2936,7 @@ nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAna
     const std::set<nx::Uuid>& engines)
 {
     return nx::vms::api::ResourceParamData(
-        kUserEnabledAnalyticsEnginesProperty,
+        api::device_properties::kUserEnabledAnalyticsEngines,
         QString::fromUtf8(QJson::serialized(engines))
     );
 }
@@ -2964,7 +2959,7 @@ nx::vms::common::AnalyticsEngineResourceList
 
 void QnVirtualCameraResource::setCompatibleAnalyticsEngines(const std::set<nx::Uuid>& engines)
 {
-    setProperty(kCompatibleAnalyticsEnginesProperty, QString::fromUtf8(QJson::serialized(engines)));
+    setProperty(api::device_properties::kCompatibleAnalyticsEngines, QString::fromUtf8(QJson::serialized(engines)));
 }
 
 AnalyticsEntitiesByEngine QnVirtualCameraResource::supportedEventTypes() const

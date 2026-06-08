@@ -1242,8 +1242,8 @@ void AnalyticsSearchListModel::setSystemContext(SystemContext* systemContext)
             if (!isOnline() || !camera->isOnline())
                 return;
 
-            if (key == QnVirtualCameraResource::kCompatibleAnalyticsEnginesProperty
-                || key == QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty)
+            if (key == nx::vms::api::device_properties::kCompatibleAnalyticsEngines
+                || key == nx::vms::api::device_properties::kUserEnabledAnalyticsEngines)
             {
                 d->updateMetadataReceivers();
             }

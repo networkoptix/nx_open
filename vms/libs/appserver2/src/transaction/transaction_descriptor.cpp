@@ -1958,7 +1958,7 @@ struct ModifyResourceParamAccess
             Result result;
             if (param.name == ResourcePropertyKey::Server::kMetadataStorageIdKey)
                 result = checkMetadataStorageAccess(systemContext, param);
-            if (param.name == QnVirtualCameraResource::kUserEnabledAnalyticsEnginesProperty)
+            if (param.name == nx::vms::api::device_properties::kUserEnabledAnalyticsEngines)
                 result = checkAnalyticsIntegrationAccess(systemContext, param);
             if (result.error != ErrorCode::ok)
                 return result;
