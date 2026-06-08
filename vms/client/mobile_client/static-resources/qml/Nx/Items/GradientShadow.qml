@@ -18,6 +18,4 @@ Rectangle
         GradientStop { position: 0.0; color: root.from }
         GradientStop { position: 1.0; color: root.to }
     }
-    opacity: visible ? 1.0 : 0.0
-    Behavior on opacity { NumberAnimation { duration: 200 } }
 }

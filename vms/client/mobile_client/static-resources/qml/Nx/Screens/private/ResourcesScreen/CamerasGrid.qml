@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Window
 
 import Nx.Core
+import Nx.Items
 import Nx.Mobile
 
 import "CamerasGrid_private"
@@ -58,7 +59,6 @@ Item
         contentWidth: width
         contentHeight: layoutItem.implicitHeight
 
-        clip: true
         boundsBehavior: Flickable.StopAtBounds
 
         property real previousContentY: -1
@@ -469,55 +469,32 @@ Item
         }
     }
 
-    Rectangle
+    GradientShadow
     {
         id: topShadow
 
-        readonly property real kMaxOpacity: 1
-        readonly property int kAnimationZoneHeight: sizesCalculator.kMinCellHeight
-
-        readonly property real animationFactor:
-            MathUtils.bound(0, flickable.contentY / kAnimationZoneHeight, 1)
-
-        x: flickable.x
-        y: flickable.y
-        width: flickable.width
+        width: parent.width
         height: 32
-
+        opacity: d.shadowFade(flickable.contentY, sizesCalculator.kMinCellHeight)
         visible: opacity > 0
-        opacity: kMaxOpacity * animationFactor
 
-        gradient: Gradient
-        {
-            GradientStop { position: 0.0; color: "#E5000000" }
-            GradientStop { position: 1.0; color: "#00000000" }
-        }
+        from: "#E5000000"
     }
 
-    Rectangle
+    GradientShadow
     {
-        readonly property real animationFactor: MathUtils.bound(
-            0,
-            (flickable.contentHeight - flickable.height - flickable.contentY)
-                / topShadow.kAnimationZoneHeight,
-            1)
+        id: bottomShadow
 
-        x: flickable.x
-        // +1 is added, because for an unknown reason, 1px gap appears otherwise,
-        // for some window size.
-        y: flickable.y + flickable.height - height + 1
-
-        width: flickable.width
-        height: topShadow.height
-
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 32
+        rotation: 180
+        opacity: d.shadowFade(
+            flickable.contentHeight - flickable.height - flickable.contentY,
+            sizesCalculator.kMinCellHeight)
         visible: opacity > 0
-        opacity: topShadow.kMaxOpacity * animationFactor
 
-        gradient: Gradient
-        {
-            GradientStop { position: 0.0; color: "#00000000" }
-            GradientStop { position: 1.0; color: "#E5000000" }
-        }
+        from: "#E5000000"
     }
 
     // Overlay shown during resize to hide intermediate states.
@@ -789,6 +766,13 @@ Item
         // Stores the relative position of the anchored cell within the viewport before pinch
         // gesture.
         property real anchorRelativePosition: 0.0
+
+        // Returns shadow opacity [0..1] proportional to the distance left to the corresponding
+        // flickable edge, reaching full opacity once that distance exceeds `fadeZone`.
+        function shadowFade(distance, fadeZone)
+        {
+            return MathUtils.bound(0, distance / fadeZone, 1)
+        }
 
         function saveTargetColumnsCount()
         {
