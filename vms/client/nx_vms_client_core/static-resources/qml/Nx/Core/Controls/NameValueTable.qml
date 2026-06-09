@@ -47,6 +47,7 @@ Item
     // Default: 30% to label, 70% to value. This isn't strict proportion and uses only if there
     // is not enough space for labels or values.
     property real labelFraction: 0.3
+    property bool forceLabelFraction: false
 
     property bool interactive: false
     readonly property alias hoveredRow: highlight.rowIndex

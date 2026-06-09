@@ -27,6 +27,7 @@ struct NameValueTableCalculator::Private
     QmlProperty<int> maxRowCount;
     qreal availableWidth;
     QmlProperty<qreal> labelFraction;
+    QmlProperty<bool> forceLabelFraction;
     qreal maxLabelWidth;
     QList<QQuickText*> labels;
     QList<ValuesText*> values;
@@ -126,9 +127,18 @@ void NameValueTableCalculator::updateColumnWidths()
     qreal preferredValueWidth = d->availableWidth - preferredLabelWidth;
 
     d->sortWidths();
-    if (d->maxLabelWidth + d->rowWidths.first().valueWidth <= d->availableWidth)
+
+    const qreal maxValueWidth = d->rowWidths.first().valueWidth;
+    if (d->maxLabelWidth + maxValueWidth <= d->availableWidth)
     {
+        const qreal fractionLabelWidth = d->availableWidth * d->labelFraction;
+        const bool splitByFraction = d->forceLabelFraction
+            && d->maxLabelWidth <= fractionLabelWidth
+            && maxValueWidth <= d->availableWidth - fractionLabelWidth;
+
+        preferredLabelWidth = splitByFraction ? fractionLabelWidth : d->maxLabelWidth;
         preferredValueWidth = d->availableWidth - preferredLabelWidth;
+
         d->setWidths(preferredLabelWidth, preferredValueWidth);
         return;
     }
@@ -203,6 +213,10 @@ void NameValueTableCalculator::onContextReady()
 
         d->labelFraction = QmlProperty<qreal>(d->grid->parentItem(), "labelFraction");
         d->labelFraction.connectNotifySignal(this, &NameValueTableCalculator::updateColumnWidths);
+
+        d->forceLabelFraction = QmlProperty<bool>(d->grid->parentItem(), "forceLabelFraction");
+        d->forceLabelFraction.connectNotifySignal(
+            this, &NameValueTableCalculator::updateColumnWidths);
 
         d->maxRowCount = QmlProperty<int>(d->grid, "maxRowCount");
         d->maxRowCount.connectNotifySignal(this,&NameValueTableCalculator::updateColumnWidths);

@@ -178,6 +178,8 @@ BaseAdaptiveSheet
                     valueFont.weight: Font.Medium
                     colorBoxSize: 16
                     rowSpacing: 4
+                    labelFraction: 0.5
+                    forceLabelFraction: true
                 }
 
                 Rectangle
