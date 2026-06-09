@@ -30,6 +30,8 @@ Item
     property int maximumLineCount: 2
     property alias rowSpacing: grid.rowSpacing
     property real colorBoxSize: 16
+    property real colorBoxRadius: 2
+    property color colorBoxBorderColor: ColorTheme.colors.dark8
 
     property color nameColor: "gray"
     property color valueColor: "white"
@@ -191,6 +193,8 @@ Item
                 maximumLineCount: control.maximumLineCount
                 alignment: valueAlignment
                 colorBoxSize: control.colorBoxSize
+                colorBoxRadius: control.colorBoxRadius
+                colorBoxBorderColor: control.colorBoxBorderColor
             }
         }
     }

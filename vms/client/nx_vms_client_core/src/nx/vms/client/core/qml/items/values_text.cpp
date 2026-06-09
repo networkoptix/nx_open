@@ -2,12 +2,15 @@
 
 #include "values_text.h"
 
+#include <QtCore/QUrl>
 #include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QImage>
 #include <QtGui/QPainter>
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextDocument>
 #include <QtGui/QTextFrame>
 #include <QtGui/QTextTable>
+#include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGSimpleRectNode>
 #include <QtQuick/QSGTextNode>
@@ -16,8 +19,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/vms/client/core/common/utils/text_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
-
-#include "private/color_square_text_object.h"
+#include <nx/vms/client/core/utils/geometry.h>
 
 namespace nx::vms::client::core {
 
@@ -37,6 +39,8 @@ struct ValuesText::Private
     int spacing = 4;
     int innerSpacing = 2;
     qreal colorBoxSize = 16;
+    qreal colorBoxRadius = 2;
+    QColor colorBoxBorderColor{colorTheme()->color("dark8")};
     qreal effectiveWidth = 0;
 
     void updateImplicitWidth()
@@ -118,6 +122,28 @@ struct ValuesText::Private
                 cursor.mergeCharFormat(range.format);
             }
         }
+    }
+
+    QImage colorBoxImage(const QColor& color) const
+    {
+        const qreal devicePixelRatio =
+            q->window() ? q->window()->effectiveDevicePixelRatio() : 1.0;
+
+        const int size = qMax(1, qRound(colorBoxSize * devicePixelRatio));
+        QImage image{size, size, QImage::Format_ARGB32_Premultiplied};
+        image.setDevicePixelRatio(devicePixelRatio);
+        image.fill(Qt::transparent);
+
+        QPainter painter{&image};
+        painter.setRenderHint(QPainter::Antialiasing);
+        QPen pen{colorBoxBorderColor};
+        pen.setWidthF(1.0);
+        painter.setPen(pen);
+        painter.setBrush(color);
+        const QRectF rect = Geometry::eroded(QRectF{0, 0, colorBoxSize, colorBoxSize}, 1);
+        painter.drawRoundedRect(rect, colorBoxRadius, colorBoxRadius);
+
+        return image;
     }
 };
 
@@ -302,12 +328,54 @@ void ValuesText::setColorBoxSize(qreal value)
     emit colorBoxSizeChanged();
 }
 
+qreal ValuesText::colorBoxRadius() const
+{
+    return d->colorBoxRadius;
+}
+
+void ValuesText::setColorBoxRadius(qreal value)
+{
+    if (d->colorBoxRadius == value)
+        return;
+
+    d->colorBoxRadius = value;
+    updateItemView();
+    emit colorBoxRadiusChanged();
+}
+
+QColor ValuesText::colorBoxBorderColor() const
+{
+    return d->colorBoxBorderColor;
+}
+
+void ValuesText::setColorBoxBorderColor(const QColor& value)
+{
+    if (d->colorBoxBorderColor == value)
+        return;
+
+    d->colorBoxBorderColor = value;
+    updateItemView();
+    emit colorBoxBorderColorChanged();
+}
+
 void ValuesText::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
     base_type::geometryChange(newGeometry, oldGeometry);
     if (!qFuzzyEquals(newGeometry.width(), oldGeometry.width()))
     {
         d->document.setTextWidth(newGeometry.width());
+        updateItemView();
+    }
+}
+
+void ValuesText::itemChange(ItemChange change, const ItemChangeData& value)
+{
+    base_type::itemChange(change, value);
+
+    if (!d->colorValues.isEmpty()
+        && (change == ItemDevicePixelRatioHasChanged
+            || (change == ItemSceneChange && value.window)))
+    {
         updateItemView();
     }
 }
@@ -457,11 +525,6 @@ void ValuesText::updateTextRow()
 
 void ValuesText::updateColorRow()
 {
-    auto squareInterface = new ColorSquareTextObject;
-    squareInterface->setParent(&d->document);
-    d->document.documentLayout()->registerHandler(
-        ColorSquareTextObject::ColorSquareTextFormat, squareInterface);
-
     qreal valuesWidth = 0;
     qreal appendixWidth = 0;
     qreal availableWidth = 0;
@@ -536,13 +599,21 @@ void ValuesText::updateColorRow()
         int decorationWidth = 0;
         if (d->colorValues.count() > i)
         {
-            QColor color(d->colorValues.at(i));
-            QTextCharFormat squareFormat(textFormat);
-            squareFormat.setObjectType(ColorSquareTextObject::ColorSquareTextFormat);
-            squareFormat.setProperty(ColorSquareTextObject::Color, color);
-            squareFormat.setProperty(ColorSquareTextObject::Length, d->colorBoxSize);
-            cursor.insertText(QString(QChar::ObjectReplacementCharacter), squareFormat);
+            const auto color = d->colorValues.at(i);
+            const auto name = QString("color://%1").arg(i);
+            d->document.addResource(QTextDocument::ImageResource, name, d->colorBoxImage(color));
+
+            QTextImageFormat imageFormat;
+            imageFormat.setName(name);
+            imageFormat.setWidth(d->colorBoxSize);
+            imageFormat.setHeight(d->colorBoxSize);
+            imageFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
+            cursor.insertImage(imageFormat);
             decorationWidth = d->colorBoxSize + d->innerSpacing;
+
+            QTextTableCellFormat colorCellFormat = cell.format().toTableCellFormat();
+            colorCellFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
+            cell.setFormat(colorCellFormat);
 
             column += 2;
             cell = table->cellAt(0, column);

@@ -199,7 +199,9 @@ Page
                     valueFont.weight: Font.Medium
                     valueFont.underline: true
                     valueAlignment: Text.AlignRight
-                    colorBoxSize: 18
+                    colorBoxSize: 12
+                    colorBoxRadius: colorBoxSize / 2
+                    colorBoxBorderColor: ColorTheme.colors.dark10
                     rowSpacing: 16
                     separatorsVisible: true
 

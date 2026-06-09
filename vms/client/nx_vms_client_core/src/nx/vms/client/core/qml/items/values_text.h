@@ -40,6 +40,16 @@ class ValuesText: public QQuickItem
         READ colorBoxSize
         WRITE setColorBoxSize
         NOTIFY colorBoxSizeChanged)
+    Q_PROPERTY(
+        qreal colorBoxRadius
+        READ colorBoxRadius
+        WRITE setColorBoxRadius
+        NOTIFY colorBoxRadiusChanged)
+    Q_PROPERTY(
+        QColor colorBoxBorderColor
+        READ colorBoxBorderColor
+        WRITE setColorBoxBorderColor
+        NOTIFY colorBoxBorderColorChanged)
 
 public:
     ValuesText(QQuickItem* parent = nullptr);
@@ -77,10 +87,17 @@ public:
     qreal colorBoxSize() const;
     void setColorBoxSize(qreal value);
 
+    qreal colorBoxRadius() const;
+    void setColorBoxRadius(qreal value);
+
+    QColor colorBoxBorderColor() const;
+    void setColorBoxBorderColor(const QColor& value);
+
     static void registerQmlType();
 
 protected:
     virtual void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+    virtual void itemChange(ItemChange change, const ItemChangeData& value) override;
     virtual QSGNode* updatePaintNode(
         QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* data) override;
 
@@ -96,6 +113,8 @@ signals:
     void effectiveWidthChanged();
     void spacingChanged();
     void colorBoxSizeChanged();
+    void colorBoxRadiusChanged();
+    void colorBoxBorderColorChanged();
 
 private:
     void updateItemView();
