@@ -153,7 +153,7 @@ TEST_F(RecordingStatusHelperTest, recordingScheduled)
     whenRecordingEnabled();
     givenRecordingIsSet(nx::vms::api::RecordingType::always);
     whenRecordingTodayIs(nx::vms::api::RecordingType::never);
-
+    whenStorageDisabled(); //< If never, status should be online.
     thenIconIs(qnSkin->icon(kNotRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_part.svg"));
 }
@@ -182,6 +182,7 @@ TEST_F(RecordingStatusHelperTest, archiveIconAndScheduled)
     givenRecordingIsSet(nx::vms::api::RecordingType::metadataOnly);
     givenArchiveExists();
     whenRecordingTodayIs(nx::vms::api::RecordingType::never);
+    whenStorageDisabled(); //< If never, status should be online.
     thenIconIs(qnSkin->icon(kNotRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_part.svg"));
 }
