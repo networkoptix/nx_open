@@ -91,8 +91,10 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
                 return {status, task.metadataTypes};
             }
         }
-
-        return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
+        if (recording) //< Recording can also be started by an event rule.
+            return {RecordingStatus::recordingContinious, {RecordingMetadataType::none}};
+        else
+            return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
     }
 
     return {hasArchive(camera)
