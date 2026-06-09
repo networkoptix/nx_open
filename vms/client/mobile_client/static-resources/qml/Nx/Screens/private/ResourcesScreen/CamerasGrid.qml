@@ -59,7 +59,7 @@ Item
         contentWidth: width
         contentHeight: layoutItem.implicitHeight
 
-        boundsBehavior: Flickable.StopAtBounds
+        boundsBehavior: Flickable.DragOverBounds
 
         property real previousContentY: -1
 
@@ -197,7 +197,7 @@ Item
                             function()
                             {
                                 // Sync availableWidth/Height now in case the flickable is mid-
-                                // resize (geometryChangeAccumulatorTimer hasn't fired yet — e.g.
+                                // resize (geometryChangeAccumulatorTimer hasn't fired yet - e.g.
                                 // rotation in progress, or initial layout passes at startup),
                                 // so the loads below work on current dimensions.
                                 flickable.updateSizesCalculatorAvailableGeometry()
@@ -820,6 +820,12 @@ Item
 
         function saveLayoutPosition()
         {
+            if (flickable.contentY < 0
+                || flickable.contentY > flickable.contentHeight - flickable.height)
+            {
+                return
+            }
+
             camerasGridHelper.saveLayoutPosition(layout, flickable.contentY)
         }
 
