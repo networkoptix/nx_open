@@ -208,11 +208,11 @@ Page
 
                     onValueClicked: (item) =>
                     {
-                        searchMenu.attribute = item
-                        searchMenu.open()
+                        searchSheet.attribute = item
+                        searchSheet.open()
                     }
 
-                    onContentChanged: searchMenu.close()
+                    onContentChanged: searchSheet.close()
                 }
             }
         }
@@ -257,46 +257,48 @@ Page
         }
     }
 
-    Menu
+    MobileControls.AdaptiveSheet
     {
-        id: searchMenu
+        id: searchSheet
 
         property var attribute: null
-        property int margin: 20
 
-        x: margin
-        y: parent.height - height - margin
-        width: parent.width - x - margin
+        title: qsTr("Search by %1").arg(attribute?.displayedName.toLowerCase() ?? "")
 
-        function popup()
+        Repeater
         {
-            attribute = attributeTable.hoveredItem
-            open() //< Open at the current position.
-        }
+            model: searchSheet.attribute?.displayedValues.length
 
-        MenuItem
-        {
-            text: searchMenu.attribute?.displayedValues.join(", ") ?? ""
-            horizontalAlignment: Qt.AlignHCenter
-            textColor: ColorTheme.colors.light14
-        }
-
-        MenuItem
-        {
-            text: qsTr("Search by attribute")
-            horizontalAlignment: Qt.AlignHCenter
-
-            onClicked:
+            delegate: MobileControls.Button
             {
-                eventDetailsScreen.searchRequested(EventSearchHelpers.createSearchRequestText(
-                    searchMenu.attribute.id, searchMenu.attribute.values))
+                readonly property var colorValue: searchSheet.attribute.colorValues[index]
+
+                width: parent.width
+
+                text: searchSheet.attribute.displayedValues[index]
+
+                spacing: 8
+                type: MobileControls.Button.LightInterface
+                textHorizontalAlignment: colorValue ? Qt.AlignLeft : Qt.AlignHCenter
+                icon.source: colorValue ? "image://skin/24x24/Solid/default_color.svg" : ""
+                icon.color: colorValue ?? "transparent"
+
+                onClicked:
+                {
+                    eventDetailsScreen.searchRequested(
+                        EventSearchHelpers.createSearchRequestText(
+                            searchSheet.attribute.id, [searchSheet.attribute.values[index]]))
+
+                    searchSheet.close()
+                }
             }
         }
 
-        MenuItem
+        footer: MobileControls.Button
         {
             text: qsTr("Cancel")
-            horizontalAlignment: Qt.AlignHCenter
+            type: MobileControls.Button.LightInterface
+            onClicked: searchSheet.close()
         }
     }
 
