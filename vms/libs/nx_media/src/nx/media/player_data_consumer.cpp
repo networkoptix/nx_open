@@ -275,17 +275,21 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         return true;
 
     quint32 videoChannel = data->channelNumber;
-    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(data->dataProvider);
-    if (archiveReader)
+    if (auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(data->dataProvider))
     {
-        auto resource = archiveReader->resource();
-        if (resource)
+        if (auto resource = archiveReader->resource())
         {
             if (auto camera = resource.dynamicCast<QnMediaResource>())
             {
-                auto videoLayout = camera->getVideoLayout();
-                if (videoLayout)
-                    m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
+                if (auto layout = camera->getVideoLayout(data->dataProvider);
+                    layout && layout != m_cachedVideoLayout)
+                {
+                    m_cachedVideoLayout = layout;
+                    // m_awaitingFramesMask is also accessed under m_jumpMutex in
+                    // dequeueVideoFrame() and onJumpOccurred(), so we must lock here too.
+                    NX_MUTEX_LOCKER lock(&m_jumpMutex);
+                    m_awaitingFramesMask.setChannelCount(layout->channelCount());
+                }
             }
         }
     }

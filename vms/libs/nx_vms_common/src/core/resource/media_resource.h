@@ -6,6 +6,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout_fwd.h>
+#include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <utils/common/aspect_ratio.h>
@@ -70,12 +71,8 @@ protected:
     nx::vms::api::CameraAttributesData m_userAttributes;
     mutable std::optional<nx::vms::api::dewarping::MediaData> m_cachedDewarpingParams;
 
-protected:
-    mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    mutable nx::Mutex m_layoutMutex;
-
     static const QString kRotationKey;
 
 private:
-    mutable QString m_cachedLayout;
+    nx::utils::CachedValue<QnConstResourceVideoLayoutPtr> m_cachedVideoLayout;
 };

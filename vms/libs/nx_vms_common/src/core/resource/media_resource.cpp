@@ -31,7 +31,17 @@ static const QString panicRecordingKey("panic_mode");
 
 const QString QnMediaResource::kRotationKey("rotation");
 
-QnMediaResource::QnMediaResource() = default;
+QnMediaResource::QnMediaResource():
+    m_cachedVideoLayout(
+        [this]() -> QnConstResourceVideoLayoutPtr
+        {
+            const QString strVal = getProperty(nx::vms::api::device_properties::kVideoLayout);
+            if (strVal.isEmpty())
+                return getDefaultVideoLayout();
+            return QnCustomResourceVideoLayout::fromString(strVal);
+        })
+{
+}
 
 QnMediaResource::~QnMediaResource() = default;
 
@@ -57,26 +67,10 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
 {
     if (dataProvider)
     {
-        QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
-        if (providerLayout)
-            return providerLayout;
+        if (auto layout = dataProvider->getVideoLayout())
+            return layout;
     }
-
-    QString strVal = getProperty(nx::vms::api::device_properties::kVideoLayout);
-    if (strVal.isEmpty())
-    {
-        return defaultVideoLayout;
-    }
-    else
-    {
-        NX_MUTEX_LOCKER lock(&m_layoutMutex);
-        if (m_cachedLayout != strVal || !m_customVideoLayout)
-        {
-            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
-            m_cachedLayout = strVal;
-        }
-        return m_customVideoLayout;
-    }
+    return m_cachedVideoLayout.get();
 }
 
 static AudioLayoutConstPtr audioLayout(new AudioLayout());
@@ -89,6 +83,12 @@ AudioLayoutConstPtr QnMediaResource::getAudioLayout(
 void QnMediaResource::initMediaResource()
 {
     addFlags(Qn::media);
+    connect(this, &QnResource::propertyChanged,
+        this, [this](const QnResourcePtr&, const QString& key)
+        {
+            if (key == nx::vms::api::device_properties::kVideoLayout)
+                m_cachedVideoLayout.reset();
+        });
 }
 
 nx::vms::api::dewarping::MediaData QnMediaResource::getDewarpingParams() const
