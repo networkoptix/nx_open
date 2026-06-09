@@ -4,6 +4,7 @@
 
 #include <QtGui/QAbstractTextDocumentLayout>
 #include <QtGui/QPainter>
+#include <QtGui/QTextBlock>
 #include <QtGui/QTextDocument>
 #include <QtGui/QTextFrame>
 #include <QtGui/QTextTable>
@@ -76,6 +77,47 @@ struct ValuesText::Private
 
         QFontMetricsF fm(document.defaultFont());
         return fm.size(0, text).width();
+    }
+
+    QTextCharFormat appendixFormat() const
+    {
+        QTextCharFormat format;
+        format.setForeground(appendixColor);
+        format.setFontUnderline(false);
+        return format;
+    }
+
+    QList<QTextLayout::FormatRange> separatorFormatRanges(const QString& text) const
+    {
+        if (separator.isEmpty())
+            return {};
+
+        QTextCharFormat format;
+        format.setFontUnderline(false);
+
+        QList<QTextLayout::FormatRange> result;
+        for (int i = text.indexOf(separator); i >= 0;
+            i = text.indexOf(separator, i + separator.length()))
+        {
+            result.append({i, (int) separator.length(), format});
+        }
+
+        return result;
+    }
+
+    void applySeparatorFormat()
+    {
+        QTextCursor cursor(&document);
+        for (QTextBlock block = document.begin(); block.isValid(); block = block.next())
+        {
+            const int base = block.position();
+            for (const QTextLayout::FormatRange& range: separatorFormatRanges(block.text()))
+            {
+                cursor.setPosition(base + range.start);
+                cursor.setPosition(base + range.start + range.length, QTextCursor::KeepAnchor);
+                cursor.mergeCharFormat(range.format);
+            }
+        }
     }
 };
 
@@ -324,6 +366,10 @@ void ValuesText::updateTextRow()
         appendixWidth = d->appendixWidth();
         availableWidth = width() - appendixWidth - (appendixWidth > 0 ? d->spacing : 0);
         layout.setText(d->visibleValues.join(d->separator));
+
+        // Format separators the same way as in the resulting document to match its wrapping.
+        layout.setFormats(d->separatorFormatRanges(layout.text()));
+
         textHeight = 0;
         layout.beginLayout();
         while (true)
@@ -391,6 +437,8 @@ void ValuesText::updateTextRow()
         cursor.insertText(text);
     }
 
+    d->applySeparatorFormat();
+
     if (!appendix.isEmpty())
     {
         auto cell = table->cellAt(0, 2);
@@ -398,9 +446,8 @@ void ValuesText::updateTextRow()
         cellFormat.setVerticalAlignment(QTextCharFormat::AlignMiddle);
         cell.setFormat(cellFormat);
 
-        textFormat.setForeground(d->appendixColor);
         cursor = cell.firstCursorPosition();
-        cursor.setCharFormat(textFormat);
+        cursor.setCharFormat(d->appendixFormat());
         cursor.insertText(appendix);
 
         effectiveWidth += appendixWidth + d->spacing;
@@ -469,8 +516,13 @@ void ValuesText::updateColorRow()
     }
     if (d->alignment != Qt::AlignRight)
         constraints.append(QTextLength());
+
     if (!appendix.isEmpty())
+    {
+        constraints.append(QTextLength(QTextLength::FixedLength, d->spacing));
         constraints.append(QTextLength(QTextLength::FixedLength, ceil(appendixWidth)));
+    }
+
     tableFormat.setColumnWidthConstraints(constraints);
     QTextCursor cursor(&d->document);
     cursor.setCharFormat(textFormat);
@@ -512,8 +564,7 @@ void ValuesText::updateColorRow()
     {
         auto cell = table->cellAt(0, constraints.count() - 1);
         cursor = cell.firstCursorPosition();
-        textFormat.setForeground(d->appendixColor);
-        cursor.setCharFormat(textFormat);
+        cursor.setCharFormat(d->appendixFormat());
         cursor.insertText(appendix);
     }
     setEffectiveWidth(valuesWidth + (appendixWidth > 0 ? appendixWidth + d->spacing : 0));

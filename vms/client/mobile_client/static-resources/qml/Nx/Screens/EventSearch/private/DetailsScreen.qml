@@ -197,6 +197,7 @@ Page
                     valueFont.pixelSize: 14
                     valueColor: ColorTheme.colors.light6
                     valueFont.weight: Font.Medium
+                    valueFont.underline: true
                     valueAlignment: Text.AlignRight
                     colorBoxSize: 18
                     rowSpacing: 16
