@@ -49,10 +49,9 @@ Item
     property real labelFraction: 0.3
 
     property bool interactive: false
-    property Menu contextMenu
     readonly property alias hoveredRow: highlight.rowIndex
     readonly property var hoveredItem: hoveredRow >= 0 ? items[hoveredRow] : undefined
-    property alias highlight: highlight
+    property bool highlightVisible: interactive && !!hoveredItem
 
     property bool enableTooltip: true
     property bool separatorsVisible: false
@@ -64,6 +63,10 @@ Item
     property alias rightPadding: grid.rightPadding
     property alias topPadding: grid.topPadding
     property alias bottomPadding: grid.bottomPadding
+
+    signal rowClicked(var item)
+    signal valueClicked(var item)
+    signal contentChanged()
 
     implicitWidth: 400
     implicitHeight: grid.implicitHeight
@@ -81,7 +84,7 @@ Item
 
         color: ColorTheme.colors.dark12
         width: control.width
-        visible: interactive && (rowIndex >= 0 || control.contextMenu?.opened)
+        visible: highlightVisible
     }
 
     Grid
@@ -107,8 +110,7 @@ Item
 
         onClippedDataChanged:
         {
-            if (control.contextMenu?.opened)
-                control.contextMenu.close()
+            control.contentChanged()
 
             labelsRepeater.model = clippedData
             valuesRepeater.model = clippedData
@@ -221,6 +223,8 @@ Item
     {
         id: gridMouseArea
 
+        property Item hoveredValueCell: null
+
         enabled: control.interactive
         anchors.fill: grid
         hoverEnabled: true
@@ -241,11 +245,13 @@ Item
             highlight.height = row.height
             highlight.rowIndex = row.rowIndex
 
-            const cell = grid.childAt(mouse.x, mouse.y)
-            if (cell && cell.objectName === "cellValues")
+            const valueCell = valuesRepeater.itemAt(row.rowIndex)
+            hoveredValueCell = (valueCell && mouse.x >= valueCell.x) ? valueCell : null
+
+            if (hoveredValueCell)
             {
-                toolTip.dataItem = cell
-                toolTip.y = cell.y - toolTip.height
+                toolTip.dataItem = hoveredValueCell
+                toolTip.y = hoveredValueCell.y - toolTip.height
             }
             else
             {
@@ -264,8 +270,11 @@ Item
         onClicked: (mouse) =>
         {
             update(mouse)
-            if (contextMenu)
-                contextMenu.popup()
+
+            control.rowClicked(control.hoveredItem)
+
+            if (hoveredValueCell)
+                control.valueClicked(control.hoveredItem)
         }
     }
 

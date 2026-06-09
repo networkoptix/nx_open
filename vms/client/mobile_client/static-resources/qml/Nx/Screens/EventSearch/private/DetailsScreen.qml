@@ -189,8 +189,7 @@ Page
 
                     visible: attributes && attributes.length > 0
                     interactive: true
-                    contextMenu: searchMenu
-                    highlight.visible: false
+                    highlightVisible: false
                     enableTooltip: false
                     nameFont.pixelSize: 14
                     nameColor: ColorTheme.colors.light10
@@ -206,6 +205,14 @@ Page
                     separatorsVisible: true
 
                     Layout.fillWidth: true
+
+                    onValueClicked: (item) =>
+                    {
+                        searchMenu.attribute = item
+                        searchMenu.open()
+                    }
+
+                    onContentChanged: searchMenu.close()
                 }
             }
         }

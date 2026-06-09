@@ -468,8 +468,17 @@ Rectangle
                         valueFont { pixelSize: FontConfig.normal.pixelSize; weight: Font.Normal }
 
                         interactive: true
+                        highlightVisible: !!hoveredItem || menu.opened
 
-                        contextMenu: Menu
+                        onRowClicked: (item) =>
+                        {
+                            menu.attribute = item
+                            menu.popup()
+                        }
+
+                        onContentChanged: menu.close()
+
+                        Menu
                         {
                             id: menu
 
