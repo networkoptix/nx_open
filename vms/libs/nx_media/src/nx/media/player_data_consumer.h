@@ -8,11 +8,14 @@
 
 #include "gop_reverser.h"
 
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource_media_layout_fwd.h>
 #include <nx/media/audio_data_packet.h>
 #include <nx/media/audio_output.h>
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/media/externaltimesource.h>
 
 class QnArchiveStreamReader;
@@ -209,6 +212,7 @@ private:
     std::atomic<bool> m_needToResetAudio;
     std::atomic<bool> m_allowHardwareAcceleration {false};
     std::atomic<bool> m_allowSoftwareDecoderFallback {true};
+    QnConstResourceVideoLayoutPtr m_cachedVideoLayout;
     std::atomic<double> m_speed;
     nx::media::StreamEventPacket m_mediaEvent;
     const QnArchiveStreamReader* m_archiveReader = nullptr;
