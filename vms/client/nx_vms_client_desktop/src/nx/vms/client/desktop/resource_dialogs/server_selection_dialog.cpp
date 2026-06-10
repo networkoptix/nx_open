@@ -150,7 +150,7 @@ ServerSelectionDialog::Private::Private(
 
         AbstractItemPtr pinnedItem = GenericItemBuilder()
             .withRole(Qn::ResourceIconKeyRole, (int) QnResourceIconCache::Server)
-            .withRole(Qt::DisplayRole, q->tr("Source Server"))
+            .withRole(Qt::DisplayRole, ServerSelectionDialog::tr("Source Server"))
             .withRole(ResourceDialogItemRole::IsPinnedItemRole, true)
             .withFlags({Qt::ItemIsEnabled, Qt::ItemNeverHasChildren});
 
