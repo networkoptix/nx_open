@@ -6559,6 +6559,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>Create New List...</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Create Bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
