@@ -6561,6 +6561,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>Create New List...</source>
       <translation type="unfinished">Create New List...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

@@ -6458,6 +6458,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Create New List...</source>
       <translation>Tạo danh sách mới...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

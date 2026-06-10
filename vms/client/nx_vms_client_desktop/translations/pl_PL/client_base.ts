@@ -6766,6 +6766,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Create New List...</source>
       <translation>Utwórz nową listę...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

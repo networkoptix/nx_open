@@ -6561,6 +6561,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Create New List...</source>
       <translation>Créer une nouvelle liste...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

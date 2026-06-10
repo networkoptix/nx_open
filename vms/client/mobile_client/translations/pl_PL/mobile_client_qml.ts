@@ -1564,7 +1564,7 @@
     </message>
     <message>
       <source>2FA disabled</source>
-      <translation type="unfinished">2FA disabled</translation>
+      <translation>Weryfikacja 2FA wyłączona</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1572,7 +1572,7 @@
     </message>
     <message>
       <source>Unsupported</source>
-      <translation type="unfinished">Unsupported</translation>
+      <translation>Nieobsługiwane</translation>
     </message>
   </context>
   <context>

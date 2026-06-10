@@ -497,6 +497,17 @@
     </message>
   </context>
   <context>
+    <name>nx::vms::client::core::bookmarks::BookmarkUtilsStrings</name>
+    <message>
+      <source>Unknown Object</source>
+      <translation type="unfinished">Unknown Object</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation type="unfinished">Camera</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::core::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>

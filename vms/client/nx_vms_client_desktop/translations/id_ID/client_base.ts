@@ -6458,6 +6458,10 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
       <source>Create New List...</source>
       <translation>Buat Daftar Baru...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

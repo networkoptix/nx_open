@@ -6560,6 +6560,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Create New List...</source>
       <translation type="unfinished">Create New List...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

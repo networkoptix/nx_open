@@ -6561,6 +6561,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>Create New List...</source>
       <translation>Crear nueva lista...</translation>
     </message>
+    <message>
+      <source>Create Bookmark...</source>
+      <translation type="unfinished">Create Bookmark...</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>

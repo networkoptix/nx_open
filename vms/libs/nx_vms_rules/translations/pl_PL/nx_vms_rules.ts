@@ -1292,43 +1292,43 @@
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>Błąd wejścia/wyjścia pamięci masowej w %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>Zbyt wolne archiwum w %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>Dysk archiwum jest pełny w %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>Dysk systemowy prawie pełny w %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>Magazyn danych analitycznych offline w %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>Pamięć analityczna jest prawie pełna w %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>Błąd uprawnień do przechowywania danych analitycznych w %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>Szyfrowanie archiwum nie powiodło się w %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>Błąd pamięci RAID w %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>Kopia zapasowa archiwum nie powiodła się w %1</translation>
     </message>
   </context>
   <context>
