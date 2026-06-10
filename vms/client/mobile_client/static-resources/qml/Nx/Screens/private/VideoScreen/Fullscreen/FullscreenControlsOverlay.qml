@@ -113,8 +113,8 @@ Item
         hintText: qsTr("-5 sec")
 
         visible: showPlaybackControls && !controller.playingLive
-        opacity: opacityController.defaultControlsOpacity
 
+        onTapped: control.toggle()
         onActivated: controller.jumpDistance(-5000)
     }
 
@@ -129,8 +129,8 @@ Item
         hintText: qsTr("+5 sec")
 
         visible: showPlaybackControls && !controller.playingLive
-        opacity: opacityController.defaultControlsOpacity
 
+        onTapped: control.toggle()
         onActivated: controller.jumpDistance(5000)
     }
 

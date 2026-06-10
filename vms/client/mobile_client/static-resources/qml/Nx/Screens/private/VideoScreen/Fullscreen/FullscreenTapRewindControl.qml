@@ -16,6 +16,7 @@ Item
     implicitWidth: height * 2 / 3
 
     signal activated()
+    signal tapped()
 
     Shape
     {
@@ -127,11 +128,13 @@ Item
         font { pixelSize: 16; weight: Font.Normal }
     }
 
-    MouseArea
+    TapHandler
     {
-        anchors.fill: parent
-        acceptedButtons: Qt.LeftButton
-        onDoubleClicked:
+        gesturePolicy: TapHandler.WithinBounds
+        exclusiveSignals: TapHandler.SingleTap | TapHandler.DoubleTap
+
+        onSingleTapped: control.tapped()
+        onDoubleTapped:
         {
             control.activated()
             control.showIndicator()
