@@ -303,7 +303,6 @@ AdaptiveScreen
         id: searchField
 
         implicitHeight: 36
-        hasClearButton: false
 
         onDisplayTextChanged:
         {
