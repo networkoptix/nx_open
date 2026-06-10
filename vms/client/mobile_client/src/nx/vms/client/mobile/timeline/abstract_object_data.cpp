@@ -12,10 +12,10 @@
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/bookmarks/bookmark_constants.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/cross_system/cross_system_camera_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <utils/common/synctime.h>
 
@@ -43,25 +43,8 @@ common::CameraBookmark AbstractObjectData::convertToBookmark() const
         .creatorId = context->userWatcher()->user()->getId(),
         .creationTimeStampMs = qnSyncTime->value(),
         .name = title(),
-        .description =
-            [this, camera]()
-            {
-                static const QString kTemplate("%1: %2");
-
-                QStringList result;
-
-                const auto dateTime = QDateTime::fromMSecsSinceEpoch(
-                    startTimeMs(), core::ServerTimeWatcher::timeZone(camera));
-                result.append(dateTime.toString());
-                result.append(kTemplate.arg(tr("Camera"), camera->getName()));
-
-                for (const auto& attribute: attributes().value<core::analytics::AttributeList>())
-                {
-                    result.append(kTemplate.arg(
-                        attribute.displayedName, attribute.displayedValues.join(", ")));
-                }
-                return result.join("\n");
-            }(),
+        .description = core::bookmarks::bookmarkDescription(milliseconds(startTimeMs()), camera,
+            attributes().value<core::analytics::AttributeList>()),
         .startTimeMs = milliseconds(startTimeMs()),
         .durationMs = milliseconds(std::max<qint64>(durationMs(), kMinDurationMs)),
         .tags = { core::bookmarks::BookmarkConstants::objectBasedTagName() },

@@ -10,6 +10,7 @@
 #include <nx/utils/log/format.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/analytics/analytics_icon_manager.h>
+#include <nx/vms/client/core/bookmarks/bookmark_utils.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
@@ -35,33 +36,11 @@ constexpr seconds kTrackTerminationThreshold = 5min;
 
 constexpr seconds kThumbnailExpirationInterval = 30s; //< For ongoing tracks only.
 
-std::shared_ptr<AbstractState> taxonomyState(core::SystemContext* systemContext)
-{
-    const auto watcher = systemContext->analyticsTaxonomyStateWatcher();
-    return NX_ASSERT(watcher) ? watcher->state() : nullptr;
-}
-
 ObjectType* objectTypeById(
     const std::shared_ptr<AbstractState>& taxonomy,
     const std::string& objectTypeId)
 {
     return taxonomy ? taxonomy->objectTypeById(objectTypeId) : nullptr;
-}
-
-std::tuple<ObjectType*, QString> trackInfo(
-    const std::shared_ptr<AbstractState>& taxonomy,
-    const ObjectTrackEx& track)
-{
-    const auto objectType = objectTypeById(taxonomy, track.objectTypeId);
-    auto name = track.title.value_or(Title{}).text;
-    if (name.isEmpty())
-    {
-        name = objectType
-            ? QString::fromStdString(objectType->name())
-            : AbstractObjectData::tr("Unknown Object");
-    }
-
-    return {objectType, name};
 }
 
 QString iconPath(ObjectType* objectType)
@@ -244,9 +223,7 @@ void AnalyticsData::update(analytics::db::ObjectTrack track)
         return;
 
     m_attributes = preprocessAttributes(systemContext, m_track);
-
-    const auto [_, title] = trackInfo(taxonomyState(systemContext), m_track);
-    m_title = std::move(title);
+    m_title = core::bookmarks::bookmarkNameFromObjectTrack(m_track, systemContext);
 
     emit changed();
 }
@@ -269,7 +246,8 @@ MultiObjectData AnalyticsData::merge(
     {
         const auto& track = tracks.front();
 
-        const auto [objectType, title] = trackInfo(taxonomyState(systemContext), track);
+        const auto objectType =
+            objectTypeById(systemContext->analyticsTaxonomyState(), track.objectTypeId);
 
         const auto perObjectData = std::make_shared<AnalyticsData>(track, resource);
 
@@ -301,7 +279,7 @@ MultiObjectData AnalyticsData::merge(
         const auto duration = duration_cast<milliseconds>(microseconds{
             tracks.front().firstAppearanceTimeUs}) - firstPosition;
 
-        const auto taxonomy = taxonomyState(systemContext);
+        const auto taxonomy = systemContext->analyticsTaxonomyState();
         const auto [names, iconPaths] = objectTypeInfos(taxonomy, tracks, kMaxTypesPerBucket);
 
         QList<std::shared_ptr<AbstractObjectData>> perObjectData;

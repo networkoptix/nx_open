@@ -155,49 +155,8 @@ std::optional<common::CameraBookmark> bookmarkFromObjectTrack(
     const auto duration = duration_cast<milliseconds>(microseconds(
         track.lastAppearanceTimeUs - track.firstAppearanceTimeUs));
 
-    const auto getBookmarkName =
-        [systemContext, &track]()
-        {
-            if (track.title.has_value() && !track.title->text.isEmpty())
-                return track.title->text;
-
-            const auto taxonomyState = systemContext->analyticsTaxonomyStateWatcher()
-                ? systemContext->analyticsTaxonomyStateWatcher()->state()
-                : nullptr;
-
-            const auto objectType = taxonomyState
-                ? taxonomyState->objectTypeById(track.objectTypeId)
-                : nullptr;
-
-            return objectType
-                ? QString::fromStdString(objectType->name())
-                : BookmarkUtilsStrings::tr("Unknown Object");
-        };
-
-    const auto getBookmarkDescription =
-        [systemContext, &track, &camera, startTime]()
-        {
-            static const QString kLineTemplate("%1: %2");
-
-            QStringList resultLines;
-
-            const auto dateTime = QDateTime::fromMSecsSinceEpoch(
-                startTime.count(), nx::vms::client::core::ServerTimeWatcher::timeZone(camera));
-            resultLines.append(dateTime.toString());
-            resultLines.append(kLineTemplate.arg(BookmarkUtilsStrings::tr("Camera"),
-                camera->getName()));
-
-            const auto attributeList = systemContext->analyticsAttributeHelper()->
-                preprocessAttributes(QString::fromStdString(track.objectTypeId), track.attributes);
-
-            for (const auto& attribute: attributeList)
-            {
-                resultLines.append(kLineTemplate.arg(attribute.displayedName,
-                    attribute.displayedValues.join(", ")));
-            }
-
-            return resultLines.join("\n");
-        };
+    const auto attributes = systemContext->analyticsAttributeHelper()->
+        preprocessAttributes(QString::fromStdString(track.objectTypeId), track.attributes);
 
     nx::vms::common::CameraBookmark result;
 
@@ -206,10 +165,57 @@ std::optional<common::CameraBookmark> bookmarkFromObjectTrack(
     result.startTimeMs = startTime;
     result.durationMs = std::max(duration, kMinBookmarkDuration);
     result.tags = { BookmarkConstants::objectBasedTagName() };
-    result.name = getBookmarkName();
-    result.description = getBookmarkDescription();
+    result.name = bookmarkNameFromObjectTrack(track, systemContext);
+    result.description = bookmarkDescription(startTime, camera, attributes);
 
     return result;
+}
+
+QString bookmarkNameFromObjectTrack(
+    const nx::analytics::db::ObjectTrack& track,
+    SystemContext* systemContext)
+{
+    if (!NX_ASSERT(systemContext))
+        return {};
+
+    if (track.title.has_value() && !track.title->text.isEmpty())
+        return track.title->text;
+
+    const auto taxonomyState = systemContext->analyticsTaxonomyState();
+    const auto objectType = taxonomyState
+        ? taxonomyState->objectTypeById(track.objectTypeId)
+        : nullptr;
+
+    return objectType
+        ? QString::fromStdString(objectType->name())
+        : BookmarkUtilsStrings::tr("Unknown Object");
+}
+
+QString bookmarkDescription(
+    std::chrono::milliseconds startTime,
+    const QnMediaResourcePtr& camera,
+    const analytics::AttributeList& attributes)
+{
+    if (!NX_ASSERT(camera))
+        return {};
+
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+        startTime.count(), nx::vms::client::core::ServerTimeWatcher::timeZone(camera));
+
+    static const QString kLineTemplate("%1: %2");
+
+    QStringList resultLines;
+    resultLines.append(dateTime.toString());
+    resultLines.append(kLineTemplate.arg(BookmarkUtilsStrings::tr("Camera"), camera->getName()));
+
+    for (const auto& attribute: attributes)
+    {
+        resultLines.append(kLineTemplate.arg(
+            attribute.displayedName,
+            attribute.displayedValues.join(", ")));
+    }
+
+    return resultLines.join("\n");
 }
 
 } // namespace bookmarks

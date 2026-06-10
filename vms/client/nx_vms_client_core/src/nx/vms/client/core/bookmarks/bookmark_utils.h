@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <analytics/db/analytics_db_types.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 
 namespace nx::vms::client::core {
 
@@ -58,6 +61,22 @@ std::optional<nx::Url> NX_VMS_CLIENT_CORE_API getBookmarkSharingLink(
  */
 bool NX_VMS_CLIENT_CORE_API sharedBookmarkAccessible(const common::CameraBookmark& bookmark,
     SystemContext* context);
+
+/**
+ * @return Bookmark name derived from the object track, taxonomy-based.
+ */
+QString NX_VMS_CLIENT_CORE_API bookmarkNameFromObjectTrack(
+    const nx::analytics::db::ObjectTrack& track,
+    SystemContext* systemContext);
+
+/**
+ * @return Formatted bookmark description: object capture time, camera name and the given object
+ *     attributes, one entry per line.
+ */
+QString NX_VMS_CLIENT_CORE_API bookmarkDescription(
+    std::chrono::milliseconds startTime,
+    const QnMediaResourcePtr& camera,
+    const analytics::AttributeList& attributes);
 
 /**
  * @return Camera bookmark structure initialized with data obtained from analytics object track,
