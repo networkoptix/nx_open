@@ -195,7 +195,7 @@ class NxOpenConan(ConanFile):
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
-                self.tool_requires("clang/20.1.2" "#3d16a819a0610ab5b0fe416c2c2e73aa")
+                self.tool_requires("clang/20.1.2" "#493f55bfbb20874208a25ee845a83c3c")
                 self.tool_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
             if self.isLinux:
                 self.tool_requires("sdk-gcc/9.5" "#54cc3c576f5d9f324caaf23152b4074e")
