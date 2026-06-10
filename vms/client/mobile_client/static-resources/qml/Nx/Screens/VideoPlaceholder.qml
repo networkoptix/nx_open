@@ -30,6 +30,8 @@ Control
 
     property real highlightIntensity: type === VideoPlaceholder.Error ? 0.10 : 0.25
 
+    property real preferredVerticalPadding: 44
+
     background: Rectangle
     {
         color: control.backgroundColor
@@ -96,18 +98,25 @@ Control
 
         spacing: 0
 
-        Item { Layout.fillHeight: true }
+        Item
+        {
+            Layout.fillHeight: true
+            Layout.preferredHeight: preferredVerticalPadding
+        }
 
         ColoredImage
         {
             id: image
 
-            readonly property int requiredHeight: Layout.preferredHeight + Layout.topMargin
+            readonly property int requiredHeight:
+                Layout.preferredHeight + Layout.topMargin + preferredVerticalPadding * 2
+
+            readonly property bool hasEnoughSpace: control.height >= requiredHeight
 
             sourceSize: Qt.size(height, height)
             primaryColor: foregroundColor
 
-            Layout.fillHeight: true
+            Layout.fillHeight: !hasEnoughSpace
             Layout.maximumHeight: 48
             Layout.preferredHeight: 48
             Layout.alignment: Qt.AlignCenter
@@ -149,6 +158,10 @@ Control
             Layout.alignment: Qt.AlignCenter
         }
 
-        Item { Layout.fillHeight: true }
+        Item
+        {
+            Layout.fillHeight: true
+            Layout.preferredHeight: preferredVerticalPadding
+        }
     }
 }

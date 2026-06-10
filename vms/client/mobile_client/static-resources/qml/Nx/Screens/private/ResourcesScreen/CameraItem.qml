@@ -111,13 +111,7 @@ Control
                 id: thumbnailContent
 
                 width: parent.width
-                height:
-                {
-                    const dummyModeOffset = d.showThumbnailDummy
-                        ? cameraInfo.height + cameraInfo.margin * 2
-                        : 0
-                    return parent.width * cameraItem.aspectRatio - dummyModeOffset
-                }
+                height: parent.width * cameraItem.aspectRatio
 
                 Loader
                 {
