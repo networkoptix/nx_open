@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Apie</translation>
     </message>
     <message>
       <source>Config</source>
@@ -314,7 +314,7 @@ Press ESC to cancel</translation>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>AM</translation>
     </message>
     <message>
       <source>am</source>
@@ -423,7 +423,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Atgal</translation>
     </message>
     <message>
       <source>Go back</source>
@@ -732,7 +732,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation type="unfinished">&amp;Cancel</translation>
+      <translation>&amp;Atšaukti</translation>
     </message>
     <message>
       <source>&amp;Close</source>
@@ -855,7 +855,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Kopijuoti</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
@@ -941,7 +941,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -953,7 +953,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Taikyti</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -968,7 +968,7 @@ Do you want to delete it anyway?</translation>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>
@@ -1157,7 +1157,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation type="unfinished">&amp;Copy</translation>
+      <translation>&amp;Kopijuoti</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
