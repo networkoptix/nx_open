@@ -5,16 +5,17 @@
 #include <initializer_list>
 #include <limits>
 #include <random>
+#include <string_view>
 #include <type_traits>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRandomGenerator>
 
+#include <nx/concepts/common.h>
+
 // #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 
-namespace nx {
-namespace utils {
-namespace random {
+namespace nx::utils::random {
 
 /**
  * Simple implementation of std::uniform_int_distribution.
@@ -67,11 +68,13 @@ class UniformIntDistribution<char>
     // Char specialization is not defined by standard, as it is not even clear if it is signed.
 };
 
-template<typename StringType>
+inline QRandomGenerator& defaultGenerator() { return *QRandomGenerator::global(); }
+
+template<typename StringType = QByteArray>
 // requires String<StringType>
 StringType generate(int count)
 {
-    auto& device = *QRandomGenerator::global();
+    auto& device = defaultGenerator();
 
     // NOTE: Direct device access with simple cast works significantly faster than
     //     uniform_int_distribution on a number of platforms (STL implementations).
@@ -86,89 +89,79 @@ StringType generate(int count)
 }
 
 /**
- * Generates uniform_int_distribution random data the length of count.
+ * Generates uniform_int_distribution random integer in [min, max].
  */
-NX_UTILS_API QByteArray generate(int count);
-
-/**
- * Generates uniform_int_distribution random integer in [min, max]
- */
-template<typename RandomDevice, typename Type = int>
-Type number(
-    RandomDevice& randomDevice,
-    Type min = 0,
-    Type max = std::numeric_limits<Type>::max(),
-    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
-    typename std::enable_if<
-        std::is_integral<Type>::value &&
-        !std::is_same<Type, bool>::value>::type* = 0)
+template<NonBoolIntegral Type, typename Generator>
+requires std::is_class_v<Generator>
+Type number(Generator& generator, Type min, Type max)
 {
     #ifdef NX_UTILS_USE_OWN_INT_DISTRIBUTION
         UniformIntDistribution<Type> distribution(min, max);
     #else
         std::uniform_int_distribution<Type> distribution(min, max);
     #endif
-    return distribution(randomDevice);
+    return distribution(generator);
 }
 
-template<typename Type = int>
-Type number(
-    Type min = 0,
-    Type max = std::numeric_limits<Type>::max(),
-    typename std::enable_if<
-        std::is_integral<Type>::value &&
-        !std::is_same<Type, bool>::value>::type* = 0)
+template<NonBoolIntegral Type>
+Type number(Type min, Type max)
 {
-    return number<QRandomGenerator, Type>(*QRandomGenerator::global(), min, max);
+    return number(defaultGenerator(), min, max);
 }
 
-template<typename RandomDevice, typename Type>
-bool number(
-    RandomDevice& randomDevice,
-    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
-    typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
+template<NonBoolIntegral Type = int>
+Type number()
 {
-    return randomDevice() >
-        (RandomDevice::min() + ((RandomDevice::max() - RandomDevice::min()) / 2));
-}
-
-template<typename Type>
-bool number(typename std::enable_if<std::is_same<Type, bool>::value>::type* = 0)
-{
-    return number<QRandomGenerator, Type>(*QRandomGenerator::global());
-}
-
-template<typename RandomDevice, typename Type>
-Type number(
-    RandomDevice& randomDevice,
-    Type min = 0,
-    Type max = std::numeric_limits<Type>::max(),
-    typename std::enable_if<std::is_class<RandomDevice>::value>::type* = 0,
-    typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
-{
-    std::uniform_real_distribution<Type> distribution(min, max);
-    return distribution(randomDevice);
+    return number<Type>(0, std::numeric_limits<Type>::max());
 }
 
 /**
  * Generates uniform_real_distribution random real in [min, max)
  */
-template<typename Type>
-Type number(
-    Type min = 0,
-    Type max = std::numeric_limits<Type>::max(),
-    typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
+template<std::floating_point Type, typename Generator>
+requires std::is_class_v<Generator>
+Type number(Generator& generator, Type min, Type max)
 {
-    return number<QRandomGenerator, Type>(*QRandomGenerator::global(), min, max);
+    std::uniform_real_distribution<Type> distribution(min, max);
+    return distribution(generator);
 }
 
-template<typename RandomDevice, typename String = std::string>
-String generateName(RandomDevice& randomDevice, int length)
+template<std::floating_point Type>
+Type number(Type min, Type max)
 {
-    static const char kAlphaAndDigits[] =
+    return number(defaultGenerator(), min, max);
+}
+
+/**
+ * Generates uniform random number in [base - delta, base + delta]
+ */
+template<typename Type>
+Type numberDelta(Type base, Type delta) { return number(base - delta, base + delta); }
+
+/** Generates random boolean value. */
+template<typename Generator>
+requires std::is_class_v<Generator>
+bool coin(Generator& generator)
+{
+    std::bernoulli_distribution bd(0.5);
+
+    return bd(generator);
+}
+
+inline bool coin()
+{
+    return coin(defaultGenerator());
+}
+
+/** Generates random alfanumeric name starting with a letter. */
+template<typename String = std::string, typename Generator>
+requires std::is_class_v<Generator>
+String generateName(Generator& generator, int length)
+{
+    static constexpr std::string_view kAlphaAndDigits =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    static const size_t kDigitsCount = 10;
-    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
+    static constexpr size_t kDigitsCount = 10;
+    static_assert(kDigitsCount < kAlphaAndDigits.size(), "Check kAlphaAndDigits array");
 
     if (!length)
         return String();
@@ -176,31 +169,20 @@ String generateName(RandomDevice& randomDevice, int length)
     String str;
     str.resize(length);
     str[0] = kAlphaAndDigits[
-        nx::utils::random::number(randomDevice) %
-            (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+        number(generator, (size_t) 0, kAlphaAndDigits.size() - kDigitsCount - 1)];
     for (int i = 1; i < length; ++i)
     {
-        str[i] = kAlphaAndDigits[nx::utils::random::number(randomDevice) %
-            (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+        str[i] = kAlphaAndDigits[number(generator, (size_t) 0, kAlphaAndDigits.size() - 1)];
     }
 
     return str;
 }
 
-template<typename String>
+template<typename String = std::string>
 String generateName(int length)
 {
-    return generateName<std::decay_t<decltype(*QRandomGenerator::global())>, String>(
-        *QRandomGenerator::global(), length);
+    return generateName<String>(defaultGenerator(), length);
 }
-
-NX_UTILS_API std::string generateName(int length);
-
-/**
- * Generates uniform random number in [base - delta, base + delta]
- */
-template<typename Type>
-Type numberDelta(Type base, Type delta) { return number(base - delta, base + delta); }
 
 /**
  * Returns ref on random element in container.
@@ -233,6 +215,4 @@ typename Iterator::value_type& choice(Iterator begin, Iterator end)
     return *std::next(begin, position);
 }
 
-} // namespace random
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::random

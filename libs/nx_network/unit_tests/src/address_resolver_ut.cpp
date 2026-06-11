@@ -516,7 +516,7 @@ protected:
         m_hostNameToResolve = "a.b";
         m_hostEndpoint = SocketAddress(
             HostAddress::localhost,
-            nx::utils::random::number<std::uint16_t>(1));
+            nx::utils::random::number<std::uint16_t>(1, std::numeric_limits<std::uint16_t>::max()));
         resolver().addFixedAddress(m_hostNameToResolve, m_hostEndpoint);
     }
 

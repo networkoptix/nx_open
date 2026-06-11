@@ -76,6 +76,9 @@ concept TimePeriodLike = requires(const T& t) {
 };
 
 template<typename T>
+concept NonBoolIntegral = std::integral<T> && !std::same_as<std::remove_cvref_t<T>, bool>;
+
+template<typename T>
 concept ToStringViewConvertible = requires(const T& t) { std::string_view(t.data(), t.size()); };
 
 /*
