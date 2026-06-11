@@ -138,11 +138,14 @@ if(CONAN_QUICK_START_GUIDE_ROOT)
     set(quick_start_guide_directory ${CONAN_QUICK_START_GUIDE_ROOT})
 endif()
 
-# Exclude conan-generated files from ninja_clean
-foreach(extension "bat" "sh" "ps1")
-    nx_store_known_file(${CMAKE_BINARY_DIR}/activate_run.${extension})
-    nx_store_known_file(${CMAKE_BINARY_DIR}/deactivate_run.${extension})
-    nx_store_known_file(${CMAKE_BINARY_DIR}/environment_run.${extension}.env)
-endforeach(extension)
+# Exclude conan-generated env scripts from ninja_clean (some, e.g. os_deps_env.sh, are sourced
+# only transitively by conanbuild.sh and named in no build.ninja rule).
+file(GLOB _conan_env_scripts
+    ${CMAKE_BINARY_DIR}/conanbuild.* ${CMAKE_BINARY_DIR}/conanrun.*
+    ${CMAKE_BINARY_DIR}/conanbuildenv-* ${CMAKE_BINARY_DIR}/conanrunenv-*
+    ${CMAKE_BINARY_DIR}/deactivate_conan* ${CMAKE_BINARY_DIR}/*env.sh)
+foreach(_script ${_conan_env_scripts})
+    nx_store_known_file(${_script})
+endforeach()
 
 nx_store_known_file(${CMAKE_BINARY_DIR}/lib/ffmpeg)
