@@ -382,7 +382,7 @@
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analitikos įvykis</translation>
     </message>
     <message>
       <source>%1 at %2</source>

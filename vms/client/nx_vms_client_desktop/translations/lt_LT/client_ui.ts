@@ -5,7 +5,7 @@
     <name>AboutDialog</name>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Apie</translation>
     </message>
     <message>
       <source>Information</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Black level</source>
@@ -119,7 +119,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Done</source>
@@ -150,7 +150,7 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
@@ -426,7 +426,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -589,7 +589,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
   </context>
   <context>
@@ -701,7 +701,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Atgal</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -754,7 +754,7 @@
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autentifikavimas</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Garsas</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -795,7 +795,7 @@
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Keisti slaptažodį</translation>
     </message>
   </context>
   <context>
@@ -861,7 +861,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresas</translation>
     </message>
     <message>
       <source>Hint</source>
@@ -932,7 +932,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Pridėti įrenginius</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1454,7 +1454,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Aktyvuoti nemokamą licenciją</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1562,7 +1562,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Done</source>
@@ -1656,7 +1656,7 @@
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Patikrinkite</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -1691,7 +1691,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Link copied</source>
@@ -1733,7 +1733,7 @@
     <name>NewDeviceAdditionDialog</name>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Pridėti įrenginius</translation>
     </message>
     <message>
       <source>to</source>
@@ -1998,7 +1998,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
@@ -2252,7 +2252,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Keisti slaptažodį...</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2296,7 +2296,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoriai</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2422,7 +2422,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Pridėti išorinę saugyklą...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
@@ -2441,14 +2441,14 @@ and click on the &quot;Search&quot; button</translation>
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Pridėti išorinę saugyklą...</translation>
     </message>
     <message>
       <source>Protocol:</source>
@@ -2581,7 +2581,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Pridėti vartotoją</translation>
     </message>
     <message>
       <source>Del</source>
@@ -2629,7 +2629,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Upload Footage</source>

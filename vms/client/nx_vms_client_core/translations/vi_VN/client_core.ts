@@ -500,11 +500,11 @@
     <name>nx::vms::client::core::bookmarks::BookmarkUtilsStrings</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>Đối tượng không xác định</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Máy chụp hình</translation>
     </message>
   </context>
   <context>

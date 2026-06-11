@@ -99,17 +99,6 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::AbstractObjectData</name>
-    <message>
-      <source>Camera</source>
-      <translation>攝影機</translation>
-    </message>
-    <message>
-      <source>Unknown Object</source>
-      <translation>未知的物件</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
     <message>
       <source>Objects (%1)</source>

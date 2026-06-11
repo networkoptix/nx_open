@@ -6563,7 +6563,7 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Opret Bogmærke...</translation>
     </message>
   </context>
   <context>

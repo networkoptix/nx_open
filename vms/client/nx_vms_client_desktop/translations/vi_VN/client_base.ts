@@ -6460,7 +6460,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Tạo dấu trang...</translation>
     </message>
   </context>
   <context>

@@ -500,11 +500,11 @@
     <name>nx::vms::client::core::bookmarks::BookmarkUtilsStrings</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>未知的物件</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>攝影機</translation>
     </message>
   </context>
   <context>

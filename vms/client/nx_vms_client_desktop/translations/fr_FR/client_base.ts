@@ -6563,7 +6563,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Créer un signet...</translation>
     </message>
   </context>
   <context>

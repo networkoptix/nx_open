@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Câmara</translation>
     </message>
   </context>
   <context>

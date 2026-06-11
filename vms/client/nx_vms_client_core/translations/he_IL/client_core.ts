@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>מצלמה</translation>
     </message>
   </context>
   <context>

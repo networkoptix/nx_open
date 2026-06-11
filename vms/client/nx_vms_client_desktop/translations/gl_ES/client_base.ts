@@ -6563,7 +6563,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Crear un marcador...</translation>
     </message>
   </context>
   <context>

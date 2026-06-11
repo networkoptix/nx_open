@@ -506,11 +506,11 @@
     <name>nx::vms::client::core::bookmarks::BookmarkUtilsStrings</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>Nieznany obiekt</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
   </context>
   <context>

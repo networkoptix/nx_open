@@ -6460,7 +6460,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>북마크 생성...</translation>
     </message>
   </context>
   <context>

@@ -100,17 +100,6 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::AbstractObjectData</name>
-    <message>
-      <source>Camera</source>
-      <translation>Camera</translation>
-    </message>
-    <message>
-      <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
     <message>
       <source>Objects (%1)</source>

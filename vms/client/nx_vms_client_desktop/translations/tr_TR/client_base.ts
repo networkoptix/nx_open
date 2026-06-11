@@ -6562,7 +6562,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Yer İşareti Oluştur...</translation>
     </message>
   </context>
   <context>

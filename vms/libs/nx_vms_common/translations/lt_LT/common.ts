@@ -167,7 +167,7 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Administratoriai</translation>
     </message>
     <message>
       <source>Power Users</source>
@@ -175,7 +175,7 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Išplėstiniai žiūrėtojai</translation>
     </message>
     <message>
       <source>Viewers</source>
@@ -638,7 +638,7 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Analoginis</translation>
     </message>
     <message>
       <source>Professional</source>
@@ -666,7 +666,7 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Analoginis kodavimo įrenginys</translation>
     </message>
     <message>
       <source>Analog Licenses</source>

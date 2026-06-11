@@ -329,7 +329,7 @@
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>Paskyros nustatymai...</translation>
     </message>
     <message>
       <source>Create Account...</source>
@@ -373,7 +373,7 @@
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation type="unfinished">Add Bookmark...</translation>
+      <translation>Pridėti žymę...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
@@ -981,7 +981,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Device...</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>Add User...</source>
-      <translation type="unfinished">Add User...</translation>
+      <translation>Pridėti vartotoją...</translation>
     </message>
     <message>
       <source>Integration...</source>
@@ -1599,7 +1599,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Patikrinkite</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -1607,7 +1607,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktyvus</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -2303,7 +2303,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Activity</source>
-      <translation type="unfinished">Activity</translation>
+      <translation>Veikla</translation>
     </message>
     <message>
       <source>Date</source>
@@ -2888,7 +2888,7 @@ License Key: %2</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Paskyra nerasta</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2938,7 +2938,7 @@ License Key: %2</translation>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Paskyros nustatymai</translation>
     </message>
   </context>
   <context>
@@ -3431,7 +3431,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Kanalai</translation>
     </message>
     <message>
       <source>Not verified</source>
@@ -4174,7 +4174,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Visi serveriai</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -4218,7 +4218,7 @@ License Key: %2</translation>
     <name>QnServerAddressesModel</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresas</translation>
     </message>
   </context>
   <context>
@@ -4280,7 +4280,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Atsarginė kopija</translation>
     </message>
     <message>
       <source>Failover</source>
@@ -4467,7 +4467,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>2FA IŠJUNGTA</translation>
     </message>
   </context>
   <context>
@@ -4536,7 +4536,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Atsarginė kopija</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -4584,7 +4584,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -4722,7 +4722,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Atsarginė kopija</translation>
     </message>
     <message>
       <source>Main</source>
@@ -4826,7 +4826,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>Adaptyvus</translation>
     </message>
   </context>
   <context>
@@ -4868,7 +4868,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Vis tiek pridėti šią saugyklą?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
@@ -4876,7 +4876,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Pridėti saugyklą</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
@@ -5034,7 +5034,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>Analitiniai duomenys gali užimti daug vietos.</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -5821,7 +5821,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
@@ -6015,7 +6015,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Geriausias</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -6118,7 +6118,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -6564,7 +6564,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Taikyti</translation>
     </message>
     <message>
       <source>Unsaved changes:</source>
@@ -7321,7 +7321,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -7379,11 +7379,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Auto</source>
       <comment>Automatic profile selection</comment>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
@@ -8904,7 +8904,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresas</translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
@@ -9039,7 +9039,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
@@ -9194,7 +9194,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Fonas</translation>
     </message>
   </context>
   <context>
@@ -9252,7 +9252,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Taikyti</translation>
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
@@ -9500,7 +9500,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Taikyti</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
@@ -9634,7 +9634,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Visi</translation>
     </message>
     <message>
       <source>Export List</source>
@@ -10065,7 +10065,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -10743,7 +10743,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Best</source>
-      <translation type="unfinished">Best</translation>
+      <translation>Geriausias</translation>
     </message>
     <message>
       <source>Average</source>
@@ -10903,7 +10903,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Aktyvus</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -10918,7 +10918,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Visi</translation>
     </message>
   </context>
   <context>
@@ -11326,7 +11326,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerListModel</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -12978,7 +12978,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::menu::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Low</source>
@@ -13122,7 +13122,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autentifikavimas</translation>
     </message>
     <message>
       <source>Login</source>
@@ -13169,7 +13169,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributai</translation>
     </message>
   </context>
   <context>
@@ -13214,7 +13214,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Visi serveriai</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
