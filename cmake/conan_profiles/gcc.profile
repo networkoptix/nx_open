@@ -6,3 +6,6 @@
 # gcc-toolchain dependency.
 [tool_requires]
 gcc-toolchain/13.3#54cc3c576f5d9f324caaf23152b4074e
+
+# Pin clang recipe revision here until we update to conan 2.30+
+clang/20.1.2#493f55bfbb20874208a25ee845a83c3c
