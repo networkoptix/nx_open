@@ -197,13 +197,13 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     using namespace nx::common::metadata;
     if (auto motionPacket = std::dynamic_pointer_cast<const QnMetaDataV1>(md))
     {
-        NX_VERBOSE(this, "Got motion packet, timestamp %1 us", md->timestamp);
+        NX_VERBOSE(this, "Got motion packet: %1", md);
         saveMotion(motionPacket);
     }
     else if (auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(md);
         metadata && metadata->metadataType == MetadataType::ObjectDetection)
     {
-        NX_VERBOSE(this, "Got analytics packet, timestamp %1 us", md->timestamp);
+        NX_VERBOSE(this, "Got analytics packet: %1", md);
         const auto analytics =
             std::dynamic_pointer_cast<const QnCompressedObjectMetadataPacket>(metadata);
     }

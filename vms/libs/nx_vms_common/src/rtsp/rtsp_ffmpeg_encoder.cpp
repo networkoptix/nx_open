@@ -89,9 +89,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     if (!media)
         return;
 
-    NX_VERBOSE(this, "Received media data: timestamp %1, dataType %2",
-        media->timestamp, media->dataType);
-
+    NX_VERBOSE(this, "Received media data: %1", media);
     if (m_videoTranscoder && media->dataType == QnAbstractMediaData::VIDEO)
         media = transcodeVideoPacket(media);
     if (!media)

@@ -103,7 +103,7 @@ bool NovMediaExport::saveMotion(const QnConstMetaDataV1Ptr& motion)
             m_motionFileList[channel]->open(QIODevice::ReadWrite);
         }
 
-        NX_VERBOSE(this, "Saving motion, timestamp %1 us", motion->timestamp);
+        NX_VERBOSE(this, "Saving motion: %1", motion);
         motion->serialize(m_motionFileList[channel].get());
     }
     return true;

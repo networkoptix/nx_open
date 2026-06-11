@@ -186,7 +186,7 @@ void QnAbstractArchiveStreamReader::runCycleImpl()
         }
         else
         {
-            NX_VERBOSE(this, "Skip non-key frame: %1, type: %2", data->timestamp, data->dataType);
+            NX_VERBOSE(this, "Skip non-key frame: %1", data);
             return; // need key data but got not key data
         }
     }

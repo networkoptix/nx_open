@@ -1418,7 +1418,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             if (m_gotKeyDataInfo.size() <= (int) vd->channelNumber ||
                 !m_gotKeyDataInfo[vd->channelNumber])
             {
-                NX_DEBUG(this, "Ignore video data with timestamp %1. Waiting for I-frame", vd->timestamp);
+                NX_DEBUG(this, "Ignore video data: %1. Waiting for I-frame", vd);
                 return true; //< Wait for key frame.
             }
         }

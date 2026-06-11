@@ -121,7 +121,7 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& data, doubl
     int error = avcodec_send_packet(d->codecContext, packet);
     if (error < 0)
     {
-        NX_WARNING(this, "Failed to decode audio packet, error: %2", data->timestamp,
+        NX_WARNING(this, "Failed to decode audio packet %1, error: %2", data,
             nx::media::ffmpeg::avErrorToString(error));
         return false;
     }

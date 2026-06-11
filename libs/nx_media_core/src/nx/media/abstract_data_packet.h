@@ -18,6 +18,8 @@ struct NX_MEDIA_CORE_API QnAbstractDataPacket
     {
         return timestamp < 0 || timestamp == DATETIME_NOW;
     }
+
+    virtual QString idForToStringFromPtr() const;
 };
 
 typedef std::shared_ptr<QnAbstractDataPacket> QnAbstractDataPacketPtr;

@@ -222,7 +222,7 @@ void TwoWayAudioStreamer::putData(const QnAbstractDataPacketPtr& data)
     NX_VERBOSE(this, "Process audio data: %1", audioData);
     if ((int)m_bufferQueue.lock()->size() >= kMaxBufferLength)
     {
-        NX_DEBUG(this, "Drop audio packet: %1, buffer is full", audioData->timestamp);
+        NX_DEBUG(this, "Drop audio packet: %1, buffer is full", audioData);
         return;
     }
 

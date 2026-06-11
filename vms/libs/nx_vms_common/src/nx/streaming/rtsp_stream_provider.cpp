@@ -483,7 +483,6 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
                 bytesRead, rtpChannelNum);
             break; // error
         }
-        NX_VERBOSE(this, "Got %1 bytes, trackFound=%2", bytesRead, trackIndexIter != m_trackIndices.end());
 
         if (trackIndexIter != m_trackIndices.end())
         {

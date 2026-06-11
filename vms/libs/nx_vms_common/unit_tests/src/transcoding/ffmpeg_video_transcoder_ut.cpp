@@ -190,7 +190,7 @@ TEST(FfmpegVideoTranscoder, FlushBFrames)
         if (!result || result->dataSize() == 0)
             break;
 
-        NX_DEBUG(this, "flushed packet: %1", result->timestamp);
+        NX_DEBUG(this, "flushed packet: %1", result);
         ++outFrames;
     }
     ASSERT_EQ(outFrames, inputFrames);

@@ -97,7 +97,7 @@ void MediaQueue::putData(const QnConstAbstractMediaDataPtr& media)
             m_keyDataFound[video->channelNumber] = true;
         if (!m_keyDataFound[video->channelNumber] && !isKeyFrame)
         {
-            NX_VERBOSE(this, "Skip data, waiting for keyframe: %1", media->timestamp);
+            NX_VERBOSE(this, "Skip data, waiting for keyframe: %1", media);
             return;
         }
     }

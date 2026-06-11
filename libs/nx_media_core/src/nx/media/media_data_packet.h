@@ -141,7 +141,7 @@ public:
 
     const CodecParametersConstPtr& getContext() const;
 
-    QString idForToStringFromPtr() const;
+    virtual QString idForToStringFromPtr() const override;
 
 public:
     QnAbstractStreamDataProvider* dataProvider;
