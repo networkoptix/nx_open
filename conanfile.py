@@ -274,7 +274,7 @@ class NxOpenConan(ConanFile):
             self.requires("pathkit/m134" "#de17b62844ca3085dbeeb8c8fdea90c5")
 
         if self.isWindows or self.isMacos or self.isAndroid or self.isIos or (self.isLinux and not self.isArm32):
-            self.requires("openal/1.24.3" "#bec0ba1235fbfba9af1eaf14d814e4b0")
+            self.requires("openal/1.24.3" "#9ef9f2142e23589eb803a477be0c18a3")
 
         if self.isWindows:
             self.requires("directx/june2010" "#a0cbbd6a9cfef629fae6d2cf5a18bcdd")
