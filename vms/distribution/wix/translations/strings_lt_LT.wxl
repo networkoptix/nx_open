@@ -28,11 +28,11 @@
   <String Id="OptionsLocationLabel">Install location:</String>
   <String Id="OptionsBrowseButton">Browse</String>
   <String Id="OptionsOkButton">OK</String>
-  <String Id="OptionsCancelButton">Cancel</String>
+  <String Id="OptionsCancelButton">Atšaukti</String>
   <String Id="ProgressHeader">Setup Progress</String>
   <String Id="ProgressLabel">Processing...</String>
   <String Id="OverallProgressPackageText">Initializing...</String>
-  <String Id="ProgressCancelButton">Cancel</String>
+  <String Id="ProgressCancelButton">Atšaukti</String>
   <String Id="ModifyHeader">Modify Setup</String>
   <String Id="ModifyRepairButton">Repair</String>
   <String Id="ModifyUninstallButton">Uninstall</String>
@@ -56,7 +56,7 @@
   <String Id="FilesInUseCloseRadioButton">Close the applications and attempt to restart them</String>
   <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
   <String Id="FilesInUseOkButton">OK</String>
-  <String Id="FilesInUseCancelButton">Cancel</String>
+  <String Id="FilesInUseCancelButton">Atšaukti</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Select applications to be installed:</String>
   <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>

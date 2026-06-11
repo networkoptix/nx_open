@@ -267,7 +267,7 @@
     </message>
     <message>
       <source>&amp;Back</source>
-      <translation type="unfinished">&amp;Back</translation>
+      <translation>&amp;Atgal</translation>
     </message>
     <message>
       <source>&amp;Forward</source>
@@ -286,7 +286,7 @@
     <name>RenderViewContextMenuQt</name>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Atgal</translation>
     </message>
     <message>
       <source>Forward</source>

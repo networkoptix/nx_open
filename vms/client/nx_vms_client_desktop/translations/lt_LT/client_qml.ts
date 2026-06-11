@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
   </context>
   <context>
@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Visi</translation>
     </message>
   </context>
   <context>
@@ -370,7 +370,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
   </context>
   <context>
@@ -667,7 +667,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -756,7 +756,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Atributai</translation>
     </message>
     <message>
       <source>Select type</source>
@@ -803,7 +803,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Analitikos įvykis</translation>
     </message>
   </context>
   <context>
@@ -833,7 +833,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Done</source>
@@ -867,7 +867,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>
@@ -1006,7 +1006,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Atgal</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -1482,7 +1482,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Not configured yet</source>
@@ -1617,7 +1617,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Importing</source>
@@ -1656,7 +1656,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Import</source>
@@ -1833,7 +1833,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adresas</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
@@ -2121,7 +2121,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Done</source>
@@ -2290,7 +2290,7 @@ Press Alt + Click to follow object</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Pridėti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2460,7 +2460,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Nepavyksta įkelti peržiūros</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
@@ -2557,7 +2557,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>
@@ -2891,7 +2891,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Pridėti vartotoją</translation>
     </message>
   </context>
   <context>
@@ -3028,7 +3028,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Paskyros nustatymai</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3036,7 +3036,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Keisti slaptažodį</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
