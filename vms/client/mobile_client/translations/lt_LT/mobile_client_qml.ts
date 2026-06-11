@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta funkcijos</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Garsas</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -129,7 +129,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Kanalo partneris</translation>
     </message>
   </context>
   <context>
@@ -176,7 +176,7 @@
     <name>ComboBox</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>
@@ -268,7 +268,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Close</source>
@@ -402,7 +402,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -522,7 +522,7 @@
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Bet kuris</translation>
     </message>
   </context>
   <context>
@@ -866,7 +866,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Visi</translation>
     </message>
     <message>
       <source>Log in to the cloud to use push notifications</source>
@@ -882,7 +882,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Beta funkcijos</translation>
     </message>
     <message>
       <source>Early access to new features</source>
@@ -921,7 +921,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Create &amp; Share</source>
@@ -988,7 +988,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -1245,7 +1245,7 @@
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Plotas</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
