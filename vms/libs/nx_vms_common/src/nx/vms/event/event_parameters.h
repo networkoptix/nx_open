@@ -40,11 +40,6 @@ struct EventMetaData
     bool allUsers = false;
     nx::vms::api::EventLevel level = nx::vms::api::EventLevel::undefined;
 
-    EventMetaData() = default;
-    EventMetaData(const EventMetaData&) = default;
-    EventMetaData(EventMetaData&&) = default;
-    EventMetaData& operator= (const EventMetaData&) = default;
-    EventMetaData& operator= (EventMetaData&&) = default;
     bool operator==(const EventMetaData& other) const = default;
 };
 
