@@ -910,7 +910,7 @@ Page
                     return
 
                 timelineObjectSheet.fallbackImagePaths = data.imagePaths ?? []
-                timelineObjectSheet.model = data.perObjectData
+                timelineObjectSheet.data = data
                 timelineObjectSheet.open()
             }
         }
@@ -919,9 +919,14 @@ Page
         {
             id: timelineObjectSheet
 
+            property var data: null //< Store a copy of the value to keep its data in memory.
+
             objectsType: timeline.objectsType
             dateFormatter: ((timestampMs) => timeline.labelFormatter.objectTimestamp(
                 timestampMs, timeline.timeZone))
+
+            onDataChanged: model = data?.perObjectData
+            onClosed: model = null
         }
 
         Rectangle

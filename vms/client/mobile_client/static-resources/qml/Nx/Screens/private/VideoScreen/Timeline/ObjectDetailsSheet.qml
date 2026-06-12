@@ -254,6 +254,4 @@ BaseAdaptiveSheet
         repeater.model = sheet.model ?? []
         swipeView.setCurrentIndex(swipeView.count ? 0 : -1)
     }
-
-    onClosed: sheet.model = []
 }
