@@ -201,7 +201,7 @@
     <name>QnBusinessResourceValidationStrings</name>
     <message>
       <source>Any Device</source>
-      <translation>任何設備</translation>
+      <translation>任何裝置</translation>
     </message>
     <message>
       <source>Any Camera</source>
@@ -489,7 +489,7 @@
     </message>
     <message>
       <source>Invalid data was received from the device. Details: &quot;%1&quot;.</source>
-      <translation>從設備收到無效的資料。詳細內容：&quot;%1&quot;</translation>
+      <translation>從裝置收到無效的資料。詳細內容：&quot;%1&quot;。</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera. Details: &quot;%1&quot;.</source>
@@ -896,7 +896,7 @@
     <name>QnOnlineServerPolicy</name>
     <message>
       <source>Online servers</source>
-      <translation type="unfinished">Online servers</translation>
+      <translation>在線伺服器</translation>
     </message>
   </context>
   <context>
@@ -1490,7 +1490,7 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation>裝置儲存資訊更新間隔.</translation>
+      <translation>裝置儲存資訊更新間隔。</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
@@ -1562,7 +1562,7 @@
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation>停用設備供應商.</translation>
+      <translation>停用裝置供應商。</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
@@ -1794,7 +1794,7 @@
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation>伺服器連接設備時保持IO接口狀態開啟.</translation>
+      <translation>伺服器連接裝置時保持IO接口狀態開啟。</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
