@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Password protection</source>
-      <translation type="unfinished">Password protection</translation>
+      <translation>密碼保護</translation>
     </message>
   </context>
   <context>

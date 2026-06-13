@@ -165,7 +165,7 @@
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Przewijanie do tyłu</translation>
     </message>
     <message>
       <source>On Layout</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Nieobsługiwany typ wartości JSON w kluczu %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
@@ -516,7 +516,7 @@
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>Moduł I/O odłączony w %1</translation>
     </message>
   </context>
   <context>
@@ -614,7 +614,7 @@
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Awaria wentylatora w %1</translation>
     </message>
   </context>
   <context>
@@ -716,7 +716,7 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Dla wtyczki</translation>
     </message>
     <message>
       <source>And Level Is</source>
@@ -952,7 +952,7 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Przekroczenie limitu PoE</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
@@ -1234,7 +1234,7 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Na urządzeniu</translation>
     </message>
   </context>
   <context>

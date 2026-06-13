@@ -639,11 +639,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>鏡像時間軸</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use</source>
-      <translation type="unfinished">Flip the timeline for left-handed use</translation>
+      <translation>翻轉時間軸以方便左手慣用者使用</translation>
     </message>
   </context>
   <context>
@@ -700,7 +700,7 @@
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Are you sure you want to disconnect from %1?</translation>
+      <translation>您確定要從 %1 斷開連接嗎？</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1561,7 +1561,7 @@
     </message>
     <message>
       <source>2FA disabled</source>
-      <translation type="unfinished">2FA disabled</translation>
+      <translation>已停用雙重認證</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1569,7 +1569,7 @@
     </message>
     <message>
       <source>Unsupported</source>
-      <translation type="unfinished">Unsupported</translation>
+      <translation>不支援</translation>
     </message>
   </context>
   <context>
