@@ -53,6 +53,8 @@ static void registerLoginRestHandlers(
      * %param[ref] _local
      * %permissions Authorization is not required.
      * %return:{LoginSession}
+     *     %param token The session authorization token to be used as HTTP bearer token or URL
+     *         parameter. Truncated if request is performed with non-fresh session.
      *
      **%apidoc GET /rest/v{1-3}/login/sessions
      * Retrieves the session information about all sessions known to Server.
