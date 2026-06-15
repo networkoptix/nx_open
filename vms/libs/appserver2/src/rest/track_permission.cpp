@@ -17,7 +17,7 @@
 struct TrackPermission::Private
 {
     using Notifier = nx::core::access::AccessRightsResolver::Notifier;
-    using Notification = nx::MoveOnlyFunc<void(bool noEtag)>;
+    using Notification = nx::MoveOnlyFunc<void()>;
     using NotificationList = std::vector<Notification>;
     using NotifyType = nx::network::rest::Handler::NotifyType;
 
@@ -41,8 +41,7 @@ struct TrackPermission::Private
     nx::vms::api::AccessRight requiredAccess;
     nx::MoveOnlyFunc<void(const QString& id,
         nx::network::rest::Handler::NotifyType notifyType,
-        std::optional<nx::Uuid> user,
-        bool noEtag)>
+        std::optional<nx::Uuid> user)>
         notifyFunc;
     nx::Lockable<std::map<nx::Uuid, Subscription>> userSubscriptions;
 
@@ -53,8 +52,7 @@ struct TrackPermission::Private
         nx::vms::api::AccessRight requiredAccess,
         nx::MoveOnlyFunc<void(const QString& id,
             nx::network::rest::Handler::NotifyType notifyType,
-            std::optional<nx::Uuid> user,
-            bool noEtag)> notify)
+            std::optional<nx::Uuid> user)> notify)
         :
         q(q),
         systemContext(systemContext),
@@ -69,9 +67,8 @@ struct TrackPermission::Private
         if (notifications.empty())
             return;
 
-        auto last = std::prev(notifications.end());
         for (auto it = notifications.begin(); it != notifications.end(); ++it)
-            (*it)(/*noEtag*/ it != last);
+            (*it)();
     }
 
     void at_accessChanged(const nx::Uuid& user)
@@ -145,9 +142,9 @@ struct TrackPermission::Private
     Notification makeNotification(nx::Uuid user, QString id, NotifyType type) const
     {
         return
-            [this, user = std::move(user), id = std::move(id), type](bool noEtag) mutable
+            [this, user = std::move(user), id = std::move(id), type]() mutable
             {
-                notifyFunc(id, type, std::move(user), noEtag);
+                notifyFunc(id, type, std::move(user));
             };
     }
 
@@ -246,8 +243,7 @@ TrackPermission::TrackPermission(
     nx::vms::api::AccessRight requiredAccess,
     nx::MoveOnlyFunc<void(const QString& id,
         nx::network::rest::Handler::NotifyType notifyType,
-        std::optional<nx::Uuid> user,
-        bool noEtag)> notify)
+        std::optional<nx::Uuid> user)> notify)
     :
     d(std::make_unique<Private>(
         this, systemContext, std::move(allAccessibleGroupId), requiredAccess, std::move(notify)))

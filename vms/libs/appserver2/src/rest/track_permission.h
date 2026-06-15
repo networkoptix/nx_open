@@ -17,8 +17,7 @@ public:
         nx::MoveOnlyFunc<void(
             const QString& id,
             nx::network::rest::Handler::NotifyType notifyType,
-            std::optional<nx::Uuid> user,
-            bool noEtag)> notify);
+            std::optional<nx::Uuid> user)> notify);
 
     virtual ~TrackPermission();
     nx::utils::Guard trackPermissions(const nx::Uuid& user);

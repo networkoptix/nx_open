@@ -101,6 +101,7 @@ struct ResponseAttributes
 {
     nx::network::http::HttpHeaders httpHeaders;
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
+    std::optional<Response::ETags> etags;
 };
 
 template<typename Derived>
@@ -182,40 +183,14 @@ protected:
         Params filters = {},
         json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
     {
-        const auto format = request.responseFormatOrThrow();
         Response response{
-            responseAttributes.statusCode, std::move(responseAttributes.httpHeaders)};
-        const bool notification = request.jsonRpcContext() && request.jsonRpcContext()->subscribed;
-        if (!notification)
-        {
-            if (auto it = response.httpHeaders.find("ETag"); it != response.httpHeaders.end())
-            {
-                auto etag =
-                    nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
-                if (!etag.empty())
-                {
-                    bool notModified = false;
-                    auto d = static_cast<const Derived*>(this);
-                    if constexpr (requires { d->checkEtag(/*useId*/ false, etag, it->second); })
-                    {
-                        const bool useId = idParam(request).value || m_idParamName.isEmpty();
-                        notModified = d->checkEtag(useId, etag, it->second);
-                    }
-                    else
-                    {
-                        notModified = etag == it->second;
-                    }
-                    if (notModified)
-                    {
-                        response.statusCode = nx::network::http::StatusCode::notModified;
-                        return response;
-                    }
-                }
-            }
-        }
+            responseAttributes.statusCode,
+            std::move(responseAttributes.httpHeaders),
+            std::move(responseAttributes.etags)};
         if constexpr (std::is_same_v<Void, Data>)
             return response;
 
+        const auto format = request.responseFormatOrThrow();
         if (useReflect(request))
         {
             detail::filter(&data, filters);
@@ -238,7 +213,8 @@ protected:
     {
         ResponseAttributes responseAttributes;
         auto resource = readById(id, request, &responseAttributes, ErrorId::internalServerError);
-        return response(std::move(resource), request, std::move(responseAttributes));
+        return static_cast<Derived*>(this)->response(
+            std::move(resource), request, std::move(responseAttributes));
     }
 
     template<typename Id>
@@ -328,7 +304,7 @@ protected:
     {
         auto filter{request.parseContentOrThrow<std::decay_t<Filter>>()};
         auto params = request.params();
-        if constexpr (!std::is_same_v<nx::utils::Void, std::decay_t<Filter>>)
+        if constexpr (!std::is_same_v<Void, std::decay_t<Filter>>)
         {
             if (useReflect(request))
             {
@@ -448,13 +424,14 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             processGetRequest<traits::FunctionArgumentType<&Derived::read, 0>>(request);
         ResponseAttributes responseAttributes;
         auto list = call(&Derived::read, std::move(filter), request, &responseAttributes);
+        auto* d = static_cast<Derived*>(this);
 
         // As of this writing `std::array<X, 1>` return type for `CrudHandler::read` implementation
         // is an ad hoc to allow returning a single element or to not unwrap an array that might
         // contain a single element but still has to be serialized as an array.
         if constexpr (detail::isStdArrayOfSingleElement(list))
         {
-            return response(detail::front(std::move(list)),
+            return d->response(detail::front(std::move(list)),
                 request, std::move(responseAttributes), std::move(params), defaultValueAction);
         }
 
@@ -468,7 +445,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
                 size = list.size();
             if (size == 1)
             {
-                return response(detail::front(std::move(list)),
+                return d->response(detail::front(std::move(list)),
                     request, std::move(responseAttributes), std::move(params), defaultValueAction);
             }
 
@@ -486,7 +463,7 @@ Response CrudHandler<Derived>::executeGet(const Request& request)
             else
                 throw Exception::internalServerError(error);
         }
-        return response(std::move(list),
+        return d->response(std::move(list),
             request, std::move(responseAttributes), std::move(params), defaultValueAction);
     }
     else
@@ -503,7 +480,6 @@ Response CrudHandler<Derived>::executePost(const Request& request)
     if constexpr (requires { &Derived::create; })
     {
         using Model = traits::FunctionArgumentType<&Derived::create, 0>;
-        const auto derived = static_cast<Derived*>(this);
         if (!m_features.testFlag(CrudFeature::idInPost) && idParam(request).value)
         {
             throw Exception::badRequest(
@@ -511,8 +487,9 @@ Response CrudHandler<Derived>::executePost(const Request& request)
                     m_idParamName));
         }
         Model model{request.parseContentOrThrow<Model>()};
+        auto* d = static_cast<Derived*>(this);
         if constexpr (requires { &Derived::fillMissingParams; })
-            derived->fillMissingParams(&model, request);
+            d->fillMissingParams(&model, request);
 
         if constexpr (isIdGenerationEnabled<Model>)
         {
@@ -536,7 +513,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
         {
             ResponseAttributes responseAttributes;
             auto result = call(&Derived::create, std::move(model), request, &responseAttributes);
-            return response(std::move(result), request, std::move(responseAttributes));
+            return d->response(std::move(result), request, std::move(responseAttributes));
         }
         else if constexpr (requires { &Derived::read; }
             && HasGetId<Model>::value)
@@ -549,7 +526,7 @@ Response CrudHandler<Derived>::executePost(const Request& request)
         {
             ResponseAttributes responseAttributes;
             call(&Derived::create, std::move(model), request, &responseAttributes);
-            return response(Void{}, request, std::move(responseAttributes));
+            return d->response(Void{}, request, std::move(responseAttributes));
         }
     }
     else
@@ -596,7 +573,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
 
     if constexpr (requires { &Derived::update; })
     {
-        const auto d = static_cast<Derived*>(this);
+        auto d = static_cast<Derived*>(this);
         using Model = traits::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         Model model{request.parseContentOrThrow<Model>()};
@@ -613,14 +590,14 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                 {
                     if (NX_ASSERT(result.size() == 1, "Expected 1 result, got %1", result.size()))
                     {
-                        return response(detail::front(std::move(result)),
+                        return d->response(detail::front(std::move(result)),
                             request, std::move(responseAttributes));
                     }
                     return response(Void{}, request, std::move(responseAttributes));
                 }
                 else
                 {
-                    return response(std::move(result), request, std::move(responseAttributes));
+                    return d->response(std::move(result), request, std::move(responseAttributes));
                 }
             }
             else
@@ -649,7 +626,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
         {
             ResponseAttributes responseAttributes;
             auto result = call(&Derived::update, std::move(model), request, &responseAttributes);
-            return response(std::move(result), request, std::move(responseAttributes));
+            return d->response(std::move(result), request, std::move(responseAttributes));
         }
         else
         {
@@ -662,7 +639,7 @@ Response CrudHandler<Derived>::executePut(const Request& request)
                     ResponseAttributes responseAttributes;
                     auto result =
                         call(&Derived::read, std::move(emptyFilter), request, &responseAttributes);
-                    return response(std::move(result), request, std::move(responseAttributes));
+                    return d->response(std::move(result), request, std::move(responseAttributes));
                 }
             }
             ResponseAttributes responseAttributes;
@@ -684,7 +661,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
     if constexpr (requires { &Derived::read; }
         && requires { &Derived::update; })
     {
-        const auto d = static_cast<Derived*>(this);
+        auto d = static_cast<Derived*>(this);
         using Model = traits::FunctionArgumentType<&Derived::update, 0>;
         using Result = typename nx::traits::FunctionTraits<&Derived::update>::ReturnType;
         const bool useId = idParam(request).value || m_idParamName.isEmpty();
@@ -696,7 +673,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
             ResponseAttributes responseAttributes;
             auto result =
                 call(&Derived::update, std::move(model), request, &responseAttributes);
-            return response(std::move(result), request, std::move(responseAttributes));
+            return d->response(std::move(result), request, std::move(responseAttributes));
         }
         else
         {
@@ -712,7 +689,7 @@ Response CrudHandler<Derived>::executePatch(const Request& request)
                     ResponseAttributes responseAttributes;
                     auto result =
                         call(&Derived::read, std::move(id), request, &responseAttributes);
-                    return response(std::move(result), request, std::move(responseAttributes));
+                    return d->response(std::move(result), request, std::move(responseAttributes));
                 }
             }
             ResponseAttributes responseAttributes;
@@ -734,7 +711,7 @@ nx::utils::Guard CrudHandler<Derived>::subscribe(
         "Id must be filled by setJsonRpcSubscriptionId()");
     if constexpr (requires { &Derived::addSubscription; })
     {
-        handler(json_rpc::to(request.jsonRpcContext()->request.responseId(), executeGet(request)));
+        handler(request.jsonRpcContext()->request.responseId(), executeGet(request));
         return static_cast<Derived*>(this)->addSubscription(
             std::move(request), std::move(callback));
     }

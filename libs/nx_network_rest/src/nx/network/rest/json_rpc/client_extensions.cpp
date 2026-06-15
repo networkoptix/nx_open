@@ -10,14 +10,8 @@ namespace {
 
 std::optional<rapidjson::Document> contentBody(nx::network::rest::Response* response)
 {
-    if (std::holds_alternative<rapidjson::Document>(response->contentBodyJson))
-        return std::get<rapidjson::Document>(std::move(response->contentBodyJson));
-
-    if (std::holds_alternative<QJsonValue>(response->contentBodyJson))
-    {
-        return nx::json::serialized(std::get<QJsonValue>(std::move(response->contentBodyJson)),
-            /*stripDefault*/ false);
-    }
+    if (response->contentBodyJson)
+        return std::move(response->contentBodyJson);
 
     auto buffer = response->content ? response->content->body : QByteArray();
     if (buffer.isEmpty())

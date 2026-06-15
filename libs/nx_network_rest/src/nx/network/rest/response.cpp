@@ -4,8 +4,12 @@
 
 namespace nx::network::rest {
 
-Response::Response(http::StatusCode::Value statusCode, http::HttpHeaders httpHeaders):
-    statusCode(statusCode), httpHeaders(std::move(httpHeaders))
+Response::Response(
+    http::StatusCode::Value statusCode, http::HttpHeaders httpHeaders, std::optional<ETags> etags)
+    :
+    statusCode(statusCode),
+    httpHeaders(std::move(httpHeaders)),
+    etags(std::move(etags))
 {
 }
 
