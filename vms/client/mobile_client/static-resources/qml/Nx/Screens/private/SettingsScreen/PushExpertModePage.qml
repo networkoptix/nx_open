@@ -146,6 +146,7 @@ BaseSettingsPage
                         enabled: !appContext.pushManager.userUpdateInProgress
                         width: parent.width
                         text: qsTr("All Sites")
+                        font.pixelSize: 18
                     }
 
                     StyledRadioButton
@@ -159,21 +160,26 @@ BaseSettingsPage
                         enabled: !appContext.pushManager.userUpdateInProgress
                         text: qsTr("Selected Sites")
                         backgroundRadius: 8
+                        font.pixelSize: 18
                     }
                 }
             }
 
             Text
             {
-                height: 46
                 width: parent.width - leftPadding - rightPadding
+                topPadding: 20
+                bottomPadding: 12
                 leftPadding: 16
                 rightPadding: leftPadding
 
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 14
-                color: ColorTheme.colors.light12
-                text: qsTr("SELECT")
+                font.weight: Font.Medium
+                color: ColorTheme.colors.light16
+                text: qsTr("SELECTED %1/%2")
+                    .arg(d.selectionModel.selectedSystems.length)
+                    .arg(systemsList.count)
                 enabled: !appContext.pushManager.userUpdateInProgress
                 opacity: enabled ? 1.0 : 0.3
 
@@ -183,6 +189,8 @@ BaseSettingsPage
 
         ListView
         {
+            id: systemsList
+
             clip: true
             spacing: 4
             anchors.top: topControlsHolder.bottom
@@ -196,10 +204,17 @@ BaseSettingsPage
             {
                 id: checkbox
 
-                rightPadding: 18
+
                 width: parent ? parent.width : 0
+                height: 56
+                topPadding: 16
+                bottomPadding: 16
+
                 text: model.systemName
-                iconSource: lp("images/cloud_item_marker.svg")
+                font.pixelSize: 18
+                backgroundRadius: 8
+                iconSource: "image://skin/24x24/Outline/cloud.svg?primary=%1"
+                    .arg(checkbox.checked ? "brand_core" : "light10")
 
                 onCheckStateChanged: d.selectionModel.setCheckedState(index, checkState)
 
