@@ -27,6 +27,16 @@ static Hash combineHashes(const std::map<CollectionHash::ItemId, Hash>& hashes)
     return calculateHash(join);
 }
 
+static CollectionHash::ValueView itemHash(CollectionHash::ValueView value)
+{
+    return value.size() == kHashSize * 2 ? value.substr(kHashSize, kHashSize) : value;
+}
+
+static CollectionHash::ValueView listHash(CollectionHash::ValueView value)
+{
+    return value.size() == kHashSize * 2 ? value.substr(0, kHashSize) : value;
+}
+
 } // namespace
 
 CollectionHash::CollectionHash(std::vector<Item> list)
@@ -34,10 +44,10 @@ CollectionHash::CollectionHash(std::vector<Item> list)
     calculate(std::move(list));
 }
 
-std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::calculate(Item item)
+std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::update(ItemId id, Value hash_)
 {
-    auto hash = calculateHash(std::move(item.raw));
-    auto it = m_hashes.find(item.id);
+    Hash hash{itemHash(hash_)};
+    auto it = m_hashes.find(id);
     if (it != m_hashes.end())
     {
         if (it->second == hash)
@@ -47,9 +57,14 @@ std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::calculate(Ite
     }
     else
     {
-        it = m_hashes.emplace(std::move(item.id), std::move(hash)).first;
+        it = m_hashes.emplace(std::move(id), std::move(hash)).first;
     }
     return {(m_combinedHash = combineHashes(m_hashes)) + it->second, /*changed*/ true};
+}
+
+std::pair<CollectionHash::Value, bool /*changed*/> CollectionHash::calculate(Item item)
+{
+    return update(std::move(item.id), calculateHash(std::move(item.raw)));
 }
 
 CollectionHash::Value CollectionHash::calculate(std::vector<Item> list)
@@ -94,17 +109,9 @@ bool CollectionHash::check(Check check, ValueView in, ValueView out)
     switch (check)
     {
         case item:
-            if (in.size() == kHashSize * 2)
-                in = in.substr(kHashSize, kHashSize);
-            if (out.size() == kHashSize * 2)
-                out = out.substr(kHashSize, kHashSize);
-            break;
+            return itemHash(in) == itemHash(out);
         case list:
-            if (in.size() == kHashSize * 2)
-                in = in.substr(0, kHashSize);
-            if (out.size() == kHashSize * 2)
-                out = out.substr(0, kHashSize);
-            break;
+            return listHash(in) == listHash(out);
     }
     return in == out;
 }

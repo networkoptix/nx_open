@@ -72,8 +72,8 @@ public:
     void notify(
         const QString& id,
         NotifyType notifyType,
-        rapidjson::Document data,
-        rapidjson::Document extensions) const
+        const rapidjson::Document& data,
+        const std::string& etag) const
     {
         std::set<std::shared_ptr<SubscriptionCallback>> holder1;
         std::set<std::shared_ptr<SubscriptionCallback>> holder2;
@@ -85,9 +85,9 @@ public:
                 holder2 = it->second;
         }
         for (auto callback: holder1)
-            (*callback)(id, notifyType, &data, &extensions);
+            (*callback)(id, notifyType, data, etag);
         for (auto callback: holder2)
-            (*callback)(id, notifyType, &data, &extensions);
+            (*callback)(id, notifyType, data, etag);
     }
 
     void setAddMonitor(AddMonitor addMonitor)

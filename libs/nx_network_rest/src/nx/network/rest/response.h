@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "collection_hash.h"
 #include "content.h"
 #include "result.h"
 
@@ -13,11 +14,15 @@ struct NX_NETWORK_REST_API Response
     std::optional<Content> content;
     bool isUndefinedContentLength = false;
     nx::network::http::HttpHeaders httpHeaders;
-    std::variant<std::nullptr_t, rapidjson::Document, QJsonValue> contentBodyJson;
+    std::optional<rapidjson::Document> contentBodyJson;
+
+    using ETags = CollectionHash;
+    std::optional<ETags> etags;
 
     Response(
         nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
-        nx::network::http::HttpHeaders httpHeaders = {});
+        nx::network::http::HttpHeaders httpHeaders = {},
+        std::optional<ETags> etags = {});
 
     Response(const Result& result, Qn::SerializationFormat format = Qn::SerializationFormat::json);
 

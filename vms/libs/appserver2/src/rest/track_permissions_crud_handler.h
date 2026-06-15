@@ -49,8 +49,7 @@ public:
     void notify(
         const QString& id,
         nx::network::rest::Handler::NotifyType notifyType,
-        std::optional<nx::Uuid> user = {},
-        bool noEtag = false)
+        std::optional<nx::Uuid> user = {})
     {
         switch (notifyType)
         {
@@ -61,6 +60,6 @@ public:
                 removeAccessible(id);
                 break;
         }
-        TrackPermissionCrudHandler::CrudHandler::notify(id, notifyType, std::move(user), noEtag);
+        TrackPermissionCrudHandler::CrudHandler::notify(id, notifyType, std::move(user));
     }
 };

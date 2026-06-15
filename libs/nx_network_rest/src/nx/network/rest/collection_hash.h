@@ -26,6 +26,7 @@ public:
     CollectionHash(const CollectionHash&) = default;
     CollectionHash& operator=(const CollectionHash&) = default;
 
+    std::pair<Value, bool /*changed*/> update(ItemId id, Value hash);
     std::pair<Value, bool /*changed*/> calculate(Item item);
     Value calculate(std::vector<Item> list);
     Value remove(const ItemId& id);

@@ -2,6 +2,8 @@
 
 #include "crud_handler.h"
 
+#include <nx/utils/json/qjson.h>
+
 #include "open_api_schema.h"
 
 namespace nx::network::rest::detail {
@@ -174,7 +176,7 @@ void setResponseContent(Response* response,
     }
     response->content = {Qn::serializationFormatToHttpContentType(format), QByteArray{}};
     if (request.jsonRpcContext())
-        response->contentBodyJson = std::move(value);
+        response->contentBodyJson = nx::json::serialized(value, /*stripDefault*/ false);
     else
         response->content->body = json::serialized(value, format);
 }

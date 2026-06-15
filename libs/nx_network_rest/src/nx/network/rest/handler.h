@@ -110,12 +110,12 @@ public:
         delete_
     };
 
-    using SubscriptionResponseHandler = nx::MoveOnlyFunc<void(nx::json_rpc::Response)>;
+    using SubscriptionResponseHandler = nx::MoveOnlyFunc<void(nx::json_rpc::ResponseId, Response)>;
     using SubscriptionCallback = nx::MoveOnlyFunc<void(
         const QString& id,
         NotifyType,
-        rapidjson::Document* data,
-        rapidjson::Document* extensions)>;
+        const rapidjson::Document& data,
+        const std::string& etag)>;
 
     virtual nx::utils::Guard subscribe(SubscriptionResponseHandler, Request, SubscriptionCallback)
     {
