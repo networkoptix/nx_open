@@ -366,7 +366,7 @@ Page
 
         width: 200
 
-        readonly property bool available: menu.contentHeight > 0
+        readonly property bool available: downloadButton.enabled || shareButton.enabled
 
         MenuItem
         {
@@ -384,6 +384,8 @@ Page
 
         MenuItem
         {
+            id: shareButton
+
             action: ShareAction
             {
                 icon.width: 20
