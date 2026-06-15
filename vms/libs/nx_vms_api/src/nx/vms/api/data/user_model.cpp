@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/algorithm.h>
 
+#include "login.h"
 #include "resource_property_key.h"
 #include "user_data_deprecated.h"
 #include "user_group_data.h"
@@ -250,7 +251,7 @@ void UserModelV3::convertToLatestApi()
 
 void TemporaryToken::generateToken()
 {
-    token = kPrefix + nx::utils::random::generateName(30);
+    token = kPrefix + nx::utils::random::generateName(LoginSession::kGeneratedLocalTokenSize);
 }
 
 bool TemporaryToken::isValid() const
