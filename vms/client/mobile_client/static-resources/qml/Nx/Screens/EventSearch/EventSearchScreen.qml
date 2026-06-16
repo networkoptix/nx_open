@@ -101,6 +101,7 @@ AdaptiveScreen
                     screen.customBackHandler: () =>
                     {
                         optionSelectorItem.apply()
+                        screenController.updateIfRequired()
                         screen.contentItem = filtersItem
                     }
                 }
