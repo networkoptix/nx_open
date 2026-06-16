@@ -246,6 +246,7 @@ ListView
             : ""
 
         readonly property bool isFirstSection: y === 0
+        readonly property bool headerVisible: siteList.headerItem?.height
 
         width: parent.width
         spacing: 12
@@ -268,7 +269,7 @@ ListView
         {
             id: titleText
 
-            Layout.topMargin: sectionItem.isFirstSection ? 0 : 24
+            Layout.topMargin: sectionItem.isFirstSection && !sectionItem.headerVisible ? 0 : 24
             Layout.fillWidth: true
 
             color: ColorTheme.colors.light4
@@ -287,7 +288,9 @@ ListView
             visible: text
             Layout.topMargin: sectionTitle
                 ? 0
-                : (sectionItem.isFirstSection ? 0 : (siteList.cellsInRow == 1 ? 16 : 24))
+                : (sectionItem.isFirstSection && !sectionItem.headerVisible
+                   ? 0
+                   : (siteList.cellsInRow == 1 ? 16 : 24))
             Layout.bottomMargin: 8
             Layout.fillWidth: true
 
