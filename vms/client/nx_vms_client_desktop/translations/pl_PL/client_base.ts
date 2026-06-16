@@ -4602,7 +4602,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Wyłączny</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4610,7 +4610,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation>Odizolowany</translation>
+      <translation>Izolowany</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -4774,11 +4774,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation>Odizolowany</translation>
+      <translation>Izolowany</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Wyłączny</translation>
     </message>
     <message>
       <source>Shared</source>
