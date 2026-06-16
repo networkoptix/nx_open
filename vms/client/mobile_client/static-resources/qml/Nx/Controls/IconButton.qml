@@ -97,6 +97,8 @@ Control
 
             anchors.right: iconLabel.right
             anchors.top: iconLabel.top
+            anchors.topMargin: 3
+            anchors.rightMargin: 2
             width: 6
             height: 6
             visible: false

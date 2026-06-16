@@ -138,6 +138,7 @@ AdaptiveScreen
     {
         icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
         visible: !LayoutController.isTabletLayout && screen.contentItem === searchContent
+        indicator.visible: filtersItem.hasActiveFilters
         onClicked:
         {
             screen.contentItem = filtersItem
@@ -204,6 +205,8 @@ AdaptiveScreen
         visible: true
         item: contentItem === searchContent ? leftPanelContainer : null
     }
+
+    leftPanelButtonIndicator.visible: filtersItem.hasActiveFilters
 
     rightPanel
     {
