@@ -24,6 +24,7 @@ static constexpr char kApiPrefix[] = "/oauth2";
 static constexpr char kClientIdParam[] = "clientId";
 
 static constexpr char kApiDocPrefix[] = "/oauth2/docs/api";
+static constexpr char kInternalApiDocPrefix[] = "/oauth2/docs/internal-api";
 
 static constexpr char kOauthServiceToken[] = "/oauth2/v1/internal/serviceToken";
 
