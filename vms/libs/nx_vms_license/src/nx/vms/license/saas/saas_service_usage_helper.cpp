@@ -103,18 +103,18 @@ void IntegrationServiceUsageHelper::updateCacheUnsafe() const
 
     for (const auto& camera: getAllCameras())
     {
-        for (const auto& engineId: camera->userEnabledAnalyticsEngines())
+        const auto engines = resourcePool()->getResourcesByIds<AnalyticsEngineResource>(
+            camera->userEnabledAnalyticsEngines());
+
+        for (const auto& engineResource: engines)
         {
-            if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
+            const auto manifest = engineResource->plugin()->manifest();
+            if (manifest.isLicenseRequired)
             {
-                const auto manifest = r->plugin()->manifest();
-                if (manifest.isLicenseRequired)
-                {
-                    auto& value = (*m_cache)[manifest.id];
-                    ++value.inUse;
-                    if (value.inUse > value.available)
-                        value.exceedDevices.insert(camera->getId());
-                }
+                auto& value = (*m_cache)[manifest.id];
+                ++value.inUse;
+                if (value.inUse > value.available)
+                    value.exceedDevices.insert(camera->getId());
             }
         }
     }
@@ -160,52 +160,38 @@ std::tuple<int, int> IntegrationServiceUsageHelper::proposeChange(const std::vec
         if (!camera)
             continue;
 
-        QSet<nx::Uuid> alreadyEnabledEngines;
-        for (const auto& id: camera->userEnabledAnalyticsEngines())
-        {
-            if (auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
-                alreadyEnabledEngines.insert(engineResource->getId());
-        }
+        const auto proposedEngines =
+            resourcePool()->getResourcesByIds<AnalyticsEngineResource>(propose.integrations);
 
-        QSet<nx::Uuid> proposedEngines;
-        for (const auto& id: propose.integrations)
-        {
-            if (auto engineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
-                proposedEngines.insert(engineResource->getId());
-        }
+        const auto alreadyEnabledEngines =
+            resourcePool()->getResourcesByIds<AnalyticsEngineResource>(
+                camera->userEnabledAnalyticsEngines());
 
-        for (const auto& id: camera->userEnabledAnalyticsEngines())
+        for (const auto& alreadyEnabledEngineResource: alreadyEnabledEngines)
         {
-            if (auto alreadyEnabledEngineResource =
-                    resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+            const auto manifest = alreadyEnabledEngineResource->plugin()->manifest();
+            if (manifest.isLicenseRequired)
             {
-                const auto manifest = alreadyEnabledEngineResource->plugin()->manifest();
-                if (manifest.isLicenseRequired)
-                {
-                    auto& value = (*m_cache)[manifest.id];
+                auto& value = (*m_cache)[manifest.id];
 
-                    if (!proposedEngines.contains(alreadyEnabledEngineResource->getId()))
-                    {
-                        --value.inUse;
-                        ++oldLicensedEnginesRemovedCount;
-                    }
+                if (!proposedEngines.ids().contains(alreadyEnabledEngineResource->getId()))
+                {
+                    --value.inUse;
+                    ++oldLicensedEnginesRemovedCount;
                 }
             }
         }
 
-        for (const auto& id: propose.integrations)
+        for (const auto& proposedEngineResource: proposedEngines)
         {
-            if (auto proposedEngineResource = resourcePool()->getResourceById<AnalyticsEngineResource>(id))
+            const auto manifest = proposedEngineResource->plugin()->manifest();
+            if (manifest.isLicenseRequired)
             {
-                const auto manifest = proposedEngineResource->plugin()->manifest();
-                if (manifest.isLicenseRequired)
+                auto& value = (*m_cache)[manifest.id];
+                if (!alreadyEnabledEngines.ids().contains(proposedEngineResource->getId()))
                 {
-                    auto& value = (*m_cache)[manifest.id];
-                    if (!alreadyEnabledEngines.contains(proposedEngineResource->getId()))
-                    {
-                        ++value.inUse;
-                        ++newLicensedEnginesAddedCount;
-                    }
+                    ++value.inUse;
+                    ++newLicensedEnginesAddedCount;
                 }
             }
         }
@@ -240,17 +226,16 @@ std::map<nx::Uuid, std::set<QString>> IntegrationServiceUsageHelper::camerasBySe
 
     for (const auto& camera: getAllCameras())
     {
-        const auto& engines = camera->userEnabledAnalyticsEngines();
-        for (const auto& engineId: engines)
+        const auto engines = resourcePool()->getResourcesByIds<AnalyticsEngineResource>(
+            camera->userEnabledAnalyticsEngines());
+
+        for (const auto& engineResource: engines)
         {
-            if (auto r = resourcePool()->getResourceById<AnalyticsEngineResource>(engineId))
+            const auto manifest = engineResource->plugin()->manifest();
+            if (manifest.isLicenseRequired)
             {
-                const auto manifest = r->plugin()->manifest();
-                if (manifest.isLicenseRequired)
-                {
-                    const auto& serviceId = serviceByIntegration.value(manifest.id);
-                    result[serviceId].insert(camera->getPhysicalId());
-                }
+                const auto& serviceId = serviceByIntegration.value(manifest.id);
+                result[serviceId].insert(camera->getPhysicalId());
             }
         }
     }
