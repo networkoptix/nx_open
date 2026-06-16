@@ -56,7 +56,9 @@ AdaptiveScreen
             }
         ]
 
-    contentItem: resourceHelper.isCamera ? videoScreenLoader.item : camerasGrid
+    contentItem: LayoutController.isTablet && resourceHelper.isCamera
+        ? videoScreenLoader.item
+        : camerasGrid
     overlayItem: overlayItem
     longContent: contentItem === videoScreenLoader.item
 
@@ -325,7 +327,7 @@ AdaptiveScreen
             if (resourcesScreen.contentItem === camerasGrid)
                 title = camerasGrid.layout?.name ?? qsTr("All Devices")
             else if (resourcesScreen.contentItem === videoScreenLoader.item)
-                title = videoScreenLoader.item.title
+                title = videoScreenLoader.item?.title
 
             return title || windowContext.sessionManager.systemName
         }
