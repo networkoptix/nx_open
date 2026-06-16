@@ -400,13 +400,14 @@ struct CloudLayoutsManager::Private
             /*isNewLayout*/ layout->hasFlags(Qn::local));
     }
 
-    void deleteLayout(const QnLayoutResourcePtr& layout)
+    bool deleteLayout(const QnLayoutResourcePtr& layout)
     {
-        if (!NX_ASSERT(cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online))
-            return;
+        if (cloudStatusWatcher->status() != core::CloudStatusWatcher::Status::Online)
+            return false;
 
         sendDeleteLayoutRequest(layout->getId());
         systemContext->resourcePool()->removeResource(layout);
+        return true;
     }
 
     void setCloudStatus(CloudStatus value)
@@ -473,9 +474,9 @@ void CloudLayoutsManager::saveLayout(
     d->saveLayout(layout, std::move(callback));
 }
 
-void CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
+bool CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
 {
-    d->deleteLayout(layout);
+    return d->deleteLayout(layout);
 }
 
 void CloudLayoutsManager::updateLayouts()

@@ -194,6 +194,13 @@ bool Resources::deleteLayouts(QWidget* parent, const QnResourceList& sharedLayou
     return (result != QDialogButtonBox::Cancel);
 }
 
+void Resources::cloudLayoutsDeleteFailed(QWidget* parent)
+{
+    QnSessionAwareMessageBox::warning(parent,
+        tr("Failed to delete cloud layout"),
+        tr("Connection to the cloud has been lost. Please try again later."));
+}
+
 bool Resources::removeItemsFromLayout(QWidget* parent,
     const QnResourceList& resources)
 {

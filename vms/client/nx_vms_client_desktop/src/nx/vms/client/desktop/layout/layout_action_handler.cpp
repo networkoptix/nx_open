@@ -865,6 +865,7 @@ void LayoutActionHandler::removeLayouts(const core::LayoutResourceList& layouts)
         return;
 
     core::LayoutResourceList remoteResources;
+    bool cloudLayoutDeletionFailed = false;
     for (const core::LayoutResourcePtr& layout: layouts)
     {
         NX_ASSERT(!layout->isFile());
@@ -872,15 +873,26 @@ void LayoutActionHandler::removeLayouts(const core::LayoutResourceList& layouts)
             continue;
 
         if (layout->isCrossSystem())
-            appContext()->cloudLayoutsManager()->deleteLayout(layout);
+        {
+            if (!appContext()->cloudLayoutsManager()->deleteLayout(layout))
+                cloudLayoutDeletionFailed = true;
+        }
         else if (layout->hasFlags(Qn::local))
-            system()->resourcePool()->removeResource(layout); /*< This one can be simply deleted from resource pool. */
+        {
+            // This one can be simply deleted from resource pool.
+            system()->resourcePool()->removeResource(layout);
+        }
         else
+        {
             remoteResources << layout;
+        }
     }
 
     for (const auto& resource: remoteResources)
         qnResourcesChangesManager->deleteResource(resource);
+
+    if (cloudLayoutDeletionFailed)
+        ui::messages::Resources::cloudLayoutsDeleteFailed(mainWindowWidget());
 }
 
 bool LayoutActionHandler::closeLayouts(const QnWorkbenchLayoutList& layouts)

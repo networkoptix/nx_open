@@ -27,6 +27,8 @@ public:
     static bool deleteLayouts(QWidget* parent, const QnResourceList& sharedLayouts,
         const QnResourceList& personalLayouts);
 
+    static void cloudLayoutsDeleteFailed(QWidget* parent);
+
     static bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
     static bool removeItemsFromShowreel(QWidget* parent, const QnResourceList& resources);
 

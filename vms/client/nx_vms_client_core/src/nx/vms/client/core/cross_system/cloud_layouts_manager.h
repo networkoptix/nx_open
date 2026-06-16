@@ -32,7 +32,7 @@ public:
     using SaveCallback = std::function<void(bool)>;
     void saveLayout(const CrossSystemLayoutResourcePtr& layout, SaveCallback callback = {});
 
-    void deleteLayout(const QnLayoutResourcePtr& layout);
+    bool deleteLayout(const QnLayoutResourcePtr& layout);
 
     /** Update cloud layout resources by fetching the latest data. */
     void updateLayouts();
