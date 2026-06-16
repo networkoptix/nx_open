@@ -263,6 +263,10 @@ private:
                 case Attribute::Type::attributeSet:
                     validateAttributeSetAttribute(attribute, expectedAttribute);
                     break;
+                case Attribute::Type::boolean:
+                case Attribute::Type::string:
+                case Attribute::Type::undefined:
+                    break; //< These types don't have additional properties to validate.
             }
         }
     }

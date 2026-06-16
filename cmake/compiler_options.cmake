@@ -341,6 +341,9 @@ if(compilerMsvc)
 
         # Inconsistent dll linkage. Most often caused by the double function implementation.
         /we4273
+
+        # 'identifier' in switch of enum is not explicitly handled by a case label.
+        /we4062
     )
 
     # Ignore PDB was not found
@@ -464,6 +467,7 @@ if(NOT compilerMsvc)
         -Wextra
         -Werror=enum-compare
         -Werror=return-type
+        -Werror=switch #< Analog of we4062.
         -Wuninitialized
         -Wno-error=unused-function
         -Wno-unknown-pragmas
