@@ -56,6 +56,7 @@ public:
     Q_INVOKABLE void update();
     Q_INVOKABLE bool hasChunks() const;
     Q_INVOKABLE bool hasMotionChunks() const;
+    Q_INVOKABLE bool hasArchive(qint64 timestampMs) const;
 
     static void registerQmlType();
 

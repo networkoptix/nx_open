@@ -199,6 +199,17 @@ VideoPlaceholder
                 text: qsTr("No live stream")
                 imageSource: "image://skin/48x48/Outline/restrict.svg"
             }
+        },
+        State
+        {
+            name: "noData"
+            PropertyChanges
+            {
+                target: control
+                type: VideoPlaceholder.Info
+                text: qsTr("No data")
+                imageSource: "image://skin/48x48/Outline/restrict.svg"
+            }
         }
     ]
 

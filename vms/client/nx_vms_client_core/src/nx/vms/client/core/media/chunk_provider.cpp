@@ -442,6 +442,11 @@ qint64 ChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
     return it == data.end() ? -1 : it->endTimeMs();
 }
 
+bool ChunkProvider::hasArchive(qint64 timestampMs) const
+{
+    return periods(Qn::RecordingContent).containTime(timestampMs);
+}
+
 void ChunkProvider::update()
 {
     for (const auto& [_, provider]: d->providers)

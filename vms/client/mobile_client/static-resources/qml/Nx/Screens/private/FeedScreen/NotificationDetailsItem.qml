@@ -5,9 +5,11 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import Nx.Controls
 import Nx.Core
 import Nx.Core.Items
 import Nx.Items
+import Nx.Ui
 
 import nx.vms.client.core
 
@@ -18,6 +20,69 @@ Item
     property alias notification: d.notification
 
     signal fullscreenButtonClicked
+
+    Rectangle
+    {
+        id: cameraBar
+
+        width: parent.width
+        height: 64
+
+        color: ColorTheme.colors.dark6
+        visible: !!d.currentCamera
+
+        RowLayout
+        {
+            anchors.fill: parent
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
+            spacing: 20
+
+            IconButton
+            {
+                Layout.alignment: Qt.AlignVCenter
+
+                visible: d.resourceCount > 1
+                enabled: d.currentIndex > 0
+                compact: true
+
+                icon.source: "image://skin/24x24/Outline/arrow_left_2px.svg?primary=light10"
+                icon.width: 24
+                icon.height: 24
+
+                onClicked: d.selectResource(d.currentIndex - 1)
+            }
+
+            Text
+            {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignVCenter
+
+                text: resourceHelper.resourceName
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+
+                font.pixelSize: 18
+                font.weight: Font.Medium
+                color: ColorTheme.colors.light4
+            }
+
+            IconButton
+            {
+                Layout.alignment: Qt.AlignVCenter
+
+                visible: d.resourceCount > 1
+                enabled: d.currentIndex < d.resourceCount - 1
+                compact: true
+
+                icon.source: "image://skin/24x24/Outline/arrow_right_2px.svg?primary=light10"
+                icon.width: 24
+                icon.height: 24
+
+                onClicked: d.selectResource(d.currentIndex + 1)
+            }
+        }
+    }
 
     Preview
     {
@@ -31,6 +96,7 @@ Item
             interval.setPosition(0)
         }
 
+        y: cameraBar.visible ? cameraBar.height : 0
         width: parent.width
         height:
         {
@@ -43,14 +109,20 @@ Item
         visible: interval.resource
         fullscreenLayout: !d.portraitOrientation
 
-        onShowOnCamera:
-        {
-            const url = d.notification?.url
-            if (url)
-                windowContext.uriHandler.handleUrl(url)
-        }
+        onShowOnCamera: d.showOnCamera()
 
         onShowFullscreen: root.fullscreenButtonClicked()
+    }
+
+    CircleBusyIndicator
+    {
+        anchors.centerIn: preview
+
+        width: 32
+        height: 32
+
+        color: ColorTheme.colors.light1
+        visible: preview.visible && preview.dataState === Preview.DataState.Checking
     }
 
     Flickable
@@ -59,7 +131,9 @@ Item
 
         anchors.fill: parent
         anchors.margins: 20
-        anchors.topMargin: 20 + (preview.visible ? preview.height : 0)
+        anchors.topMargin: 20
+            + (cameraBar.visible ? cameraBar.height : 0)
+            + (preview.visible ? preview.height : 0)
 
         contentHeight: notificationDetailsColumn.implicitHeight
         clip: true
@@ -114,7 +188,21 @@ Item
 
         resource: preview.interval.resource
 
-        onResourceRemoved: preview.reset()
+        onResourceRemoved: d.reset()
+    }
+
+    // Loads recorded time periods for the current camera so we can tell whether the archive covers
+    // the requested timestamp before touching the media player.
+    ChunkProvider
+    {
+        id: archiveProvider
+
+        onLoadingChanged: d.evaluateArchive()
+        onPeriodsUpdated: (contentType) =>
+        {
+            if (contentType === ChunkProvider.RecordingContent)
+                d.evaluateArchive()
+        }
     }
 
     QtObject
@@ -124,49 +212,119 @@ Item
         readonly property bool portraitOrientation: root.width < root.height
         property var notification
 
+        // Ids of the resolvable resources from the notification url, in their original order.
+        property var resourceIds: []
+        property int currentIndex: 0
+        property real timestamp: -1
+        property var currentCamera: null
+
+        readonly property int resourceCount: resourceIds.length
+
+        function reset()
+        {
+            preview.reset()
+            archiveProvider.resource = null
+            resourceIds = []
+            currentIndex = 0
+            timestamp = -1
+            currentCamera = null
+            preview.dataState = Preview.DataState.Checking
+        }
+
+        function startPlayback()
+        {
+            const durationTimeMs = 10000
+            const paddingTimeMs = durationTimeMs / 2
+            preview.interval.startTimeMs = timestamp - paddingTimeMs
+            preview.interval.durationMs = durationTimeMs + paddingTimeMs * 2
+            preview.interval.setPosition(preview.interval.startTimeMs)
+            preview.interval.play(preview.interval.startTimeMs) //< Loads the stream.
+        }
+
+        function evaluateArchive()
+        {
+            if (!currentCamera || timestamp < 0)
+                return
+
+            if (archiveProvider.hasArchive(timestamp))
+            {
+                if (preview.dataState !== Preview.DataState.Available)
+                {
+                    preview.dataState = Preview.DataState.Available
+                    startPlayback()
+                }
+            }
+            else if (!archiveProvider.loading)
+            {
+                preview.dataState = Preview.DataState.NoData
+            }
+            else
+            {
+                preview.dataState = Preview.DataState.Checking
+            }
+        }
+
+        function selectResource(index)
+        {
+            if (index < 0 || index >= resourceIds.length)
+                return
+
+            currentIndex = index
+            currentCamera = windowContext.mainSystemContext.availableCamerasWatcher()
+                .getCamera(resourceIds[index])
+
+            preview.reset()
+            preview.dataState = Preview.DataState.Checking
+
+            if (!currentCamera)
+            {
+                archiveProvider.resource = null
+                return
+            }
+
+            preview.interval.resource = currentCamera //< Makes the preview visible, no stream yet.
+            archiveProvider.resource = currentCamera //< Triggers async archive periods loading.
+            evaluateArchive() //< Handle the case when the periods are already cached.
+        }
+
+        function showOnCamera()
+        {
+            Workflow.openVideoScreen(currentCamera, timestamp)
+        }
+
         onNotificationChanged:
         {
             notificationDetailsFlickable.contentY = 0
+            reset()
 
             if (!notification || (notification.url && !notification.url.toString()))
-            {
-                preview.reset()
                 return
-            }
 
             const url = new URL(notification.url)
             const searchParams = new URLSearchParams(url.search);
-            const resourceIds = searchParams.get("resources")
-            const timestamp = searchParams.get("timestamp")
-            if (!resourceIds || !timestamp)
+            const resources = searchParams.get("resources")
+            const ts = searchParams.get("timestamp")
+            if (!resources || !ts)
             {
-                console.warn("Notification", url, "url does not contain required `resources`` or `timestamp` parameters")
+                console.warn("Notification", url, "url does not contain required `resources` or `timestamp` parameters")
                 return
             }
 
-            const ts = Number(timestamp)
-            if (!Number.isFinite(ts) || ts < 0)
+            const tsNumber = Number(ts)
+            if (!Number.isFinite(tsNumber) || tsNumber < 0)
                 return
 
-            const firstResourceId = resourceIds.split(":")[0]
-            const camera = windowContext.mainSystemContext.availableCamerasWatcher()
-                .getCamera(firstResourceId)
-
-            if (!camera)
+            const watcher = windowContext.mainSystemContext.availableCamerasWatcher()
+            const availableIds = resources.split(":").filter(id => !!watcher.getCamera(id))
+            if (availableIds.length === 0)
             {
-                console.log("Resource from the provided url is not exists")
-                return;
+                console.log("Resources from the provided url do not exist")
+                return
             }
 
-            preview.interval.resource = camera
-
-            const durationTimeMs = 10000
-            const paddingTimeMs = durationTimeMs / 2
-            preview.interval.startTimeMs = ts - paddingTimeMs
-            preview.interval.durationMs = durationTimeMs + paddingTimeMs * 2
-            preview.interval.setPosition(preview.interval.startTimeMs)
-
-            preview.interval.play(preview.interval.startTimeMs) //< Loads the stream anyway.
+            timestamp = tsNumber
+            resourceIds = availableIds
+            selectResource(0)
         }
     }
 }

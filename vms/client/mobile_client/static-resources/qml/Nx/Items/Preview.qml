@@ -26,6 +26,14 @@ Rectangle
     property alias hasPrevious: previousButton.enabled
     property alias hasNext: nextButton.enabled
 
+    // State of the recorded data for the requested position:
+    // - Available: data is present; the player and the playback controls are shown;
+    // - Checking: archive presence is still being resolved; controls and placeholder are hidden;
+    // - NoData: no archive at the position; the "No data" placeholder is shown and every control
+    //   except "Show on camera" is disabled.
+    enum DataState { Available, Checking, NoData }
+    property int dataState: Preview.DataState.Available
+
     signal showFullscreen
     signal previous
     signal next
@@ -68,7 +76,7 @@ Rectangle
         anchors.fill: parent
         anchors.bottomMargin: d.fullscreenLayout
             ? 0
-            : (parent.height - slider.y - slider.height / 2 + 2)
+            : bottomPanel.height
 
         audioEnabled: audioController.audioEnabled
         scalable: true
@@ -95,8 +103,8 @@ Rectangle
         VideoDummy
         {
             anchors.fill: preview
-            visible: preview.cannotDecryptMedia
-            state: "cannotDecryptMedia"
+            visible: preview.cannotDecryptMedia || root.dataState === Preview.DataState.NoData
+            state: root.dataState === Preview.DataState.NoData ? "noData" : "cannotDecryptMedia"
         }
 
         RowLayout
@@ -133,6 +141,7 @@ Rectangle
             LayoutItemProxy
             {
                 target: fullscreenButton
+                visible: root.dataState === Preview.DataState.Available
             }
         }
     }
@@ -142,13 +151,14 @@ Rectangle
         id: slider
 
         anchors.left: parent.left
-        anchors.bottom: bottomPanel.top
-        anchors.bottomMargin: - (height / 2) + 6 + 2
+        anchors.bottom: preview.bottom
+        anchors.bottomMargin: - (height / 2) + 2
         anchors.right: parent.right
 
         preview: preview
 
         visible: opacity > 0 && !preview.cannotDecryptMedia
+            && root.dataState === Preview.DataState.Available
         opacity: d.hasControls ? 1 : 0
     }
 
@@ -160,18 +170,15 @@ Rectangle
         anchors.right: parent.right
         anchors.bottom: parent.bottom
 
-        height: 60
+        height: 68
 
         RowLayout
         {
             visible: !d.fullscreenLayout
             spacing: 8
 
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 12
-            anchors.rightMargin: 12
+            anchors.fill: parent
+            anchors.margins: 12
 
             LayoutItemProxy
             {
@@ -254,7 +261,9 @@ Rectangle
         font.weight: Font.Medium
 
         color: ColorTheme.colors.light4
-        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
+        opacity: !preview.cannotDecryptMedia && root.dataState === Preview.DataState.Available
+            ? 1.0
+            : 0.0
 
         text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
     }
@@ -292,7 +301,7 @@ Rectangle
         implicitHeight: d.fullscreenLayout ? 44 : 24
 
         opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
-        enabled: opacity > 0
+        enabled: opacity > 0 && root.dataState === Preview.DataState.Available
         backgroundColor: d.fullscreenLayout
             ? ColorTheme.transparent("#0D1012", 0.5)
             : "transparent"
@@ -306,6 +315,7 @@ Rectangle
 
         icon.source: "image://skin/24x24/Solid/repeat.svg"
 
+        enabled: root.dataState === Preview.DataState.Available
         checkable: true
         checked: preview.autoRepeat
 
@@ -336,7 +346,7 @@ Rectangle
         id: playPauseButton
 
         opacity: d.hasControls && !preview.cannotDecryptMedia ? 1.0 : 0.0
-        enabled: opacity > 0
+        enabled: opacity > 0 && root.dataState === Preview.DataState.Available
         rounded: d.fullscreenLayout
 
         implicitWidth: d.fullscreenLayout ? 64 : 44
