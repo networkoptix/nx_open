@@ -101,7 +101,7 @@ AdaptiveScreen
 
         onSelectedNotificationChanged:
         {
-            if (LayoutController.isTabletLayout)
+            if (!selectedNotification || LayoutController.isTabletLayout)
                 return
 
             feedScreen.contentItem = notificationDetailsItem
@@ -184,6 +184,43 @@ AdaptiveScreen
                     [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
                 }
             }
+        }
+    }
+
+    Connections
+    {
+        target: LayoutController
+
+        function onIsPortraitChanged()
+        {
+            if (feedScreen.contentItem === feed) //< Feed list fits any orientation.
+            {
+                feed.selectedNotification = null
+                return
+            }
+
+            if (LayoutController.isMobile && feedScreen.contentItem === notificationDetailsItem)
+            {
+                if (!notificationDetailsItem.hasPreview)
+                    return
+
+                // Enter/exit fullscreen on mobile device rotation.
+                feedScreen.fullscreen = !LayoutController.isPortrait
+                return
+            }
+
+            if (LayoutController.isTabletLayout && screen.fullscreen)
+                return
+
+            if (LayoutController.isPortrait && screen.fullscreen)
+            {
+                screen.fullscreen = false
+                return
+            }
+
+            feedScreen.contentItem = feed
+            if (rightPanel.item)
+                feedScreen.showPanel(rightPanel)
         }
     }
 

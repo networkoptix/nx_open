@@ -17,6 +17,7 @@ Item
 {
     id: root
 
+    readonly property bool hasPreview: d.currentCamera !== null
     property alias notification: d.notification
 
     signal fullscreenButtonClicked
