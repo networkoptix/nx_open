@@ -952,10 +952,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SELECT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>At least one site has to be selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -969,6 +965,10 @@
     </message>
     <message>
         <source>Save changes?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SELECTED %1/%2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1570,6 +1570,10 @@
     </message>
     <message>
         <source>Unsupported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
