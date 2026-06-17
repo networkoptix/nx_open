@@ -951,10 +951,6 @@
       <translation>已選擇的站點</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>選擇</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>請至少選擇一個站點(site)</translation>
     </message>
@@ -969,6 +965,10 @@
     <message>
       <source>Save changes?</source>
       <translation>是否儲存變更？</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1570,6 +1570,10 @@
     <message>
       <source>Unsupported</source>
       <translation>不支援</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

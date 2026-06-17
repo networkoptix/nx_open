@@ -951,10 +951,6 @@
       <translation>Site yang Dipilih</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>PILIH</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>Setidaknya satu site harus dipilih</translation>
     </message>
@@ -969,6 +965,10 @@
     <message>
       <source>Save changes?</source>
       <translation>Simpan perubahan?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1570,6 +1570,10 @@
     <message>
       <source>Unsupported</source>
       <translation>Tidak didukung</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

@@ -5718,6 +5718,14 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>這些伺服器代理轉送(proxy)的網頁即將被移動到伺服器 &quot;%1&quot;，其使用的代理伺服器亦將變更為&quot;%1&quot;。</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

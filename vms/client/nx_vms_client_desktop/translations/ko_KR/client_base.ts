@@ -5718,6 +5718,14 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>이 웹 페이지를 Server &quot;%1&quot;로 옮기려고 합니다. 이 웹 페이지는 요청된 모든 콘텐츠를 프록시하고, 프록시 서버는 Server &quot;%1&quot;로 변경됩니다.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

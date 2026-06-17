@@ -5794,6 +5794,14 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
         <numerusform>Estás a piques de mover estas páxinas web ao servidor &quot;%1&quot;. Estas páxinas web envían por proxy todos os contidos solicitados e o seu servidor proxy cambiará ao servidor &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

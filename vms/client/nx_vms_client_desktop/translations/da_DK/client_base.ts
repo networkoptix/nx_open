@@ -5794,6 +5794,14 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
         <numerusform>Du er ved at flytte disse websider til Server &quot;%1&quot;. Disse websider proxyer alt anmodet indhold, og deres proxyserver vil ændres til Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

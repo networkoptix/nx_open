@@ -5794,6 +5794,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Vous êtes sur le point de déplacer ces pages web vers le serveur &quot;%1&quot;. Ces pages Web proxy tous les contenus demandés, et leur serveur proxy passera au serveur &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

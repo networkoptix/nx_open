@@ -5718,6 +5718,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>Bạn sắp chuyển các trang web này sang máy chủ &quot;%1&quot;. Các trang web này ủy quyền tất cả các nội dung được yêu cầu và máy chủ ủy quyền sẽ thay đổi thành máy chủ &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

@@ -952,10 +952,6 @@
       <translation>Valgte Sites</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>VÆLG</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>Mindst ét site skal vælges</translation>
     </message>
@@ -970,6 +966,10 @@
     <message>
       <source>Save changes?</source>
       <translation>Gem ændringer?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1571,6 +1571,10 @@
     <message>
       <source>Unsupported</source>
       <translation>Ikke understøttet</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

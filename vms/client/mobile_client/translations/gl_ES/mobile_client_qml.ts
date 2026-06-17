@@ -952,10 +952,6 @@
       <translation>Sitios seleccionados</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>SELECCIONAR</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>Hai que seleccionar polo menos un sitio</translation>
     </message>
@@ -970,6 +966,10 @@
     <message>
       <source>Save changes?</source>
       <translation>Gardar os cambios?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1571,6 +1571,10 @@
     <message>
       <source>Unsupported</source>
       <translation>Non compatible</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

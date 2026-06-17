@@ -952,10 +952,6 @@
       <translation>Valda webplatser</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>VÄLJ</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>Minst en webplats måste väljas</translation>
     </message>
@@ -970,6 +966,10 @@
     <message>
       <source>Save changes?</source>
       <translation>Spara ändringarna?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1571,6 +1571,10 @@
     <message>
       <source>Unsupported</source>
       <translation>Stöds inte</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

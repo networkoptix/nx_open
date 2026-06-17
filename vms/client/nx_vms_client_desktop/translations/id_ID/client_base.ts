@@ -5718,6 +5718,14 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
         <numerusform>Anda akan memindahkan halaman web ini ke Server &quot;%1&quot;. Halaman web ini memproksi semua konten yang diminta, dan server proksinya akan berubah menjadi Server &quot;%1&quot;.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

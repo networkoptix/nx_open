@@ -951,10 +951,6 @@
       <translation type="unfinished">Selected Sites</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>เลือก</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation type="unfinished">At least one site has to be selected</translation>
     </message>
@@ -969,6 +965,10 @@
     <message>
       <source>Save changes?</source>
       <translation>ต้องการบันทึกการเปลี่ยนแปลง?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1570,6 +1570,10 @@
     <message>
       <source>Unsupported</source>
       <translation type="unfinished">Unsupported</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

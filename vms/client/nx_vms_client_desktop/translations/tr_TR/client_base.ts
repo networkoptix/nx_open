@@ -5793,6 +5793,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>Bu web sayfalarını Sunucu &quot;%1&quot; taşımak üzeresiniz. Bu web sayfaları istenen tüm içerikleri proxy olarak kullanır ve proxy sunucuları Server &quot;%1&quot; olarak değişir.</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+    </message>
   </context>
   <context>
     <name>RestErrorStrings</name>

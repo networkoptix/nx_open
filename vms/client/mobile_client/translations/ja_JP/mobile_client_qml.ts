@@ -951,10 +951,6 @@
       <translation>選択されたサイト</translation>
     </message>
     <message>
-      <source>SELECT</source>
-      <translation>選択</translation>
-    </message>
-    <message>
       <source>At least one site has to be selected</source>
       <translation>少なくとも1つのサイトを選択する必要があります</translation>
     </message>
@@ -969,6 +965,10 @@
     <message>
       <source>Save changes?</source>
       <translation>変更を保存しますか?</translation>
+    </message>
+    <message>
+      <source>SELECTED %1/%2</source>
+      <translation type="unfinished">SELECTED %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1570,6 +1570,10 @@
     <message>
       <source>Unsupported</source>
       <translation>非対応</translation>
+    </message>
+    <message>
+      <source>No data</source>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>

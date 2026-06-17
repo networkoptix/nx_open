@@ -4617,7 +4617,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Wyłączny</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4793,7 +4793,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Wyłączny</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5944,6 +5944,14 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
         <numerusform>Zamierzasz przenieść te strony na serwer &quot;%1&quot;. Te strony internetowe obsługują wszystkie żądane treści, a ich serwer proxy zmieni się na serwer &quot;%1&quot;.</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Failed to delete cloud layout</source>
+      <translation type="unfinished">Failed to delete cloud layout</translation>
+    </message>
+    <message>
+      <source>Connection to the cloud has been lost. Please try again later.</source>
+      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
     </message>
   </context>
   <context>
