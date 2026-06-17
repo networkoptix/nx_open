@@ -465,6 +465,19 @@ AdaptiveScreen
             else
                 screen.contentItem = filtersItem
         }
+
+        // In tablet mode, even intermediate filter values are expected to be applied immediately.
+        Connections
+        {
+            target: optionSelectorItem.selector
+            enabled: leftPanelPopup.opened
+
+            function onIntermediateValueChanged()
+            {
+                optionSelectorItem.apply()
+                screenController.updateIfRequired()
+            }
+        }
     }
 
     Item

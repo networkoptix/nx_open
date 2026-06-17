@@ -17,7 +17,7 @@ CheckBox
     property color checkedBackgroundColor: ColorTheme.colors.dark8
     property alias iconSource: icon.source
 
-    implicitWidth: leftPadding + rightPadding + indicator.implicitwidth + contentItem.implicitWidth
+    implicitWidth: leftPadding + rightPadding + indicator.implicitWidth + contentItem.implicitWidth
     implicitHeight: topPadding + bottomPadding + textItem.implicitHeight
 
     font.pixelSize: 16
@@ -89,7 +89,7 @@ CheckBox
             font: control.font
             color: control.checked ? ColorTheme.colors.brand_core : ColorTheme.colors.light10
             width: parent.width - (icon.x + icon.width + indicator.width + 2 * control.spacing)
-            wrapMode: Text.Wrap
+            elide: Text.ElideRight
         }
     }
 }
