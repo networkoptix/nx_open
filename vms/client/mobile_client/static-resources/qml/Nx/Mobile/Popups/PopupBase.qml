@@ -141,7 +141,8 @@ Popup
             x: scrollView.x
             y: scrollView.y
             width: scrollView.width
-            visible: scrollView.needScroll && scrollBar.position > 0
+            distance: scrollBar.position * scrollView.contentHeight
+            fadeZone: 24
         }
 
         GradientShadow
@@ -151,7 +152,8 @@ Popup
             y: contentLayout.height - height
             width: scrollView.width
             rotation: 180
-            visible: scrollView.needScroll && scrollBar.size + scrollBar.position < 1
+            distance: (1 - scrollBar.position - scrollBar.size) * scrollView.contentHeight
+            fadeZone: 24
         }
 
         IconButton

@@ -26,7 +26,7 @@ BaseAdaptiveSheet
             id: titleTextItem
 
             Layout.fillWidth: true
-            font.pixelSize: 24
+            font.pixelSize: 18
             font.weight: 500
             color: ColorTheme.colors.light4
             wrapMode: Text.Wrap

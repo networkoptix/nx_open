@@ -475,8 +475,8 @@ Item
 
         width: parent.width
         height: 32
-        opacity: d.shadowFade(flickable.contentY, sizesCalculator.kMinCellHeight)
-        visible: opacity > 0
+        distance: flickable.contentY
+        fadeZone: sizesCalculator.kMinCellHeight
 
         from: "#E5000000"
     }
@@ -489,10 +489,8 @@ Item
         width: parent.width
         height: 32
         rotation: 180
-        opacity: d.shadowFade(
-            flickable.contentHeight - flickable.height - flickable.contentY,
-            sizesCalculator.kMinCellHeight)
-        visible: opacity > 0
+        distance: flickable.contentHeight - flickable.height - flickable.contentY
+        fadeZone: sizesCalculator.kMinCellHeight
 
         from: "#E5000000"
     }
@@ -766,13 +764,6 @@ Item
         // Stores the relative position of the anchored cell within the viewport before pinch
         // gesture.
         property real anchorRelativePosition: 0.0
-
-        // Returns shadow opacity [0..1] proportional to the distance left to the corresponding
-        // flickable edge, reaching full opacity once that distance exceeds `fadeZone`.
-        function shadowFade(distance, fadeZone)
-        {
-            return MathUtils.bound(0, distance / fadeZone, 1)
-        }
 
         function saveTargetColumnsCount()
         {

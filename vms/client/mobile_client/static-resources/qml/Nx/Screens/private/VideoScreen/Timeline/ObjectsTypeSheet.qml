@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Controls
+import Nx.Core
 import Nx.Mobile.Controls
 
 import nx.vms.client.mobile.timeline as Timeline
@@ -16,14 +17,29 @@ AdaptiveSheet
     signal objectsTypeClicked()
 
     title: qsTr("View")
-    contentSpacing: 0
+    contentSpacing: 8
 
-    component ObjectsTypeRadioButton: RadioButton
+    component ObjectsTypeRadioButton: StyledRadioButton
     {
         required property int objectsType
 
-        leftPadding: 0
-        rightPadding: 0
+        height: 44
+        width: parent.width
+
+        backgroundRadius: 8
+        backgroundColor: ColorTheme.colors.dark12
+        checkedBackgroundColor: ColorTheme.colors.dark14
+        backgroundBorderWidth: checked ? 1 : 0
+        backgroundBorderColor: ColorTheme.colors.dark18
+
+        topPadding: 0
+        bottomPadding: 0
+
+        checkedTextColor: ColorTheme.colors.light4
+
+        indicator: null
+
+        font.weight: Font.Medium
 
         onClicked:
         {
@@ -38,7 +54,7 @@ AdaptiveSheet
         id: motionsButton
 
         text: qsTr("Motion")
-        icon.source: "image://skin/24x24/Outline/motion.svg"
+        icon.source: "image://skin/24x24/Outline/motion.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.motion
         width: parent.width
         checked: true
@@ -49,7 +65,7 @@ AdaptiveSheet
         id: bookmarksButton
 
         text: qsTr("Bookmarks")
-        icon.source: "image://skin/24x24/Outline/bookmark.svg"
+        icon.source: "image://skin/24x24/Outline/bookmark.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.bookmarks
         width: parent.width
     }
@@ -59,20 +75,14 @@ AdaptiveSheet
         id: objectsButton
 
         text: qsTr("Objects")
-        icon.source: "image://skin/24x24/Outline/object.svg"
+        icon.source: "image://skin/24x24/Outline/object.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
         width: parent.width
     }
 
-    Item
-    {
-        width: parent.width
-        height: 20
-    }
-
     footer: Button
     {
-        text: qsTr("Close")
+        text: qsTr("Cancel")
         type: Button.LightInterface
 
         onClicked:

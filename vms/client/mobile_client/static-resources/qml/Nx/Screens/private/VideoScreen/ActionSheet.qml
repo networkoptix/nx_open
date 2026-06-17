@@ -24,8 +24,6 @@ AdaptiveSheet
     signal unavailableAction()
 
     title: qsTr("Actions")
-    titleTextItem.font.pixelSize: 18
-    spacing: 24
 
     onResourceChanged: hintControl.hide()
 
@@ -225,7 +223,7 @@ AdaptiveSheet
 
     footer: Button
     {
-        text: qsTr("Close")
+        text: qsTr("Cancel")
         type: Button.LightInterface
         onClicked: sheet.close()
     }

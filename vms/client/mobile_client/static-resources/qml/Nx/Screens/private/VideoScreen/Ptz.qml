@@ -67,12 +67,9 @@ Item
         visible: control.active && !!currentPage
         opacity: control.opacity
         title: currentPage?.title ?? qsTr("PTZ")
-        titleTextItem.font.pixelSize: 18
         alwaysShowCloseButton: !footer
 
-        spacing: footer ? 20 : 0
         contentSpacing: 0
-        bottomPadding: 20
 
         interactive: !panel.joystick.active
         closePolicy: Popup.NoAutoClose

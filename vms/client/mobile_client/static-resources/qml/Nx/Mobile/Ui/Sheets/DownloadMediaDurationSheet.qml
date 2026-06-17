@@ -96,7 +96,7 @@ AdaptiveSheet
 
     footer: Button
     {
-        text: qsTr("Close")
+        text: qsTr("Cancel")
         type: Button.LightInterface
 
         onClicked: sheet.close()
