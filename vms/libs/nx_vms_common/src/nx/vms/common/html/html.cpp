@@ -297,7 +297,7 @@ QString toHtmlWithLinks(const QString& text)
     int pos = 0;
     int lastPos = 0;
 
-    const QString html = toHtml(text);
+    const QString html = replaceNewLineToBrTag(text.toHtmlEscaped());
     auto it = rx.globalMatch(html);
     while (it.hasNext())
     {
