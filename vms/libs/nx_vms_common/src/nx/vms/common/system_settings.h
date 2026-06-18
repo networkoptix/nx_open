@@ -59,6 +59,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     DECLARE_SETTING_NAME(exposeDeviceCredentials);
     DECLARE_SETTING_NAME(exposeServerEndpoints);
     DECLARE_SETTING_NAME(frameOptionsHeader);
+    DECLARE_SETTING_NAME(jsonRpcSubUpdateMs);
     DECLARE_SETTING_NAME(insecureDeprecatedApiEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedApiInUseEnabled);
     DECLARE_SETTING_NAME(insecureDeprecatedAuthEnabled);
@@ -120,6 +121,7 @@ struct NX_VMS_COMMON_API SystemSettingNames
     static const inline std::set<QString> kSecurityNames = {
         cloudPollingIntervalS,
         disabledVendors,
+        jsonRpcSubUpdateMs,
         insecureDeprecatedApiEnabled,
         licenseServer,
         maxHttpTranscodingSessions,
@@ -314,6 +316,9 @@ public:
 
     std::chrono::seconds deviceStorageInfoUpdateInterval() const;
     void setDeviceStorageInfoUpdateInterval(std::chrono::seconds value);
+
+    std::chrono::milliseconds jsonRpcSubUpdate() const;
+    void setJsonRpcSubUpdate(std::chrono::milliseconds value);
 
     QString statisticsReportServerApi() const;
     void setStatisticsReportServerApi(const QString& value);
@@ -649,6 +654,7 @@ signals:
     void integrationProcessModeChanged();
     void lastMergeIdChanged();
     void insecureDeprecatedAuthEnabledChanged();
+    void jsonRpcSubUpdateChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

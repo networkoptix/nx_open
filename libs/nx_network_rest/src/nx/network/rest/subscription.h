@@ -116,6 +116,12 @@ public:
         return r;
     }
 
+    static QString subscriptionIdFromId(QString id) { return id.isEmpty() ? QString('*') : id; }
+    static QString subscriptionIdFromId(nx::Uuid id)
+    {
+        return id.isNull() ? QString('*') : id.toSimpleString();
+    }
+
 protected:
     using Callback = std::shared_ptr<SubscriptionCallback>;
     using Connection = json_rpc::WeakConnection;

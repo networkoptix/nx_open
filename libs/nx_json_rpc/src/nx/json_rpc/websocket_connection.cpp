@@ -174,7 +174,9 @@ void WebSocketConnection::readNextMessage()
         {
             if (errorCode != SystemError::noError)
             {
-                NX_DEBUG(this, "Failed to read next message with error code %1", errorCode);
+                NX_DEBUG(this,
+                    "Failed to read next message with error code %1",
+                    SystemError::toString(errorCode));
                 m_outgoingProcessor->clear(errorCode);
                 nx::moveAndCallOptional(m_onDone, errorCode, id);
                 return;

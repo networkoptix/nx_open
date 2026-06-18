@@ -26,6 +26,13 @@ public:
     CollectionHash(const CollectionHash&) = default;
     CollectionHash& operator=(const CollectionHash&) = default;
 
+    template<typename Pred>
+    void forEach(const Pred& p) const
+    {
+        for (const auto& [id, hash]: m_hashes)
+            p(id, hash);
+    }
+
     std::pair<Value, bool /*changed*/> update(ItemId id, Value hash);
     std::pair<Value, bool /*changed*/> calculate(Item item);
     Value calculate(std::vector<Item> list);

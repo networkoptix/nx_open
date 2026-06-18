@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <nx/json_rpc/messages.h>
 #include <nx/network/rest/response.h>
 
@@ -13,16 +15,23 @@ struct ClientExtensions
 };
 NX_REFLECTION_INSTRUMENT(ClientExtensions, (etag))
 
-template<typename T>
+struct SubscriptionExtensions: ClientExtensions
+{
+    std::optional<std::chrono::milliseconds> updateMs;
+};
+NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs))
+
+template<typename T, typename Extensions = ClientExtensions>
 struct Payload
 {
     std::optional<T> data;
-    std::optional<ClientExtensions> extensions;
+    std::optional<Extensions> extensions;
 };
 NX_REFLECTION_INSTRUMENT_TEMPLATE(Payload, (data)(extensions))
 
-template<typename T>
-inline nx::json_rpc::Request to(nx::json_rpc::RequestId id, std::string method, Payload<T> payload)
+template<typename T, typename Extensions = ClientExtensions>
+inline nx::json_rpc::Request to(
+    nx::json_rpc::RequestId id, std::string method, Payload<T, Extensions> payload)
 {
     auto result = nx::json_rpc::Request::create(std::move(id), std::move(method));
     if (payload.data || payload.extensions)
@@ -37,10 +46,10 @@ inline nx::json_rpc::Request to(nx::json_rpc::RequestId id, std::string method, 
     return result;
 }
 
-template<typename T>
-inline Payload<T> from(nx::json_rpc::Request origin)
+template<typename T, typename Extensions>
+inline Payload<T, Extensions> from(nx::json_rpc::Request origin)
 {
-    Payload<T> result;
+    Payload<T, Extensions> result;
     if (origin.params)
     {
         T data;
@@ -49,7 +58,7 @@ inline Payload<T> from(nx::json_rpc::Request origin)
     }
     if (origin.extensions)
     {
-        ClientExtensions data;
+        Extensions data;
         if (nx::reflect::json::deserialize({*origin.extensions}, &data))
             result.extensions = std::move(data);
     }

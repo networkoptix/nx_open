@@ -141,6 +141,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .forceAnalyticsDbStoragePermissions = true,
     .forceLiveCacheForPrimaryStream = QString{"auto"},
     .frameOptionsHeader = QString{"SAMEORIGIN"},
+    .jsonRpcSubUpdateMs = 2000ms,
     .insecureDeprecatedApiEnabled = false,
     .insecureDeprecatedApiInUseEnabled = true,
     .insecureDeprecatedAuthEnabled = true,

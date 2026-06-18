@@ -245,8 +245,9 @@ public:
         nx::network::rest::json::DefaultValueAction defaultValueAction =
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
+        auto etag = calculateEtag(&model, &responseAttributes);
         return responseWithEtag(nx::network::rest::CollectionHash::Check::item,
-            nx::utils::toBase64Url(calculateEtag(&model)),
+            nx::utils::toBase64Url(etag),
             std::move(model),
             request,
             std::move(responseAttributes),
@@ -306,13 +307,20 @@ protected:
     }
 
     template<typename Data>
-    nx::network::rest::CollectionHash::Value calculateEtag(Data* model)
+    nx::network::rest::CollectionHash::Value calculateEtag(
+        Data* model, nx::network::rest::ResponseAttributes* responseAttributes = nullptr)
     {
-        nx::network::rest::CollectionHash::Item item{{}, nx::reflect::json::serialize(*model)};
+        nx::network::rest::CollectionHash::Item item{
+            static_cast<Derived*>(this)->subscriptionIdFromId(nx::utils::model::getId(*model)),
+            nx::reflect::json::serialize(*model)};
         nx::network::rest::CollectionHash etags;
         auto result = etags.calculate(std::move(item)).first;
         if constexpr (requires { Data::etag; })
+        {
             model->etag = nx::utils::toBase64Url(result);
+            if (responseAttributes)
+                responseAttributes->etags = std::move(etags);
+        }
         return result;
     }
 
@@ -383,12 +391,6 @@ protected:
         const auto objectType =
             m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
-    }
-
-    static QString subscriptionIdFromId(QString id)  { return id.isEmpty() ? QString('*') : id; }
-    static QString subscriptionIdFromId(nx::Uuid id)
-    {
-        return id.isNull() ? QString('*') : id.toSimpleString();
     }
 
     void notify(

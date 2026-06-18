@@ -86,6 +86,7 @@ struct SaveableSettingsBase
     std::optional<bool> forceAnalyticsDbStoragePermissions;
     std::optional<QString> forceLiveCacheForPrimaryStream;
     std::optional<QString> frameOptionsHeader;
+    std::optional<std::chrono::milliseconds> jsonRpcSubUpdateMs;
     std::optional<bool> insecureDeprecatedApiEnabled;
     std::optional<bool> insecureDeprecatedApiInUseEnabled;
     std::optional<bool> insecureDeprecatedAuthEnabled;
@@ -171,6 +172,7 @@ struct SaveableSettingsBase
     (forceAnalyticsDbStoragePermissions) \
     (forceLiveCacheForPrimaryStream) \
     (frameOptionsHeader) \
+    (jsonRpcSubUpdateMs) \
     (insecureDeprecatedApiEnabled) \
     (insecureDeprecatedApiInUseEnabled) \
     (insecureDeprecatedAuthEnabled) \
