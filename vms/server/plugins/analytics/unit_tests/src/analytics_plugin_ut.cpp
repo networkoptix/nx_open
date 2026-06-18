@@ -325,6 +325,11 @@ public:
     {
         return new nx::sdk::String(sdkVersion());
     }
+
+    virtual std::chrono::milliseconds defaultNetworkTimeout() const override
+    {
+        return std::chrono::seconds(10);
+    }
 };
 
 /**

@@ -40,6 +40,11 @@ public:
         return new nx::sdk::String(nx::sdk::sdkVersion());
     }
 
+    virtual std::chrono::milliseconds defaultNetworkTimeout() const override
+    {
+        return std::chrono::seconds(10);
+    }
+
     virtual void doSendHttpRequest(
         HttpDomainName /*requestDomain*/,
         const char* /*url*/,

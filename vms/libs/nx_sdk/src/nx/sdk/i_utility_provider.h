@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <optional>
 
 #include <nx/sdk/i_string.h>
@@ -186,7 +187,7 @@ public:
     public: std::string dataDir() const { return Ptr(getDataDir())->str(); }
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider7>
+class IUtilityProvider8: public Interface<IUtilityProvider8, IUtilityProvider7>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
@@ -208,6 +209,19 @@ public:
     }
 };
 
-using IUtilityProvider8 = IUtilityProvider;
+class IUtilityProvider : public Interface<IUtilityProvider, IUtilityProvider8>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider9"); }
+
+    /**
+     * @return The default network timeout configured in Server network settings.
+     *    Plugins issuing requests to the device should use this value as the minimum
+     *    network timeout.
+     */
+    virtual std::chrono::milliseconds defaultNetworkTimeout() const = 0;
+};
+
+using IUtilityProvider9 = IUtilityProvider;
 
 } // namespace nx::sdk
