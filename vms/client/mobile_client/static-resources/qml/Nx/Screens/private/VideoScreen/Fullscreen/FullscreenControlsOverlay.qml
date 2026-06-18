@@ -179,16 +179,32 @@ Item
                     id: titleLabels
 
                     anchors.centerIn: parent
+                    spacing: 5
 
-                    Text
+                    Row
                     {
-                        id: cameraTitleLabel
+                        id: titleRow
 
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font { pixelSize: 18; weight: Font.Medium }
-                        color: ColorTheme.colors.light4
-                        lineHeight: 1.25
+                        height: cameraTitleLabel.height
+
+                        RecordingStatusIndicator
+                        {
+                            id: recordingStatusIndicator
+
+                            anchors.verticalCenter: titleRow.verticalCenter
+                            resource: controller.resource
+                        }
+
+                        Text
+                        {
+                            id: cameraTitleLabel
+
+                            font { pixelSize: 18; weight: Font.Medium }
+                            color: ColorTheme.colors.light4
+                        }
                     }
+
                     Text
                     {
                         id: cameraTimestampLabel
@@ -384,7 +400,7 @@ Item
         forced1x: controller.playingLive
         paused: !controller.playing
 
-        onMoved: 
+        onMoved:
             controller.setSpeed(speed)
 
         // To block camera swipe if the speed control is dragged.
