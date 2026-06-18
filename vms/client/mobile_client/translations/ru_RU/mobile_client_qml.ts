@@ -19,12 +19,12 @@
       <translation>Отключено по расписанию</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Закрыть</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -393,8 +393,8 @@
       <translation>Загрузить следующие</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Закрыть</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -781,12 +781,12 @@
       <translation>Объекты</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Закрыть</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Движение</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1576,7 +1576,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Нет данных</translation>
     </message>
   </context>
   <context>

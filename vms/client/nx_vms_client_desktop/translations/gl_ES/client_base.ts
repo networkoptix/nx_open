@@ -5796,11 +5796,11 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>Non se puido eliminar o deseño da nube</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>Perdeuse a conexión coa nube. Por favor, téntao de novo máis tarde.</translation>
     </message>
   </context>
   <context>

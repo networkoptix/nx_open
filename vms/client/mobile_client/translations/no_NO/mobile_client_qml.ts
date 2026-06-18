@@ -19,12 +19,12 @@
       <translation>Deaktivert etter planen</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Lukke</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation>Last ned neste</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Lukke</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objekter</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Lukke</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Bevegelse</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Ingen opptak</translation>
     </message>
   </context>
   <context>

@@ -5724,11 +5724,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>クラウドレイアウトの削除に失敗しました。</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>クラウドへの接続が失われました。時間をおいて再度お試しください。</translation>
     </message>
   </context>
   <context>

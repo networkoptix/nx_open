@@ -19,12 +19,12 @@
       <translation>Nach Zeitplan deaktiviert</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Schließen</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Schließen</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objekte</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Schließen</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Bewegung</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Keine Daten</translation>
     </message>
   </context>
   <context>

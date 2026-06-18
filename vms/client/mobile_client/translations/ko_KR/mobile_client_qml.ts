@@ -19,12 +19,12 @@
       <translation>일정에 따라 중지됨</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>닫기</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -390,8 +390,8 @@
       <translation>다음 다운로드</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>닫기</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -778,12 +778,12 @@
       <translation>객체</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>닫기</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>움직임</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1573,7 +1573,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>데이터 없음</translation>
     </message>
   </context>
   <context>

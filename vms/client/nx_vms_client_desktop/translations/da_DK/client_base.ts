@@ -5796,11 +5796,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>Kunne ikke slette cloud layoutet</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>Forbindelsen til cloud er gået tabt. Prøv igen senere.</translation>
     </message>
   </context>
   <context>

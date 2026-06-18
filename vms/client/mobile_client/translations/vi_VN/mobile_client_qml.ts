@@ -19,12 +19,12 @@
       <translation>Lịch trình bị vô hiêu hóa</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Đóng</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -390,8 +390,8 @@
       <translation>Tải xuống tiếp</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>gần</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -778,12 +778,12 @@
       <translation>Đối tượng</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>gần</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Vận động</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1573,7 +1573,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Không có dữ liệu</translation>
     </message>
   </context>
   <context>

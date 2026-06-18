@@ -19,12 +19,12 @@
       <translation>Desactivado por horario programado</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Pechar</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>Falar...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation>Baixar seguinte</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Pechar</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Obxectos</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Pechar</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Movemento</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -969,7 +969,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>SELECCIONADO %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Sen datos</translation>
     </message>
   </context>
   <context>

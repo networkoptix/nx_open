@@ -19,12 +19,12 @@
       <translation>Desactivat per calendari</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tanca</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tanca</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objectes</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tanca</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Moviment</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Sense dades</translation>
     </message>
   </context>
   <context>

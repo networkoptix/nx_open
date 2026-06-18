@@ -19,12 +19,12 @@
       <translation>Dinonaktifkan berdasarkan jadwal</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tutup</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>Bicara...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -390,8 +390,8 @@
       <translation>Download berikutnya</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tutup</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -778,12 +778,12 @@
       <translation>Objek</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Tutup</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Motion</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1573,7 +1573,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Tidak ada data</translation>
     </message>
   </context>
   <context>

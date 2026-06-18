@@ -19,12 +19,12 @@
       <translation>Deaktiveret efter tidsplan</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Luk</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>Tal...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation>Download næste</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Luk</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objekter</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Luk</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Bevægelse</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -969,7 +969,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>VALGT %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Ingen data</translation>
     </message>
   </context>
   <context>

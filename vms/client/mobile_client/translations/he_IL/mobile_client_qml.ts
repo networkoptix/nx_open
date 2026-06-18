@@ -19,12 +19,12 @@
       <translation>מושבת לפי לוח זמנים</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>סגירה</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -393,8 +393,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>סגירה</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -781,12 +781,12 @@
       <translation>אובייקטים</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>סגירה</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>תנועה</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1576,7 +1576,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>אין נתונים</translation>
     </message>
   </context>
   <context>

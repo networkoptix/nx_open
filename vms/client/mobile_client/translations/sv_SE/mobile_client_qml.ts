@@ -19,12 +19,12 @@
       <translation>Inaktiverad enligt schema</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Stäng</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>Tala...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation>Ladda ner nästa</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Stäng</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objekt</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Stäng</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Rörelse</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Data saknas</translation>
     </message>
   </context>
   <context>

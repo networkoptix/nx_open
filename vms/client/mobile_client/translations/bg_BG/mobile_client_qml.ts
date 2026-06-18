@@ -19,12 +19,12 @@
       <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation type="unfinished">Close</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation type="unfinished">Objects</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation type="unfinished">Close</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation type="unfinished">Motion</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>

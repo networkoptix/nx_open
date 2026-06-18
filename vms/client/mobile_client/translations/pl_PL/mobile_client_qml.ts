@@ -19,12 +19,12 @@
       <translation>Wyłączone harmonogramem</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Zamknij</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>Mówić...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -393,8 +393,8 @@
       <translation>Pobierz następny</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Zamknij</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -781,12 +781,12 @@
       <translation>Obiekty</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Zamknij</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Ruch</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1576,7 +1576,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Brak danych</translation>
     </message>
   </context>
   <context>

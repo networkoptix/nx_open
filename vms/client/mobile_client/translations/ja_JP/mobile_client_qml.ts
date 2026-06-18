@@ -19,12 +19,12 @@
       <translation>スケジュールにより無効</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>閉じる</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>話す...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -390,8 +390,8 @@
       <translation>次のファイルをダウンロード</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>閉じる</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -778,12 +778,12 @@
       <translation>オブジェクト</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>閉じる</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>モーション</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>選択済み %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1573,7 +1573,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>データがありません</translation>
     </message>
   </context>
   <context>

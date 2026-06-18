@@ -19,12 +19,12 @@
       <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Хаах</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Хаах</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Объектууд</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Хаах</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Хөдөлгөөн</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Өгөгдөл байхгүй</translation>
     </message>
   </context>
   <context>

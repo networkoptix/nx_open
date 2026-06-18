@@ -19,12 +19,12 @@
       <translation>已依據排程停用</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>關閉​​​</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation>說話...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -390,8 +390,8 @@
       <translation>Download 下一個</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>關閉​​​</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -778,12 +778,12 @@
       <translation>物件</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>關閉​​​</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>位移</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1573,7 +1573,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>無資料</translation>
     </message>
   </context>
   <context>

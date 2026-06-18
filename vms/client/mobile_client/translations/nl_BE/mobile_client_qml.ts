@@ -19,12 +19,12 @@
       <translation>Uitgeschakeld volgens schema</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Sluiten</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation type="unfinished">Download next</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Sluiten</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objecten</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Sluiten</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Beweging</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Geen data</translation>
     </message>
   </context>
   <context>

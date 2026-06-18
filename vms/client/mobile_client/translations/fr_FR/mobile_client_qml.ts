@@ -19,12 +19,12 @@
       <translation>Désactivé selon l'horaire</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Fermer</translation>
-    </message>
-    <message>
       <source>Speak...</source>
       <translation type="unfinished">Speak...</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -391,8 +391,8 @@
       <translation>Télécharger le suivant</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Fermer</translation>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -779,12 +779,12 @@
       <translation>Objets</translation>
     </message>
     <message>
-      <source>Close</source>
-      <translation>Fermer</translation>
-    </message>
-    <message>
       <source>Motion</source>
       <translation>Mouvement</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -1574,7 +1574,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Aucune donnée</translation>
     </message>
   </context>
   <context>
