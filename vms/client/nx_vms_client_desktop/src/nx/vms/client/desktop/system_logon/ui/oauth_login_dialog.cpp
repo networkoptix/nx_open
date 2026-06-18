@@ -33,9 +33,9 @@ constexpr int kCloseCheckIntervalMs = 250;
 
 Qt::WindowFlags makeWindowFlags(SessionRefreshFlags flags)
 {
-    Qt::WindowFlags result = {};
-    if (flags.testFlag(SessionRefreshFlag::stayOnTop))
-        result |= Qt::WindowStaysOnTopHint;
+    Qt::WindowFlags result = Qt::WindowMaximizeButtonHint;
+
+    result.setFlag(Qt::WindowStaysOnTopHint, flags.testFlag(SessionRefreshFlag::stayOnTop));
 
     return result;
 }
@@ -48,7 +48,7 @@ OauthLoginDialog::OauthLoginDialog(
     const QString& cloudSystem,
     SessionRefreshFlags flags)
 :
-    base_type(parent, makeWindowFlags(flags)),
+    base_type(parent),
     d(new OauthLoginDialogPrivate(this, clientType, cloudSystem))
 {
     QSize size = kLoginDialogSize;
@@ -62,6 +62,8 @@ OauthLoginDialog::OauthLoginDialog(
     }
 
     layout->addWidget(d->m_stackedWidget);
+
+    setWindowFlags(windowFlags() | makeWindowFlags(flags));
     resize(size);
     setHelpTopic(this, HelpTopic::Id::Login);
 

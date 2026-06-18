@@ -124,10 +124,9 @@ void QnDialog::afterLayout()
 void QnDialog::fixWindowFlags()
 {
     auto flags = windowFlags();
-    if (hasAnyHelpTopic(this))
-        flags |= Qt::WindowContextHelpButtonHint;
-    else
-        flags &= ~Qt::WindowContextHelpButtonHint;
+
+    flags.setFlag(Qt::WindowContextHelpButtonHint, hasAnyHelpTopic(this));
+
     setWindowFlags(flags);
 }
 
