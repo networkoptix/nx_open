@@ -19,11 +19,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Close</source>
+        <source>Speak...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Speak...</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -391,7 +391,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Close</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -779,11 +779,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Close</source>
+        <source>Motion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
