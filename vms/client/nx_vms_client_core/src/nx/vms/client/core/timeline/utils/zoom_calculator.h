@@ -21,7 +21,7 @@ class NX_VMS_CLIENT_CORE_API ZoomCalculator: public QObject
         WRITE setMinimumTickSpacingMs NOTIFY minimumTickSpacingChanged)
 
     Q_PROPERTY(TimelineZoomLevel::LevelType majorTicksLevel READ majorTicksLevel
-        NOTIFY majorTicksLevelChanged)
+        NOTIFY majorTicksChanged)
 
     Q_PROPERTY(QList<qint64> majorTicks READ majorTicks NOTIFY majorTicksChanged)
     Q_PROPERTY(QList<qint64> minorTicks READ minorTicks NOTIFY minorTicksChanged)
@@ -55,7 +55,6 @@ signals:
     void startTimeChanged();
     void durationChanged();
     void minimumTickSpacingChanged();
-    void majorTicksLevelChanged();
     void majorTicksChanged();
     void minorTicksChanged();
     void timeZoneChanged();

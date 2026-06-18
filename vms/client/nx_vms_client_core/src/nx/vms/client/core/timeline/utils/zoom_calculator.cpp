@@ -247,16 +247,11 @@ void ZoomCalculator::Private::update()
         minorTickMs = minorZoomLevel.nextTick(previousMinorTickMs, timeZone);
     }
 
-    if (majorTicks != newMajorTicks)
+    if (majorTicks != newMajorTicks || majorTicksLevel != majorZoomLevel.type)
     {
         majorTicks = newMajorTicks;
-        emit q->majorTicksChanged();
-    }
-
-    if (majorTicksLevel != majorZoomLevel.type)
-    {
         majorTicksLevel = majorZoomLevel.type;
-        emit q->majorTicksLevelChanged();
+        emit q->majorTicksChanged();
     }
 
     if (minorTicks != newMinorTicks)

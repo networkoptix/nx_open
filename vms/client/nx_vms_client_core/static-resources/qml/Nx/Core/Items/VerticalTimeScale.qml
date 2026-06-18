@@ -53,7 +53,9 @@ Item
 
             font: item.font
             color: item.textColor
-            text: item.labelFormatter.tickLabel(modelData.timestampMs, d.timeZone, item.zoomLevel)
+            text: item.labelFormatter.tickLabel(
+                modelData.timestampMs, d.timeZone, modelData.zoomLevel)
+
             horizontalAlignment: Qt.AlignRight
         }
     }
@@ -194,10 +196,7 @@ Item
 
         onMajorTicksChanged:
         {
-            let newTicks = {}
-            for (const timeMs of d.majorTicks)
-                newTicks[timeMs] = 1
-
+            let newTicks = new Set(d.majorTicks)
             const oldTicks = [...d.labels.keys()]
 
             const isInserted = (timeMs) => (oldTicks.length > 0 && timeMs >= d.prevStartTimeMs
@@ -208,10 +207,13 @@ Item
                 const label = d.labels.get(timeMs)
                 console.assert(label, `${label} label for ${timeMs}`)
 
-                if (newTicks[timeMs])
+                if (newTicks.has(timeMs))
                 {
+                    if (label.modelData.zoomLevel !== d.majorTicksLevel)
+                        label.modelData = {timestampMs: timeMs, zoomLevel: d.majorTicksLevel}
+
                     label.state = isInserted(timeMs) ? "Added" : "AddedInstantly"
-                    newTicks[timeMs] = 0
+                    newTicks.delete(timeMs)
                 }
                 else if (label.y >= item.height || label.y + label.height <= 0)
                 {
@@ -223,15 +225,12 @@ Item
                 }
             }
 
-            for (const timeMs in newTicks)
+            for (const timeMs of newTicks.keys())
             {
-                if (newTicks[timeMs])
-                {
-                    console.assert(!d.labels.has(timeMs))
+                console.assert(!d.labels.has(timeMs))
 
-                    const modelData = {timestampMs: timeMs}
-                    ensureLabel(modelData).state = isInserted(timeMs) ? "Added" : "AddedInstantly"
-                }
+                const modelData = {timestampMs: timeMs, zoomLevel: d.majorTicksLevel}
+                ensureLabel(modelData).state = isInserted(timeMs) ? "Added" : "AddedInstantly"
             }
 
             d.prevStartTimeMs = d.startTimeMs
@@ -253,9 +252,7 @@ Item
             if (item.labelDelegate)
             {
                 labelHolder.label = item.labelDelegate.createObject(
-                    labelHolder, {modelData: modelData})
-
-                labelHolder.label.modelData = Qt.binding(() => labelHolder.modelData)
+                    labelHolder, {modelData: Qt.binding(() => labelHolder.modelData)})
             }
 
             d.labels.set(modelData.timestampMs, labelHolder)
