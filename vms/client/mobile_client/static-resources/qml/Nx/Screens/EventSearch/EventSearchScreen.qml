@@ -828,6 +828,7 @@ AdaptiveScreen
                 screenController.updateIfRequired()
             }
 
+            screen.closeDetailsPanel()
             screen.contentItem = searchContent
         }
     }
