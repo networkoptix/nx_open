@@ -250,6 +250,7 @@ struct SystemSettings::Private
     QnResourcePropertyAdaptor<std::chrono::seconds>* cloudPollingIntervalSAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* allowRegisteringIntegrationsAdaptor = nullptr;
     QnResourcePropertyAdaptor<QByteArray>* secureCookieStorageKey = nullptr;
+    QnResourcePropertyAdaptor<std::chrono::milliseconds>* jsonRpcSubUpdateMsAdaptor = nullptr;
 
     AdaptorList allAdaptors;
     std::unordered_set<QString> settingNames;
@@ -1004,6 +1005,11 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
             this,
             [] { return tr("Encryption key used to encode secure cookie values."); });
 
+    d->jsonRpcSubUpdateMsAdaptor = new QnJsonResourcePropertyAdaptor<std::chrono::milliseconds>(
+        "jsonRpcSubUpdateMs", 2000ms,
+        [](const std::chrono::milliseconds& value) { return value >= 0ms; }, this,
+        [] { return tr("JSON RPC subscription update interval (milliseconds, 0 = disabled)."); });
+
     connect(
         d->systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1354,6 +1360,12 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         &SystemSettings::licenseServerChanged,
         Qt::QueuedConnection);
 
+    connect(d->jsonRpcSubUpdateMsAdaptor,
+        &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this,
+        &SystemSettings::jsonRpcSubUpdateChanged,
+        Qt::DirectConnection);
+
     AdaptorList result;
     result
         << d->systemNameAdaptor
@@ -1447,6 +1459,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
         << d->exposeServerEndpointsAdaptor
         << d->cloudPollingIntervalSAdaptor
         << d->allowRegisteringIntegrationsAdaptor
+        << d->jsonRpcSubUpdateMsAdaptor
     ;
 
     return result;
@@ -1897,6 +1910,16 @@ std::chrono::seconds SystemSettings::deviceStorageInfoUpdateInterval() const
 void SystemSettings::setDeviceStorageInfoUpdateInterval(std::chrono::seconds value)
 {
     d->deviceStorageInfoUpdateIntervalSAdaptor->setValue(value);
+}
+
+std::chrono::milliseconds SystemSettings::jsonRpcSubUpdate() const
+{
+    return d->jsonRpcSubUpdateMsAdaptor->value();
+}
+
+void SystemSettings::setJsonRpcSubUpdate(std::chrono::milliseconds value)
+{
+    d->jsonRpcSubUpdateMsAdaptor->setValue(value);
 }
 
 QString SystemSettings::statisticsReportServerApi() const

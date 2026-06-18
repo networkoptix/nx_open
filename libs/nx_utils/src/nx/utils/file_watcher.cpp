@@ -192,15 +192,8 @@ void FileWatcher::run()
         m_timerPool.processTimers();
         lock.relock();
 
-        const auto delayToNextProcessing = m_timerPool.delayToNextProcessing();
-
-        const auto delay =
-            delayToNextProcessing && *delayToNextProcessing > std::chrono::milliseconds(0)
-            ? *delayToNextProcessing
-            : m_timeout;
-
         if (!m_terminated)
-            m_cond.wait(lock.mutex(), delay);
+            m_cond.wait(lock.mutex(), m_timerPool.delayToNextProcessing().value_or(m_timeout));
     }
 }
 

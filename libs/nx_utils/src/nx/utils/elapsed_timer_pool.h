@@ -78,20 +78,52 @@ public:
     }
 
     /**
-     * Calculates the delay before the next timerFunction is processing.
+     * Calculates the delay before the next timerFunction processing.
      * @return std::nullopt if there are no timers, otherwise amount of time between now and the
      * next timerFunction invocation.
-     * NOTE: return value may be negative if the timers are backed up or if processTimers is not
-     * called periodically.
      */
-    std::optional<std::chrono::milliseconds> delayToNextProcessing()
+    std::optional<std::chrono::milliseconds> delayToNextProcessing() const
     {
-        const auto currentTime = nx::utils::monotonicTime();
         if (m_deadlineToTimerId.empty())
             return std::nullopt;
 
-        return std::chrono::duration_cast<std::chrono::milliseconds>(
-            currentTime - m_deadlineToTimerId.begin()->first);
+        const auto r = std::chrono::duration_cast<std::chrono::milliseconds>(
+            m_deadlineToTimerId.begin()->first - nx::utils::monotonicTime());
+        return r.count() > 0 ? r : std::chrono::milliseconds{};
+    }
+
+    /**
+     * Same as delayToNextProcessing without arguments but returns the delay for a specific timer
+     * if it is presented.
+     */
+    std::optional<std::chrono::milliseconds> delayToNextProcessing(const TimerId& timerId) const
+    {
+        if (auto it = m_timerIdToDeadline.find(timerId); it != m_timerIdToDeadline.end())
+        {
+            const auto r = std::chrono::duration_cast<std::chrono::milliseconds>(
+                it->second->first - nx::utils::monotonicTime());
+            return r.count() > 0 ? r : std::chrono::milliseconds{};
+        }
+        return {};
+    }
+
+    void clear(TimerFuncArgs... args)
+    {
+        decltype(m_timerIdToDeadline) holder;
+        std::swap(holder, m_timerIdToDeadline);
+        m_deadlineToTimerId.clear();
+        for (const auto& [timerId, _]: holder)
+            m_timerFunction(timerId, args...);
+    }
+
+    void correctDeadlines(std::chrono::milliseconds delta)
+    {
+        for (auto it = m_timerIdToDeadline.begin(); it != m_timerIdToDeadline.end(); ++it)
+        {
+            const auto deadline = it->second->first + delta;
+            m_deadlineToTimerId.erase(it->second);
+            it->second = m_deadlineToTimerId.emplace(deadline, it->first);
+        }
     }
 
 private:

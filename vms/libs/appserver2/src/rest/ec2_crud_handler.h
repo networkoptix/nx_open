@@ -188,16 +188,16 @@ public:
 
         auto d = static_cast<Derived*>(this);
         if (nx::Uuid::isUuidString(*it))
-            return d->subscriptionId(nx::Uuid::fromStringSafe(*it));
+            return d->subscriptionIdFromId(nx::Uuid::fromStringSafe(*it));
 
         if constexpr (requires { d->flexibleIdToId(*it); })
         {
             if (const auto id = d->flexibleIdToId(*it); id.isNull())
                 throw Exception::notFound(NX_FMT("Resource '%1' is not found", *it));
             else
-                return d->subscriptionId(id);
+                return d->subscriptionIdFromId(id);
         }
-        return d->subscriptionId(*it);
+        return d->subscriptionIdFromId(*it);
     }
 
     template<typename T>
@@ -245,8 +245,9 @@ public:
         nx::network::rest::json::DefaultValueAction defaultValueAction =
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
+        auto etag = calculateEtag(&model, &responseAttributes);
         return responseWithEtag(nx::network::rest::CollectionHash::Check::item,
-            nx::utils::toBase64Url(calculateEtag(&model)),
+            nx::utils::toBase64Url(etag),
             std::move(model),
             request,
             std::move(responseAttributes),
@@ -290,7 +291,7 @@ protected:
         data.reserve(list->size());
         for (const auto& item: *list)
         {
-            data.emplace_back(d->subscriptionId(nx::utils::model::getId(item)),
+            data.emplace_back(d->subscriptionIdFromId(nx::utils::model::getId(item)),
                 nx::reflect::json::serialize(item));
         }
         auto result = nx::network::rest::CollectionHash{std::move(data)};
@@ -299,20 +300,27 @@ protected:
             for (auto& item: *list)
             {
                 item.etag = nx::utils::toBase64Url(
-                    result.hash(d->subscriptionId(nx::utils::model::getId(item))));
+                    result.hash(d->subscriptionIdFromId(nx::utils::model::getId(item))));
             }
         }
         return result;
     }
 
     template<typename Data>
-    nx::network::rest::CollectionHash::Value calculateEtag(Data* model)
+    nx::network::rest::CollectionHash::Value calculateEtag(
+        Data* model, nx::network::rest::ResponseAttributes* responseAttributes = nullptr)
     {
-        nx::network::rest::CollectionHash::Item item{{}, nx::reflect::json::serialize(*model)};
+        nx::network::rest::CollectionHash::Item item{
+            static_cast<Derived*>(this)->subscriptionIdFromId(nx::utils::model::getId(*model)),
+            nx::reflect::json::serialize(*model)};
         nx::network::rest::CollectionHash etags;
         auto result = etags.calculate(std::move(item)).first;
         if constexpr (requires { Data::etag; })
+        {
             model->etag = nx::utils::toBase64Url(result);
+            if (responseAttributes)
+                responseAttributes->etags = std::move(etags);
+        }
         return result;
     }
 
@@ -383,12 +391,6 @@ protected:
         const auto objectType =
             m_queryProcessor->getAccess(nx::network::rest::kSystemSession).getObjectType(id);
         return objectType == ApiObject_NotDefined || objectType == m_objectType;
-    }
-
-    static QString subscriptionId(QString id)  { return id.isEmpty() ? QString('*') : id; }
-    static QString subscriptionId(nx::Uuid id)
-    {
-        return id.isNull() ? QString('*') : id.toSimpleString();
     }
 
     void notify(
@@ -571,7 +573,7 @@ private:
             if (d->isValidType(id))
             {
                 NX_VERBOSE(this, "Notify %1 for %2", id, transaction.command);
-                d->notify(d->subscriptionId(id), NotifyType::delete_);
+                d->notify(d->subscriptionIdFromId(id), NotifyType::delete_);
             }
             return;
         }
@@ -587,7 +589,7 @@ private:
                 const auto id = getId(static_cast<const QnTransaction<T>&>(transaction).params);
                 if (d->isValidType(id))
                 {
-                    const auto subId = d->subscriptionId(id);
+                    const auto subId = d->subscriptionIdFromId(id);
                     if (subId == QString('*'))
                         return false; //< ResourceParam can be stored with nil UUID - ignore it.
 
