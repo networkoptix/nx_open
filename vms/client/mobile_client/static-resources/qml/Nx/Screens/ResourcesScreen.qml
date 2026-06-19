@@ -280,6 +280,7 @@ AdaptiveScreen
         id: videoScreenLoader
 
         active: LayoutController.isTablet
+        clip: true
 
         sourceComponent: Component
         {
@@ -288,9 +289,6 @@ AdaptiveScreen
                 toolBar.visible: false
                 backgroundColor: ColorTheme.colors.dark4
                 ownsNavigator: !LayoutController.isTabletLayout
-                padding: resourcesScreen.fullscreen
-                    ? 0
-                    : (LayoutController.isTabletLayout ? 20 : 0)
 
                 // The visible kebab button lives in resourcesScreen's toolBar (above), so
                 // anchor the menu to it instead of VideoScreen's hidden internal kebab.

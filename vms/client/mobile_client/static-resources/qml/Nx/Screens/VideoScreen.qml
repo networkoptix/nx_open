@@ -77,7 +77,8 @@ Page
 
             PropertyChanges
             {
-                cameraSwitcher.height: navigationBar.y
+                // Must be over open panel float button.
+                cameraSwitcher.height: modernVideoScreen.height - 96
                 cameraSwitcher.y: 0
                 cameraSwitcher.backgroundColor: modernVideoScreen.backgroundColor
 
@@ -699,10 +700,7 @@ Page
         id: navigationBar
 
         implicitHeight: navigationBarContent.height + navigationBarContent.contentMargin * 2
-
-        color: LayoutController.isTabletLayout && !modernVideoScreen.activePage
-            ? "transparent"
-            : ColorTheme.colors.dark4
+        color: modernVideoScreen.backgroundColor
 
         Item
         {
