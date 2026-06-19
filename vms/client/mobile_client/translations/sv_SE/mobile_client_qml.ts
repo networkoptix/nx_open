@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -784,7 +784,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>

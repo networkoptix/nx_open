@@ -5947,11 +5947,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>Nie udało się usunąć układu chmurowego</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>Połączenie z chmurą zostało utracone. Spróbuj ponownie później.</translation>
     </message>
   </context>
   <context>

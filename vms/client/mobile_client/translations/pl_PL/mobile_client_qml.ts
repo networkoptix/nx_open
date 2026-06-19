@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -971,7 +971,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>WYBRANE %1/%2</translation>
     </message>
   </context>
   <context>
