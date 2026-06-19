@@ -2610,6 +2610,20 @@ QnResourceData QnVirtualCameraResource::resourceData() const
     return {};
 }
 
+QString QnVirtualCameraResource::configuredVideoLayout() const
+{
+    if (auto layout = resourceData().value<QString>(ResourceDataKey::kVideoLayout);
+        !layout.isEmpty())
+    {
+        return layout;
+    }
+
+    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()))
+        return resType->defaultValue(nx::vms::api::device_properties::kVideoLayout);
+
+    return {};
+}
+
 nx::vms::api::ExtendedCameraOutputs QnVirtualCameraResource::extendedOutputs() const
 {
     nx::vms::api::ExtendedCameraOutputs result{};

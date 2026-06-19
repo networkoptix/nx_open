@@ -685,6 +685,13 @@ public:
     bool isVideoQualityAdjustable() const;
 
     virtual QnResourceData resourceData() const;
+
+    /**
+     * Return statically configured video layout string, taken from resource_data
+     * or type's default value. Empty if none is configured.
+     */
+    QString configuredVideoLayout() const;
+
     nx::vms::api::BackupContentTypes getBackupContentType() const;
     void setBackupContentType(nx::vms::api::BackupContentTypes contentTypes);
 

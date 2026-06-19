@@ -92,12 +92,6 @@ bool CameraResource::hasAudio() const
         && context->accessController()->hasPermissions(toSharedPointer(), Qn::PlayAudioPermission);
 }
 
-QnConstResourceVideoLayoutPtr CameraResource::getVideoLayout(
-    const QnAbstractStreamDataProvider* dataProvider)
-{
-    return QnVirtualCameraResource::getVideoLayout(dataProvider);
-}
-
 QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionRole role)
 {
     NX_ASSERT(role == Qn::CR_Default);

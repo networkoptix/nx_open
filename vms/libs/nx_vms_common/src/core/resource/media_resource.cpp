@@ -76,12 +76,8 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
 void QnMediaResource::initMediaResource()
 {
     addFlags(Qn::media);
-    connect(this, &QnResource::propertyChanged,
-        this, [this](const QnResourcePtr&, const QString& key)
-        {
-            if (key == nx::vms::api::device_properties::kVideoLayout)
-                m_cachedVideoLayout.reset();
-        });
+    connect(this, &QnResource::videoLayoutChanged, this,
+        [this](const QnResourcePtr&) { m_cachedVideoLayout.reset(); });
 }
 
 nx::vms::api::dewarping::MediaData QnMediaResource::getDewarpingParams() const

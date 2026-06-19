@@ -37,9 +37,6 @@ public:
     /** Improved check which includes current user permissions validation. */
     virtual bool hasAudio() const override;
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
-        const QnAbstractStreamDataProvider* dataProvider = nullptr) override;
-
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 
     bool isPtzSupported() const;

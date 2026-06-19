@@ -46,8 +46,8 @@ core::LayoutResourcePtr layoutFromResource(const QnResourcePtr& resource)
     if (const auto media = resource.dynamicCast<QnMediaResource>())
     {
         // If video occupies several cells, remember this.
-        if (media->getVideoLayout() && media->getVideoLayout()->size().isValid())
-            cellGeometry.setSize(media->getVideoLayout()->size());
+        if (const auto layout = media->getVideoLayout(); layout && layout->size().isValid())
+            cellGeometry.setSize(layout->size());
         // Set rotation.
         rotation = media->forcedRotation().value_or(0);
         // Transpose cell configuration if 90 degree rotated.

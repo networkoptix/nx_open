@@ -48,20 +48,6 @@ static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 // prefix has the following format $<ChannelId(1byte)><PayloadLength(2bytes)>
 static const int kInterleavedRtpOverTcpPrefixLength = 4;
 
-QString getConfiguredVideoLayout(const QnVirtualCameraResourcePtr& device)
-{
-    if (auto layout = device->resourceData().value<QString>(ResourceDataKey::kVideoLayout);
-        !layout.isEmpty())
-    {
-        return layout;
-    }
-
-    if (QnResourceTypePtr resType = qnResTypePool->getResourceType(device->getTypeId()))
-        return resType->defaultValue(nx::vms::api::device_properties::kVideoLayout);
-
-    return {};
-}
-
 bool isEmptyMediaAllowed(const QnResourcePtr& res)
 {
     if (const auto camera = res.dynamicCast<QnVirtualCameraResource>())
@@ -1240,7 +1226,7 @@ uint32_t RtspResourceStreamProvider::numberOfVideoChannels() const
 
 void RtspResourceStreamProvider::at_numberOfVideoChannelsChanged()
 {
-    QString manualConfiguredLayout = getConfiguredVideoLayout(m_resource);
+    QString manualConfiguredLayout = m_resource->configuredVideoLayout();
     if (m_numberOfVideoChannels > 1 && manualConfiguredLayout.isEmpty())
     {
         NX_MUTEX_LOCKER lock(&m_layoutMutex);
