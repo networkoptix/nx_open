@@ -9601,7 +9601,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
+      <translation>一部のコンポーネントで更新パッケージのダウンロードに失敗しました</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -9621,7 +9621,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation>更新は完了しましたが、一部のコンポーネントは更新に失敗しました</translation>
+      <translation>更新は完了しましたが、一部のコンポーネントの更新に失敗しました</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
