@@ -45,7 +45,7 @@ Page
     signal nextClicked()
     signal previousClicked()
 
-    title: qsTr("Preview")
+    title: eventDetailsScreen.resource?.name ?? qsTr("Preview")
     toolBar.visible: false
 
     clip: false
@@ -77,7 +77,6 @@ Page
 
         readonly property real kHorizontalLayoutRatio: 1.5
         property bool horizontal: width / height > kHorizontalLayoutRatio
-            && attributeTable.attributes.length > 0
 
         anchors.top: preview.bottom
         anchors.right: parent.right
@@ -153,6 +152,35 @@ Page
                     Layout.fillHeight: true
                 }
 
+                Text
+                {
+                    id: descriptionText //< Id is required for the FT purposes.
+
+                    text: NxGlobals.toHtmlWithLinks(objectData?.description ?? "")
+                    visible: !!text
+
+                    color: ColorTheme.colors.light10
+                    font.pixelSize: 14
+                    font.weight: Font.Normal
+                    wrapMode: Text.Wrap
+
+                    Layout.fillWidth: true
+
+                    onLinkActivated: (link) =>
+                    {
+                        Workflow.openDialog("qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml", {"link": link});
+                    }
+                }
+
+                MobileControls.TagView
+                {
+                    Layout.fillWidth: true
+
+                    model: objectData?.tags ?? []
+                    visible: hasTags
+                    color: ColorTheme.colors.dark8
+                }
+
                 AnalyticsAttributeTable
                 {
                     id: attributeTable
@@ -202,22 +230,6 @@ Page
 
         Text
         {
-            text: eventDetailsScreen.resource?.name
-            visible: !!text
-
-            elide: Text.ElideRight
-            wrapMode: Text.WrapAnywhere
-            maximumLineCount: 2
-
-            color: ColorTheme.colors.light16
-            font.pixelSize: 18
-            font.weight: Font.Medium
-
-            Layout.fillWidth: true
-        }
-
-        Text
-        {
             id: titleText
 
             text: objectData?.title ?? ""
@@ -232,35 +244,6 @@ Page
             font.weight: Font.Medium
 
             Layout.fillWidth: true
-        }
-
-        Text
-        {
-            id: descriptionText
-
-            text: NxGlobals.toHtmlWithLinks(objectData?.description ?? "")
-            visible: !!text
-
-            color: ColorTheme.colors.light10
-            font.pixelSize: 14
-            font.weight: Font.Normal
-            wrapMode: Text.Wrap
-
-            Layout.fillWidth: true
-
-            onLinkActivated: (link) =>
-            {
-                Workflow.openDialog("qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml", {"link": link});
-            }
-        }
-
-        MobileControls.TagView
-        {
-            Layout.fillWidth: true
-
-            model: objectData?.tags ?? []
-            visible: hasTags
-            color: ColorTheme.colors.dark8
         }
     }
 
