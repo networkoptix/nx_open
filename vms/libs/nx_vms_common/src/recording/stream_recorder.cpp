@@ -89,14 +89,14 @@ void QnStreamRecorder::flushPrebuffer()
     m_nextIFrameTime = m_lastPrimaryTime = AV_NOPTS_VALUE;
 }
 
-qint64 QnStreamRecorder::isPrimaryStream(const QnConstAbstractMediaDataPtr& md) const
+qint64 QnStreamRecorder::isMainStream(const QnConstAbstractMediaDataPtr& md) const
 {
     if (!m_hasVideo)
         return md->dataType == QnAbstractMediaData::AUDIO;
     return md->dataType == QnAbstractMediaData::VIDEO && md->channelNumber == 0;
 }
 
-qint64 QnStreamRecorder::isPrimaryKeyFrame(const QnConstAbstractMediaDataPtr& md) const
+qint64 QnStreamRecorder::isMainStreamKeyFrame(const QnConstAbstractMediaDataPtr& md) const
 {
     if (!m_hasVideo)
         return md->dataType == QnAbstractMediaData::AUDIO;
@@ -110,7 +110,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     for (int i = 0; i < m_prebuffer.size(); ++i)
     {
         const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
-        if (isPrimaryKeyFrame(media) && media->timestamp > baseTime)
+        if (isMainStreamKeyFrame(media) && media->timestamp > baseTime)
             return media->timestamp;
     }
     return AV_NOPTS_VALUE;
@@ -174,7 +174,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     m_prebuffer.push(md);
     const bool alwaysSave = md->flags & QnAbstractMediaData::MediaFlags_AlwaysSave;
-    const bool timeDiscontinue = isPrimaryStream(md) && md->timestamp < m_lastPrimaryTime;
+    const bool timeDiscontinue = isMainStream(md) && md->timestamp < m_lastPrimaryTime;
     bool hardLimitReached = m_prebuffer.size() > kPrebufferHardLimit;
     const qint64 kNoPtsValue = (qint64) AV_NOPTS_VALUE;
 
@@ -187,18 +187,18 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     {
         flushPrebuffer();
     }
-    else if (isPrimaryStream(md) || hardLimitReached)
+    else if (isMainStream(md) || hardLimitReached)
     {
-        if (isPrimaryStream(md))
+        if (isMainStream(md))
         {
             m_lastPrimaryTime = md->timestamp;
-            if (m_nextIFrameTime == kNoPtsValue && isPrimaryKeyFrame(md))
+            if (m_nextIFrameTime == kNoPtsValue && isMainStreamKeyFrame(md))
                 m_nextIFrameTime = md->timestamp;
         }
         while ((m_nextIFrameTime != kNoPtsValue && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
             || hardLimitReached)
         {
-            while (!m_prebuffer.isEmpty() && (!isPrimaryStream(m_prebuffer.front())
+            while (!m_prebuffer.isEmpty() && (!isMainStream(m_prebuffer.front())
                 || m_prebuffer.front()->timestamp < m_nextIFrameTime
                 || m_prebuffer.size() > kPrebufferHardLimit))
             {
@@ -250,12 +250,12 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
 
 bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
 {
-    if (m_endDateTimeUs != (int64_t) AV_NOPTS_VALUE
-        && (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+    if (m_endDateTimeUs != (int64_t)AV_NOPTS_VALUE
+        && isMainStream(md)
         && md->timestamp < m_endDateTimeUs - 1000LL * 1000)
     {
         NX_DEBUG(
-            this, "Time translated into the past for %1 s(%2 - %3).  Closing file",
+            this, "Time translated into the past for %1s (%2us - %3us).  Closing file",
             (md->timestamp - m_endDateTimeUs) / 1'000'000, md->timestamp, m_endDateTimeUs);
 
         return true;
@@ -337,10 +337,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true; // skip data
     }
 
-    bool canStartNewFile = m_hasVideo ?
-        md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY) :
-        md->dataType == QnAbstractMediaData::AUDIO;
-
+    bool canStartNewFile = isMainStreamKeyFrame(md);
     if (canStartNewFile && needToTruncate(md))
     {
         m_endDateTimeUs = md->timestamp;
@@ -389,7 +386,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true;
     }
 
-    if (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+    if (isMainStream(md))
         m_endDateTimeUs = std::max(m_endDateTimeUs, (int64_t) md->timestamp);
 
     const auto frameMediaType = toAvMediaType(md->dataType);
