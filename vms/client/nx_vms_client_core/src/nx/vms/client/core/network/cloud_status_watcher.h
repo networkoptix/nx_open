@@ -7,6 +7,7 @@
 #include <string>
 
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 #include <network/cloud_system_data.h>
 #include <nx/cloud/db/api/account_data.h>
@@ -59,6 +60,25 @@ public:
 
     /** Resets current cloud credentials. */
     Q_INVOKABLE void resetAuthData();
+
+    /**
+     * Cloud logout that also terminates the SSO identity provider session. Emits ssoLogoutUrlReady()
+     * with the provider's logout URL for the UI to open in the in-app browser. Resets auth data only
+     * after the request completes, so its access token is not revoked early; falls back to plain
+     * resetAuthData() for non-SSO sessions.
+     */
+    Q_INVOKABLE void logoutWithSsoSessionTermination();
+
+    /**
+     * Whether the SSO logout chain has finished, i.e. navigation returned to the cloud host off the
+     * "/sso" IdP path.
+     */
+    Q_INVOKABLE bool isSsoLogoutComplete(const QUrl& navigatedUrl) const;
+
+    // Timeout for the SSO logout browser navigation.
+    static constexpr std::chrono::milliseconds kSsoLogoutTimeout = std::chrono::seconds(20);
+
+    Q_INVOKABLE int ssoLogoutTimeoutMs() const;
 
     /** Options to update current credentials. */
     enum class AuthMode
@@ -120,6 +140,9 @@ signals:
     void cloudLoginChanged();
     void forcedLogout();
     void loggedOutWithError();
+
+    /** Emitted during logoutWithSsoSessionTermination() with the SSO provider's logout URL. */
+    void ssoLogoutUrlReady(const QUrl& logoutUrl);
     void errorChanged(ErrorCode error);
     void isCloudEnabledChanged();
     void is2FaEnabledForUserChanged();

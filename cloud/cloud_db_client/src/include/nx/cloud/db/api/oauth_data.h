@@ -272,6 +272,15 @@ struct IssueStunTokenResponse
 
 NX_REFLECTION_INSTRUMENT(IssueStunTokenResponse, (token)(mac_code)(error)(kid)(expires_at)(expires_in))
 
+struct SsoLogoutResponse
+{
+    /**%apidoc URL of the SSO identity provider's end-session endpoint. The caller must navigate
+     * the in-app browser to this URL to terminate the IdP/Keycloak session. */
+    std::string logout_url;
+};
+
+NX_REFLECTION_INSTRUMENT(SsoLogoutResponse, (logout_url))
+
 /**
  * JWT claims set. Field names extended with field from RFC 9068
  */

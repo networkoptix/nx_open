@@ -1,6 +1,7 @@
 module Nx.Ui
 
 FeedStateProvider 1.0 FeedStateProvider.qml
+SsoLogoutController 1.0 SsoLogoutController.qml
 singleton LayoutController 1.0 LayoutController.qml
 singleton StyleHints 1.0 StyleHints.qml
 UiContainer 1.0 UiContainer.qml

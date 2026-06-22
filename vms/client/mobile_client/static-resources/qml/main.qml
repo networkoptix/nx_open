@@ -176,6 +176,8 @@ Controls.ApplicationWindow
         property int lastSelectedOrgTab: -1
     }
 
+    SsoLogoutController {}
+
     onClosing:
         (close) =>
         {

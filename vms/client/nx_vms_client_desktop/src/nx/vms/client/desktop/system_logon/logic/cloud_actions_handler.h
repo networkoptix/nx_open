@@ -25,6 +25,10 @@ private:
 
     void at_logout();
     void at_forcedLogout();
+
+    // While set, the user-logout slot skips SSO termination (forced logout - session already
+    // invalid server-side).
+    bool m_forcedLogout = false;
 };
 
 } // namespace nx::vms::client::desktop

@@ -12,7 +12,10 @@
 #include <nx/branding.h>
 #include <nx/cloud/db/client/cdb_connection.h>
 #include <nx/cloud/db/client/oauth_manager.h>
+#include <nx/network/cloud/cloud_connect_controller.h>
+#include <nx/network/socket_global.h>
 #include <nx/reflect/json.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
@@ -134,6 +137,7 @@ struct CloudStatusWatcher::Private: public QObject
 
     const CloudAuthData& authData() const;
     bool setAuthData(const CloudAuthData& authData, AuthMode mode);
+    void logoutWithSsoSessionTermination();
 
     void saveCredentials() const;
 
@@ -253,6 +257,29 @@ void CloudStatusWatcher::resetAuthData()
 {
     setAuthData(CloudAuthData(), AuthMode::login);
     appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
+}
+
+void CloudStatusWatcher::logoutWithSsoSessionTermination()
+{
+    d->logoutWithSsoSessionTermination();
+}
+
+bool CloudStatusWatcher::isSsoLogoutComplete(const QUrl& navigatedUrl) const
+{
+    // The logout walks the browser through several URLs (the cloud "/sso" end-session, then possibly
+    // an upstream IdP on another host) before returning to the cloud portal; that return - the cloud
+    // host, off the "/sso" path - is what we treat as completion. Match the client's own cloud host
+    // (it equals the post_logout_redirect_uri we sent) rather than a value parsed from the response,
+    // so this still works if the response omits it.
+    const auto cloudHost = QString::fromStdString(nx::network::SocketGlobals::cloud().cloudHost());
+    const QString path = navigatedUrl.path();
+    const bool isProviderPath = (path == "/sso" || path.startsWith("/sso/"));
+    return !cloudHost.isEmpty() && navigatedUrl.host() == cloudHost && !isProviderPath;
+}
+
+int CloudStatusWatcher::ssoLogoutTimeoutMs() const
+{
+    return static_cast<int>(kSsoLogoutTimeout.count());
 }
 
 bool CloudStatusWatcher::setAuthData(const CloudAuthData& authData, AuthMode mode)
@@ -860,6 +887,39 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, Aut
         emit q->credentialsChanged();
 
     return true;
+}
+
+void CloudStatusWatcher::Private::logoutWithSsoSessionTermination()
+{
+    const auto authToken = m_authData.credentials.authToken;
+    auto connection = cloudConnection; //< Keeps the connection alive across the async request.
+
+    if (!connection || !authToken.isBearerToken() || authToken.value.empty())
+    {
+        q->resetAuthData();
+        return;
+    }
+
+    const std::string redirectUri =
+        "https://" + nx::network::SocketGlobals::cloud().cloudHost();
+    const std::string customization = nx::branding::customization().toStdString();
+
+    // The handler is delivered on the watcher's thread. The connection is captured (and thus kept
+    // alive) so resetAuthData()'s token removal does not destroy it mid-request, and the auth data
+    // is reset only after the SSO request completes so the access token it relies on stays valid.
+    auto handler = nx::utils::AsyncHandlerExecutor(q).bind(
+        [this, connection](ResultCode result, SsoLogoutResponse response)
+        {
+            if (result == ResultCode::ok && !response.logout_url.empty())
+                emit q->ssoLogoutUrlReady(QUrl(QString::fromStdString(response.logout_url)));
+            else if (result != ResultCode::ok)
+                NX_WARNING(q, "SSO logout request failed (%1); the provider session may persist",
+                    result);
+
+            q->resetAuthData();
+        });
+
+    connection->oauthManager()->ssoLogout(redirectUri, customization, std::move(handler));
 }
 
 void CloudStatusWatcher::Private::saveCredentials() const
