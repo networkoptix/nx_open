@@ -77,6 +77,9 @@ protected:
     virtual QnConstAbstractMediaDataPtr encryptDataIfNeed(const QnConstAbstractMediaDataPtr& data);
     virtual void setLastError(nx::recording::Error::Code code) = 0;
 
+    qint64 isMainStream(const QnConstAbstractMediaDataPtr& md) const;
+    qint64 isMainStreamKeyFrame(const QnConstAbstractMediaDataPtr& md) const;
+
 private:
     void updateProgress(qint64 timestampUs);
     bool prepareToStart(const QnConstAbstractMediaDataPtr& mediaData);

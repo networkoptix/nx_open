@@ -67,6 +67,22 @@ void QnStreamRecorder::markNeedKeyData()
         m_gotKeyFrame[i] = false;
 }
 
+qint64 QnStreamRecorder::isMainStream(const QnConstAbstractMediaDataPtr& md) const
+{
+    if (!m_hasVideo)
+        return md->dataType == QnAbstractMediaData::AUDIO;
+    return md->dataType == QnAbstractMediaData::VIDEO && md->channelNumber == 0;
+}
+
+qint64 QnStreamRecorder::isMainStreamKeyFrame(const QnConstAbstractMediaDataPtr& md) const
+{
+    if (!m_hasVideo)
+        return md->dataType == QnAbstractMediaData::AUDIO;
+    return md->dataType == QnAbstractMediaData::VIDEO
+        && md->channelNumber == 0
+        && md->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+}
+
 void QnStreamRecorder::updateProgress(qint64 timestampUs)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -145,12 +161,12 @@ bool QnStreamRecorder::prepareToStart(const QnConstAbstractMediaDataPtr& mediaDa
 
 bool QnStreamRecorder::dataHoleDetected(const QnConstAbstractMediaDataPtr& md)
 {
-    if (m_endDateTimeUs != (int64_t) AV_NOPTS_VALUE
-        && (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+    if (m_endDateTimeUs != (int64_t)AV_NOPTS_VALUE
+        && isMainStream(md)
         && md->timestamp < m_endDateTimeUs - 1000LL * 1000)
     {
         NX_DEBUG(
-            this, "Time translated into the past for %1 s(%2 - %3).  Closing file",
+            this, "Time translated into the past for %1s (%2us - %3us).  Closing file",
             (md->timestamp - m_endDateTimeUs) / 1'000'000, md->timestamp, m_endDateTimeUs);
 
         return true;
@@ -239,9 +255,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 
     if (m_firstTime)
     {
-        bool canStartNewFile = m_hasVideo
-            ? md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY)
-            : md->dataType == QnAbstractMediaData::AUDIO;
+        bool canStartNewFile = isMainStreamKeyFrame(md);
         if (!canStartNewFile)
         {
             NX_DEBUG(this, "Skip packet before first video(or audio in case audio only) packet: %1"
@@ -279,7 +293,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return true;
     }
 
-    if (md->dataType == QnAbstractMediaData::VIDEO || md->dataType == QnAbstractMediaData::AUDIO)
+    if (isMainStream(md))
         m_endDateTimeUs = std::max(m_endDateTimeUs, (int64_t) md->timestamp);
 
     const auto frameMediaType = toAvMediaType(md->dataType);
