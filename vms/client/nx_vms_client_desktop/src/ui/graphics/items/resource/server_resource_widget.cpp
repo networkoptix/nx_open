@@ -172,7 +172,7 @@ namespace {
     }
 
     const int legendImageSize = 12;
-    const int legendFontSize = 10;
+    const int legendFontSize = 14;
     const int legendMaxLength = 185;
 
     const char *legendKeyPropertyName = "_qn_legendKey";
@@ -263,7 +263,7 @@ protected:
     }
 
     qreal stateOpacity(StateFlags stateFlags) {
-        return (stateFlags & Hovered) ? 1.0 : 0.5;
+        return (stateFlags & Hovered) ? 1.0 : 0.8;
     }
 
     virtual void paint(
