@@ -9,7 +9,6 @@ import Nx.Controls
 import Nx.Core
 import Nx.Items
 import Nx.Mobile
-import Nx.Mobile.Controls
 import Nx.Mobile.Ui
 import Nx.Ui
 
@@ -28,7 +27,6 @@ Item
 
     property alias stackView: stackView
     property alias navigationBar: screenNavigationBar
-    property alias windowBanner: windowBanner
 
     ColumnLayout
     {
@@ -127,13 +125,6 @@ Item
         }
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
-    }
-
-    WindowBanner
-    {
-        id: windowBanner
-
-        width: parent.width
     }
 
     UiController

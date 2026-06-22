@@ -339,18 +339,6 @@ AdaptiveScreen
 
         Rectangle
         {
-            id: offlineDimmer
-
-            anchors.fill: parent
-            color: ColorTheme.transparent(ColorTheme.colors.dark5, 0.8)
-
-            Behavior on opacity { NumberAnimation { duration: 200 } }
-            opacity: windowContext.sessionManager.hasReconnectingSession ? 1.0 : 0.0
-            visible: opacity > 0
-        }
-
-        Rectangle
-        {
             id: loadingDummy
 
             anchors.fill: parent

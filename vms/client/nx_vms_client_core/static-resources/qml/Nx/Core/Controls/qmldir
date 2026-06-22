@@ -3,6 +3,7 @@ module Nx.Core.Controls
 ClipboardCopyButton 1.0 ClipboardCopyButton.qml
 ColoredImage 1.0 ColoredImage.qml
 CustomPopupDimmer 1.0 CustomPopupDimmer.qml
+Dimmer 1.0 Dimmer.qml
 IconImage 1.0 IconImage.qml
 NameValueTable 1.0 NameValueTable.qml
 NxDotPreloader 1.0 NxDotPreloader.qml

@@ -15,6 +15,7 @@ Item
     property bool active: false
 
     property Item target: mainWindow.banner
+    property bool modal: false
 
     parent: target
     visible: false

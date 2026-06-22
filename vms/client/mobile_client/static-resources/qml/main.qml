@@ -5,6 +5,7 @@ import QtQuick.Controls as Controls
 
 import Nx.Controls
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Screens
@@ -23,7 +24,7 @@ Controls.ApplicationWindow
 
     property alias windowParams: windowParams
     property alias uiContainer: uiContainer
-    property alias banner: uiContainer.windowBanner
+    property alias banner: windowBanner
 
     visible: true
     background: Rectangle { color: ColorTheme.colors.dark4 }
@@ -79,6 +80,11 @@ Controls.ApplicationWindow
             : mainWindow.height - height - 16
     }
 
+    WindowBanner
+    {
+        id: windowBanner
+    }
+
     onActiveFocusItemChanged:
     {
         autoScrollDelayTimer.restart()
@@ -121,12 +127,23 @@ Controls.ApplicationWindow
         {
             active: !!text
             type: Banner.Error
+            modal: windowContext.sessionManager.hasReconnectingSession
             text: windowContext.sessionManager.hasReconnectingSession
                 ? qsTr("Connection lost. Reconnecting...")
                 : d.showCloudOfflineWarning
                     ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
                         .arg(appContext.appInfo.cloudName())
                     : ""
+
+            action: windowContext.sessionManager.hasReconnectingSession ? stopSessionAction : null
+
+            Controls.Action
+            {
+                id: stopSessionAction
+
+                text: qsTr("Back to Welcome Screen")
+                onTriggered: windowContext.sessionManager.stopSessionByUser()
+            }
         }
 
         onCloudOfflineChanged:

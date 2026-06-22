@@ -3,13 +3,19 @@
 import QtQuick
 import QtQuick.Controls
 
-Control
+import Nx.Core.Controls
+
+Item
 {
     id: control
 
     property BannerSource currentItem: null
     readonly property var activeItems: Array.from(children).filter(
         item => (item instanceof BannerSource) && item.active)
+
+    parent: Overlay.overlay
+    anchors.fill: parent
+    z: 1 //< Should be above sheets.
 
     visible: !!currentItem
 
@@ -32,9 +38,26 @@ Control
             showActive()
     }
 
-    contentItem: Banner
+    Dimmer
+    {
+        anchors.fill: parent
+
+        active: currentItem?.modal ?? false
+    }
+
+    Banner
     {
         id: banner
+
+        anchors
+        {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            topMargin: parent.SafeArea.margins.top
+            leftMargin: parent.SafeArea.margins.left
+            rightMargin: parent.SafeArea.margins.right
+        }
 
         shown: currentItem?.active ?? false
 
