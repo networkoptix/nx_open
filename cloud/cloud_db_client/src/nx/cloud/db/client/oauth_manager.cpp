@@ -6,6 +6,7 @@
 #include "cdb_request_path.h"
 
 #include <nx/network/http/rest/http_rest_client.h>
+#include <nx/utils/url_query.h>
 
 namespace nx::cloud::db::client {
 
@@ -112,6 +113,22 @@ void OauthManager::logout(nx::MoveOnlyFunc<void(api::ResultCode)> completionHand
         nx::network::http::Method::delete_,
         kOauthLogoutPath,
         {}, //query
+        std::move(completionHandler));
+}
+
+void OauthManager::ssoLogout(
+    const std::string& postLogoutRedirectUri,
+    const std::string& customization,
+    nx::MoveOnlyFunc<void(api::ResultCode, api::SsoLogoutResponse)> completionHandler)
+{
+    nx::UrlQuery query;
+    query.addQueryItem("customization", QString::fromStdString(customization));
+    query.addQueryItem("post_logout_redirect_uri", QString::fromStdString(postLogoutRedirectUri));
+
+    m_requestsExecutor->makeAsyncCall<api::SsoLogoutResponse>(
+        nx::network::http::Method::get,
+        kOauthSsoLogoutPath,
+        query,
         std::move(completionHandler));
 }
 

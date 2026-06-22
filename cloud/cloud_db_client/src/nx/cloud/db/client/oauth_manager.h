@@ -53,6 +53,12 @@ public:
 
     virtual void logout(nx::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
+    virtual void ssoLogout(
+        const std::string& postLogoutRedirectUri,
+        const std::string& customization,
+        nx::MoveOnlyFunc<void(api::ResultCode, api::SsoLogoutResponse)> completionHandler)
+        override;
+
     void issueStunToken(
         const api::IssueStunTokenRequest& request,
         nx::MoveOnlyFunc<void(api::ResultCode, api::IssueStunTokenResponse)>

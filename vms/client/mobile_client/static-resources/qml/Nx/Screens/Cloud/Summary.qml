@@ -134,7 +134,7 @@ Page
 
                     onClicked:
                     {
-                        appContext.cloudStatusWatcher.resetAuthData();
+                        appContext.cloudStatusWatcher.logoutWithSsoSessionTermination();
                         Workflow.popCurrentScreen()
                     }
                 }

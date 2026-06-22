@@ -175,6 +175,8 @@ Controls.ApplicationWindow
         property var lastOpenedNodeId: NxGlobals.uuid("")
     }
 
+    SsoLogoutController {}
+
     onClosing:
         (close) =>
         {
