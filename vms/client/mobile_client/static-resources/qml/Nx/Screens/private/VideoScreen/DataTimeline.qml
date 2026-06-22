@@ -227,6 +227,7 @@ Rectangle
 
             textColor: ColorTheme.colors.mobileTimeline.scale.labels
             majorTickColor: ColorTheme.colors.mobileTimeline.scale.ticks
+            transitionTickColor: ColorTheme.colors.mobileTimeline.scale.transitionTicks
 
             function setPosition(y)
             {

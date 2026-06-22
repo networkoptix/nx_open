@@ -343,6 +343,7 @@
         },
         "scale": {
             "ticks": "dark10",
+            "transitionTicks": "light16",
             "labels": "light10"
         },
         "timeMarker": {

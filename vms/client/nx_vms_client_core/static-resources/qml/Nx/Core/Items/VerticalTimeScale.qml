@@ -25,6 +25,8 @@ Item
     property real minorTickLength: 4
     property real minorTickOffset: 4
 
+    property color transitionTickColor: majorTickColor
+
     property real minimumTickSpacing: 12
 
     property color textColor: "grey"
@@ -93,7 +95,28 @@ Item
 
             PathMultiline
             {
-                paths: d.majorTicks.map(
+                paths: d.majorTicks.filter(tickMs => !d.transitionTickSet.has(tickMs)).map(
+                    (tickMs) =>
+                    {
+                        const y = item.timeToPosition(tickMs)
+                        return [Qt.point(0.0, y), Qt.point(item.majorTickLength, y)]
+                    })
+            }
+        }
+
+        ShapePath
+        {
+            id: transitionTicks
+
+            strokeColor: transitionTickColor
+            strokeWidth: 1
+            fillColor: "transparent"
+            capStyle: ShapePath.FlatCap
+            pathHints: ShapePath.PathLinear
+
+            PathMultiline
+            {
+                paths: d.transitionTicks.map(
                     (tickMs) =>
                     {
                         const y = item.timeToPosition(tickMs)
@@ -187,6 +210,8 @@ Item
         id: d
 
         minimumTickSpacingMs: item.minimumTickSpacing * item.millisecondsPerPixel
+
+        property var transitionTickSet: new Set(d.transitionTicks)
 
         property var labels: new Map()
         property var pooledLabels: []

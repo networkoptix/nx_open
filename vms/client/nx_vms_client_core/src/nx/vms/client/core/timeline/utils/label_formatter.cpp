@@ -119,7 +119,7 @@ QString LabelFormatter::tickLabel(
             if (dt.date().month() > 1 || dt.date().day() > 1)
                 return d->dayMonth(dt);
 
-            return nx::format(u"%1\n%2"_qs, d->year(dt), d->dayMonth(dt));
+            return d->year(dt);
         }
 
         case TimelineZoomLevel::Hours:
@@ -128,7 +128,7 @@ QString LabelFormatter::tickLabel(
             if (dt.time().hour() > 0 || dt.time().minute() > 0)
                 return d->hoursMinutes(dt);
 
-            return nx::format(u"%1\n%2"_qs, d->dayMonth(dt), isolateLtr(d->hoursMinutes(dt)));
+            return d->dayMonth(dt);
         }
 
         case TimelineZoomLevel::Seconds:
@@ -144,7 +144,9 @@ QString LabelFormatter::tickLabel(
             if (dt.time().msec() > 0)
                 return nx::format(u"%1ms"_qs, dt.time().msec());
 
-            return nx::format(u"%1s"_qs, dt.time().second());
+            return dt.time().second() == 0
+                ? isolateLtr(d->hoursMinutes(dt))
+                : nx::format(u"%1s"_qs, dt.time().second()).toQString();
         }
     }
 

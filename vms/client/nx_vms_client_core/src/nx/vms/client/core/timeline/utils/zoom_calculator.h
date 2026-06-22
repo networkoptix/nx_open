@@ -25,6 +25,7 @@ class NX_VMS_CLIENT_CORE_API ZoomCalculator: public QObject
 
     Q_PROPERTY(QList<qint64> majorTicks READ majorTicks NOTIFY majorTicksChanged)
     Q_PROPERTY(QList<qint64> minorTicks READ minorTicks NOTIFY minorTicksChanged)
+    Q_PROPERTY(QList<qint64> transitionTicks READ transitionTicks NOTIFY transitionTicksChanged)
 
     Q_PROPERTY(QTimeZone timeZone READ timeZone WRITE setTimeZone NOTIFY timeZoneChanged)
 
@@ -46,6 +47,8 @@ public:
 
     QList<qint64> minorTicks() const;
 
+    QList<qint64> transitionTicks() const;
+
     QTimeZone timeZone() const;
     void setTimeZone(const QTimeZone& value);
 
@@ -57,6 +60,7 @@ signals:
     void minimumTickSpacingChanged();
     void majorTicksChanged();
     void minorTicksChanged();
+    void transitionTicksChanged();
     void timeZoneChanged();
 
 private:

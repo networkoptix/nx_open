@@ -6,6 +6,7 @@
 
 #include <QtQml/QtQml>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 
 namespace nx::vms::client::core {
@@ -49,6 +50,35 @@ static const std::vector<TimelineZoomLevel> kZoomLevels =
         return result;
     }();
 
+bool isTransition(qint64 timestampMs, TimelineZoomLevel::LevelType zoom, const QTimeZone& tz)
+{
+    const auto dt = QDateTime::fromMSecsSinceEpoch(timestampMs, tz);
+    switch (zoom)
+    {
+        case TimelineZoomLevel::Milliseconds:
+            return dt.time().msec() == 0;
+
+        case TimelineZoomLevel::Seconds:
+            return dt.time().second() == 0;
+
+        case TimelineZoomLevel::Minutes:
+        case TimelineZoomLevel::Hours:
+            return dt == dt.date().startOfDay(tz);
+
+        case TimelineZoomLevel::Days:
+            return dt.date().day() == 1;
+
+        case TimelineZoomLevel::Months:
+            return dt.date().month() == 1;
+
+        case TimelineZoomLevel::Years:
+            return false;
+    }
+
+    NX_ASSERT(false, "Unknown zoom level %1", zoom);
+    return false;
+}
+
 } // namespace
 
 struct ZoomCalculator::Private
@@ -62,9 +92,10 @@ struct ZoomCalculator::Private
     qreal minimumTickSpacingMs{1000};
 
     TimelineZoomLevel::LevelType majorTicksLevel{};
-    QList<qint64> majorTicks;
+    QList<qint64> majorTicks; //< Including transition ticks.
 
     QList<qint64> minorTicks;
+    QList<qint64> transitionTicks;
 
     int maximumTickCount = 100;
 
@@ -149,6 +180,11 @@ QList<qint64> ZoomCalculator::minorTicks() const
     return d->minorTicks;
 }
 
+QList<qint64> ZoomCalculator::transitionTicks() const
+{
+    return d->transitionTicks;
+}
+
 QTimeZone ZoomCalculator::timeZone() const
 {
     return d->timeZone;
@@ -180,6 +216,12 @@ void ZoomCalculator::Private::update()
     // very computational-heavy situations.
     if ((durationMs / minimumTickSpacingMs) > maximumTickCount)
     {
+        if (!transitionTicks.empty())
+        {
+            transitionTicks = {};
+            emit q->transitionTicksChanged();
+        }
+
         if (!majorTicks.empty())
         {
             majorTicks = {};
@@ -210,6 +252,7 @@ void ZoomCalculator::Private::update()
 
     QList<qint64> newMajorTicks;
     QList<qint64> newMinorTicks;
+    QList<qint64> newTransitionTicks;
 
     const auto nextIt = it == kZoomLevels.end() ? it : (it + 1);
     const auto majorZoomLevel = nextIt != kZoomLevels.end()
@@ -236,6 +279,9 @@ void ZoomCalculator::Private::update()
         }
         else
         {
+            if (isTransition(majorTickMs, majorZoomLevel.type, timeZone))
+                newTransitionTicks.push_back(majorTickMs);
+
             newMajorTicks.push_back(majorTickMs);
             minorTickMs = majorTickMs;
 
@@ -245,6 +291,12 @@ void ZoomCalculator::Private::update()
 
         previousMinorTickMs = minorTickMs;
         minorTickMs = minorZoomLevel.nextTick(previousMinorTickMs, timeZone);
+    }
+
+    if (transitionTicks != newTransitionTicks)
+    {
+        transitionTicks = newTransitionTicks;
+        emit q->transitionTicksChanged();
     }
 
     if (majorTicks != newMajorTicks || majorTicksLevel != majorZoomLevel.type)
