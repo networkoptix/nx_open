@@ -18,5 +18,6 @@
     "protoVersion": @vmsProtocolVersion@,
     "metaVersion": "@usedMetaVersion@",
     "vmsVersion": "@releaseVersion.full@",
-    "mobileClientVersion": "@mobileClientVersion.full@"
+    "mobileClientVersion": "@mobileClientVersion.full@",
+    "nxAiManagerPluginVersion": "@nxAiManagerPluginVersion@"
 }
