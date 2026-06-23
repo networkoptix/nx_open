@@ -26,6 +26,11 @@ AdaptiveSheet
     title: qsTr("Actions")
 
     onResourceChanged: hintControl.hide()
+    onExternalModeChanged:
+    {
+        if(externalMode && opened)
+            close() //< No actions left to display.
+    }
 
     ActionVisualizer
     {
