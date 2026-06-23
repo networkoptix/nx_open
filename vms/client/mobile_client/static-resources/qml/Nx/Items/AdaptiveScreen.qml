@@ -315,8 +315,8 @@ FocusScope
         {
             id: leftPanelButtonIndicator
 
-            anchors.topMargin: (parent.height - parent.icon.height) / 2
-            anchors.rightMargin: (parent.width - parent.icon.width) / 2
+            anchors.topMargin: (parent.height - parent.icon.height) / 2 + 3
+            anchors.rightMargin: (parent.width - parent.icon.width) / 2 + 2
             z: 1
             visible: false
         }

@@ -12,7 +12,7 @@ Rectangle
     anchors.right: parent.right
 
     color: ColorTheme.colors.red_attention
-    width: 12
+    width: 6
     height: width
     radius: width / 2
 
