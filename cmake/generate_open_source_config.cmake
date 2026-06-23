@@ -11,6 +11,9 @@ set(UPDATE_SERVER_URL "https://updates.networkoptix.com")
 set(SERVER_PLATFORMS windows_x64 linux_x64 linux_arm32 linux_arm64)
 set(SERVER_REFS_FILE_NAME "${PROJECT_BINARY_DIR}/compatible_servers.txt")
 
+# The Nx AI Manager plugin is not present on this branch, so its version is empty.
+set(nxAiManagerPluginVersion "")
+
 nx_configure_file("${open_source_root}/build_info.txt.in"
     "${distribution_output_dir}/build_info.txt")
 nx_configure_file("${open_source_root}/build_info.json.in"
