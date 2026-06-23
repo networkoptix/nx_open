@@ -678,7 +678,7 @@ Rectangle
             {
                 return isOutside && !timeline.positionAtLive
                     ? timeMarkerText.width
-                    : timeScale.width
+                    : (timeScale.width - recordingChunks.width)
             }
 
             readonly property real draggingShift: timeScale.width
@@ -713,7 +713,7 @@ Rectangle
                 anchors.verticalCenterOffset:
                     -Math.max(0, timeMarker.y + height * 0.5 - content.height)
 
-                width: timeMarker.markerWidth - recordingChunks.width
+                width: timeMarker.markerWidth
 
                 height: timeMarker.isOutside
                     ? header.height
@@ -752,7 +752,7 @@ Rectangle
             {
                 id: timeMarkerText
 
-                leftPadding: timeMarker.isOutside ? 16 : 0
+                leftPadding: timeMarker.isOutside ? 12 : 0
                 rightPadding: timeMarker.isOutside ? 12 : 0
 
                 anchors.right: timeMarkerRect.right
