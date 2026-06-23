@@ -1638,5 +1638,9 @@
       <source>Connection lost. Reconnecting...</source>
       <translation>연결이 끊어졌습니다. 다시 연결하는 중입니다...</translation>
     </message>
+    <message>
+      <source>Back to Welcome Screen</source>
+      <translation type="unfinished">Back to Welcome Screen</translation>
+    </message>
   </context>
 </TS>

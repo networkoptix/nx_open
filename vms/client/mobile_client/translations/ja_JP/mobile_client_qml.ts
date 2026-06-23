@@ -1638,5 +1638,9 @@
       <source>Connection lost. Reconnecting...</source>
       <translation>接続が失われました。再接続しています...</translation>
     </message>
+    <message>
+      <source>Back to Welcome Screen</source>
+      <translation type="unfinished">Back to Welcome Screen</translation>
+    </message>
   </context>
 </TS>

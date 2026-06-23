@@ -1638,5 +1638,9 @@
       <source>Connection lost. Reconnecting...</source>
       <translation>Koneksi putus. Sedang mengkoneksikan kembali...</translation>
     </message>
+    <message>
+      <source>Back to Welcome Screen</source>
+      <translation type="unfinished">Back to Welcome Screen</translation>
+    </message>
   </context>
 </TS>

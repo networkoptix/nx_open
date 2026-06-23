@@ -1639,5 +1639,9 @@
       <source>Connection lost. Reconnecting...</source>
       <translation>Perdeuse a conexión, reconectando...</translation>
     </message>
+    <message>
+      <source>Back to Welcome Screen</source>
+      <translation type="unfinished">Back to Welcome Screen</translation>
+    </message>
   </context>
 </TS>
