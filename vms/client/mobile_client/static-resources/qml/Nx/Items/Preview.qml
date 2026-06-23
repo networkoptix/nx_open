@@ -287,10 +287,12 @@ Rectangle
         icon.height: 24
 
         backgroundColor: transparent
-            ? ColorTheme.transparent("#0D1012", 0.5)
+            ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
             : parameters.colors[state]
 
-        foregroundColor: transparent ? ColorTheme.colors.light1 : parameters.textColors[state]
+        foregroundColor: transparent
+            ? ColorTheme.transparent(ColorTheme.colors.light1, enabled ? 1.0 : 0.3)
+            : parameters.textColors[state]
     }
 
     ControlButton
@@ -307,7 +309,7 @@ Rectangle
         opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
         enabled: opacity > 0 && root.dataState === Preview.DataState.Available
         backgroundColor: d.fullscreenLayout
-            ? ColorTheme.transparent("#0D1012", 0.5)
+            ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
             : "transparent"
 
         onClicked: root.showFullscreen()
