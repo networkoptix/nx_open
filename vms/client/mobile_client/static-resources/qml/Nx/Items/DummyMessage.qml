@@ -27,8 +27,12 @@ Pane
 
     contentItem: Item
     {
+        implicitHeight: contentColumn.implicitHeight
+
         Column
         {
+            id: contentColumn
+
             width: parent.width
             y: (parent.height - height) / (centered ? 2 : 4)
 
