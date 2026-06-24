@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -100,6 +101,40 @@ TEST_F(AlgorithmMoveIf, whole_initial_data_is_left_in_place)
         splitValue,
         initialArrayAfterTest,
         resultingArrayAfterTest);
+}
+
+TEST(Algorithm_findLastIf, emptyRange)
+{
+    std::ranges::iota_view range{0, 0};
+    ASSERT_EQ(nx::utils::find_last_if(range, [](int) { return true; }), range.end());
+}
+
+TEST(Algorithm_findLastIf, allSatisfy)
+{
+    std::ranges::iota_view range{1, 6};
+    const auto it = nx::utils::find_last_if(range, [](int) { return true; });
+    ASSERT_NE(it, range.end());
+    ASSERT_EQ(*it, 5);
+}
+
+TEST(Algorithm_findLastIf, noneSatisfy)
+{
+    std::ranges::iota_view range{1, 4};
+    ASSERT_EQ(nx::utils::find_last_if(range, [](int) { return false; }), range.end());
+}
+
+TEST(Algorithm_findLastIf, binarySearchBehavior)
+{
+    constexpr int kSize = 1024;
+    constexpr int kExpected = kSize / 2;
+    std::ranges::iota_view range{0, kSize};
+    size_t callCount = 0;
+    const auto it = nx::utils::find_last_if(range,
+        [&](int x) { ++callCount; return x <= kExpected; });
+    ASSERT_NE(it, range.end());
+    ASSERT_EQ(*it, kExpected);
+    constexpr size_t kExpectedCallCount = 11; // log2(1024) + 1
+    ASSERT_LE(callCount, kExpectedCallCount);
 }
 
 TEST(Algorithm_y_combinator, compilation_test)

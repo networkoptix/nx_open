@@ -3,6 +3,7 @@
 #pragma once
 
 #include <algorithm>
+#include <concepts>
 #include <map>
 #include <set>
 #include <vector>
@@ -63,6 +64,21 @@ typename Container::value_type* binary_find(Container& c, const T& value, Compar
 {
     const auto it = binary_find(c.begin(), c.end(), value, comp);
     return it != c.end() ? &*it : nullptr;
+}
+
+// Binary searches a range partitioned by pred (true then false) and returns an iterator to
+// the last element for which pred returns true, or end(range) if pred is false for all elements.
+// random_access_range would give O(log n) iterator steps, but bidirectional_range is used to also
+// support std::set and std::list (iterator steps are O(n) but pred calls remain O(log n)).
+template<std::ranges::bidirectional_range R,
+    std::predicate<std::ranges::range_reference_t<R>> Pred>
+auto find_last_if(R&& range, Pred&& pred)
+{
+    const auto it = std::ranges::lower_bound(range, true, std::less<>(),
+        [&](auto&& element) -> bool { return !pred(element); });
+    if (it == std::ranges::begin(range))
+        return std::ranges::end(range);
+    return std::ranges::prev(it);
 }
 
 /**
