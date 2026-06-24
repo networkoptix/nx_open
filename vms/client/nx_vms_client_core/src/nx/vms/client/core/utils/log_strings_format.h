@@ -6,19 +6,26 @@
 
 namespace nx::vms::client::core {
 
-#define NX_LOG_RESPONSE(TAG, success, response, ...) \
-    if (!success || !response) \
+#define NX_LOG_RESPONSE(TAG, success, response, ...) do \
+{ \
+    const auto& nxLogResponseSuccess = (success); \
+    const auto& nxLogResponseResponse = (response); \
+    if (!nxLogResponseSuccess || !nxLogResponseResponse) \
     { \
         NX_WARNING(TAG, __VA_ARGS__); \
-        if (response) \
+        if (nxLogResponseResponse) \
         { \
-            NX_WARNING(TAG, "Success: %1, Response: [OK]", success); \
+            NX_WARNING(TAG, "Success: %1, Response: [OK]", nxLogResponseSuccess); \
         } \
         else \
         { \
+            const auto& nxLogResponseError = nxLogResponseResponse.error(); \
             NX_WARNING(TAG, "Success: %1, Error: %2, %3", \
-                success, response.error().errorId, response.error().errorString); \
+                nxLogResponseSuccess, \
+                nxLogResponseError.errorId, \
+                nxLogResponseError.errorString); \
         } \
-    }
+    } \
+} while (0)
 
 } // namespace nx::vms::client::core
