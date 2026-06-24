@@ -1641,7 +1641,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Tilbage til Velkomstskærm</translation>
     </message>
   </context>
 </TS>

@@ -968,7 +968,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>TERPILIH %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Kembali ke Layar Selamat Datang</translation>
     </message>
   </context>
 </TS>

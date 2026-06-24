@@ -1640,7 +1640,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>初期画面に戻る</translation>
     </message>
   </context>
 </TS>
