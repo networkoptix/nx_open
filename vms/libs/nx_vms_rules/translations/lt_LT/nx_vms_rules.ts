@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Device disconnected</source>
@@ -583,7 +583,7 @@
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
