@@ -210,10 +210,12 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
         return;
 
     const auto handler =
-        [this, oldValue = !value](bool success,
+        [this, oldValue = !value](
+            rest::Status status,
             rest::Handle /*requestId*/,
             rest::ServerConnection::ErrorOrEmpty /*result*/)
         {
+            const bool success = status;
             if (success)
             {
                 QnMessageBox::information(mainWindowWidget(),
@@ -224,9 +226,12 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
             {
                 action(menu::DebugToggleSecurityForPowerUsersAction)->setChecked(oldValue);
 
-                QnMessageBox::critical(mainWindowWidget(),
-                    nx::format("Failed to %1 security settings for Power Users",
-                        oldValue ? "disable" : "enable"));
+                if (status.reason() != rest::Reason::cancel)
+                {
+                    QnMessageBox::critical(mainWindowWidget(),
+                        nx::format("Failed to %1 security settings for Power Users",
+                            oldValue ? "disable" : "enable"));
+                }
             }
         };
 
@@ -241,7 +246,7 @@ void DebugActionsHandler::enableSecurityForPowerUsers(bool value)
         network::rest::Params{},
         paramValue,
         handler,
-        thread());
+        this);
 }
 
 void DebugActionsHandler::at_debugIncrementCounterAction_triggered()

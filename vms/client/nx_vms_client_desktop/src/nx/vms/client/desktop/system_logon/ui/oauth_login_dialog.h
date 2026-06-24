@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <expected>
+
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
@@ -43,8 +45,12 @@ public:
         const QString& title,
         const LoginParams& params);
 
-    /** Helper method for access token 2FA validation. */
-    static bool validateToken(
+    /**
+     * Helper method for access token 2FA validation. Returns an empty value on success, or an
+     * error: `dialogRejected` when the user dismissed the dialog (Cancel, X, Esc) and
+     * `internalCancellation` when it was closed by code (`OauthClient::cancelled`).
+     */
+    static std::expected<void, nx::vms::client::core::OauthDataRequestError> validateToken(
         QWidget* parent,
         const QString& title,
         const nx::network::http::Credentials& credentials);
@@ -71,8 +77,10 @@ signals:
 
 private:
     void loadPage();
+    void rejectAsInternalCancellation();
 
 private:
+    core::OauthDataRequestError m_rejectionReason = core::OauthDataRequestError::dialogRejected;
     nx::utils::ImplPtr<OauthLoginDialogPrivate> d;
 };
 

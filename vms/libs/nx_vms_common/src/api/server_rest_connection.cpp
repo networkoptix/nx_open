@@ -67,6 +67,7 @@
 
 using namespace nx;
 using namespace nx::coro;
+using namespace nx::vms::common;
 
 namespace {
 
@@ -85,10 +86,10 @@ rest::Callback<nx::network::rest::JsonResult> extractJsonResult(
     rest::Callback<T> callback)
 {
     return
-        [callback = std::move(callback)](bool success, rest::Handle requestId,
+        [callback = std::move(callback)](rest::Status status, rest::Handle requestId,
             const nx::network::rest::JsonResult& result)
         {
-            callback(success, requestId, result.deserialized<T>());
+            callback(status, requestId, result.deserialized<T>());
         };
 }
 
@@ -854,10 +855,10 @@ Handle ServerConnection::getOverlappedIds(
         nx::network::rest::Params{{"groupId", nvrGroupId}},
         Callback<nx::network::rest::JsonResult>(
             [callback = std::move(callback)](
-                bool success, Handle requestId, const nx::network::rest::JsonResult& result)
+                rest::Status status, Handle requestId, const nx::network::rest::JsonResult& result)
             {
                 callback(
-                    success,
+                    status,
                     requestId,
                     result.deserialized<nx::vms::api::OverlappedIdResponse>());
             }),
@@ -881,10 +882,10 @@ Handle ServerConnection::setOverlappedId(
         QJson::serialized(request),
         Callback<nx::network::rest::JsonResult>(
             [callback = std::move(callback)](
-                bool success, Handle requestId, const nx::network::rest::JsonResult& result)
+                rest::Status status, Handle requestId, const nx::network::rest::JsonResult& result)
             {
                 callback(
-                    success,
+                    status,
                     requestId,
                     result.deserialized<nx::vms::api::OverlappedIdResponse>());
             }),
@@ -1732,7 +1733,8 @@ public:
 
     virtual bool isSuccess() const override
     {
-        return success;
+        // An expired batch comes back as a successful HTTP 200.
+        return success && !isSessionExpired();
     }
 
     rest::ErrorOrData<JsonRpcResultType>&& getResult() &&
@@ -1765,42 +1767,40 @@ Handle ServerConnection::jsonRpcBatchCall(
 
     auto internalCallback =
         [callback = std::move(callback)](
-            bool success,
+            rest::Status status,
             Handle requestId,
             rest::ErrorOrData<JsonRpcResultType> result)
         {
-            if (success)
-            {
-                if (result)
-                {
-                    if (auto responseArray = std::get_if<
-                        std::vector<nx::vms::api::JsonRpcResponse>>(&*result))
-                    {
-                        callback(success, requestId, std::move(*responseArray));
-                        return;
-                    }
-                }
-                NX_ASSERT(false, "jsonrpc success but response data is invalid");
-                return;
-            }
+            auto responseArray = result
+                ? std::get_if<std::vector<nx::vms::api::JsonRpcResponse>>(&*result)
+                : nullptr;
 
-            if (!result)
+            NX_ASSERT(!status || result, "jsonrpc success but response data is invalid");
+
+            // The callback is invoked even with a falsy status: when re-auth was cancelled
+            // or failed, the array still holds the original session-expired errors and the
+            // status carries the reason.
+            std::vector<nx::json_rpc::Response> responses;
+            if (responseArray)
             {
-                std::vector<nx::json_rpc::Response> response;
-                response.emplace_back(nx::json_rpc::Response::makeError(std::nullptr_t{},
+                responses = std::move(*responseArray);
+            }
+            else if (result)
+            {
+                // The only remaining variant alternative is a single response.
+                responses.emplace_back(
+                    std::move(std::get<nx::vms::api::JsonRpcResponse>(*result)));
+            }
+            else
+            {
+                // Transport or REST level failure: wrap it into a single json-rpc error.
+                responses.emplace_back(nx::json_rpc::Response::makeError(std::nullptr_t{},
                     nx::json_rpc::Error::applicationError,
                     result.error().errorString.toStdString(),
                     result.error()));
-                callback(success, requestId, std::move(response));
-                return;
             }
 
-            if (auto singleResponse = std::get_if<nx::vms::api::JsonRpcResponse>(&*result))
-            {
-                std::vector<nx::json_rpc::Response> response;
-                response.emplace_back(std::move(*singleResponse));
-                callback(success, requestId, std::move(response));
-            }
+            callback(status, requestId, std::move(responses));
         };
 
     return d->executeRequest(
@@ -1811,7 +1811,10 @@ Handle ServerConnection::jsonRpcBatchCall(
             std::unique_ptr<BaseResultContext> resultContext, rest::Handle handle)
         {
             auto context = static_cast<JsonRpcResultContext*>(resultContext.get());
-            callback(context->isSuccess(), handle, std::move(*context).getResult());
+            const rest::Status status = context->isUserCancelled()
+                ? rest::Status(rest::Reason::cancel)
+                : rest::Status(context->isSuccess());
+            callback(status, handle, std::move(*context).getResult());
         },
         executor,
         timeouts);
@@ -2767,13 +2770,21 @@ ServerConnection::Private::executeRequestAsync(
 
         if (!updatedToken)
         {
-            updatedToken = co_await rerunner.getNewToken(helper);
-            if (updatedToken)
+            auto refreshResult = co_await rerunner.getNewToken(helper);
+            if (refreshResult.has_value())
             {
+                updatedToken = refreshResult.value();
+
                 NX_MUTEX_LOCKER lock(&mutex);
                 directConnect->credentials.authToken = *updatedToken;
             }
+            else if (refreshResult.error()
+                == AbstractSessionTokenHelper::RefreshError::userCancelled)
+            {
+                requestContext->setUserCancelled();
+            }
         }
+
         if (updatedToken)
         {
             // GUI or ASIO thread.

@@ -44,7 +44,7 @@ public:
 
     void setFlags(SessionRefreshFlags flags);
 
-    std::optional<nx::network::http::AuthToken> refreshSession() override;
+    RefreshResult refreshSession() override;
 
     core::CloudAuthDataOrError requestAuthData(
         std::function<bool()> closeCondition = {}) const;

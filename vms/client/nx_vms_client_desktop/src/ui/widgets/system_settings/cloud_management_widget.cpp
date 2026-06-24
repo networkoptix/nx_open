@@ -240,7 +240,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
     auto handler =
         [this, isCloudUser = context()->user()->isCloud()](
-            bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
+            rest::Status status, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
             // The request handle may be cleared already in case of disconnection before the
             // response callback.
@@ -250,12 +250,16 @@ void QnCloudManagementWidget::disconnectFromCloud()
             m_currentRequest = 0;
             ui->unlinkButton->setBusy(false);
 
+            const bool success = status;
             if (success && reply)
             {
                 NX_DEBUG(this, "Cloud unbind succeeded");
                 onDisconnectSuccess();
                 return;
             }
+
+            if (status.reason() == rest::Reason::cancel)
+                return;
 
             QString errorString;
             if (!reply)

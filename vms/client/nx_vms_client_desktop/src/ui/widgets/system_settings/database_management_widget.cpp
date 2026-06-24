@@ -137,11 +137,13 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
 
     auto dumpDatabaseHandler =
         [this, fileName](
-            bool success,
+            rest::Status status,
             rest::Handle requestId,
             rest::ErrorOrData<QByteArray> data)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+
+            bool success = status;
             if (!data)
                 success = false;
 
@@ -157,6 +159,13 @@ void QnDatabaseManagementWidget::onBackupFileSelected(QString fileName)
             }
             else
             {
+                if (status.reason() == rest::Reason::cancel)
+                {
+                    m_currentRequest = 0;
+                    updateState(State::empty);
+                    return;
+                }
+
                 if (!data)
                 {
                     NX_ERROR(this,
@@ -242,9 +251,18 @@ void QnDatabaseManagementWidget::restoreDb()
     ui->labelMessage->setText(tr("Database backup is being uploaded to the server. Please wait."));
 
     auto restoreDatabaseHandler =
-        [this, fileName](bool success, rest::Handle requestId, rest::ErrorOrEmpty reply)
+        [this, fileName](rest::Status status, rest::Handle requestId, rest::ErrorOrEmpty reply)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+
+            if (status.reason() == rest::Reason::cancel)
+            {
+                m_currentRequest = 0;
+                updateState(State::empty);
+                return;
+            }
+
+            const bool success = status;
             m_currentRequest = 0;
             updateState(State::restoreFinished, success);
 
@@ -288,6 +306,7 @@ void QnDatabaseManagementWidget::updateState(State state, bool operationSuccess)
             ui->cancelCreateBackupButton->hide();
             ui->cancelRestoreBackupButton->hide();
             ui->openFolderButton->hide();
+            ui->frameMain->setDisabled(false);
             break;
         }
         case State::backupStarted:

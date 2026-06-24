@@ -427,12 +427,12 @@ bool LdapSettingsWidget::requestLdapReset()
 
     const auto resetCallback = nx::utils::guarded(this,
         [this, settingsBackup = std::move(settingsBackup)](
-            bool success, rest::Handle handle, const rest::ErrorOrEmpty& result)
+            rest::Status status, rest::Handle handle, const rest::ErrorOrEmpty& result)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
-            if (success)
+            if (status)
             {
                 d->initialSettings = {};
                 d->setState(d->initialSettings);
@@ -442,14 +442,12 @@ bool LdapSettingsWidget::requestLdapReset()
 
             globalSettings()->setLdap(settingsBackup);
 
-            if (!result)
+            if (status.reason() != rest::Reason::cancel)
             {
-                if (result.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                if (!result)
                     showError(result.error().errorString);
-            }
-            else
-            {
-                showError(tr("Connection failed"));
+                else
+                    showError(tr("Connection failed"));
             }
         });
 
@@ -517,11 +515,12 @@ void LdapSettingsWidget::applyChanges()
 
     const auto settingsCallback = nx::utils::guarded(this,
         [this, settingsBackup = std::move(settingsBackup)](
-            bool success, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> settings)
+            rest::Status status, int handle, rest::ErrorOrData<nx::vms::api::LdapSettings> settings)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
+            const bool success = status;
             NX_LOG_RESPONSE(this, success, settings, "Failed to apply LDAP settings changes.");
 
             if (settings)
@@ -541,15 +540,8 @@ void LdapSettingsWidget::applyChanges()
                 d->checkingOnlineStatus = false;
                 globalSettings()->setLdap(settingsBackup);
 
-                if (!settings)
-                {
-                    if (settings.error().errorId != nx::network::rest::ErrorId::sessionExpired)
-                        showError(settings.error().errorString);
-                }
-                else
-                {
-                    showError(tr("Connection failed"));
-                }
+                if (status.reason() != rest::Reason::cancel)
+                    showError(settings.error().errorString);
             }
         });
 
@@ -582,25 +574,23 @@ void LdapSettingsWidget::requestSync()
     d->syncRequested = true;
 
     auto callback = nx::utils::guarded(this,
-        [this](bool success, int handle, const rest::ErrorOrEmpty& result)
+        [this](rest::Status status, int handle, const rest::ErrorOrEmpty& result)
         {
             if (handle == d->currentHandle)
                 d->currentHandle = 0;
 
             d->syncRequested = false;
 
-            if (success)
+            if (status)
             {
                 checkOnlineAndSyncStatus();
             }
-            else if (!result)
+            else if (status.reason() != rest::Reason::cancel)
             {
-                if (result.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                if (!result)
                     showError(result.error().errorString);
-            }
-            else
-            {
-                showError(tr("Connection failed"));
+                else
+                    showError(tr("Connection failed"));
             }
         });
 

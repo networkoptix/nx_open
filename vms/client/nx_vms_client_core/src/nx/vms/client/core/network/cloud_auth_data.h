@@ -56,12 +56,18 @@ NX_VMS_CLIENT_CORE_API std::string usernameFromToken(const std::string& value);
 
 NX_REFLECTION_ENUM_CLASS(OauthDataRequestError,
     alreadyOpenedDialog,
+    /** User dismissed the OAuth dialog (Cancel, X, Esc). */
     dialogRejected,
     tokenValidationFailed,
     wrongThread,
     noParent,
     cloudLoginEmpty,
-    unexpectedClientType
+    unexpectedClientType,
+    /**
+     * Closed by code (`OauthClient::cancelled` or a fired `closeCondition`), not by the
+     * user. A close on session end is reported as `dialogRejected` instead.
+     */
+    internalCancellation
 );
 
 using CloudAuthDataOrError = std::expected<CloudAuthData, OauthDataRequestError>;

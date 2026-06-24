@@ -5,6 +5,8 @@
 #include <memory>
 #include <set>
 
+#include <api/rest_types.h>
+#include <nx/network/rest/result.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/desktop/common/dialogs/qml_dialog_with_state.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
@@ -115,7 +117,7 @@ public:
     static void removeGroups(
         WindowContext* windowContext,
         const QSet<nx::Uuid>& idsToRemove,
-        nx::MoveOnlyFunc<void(bool, const QString&)> callback = {});
+        nx::MoveOnlyFunc<void(rest::Status, const QString&)> callback = {});
 
 public slots:
     void onDeleteRequested();

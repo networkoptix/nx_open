@@ -488,16 +488,16 @@ struct UserSettingsDialog::Private
         const UserSettingsDialogState& state,
         std::optional<QString> actualPassword,
         common::SessionTokenHelperPtr /*sessionTokenHelper*/,
-        bool success,
+        rest::Status status,
         int handle,
         rest::ErrorOrData<nx::vms::api::UserModel> data)
     {
         if (NX_ASSERT(handle == currentRequest))
             currentRequest = 0;
 
-        if (!success)
+        if (!status)
         {
-            if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+            if (!data && status.reason() != rest::Reason::cancel)
                 showServerError(tr("Failed to apply changes"), data.error());
             isSaving = false;
             return;
@@ -876,24 +876,22 @@ void UserSettingsDialog::onTerminateLink()
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
+                rest::Status status, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
 
                 d->isSaving = false;
 
-                if (success)
+                if (status)
                     return;
 
                 if (!data)
                 {
-                    if (data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                    if (status.reason() != rest::Reason::cancel)
                         d->showServerError(tr("Failed to apply changes"), data.error());
-                    return;
                 }
-
-                if (data)
+                else
                 {
                     NX_ASSERT(data->temporaryToken);
                     d->updateUiFromTemporaryToken(*data->temporaryToken);
@@ -938,19 +936,20 @@ void UserSettingsDialog::onResetLink(
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, callback](
-                bool success, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
+                rest::Status status, int handle, rest::ErrorOrData<nx::vms::api::UserModel> data)
             {
                 if (NX_ASSERT(handle == d->currentRequest))
                     d->currentRequest = 0;
 
                 d->isSaving = false;
 
+                const bool success = status;
                 if (callback.isCallable())
                     callback.call({success});
 
                 if (!success)
                 {
-                    if (!data && data.error().errorId != nx::network::rest::ErrorId::sessionExpired)
+                    if (!data && status.reason() != rest::Reason::cancel)
                         d->showServerError(tr("Failed to apply changes"), data.error());
                     return;
                 }
@@ -1328,13 +1327,15 @@ void UserSettingsDialog::saveState(const UserSettingsDialogState& state)
         sessionTokenHelper,
         nx::utils::guarded(this,
             [this, state, actualPassword, sessionTokenHelper](
-                bool success, rest::Handle handle, rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
+                rest::Status status,
+                rest::Handle handle,
+                rest::ErrorOrData<nx::vms::api::UserModel> errorOrData)
             {
                 d->onUserSaveRequestCompleted(
                     state,
                     actualPassword,
                     sessionTokenHelper,
-                    success,
+                    status,
                     handle,
                     errorOrData);
             }),

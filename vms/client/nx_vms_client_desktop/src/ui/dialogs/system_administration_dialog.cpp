@@ -172,7 +172,7 @@ void QnSystemAdministrationDialog::applyChanges()
 
     auto callback =
         [this, sessionLimitChanged = d->editableSystemSettings.sessionLimitS.has_value()](
-            bool /*success*/,
+            rest::Status status,
             rest::Handle requestId,
             rest::ServerConnection::ErrorOrEmpty response)
         {
@@ -187,6 +187,9 @@ void QnSystemAdministrationDialog::applyChanges()
             }
             else
             {
+                if (status.reason() == rest::Reason::cancel)
+                    return;
+
                 const auto& error = response.error();
 
                 // If the session duration is set to be less than the current token's lifetime, the

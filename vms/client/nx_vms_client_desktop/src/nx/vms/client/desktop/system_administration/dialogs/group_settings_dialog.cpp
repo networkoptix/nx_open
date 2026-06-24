@@ -302,14 +302,17 @@ void GroupSettingsDialog::onDeleteRequested()
     d->isSaving = true;
 
     const auto handleRemove = nx::utils::guarded(this,
-        [this](bool success, const QString& errorString)
+        [this](rest::Status status, const QString& errorString)
         {
             d->isSaving = false;
-            if (success)
+            if (status)
             {
                 reject();
                 return;
             }
+
+            if (status.reason() == rest::Reason::cancel)
+                return;
 
             QnMessageBox messageBox(
                 QnMessageBoxIcon::Critical,
@@ -596,17 +599,17 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
     chain->start(nx::utils::guarded(this,
         [chain, state, this,
             guard = workbenchContext()->instance<ContextCurrentUserWatcher>()->reconnectGuard()](
-                bool success,
-                nx::network::rest::ErrorId errorCode,
+                rest::Status status,
+                nx::network::rest::ErrorId /*errorCode*/,
                 const QString& errorString)
         {
             d->isSaving = false;
 
-            if (success)
+            if (status)
             {
                 saveStateComplete(state);
             }
-            else if (errorCode != nx::network::rest::ErrorId::sessionExpired)
+            else if (status.reason() != rest::Reason::cancel)
             {
                 QnMessageBox messageBox(
                     QnMessageBoxIcon::Critical,
@@ -626,7 +629,7 @@ void GroupSettingsDialog::saveState(const GroupSettingsDialogState& state)
 void GroupSettingsDialog::removeGroups(
     WindowContext* windowContext,
     const QSet<nx::Uuid>& idsToRemove,
-    nx::MoveOnlyFunc<void(bool, const QString&)> callback)
+    nx::MoveOnlyFunc<void(rest::Status, const QString&)> callback)
 {
     auto systemContext = windowContext->system();
 
@@ -702,12 +705,12 @@ void GroupSettingsDialog::removeGroups(
 
     chain->start(nx::utils::guarded(chain,
         [chain, callback = std::move(callback), guard = userWatcher->reconnectGuard()](
-            bool success,
-            nx::network::rest::ErrorId errorCode,
+            rest::Status status,
+            nx::network::rest::ErrorId /*errorCode*/,
             const QString& errorString)
         {
-            if (callback && errorCode != nx::network::rest::ErrorId::sessionExpired)
-                callback(success, errorString);
+            if (callback)
+                callback(status, errorString);
             chain->deleteLater();
         }));
 }

@@ -127,15 +127,16 @@ SessionRefreshDialog::SessionRefreshDialog(
     setStandardButtons({QDialogButtonBox::Cancel});
 }
 
-void SessionRefreshDialog::accept()
+void SessionRefreshDialog::done(int result)
 {
-    if (!m_refreshResult.token.empty())
+    if (result == QDialog::Accepted && m_refreshResult.token.empty())
     {
-        base_type::accept();
+        refreshSession();
         return;
     }
 
-    refreshSession();
+    m_refreshResult.userCancelled = (result == QDialog::Rejected) && !m_internalCancellation;
+    base_type::done(result);
 }
 
 void SessionRefreshDialog::refreshSession()
@@ -162,7 +163,7 @@ void SessionRefreshDialog::refreshSession()
                     logonData.storeSession = false;
                     menu()->trigger(menu::ConnectAction,
                         menu::Parameters().withArgument(Qn::LogonDataRole, logonData));
-                    base_type::reject();
+                    rejectAsInternalCancellation();
                 }
                 else if (NX_ASSERT(!session->token.empty()))
                 {
@@ -189,6 +190,19 @@ void SessionRefreshDialog::refreshSession()
             validationResultReady();
         });
 
+    auto loginOrReject =
+        [this, &callback](const auto& loginRequest)
+        {
+            if (auto api = system()->connectedServerApi(); NX_ASSERT(api, "No Server connection"))
+            {
+                api->loginAsync(loginRequest, std::move(callback), thread());
+            }
+            else
+            {
+                rejectAsInternalCancellation();
+            }
+        };
+
     if (system()->user()->isTemporary())
     {
 
@@ -206,10 +220,7 @@ void SessionRefreshDialog::refreshSession()
         m_token = uri.credentials.authToken;
 
         lockUi(true);
-        if (auto api = system()->connectedServerApi(); NX_ASSERT(api, "No Server connection"))
-            api->loginAsync(loginRequest, std::move(callback), thread());
-        else
-            base_type::reject();
+        loginOrReject(loginRequest);
     }
     else
     {
@@ -222,10 +233,8 @@ void SessionRefreshDialog::refreshSession()
 
         if (m_passwordValidationMode)
             validatePassword(loginRequest);
-        else if (auto api = system()->connectedServerApi(); NX_ASSERT(api, "No Server connection"))
-            api->loginAsync(loginRequest, std::move(callback), thread());
         else
-            base_type::reject();
+            loginOrReject(loginRequest);
     }
 }
 
@@ -296,6 +305,12 @@ SessionRefreshDialog::SessionRefreshResult SessionRefreshDialog::refreshResult()
 void SessionRefreshDialog::setPasswordValidationMode(bool value)
 {
     m_passwordValidationMode = value;
+}
+
+void SessionRefreshDialog::rejectAsInternalCancellation()
+{
+    m_internalCancellation = true;
+    base_type::reject();
 }
 
 } // nx::vms::client::desktop

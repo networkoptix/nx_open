@@ -2,6 +2,7 @@
 
 #include "analytics_settings_test_fixture.h"
 
+#include <api/rest_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_settings_response.h>

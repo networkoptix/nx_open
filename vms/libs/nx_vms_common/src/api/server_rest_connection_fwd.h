@@ -15,10 +15,12 @@ namespace nx::network::rest { class UbjsonResult; }
 
 namespace rest {
 
+class Status;
+
 using Handle = int; // TODO: Make dependend on nx::network::http::ClientPool handle type.
 
 template<typename ResultType>
-using Callback = nx::MoveOnlyFunc<void(bool success, Handle requestId, ResultType result)>;
+using Callback = nx::MoveOnlyFunc<void(Status status, Handle requestId, ResultType result)>;
 
 class ServerConnection;
 using ServerConnectionPtr = std::shared_ptr<ServerConnection>;

@@ -25,7 +25,8 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
                 return false;
 
             return OauthLoginDialog::validateToken(
-                parent, OauthLoginDialog::tr("Connect to Site"), credentials);
+                parent, OauthLoginDialog::tr("Connect to Site"), credentials)
+                    .has_value();
         };
 
     const auto askToAcceptCertificates =

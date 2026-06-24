@@ -2,6 +2,7 @@
 
 #include "analytics_settings_manager.h"
 
+#include <api/rest_types.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/analytics/device_agent_active_setting_changed_response.h>

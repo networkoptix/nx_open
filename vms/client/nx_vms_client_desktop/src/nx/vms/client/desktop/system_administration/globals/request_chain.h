@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include <api/rest_types.h>
 #include <nx/network/rest/result.h>
 #include <nx/utils/move_only_func.h>
 
@@ -19,7 +20,7 @@ class RequestChain
 {
 public:
     using ChainCompleteCallback =
-        nx::MoveOnlyFunc<void(bool, nx::network::rest::ErrorId, const QString&)>;
+        nx::MoveOnlyFunc<void(rest::Status, nx::network::rest::ErrorId, const QString&)>;
 
 public:
     virtual ~RequestChain()
@@ -59,22 +60,21 @@ public:
     int nextIndex() const { return m_next; }
 
     void requestComplete(
-        bool success,
+        rest::Status status,
         nx::network::rest::ErrorId errorCode,
         const QString& errorString = {})
     {
-        if (!success)
+        if (!status)
         {
             if (m_chainComplete)
             {
-                m_chainComplete(success, errorCode, errorString);
+                m_chainComplete(status, errorCode, errorString);
                 m_chainComplete = {};
             }
             return;
         }
 
-        if (success)
-            requestNext();
+        requestNext();
     }
 
 protected:

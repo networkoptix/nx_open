@@ -176,10 +176,13 @@ void NotificationActionExecutor::handleAcknowledgeAction()
 
             auto callback =
                 [this, id = notification->id(), camera](
+                    rest::Status status,
                     rest::Handle,
-                    bool success,
                     rest::ErrorOrData<nx::vms::api::BookmarkV3>&& bookmark)
                 {
+                    NX_ASSERT(status.reason() != rest::Reason::cancel, "Insecure operation");
+
+                    const bool success = status;
                     NX_LOG_RESPONSE(this, success, bookmark,
                         "Can't acknowledge action id: %1.", id.toString());
 

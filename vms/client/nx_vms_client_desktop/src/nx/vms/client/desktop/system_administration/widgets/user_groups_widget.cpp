@@ -13,6 +13,7 @@
 
 #include <client/client_globals.h>
 #include <core/resource_access/resource_access_subject_hierarchy.h>
+#include <nx/network/rest/result.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/skin/color_theme.h>
@@ -734,9 +735,10 @@ void UserGroupsWidget::Private::deleteGroups(const QSet<nx::Uuid>& groupsToDelet
 
     GroupSettingsDialog::removeGroups(q->windowContext(), groupsToDelete, nx::utils::guarded(q,
         [this, groupsToDelete, rollback = std::move(rollback)](
-            bool success, const QString& errorString)
+            rest::Status status,
+            const QString& errorString)
         {
-            if (success)
+            if (status || status.reason() == rest::Reason::cancel)
                 return;
 
             QString text;

@@ -71,7 +71,8 @@ OauthLoginDialog::OauthLoginDialog(
     connect(helper, &core::OauthClient::authDataReady, this, &OauthLoginDialog::authDataReady);
     connect(helper, &core::OauthClient::bindToCloudDataReady, this, &OauthLoginDialog::bindToCloudDataReady);
     connect(helper, &core::OauthClient::cloudTokensReady, this, &OauthLoginDialog::cloudTokensReady);
-    connect(helper, &core::OauthClient::cancelled, this, &OauthLoginDialog::reject);
+    connect(helper, &core::OauthClient::cancelled,
+        this, &OauthLoginDialog::rejectAsInternalCancellation);
 }
 
 OauthLoginDialog::~OauthLoginDialog()
@@ -111,37 +112,49 @@ nx::vms::client::core::CloudAuthDataOrError OauthLoginDialog::login(
             [closeCondition = params.closeCondition, dialog = dialog.get()]()
             {
                 if (closeCondition())
-                    dialog->reject();
+                    dialog->rejectAsInternalCancellation();
             });
         timer->start(kCloseCheckIntervalMs);
     }
 
+    auto handleDialogExecResult =
+        [&dialog](int execResult) -> nx::vms::client::core::CloudAuthDataOrError
+        {
+            if (execResult == QDialog::Accepted)
+            {
+                nx::vms::client::core::CloudAuthData authData = dialog->authData();
+                if (authData.empty())
+                {
+                    NX_WARNING(NX_SCOPE_TAG, "Unexpected cloud auth data response");
+                    return std::unexpected{ core::OauthDataRequestError::tokenValidationFailed };
+                }
+                return authData;
+            }
+            return std::unexpected{ dialog->m_rejectionReason };
+        };
+
     if (!ini().modalOAuthDialog)
     {
-        nx::vms::client::core::CloudAuthData authData;
+        int execResult = QDialog::Rejected;
+
         dialog->show();
         QEventLoop loop;
 
         connect(dialog.get(), &QDialog::finished, parent,
             [&](int result)
             {
-                if (result == QDialog::Accepted)
-                    authData = dialog->authData();
+                execResult = result;
                 loop.quit();
             });
         loop.exec();
-        if (authData.empty())
-            return std::unexpected{core::OauthDataRequestError::dialogRejected};
-        return authData;
+
+        return handleDialogExecResult(execResult);
     }
 
-    if (dialog->exec() == QDialog::Accepted)
-        return dialog->authData();
-
-    return std::unexpected{core::OauthDataRequestError::dialogRejected};
+    return handleDialogExecResult(dialog->exec());
 }
 
-bool OauthLoginDialog::validateToken(
+std::expected<void, core::OauthDataRequestError> OauthLoginDialog::validateToken(
     QWidget* parent,
     const QString& title,
     const nx::network::http::Credentials& credentials)
@@ -157,28 +170,31 @@ bool OauthLoginDialog::validateToken(
         dialog.get(),
         &OauthLoginDialog::accept);
 
+    const auto makeResult =
+        [&dialog](int execResult) -> std::expected<void, core::OauthDataRequestError>
+        {
+            if (execResult == QDialog::Accepted)
+                return {};
+            return std::unexpected{dialog->m_rejectionReason};
+        };
+
     if (!ini().modalOAuthDialog)
     {
-        bool success = false;
+        int execResult = QDialog::Rejected;
         dialog->show();
         QEventLoop loop;
 
         connect(dialog.get(), &QDialog::finished, parent,
             [&](int result)
             {
-                success = (result == QDialog::Accepted);
+                execResult = result;
                 loop.quit();
             });
         loop.exec();
-        return success;
+        return makeResult(execResult);
     }
 
-    return (dialog->exec() == QDialog::Accepted);
-}
-
-void OauthLoginDialog::loadPage()
-{
-    d->load(d->oauthClient()->url());
+    return makeResult(dialog->exec());
 }
 
 const nx::vms::client::core::CloudAuthData& OauthLoginDialog::authData() const
@@ -204,6 +220,17 @@ void OauthLoginDialog::setCredentials(const nx::network::http::Credentials& cred
 void OauthLoginDialog::setSystemName(const QString& systenName)
 {
     d->oauthClient()->setSystemName(systenName);
+}
+
+void OauthLoginDialog::loadPage()
+{
+    d->load(d->oauthClient()->url());
+}
+
+void OauthLoginDialog::rejectAsInternalCancellation()
+{
+    m_rejectionReason = core::OauthDataRequestError::internalCancellation;
+    reject();
 }
 
 } // namespace nx::vms::client::desktop

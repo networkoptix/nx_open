@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <expected>
+
 #include <QtCore/QString>
 
 #include <nx/network/http/auth_tools.h>
@@ -14,11 +16,16 @@ namespace nx::vms::common {
 class NX_VMS_COMMON_API AbstractSessionTokenHelper
 {
 public:
+    enum class RefreshError
+    {
+        userCancelled,
+        internalError
+    };
+
+    using RefreshResult = std::expected<nx::network::http::AuthToken, RefreshError>;
+
     virtual ~AbstractSessionTokenHelper() = default;
-
-    /* Return access token. */
-    virtual std::optional<nx::network::http::AuthToken> refreshSession() = 0;
-
+    virtual RefreshResult refreshSession() = 0;
     virtual QString password() const = 0;
 };
 

@@ -200,13 +200,17 @@ void ManualDeviceSearcher::searchForDevices(
         return;
 
     const auto startCallback = nx::utils::guarded(this,
-        [this](bool success,
+        [this](
+            rest::Status status,
             rest::Handle /*handle*/,
             const rest::ErrorOrData<api::DeviceSearch>& result)
         {
+            const bool success = status;
             if (!success || (!result && result.error().errorId != nx::network::rest::ErrorId::ok))
             {
-                setLastErrorText(tr("Can not start the search process"));
+                if (status.reason() != rest::Reason::cancel)
+                    setLastErrorText(tr("Can not start the search process"));
+
                 abort();
             }
             else if (result)

@@ -13,6 +13,37 @@
 
 namespace rest {
 
+enum class Reason
+{
+    ok,
+    fail, //< Real failure (server error, transport error, etc).
+    cancel //< User dismissed the client-side re-auth dialog.
+};
+
+/**
+ * Implicitly convertible to/from bool, which can be treated as an operation success/fail status.
+ * Reason allows distinguishing user cancellation from an unexpected failure.
+ */
+class Status
+{
+public:
+    Status() = default;
+    explicit Status(Reason reason) : m_reason(reason) {}
+    Status(bool success) : m_reason(success ? Reason::ok : Reason::fail) {}
+
+    operator bool() const { return m_reason == Reason::ok; }
+
+    friend bool operator==(const Status& lhs, const Status& rhs)
+    {
+        return lhs.m_reason == rhs.m_reason;
+    }
+
+    Reason reason() const { return m_reason; }
+
+private:
+    Reason m_reason = Reason::fail;
+};
+
 struct EmptyResponseType {};
 
 template<typename Data>

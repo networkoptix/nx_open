@@ -47,6 +47,13 @@ ActionTypeInfo info(FreshSessionTokenHelper::ActionType actionType)
     return {core::OauthClientType::undefined};
 }
 
+common::AbstractSessionTokenHelper::RefreshError convertError(core::OauthDataRequestError error)
+{
+    return error == core::OauthDataRequestError::dialogRejected
+        ? common::AbstractSessionTokenHelper::RefreshError::userCancelled
+        : common::AbstractSessionTokenHelper::RefreshError::internalError;
+}
+
 } // namespace.
 
 FreshSessionTokenHelper::FreshSessionTokenHelper(
@@ -81,22 +88,21 @@ void FreshSessionTokenHelper::setFlags(SessionRefreshFlags flags)
     m_flags = flags;
 }
 
-std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSession()
+FreshSessionTokenHelper::RefreshResult FreshSessionTokenHelper::refreshSession()
 {
-    m_password = {};
+    m_password.clear();
 
     if (!NX_ASSERT(QThread::currentThread() == qApp->thread()))
-        return {};
+        return std::unexpected(RefreshError::internalError);
 
     if (!m_parent)
-        return {};
+        return std::unexpected(RefreshError::internalError);
 
-    nx::network::http::AuthToken token;
     // TODO: #amalov Make FreshSessionTokenHelper windows context aware.
     const auto windowContext = appContext()->mainWindowContext();
     const auto connection = windowContext->system()->connection();
     if (!connection)
-        return {};
+        return std::unexpected(RefreshError::internalError);
 
     if (connection->userType() == nx::vms::api::UserType::cloud)
     {
@@ -111,13 +117,15 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
         if (!cloudAuthData)
         {
             NX_WARNING(this, "Cloud login failed due to %1", cloudAuthData.error());
-            return {};
+            return std::unexpected(convertError(cloudAuthData.error()));
         }
 
-        if (cloudAuthData->needValidateToken && !OauthLoginDialog::validateToken(
-                m_parent, m_title, cloudAuthData->credentials))
+        if (cloudAuthData->needValidateToken)
         {
-            return {};
+            const auto validation = OauthLoginDialog::validateToken(
+                m_parent, m_title, cloudAuthData->credentials);
+            if (!validation)
+                return std::unexpected(convertError(validation.error()));
         }
 
         cloudAuthData->credentials.username = qnCloudStatusWatcher->credentials().username;
@@ -126,31 +134,37 @@ std::optional<nx::network::http::AuthToken> FreshSessionTokenHelper::refreshSess
 
         windowContext->connectActionsHandler()->updateCloudSessionToken();
 
-        token = cloudAuthData->credentials.authToken;
+        const auto token = cloudAuthData->credentials.authToken;
+        if (token.empty())
+            return std::unexpected(RefreshError::internalError);
+
+        NX_ASSERT(token.isBearerToken());
+        return token;
     }
-    else
+
+    const auto result = SessionRefreshDialog::refreshSession(
+        m_parent,
+        m_title,
+        m_mainText,
+        /*infoText*/ QString(),
+        m_actionText,
+        info(m_actionType).isImportant,
+        /*passwordValidationMode*/ false,
+        Qt::WindowStaysOnTopHint
+    );
+
+    if (result.token.empty())
     {
-        const auto result = SessionRefreshDialog::refreshSession(
-            m_parent,
-            m_title,
-            m_mainText,
-            /*infoText*/ QString(),
-            m_actionText,
-            info(m_actionType).isImportant,
-            /*passwordValidationMode*/ false,
-            Qt::WindowStaysOnTopHint
-        );
-
-        token = result.token;
-        if (!token.empty())
-            m_password = result.password;
+        // Empty token is not a reliable cancel signal: internal failures (e.g. missing
+        // server API) auto-reject the dialog too.
+        return std::unexpected(result.userCancelled
+            ? RefreshError::userCancelled
+            : RefreshError::internalError);
     }
-    NX_ASSERT(token.empty() || token.isBearerToken());
 
-    if (token.empty())
-        return {};
-
-    return token;
+    m_password = result.password;
+    NX_ASSERT(result.token.isBearerToken());
+    return result.token;
 }
 
 core::CloudAuthDataOrError
@@ -182,10 +196,12 @@ core::CloudAuthDataOrError
     if (!cloudAuthData)
         NX_WARNING(this, "Cloud login failed due to %1", cloudAuthData.error());
 
-    if (cloudAuthData && cloudAuthData->needValidateToken
-        && !OauthLoginDialog::validateToken(m_parent, m_title, cloudAuthData->credentials))
+    if (cloudAuthData && cloudAuthData->needValidateToken)
     {
-        return std::unexpected{core::OauthDataRequestError::tokenValidationFailed};
+        const auto validation = OauthLoginDialog::validateToken(
+            m_parent, m_title, cloudAuthData->credentials);
+        if (!validation)
+            return std::unexpected{validation.error()};
     }
 
     return cloudAuthData;

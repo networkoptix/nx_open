@@ -25,6 +25,9 @@ public:
         nx::network::http::AuthToken token;
         std::chrono::microseconds tokenExpirationTime{};
         QString password;
+
+        // True if the user explicitly dismissed the dialog.
+        bool userCancelled = false;
     };
 
 public:
@@ -52,7 +55,7 @@ public:
     /** Validate user password instead of token request. Default is false. */
     void setPasswordValidationMode(bool value);
 
-    virtual void accept() override;
+    virtual void done(int result) override;
 
 signals:
     void sessionTokenReady();
@@ -64,6 +67,8 @@ private:
     void refreshSession();
     void validatePassword(const nx::vms::api::LoginSessionRequest& loginRequest);
 
+    void rejectAsInternalCancellation();
+
 private:
     InputField* m_passwordField = nullptr;
     InputField* m_linkField = nullptr;
@@ -74,6 +79,7 @@ private:
     ValidationResult m_validationResult = ValidationResult{QValidator::Intermediate};
     nx::network::SocketAddress m_address;
     nx::network::http::AuthToken m_token;
+    bool m_internalCancellation = false;
 };
 
 } // nx::vms::client::desktop

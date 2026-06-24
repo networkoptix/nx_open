@@ -686,20 +686,28 @@ bool LicenseManagerWidget::activateLicense()
 
     auto callback = nx::utils::guarded(this,
         [this, body](
-            bool success,
+            rest::Status status,
             rest::Handle requestId,
             rest::ServerConnection::ErrorOrEmpty result)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
+
+            const bool success = status;
             m_currentRequest = 0;
 
-            NX_VERBOSE(this, "Received response from license server. License key: %1",
-                body.key);
+            NX_VERBOSE(this, "Received response from license server. License key: %1", body.key);
+
             if (!success)
             {
+                if (status.reason() == rest::Reason::cancel)
+                {
+                    ui->licenseWidget->setState(QnLicenseWidget::Normal);
+                    return;
+                }
+
                 if (!result)
                 {
-                    auto res = result.error();
+                    const auto res = result.error();
                     if (res.errorId == nx::network::rest::ErrorId::serviceUnavailable)
                     {
                         NX_VERBOSE(this, "Network error occurred activating license key.");

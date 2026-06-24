@@ -9,7 +9,7 @@
 
 namespace nx::vms::common {
 
-nx::coro::Task<std::optional<nx::network::http::AuthToken>> RequestRerunner::getNewToken(
+nx::coro::Task<RequestRerunner::RefreshResult> RequestRerunner::getNewToken(
     nx::vms::common::SessionTokenHelperPtr helper)
 {
     NX_ASSERT(QThread::currentThread() == qApp->thread());
@@ -21,8 +21,7 @@ nx::coro::Task<std::optional<nx::network::http::AuthToken>> RequestRerunner::get
             qApp,
             [this, helper]()
             {
-                const auto token = helper->refreshSession();
-                rerunRequests(token);
+                rerunRequests(helper->refreshSession());
             },
             Qt::QueuedConnection);
     }

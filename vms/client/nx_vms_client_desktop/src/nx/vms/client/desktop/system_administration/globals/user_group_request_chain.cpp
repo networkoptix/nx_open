@@ -308,9 +308,12 @@ void UserGroupRequestChain::Private::runRequests(
 {
     if (!q->connectedServerApi())
     {
-        // Use SessionExpired to suppress showing error message box - this is the same error as if
-        // user cancels session refresh dialog.
-        q->requestComplete(/*success*/ false, nx::network::rest::ErrorId::sessionExpired, {});
+        // Report a cancel so consumers suppress the error message box - treat a missing
+        // connection the same as if the user cancelled the session refresh dialog.
+        q->requestComplete(
+            rest::Status(rest::Reason::cancel),
+            nx::network::rest::ErrorId::sessionExpired,
+            {});
         return;
     }
 
@@ -320,8 +323,11 @@ void UserGroupRequestChain::Private::runRequests(
         nx::utils::guarded(
             q,
             [this, onSuccess = std::move(onSuccess)](
-                bool success, rest::Handle handle, const std::vector<api::JsonRpcResponse>& result)
+                rest::Status status,
+                rest::Handle handle,
+                const std::vector<api::JsonRpcResponse>& result)
             {
+                bool success = status;
                 if (NX_ASSERT(handle == currentRequest))
                     currentRequest = 0;
 
@@ -371,7 +377,11 @@ void UserGroupRequestChain::Private::runRequests(
                 }
                 else
                 {
-                    if (!result.empty() && result.front().error)
+                    if (status.reason() == rest::Reason::cancel)
+                    {
+                        errorCode = nx::network::rest::ErrorId::sessionExpired;
+                    }
+                    else if (!result.empty() && result.front().error)
                     {
                         std::tie(errorCode, errorString) = extractError(*result.front().error);
                     }
@@ -382,7 +392,7 @@ void UserGroupRequestChain::Private::runRequests(
                     }
                 }
 
-                q->requestComplete(success, errorCode, errorString);
+                q->requestComplete(status, errorCode, errorString);
             }),
         q->thread());
 }

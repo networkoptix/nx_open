@@ -304,8 +304,12 @@ public:
         return m_token;
     }
 
+    bool isUserCancelled() const { return m_userCancelled; }
+    void setUserCancelled() { m_userCancelled = true; }
+
 private:
     std::optional<nx::network::http::AuthToken> m_token; //< Token which was used for this request.
+    bool m_userCancelled = false; //< User dismissed the client-side re-auth dialog.
 };
 
 using RequestCallback =
@@ -415,11 +419,16 @@ public:
             {
                 if (!callback)
                     return;
+
                 const auto context = static_cast<ResultContext<T>*>(resultContext.get());
+
+                const rest::Status status = context->isUserCancelled()
+                    ? rest::Status(rest::Reason::cancel)
+                    : rest::Status(context->isSuccess());
 
                 if (context->result)
                 {
-                    callback(context->success, handle, std::move(*(context->result)));
+                    callback(status, handle, std::move(*(context->result)));
                     return;
                 }
 
@@ -427,14 +436,14 @@ public:
                 if constexpr (canHoldRestResult<T>::value)
                 {
                     callback(
-                        context->success,
+                        status,
                         handle,
                         std::unexpected(
                             nx::network::rest::Result::cantProcessRequest("Unknown error")));
                 }
                 else
                 {
-                    callback(context->success, handle, T());
+                    callback(status, handle, T());
                 }
             };
     }

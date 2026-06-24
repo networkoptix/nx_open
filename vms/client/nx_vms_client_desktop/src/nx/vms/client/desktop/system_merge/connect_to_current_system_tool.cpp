@@ -259,16 +259,17 @@ void ConnectToCurrentSystemTool::systemFound(
         tr("Merge", "Merge Server to the current Site (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
-    auto ownerSessionToken = sessionTokenHelper->refreshSession();
-    if (!ownerSessionToken)
+    const auto refreshSessionResult = sessionTokenHelper->refreshSession();
+    if (!refreshSessionResult.has_value())
     {
         cancel();
         return;
     }
 
+    const auto& token = refreshSessionResult.value();
     m_mergeTool->mergeSystem(
         m_mergeContextId,
-        ownerSessionToken->value,
+        token.value,
         /*ownSettings*/ true,
         /*oneServer*/ true,
         /*ignoreIncompatible*/ true);

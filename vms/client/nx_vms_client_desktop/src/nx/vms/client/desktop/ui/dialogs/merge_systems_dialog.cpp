@@ -338,8 +338,8 @@ void MergeSystemsDialog::at_mergeButton_clicked()
         tr("Merge", "Merge two Sites together (dialog button text)"),
         FreshSessionTokenHelper::ActionType::merge);
 
-    const auto ownerSessionToken = sessionTokenHelper->refreshSession();
-    if (!ownerSessionToken)
+    const auto refreshSessionResult = sessionTokenHelper->refreshSession();
+    if (!refreshSessionResult.has_value())
         return;
 
     setConfigurationAllowed(false);
@@ -348,7 +348,8 @@ void MergeSystemsDialog::at_mergeButton_clicked()
     if (!ownSettings)
         workbenchContext()->instance<ContextCurrentUserWatcher>()->setReconnectOnPasswordChange(false);
 
-    if (m_mergeTool->mergeSystem(m_mergeContextId, ownerSessionToken->value, ownSettings))
+    const auto& token = refreshSessionResult.value();
+    if (m_mergeTool->mergeSystem(m_mergeContextId, token.value, ownSettings))
         ui->buttonBox->showProgress(tr("Merging Sites..."));
 }
 
