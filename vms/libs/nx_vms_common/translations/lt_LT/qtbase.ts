@@ -1108,7 +1108,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation type="unfinished">Configuration</translation>
+      <translation>Konfigūracija</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
