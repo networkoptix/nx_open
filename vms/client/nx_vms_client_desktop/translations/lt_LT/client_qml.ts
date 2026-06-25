@@ -1597,7 +1597,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
     <message>
       <source>Separator:</source>
@@ -1849,7 +1849,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -2370,7 +2370,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameros ir įrenginiai</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -2429,7 +2429,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameros ir įrenginiai</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -2479,7 +2479,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Events</source>
@@ -2635,7 +2635,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>

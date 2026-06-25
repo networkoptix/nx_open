@@ -1708,27 +1708,27 @@
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>Habilitar RTSP para Arecont.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>Habilitar el buscador secuencial ONVIF de Flir.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo de la cola P2P (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo de todos los clientes P2P (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
+      <translation>Tamaño máximo de la cola de registros (bytes, 6-96 Mb).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
+      <translation>Tamaño máximo de la cola de registros (elementos, 250-4000).</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
@@ -1736,27 +1736,27 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>Duración máxima de la conexión RTSP (segundos).</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>Habilitar la perforación de agujeros UDP en la conexión a la nube.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>Habilitar el uso de relés conectados a la nube.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
+      <translation>Implementar SSL para los relés de conexión a la nube.</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation type="unfinished">Enable recording on EDGE.</translation>
+      <translation>Habilitar la grabación en EDGE.</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation type="unfinished">Enable WebSocket for P2P.</translation>
+      <translation>Habilitar WebSocket para P2P.</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>

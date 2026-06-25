@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Kameros ID</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -1067,7 +1067,7 @@
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
   </context>
   <context>
@@ -1194,7 +1194,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
   </context>
   <context>
@@ -1254,7 +1254,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
     <message>
       <source>Clear</source>
@@ -1282,7 +1282,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Apkirpimo ir monitoriaus kraštinių santykis</translation>
     </message>
   </context>
   <context>
@@ -1369,7 +1369,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
     <message>
       <source>Language</source>
@@ -2004,7 +2004,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Naršyti...</translation>
     </message>
     <message>
       <source>Source</source>
