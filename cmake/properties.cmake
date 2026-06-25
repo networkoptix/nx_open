@@ -104,6 +104,7 @@ set(translations
     it_IT
     ja_JP
     ko_KR
+    lt_LT
     tr_TR
     zh_CN
     zh_TW
