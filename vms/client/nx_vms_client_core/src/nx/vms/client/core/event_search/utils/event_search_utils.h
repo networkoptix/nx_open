@@ -38,11 +38,13 @@ public:
 
     Q_INVOKABLE QString timestampText(
         qint64 timestampMs,
-        nx::vms::client::core::SystemContext* context) const;
+        nx::vms::client::core::SystemContext* context,
+        bool alwaysShowDate = false) const;
 
     static QString timestampText(
         const std::chrono::milliseconds& timestampMs,
-        SystemContext* context);
+        SystemContext* context,
+        bool alwaysShowDate = false);
 
     static QString timeFromNowText(
         const std::chrono::microseconds& timestampMs,

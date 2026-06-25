@@ -265,7 +265,8 @@ Rectangle
             ? 1.0
             : 0.0
 
-        text: EventSearchUtils.timestampText(slider.value, windowContext.mainSystemContext)
+        text: EventSearchUtils.timestampText(
+            slider.value, windowContext.mainSystemContext, /*alwaysShowDate*/ true)
     }
 
     component ControlButton: Button

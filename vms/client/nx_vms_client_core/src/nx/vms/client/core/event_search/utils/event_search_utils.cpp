@@ -78,9 +78,10 @@ FetchRequest EventSearchUtils::fetchRequest(
 
 QString EventSearchUtils::timestampText(
     qint64 timestampMs,
-    SystemContext* context) const
+    SystemContext* context,
+    bool alwaysShowDate) const
 {
-    return timestampText(std::chrono::milliseconds(timestampMs), context);
+    return timestampText(std::chrono::milliseconds(timestampMs), context, alwaysShowDate);
 }
 
 QString EventSearchUtils::timeFromNowText(
@@ -107,7 +108,8 @@ QString EventSearchUtils::timeFromNowText(
 
 QString EventSearchUtils::timestampText(
     const std::chrono::milliseconds& timestampMs,
-    SystemContext* context)
+    SystemContext* context,
+    bool alwaysShowDate)
 {
     using namespace std::chrono;
     if (timestampMs <= 0ms || !NX_ASSERT(context))
@@ -116,7 +118,7 @@ QString EventSearchUtils::timestampText(
     const QDateTime dateTime = context->serverTimeWatcher()->displayTime(timestampMs.count());
 
     // For current day just display the time in system format.
-    if (qnSyncTime->currentDateTime().date() == dateTime.date())
+    if (!alwaysShowDate && qnSyncTime->currentDateTime().date() == dateTime.date())
         return nx::vms::time::toString(dateTime.time());
 
     // Display both date and time for all other days.

@@ -163,7 +163,9 @@ Control
                 text:
                 {
                     return EventSearchUtils.timestampText(
-                        control.timestampMs, windowContext.mainSystemContext)
+                        control.timestampMs,
+                        windowContext.mainSystemContext,
+                        /*alwaysShowDate*/ true)
                 }
             }
         }
