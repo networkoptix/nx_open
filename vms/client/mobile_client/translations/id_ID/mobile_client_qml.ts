@@ -288,12 +288,12 @@
       <translation>Preview</translation>
     </message>
     <message>
-      <source>Search by attribute</source>
-      <translation>Cari berdasarkan atribut</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Cancel</translation>
+    </message>
+    <message>
+      <source>Search by %1</source>
+      <translation type="unfinished">Search by %1</translation>
     </message>
   </context>
   <context>

@@ -573,7 +573,7 @@
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Kameros nustatymai...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
@@ -2142,7 +2142,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameros</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -2450,7 +2450,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Device IP</source>
@@ -2752,7 +2752,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Dabartinis slaptažodis</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -3178,7 +3178,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -3970,7 +3970,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>%1 TB</source>
@@ -4100,7 +4100,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Created</source>
@@ -4356,7 +4356,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -4990,7 +4990,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6933,7 +6933,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameros</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -7796,7 +7796,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
@@ -8179,7 +8179,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect</source>
       <comment>Connect current Site to cloud</comment>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
   </context>
   <context>
@@ -8219,7 +8219,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8584,7 +8584,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Events</source>
@@ -10586,7 +10586,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Consumption</source>
@@ -10856,7 +10856,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Patvirtinti</translation>
     </message>
   </context>
   <context>
@@ -11730,7 +11730,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -12686,7 +12686,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Object Type</source>
@@ -12709,7 +12709,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -12746,7 +12746,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameros ir įrenginiai</translation>
     </message>
     <message>
       <source>Layouts</source>

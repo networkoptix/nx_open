@@ -121,7 +121,7 @@
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -258,11 +258,11 @@
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -288,12 +288,12 @@
       <translation type="unfinished">Preview</translation>
     </message>
     <message>
-      <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Atšaukti</translation>
+    </message>
+    <message>
+      <source>Search by %1</source>
+      <translation type="unfinished">Search by %1</translation>
     </message>
   </context>
   <context>
@@ -358,7 +358,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
   </context>
   <context>
@@ -405,7 +405,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -691,7 +691,7 @@
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
   </context>
   <context>
@@ -774,7 +774,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1259,7 +1259,7 @@
     </message>
     <message>
       <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
+      <translation>Žymė sukurta</translation>
     </message>
     <message>
       <source>Cannot share bookmark</source>
@@ -1353,7 +1353,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Enter server address</source>
@@ -1595,11 +1595,11 @@
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kameros nustatymai</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Žymės</translation>
     </message>
     <message>
       <source>Objects</source>

@@ -288,12 +288,12 @@
       <translation>Przegląd</translation>
     </message>
     <message>
-      <source>Search by attribute</source>
-      <translation>Szukaj według atrybutu</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Search by %1</source>
+      <translation type="unfinished">Search by %1</translation>
     </message>
   </context>
   <context>

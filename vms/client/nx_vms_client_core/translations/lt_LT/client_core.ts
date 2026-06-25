@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Lietuvių</translation>
     </message>
   </context>
   <context>
@@ -510,7 +510,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
   </context>
   <context>

@@ -98,7 +98,7 @@
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameros ir įrenginiai</translation>
     </message>
   </context>
   <context>

@@ -288,12 +288,12 @@
       <translation>Voorbeeld</translation>
     </message>
     <message>
-      <source>Search by attribute</source>
-      <translation type="unfinished">Search by attribute</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>Search by %1</source>
+      <translation type="unfinished">Search by %1</translation>
     </message>
   </context>
   <context>
