@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>Tiltas</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
@@ -1730,7 +1730,7 @@
     </message>
     <message>
       <source>Cloud owner account.</source>
-      <translation type="unfinished">Cloud owner account.</translation>
+      <translation>Debesijos savininko paskyra.</translation>
     </message>
     <message>
       <source>Organization Id.</source>
