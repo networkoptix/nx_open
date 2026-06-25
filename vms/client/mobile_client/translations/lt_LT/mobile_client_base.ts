@@ -80,7 +80,7 @@
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>Expires in %1</source>
@@ -112,7 +112,7 @@
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Kameros ir įrenginiai</translation>
     </message>
     <message>
       <source>All Devices</source>
