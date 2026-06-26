@@ -1335,8 +1335,18 @@ nx::vms::api::StreamDataFilters QnArchiveStreamReader::streamDataFilter() const
 
 void QnArchiveStreamReader::setStorageLocationFilter(nx::vms::api::StorageLocation filter)
 {
+    const bool filterChanged = m_prevStorageLocationFilter != filter;
+    m_prevStorageLocationFilter = filter;
+
     if (m_delegate)
         m_delegate->setStorageLocationFilter(filter);
+
+    // The stream is read ahead, so data from the previously selected storage may already be
+    // buffered and would keep playing until it drains. On an actual filter change re-seek
+    // to the current position to discard that buffer and re-read the stream under the new filter.
+    const qint64 position = currentTime().count();
+    if (filterChanged && !isRealTimeSource() && position > 0)
+        jumpTo(position, position);
 }
 
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
