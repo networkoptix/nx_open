@@ -709,6 +709,10 @@ Rectangle
                 anchors.rightMargin: shift
                 anchors.verticalCenter: timeMarker.verticalCenter
 
+                // Shift the rect to avoid extending down out of `content`.
+                anchors.verticalCenterOffset:
+                    -Math.max(0, timeMarker.y + height * 0.5 - content.height)
+
                 width: timeMarker.markerWidth - recordingChunks.width
 
                 height: timeMarker.isOutside
@@ -719,10 +723,12 @@ Rectangle
                 color: ColorTheme.colors.mobileTimeline.timeMarker.background
 
                 readonly property bool mirrored: timeline.LayoutMirroring.enabled
+                readonly property real bottomRadius: MathUtils.bound(0, y + height, 6)
+
                 topLeftRadius: mirrored ? 0 : 6
                 topRightRadius: mirrored ? 6 : 0
-                bottomLeftRadius: (mirrored || timeMarker.isOutside) ? 0 : 6
-                bottomRightRadius: (mirrored && !timeMarker.isOutside) ? 6 : 0
+                bottomLeftRadius: (mirrored || timeMarker.isOutside) ? 0 : bottomRadius
+                bottomRightRadius: (mirrored && !timeMarker.isOutside) ? bottomRadius : 0
 
                 // Scrolls to the time marker when tapped.
                 TapHandler
