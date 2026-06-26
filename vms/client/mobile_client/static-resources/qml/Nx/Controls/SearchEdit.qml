@@ -38,6 +38,24 @@ Item
 
     signal accepted()
 
+    // The native "Hide keyboard" key dismisses the panel without dropping the QML focus, so while
+    // the field keeps active focus Qt re-raises the keyboard and it flashes back open. Releasing
+    // focus once the panel reports hidden breaks that cycle. Scoped to iOS.
+    Connections
+    {
+        target: Qt.platform.os === "ios" ? Qt.inputMethod : null
+
+        function onVisibleChanged()
+        {
+            if (!Qt.inputMethod.visible
+                && textField.activeFocus
+                && Qt.application.state === Qt.ApplicationActive)
+            {
+                textField.focus = false
+            }
+        }
+    }
+
     ColoredImage
     {
         id: searchIcon
@@ -68,6 +86,11 @@ Item
 
         onAccepted:
         {
+            // Dismiss the keyboard by dropping active focus: per QInputMethod::hide() docs the
+            // iOS keyboard closes when the editor loses focus, while Qt.inputMethod.hide() can be
+            // silently ignored once the focus object no longer matches. hide() is kept as the
+            // dismissal path for other platforms.
+            control.resetFocus()
             Qt.inputMethod.hide()
             control.accepted()
         }
