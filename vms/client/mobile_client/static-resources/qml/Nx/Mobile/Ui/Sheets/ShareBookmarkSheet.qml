@@ -24,7 +24,7 @@ AdaptiveSheet
         ? qsTr("New Bookmark")
         : qsTr("Sharing")
 
-    function showSheet()
+    onAboutToShow:
     {
         d.updating = true
         d.hasChanges = false
@@ -69,8 +69,6 @@ AdaptiveSheet
         enableSharingToggle.animationDuration = animationDuration
 
         d.updating = false
-
-        open()
     }
 
     IconButton

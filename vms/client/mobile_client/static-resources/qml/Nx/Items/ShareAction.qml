@@ -11,9 +11,12 @@ import nx.vms.client.mobile
 
 Action
 {
+    id: action
+
     readonly property bool shared: backend.isShared && !analyticsMode
-    property alias analyticsMode: shareBookmarkSheet.isAnalyticsItemMode
+    property bool analyticsMode: false
     property alias objectData: backend.objectData
+    readonly property alias backend: backend
 
     text: shared ? qsTr("Shared") : qsTr("Share")
 
@@ -33,7 +36,7 @@ Action
         if (appContext.settings.showHowShareWorksNotification && analyticsMode)
             howItWorksSheet.open()
         else
-            shareBookmarkSheet.showSheet()
+            shareBookmarkSheet.open()
     }
 
     readonly property NxObject d: NxObject
@@ -46,28 +49,35 @@ Action
             onSharingFailed: Workflow.showBanner(qsTr("Cannot share bookmark"), Banner.Error)
         }
 
-        ShareBookmarkSheet
+        SheetLoader
         {
             id: shareBookmarkSheet
 
-            backend: backend
+            ShareBookmarkSheet
+            {
+                backend: action.backend
+                isAnalyticsItemMode: action.analyticsMode
 
-            onShowHowItWorks: howItWorksSheet.open()
+                onShowHowItWorks: howItWorksSheet.open()
+            }
         }
 
-        HowItWorksSheet
+        SheetLoader
         {
             id: howItWorksSheet
 
-            description: qsTr("Sharing opens the new bookmark dialog to generate a playback link" +
-                " after setting the sharing options")
-
-            doNotShowAgain: !appContext.settings.showHowShareWorksNotification
-
-            onContinued:
+            HowItWorksSheet
             {
-                appContext.settings.showHowShareWorksNotification = !doNotShowAgain
-                shareBookmarkSheet.showSheet()
+                description: qsTr("Sharing opens the new bookmark dialog to generate a playback"
+                    + " link after setting the sharing options")
+
+                doNotShowAgain: !appContext.settings.showHowShareWorksNotification
+
+                onContinued:
+                {
+                    appContext.settings.showHowShareWorksNotification = !doNotShowAgain
+                    shareBookmarkSheet.showSheet()
+                }
             }
         }
     }

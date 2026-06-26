@@ -5,6 +5,7 @@ import QtQuick.Controls
 
 import Nx.Controls
 import Nx.Core
+import Nx.Mobile.Controls
 import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
@@ -36,13 +37,16 @@ Action
 
     property NxObject d: NxObject
     {
-        DownloadMediaDurationSheet
+        SheetLoader
         {
             id: downloadMediaSheet
 
-            onDurationPicked: (duration) =>
+            DownloadMediaDurationSheet
             {
-                mediaDownloadBackend.downloadVideo(control.positionMs, duration)
+                onDurationPicked: (duration) =>
+                {
+                    mediaDownloadBackend.downloadVideo(control.positionMs, duration)
+                }
             }
         }
 

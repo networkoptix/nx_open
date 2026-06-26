@@ -17,6 +17,7 @@ PasswordInput 1.0 PasswordInput.qml
 RadioButton 1.0 RadioButton.qml
 RadioButtonIndicator 1.0 RadioButtonIndicator.qml
 Sheet 1.0 Sheet.qml
+SheetLoader 1.0 SheetLoader.qml
 SwipeControl 1.0 SwipeControl.qml
 SwitchSelector 1.0 SwitchSelector.qml
 TagView 1.0 TagView.qml
