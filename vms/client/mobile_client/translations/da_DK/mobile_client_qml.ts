@@ -293,7 +293,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Søg efter %1</translation>
     </message>
   </context>
   <context>

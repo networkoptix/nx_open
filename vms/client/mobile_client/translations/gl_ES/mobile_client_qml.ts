@@ -293,7 +293,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Buscar por %1</translation>
     </message>
   </context>
   <context>
@@ -1641,7 +1641,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Volver á pantalla de benvida</translation>
     </message>
   </context>
 </TS>
