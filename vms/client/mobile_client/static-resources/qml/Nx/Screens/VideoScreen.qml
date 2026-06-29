@@ -919,6 +919,10 @@ Page
 
             property var data: null //< Store a copy of the value to keep its data in memory.
 
+            height: LayoutController.isPortrait
+                ? Math.min(implicitHeight, navigator.height)
+                : parent.height //< Overlay height.
+
             objectsType: timeline.objectsType
             dateFormatter: ((timestampMs) => timeline.labelFormatter.objectTimestamp(
                 timestampMs, timeline.timeZone))
