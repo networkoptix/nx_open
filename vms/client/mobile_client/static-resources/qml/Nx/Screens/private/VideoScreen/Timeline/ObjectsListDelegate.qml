@@ -195,8 +195,8 @@ Item
                 id: singlePreview
 
                 anchors.fill: preview
-                visible: !delegate.isStack
-                requestLine: delegate.isStack ? "" : (modelData?.imagePaths?.[0] ?? "")
+                visible: modelData?.count === 1
+                requestLine: (modelData?.count === 1) ? (modelData?.imagePaths?.[0] ?? "") : ""
 
                 frameColor: "transparent"
                 backgroundColor: ColorTheme.colors.mobileTimeline.tile.preview.noDataBackground
@@ -208,10 +208,10 @@ Item
                 id: multiPreview
 
                 anchors.fill: preview
-                visible: delegate.isStack
+                visible: modelData?.count > 1
 
                 maxCountToDisplay: objectsList.maxObjectsPerBucket
-                totalCount: delegate.isStack ? modelData.count : 0
+                totalCount: (modelData?.count > 1) ? modelData.count : 0
                 paths: modelData?.imagePaths ?? []
             }
         }
