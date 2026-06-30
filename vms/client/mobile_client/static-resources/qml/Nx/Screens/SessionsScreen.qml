@@ -556,17 +556,6 @@ AdaptiveScreen
                     && cloudUserProfileWatcher.isOrgUser
                     && (organizationsModel.hasChannelPartners || organizationsModel.hasOrganizations)
 
-                readonly property var selectedTab:
-                {
-                    if (partnersTabButton.checked)
-                        return OrganizationsModel.ChannelPartnersTab
-
-                    if (organizationsTabButton.checked)
-                        return OrganizationsModel.OrganizationsTab
-
-                    return OrganizationsModel.SitesTab
-                }
-
                 Row
                 {
                     id: systemTabsRow
@@ -607,7 +596,7 @@ AdaptiveScreen
                     }
                 }
 
-                function updateCheckedState()
+                function updateSelectedTab()
                 {
                     if (organizationsModel.topLevelLoading)
                         return
@@ -650,15 +639,15 @@ AdaptiveScreen
                 Connections
                 {
                     target: organizationsModel
-                    function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
-                    function onHasChannelPartnersChanged() { systemTabs.updateCheckedState() }
-                    function onHasOrganizationsChanged() { systemTabs.updateCheckedState() }
+                    function onTopLevelLoadingChanged() { systemTabs.updateSelectedTab() }
+                    function onHasChannelPartnersChanged() { systemTabs.updateSelectedTab() }
+                    function onHasOrganizationsChanged() { systemTabs.updateSelectedTab() }
                 }
 
                 Connections
                 {
                     target: cloudUserProfileWatcher
-                    function onIsOrgUserChanged() { systemTabs.updateCheckedState() }
+                    function onIsOrgUserChanged() { systemTabs.updateSelectedTab() }
                 }
 
                 Connections
@@ -674,7 +663,7 @@ AdaptiveScreen
                 Connections
                 {
                     target: sessionsScreen
-                    function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                    function onRootTypeChanged() { systemTabs.updateSelectedTab() }
                 }
             }
 
@@ -773,7 +762,7 @@ AdaptiveScreen
                             }
                         }
                         if ((sessionsScreen.state === "loggedIn"
-                                && organizationsTabButton.checked
+                                && sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
                                 && cloudUserProfileWatcher.isOrgUser)
                             || (sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
                                 && rootType == OrganizationsModel.ChannelPartner))
@@ -940,8 +929,10 @@ AdaptiveScreen
     Component.onCompleted:
     {
         resetSearch()
-        if (appGlobalState.lastSelectedOrgTab !== -1)
-            sessionsScreen.selectedTab = appGlobalState.lastSelectedOrgTab
+        // Restore the last user-selected tab after the screen is recreated (e.g. on disconnect).
+        // updateSelectedTab() validates that the saved tab is still available and falls back
+        // otherwise; it also covers the case where the model is already loaded and emits no signal.
+        systemTabs.updateSelectedTab()
     }
 
     Connections
