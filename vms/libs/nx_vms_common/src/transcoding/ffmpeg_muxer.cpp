@@ -246,8 +246,18 @@ bool FfmpegMuxer::muxPacket(QnConstAbstractMediaDataPtr media)
         return true;
     }
 
-    if (m_videoStreamFilter && media->dataType == QnAbstractMediaData::VIDEO)
-        media = std::dynamic_pointer_cast<const QnAbstractMediaData>(m_videoStreamFilter->processData(media));
+    if (!m_videoStreamFilters.empty() && media->dataType == QnAbstractMediaData::VIDEO)
+    {
+        for (const auto& filter: m_videoStreamFilters)
+        {
+            media = std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(media));
+            if (!media)
+            {
+                NX_WARNING(this, "Muxing packet error: Failed to proces filters: %1", media);
+                return false;
+            }
+        }
+    }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
     constexpr AVRational srcRate = {1, 1'000'000};
@@ -324,7 +334,7 @@ AVCodecParameters* FfmpegMuxer::getAudioCodecParameters() const
     return m_audioCodecParameters;
 }
 
-void FfmpegMuxer::setVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter)
+void FfmpegMuxer::addVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter)
 {
-    m_videoStreamFilter = std::move(filter);
+    m_videoStreamFilters.push_back(std::move(filter));
 }

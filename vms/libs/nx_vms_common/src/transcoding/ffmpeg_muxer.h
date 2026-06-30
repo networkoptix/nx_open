@@ -3,6 +3,7 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QtCore/QQueue>
 
@@ -82,7 +83,7 @@ public:
     void setStartTimeOffset(int64_t value);
     const Config& config() const { return m_config; }
 
-    void setVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter);
+    void addVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter);
 
 private:
     void closeFfmpegContext();
@@ -110,5 +111,5 @@ private:
     PacketTimestamp m_lastPacketTimestamp;
     int m_rtpMtu = MTU_SIZE;
     std::optional<int64_t> m_firstVideoTimestamp;
-    std::unique_ptr<AbstractMediaDataFilter> m_videoStreamFilter;
+    std::vector<std::unique_ptr<AbstractMediaDataFilter>> m_videoStreamFilters;
 };

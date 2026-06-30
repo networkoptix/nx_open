@@ -15,11 +15,6 @@ constexpr int kNalReservedSpace = 16;
 
 namespace nx::media::h264 {
 
-NALUnitType decodeType(uint8_t data)
-{
-    return (NALUnitType)(data & 0x1f);
-}
-
 bool isSliceNal(uint8_t nalUnitType)
 {
     return nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
@@ -49,12 +44,12 @@ bool isIFrame(const uint8_t* data, int dataLen)
     if (dataLen < 2)
         return false;
 
-    const auto nalType = decodeType(*data);
-    bool isSlice = isSliceNal(nalType);
+    const auto unitType = nalType(*data);
+    bool isSlice = isSliceNal(unitType);
     if (!isSlice)
         return false;
 
-    if (nalType == nuSliceIDR)
+    if (unitType == nuSliceIDR)
         return true;
 
     nx::utils::BitStreamReader bitReader;
@@ -83,11 +78,11 @@ int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
 
     //NX_ASSERT((*buffer & 0x80) == 0);
     if ((*buffer & 0x80) != 0) {
-        NX_DEBUG(this, "Invalid forbidden_zero_bit for nal unit %1", decodeType(*buffer));
+        NX_DEBUG(this, "Invalid forbidden_zero_bit for nal unit %1", nalType(*buffer));
     }
 
     nal_ref_idc   = (*buffer >> 5) & 0x3;
-    nal_unit_type = decodeType(*buffer);
+    nal_unit_type = nalType(*buffer);
     return 0;
 }
 

@@ -85,7 +85,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(
         if (data >= end)
             break;
 
-        const auto nalType = nx::media::h264::decodeType(*data);
+        const auto nalType = nx::media::h264::nalType(*data);
         if (nalType >= nx::media::h264::nuSliceNonIDR && nalType <= nx::media::h264::nuSliceIDR)
         {
             if (nalType == nx::media::h264::nuSliceIDR)
