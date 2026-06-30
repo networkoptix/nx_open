@@ -8,16 +8,19 @@
 
 namespace nx::network::url {
 
-std::uint16_t getDefaultPortForScheme(const std::string_view& scheme)
+std::optional<std::uint16_t> getDefaultPortForScheme(std::string_view scheme)
 {
-    if (nx::utils::stricmp(scheme, nx::network::http::kUrlSchemeName) == 0)
-        return 80;
-    else if (nx::utils::stricmp(scheme, nx::network::http::kSecureUrlSchemeName) == 0)
-        return 443;
-    else if (nx::utils::stricmp(scheme, nx::network::rtsp::kUrlSchemeName) == 0)
-        return 554;
+    static const std::map<std::string_view, std::uint16_t, nx::utils::ci_less> kDefaultPorts = {
+        {nx::network::http::kUrlSchemeName, nx::network::http::DEFAULT_HTTP_PORT},
+        {nx::network::http::kSecureUrlSchemeName, nx::network::http::DEFAULT_HTTPS_PORT},
 
-    return 0;
+        {nx::network::rtsp::kUrlSchemeName, nx::network::rtsp::DEFAULT_RTSP_PORT},
+        {nx::network::rtsp::kSecureUrlSchemeName, nx::network::rtsp::DEFAULT_RTSPS_PORT},
+    };
+
+    if (const auto it = kDefaultPorts.find(scheme); it != kDefaultPorts.end())
+        return it->second;
+    return std::nullopt;
 }
 
 SocketAddress getEndpoint(const nx::Url& url, int defaultPort)
@@ -29,7 +32,7 @@ SocketAddress getEndpoint(const nx::Url& url, int defaultPort)
 
 SocketAddress getEndpoint(const nx::Url& url)
 {
-    return getEndpoint(url, getDefaultPortForScheme(url.scheme().toStdString()));
+    return getEndpoint(url, getDefaultPortForScheme(url.scheme().toStdString()).value_or(0));
 }
 
 std::string normalizePath(const std::string_view& path)
