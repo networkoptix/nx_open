@@ -17,6 +17,7 @@ import Nx.Models
 
 import nx.vms.client.core
 import nx.vms.client.mobile
+import nx.vms.client.mobile.timeline
 
 import "private"
 import "private/items"
@@ -654,10 +655,12 @@ AdaptiveScreen
                 const objectData = ObjectDataAdapter.create(modelIndex)
 
                 detailsLoader.setSource(
-                    Qt.resolvedUrl("private/DetailsScreen.qml"),
+                    Qt.resolvedUrl("../private/DetailsScreen.qml"),
                     {
                         "uuid": NxGlobals.modelData(modelIndex, "uuid"),
-                        "isAnalyticsDetails": screenController.analyticsSearchMode,
+                        "objectsType": screenController.analyticsSearchMode
+                            ? ObjectsLoader.ObjectsType.analytics
+                            : ObjectsLoader.ObjectsType.bookmarks,
                         "camerasModel": screen.camerasModel,
                         "objectData": objectData,
                         "hasNext": Qt.binding(() => view.currentIndex > 0),

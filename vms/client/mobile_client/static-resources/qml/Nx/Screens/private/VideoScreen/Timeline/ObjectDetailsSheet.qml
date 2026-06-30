@@ -3,11 +3,13 @@
 import QtQuick
 import QtQuick.Controls
 
+import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.Items
 import Nx.Items
 import Nx.Mobile.Controls
+import Nx.Ui
 
 import nx.vms.client.core
 import nx.vms.client.mobile
@@ -79,6 +81,27 @@ BaseAdaptiveSheet
                     }
 
                     fallbackImageIfError: true
+
+                    TapHandler
+                    {
+                        onTapped:
+                        {
+                            stateController.state = "Expanded"
+
+                            detailsLoader.setSource(Qt.resolvedUrl("../../DetailsScreen.qml"),
+                            {
+                                "objectsType": sheet.objectsType,
+                                "objectData": Qt.binding(() => sheet.model[sheet.currentIndex]),
+                                "resource": Qt.binding(() =>
+                                    sheet.model[sheet.currentIndex]?.resource ?? null),
+                                "withShowOnCamera": false,
+                                "hasNext": Qt.binding(() => sheet.currentIndex + 1 < sheet.count),
+                                "hasPrevious": Qt.binding(() => sheet.currentIndex > 0),
+                                "toolBar.visible": true,
+                                "rightControl": [closeDetailsButton]
+                            })
+                        }
+                    }
                 }
 
                 Column
@@ -254,9 +277,128 @@ BaseAdaptiveSheet
             swipeView.setCurrentIndex(index)
     }
 
+    Loader
+    {
+        id: detailsLoader
+
+        parent: sheet.contentItem
+        anchors.fill: parent
+        opacity: 0
+        z: 100
+
+        Behavior on opacity { NumberAnimation { duration: 150 }}
+
+        onOpacityChanged:
+        {
+            if (opacity == 0.0) //< Empty itself after a fade-out.
+                source = ""
+        }
+
+        Connections
+        {
+            target: detailsLoader.item
+            ignoreUnknownSignals: true
+
+            function onLeftButtonClicked()
+            {
+                stateController.state = ""
+            }
+
+            function onPreviousClicked()
+            {
+                if (swipeView.currentIndex > 0)
+                    swipeView.setCurrentIndex(swipeView.currentIndex - 1)
+            }
+
+            function onNextClicked()
+            {
+                const nextIndex = swipeView.currentIndex + 1
+                if (nextIndex < swipeView.count)
+                    swipeView.setCurrentIndex(nextIndex)
+            }
+        }
+
+        IconButton
+        {
+            id: closeDetailsButton
+
+            compact: true
+            visible: false
+
+            icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
+            icon.width: 24
+            icon.height: 24
+
+            onClicked:
+                detailsLoader.item.leftButtonClicked()
+        }
+
+        states: [
+            State //< To adjust the toolbar in landscape orientation.
+            {
+                name: "Landscape"
+                when: detailsLoader.status === Loader.Ready && !LayoutController.isPortrait
+
+                PropertyChanges
+                {
+                    target: detailsLoader.item
+
+                    title: qsTr("Details")
+                    leftButtonIcon.source: ""
+                    leftButtonEnabled: false
+                }
+
+                PropertyChanges
+                {
+                    closeDetailsButton.visible: true
+                }
+            }
+        ]
+    }
+
+    StateGroup
+    {
+        id: stateController
+
+        states: 
+        [
+            State
+            {
+                name: "Expanded"
+
+                PropertyChanges
+                {
+                    sheet.topPadding: 0
+                    sheet.bottomPadding: 0
+                    sheet.height: sheet.parent.height - sheet.parent.SafeArea.margins.top
+                    detailsLoader.opacity: 1
+                }
+            }
+        ]
+
+        transitions: 
+        [
+            Transition
+            {
+                NumberAnimation
+                {
+                    property: "height"
+                    duration: 200
+                    easing.type: Easing.InOutQuad
+                }
+            }
+        ]
+    }
+
     onModelChanged:
     {
         repeater.model = sheet.model ?? []
         swipeView.setCurrentIndex(swipeView.count ? 0 : -1)
+    }
+
+    onClosed:
+    {
+        stateController.state = ""
+        detailsLoader.source = ""
     }
 }

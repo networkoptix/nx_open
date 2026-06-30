@@ -61,6 +61,8 @@ Item
     readonly property bool audioSupported: loader.item && loader.item.content.audioSupported
 
     property var color: ColorTheme.colors.dark5
+    property alias preloaderColor: preloader.color
+    property alias preloaderDotRadius: preloader.dotRadius
 
     readonly property bool isReady: loader.previewState === EventSearch.PreviewState.ready
 
@@ -239,15 +241,20 @@ Item
 
     NxDotPreloader
     {
+        id: preloader
+
         color: ColorTheme.colors.brand_contrast
         anchors.centerIn: parent
+
+        spacing: Math.abs(dotRadius * 1.333)
+
         visible:
         {
             if (!hasPreloader || cannotDecryptMedia)
                 return false
 
-           if (loader.item && loader.item.content.mediaPlayer.loading)
-               return true;
+            if (loader.item && loader.item.content.mediaPlayer.loading)
+                return true
 
             return !control.isReady
         }

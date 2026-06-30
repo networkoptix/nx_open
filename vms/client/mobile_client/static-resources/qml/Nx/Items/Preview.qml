@@ -23,6 +23,7 @@ Rectangle
 
     property bool activePage: false
     property bool withNavigationControls: true
+    property bool withShowOnCamera: true
     property alias hasPrevious: previousButton.enabled
     property alias hasNext: nextButton.enabled
 
@@ -34,10 +35,10 @@ Rectangle
     enum DataState { Available, Checking, NoData }
     property int dataState: Preview.DataState.Available
 
-    signal showFullscreen
-    signal previous
-    signal next
-    signal showOnCamera
+    signal showFullscreen()
+    signal previous()
+    signal next()
+    signal showOnCamera()
 
     function heightForWidth(h)
     {
@@ -81,6 +82,8 @@ Rectangle
         audioEnabled: audioController.audioEnabled
         scalable: true
         hasPreloader: true
+        preloaderColor: ColorTheme.colors.light10
+        preloaderDotRadius: 6
         aspectRatio: 0 //< No forced aspect ratio.
         active: true
         autoplay: false
@@ -392,6 +395,8 @@ Rectangle
     {
         id: showOnCameraButton
 
+        opacity: (d.hasControls && root.withShowOnCamera) ? 1 : 0
+        enabled: opacity > 0
         icon.source: "image://skin/24x24/Outline/show_on_layout.svg"
 
         onClicked: root.showOnCamera()

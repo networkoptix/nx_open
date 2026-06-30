@@ -22,7 +22,7 @@ import Nx.Ui
 import nx.vms.client.core
 import nx.vms.client.mobile.timeline as Timeline
 
-import "items"
+import "DetailsScreen"
 
 Page
 {
@@ -31,7 +31,7 @@ Page
     objectName: "eventDetailsScreen"
 
     property var uuid
-    property bool isAnalyticsDetails: true
+    property int objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
     property QnCameraListModel camerasModel: null
     required property Timeline.AbstractObjectData objectData
     required property Resource resource
@@ -39,8 +39,12 @@ Page
     readonly property Menu menu: menu.available ? menu : null
     property alias hasNext: preview.hasNext
     property alias hasPrevious: preview.hasPrevious
+    property alias withShowOnCamera: preview.withShowOnCamera
 
-    signal fullscreenButtonClicked
+    property bool showPreviewImage: !LayoutController.isTabletLayout
+        && objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+
+    signal fullscreenButtonClicked()
     signal searchRequested(string text)
     signal nextClicked()
     signal previousClicked()
@@ -230,9 +234,11 @@ Page
 
             readonly property real kAspectRatio: 9.0 / 16.0
 
-            visible: !LayoutController.isTabletLayout
-            requestLine:
-                (!LayoutController.isTabletLayout && objectData) ? objectData.imagePath : ""
+            visible: eventDetailsScreen.showPreviewImage
+
+            requestLine: eventDetailsScreen.showPreviewImage && objectData
+                ? objectData.imagePath
+                : ""
 
             Layout.fillWidth: true
             Layout.preferredHeight: width * kAspectRatio
@@ -329,9 +335,10 @@ Page
 
             preview.interval.resource = eventDetailsScreen.resource
 
-            const paddingTimeMs = eventDetailsScreen.isAnalyticsDetails
-                ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
-                : 0
+            const paddingTimeMs =
+                eventDetailsScreen.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+                    ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
+                    : 0
             preview.interval.startTimeMs =
                 objectData.startTimeMs - paddingTimeMs
             preview.interval.durationMs =
@@ -348,9 +355,7 @@ Page
                 undefined,
                 preview.interval.startTimeMs,
                 camerasModel,
-                eventDetailsScreen.isAnalyticsDetails
-                    ? Timeline.ObjectsLoader.ObjectsType.analytics
-                    : Timeline.ObjectsLoader.ObjectsType.bookmarks,
+                eventDetailsScreen.objectsType,
                 /*isAuxiliary*/ true)
         }
     }
@@ -386,7 +391,8 @@ Page
                 icon.width: 20
                 icon.height: 20
                 objectData: eventDetailsScreen.objectData
-                analyticsMode: eventDetailsScreen.isAnalyticsDetails
+                analyticsMode:
+                    eventDetailsScreen.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
             }
         }
     }
