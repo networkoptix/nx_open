@@ -77,6 +77,9 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(
     connect(m_store, &TimeSynchronizationWidgetStore::stateChanged, this,
         &TimeSynchronizationWidget::loadState);
 
+    connect(systemSettings(), &nx::vms::common::SystemSettings::timeSynchronizationSettingsChanged,
+        this, &TimeSynchronizationWidget::loadDataToUi);
+
     connect(ui->syncWithInternetCheckBox, &QCheckBox::clicked, m_store,
         &TimeSynchronizationWidgetStore::setSyncTimeWithInternet);
 
@@ -222,7 +225,8 @@ void TimeSynchronizationWidget::applyChanges()
     editableSystemSettings->timeSynchronizationEnabled = state.enabled;
     editableSystemSettings->primaryTimeServer = state.primaryServer;
 
-    m_store->applyChanges();
+    // The "has changes" flag is intentionally not cleared here. On a successful save the system
+    // settings change and the timeSynchronizationSettingsChanged subscription reloads the page.
 }
 
 bool TimeSynchronizationWidget::hasChanges() const

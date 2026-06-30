@@ -44,7 +44,6 @@ public:
     void setServerOnline(const nx::Uuid& id, bool isOnline);
     void setServerHasInternet(const nx::Uuid& id, bool hasInternet);
 
-    void applyChanges();
     void setReadOnly(bool value);
     void setSyncTimeWithInternet(bool value);
     void disableSync();

@@ -75,11 +75,6 @@ void TimeSynchronizationWidgetStore::setServerHasInternet(const nx::Uuid& id, bo
     });
 }
 
-void TimeSynchronizationWidgetStore::applyChanges()
-{
-    d->executeAction([](State state) { return Reducer::applyChanges(std::move(state)); });
-}
-
 void TimeSynchronizationWidgetStore::setReadOnly(bool value)
 {
     d->executeAction([&](State state) { return Reducer::setReadOnly(std::move(state), value); });
