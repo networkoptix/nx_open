@@ -173,6 +173,9 @@ Controls.ApplicationWindow
         id: appGlobalState
 
         property var lastOpenedNodeId: NxGlobals.uuid("")
+
+        // Persists across SessionsScreen recreations (screen is destroyed on session connect).
+        property int lastSelectedOrgTab: -1
     }
 
     SsoLogoutController {}

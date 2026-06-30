@@ -40,9 +40,12 @@ Page
                 goBack()
         }
 
+    // Shared state for the selected tab; drives the tab buttons and the site list.
+    property int selectedTab: OrganizationsModel.SitesTab
+
     readonly property bool searching: !!siteList.searchText
     readonly property bool localSitesVisible: state !== "inPartnerOrOrg"
-        && (sitesTabButton.checked || !cloudUserProfileWatcher.isOrgUser)
+        && (selectedTab === OrganizationsModel.SitesTab || !cloudUserProfileWatcher.isOrgUser)
 
     StackView.onActivated: forceActiveFocus()
 
@@ -337,36 +340,19 @@ Page
                 && (organizationsModel.hasChannelPartners
                     || organizationsModel.hasOrganizations)
 
-            readonly property var selectedTab:
-            {
-                if (tabGroup.checkedButton === partnersTabButton)
-                    return OrganizationsModel.ChannelPartnersTab
-                if (tabGroup.checkedButton === organizationsTabButton)
-                    return OrganizationsModel.OrganizationsTab
-                if (tabGroup.checkedButton === sitesTabButton)
-                    return OrganizationsModel.SitesTab
-
-                return OrganizationsModel.SitesTab
-            }
-
-            ButtonGroup
-            {
-                id: tabGroup
-                buttons: systemTabsRow.children
-            }
-
             component TabButton: AbstractButton
             {
                 id: tabButton
 
+                property bool highlighted: false
+
                 height: 40
                 width: tabText.width + 16 * 2
-                checkable: true
                 focusPolicy: Qt.StrongFocus
 
                 background: Rectangle
                 {
-                    color: tabButton.checked ? ColorTheme.colors.dark10 : "transparent"
+                    color: tabButton.highlighted ? ColorTheme.colors.dark10 : "transparent"
                     radius: 8
                 }
 
@@ -374,7 +360,7 @@ Page
                 {
                     id: tabText
                     text: tabButton.text
-                    color: tabButton.checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10
+                    color: tabButton.highlighted ? ColorTheme.colors.light4 : ColorTheme.colors.light10
                     font.pixelSize: 14
                     anchors.centerIn: parent
                 }
@@ -394,6 +380,8 @@ Page
                     id: partnersTabButton
                     text: qsTr("Partners")
                     visible: organizationsModel.hasChannelPartners
+                    highlighted: sessionsScreen.selectedTab === OrganizationsModel.ChannelPartnersTab
+                    onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                 }
 
                 TabButton
@@ -401,77 +389,88 @@ Page
                     id: organizationsTabButton
                     text: qsTr("Organizations")
                     visible: organizationsModel.hasOrganizations
+                    highlighted: sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
+                    onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
                 }
 
                 TabButton
                 {
                     id: sitesTabButton
                     text: qsTr("Sites")
+                    highlighted: sessionsScreen.selectedTab === OrganizationsModel.SitesTab
+                    onClicked: sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
                 }
             }
 
-            function updateCheckedState(force)
+            function updateSelectedTab()
             {
-                if (organizationsModel.topLevelLoading && !force)
+                if (organizationsModel.topLevelLoading)
                     return
 
-                if (!systemTabs.visible && !force)
+                // Restore the tab the user explicitly selected last, if it is still available.
+                const savedTab = appGlobalState.lastSelectedOrgTab
+                if (savedTab !== -1)
                 {
-                    // If no tabs are going to be visible, select the Sites tab.
-                    if (!organizationsModel.hasChannelPartners
-                        && !organizationsModel.hasOrganizations)
-                    {
-                        sitesTabButton.checked = true
-                    }
-                    return
-                }
+                    const savedAvailable =
+                        (savedTab === OrganizationsModel.ChannelPartnersTab
+                            && organizationsModel.hasChannelPartners)
+                        || (savedTab === OrganizationsModel.OrganizationsTab
+                            && organizationsModel.hasOrganizations)
+                        || (savedTab === OrganizationsModel.SitesTab)
 
-                // Avoid switching tabs when selected tab is already visible.
-                if (tabGroup.checkedButton?.visible && !force)
-                    return
+                    if (savedAvailable)
+                    {
+                        sessionsScreen.selectedTab = savedTab
+                        return
+                    }
+                }
 
                 // Select appropriate tab based on the current state.
                 if (cloudUserProfileWatcher.isOrgUser)
                 {
                     if (organizationsModel.hasChannelPartners)
                     {
-                        partnersTabButton.checked = true
+                        sessionsScreen.selectedTab = OrganizationsModel.ChannelPartnersTab
                         return
                     }
                     if (organizationsModel.hasOrganizations)
                     {
-                        organizationsTabButton.checked = true
+                        sessionsScreen.selectedTab = OrganizationsModel.OrganizationsTab
                         return
                     }
                 }
 
-                sitesTabButton.checked = true
+                sessionsScreen.selectedTab = OrganizationsModel.SitesTab
             }
 
             Connections
             {
                 target: organizationsModel
-                function onTopLevelLoadingChanged() { systemTabs.updateCheckedState() }
-                function onHasChannelPartnersChanged()
-                {
-                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasChannelPartners)
-                }
-                function onHasOrganizationsChanged()
-                {
-                    systemTabs.updateCheckedState(/*force*/ organizationsModel.hasOrganizations)
-                }
+                function onTopLevelLoadingChanged() { systemTabs.updateSelectedTab() }
+                function onHasChannelPartnersChanged() { systemTabs.updateSelectedTab() }
+                function onHasOrganizationsChanged() { systemTabs.updateSelectedTab() }
             }
 
             Connections
             {
                 target: cloudUserProfileWatcher
-                function onIsOrgUserChanged() { systemTabs.updateCheckedState(/*force*/ true) }
+                function onIsOrgUserChanged() { systemTabs.updateSelectedTab() }
+            }
+
+            Connections
+            {
+                target: appContext.cloudStatusWatcher
+                function onStatusChanged()
+                {
+                    if (appContext.cloudStatusWatcher.status === CloudStatusWatcher.LoggedOut)
+                        appGlobalState.lastSelectedOrgTab = -1
+                }
             }
 
             Connections
             {
                 target: sessionsScreen
-                function onRootTypeChanged() { systemTabs.updateCheckedState() }
+                function onRootTypeChanged() { systemTabs.updateSelectedTab() }
             }
         }
 
@@ -494,7 +493,7 @@ Page
             visible: !loadingIndicator.visible
             siteModel: linearizationListModel
             hideOrgSystemsFromSites: cloudUserProfileWatcher.isOrgUser
-            currentTab: systemTabs.selectedTab
+            currentTab: sessionsScreen.selectedTab
             showOnly:
             {
                 if (!systemTabsRow.visible)
@@ -554,7 +553,7 @@ Page
                     }
                 }
                 if ((sessionsScreen.state === "loggedIn"
-                        && organizationsTabButton.checked
+                        && sessionsScreen.selectedTab === OrganizationsModel.OrganizationsTab
                         && cloudUserProfileWatcher.isOrgUser)
                     || (sessionsScreen.state === "inPartnerOrOrg"
                         && rootType == OrganizationsModel.ChannelPartner))
@@ -739,6 +738,9 @@ Page
     Component.onCompleted:
     {
         resetSearch()
+        // Restore the last user-selected tab after the screen is recreated (e.g. on disconnect),
+        // covering the case where the organizations model is already loaded and emits no signal.
+        systemTabs.updateSelectedTab()
     }
 
     Connections
@@ -891,11 +893,11 @@ Page
             if (newIndex.row === -1)
             {
                 if (sessionsScreen.rootType === OrganizationsModel.ChannelPartner)
-                    partnersTabButton.checked = true
+                    sessionsScreen.selectTabByUser(OrganizationsModel.ChannelPartnersTab)
                 else if (sessionsScreen.rootType === OrganizationsModel.Organization)
-                    organizationsTabButton.checked = true
+                    sessionsScreen.selectTabByUser(OrganizationsModel.OrganizationsTab)
                 else
-                    sitesTabButton.checked = true
+                    sessionsScreen.selectTabByUser(OrganizationsModel.SitesTab)
 
                 sessionsScreen.rootIndex = newIndex
                 sessionsScreen.rootType = accessor.getData(newIndex, "type")
@@ -946,6 +948,12 @@ Page
     {
         searchField.clear()
         siteList.positionViewAtBeginning()
+    }
+
+    function selectTabByUser(tab)
+    {
+        selectedTab = tab
+        appGlobalState.lastSelectedOrgTab = tab
     }
 
     function openSystem(current)
