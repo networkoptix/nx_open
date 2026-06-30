@@ -89,7 +89,8 @@ bool isUrlScheme(const S& s)
     return isUrlScheme(s.toStdString());
 }
 
-const int DEFAULT_RTSP_PORT = 554;
+constexpr int DEFAULT_RTSP_PORT = 554;
+constexpr int DEFAULT_RTSPS_PORT = 322;
 
 static const nx::network::http::MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };
 static constexpr std::string_view kUpdateHeader{"need-update"};
