@@ -94,7 +94,6 @@ struct MultiObjectData
     qint64 positionMs{};
     qint64 durationMs{};
     int count{};
-    QnTimePeriodList objectChunks;
     QList<std::shared_ptr<AbstractObjectData>> perObjectData;
 
     QList<AbstractObjectData*> getPerObjectData() const;

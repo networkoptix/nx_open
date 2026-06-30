@@ -20,6 +20,7 @@
 #include <nx/vms/client/core/timeline/backends/analytics_backend.h>
 #include <nx/vms/client/core/timeline/backends/bookmarks_backend.h>
 #include <nx/vms/client/core/timeline/backends/caching_proxy_backend.h>
+#include <nx/vms/client/core/timeline/backends/custom_chunk_accumulator.h>
 #include <recording/time_period.h>
 
 #include "bookmark_content_watcher.h"
@@ -112,7 +113,7 @@ struct ObjectsLoader::Private
     using BucketList = std::deque<InternalBucket>;
     BucketList cache;
 
-    QnTimePeriodList objectChunks;
+    const std::shared_ptr<CustomChunkAccumulator> bookmarkChunks;
 
     bool batchUpdating = false;
     milliseconds bucketSizeBeforeUpdate{};
@@ -128,12 +129,16 @@ struct ObjectsLoader::Private
     Private(ObjectsLoader* q):
         q(q),
         loadOp([this]() { loadData(); }, 200ms),
-        updateOp([this]() { internalUpdate(); }, 1ms)
+        updateOp([this]() { internalUpdate(); }, 1ms),
+        bookmarkChunks{std::make_shared<CustomChunkAccumulator>()}
     {
         loadOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
         pollingTimer.callOnTimeout(q, [this]() { requestLoad(); });
         pollingTimer.start(1s);
+
+        connect(bookmarkChunks.get(), &CustomChunkAccumulator::updated,
+            q, &ObjectsLoader::bookmarkChunksChanged);
     }
 
     int maximumCacheSize() const
@@ -155,12 +160,6 @@ struct ObjectsLoader::Private
 
         if (hadVisibleBuckets)
             emit q->bucketsReset();
-
-        if (!objectChunks.empty())
-        {
-            objectChunks = {};
-            emit q->objectChunksChanged();
-        }
 
         if (topBound != liveTime)
         {
@@ -286,12 +285,6 @@ struct ObjectsLoader::Private
             || ((expandedWindow.endTime() - cacheWindow.startTime()) / bucketSize) > maxCacheSize
             || ((cacheWindow.endTime() - expandedWindow.startTime()) / bucketSize) > maxCacheSize)
         {
-            if (!objectChunks.empty())
-            {
-                objectChunks.clear();
-                emit q->objectChunksChanged();
-            }
-
             cache.clear();
 
             std::generate_n(std::back_inserter(cache), loadedBucketCount,
@@ -396,12 +389,6 @@ struct ObjectsLoader::Private
             }
         }
 
-        const auto oldSize = objectChunks.size();
-        objectChunks = objectChunks.intersected(cacheWindow);
-
-        if (oldSize != objectChunks.size())
-            emit q->objectChunksChanged();
-
         updateTopBound();
         requestLoad();
     }
@@ -491,36 +478,12 @@ struct ObjectsLoader::Private
 
         bucketIt->expiration.setRemainingTime(expirationTime, Qt::VeryCoarseTimer);
 
-        updateObjectChunks(QnTimePeriod{bucketIt->startTimeMs, q->bucketSizeMs()},
-            bucketIt->getData().objectChunks);
-
         const int index = std::distance(cache.begin(), bucketIt) - firstVisibleBucket;
         if (index >= 0 && index < visibleBucketCount)
             emit q->bucketChanged(index);
 
         if (bucketIt->startTimeMs == (internalTopBound - bucketSize).count())
             updateTopBound();
-    }
-
-    void updateObjectChunks(const QnTimePeriod& bucketPeriod, const QnTimePeriodList& chunks)
-    {
-        if (objectChunks.empty() && chunks.empty())
-            return;
-
-        const bool wasEmpty = objectChunks.empty();
-        objectChunks.excludeTimePeriod(bucketPeriod);
-
-        if (!chunks.empty())
-        {
-            const auto insertTo = std::upper_bound(objectChunks.begin(), objectChunks.end(),
-                bucketPeriod.startTimeMs);
-
-            const auto simplified = chunks.simplified();
-            objectChunks.insert(insertTo, simplified.cbegin(), simplified.cend());
-        }
-
-        if (!wasEmpty || !objectChunks.empty())
-            emit q->objectChunksChanged();
     }
 
     static auto findBucket(auto&& sortedBuckets, qint64 startTimeMs)
@@ -585,6 +548,7 @@ struct ObjectsLoader::Private
 
             case ObjectsType::bookmarks:
                 contentWatcher.reset(new BookmarkContentWatcher(chunkProvider));
+                contentWatcher->setForced(!bookmarkChunks->empty());
                 break;
 
             case ObjectsType::analytics:
@@ -599,8 +563,12 @@ struct ObjectsLoader::Private
         connect(contentWatcher.get(), &AbstractContentWatcher::hasContentChanged,
             q, &ObjectsLoader::hasContentChanged);
 
-        connect(q, &ObjectsLoader::objectChunksChanged, contentWatcher.get(),
-            [this]() { contentWatcher->setForced(!objectChunks.empty()); });
+        connect(bookmarkChunks.get(), &CustomChunkAccumulator::updated, contentWatcher.get(),
+            [this]()
+            {
+                if (objectsType == ObjectsType::bookmarks)
+                    contentWatcher->setForced(!bookmarkChunks->empty());
+            });
     }
 
     void setBottomBound(std::optional<milliseconds> value)
@@ -654,7 +622,7 @@ struct ObjectsLoader::Private
 
         const auto cachingBackend = std::make_shared<CachingProxyBackend<QnCameraBookmarkList>>(
             std::make_shared<AggregatingProxyBackend<QnCameraBookmarkList>>(
-                std::make_shared<BookmarksBackend>(chunkProvider->resource())));
+                std::make_shared<BookmarksBackend>(chunkProvider->resource(), bookmarkChunks)));
 
         // Bookmarks can be modified in the past, therefore the cache blocks are always expirable.
         cachingBackend->setAgeThreshold(std::nullopt);
@@ -717,6 +685,7 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
     d->chunkProvider = value;
     d->analyticsBackend.reset();
     d->bookmarksBackend.reset();
+    d->bookmarkChunks->clear();
     d->initializeLoaderDelegate();
     d->initializeContentWatcher();
     emit chunkProviderChanged();
@@ -734,6 +703,7 @@ void ObjectsLoader::setChunkProvider(core::ChunkProvider* value)
             d->clear();
             d->analyticsBackend.reset();
             d->bookmarksBackend.reset();
+            d->bookmarkChunks->clear();
             d->initializeLoaderDelegate();
             d->handleWindowChanged();
         });
@@ -1002,17 +972,17 @@ void ObjectsLoader::setMinimumStackDurationMs(qint64 value)
     setMinimumStackDuration(milliseconds(value));
 }
 
-QnTimePeriodList ObjectsLoader::objectChunks() const
+QnTimePeriodList ObjectsLoader::bookmarkChunks() const
 {
-    return d->objectChunks;
+    return d->bookmarkChunks->chunks();
 }
 
 QVariant ObjectsLoader::hasContent() const
 {
     // There can be a situation when we loaded some new bookmarks, but `contentWatcher` hasn't
     // updated yet. To avoid reporting no content at the same time when some content is shown,
-    // we also check for `objectChunks` here.
-    if (!d->objectChunks.empty())
+    // we also check for `bookmarkChunks` here.
+    if (d->objectsType == ObjectsType::bookmarks && !d->bookmarkChunks->empty())
         return true;
 
     const auto result = d->contentWatcher ? d->contentWatcher->hasContent() : std::nullopt;

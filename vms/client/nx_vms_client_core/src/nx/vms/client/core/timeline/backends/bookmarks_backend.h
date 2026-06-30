@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
@@ -17,10 +19,14 @@ struct DataListTraits<QnCameraBookmarkList>
     static std::chrono::milliseconds timestamp(const auto& item) { return item.startTimeMs; }
 };
 
+class CustomChunkAccumulator;
+
 class NX_VMS_CLIENT_CORE_API BookmarksBackend: public AbstractBackend<QnCameraBookmarkList>
 {
 public:
-    explicit BookmarksBackend(const QnResourcePtr& resource);
+    explicit BookmarksBackend(const QnResourcePtr& resource,
+        const std::shared_ptr<CustomChunkAccumulator>& chunksReceiver);
+
     virtual ~BookmarksBackend() override;
 
     virtual QnResourcePtr resource() const override;

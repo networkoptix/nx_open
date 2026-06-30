@@ -73,8 +73,8 @@ class ObjectsLoader: public QObject
         WRITE setMinimumStackDurationMs NOTIFY minimumStackDurationChanged)
     Q_PROPERTY(QVariant hasContent READ hasContent NOTIFY hasContentChanged)
 
-    // Virtual "output" chunks.
-    Q_PROPERTY(QnTimePeriodList objectChunks READ objectChunks NOTIFY objectChunksChanged)
+    // Virtual bookmark chunks built up from loaded bookmarks.
+    Q_PROPERTY(QnTimePeriodList bookmarkChunks READ bookmarkChunks NOTIFY bookmarkChunksChanged)
 
 public:
     enum class ObjectsType
@@ -197,12 +197,12 @@ public:
     void setMinimumStackDurationMs(qint64 value);
 
     /**
-     * Virtual chunks constructed from the loaded objects in *visible buckets* for those
-     * object types that don't have native chunks (currently that is only bookmarks).
-     * If a bucket has more objects than `maxObjectsPerBucket`, then the whole bucket time period
-     * is included, otherwise all particular object time periods are included.
+     * Virtual chunks constructed from loaded bookmarks.
+     * If a loaded bucket has more bookmarks than `maxObjectsPerBucket`, then the time period
+     * covered by the loaded bookmarks is updated, and the rest of the bucket's time period
+     * keeps old chunks (or stays empty).
      */
-    QnTimePeriodList objectChunks() const;
+    QnTimePeriodList bookmarkChunks() const;
 
     /**
      * Whether a content exist for the selected objects type.
@@ -240,7 +240,7 @@ signals:
     void maxObjectsPerBucketChanged();
     void expirationTimeChanged();
     void minimumStackDurationChanged();
-    void objectChunksChanged();
+    void bookmarkChunksChanged();
     void hasContentChanged();
 
     /**

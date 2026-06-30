@@ -543,7 +543,7 @@ Rectangle
                         return objectsChunkProvider.chunks
 
                     case Timeline.ObjectsLoader.ObjectsType.bookmarks:
-                        return objects.objectChunks
+                        return objects.bookmarkChunks
                 }
 
                 console.assert(false, `Unknown objectsType (${timeline.objectsType})`)

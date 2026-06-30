@@ -41,7 +41,7 @@ Item
 
     property alias maxObjectsPerBucket: loader.maxObjectsPerBucket
 
-    readonly property alias objectChunks: loader.objectChunks
+    readonly property alias bookmarkChunks: loader.bookmarkChunks
     readonly property alias hasContent: loader.hasContent
 
     property Component delegate: Component { ObjectsListDelegate {} }

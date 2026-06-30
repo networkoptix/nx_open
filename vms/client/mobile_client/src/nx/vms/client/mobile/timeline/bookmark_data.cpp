@@ -87,20 +87,6 @@ MultiObjectData BookmarkData::merge(
     int limit,
     const QnResourcePtr& resource)
 {
-    QnTimePeriodList chunks;
-    if ((int) bookmarks.size() > limit)
-    {
-        // If there are more than `limit` bookmarks, make one chunk covering the entire bucket.
-        chunks.push_back(period);
-    }
-    else
-    {
-        chunks.reserve(bookmarks.size());
-
-        for (auto it = bookmarks.rbegin(); it != bookmarks.rend(); ++it)
-            chunks.push_back(QnTimePeriod(it->startTimeMs, it->durationMs).intersected(period));
-    }
-
     const int count = (int) bookmarks.size();
     if (count == 1)
     {
@@ -117,7 +103,6 @@ MultiObjectData BookmarkData::merge(
             .positionMs = bookmark.startTimeMs.count(),
             .durationMs = bookmark.durationMs.count(),
             .count = 1,
-            .objectChunks = chunks,
             .perObjectData = {perObjectData}};
     }
     else if (count > 1)
@@ -158,12 +143,7 @@ MultiObjectData BookmarkData::merge(
             .positionMs = firstPosition.count(),
             .durationMs = duration.count(),
             .count = count,
-            .objectChunks = chunks,
             .perObjectData = perObjectData};
-    }
-    else if (!chunks.empty())
-    {
-        return MultiObjectData{.objectChunks = chunks};
     }
 
     return {};

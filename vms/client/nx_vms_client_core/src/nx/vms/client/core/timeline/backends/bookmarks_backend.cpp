@@ -11,6 +11,7 @@
 #include <core/resource/resource.h>
 #include <nx/vms/client/core/system_context.h>
 
+#include "custom_chunk_accumulator.h"
 #include "data_list_helpers.h"
 
 using namespace std::chrono;
@@ -28,10 +29,14 @@ milliseconds timestamp(const QnCameraBookmark& source) { return source.startTime
 struct BookmarksBackend::Private
 {
     const QWeakPointer<QnResource> resource;
+    const std::weak_ptr<CustomChunkAccumulator> chunksReceiver;
 };
 
-BookmarksBackend::BookmarksBackend(const QnResourcePtr& resource):
-    d(new Private{.resource = resource})
+BookmarksBackend::BookmarksBackend(
+    const QnResourcePtr& resource,
+    const std::shared_ptr<CustomChunkAccumulator>& chunksReceiver)
+    :
+    d(new Private{.resource = resource, .chunksReceiver = chunksReceiver})
 {
 }
 
@@ -65,7 +70,7 @@ QFuture<QnCameraBookmarkList> BookmarksBackend::load(const QnTimePeriod& period,
     promise->start();
 
     const auto responseHandler =
-        [this, promise, period, weakGuard = this->weak_from_this()](
+        [this, promise, period, limit, weakGuard = this->weak_from_this()](
             bool success, rest::Handle requestId, QnCameraBookmarkList result)
         {
             const auto guard = weakGuard.lock();
@@ -91,6 +96,25 @@ QFuture<QnCameraBookmarkList> BookmarksBackend::load(const QnTimePeriod& period,
 
             if (!NX_ASSERT(std::is_sorted(result.cbegin(), result.cend(), Helpers::greater)))
                 std::stable_sort(result.begin(), result.end(), Helpers::greater);
+
+            if (auto chunksReceiver = d->chunksReceiver.lock())
+            {
+                QnTimePeriodList chunks;
+                chunks.reserve(result.size());
+
+                const auto reliablePeriod = (int) result.size() < limit
+                    ? period
+                    : QnTimePeriod::fromInterval(
+                        std::max(period.startTime(), result.back().startTimeMs), period.endTime());
+
+                for (auto it = result.rbegin(); it != result.rend(); ++it)
+                {
+                    chunks.push_back(
+                        QnTimePeriod(it->startTimeMs, it->durationMs).intersected(reliablePeriod));
+                }
+
+                chunksReceiver->update(reliablePeriod, chunks);
+            }
 
             // Remove bookmarks that started before the requested time period.
             Helpers::clip(result, period);
