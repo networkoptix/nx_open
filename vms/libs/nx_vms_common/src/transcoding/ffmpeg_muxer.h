@@ -3,6 +3,7 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
 #include <QtCore/QQueue>
 
@@ -18,6 +19,7 @@ extern "C" {
 #include <transcoding/timestamp_corrector.h>
 
 class QnLicensePool;
+class AbstractMediaDataFilter;
 
 class NX_VMS_COMMON_API FfmpegMuxer
 {
@@ -81,9 +83,11 @@ public:
     void setStartTimeOffset(int64_t value);
     const Config& config() const { return m_config; }
 
+    void addVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter);
+
 private:
     void closeFfmpegContext();
-    bool muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket);
+    bool muxPacket(QnConstAbstractMediaDataPtr mediaPacket);
     void checkDiscontinuity(const QnConstAbstractMediaDataPtr& data, int streamIndex);
 
 private:
@@ -107,4 +111,5 @@ private:
     PacketTimestamp m_lastPacketTimestamp;
     int m_rtpMtu = MTU_SIZE;
     std::optional<int64_t> m_firstVideoTimestamp;
+    std::vector<std::unique_ptr<AbstractMediaDataFilter>> m_videoStreamFilters;
 };

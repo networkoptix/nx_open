@@ -4,6 +4,7 @@
 
 #include <stdexcept>
 #include <tuple>
+#include <nx/utils/string.h>
 
 /** Creates gmock checker that verifies argument type with dynamic_cast. */
 #define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())
@@ -79,3 +80,7 @@
 
 #define NX_GTEST_ASSERT_NE(expected, actual) \
     NX_GTEST_WRAP(ASSERT_NE(expected, actual))
+
+
+#define ASSERT_EQ_BINARY(data1, data2, size) \
+    ASSERT_EQ(nx::utils::toHex(data1, size), nx::utils::toHex(data2, size))

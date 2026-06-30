@@ -123,7 +123,7 @@ bool extractSps(const QnCompressedVideoData* data, SequenceParameterSet& sps)
 
     for (const auto& nalu: nalUnits)
     {
-        if (nx::media::h264::decodeType(*nalu.data) == nuSPS)
+        if (nx::media::h264::nalType(*nalu.data) == nuSPS)
         {
             sps.decodeBuffer(nalu.data, nalu.data + nalu.size);
             return sps.deserialize() == 0;
@@ -139,7 +139,7 @@ std::vector<uint8_t> buildExtraDataAnnexB(const uint8_t* data, int32_t size)
     auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
-        const auto nalType = nx::media::h264::decodeType(*nalu.data);
+        const auto nalType = nx::media::h264::nalType(*nalu.data);
         if (nalType == nuSPS || nalType == nuPPS)
         {
             extraData.insert(extraData.end(), startcode.begin(), startcode.end());
@@ -161,7 +161,7 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     int brokenNalIndex = std::numeric_limits<int>::max();
     for (const auto& nalu: nalUnits)
     {
-        const auto nalType = nx::media::h264::decodeType(*nalu.data);
+        const auto nalType = nx::media::h264::nalType(*nalu.data);
         if (nalType == nuSPS)
         {
             int id = parseSpsId(nalu.data, nalu.size);

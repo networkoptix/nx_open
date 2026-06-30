@@ -6,10 +6,7 @@
 #include <nx/codec/h265/hevc_decoder_configuration_record.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/h264_utils.h>
-#include <nx/utils/string.h>
-
-#define ASSERT_EQ_BINARY(data1, data2, size) \
-    ASSERT_EQ(nx::utils::toHex(data1, size), nx::utils::toHex(data2, size))
+#include <nx/utils/test_support/utils.h>
 
 TEST(media, build_extradata_h264)
 {

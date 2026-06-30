@@ -88,7 +88,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
             const quint8* end = curNal + data->dataSize();
             for(curNal = nx::media::nal::findNextNAL(curNal, end); curNal < end; curNal = nx::media::nal::findNextNAL(curNal, end))
             {
-                const auto nalType = nx::media::h264::decodeType(*curNal);
+                const auto nalType = nx::media::h264::nalType(*curNal);
                 if (nalType >= nx::media::h264::nuSliceNonIDR && nalType <= nx::media::h264::nuSliceIDR) {
                     nx::utils::BitStreamReader bitReader;
                     try {
@@ -331,7 +331,7 @@ bool QnFfmpegVideoDecoder::decode(
                 if (curPtr + nalLen >= dataEnd)
                     break;
 
-                const auto nalUnitType = nx::media::h264::decodeType(curPtr[nalLen]);
+                const auto nalUnitType = nx::media::h264::nalType(curPtr[nalLen]);
                 if (nalUnitType == nx::media::h264::nuSPS)
                 {
                     nx::media::h264::SequenceParameterSet sps;

@@ -6,6 +6,7 @@ extern "C" {
 #include <libavutil/opt.h>
 }
 
+#include <media/filters/abstract_media_data_filter.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/media/utils.h>
@@ -221,7 +222,7 @@ void FfmpegMuxer::setStartTimeOffset(int64_t value)
     m_timestampCorrector.setOffset(std::chrono::microseconds(value));
 }
 
-bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
+bool FfmpegMuxer::muxPacket(QnConstAbstractMediaDataPtr media)
 {
     int streamIndex = 0;
     if (m_initializedVideo && media->dataType == QnAbstractMediaData::AUDIO)
@@ -243,6 +244,19 @@ bool FfmpegMuxer::muxPacket(const QnConstAbstractMediaDataPtr& media)
         NX_DEBUG(this, "Skip audio before video: %1, first video timestamp: %2", media,
             m_firstVideoTimestamp ? *m_firstVideoTimestamp : 0);
         return true;
+    }
+
+    if (!m_videoStreamFilters.empty() && media->dataType == QnAbstractMediaData::VIDEO)
+    {
+        for (const auto& filter: m_videoStreamFilters)
+        {
+            media = std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(media));
+            if (!media)
+            {
+                NX_WARNING(this, "Muxing packet error: Failed to proces filters: %1", media);
+                return false;
+            }
+        }
     }
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
@@ -317,4 +331,9 @@ AVCodecParameters* FfmpegMuxer::getVideoCodecParameters() const
 AVCodecParameters* FfmpegMuxer::getAudioCodecParameters() const
 {
     return m_audioCodecParameters;
+}
+
+void FfmpegMuxer::addVideoStreamFilter(std::unique_ptr<AbstractMediaDataFilter> filter)
+{
+    m_videoStreamFilters.push_back(std::move(filter));
 }

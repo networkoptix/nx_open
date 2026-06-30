@@ -9,6 +9,8 @@
 
 #include <nx/codec/nal_units.h>
 
+// See https://www.itu.int/rec/T-REC-H.265/en
+
 namespace nx::media::h265 {
 
 static const uint8_t kPayloadHeaderNalUnitTypeMask = 0x7e;
@@ -55,6 +57,11 @@ struct NX_CODEC_API FuHeader
     bool decode(const uint8_t* const payload, int payloadLength);
 };
 
+inline NalUnitType nalType(const uint8_t nal)
+{
+    return static_cast<NalUnitType>((nal >> 1) & 0x3f);
+}
+
 struct NX_CODEC_API NalUnitHeader
 {
     NalUnitType unitType = NalUnitType::unspec63;
@@ -90,11 +97,11 @@ bool parseNalUnit(const uint8_t* data, int size, NalUnitType& result)
 }
 
 NX_CODEC_API PacketType fromNalUnitTypeToPacketType(NalUnitType unitType);
-bool isValidUnitType(int unitType);
+NX_CODEC_API bool isValidUnitType(int unitType);
 NX_CODEC_API bool isRandomAccessPoint(NalUnitType unitType);
-bool isLeadingPicture(NalUnitType unitType);
-bool isTrailingPicture(NalUnitType unitType);
-bool isParameterSet(NalUnitType unitType);
+NX_CODEC_API bool isLeadingPicture(NalUnitType unitType);
+NX_CODEC_API bool isTrailingPicture(NalUnitType unitType);
+NX_CODEC_API bool isParameterSet(NalUnitType unitType);
 NX_CODEC_API bool isSlice(NalUnitType unitType);
 NX_CODEC_API bool isNewAccessUnit(NalUnitType unitType); //< check is new AU, excluding slices
 

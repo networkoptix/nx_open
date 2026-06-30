@@ -6,6 +6,8 @@
 
 #include <nx/utils/bit_stream.h>
 
+// See https://www.itu.int/rec/T-REC-H.264/en
+
 namespace nx::media::h264 {
 
 enum NALUnitType
@@ -18,6 +20,11 @@ enum NALUnitType
     STAP_A_PACKET, STAP_B_PACKET, MTAP16_PACKET, MTAP24_PACKET, FU_A_PACKET, FU_B_PACKET,
     nuDummy
 };
+
+inline int nalType(const uint8_t nal)
+{
+    return int(nal & 0x1F);
+}
 
 class NX_CODEC_API NALUnit
 {
@@ -43,7 +50,6 @@ public:
     virtual ~NALUnit() {
         delete [] m_nalBuffer;
     }
-    static bool isSliceNal(uint8_t nalUnitType);
     int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
     virtual int serialize(uint8_t* dstBuffer);
@@ -58,7 +64,6 @@ protected:
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
 };
 
-NX_CODEC_API NALUnitType decodeType(uint8_t data);
 NX_CODEC_API bool isSliceNal(uint8_t nalUnitType);
 NX_CODEC_API bool isIFrame(const uint8_t* data, int dataLen);
 NX_CODEC_API int ceil_log2(double val);
