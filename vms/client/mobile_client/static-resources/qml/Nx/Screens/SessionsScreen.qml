@@ -929,44 +929,25 @@ AdaptiveScreen
     Component.onCompleted:
     {
         resetSearch()
-        // Restore the last user-selected tab after the screen is recreated (e.g. on disconnect).
-        // updateSelectedTab() validates that the saved tab is still available and falls back
-        // otherwise; it also covers the case where the model is already loaded and emits no signal.
+        // Restore the last user-selected tab and the page within it after the screen is
+        // recreated (e.g. on disconnect), covering the case where the organizations model is
+        // already loaded and emits no signal.
         systemTabs.updateSelectedTab()
+        restoreLastOpenedLocation()
     }
 
     Connections
     {
         target: organizationsModel
 
-        function onFullTreeLoaded()
-        {
-            if (sessionsScreen.rootIndex === NxGlobals.invalidModelIndex()
-                && appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
-                && appGlobalState.lastOpenedNodeId !== undefined)
-            {
-                const nodeIndex =
-                    organizationsModel.indexFromNodeId(appGlobalState.lastOpenedNodeId)
-                appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
-                if (nodeIndex !== NxGlobals.invalidModelIndex())
-                    goInto(nodeIndex.parent, /*animate*/ false)
-            }
-        }
-
-        function onFoldersChanged(orgIndex)
-        {
-            sessionsScreen.refreshHasFolders()
-        }
+        function onFullTreeLoaded() { sessionsScreen.restoreLastOpenedLocation() }
     }
 
     Connections
     {
         target: windowContext.sessionManager
 
-        function onSessionStoppedManually()
-        {
-            appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
-        }
+        function onSessionStoppedManually() { sessionsScreen.restoreLastOpenedLocation() }
     }
 
     QtObject
@@ -1155,6 +1136,41 @@ AdaptiveScreen
         siteList.positionViewAtBeginning()
     }
 
+    function selectTabByUser(tab)
+    {
+        selectedTab = tab
+        appGlobalState.lastSelectedOrgTab = tab
+    }
+
+    // Return to the page within the current tab (folder / organization / partner) that contained
+    // the last opened site, so coming back from a session lands on that page instead of the tab
+    // root. Idempotent: a no-op unless we are at the top level and a last opened site is pending.
+    function restoreLastOpenedLocation()
+    {
+        if (sessionsScreen.rootIndex !== NxGlobals.invalidModelIndex())
+            return
+
+        if (appGlobalState.lastOpenedNodeId === NxGlobals.uuid("")
+            || appGlobalState.lastOpenedNodeId === undefined)
+        {
+            return
+        }
+
+        const nodeIndex = organizationsModel.indexFromNodeId(appGlobalState.lastOpenedNodeId)
+        if (nodeIndex !== NxGlobals.invalidModelIndex())
+        {
+            appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
+            goInto(nodeIndex.parent, /*animate*/ false)
+        }
+        else if (organizationsModel.firstLoadAttemptFinished)
+        {
+            // The tree has finished loading but the site is gone. Clear the marker so the loading
+            // skeleton (waitingForLastOpened) does not persist.
+            appGlobalState.lastOpenedNodeId = NxGlobals.uuid("")
+        }
+        // Otherwise the tree is still loading; onFullTreeLoaded() will retry the restore.
+    }
+
     function openSystem(current)
     {
         appGlobalState.lastOpenedNodeId = accessor.getData(current, "nodeId")
@@ -1208,11 +1224,5 @@ AdaptiveScreen
                 Workflow.openSitePlaceholderScreen(systemName)
             }
         }
-    }
-
-    function selectTabByUser(tab)
-    {
-        selectedTab = tab
-        appGlobalState.lastSelectedOrgTab = tab
     }
 }
