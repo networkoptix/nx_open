@@ -726,8 +726,19 @@ void QnArchiveSyncPlayWrapper::onConsumerBlocksReader(QnAbstractStreamDataProvid
         reader->setNavDelegate(0);
         if (d->enabled && isSyncReader) {
             qint64 currentTime = getCurrentTime();
+
+            // No enabled reader to anchor to (getCurrentTime()==AV_NOPTS during a switch):
+            // catch up to the logical clock so this reader does not stay at a stale position.
+            if (currentTime == qint64(AV_NOPTS_VALUE)
+                && d->lastJumpTime != DATETIME_NOW && d->lastJumpTime != qint64(AV_NOPTS_VALUE))
+            {
+                currentTime = expectedTime();
+            }
+
             if (currentTime != qint64(AV_NOPTS_VALUE)) {
-                setJumpTime(currentTime);
+                // Catch up only THIS reader to the group's current position; do NOT re-anchor
+                // the whole group here: setJumpTime would drag the group backward when
+                // getCurrentTime lags, and forward-clamping it over-seeks past a slow reader.
                 if (reader->getSpeed() > 0)
                 {
                     // There is tuning when big amount of items goes from offscreen to screen.
