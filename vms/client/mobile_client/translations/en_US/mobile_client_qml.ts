@@ -765,6 +765,13 @@
     </message>
 </context>
 <context>
+    <name>ObjectDetailsSheet</name>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ObjectsTypeSheet</name>
     <message>
         <source>View</source>
