@@ -2166,5 +2166,9 @@
       <source>HTTP header: Access-Control-Allow-Credentials.</source>
       <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
     </message>
+    <message>
+      <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
+      <translation type="unfinished">JSON RPC subscription update interval (milliseconds, 0 = disabled).</translation>
+    </message>
   </context>
 </TS>
