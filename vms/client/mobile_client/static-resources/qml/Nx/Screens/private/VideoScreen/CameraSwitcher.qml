@@ -7,6 +7,9 @@ import QtQuick.Layouts
 import Nx.Core
 import Nx.Mobile
 import Nx.Models
+import Nx.Screens
+
+import ".."
 
 Item
 {
@@ -92,7 +95,25 @@ Item
                 fillMode: Image.PreserveAspectFit
             }
 
-            // TODO: #vkutin Implement basic status overlay (share with CameraItem)
+            VideoDummy
+            {
+                id: overlay
+
+                anchors.fill: delegateItem
+                state: overlayController.dummyState
+                visible: !delegateItem.screenshotSuppressed && !!state
+                interactive: false
+
+                SimpleVideoOverlayController
+                {
+                    id: overlayController
+
+                    mediaResourceHelper: MediaResourceHelper
+                    {
+                        resource: delegateItem.resource
+                    }
+                }
+            }
 
             LayoutItemProxy
             {
@@ -102,7 +123,8 @@ Item
                 target: delegateItem.controlled ? switcher.videoItem : null
             }
 
-            ListView.onPooled: pooled = true
+            ListView.onPooled:
+                pooled = true
 
             ListView.onReused:
             {

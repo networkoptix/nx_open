@@ -32,6 +32,8 @@ Control
 
     property real preferredVerticalPadding: 44
 
+    property bool interactive: true
+
     background: Rectangle
     {
         color: control.backgroundColor
@@ -152,7 +154,7 @@ Control
             readonly property bool hasEnoughSpace:
                 control.height >= (requiredHeight + image.requiredHeight)
 
-            visible: !!action && hasEnoughSpace
+            visible: !!action && hasEnoughSpace && control.interactive
 
             Layout.topMargin: 24
             Layout.alignment: Qt.AlignCenter

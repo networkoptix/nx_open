@@ -17,6 +17,8 @@ import nx.vms.api
 import nx.vms.client.mobile
 import nx.vms.client.core
 
+import ".."
+
 Control
 {
     id: cameraItem
@@ -34,38 +36,15 @@ Control
     signal clicked()
     signal thumbnailRefreshRequested()
 
-    QtObject
+    SimpleVideoOverlayController
     {
         id: d
 
-        property int status: { API.ResourceStatus.offline }
+        status: API.ResourceStatus.offline //< The status is handled via custom logic.
+        mediaResourceHelper: mediaResourceHelper
 
-        readonly property bool offline: status == API.ResourceStatus.offline
         readonly property bool showThumbnailDummy:
-            dummyState !== "" || status == API.ResourceStatus.undefined
-
-        readonly property bool unauthorized: status == API.ResourceStatus.unauthorized
-        readonly property bool needsCloudAuthorization: mediaResourceHelper.needsCloudAuthorization
-        readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
-        readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
-        readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
-
-        readonly property string dummyState:
-        {
-            if (needsCloudAuthorization)
-                return "needsCloudAuthorization"
-            if (unauthorized)
-                return "cameraUnauthorized"
-            if (hasDefaultPassword)
-                return "defaultPasswordAlert"
-            if (hasOldFirmware)
-                return "oldFirmwareAlert"
-            if (offline)
-                return "cameraOffline"
-            if (ioModule)
-                return "ioModuleWarning"
-            return ""
-        }
+            dummyState !== "" || status === API.ResourceStatus.undefined
     }
 
     MediaResourceHelper
@@ -102,7 +81,6 @@ Control
 
             width: parent.width
             height: Math.floor(width * cameraItem.aspectRatio)
-
 
             color: d.showThumbnailDummy ? ColorTheme.colors.dark8 : ColorTheme.colors.dark4
 
