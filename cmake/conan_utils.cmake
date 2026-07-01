@@ -104,9 +104,17 @@ function(nx_run_conan)
     list(APPEND flags ${CONAN_FLAGS})
 
     if(DEFINED ENV{NX_CONAN_DOWNLOAD_CACHE})
-        message(STATUS "Conan download cache: $ENV{NX_CONAN_DOWNLOAD_CACHE}")
+        cmake_path(CONVERT "$ENV{NX_CONAN_DOWNLOAD_CACHE}" TO_CMAKE_PATH_LIST conanDownloadCache)
+        message(STATUS "Conan download cache: ${conanDownloadCache}")
         list(APPEND flags
-            "--core-conf core.download:download_cache=$ENV{NX_CONAN_DOWNLOAD_CACHE}")
+            "--core-conf core.download:download_cache=${conanDownloadCache}")
+    endif()
+
+    if(WIN32)
+        # Generate PowerShell runtime activation scripts (conanrun.ps1) alongside the default
+        # .bat/.sh. Conan2 does not emit these by default, leaving IDEs such as CLion without a
+        # way to set up the runtime environment (e.g. Qt libs) before launching a target.
+        list(APPEND flags "-c tools.env.virtualenv:powershell=powershell.exe")
     endif()
 
     list(APPEND flags ${extraConanArgs})
