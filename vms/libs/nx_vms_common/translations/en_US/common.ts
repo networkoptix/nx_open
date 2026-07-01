@@ -1958,5 +1958,9 @@
         <source>HTTP header: Access-Control-Allow-Credentials.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
