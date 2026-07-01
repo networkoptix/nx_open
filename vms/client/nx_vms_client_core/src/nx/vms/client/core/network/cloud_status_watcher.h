@@ -62,10 +62,11 @@ public:
     Q_INVOKABLE void resetAuthData();
 
     /**
-     * Cloud logout that also terminates the SSO identity provider session. Emits ssoLogoutUrlReady()
-     * with the provider's logout URL for the UI to open in the in-app browser. Resets auth data only
-     * after the request completes, so its access token is not revoked early; falls back to plain
-     * resetAuthData() for non-SSO sessions.
+     * Cloud logout that also terminates the SSO identity provider session. For a non-SSO session it
+     * simply calls resetAuthData(). For an SSO session it clears the local auth state immediately
+     * (so the UI reflects the logout at once), then emits ssoLogoutUrlReady() with the provider's
+     * logout URL for the UI to open in the in-app browser; the access token is kept valid for the
+     * in-flight request and the cloud tokens are revoked only once it completes.
      */
     Q_INVOKABLE void logoutWithSsoSessionTermination();
 

@@ -53,4 +53,11 @@ struct CloudTokens
 /** Decode username from cloud bearer token value. Returns empty string in case of error. */
 NX_VMS_CLIENT_CORE_API std::string usernameFromToken(const std::string& value);
 
+/**
+ * Whether the session was authenticated via SSO. Detected from the refresh token's access
+ * scope (its "aud" claim): an SSO session carries an "ssoOrganizationId" attribute, while a plain
+ * cloud session carries "cloudSystemId". Returns false if the token cannot be decoded.
+ */
+NX_VMS_CLIENT_CORE_API bool isSsoSession(const std::string& refreshToken);
+
 } // namespace nx::vms::client::core
