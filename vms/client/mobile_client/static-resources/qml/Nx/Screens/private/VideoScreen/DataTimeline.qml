@@ -40,7 +40,7 @@ Rectangle
 
     readonly property alias bottomBoundMs: d.bottomBoundMs
 
-    property real timeScaleWidth: 70
+    property real timeScaleWidth: 76
 
     property bool interactive: true
 
@@ -297,7 +297,7 @@ Rectangle
                 baseVelocity: 10
                 sensitiveAreaLength: inset + outset
 
-                readonly property real inset: timeMarkerRect.height / 2.0
+                readonly property real inset: timeMarker.height / 2.0
                 readonly property real outset: 64
 
                 property real lastTimeMs: 0
@@ -649,6 +649,7 @@ Rectangle
             enabled: timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
         }
 
+        // A line to mark current position inside of the current timeline window.
         Rectangle
         {
             id: timeMarkerLine
@@ -656,13 +657,13 @@ Rectangle
             color: ColorTheme.colors.mobileTimeline.timeMarker.background
             visible: !timeMarker.isOutside
 
-            y: timeMarker.y
-            width: timeMarker.width
+            y: timeScale.y + timeScale.timeToPosition(timeline.positionMs)
+            width: content.width
             height: 1
         }
 
-        // Current time marker ("current" as currently played).
-        Item
+        // Time marker to display position inside of the current timeline window.
+        Timeline.TimeMarker
         {
             id: timeMarker
 
@@ -674,147 +675,81 @@ Rectangle
 
             readonly property bool isOutside: isAhead || isBehind
 
-            readonly property real markerWidth:
-            {
-                return isOutside && !timeline.positionAtLive
-                    ? timeMarkerText.width
-                    : (timeScale.width - recordingChunks.width)
-            }
+            property real horizontalOffset: dragHandler.draggingTimeMarker ? timeScale.width : 0
+            Behavior on horizontalOffset { NumberAnimation { duration: 100 }}
 
-            readonly property real draggingShift: timeScale.width
+            readonly property real verticalOffset: //< To avoid extending down out of `content`.
+                Math.max(0, timeMarkerLine.y + height * 0.5 - content.height)
 
-            width: content.width
-            height: 1
+            anchors.right: timeScale.right
+            anchors.rightMargin: horizontalOffset
+            anchors.verticalCenter: timeMarkerLine.verticalCenter
+            anchors.verticalCenterOffset: -verticalOffset
+            width: timeScale.width - recordingChunks.width
             z: 1
 
-            y:
+            bottomRoundingRadius: //< Reduce to avoid timeMarkerLine crossing the rounding arc.
+                MathUtils.bound(0, height * 0.5 - verticalOffset, topRoundingRadius)
+
+            relevant: !timeMarker.isOutside
+
+            labelFormatter: timeScale.labelFormatter
+            timeZone: timeScale.timeZone
+            positionMs: timeline.positionMs
+        }
+
+        // Header or footer time marker to display position outside of the current timeline window.
+        Timeline.ExternalTimeMarker
+        {
+            id: externalTimeMarker
+
+            anchors.bottom: timeMarker.isAhead ? timeScale.top : timeScale.bottom
+            anchors.right: timeScale.right
+            anchors.rightMargin: timeMarker.horizontalOffset
+
+            widthAtLive: timeMarker.width
+            height: header.height
+            z: 1
+            topRoundingRadius: timeMarker.topRoundingRadius
+
+            relevant: timeMarker.isOutside
+            interactive: timeline.interactive
+
+            labelFormatter: timeScale.labelFormatter
+            timeZone: timeScale.timeZone
+            positionMs: timeline.positionAtLive ? -1 : timeline.positionMs
+
+            onTapped:
             {
-                if (isAhead)
-                    return timeScale.y - Math.ceil(header.height / 2.0)
-
-                if (isBehind)
-                    return timeScale.y - Math.ceil(header.height / 2.0) + timeScale.height
-
-                return timeScale.y + timeScale.timeToPosition(timeline.positionMs)
-            }
-
-            Rectangle
-            {
-                id: timeMarkerRect
-
-                property real shift: dragHandler.draggingTimeMarker ? timeMarker.draggingShift : 0
-                Behavior on shift { NumberAnimation { duration: 100 } }
-
-                anchors.right: timeMarker.right
-                anchors.rightMargin: shift
-                anchors.verticalCenter: timeMarker.verticalCenter
-
-                // Shift the rect to avoid extending down out of `content`.
-                anchors.verticalCenterOffset:
-                    -Math.max(0, timeMarker.y + height * 0.5 - content.height)
-
-                width: timeMarker.markerWidth
-
-                height: timeMarker.isOutside
-                    ? header.height
-                    : (timeScale.labelFormatter.amPm ? 39 : 41) //< Fine tuning.
-
-                clip: true
-                color: ColorTheme.colors.mobileTimeline.timeMarker.background
-
-                readonly property bool mirrored: timeline.LayoutMirroring.enabled
-                readonly property real bottomRadius: MathUtils.bound(0, y + height, 6)
-
-                topLeftRadius: mirrored ? 0 : 6
-                topRightRadius: mirrored ? 6 : 0
-                bottomLeftRadius: (mirrored || timeMarker.isOutside) ? 0 : bottomRadius
-                bottomRightRadius: (mirrored && !timeMarker.isOutside) ? bottomRadius : 0
-
-                // Scrolls to the time marker when tapped.
-                TapHandler
-                {
-                    id: timeMarkerTapHandler
-
-                    acceptedButtons: Qt.LeftButton
-
-                    enabled: timeline.interactive && timeMarker.isOutside
-
-                    onTapped:
-                    {
-                        timeline.scrollTo(timeline.positionAtLive
-                            ? NxGlobals.syncNowMs()
-                            : timeline.positionMs)
-                    }
-                }
-            }
-
-            Text
-            {
-                id: timeMarkerText
-
-                leftPadding: timeMarker.isOutside ? 12 : 0
-                rightPadding: timeMarker.isOutside ? 12 : 0
-
-                anchors.right: timeMarkerRect.right
-                anchors.verticalCenter: timeMarkerRect.verticalCenter
-
-                width: timeMarker.isOutside ? implicitWidth : timeScale.width
-
-                text:
-                {
-                    if (timeline.positionAtLive)
-                        return "Live"
-
-                    if (timeMarker.isOutside)
-                    {
-                        return timeScale.labelFormatter.externalTimeMarker(timeline.positionMs,
-                            timeScale.timeZone)
-                    }
-
-                    return timeScale.labelFormatter.htmlTimeMarker(timeline.positionMs,
-                        timeScale.timeZone, ColorTheme.colors.mobileTimeline.timeMarker.text,
-                        ColorTheme.colors.mobileTimeline.timeMarker.secondaryText)
-                }
-
-                font.pixelSize: 12
-                color: ColorTheme.colors.mobileTimeline.timeMarker.text
-                horizontalAlignment: timeScale.labelFormatter.rtl ? Qt.AlignLeft : Qt.AlignRight
-                verticalAlignment: Qt.AlignVCenter
-                textFormat: Text.RichText
-            }
-
-            ColoredImage
-            {
-                id: liveIcon
-
-                visible: timeline.positionAtLive
-
-                anchors.right: timeMarkerText.left
-                anchors.rightMargin: 2 - timeMarkerText.leftPadding
-                anchors.verticalCenter: timeMarker.verticalCenter
-
-                sourcePath: "image://skin/16x16/Solid/play_arrow.svg"
-                sourceSize: Qt.size(16, 16)
-                primaryColor: timeMarkerText.color
+                timeline.scrollTo(timeline.positionAtLive
+                    ? NxGlobals.syncNowMs()
+                    : timeline.positionMs)
             }
         }
 
-        // Positions the time marker when tapped.
+        // Seeks new position when the timeline area is tapped outside of the time marker.
         TapHandler
         {
             id: tapHandler
 
+            property bool pressedInsideTimeMarker: false
+
             acceptedButtons: Qt.LeftButton
             enabled: timeline.interactive
 
+            onGrabChanged: (transition, point) =>
+            {
+                if (transition === PointerDevice.GrabPassive)
+                    pressedInsideTimeMarker = timeMarker.hitTest(point.pressPosition)
+            }
+
             onTapped: (point) =>
             {
-                if (!timeMarkerRect.contains(
-                    timeMarkerRect.mapFromItem(content, point.pressPosition)))
-                {
-                    content.cancelAnimations()
-                    timeScale.setPosition(point.position.y)
-                }
+                if (pressedInsideTimeMarker)
+                    return
+
+                content.cancelAnimations()
+                timeScale.setPosition(point.position.y)
             }
         }
 
@@ -877,8 +812,7 @@ Rectangle
                 {
                     case PointerDevice.GrabPassive:
                     {
-                        if (timeMarkerRect.contains(
-                            timeMarkerRect.mapFromItem(content, centroid.pressPosition)))
+                        if (timeMarker.hitTest(centroid.pressPosition))
                         {
                             proximityScrollHelper.lastTimeMs = NxGlobals.syncNowMs()
                             draggingTimeMarker = !timeMarker.isOutside

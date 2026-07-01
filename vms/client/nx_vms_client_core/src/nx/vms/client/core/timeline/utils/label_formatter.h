@@ -35,9 +35,8 @@ public:
     Q_INVOKABLE QString tickLabel(qint64 timeMs, const QTimeZone& timeZone,
         TimelineZoomLevel::LevelType level) const;
 
-    /** Format time marker inside current time window. */
-    Q_INVOKABLE QString htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
-        QColor primaryColor, QColor secondaryColor) const;
+    /** Format time marker inside current time window. Returns 2 or 3 lines. */
+    Q_INVOKABLE QStringList timeMarkerLines(qint64 timeMs, const QTimeZone& timeZone) const;
 
     /** Format time marker outside current time window. */
     Q_INVOKABLE QString externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const;

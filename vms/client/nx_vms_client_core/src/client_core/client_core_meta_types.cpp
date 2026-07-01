@@ -5,6 +5,7 @@
 #include <mutex>
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QTimeZone>
 #include <QtQml/QtQml>
 
 #include <qt_helpers/scene_position_listener.h>
@@ -132,6 +133,9 @@ void registerQmlTypesInternal()
     // of that type from QML.
     qmlRegisterUncreatableType<QAbstractItemModel>("Nx.Core", 1, 0, "AbstractItemModel",
         "Cannot create instance of AbstractItemModel.");
+
+    qmlRegisterUncreatableType<QTimeZone>("Nx.Core", 1, 0, "TimeZone",
+        "Cannot create instance of TimeZone.");
 
     qmlRegisterType<QmlTestHelper>("Nx.Test", 1, 0, "QmlTestHelper");
     qmlRegisterType<ScenePositionListener>("nx.vms.client.core", 1, 0, "ScenePositionListener");

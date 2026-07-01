@@ -154,31 +154,25 @@ QString LabelFormatter::tickLabel(
     return {};
 }
 
-QString LabelFormatter::htmlTimeMarker(qint64 timeMs, const QTimeZone& timeZone,
-    QColor primaryColor, QColor secondaryColor) const
+QStringList LabelFormatter::timeMarkerLines(qint64 timeMs, const QTimeZone& timeZone) const
 {
-    static const auto kTwoLineTemplate =
-        u"<p style='margin-left: %3px; margin-right: %3px; line-height: %4px;'>%1<br>%2</p>"_qs;
-
-    static const auto kDateTemplate =
-        u"<span style='font-size: 11px; color: %2;'>%1</span>"_qs;
-
-    static const auto kTimeTemplate =
-        u"<span style='font-size: %3px; font-weight: 500; color: %2;'>%1</span>"_qs;
-
     const auto dt = QDateTime::fromMSecsSinceEpoch(timeMs, timeZone);
 
-    const auto timeStr = d->amPm
-         ? nx::format(d->timeLocale.toString(dt, u"h:mm:ss%1 AP%2"_qs),
-             u"<span style='font-size: 8px;'>"_qs,
-             u"</span>"_qs).toQString()
-         : d->timeLocale.toString(dt, u"HH:mm:ss"_qs);
+    if (d->amPm)
+    {
+        const auto timeParts = d->timeLocale.toString(dt, u"h:mm:ss\nAP"_qs).split(u'\n');
+        if (NX_ASSERT(timeParts.size() == 2)) //< In case of failure, fall back to 24h format.
+        {
+            return QStringList{
+                d->dayMonthShortYear(dt),
+                timeParts[0],
+                timeParts[1]};
+        }
+    }
 
-    return nx::format(kTwoLineTemplate,
-        nx::format(kTimeTemplate, isolateLtr(timeStr), primaryColor.name(), d->amPm ? 12 : 14),
-        nx::format(kDateTemplate, d->dayMonthShortYear(dt), secondaryColor.name()),
-        /*right padding*/ d->amPm ? 4 : 6,
-        /*line height*/ d->amPm ? 14 : 11);
+    return QStringList{
+        d->dayMonthShortYear(dt),
+        d->timeLocale.toString(dt, u"HH:mm:ss"_qs)};
 }
 
 QString LabelFormatter::externalTimeMarker(qint64 timeMs, const QTimeZone& timeZone) const

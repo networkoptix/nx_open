@@ -348,8 +348,9 @@
         },
         "timeMarker": {
             "background": "light4",
-            "text": "dark4",
-            "secondaryText": "dark15"
+            "text": "dark10",
+            "secondaryText": "dark16",
+            "tertiaryText": "light15"
         },
         "header": {
             "background": "mobileTimeline.background",
