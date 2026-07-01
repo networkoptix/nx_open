@@ -43,7 +43,7 @@ public:
 public:
     TrafficRelayUrlWatcher* const q;
     QTimer reconnectTimer;
-    std::unique_ptr<nx::network::http::AsyncClient> httpClient;
+    std::shared_ptr<nx::network::http::AsyncClient> httpClient;
     nx::utils::PendingOperation delayedRequestTrafficRelayUrl{
         [this]() { requestTrafficRelayUrl(); }, kRequestRetryDelay};
     QString trafficRelayUrl;
@@ -80,7 +80,7 @@ public:
 
         const auto address = nx::network::SocketAddress::fromUrl(urlCloud, true);
 
-        httpClient = std::make_unique<nx::network::http::AsyncClient>(
+        httpClient = std::make_shared<nx::network::http::AsyncClient>(
             nx::network::ssl::kAcceptAnyCertificate);
 
         const auto url = nx::network::url::Builder()
@@ -90,9 +90,16 @@ public:
             .toUrl();
 
         auto handler = nx::utils::AsyncHandlerExecutor(q).bind(
-            [this, url]()
+            [this, url, httpClientWeak = std::weak_ptr(httpClient)]()
             {
                 NX_MUTEX_LOCKER lock(&mutex);
+
+                // The handler runs later via a queued connection. httpClient may be
+                // destroyed/re-created by the time the reply is handled.
+                auto httpClient = httpClientWeak.lock();
+                if (!httpClient)
+                    return;
+
                 trafficRelayUrl = {};
                 if (httpClient->failed())
                 {
