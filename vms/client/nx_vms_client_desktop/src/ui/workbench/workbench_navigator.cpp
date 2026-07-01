@@ -1786,7 +1786,11 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                 return 0;
 
             if (mediaWidget->camDisplay()->isRealTimeSource())
-                return DATETIME_NOW;
+            {
+                const auto camera = mediaWidget->resource().dynamicCast<QnVirtualCameraResource>();
+                if (!isCurrentWidgetSynced() || !hasArchiveForCamera(camera))
+                    return DATETIME_NOW;
+            }
 
             const auto streamSynchronizer = workbench()->windowContext()->streamSynchronizer();
             qint64 timeUSec;
@@ -2832,8 +2836,10 @@ void QnWorkbenchNavigator::syncIfOutOfSyncWithLive(QnResourceWidget *widget)
     if (!reader)
         return;
 
-    const bool outOfSync = reader->isRealTimeSource() &&
-        streamSynchronizer->state().timeUs != DATETIME_NOW;
+    const auto camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    const bool cameraHasNoArchive = !hasArchiveForCamera(camera);
+    const bool groupInArchive = streamSynchronizer->state().timeUs != DATETIME_NOW;
+    const bool outOfSync = cameraHasNoArchive && groupInArchive;
 
     if (!outOfSync)
         return;
