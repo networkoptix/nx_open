@@ -136,7 +136,9 @@ struct CloudStatusWatcher::Private: public QObject
     bool checkSuppressed();
 
     const CloudAuthData& authData() const;
-    bool setAuthData(const CloudAuthData& authData, AuthMode mode);
+    bool setAuthData(const CloudAuthData& authData, AuthMode mode, bool removeExistingTokens = true);
+    void removeCloudTokens(
+        const CloudAuthData& authData, const std::shared_ptr<Connection>& connection);
     void logoutWithSsoSessionTermination();
 
     void saveCredentials() const;
@@ -865,16 +867,25 @@ bool CloudStatusWatcher::Private::checkSuppressed()
     return true;
 }
 
-bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, AuthMode mode)
+void CloudStatusWatcher::Private::removeCloudTokens(
+    const CloudAuthData& authData, const std::shared_ptr<Connection>& connection)
+{
+    m_tokenRemover.removeToken(authData.refreshToken, connection);
+    m_tokenRemover.removeToken(authData.credentials.authToken.value, connection);
+}
+
+bool CloudStatusWatcher::Private::setAuthData(
+    const CloudAuthData& authData, AuthMode mode, bool removeExistingTokens)
 {
     NX_ASSERT(!authData.credentials.authToken.isPassword());
 
     const bool userChanged = (m_authData.credentials.username != authData.credentials.username);
     const bool credentialsChanged = (m_authData.credentials != authData.credentials);
 
-    // Removing current tokens from cloud.
-    m_tokenRemover.removeToken(m_authData.refreshToken, cloudConnection);
-    m_tokenRemover.removeToken(m_authData.credentials.authToken.value, cloudConnection);
+    // Removing current tokens from cloud. Skipped when the caller still needs the tokens valid for
+    // an in-flight request (e.g. the SSO logout) and revokes them itself once it completes.
+    if (removeExistingTokens)
+        removeCloudTokens(m_authData, cloudConnection);
 
     m_authData = authData;
     m_tokenUpdater->onTokenUpdated(m_authData.expiresAt);
@@ -891,10 +902,12 @@ bool CloudStatusWatcher::Private::setAuthData(const CloudAuthData& authData, Aut
 
 void CloudStatusWatcher::Private::logoutWithSsoSessionTermination()
 {
-    const auto authToken = m_authData.credentials.authToken;
+    const auto authData = m_authData;
     auto connection = cloudConnection; //< Keeps the connection alive across the async request.
 
-    if (!connection || !authToken.isBearerToken() || authToken.value.empty())
+    if (!connection || !authData.credentials.authToken.isBearerToken()
+        || authData.credentials.authToken.value.empty()
+        || !isSsoSession(authData.refreshToken))
     {
         q->resetAuthData();
         return;
@@ -904,22 +917,37 @@ void CloudStatusWatcher::Private::logoutWithSsoSessionTermination()
         "https://" + nx::network::SocketGlobals::cloud().cloudHost();
     const std::string customization = nx::branding::customization().toStdString();
 
-    // The handler is delivered on the watcher's thread. The connection is captured (and thus kept
-    // alive) so resetAuthData()'s token removal does not destroy it mid-request, and the auth data
-    // is reset only after the SSO request completes so the access token it relies on stays valid.
+    // The handler is delivered on the watcher's thread. The connection and auth data are captured
+    // so the SSO request and the deferred token removal keep a live connection and valid tokens
+    // even though the local auth data is cleared right away below.
     auto handler = nx::utils::AsyncHandlerExecutor(q).bind(
-        [this, connection](ResultCode result, SsoLogoutResponse response)
+        [this, connection, authData](ResultCode result, SsoLogoutResponse response)
         {
-            if (result == ResultCode::ok && !response.logout_url.empty())
+            // Drive the browser through the IdP end-session URL only while still logged out: the
+            // user may have started a new login before this (possibly slow) request returned, and
+            // terminating the IdP session then would tear down the freshly established one.
+            if (result == ResultCode::ok && !response.logout_url.empty()
+                && status == CloudStatusWatcher::LoggedOut)
+            {
                 emit q->ssoLogoutUrlReady(QUrl(QString::fromStdString(response.logout_url)));
+            }
             else if (result != ResultCode::ok)
+            {
                 NX_WARNING(q, "SSO logout request failed (%1); the provider session may persist",
                     result);
+            }
 
-            q->resetAuthData();
+            // Revoke the tokens captured at logout, by value via the captured connection - harmless
+            // to any new session, so safe even if the user logged back in meanwhile.
+            removeCloudTokens(authData, connection);
         });
 
     connection->oauthManager()->ssoLogout(redirectUri, customization, std::move(handler));
+
+    // Switch to the logged-out state immediately so the welcome screen stops showing cloud systems.
+    RemoteConnectionFactoryCache::clearForUser(authData.credentials.username);
+    setAuthData(CloudAuthData(), AuthMode::login, /*removeExistingTokens*/ false);
+    appContext()->coreSettings()->setCloudAuthData(CloudAuthData());
 }
 
 void CloudStatusWatcher::Private::saveCredentials() const
