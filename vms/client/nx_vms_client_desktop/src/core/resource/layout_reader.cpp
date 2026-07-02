@@ -63,7 +63,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
 
     QnFileLayoutResourcePtr layout(new QnFileLayoutResource(metadata));
 
-    const auto fileInfo = nx::core::layout::readNovFileIndex(layoutUrl);
+    const auto fileInfo = nx::core::layout::readNovFileIndex(layoutUrl.toStdString());
     if (!fileInfo)
         return QnFileLayoutResourcePtr();
 
@@ -80,7 +80,7 @@ QnFileLayoutResourcePtr layout::layoutFromFile(
     // Layout is not accessible if it is Encrypted and we do not know the password.
     bool layoutIsAccessible =
         !fileInfo->cryptoInfo
-        || (!password.isEmpty() && checkPassword(password, *fileInfo->cryptoInfo));
+        || (!password.isEmpty() && checkPassword(password.toStdString(), *fileInfo->cryptoInfo));
     if (!layoutIsAccessible && !password.isEmpty())
         NX_WARNING(NX_SCOPE_TAG, "Loading encrypted layout file with wrong password.");
 

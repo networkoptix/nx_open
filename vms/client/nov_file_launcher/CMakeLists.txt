@@ -21,4 +21,7 @@ set_target_properties(nov_file_launcher PROPERTIES
     WIN32_EXECUTABLE ON #< On Windows, build a GUI (non-console) app.
 )
 
-target_include_directories(nov_file_launcher PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(nov_file_launcher PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/nx_vms_common/src
+)

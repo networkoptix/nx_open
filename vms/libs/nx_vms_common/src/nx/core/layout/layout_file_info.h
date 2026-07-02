@@ -1,10 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #pragma once
+
 #include <array>
+#include <cstdint>
+#include <optional>
+#include <string>
 #include <vector>
 
-#include <QtCore/QtGlobal>
+// Provide a no-op fallback so non-Qt builds (e.g., nov_file_launcher) can include this header.
+#ifndef NX_VMS_COMMON_API
+    #define NX_VMS_COMMON_API
+#endif
 
 // This module defines basic constants and POD structures for layout files,
 // provides basic info about .nov and .exe layout files,
@@ -16,35 +23,37 @@ struct FileInfo;
 struct CryptoInfo;
 
 // Just checks extension.
-NX_VMS_COMMON_API bool isLayoutExtension(const QString& fileName);
+NX_VMS_COMMON_API bool isLayoutExtension(const std::string& fileName);
 
 // Reads basic info for layout file. Allows .exe.tmp extension if allowTemp is set.
 NX_VMS_COMMON_API std::optional<FileInfo> readNovFileIndex(
-    const QString& fileName, bool allowTemp = false);
+    const std::string& fileName, bool allowTemp = false);
 
 // Append basic info for layout file to end of file.
-NX_VMS_COMMON_API bool writeNovFileIndex(const QString& fileName, const FileInfo& info);
+NX_VMS_COMMON_API bool writeNovFileIndex(const std::string& fileName, const FileInfo& info);
 
 // Checks a layout password against pre-loaded the hash.
-NX_VMS_COMMON_API bool checkPassword(const QString& password, const CryptoInfo& cryptoInfo);
+NX_VMS_COMMON_API bool checkPassword(const std::string& password, const CryptoInfo& cryptoInfo);
 
-constexpr int kHashSize = 32;
+static constexpr int kHashSize = 32;
+static constexpr int kCryptoInfoSize = 256;
 
 using Key = std::array<unsigned char, kHashSize>;
 
 #pragma pack(push, 4)
+
 struct StreamIndexEntry
 {
-    qint64 offset = 0;
-    quint32 fileNameCrc = 0;
-    quint32 reserved = 0;
+    int64_t offset = 0;
+    uint32_t fileNameCrc = 0;
+    uint32_t reserved = 0;
 };
 
 struct CryptoInfo
 {
     Key passwordSalt = {};
     Key passwordHash = {};
-    std::array<unsigned char, 256 - 2 * kHashSize> reserved = {};
+    std::array<unsigned char, kCryptoInfoSize - 2 * kHashSize> reserved = {};
 };
 
 struct Header
@@ -55,11 +64,11 @@ struct Header
 
 struct Footer
 {
-    static constexpr quint64 kIndexMagic = 0xdea5489c3f44ca16ll;
-    static constexpr quint64 kCurrentVersion = 2;
+    static constexpr uint64_t kIndexMagic = 0xdea5489c3f44ca16ull;
+    static constexpr uint64_t kCurrentVersion = 2;
     uint64_t magic = kIndexMagic;
-    uint32_t version = 2; //< File structure version.
-    uint64_t offset = 0; //< Offest to header data.
+    uint32_t version = 2;
+    uint64_t offset = 0; //< Offset to Header data.
 };
 
 #pragma pack(pop)

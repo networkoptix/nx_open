@@ -76,7 +76,7 @@ TEST(LayoutFileInfo, BasicParsing)
 
     writeTestFileVersion2(fileName);
 
-    auto fileInfo = readNovFileIndex(fileName);
+    auto fileInfo = readNovFileIndex(fileName.toStdString());
 
     ASSERT_TRUE(fileInfo);
     ASSERT_TRUE(!fileInfo->cryptoInfo);
@@ -92,7 +92,7 @@ TEST(LayoutFileInfo, BackwardCompatibility)
 
     writeTestFileVersion1(fileName);
 
-    auto fileInfo = readNovFileIndex(fileName);
+    auto fileInfo = readNovFileIndex(fileName.toStdString());
 
     ASSERT_TRUE(fileInfo);
     ASSERT_TRUE(fileInfo->cryptoInfo);

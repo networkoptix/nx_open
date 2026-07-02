@@ -69,7 +69,7 @@ bool QnLayoutFileStorageResource::isEncrypted() const
 
 bool QnLayoutFileStorageResource::usePasswordToRead(const QString& password)
 {
-    if (m_info.cryptoInfo && checkPassword(password, *m_info.cryptoInfo))
+    if (m_info.cryptoInfo && checkPassword(password.toStdString(), *m_info.cryptoInfo))
     {
         m_password = password;
         return true;
@@ -377,7 +377,7 @@ QnLayoutFileStorageResource::Stream QnLayoutFileStorageResource::findStream(cons
 
 bool QnLayoutFileStorageResource::finalize()
 {
-    if (!writeNovFileIndex(getUrl(), m_info))
+    if (!writeNovFileIndex(getUrl().toStdString(), m_info))
         return false;
 
     m_isOpened = true;
@@ -430,7 +430,7 @@ void QnLayoutFileStorageResource::removeFileCompletely(QnLayoutStreamSupport* fi
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
-    auto info = readNovFileIndex(getUrl(), true);
+    auto info = readNovFileIndex(getUrl().toStdString(), true);
     if (!info)
     {
         NX_WARNING(this, "Nonexistent or corrupted nov file. Ignoring.");
