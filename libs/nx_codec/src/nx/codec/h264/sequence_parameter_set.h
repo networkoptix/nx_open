@@ -30,7 +30,7 @@ public:
     int offset_for_non_ref_pic = 0;
     int offset_for_top_to_bottom_field = 0;
     int num_ref_frames_in_pic_order_cnt_cycle = 0;
-    int offset_for_ref_frame[256];
+    int offset_for_ref_frame[256] = {};
     int num_ref_frames = 0;
     int gaps_in_frame_num_value_allowed_flag = 0;
     int pic_width_in_mbs = 0;
@@ -130,7 +130,7 @@ public:
     void insertHdrParameters();
 
 private:
-    bool seq_scaling_list_present_flag[8];
+    bool seq_scaling_list_present_flag[8] = {};
     void hrd_parameters();
     void deserializeVuiParameters();
     int getCropY() const;

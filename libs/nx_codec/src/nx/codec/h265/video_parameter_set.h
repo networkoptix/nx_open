@@ -17,31 +17,31 @@ struct NX_CODEC_API VideoParameterSet
 
     struct OrderingInfo
     {
-        uint32_t vps_max_dec_pic_buffering_minus1;
-        uint32_t vps_max_num_reorder_pics;
-        uint32_t vps_max_latency_increase_plus1;
+        uint32_t vps_max_dec_pic_buffering_minus1 = 0;
+        uint32_t vps_max_num_reorder_pics = 0;
+        uint32_t vps_max_latency_increase_plus1 = 0;
     };
 
     struct HRDData
     {
-        int32_t hrd_layer_set_idx;
-        bool cprms_present_flag;
+        int32_t hrd_layer_set_idx = 0;
+        bool cprms_present_flag = false;
         HRDParameters hrd_parameters;
     };
 
-    uint8_t vps_video_parameter_set_id;
-    uint8_t vps_reserved_three_2bits;
-    uint8_t vps_max_layers_minus1;
-    uint8_t vps_max_sub_layers_minus1;
-    bool vps_temporal_id_nesting_flag;
-    uint16_t vps_reserved_0xffff_16bits;
+    uint8_t vps_video_parameter_set_id = 0;
+    uint8_t vps_reserved_three_2bits = 0;
+    uint8_t vps_max_layers_minus1 = 0;
+    uint8_t vps_max_sub_layers_minus1 = 0;
+    bool vps_temporal_id_nesting_flag = false;
+    uint16_t vps_reserved_0xffff_16bits = 0;
     ProfileTierLevel profile_tier_level;
-    bool vps_sub_layer_ordering_info_present_flag;
+    bool vps_sub_layer_ordering_info_present_flag = false;
     std::vector<OrderingInfo> ordering_info;
-    uint8_t vps_max_layer_id;
-    uint32_t vps_num_layer_sets_minus1;
+    uint8_t vps_max_layer_id = 0;
+    uint32_t vps_num_layer_sets_minus1 = 0;
     std::vector< std::bitset<64> > layer_id_included_flags; // 64 - it`s max size of vps_max_layer_id (6) bit
-    bool vps_timing_info_present_flag;
+    bool vps_timing_info_present_flag = false;
     /*TODO uint32_t vps_num_units_in_tick;
     uint32_t vps_time_scale;
     bool vps_poc_proportional_to_timing_flag;

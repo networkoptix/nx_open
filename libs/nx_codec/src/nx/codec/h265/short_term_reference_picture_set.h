@@ -16,19 +16,19 @@ struct NX_CODEC_API ShortTermReferencePictureSet
         uint32_t num_short_term_ref_pic_sets,
         const std::vector<ShortTermReferencePictureSet>& spsSets);
 
-        uint8_t inter_ref_pic_set_prediction_flag;
+        uint8_t inter_ref_pic_set_prediction_flag = 0;
 
     // apply if inter_ref_pic_set_prediction_flag is set
-    uint32_t delta_idx_minus1;
-    uint8_t delta_rps_sign;
-    uint32_t abs_delta_rps_minus1;
+    uint32_t delta_idx_minus1 = 0;
+    uint8_t delta_rps_sign = 0;
+    uint32_t abs_delta_rps_minus1 = 0;
 
     std::vector<uint8_t> used_by_curr_pic_flags;
     std::vector<uint8_t> use_delta_flags;
 
     // apply if inter_ref_pic_set_prediction_flag is not set
-    uint32_t num_negative_pics;
-    uint32_t num_positive_pics;
+    uint32_t num_negative_pics = 0;
+    uint32_t num_positive_pics = 0;
 
     std::vector<uint32_t> delta_poc_s0_minus1_vector;
     std::vector<uint8_t> used_by_curr_pic_s0_flags;

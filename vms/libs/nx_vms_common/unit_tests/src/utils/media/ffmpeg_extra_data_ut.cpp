@@ -2,7 +2,9 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/codec/h265/extradata.h>
 #include <nx/codec/h265/hevc_decoder_configuration_record.h>
+#include <nx/codec/nal_units.h>
 #include <nx/media/h264_utils.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -82,4 +84,44 @@ TEST(media, parse_extradata_h265)
     ASSERT_EQ(hvcc.size(), sizeof(frameData));
     ASSERT_TRUE(hvcc.write(serializedData, sizeof(frameData)));
     ASSERT_EQ_BINARY(serializedData, frameData, sizeof(frameData));
+}
+
+// Verifies that min_spatial_segmentation_idc is 0 when the SPS has VUI present
+// but bitstream_restriction_flag is not set. Without the fix the field was uninitialized,
+// causing extradata to differ on every keyframe for some cameras.
+// Stable detection of uninitialized memory reads requires running under Valgrind or MSan.
+TEST(media, build_extradata_h265_no_bitstream_restriction)
+{
+    // NAL units extracted from a real camera HEVCC:
+    // Main Profile, Level 4.0, 4:2:0 8-bit, VUI present, bitstream_restriction_flag=0.
+    uint8_t vpsData[] = {
+        0x40, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60, 0x00, 0x00,
+        0x03, 0x00, 0x80, 0x00, 0x00, 0x03, 0x00, 0x00, 0x03, 0x00,
+        0x78, 0xac, 0x09
+    };
+    uint8_t spsData[] = {
+        0x42, 0x01, 0x01, 0x01, 0x60, 0x00, 0x00, 0x03, 0x00, 0x80,
+        0x00, 0x00, 0x03, 0x00, 0x00, 0x03, 0x00, 0x78, 0xa0, 0x03,
+        0xc0, 0x80, 0x10, 0xe7, 0xf8, 0xda, 0xee, 0xd4, 0xdd, 0xdc,
+        0x97, 0x58, 0x0b, 0x70, 0x10, 0x10, 0x10, 0x40, 0x00, 0x00,
+        0xfa, 0x00, 0x00, 0x1d, 0x4c, 0x1c, 0x87, 0x7b, 0x94, 0x76,
+        0x20
+    };
+    uint8_t ppsData[] = {
+        0x44, 0x01, 0xc1, 0x72, 0xb0, 0x9c, 0x14, 0x0a, 0x62, 0x40
+    };
+
+    std::vector<nx::media::nal::NalUnitInfo> nalUnits = {
+        {vpsData, (int) sizeof(vpsData)},
+        {spsData, (int) sizeof(spsData)},
+        {ppsData, (int) sizeof(ppsData)},
+    };
+
+    auto extradata = nx::media::h265::buildExtraDataMp4(nalUnits);
+    ASSERT_FALSE(extradata.empty());
+
+    // Verify that min_spatial_segmentation_idc defaults to 0 when bitstream_restriction_flag=0.
+    nx::media::h265::HEVCDecoderConfigurationRecord result;
+    ASSERT_TRUE(result.read(extradata.data(), (int) extradata.size()));
+    ASSERT_EQ(result.min_spatial_segmentation_idc, 0);
 }
