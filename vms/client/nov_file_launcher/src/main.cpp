@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include <boost/preprocessor/cat.hpp>
+#include <nx/core/layout/layout_file_info.h>
 
 #include <tchar.h>
 #include <Windows.h>
@@ -18,18 +19,14 @@
 #include "progress.h"
 #include "resource.h"
 
-typedef signed __int64 int64_t;
-
 #define CLIENT_FILE_NAME BOOST_PP_CAT(L, QN_CLIENT_EXECUTABLE_NAME)
 
 using namespace std;
-
-static const int IO_BUFFER_SIZE = 1024*1024;
-static const int64_t MAGIC = 0x73a0b934820d4055ll;
+using namespace nx::core::layout;
 
 wofstream logfile;
 
-wstring loadString(UINT id)
+wstring loadString(UINT /*id*/)
 {
     enum { BUFFER_SIZE = 1024 };
     wchar_t buffer[BUFFER_SIZE];
@@ -53,7 +50,7 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
         return fileName;
 
     wstring value = folder;
-    for (int i = 0; i < value.length(); ++i)
+    for (int i = 0; i < (int) value.length(); ++i)
     {
         if (value[i] == L'\\')
             value[i] = L'/';
@@ -91,7 +88,7 @@ wchar_t getNativeSeparator()
 wstring toNativeSeparator(const wstring& path)
 {
     wstring value = path;
-    for (int i = 0; i < value.length(); ++i)
+    for (int i = 0; i < (int) value.length(); ++i)
     {
         if (value[i] == L'/' || value[i] == L'\\')
             value[i] = getNativeSeparator();
@@ -190,9 +187,6 @@ BOOL startProcessAsync(wchar_t* commandline, const wstring& dstDir)
  * / INDEX PTR: 8 bytes /
  * /--------------------/
  * / NOV file           /
- * / NOV PTR: 8 bytes   /
- * /--------------------/
- * / MAGIC: 8 bytes     /
  * /--------------------/
  */
 int launchFile(const wstring& executePath)
@@ -209,18 +203,42 @@ int launchFile(const wstring& executePath)
         return -1;
     }
 
-    srcFile.seekg(-sizeof(int64_t) * 2, std::ios::end);
-    [[maybe_unused]] const int64_t novPosOffset = srcFile.tellg();
+    int64_t novPos = 0, indexTablePos = 0;
 
-    int64_t magic = 0, novPos = 0, indexTablePos = 0;
-
-    srcFile.read((char*) &novPos, sizeof(int64_t));
-    srcFile.read((char*) &magic, sizeof(int64_t));
-    if (magic != MAGIC)
+    Footer footer;
+    srcFile.seekg(-(int) sizeof(footer), std::ios::end);
+    srcFile.read((char*) &footer, sizeof(footer));
+    if (footer.magic != Footer::kIndexMagic)
     {
         logfile << L"Magic was not found" << "\n";
         return -5;
     }
+
+    Header header;
+    srcFile.seekg(footer.offset);
+    srcFile.read((char*) &header, sizeof(header));
+    if (!srcFile)
+    {
+        logfile << L"Failed to read index header" << "\n";
+        return -5;
+    }
+    if (header.entryCount < 1)
+    {
+        logfile << L"No stream entries in index" << "\n";
+        return -5;
+    }
+
+    // First stream entry holds the absolute start of NOV data (= right after the index ptr field).
+    if (header.hasCryptoData)
+        srcFile.seekg(kCryptoInfoSize, std::ios::cur);
+    StreamIndexEntry entry;
+    srcFile.read((char*) &entry, sizeof(entry));
+    if (!srcFile)
+    {
+        logfile << L"Failed to read stream index entry" << "\n";
+        return -5;
+    }
+    novPos = entry.offset;
 
     srcFile.seekg(novPos-sizeof(int64_t)); // go to index_pos field
     const int64_t indexEndOffset = novPos - sizeof(int64_t);
@@ -279,7 +297,7 @@ int launchFile(const wstring& executePath)
 
             progress.setRange(filePosList.front(), filePosList.back());
 
-            for (int i = 0; i < filePosList.size() - 1; ++i)
+            for (int i = 0; i < (int) filePosList.size() - 1; ++i)
             {
                 wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
                 logfile << L"Export file: " << fullFileName.c_str() << L"\n";
@@ -318,7 +336,7 @@ wstring trimAndUnquote(std::wstring str)
     return str;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char** /*argv*/)
 {
     logfile.open(getTempPath() + L"nov_file_launcher.log", std::ofstream::out);
 

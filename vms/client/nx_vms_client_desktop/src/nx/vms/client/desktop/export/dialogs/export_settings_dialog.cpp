@@ -599,7 +599,7 @@ void ExportSettingsDialog::updateWidgetsState()
     // All UI events should be locked here.
     ui->exportMediaSettingsPage->setData({transcodingChecked, !transcodingLocked});
     m_passwordWidget->setVisible(mode == ExportMode::layout
-        || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName()));
+        || nx::core::layout::isLayoutExtension(ui->mediaFilenamePanel->filename().completeFileName().toStdString()));
 
     ui->transcodingButtonsWidget->setVisible(overlayOptionsAvailable);
 
@@ -803,7 +803,7 @@ void ExportSettingsDialog::accept()
     if (!filenamePanel->validate())
         return;
 
-    if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName())
+    if (nx::core::layout::isLayoutExtension(filenamePanel->filename().completeFileName().toStdString())
         && !m_passwordWidget->validate())
     {
         return;
