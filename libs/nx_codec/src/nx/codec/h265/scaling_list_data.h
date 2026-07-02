@@ -11,10 +11,10 @@ struct NX_CODEC_API ScalingListData
     bool read(nx::utils::BitStreamReader& reader);
     struct ScalingListElement
     {
-        uint8_t scaling_list_pred_mode_flag;
-        uint8_t scaling_list_pred_matrix_id_delta;
-        int16_t scaling_list_dc_coef_minus8;
-        int8_t scaling_list_delta_coef[64];
+        uint8_t scaling_list_pred_mode_flag = 0;
+        uint8_t scaling_list_pred_matrix_id_delta = 0;
+        int16_t scaling_list_dc_coef_minus8 = 0;
+        int8_t scaling_list_delta_coef[64] = {};
 
         uint32_t coefNum = 0;
     };

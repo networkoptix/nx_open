@@ -12,7 +12,7 @@
 
 namespace {
 
-static constexpr uint16_t kMaxSpatialSefmentation = 4096;
+static constexpr uint16_t kMaxSpatialSegmentation = 4096;
 static constexpr uint8_t kNaluLengthSizeBytes = 4;
 
 using namespace nx::media::h265;
@@ -96,7 +96,6 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
     hvcc.general_profile_idc = 0;
     hvcc.general_profile_compatibility_flags = 0xffffffff;
     hvcc.general_constraint_indicator_flags  = 0xffffffffffff;
-    hvcc.min_spatial_segmentation_idc = kMaxSpatialSefmentation + 1;
     hvcc.avgFrameRate = 0;
     hvcc.constantFrameRate = 0;
     hvcc.numTemporalLayers = 0;
@@ -109,8 +108,11 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
 
     // SPS
     updatePTL(sps.profile_tier_level, hvcc);
-    hvcc.min_spatial_segmentation_idc = std::min<uint16_t>(
-        hvcc.min_spatial_segmentation_idc, sps.vui_parameters.min_spatial_segmentation_idc);
+    hvcc.min_spatial_segmentation_idc =
+        sps.vui_parameters.min_spatial_segmentation_idc < kMaxSpatialSegmentation
+            ? sps.vui_parameters.min_spatial_segmentation_idc
+            : 0;
+
     hvcc.chromaFormat = sps.chroma_format_idc;
     hvcc.bitDepthLumaMinus8 = sps.bit_depth_luma_minus8;
     hvcc.bitDepthChromaMinus8 = sps.bit_depth_chroma_minus8;
@@ -127,9 +129,6 @@ std::vector<uint8_t> buildExtraDataMp4(const std::vector<nal::NalUnitInfo>& nalU
         hvcc.parallelismType = 2; // tile-based parallel decoding
     else
         hvcc.parallelismType = 1;
-
-    if (hvcc.min_spatial_segmentation_idc > kMaxSpatialSefmentation)
-        hvcc.min_spatial_segmentation_idc = 0;
 
     std::vector<uint8_t> extradata(hvcc.size());
     hvcc.write(extradata.data(), extradata.size());

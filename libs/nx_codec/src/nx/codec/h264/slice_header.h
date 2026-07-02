@@ -12,17 +12,17 @@ class NX_CODEC_API SliceHeader: public NALUnit
 {
 public:
     enum SliceType {P_TYPE, B_TYPE, I_TYPE, SP_TYPE, SI_TYPE, DUMMY_TYPE};
-    int first_mb_in_slice;
-    int slice_type;
-    int orig_slice_type;
-    int pic_parameter_set_id;
-    int frame_num;
-    int bottom_field_flag;
-    int idr_pic_id;
-    int pic_order_cnt_lsb;
-    int delta_pic_order_cnt_bottom;
-    int m_picOrderBitPos;
-    int m_picOrderNumBits;
+    int first_mb_in_slice = 0;
+    int slice_type = 0;
+    int orig_slice_type = 0;
+    int pic_parameter_set_id = 0;
+    int frame_num = 0;
+    int bottom_field_flag = 0;
+    int idr_pic_id = 0;
+    int pic_order_cnt_lsb = 0;
+    int delta_pic_order_cnt_bottom = 0;
+    int m_picOrderBitPos = 0;
+    int m_picOrderNumBits = 0;
     int m_field_pic_flag = 0;
     int memory_management_control_operation = 0;
 
@@ -31,30 +31,30 @@ public:
     const SequenceParameterSet* getSPS() const {return sps;}
     const PictureParameterSet* getPPS() const {return pps;}
 
-    int slice_qp_delta;
+    int slice_qp_delta = 0;
     int disable_deblocking_filter_idc = 0;
-    int slice_alpha_c0_offset_div2;
-    int slice_beta_offset_div2;
-    int delta_pic_order_cnt[2];
-    int slice_qs_delta;
-    int redundant_pic_cnt;
-    int slice_group_change_cycle;
-    int num_ref_idx_l0_active_minus1;
-    int num_ref_idx_l1_active_minus1;
-    int direct_spatial_mv_pred_flag;
-    int num_ref_idx_active_override_flag;
-    int sp_for_switch_flag;
-    int ref_pic_list_reordering_flag_l0;
-    int abs_diff_pic_num_minus1;
-    int cabac_init_idc;
-    int no_output_of_prior_pics_flag;
-    int long_term_reference_flag;
-    int adaptive_ref_pic_marking_mode_flag;
+    int slice_alpha_c0_offset_div2 = 0;
+    int slice_beta_offset_div2 = 0;
+    int delta_pic_order_cnt[2] = {};
+    int slice_qs_delta = 0;
+    int redundant_pic_cnt = 0;
+    int slice_group_change_cycle = 0;
+    int num_ref_idx_l0_active_minus1 = 0;
+    int num_ref_idx_l1_active_minus1 = 0;
+    int direct_spatial_mv_pred_flag = 0;
+    int num_ref_idx_active_override_flag = 0;
+    int sp_for_switch_flag = 0;
+    int ref_pic_list_reordering_flag_l0 = 0;
+    int abs_diff_pic_num_minus1 = 0;
+    int cabac_init_idc = 0;
+    int no_output_of_prior_pics_flag = 0;
+    int long_term_reference_flag = 0;
+    int adaptive_ref_pic_marking_mode_flag = 0;
 
-    int ref_pic_list_reordering_flag_l1;
-    int long_term_pic_num;
-    int luma_log2_weight_denom;
-    int chroma_log2_weight_denom;
+    int ref_pic_list_reordering_flag_l1 = 0;
+    int long_term_pic_num = 0;
+    int luma_log2_weight_denom = 0;
+    int chroma_log2_weight_denom = 0;
 
     QVector<int> m_ref_pic_vect;
     QVector<int> m_ref_pic_vect2;
@@ -152,8 +152,8 @@ private:
     int NextMbAddress(int n);
 
 private:
-    const PictureParameterSet* pps;
-    const SequenceParameterSet* sps;
+    const PictureParameterSet* pps = nullptr;
+    const SequenceParameterSet* sps = nullptr;
     int m_frameNumBits = 0;
     int m_fullHeaderLen = 0;
     int deserializeSliceHeader(const SequenceParameterSet* sps, const PictureParameterSet* pps);

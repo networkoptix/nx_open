@@ -14,8 +14,8 @@ public:
     int cpb_removal_delay = 0;
     int dpb_output_delay = 0;
     int pic_struct = 0;
-    int initial_cpb_removal_delay[32];
-    int initial_cpb_removal_delay_offset[32];
+    int initial_cpb_removal_delay[32] = {};
+    int initial_cpb_removal_delay_offset[32] = {};
     QSet<int> m_processedMessages;
     QList<QPair<const quint8*, int> > m_userDataPayload;
     quint8* m_cpb_removal_delay_baseaddr = 0;
