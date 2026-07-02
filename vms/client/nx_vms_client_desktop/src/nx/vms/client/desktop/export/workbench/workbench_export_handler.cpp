@@ -810,9 +810,8 @@ void WorkbenchExportHandler::at_exportStandaloneClientAction_triggered()
             QString temporaryFilename = targetFilename;
             temporaryFilename.replace(kExeExtension, kTmpExtension);
             #if defined(Q_OS_WIN)
-                if (QnNovLauncher::createLaunchingFile(
-                        temporaryFilename,
-                        QnNovLauncher::ExportMode::standaloneClient) != QnNovLauncher::ErrorCode::Ok)
+                if (QnNovLauncher::createLaunchingFile(temporaryFilename)
+                    != QnNovLauncher::ErrorCode::Ok)
                 {
                     QnMessageBox::critical(mainWindowWidget(),
                         QString("File %1 cannot be written").arg(temporaryFilename));

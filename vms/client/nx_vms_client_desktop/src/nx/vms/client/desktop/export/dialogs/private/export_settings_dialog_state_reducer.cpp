@@ -244,7 +244,7 @@ State ExportSettingsDialogStateReducer::loadSettings(State state,
     if (state.bookmarkName.isEmpty()
         || mode == ExportMode::layout
         || nx::core::layout::isLayoutExtension(
-            state.exportMediaSettings.fileName.completeFileName()))
+            state.exportMediaSettings.fileName.completeFileName().toStdString()))
         return clearSelection(std::move(state));
 
     return selectOverlay(std::move(state), ExportOverlayType::bookmark);
@@ -560,7 +560,7 @@ State ExportSettingsDialogStateReducer::setMediaFilename(State state, const File
     state.exportMediaSettings.fileName = filename;
     state.exportMediaPersistentSettings.fileFormat = FileSystemStrings::suffix(filename.extension);
 
-    if (nx::core::layout::isLayoutExtension(filename.completeFileName()))
+    if (nx::core::layout::isLayoutExtension(filename.completeFileName().toStdString()))
         state = clearSelection(std::move(state));
 
     const auto& objectExportSettings =

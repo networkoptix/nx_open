@@ -13,9 +13,9 @@
 
 namespace nx::core::layout {
 
-bool isLayoutExtension(const QString& fileName)
+bool isLayoutExtension(const std::string& fileName)
 {
-    const QString extension = QFileInfo(fileName).suffix().toLower();
+    const QString extension = QFileInfo(QString::fromStdString(fileName)).suffix().toLower();
     return extension == "nov" || extension == "exe";
 }
 
@@ -89,10 +89,9 @@ std::optional<FileInfo> parseVerson2(QFile&& file)
     return info;
 }
 
-bool writeNovFileIndex(const QString& fileName, const FileInfo& info)
+bool writeNovFileIndex(const std::string& fileName, const FileInfo& info)
 {
-
-    QFile file(fileName);
+    QFile file(QString::fromStdString(fileName));
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return false;
 
@@ -118,20 +117,21 @@ bool writeNovFileIndex(const QString& fileName, const FileInfo& info)
     return true;
 }
 
-std::optional<FileInfo> readNovFileIndex(const QString& fileName, bool allowTemp)
+std::optional<FileInfo> readNovFileIndex(const std::string& fileName, bool allowTemp)
 {
-    const QString extension = QFileInfo(fileName).suffix().toLower();
+    const QString qFileName = QString::fromStdString(fileName);
+    const QString extension = QFileInfo(qFileName).suffix().toLower();
     if (!(extension == "nov" || extension == "exe"
-        || (allowTemp && (fileName.endsWith(".exe.tmp") || fileName.endsWith(".nov.tmp")))))
+        || (allowTemp && (qFileName.endsWith(".exe.tmp") || qFileName.endsWith(".nov.tmp")))))
     {
         NX_WARNING(NX_SCOPE_TAG, "Invalid NOV file extension: %1", extension);
         return std::nullopt;
     }
 
-    QFile file(fileName);
+    QFile file(qFileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to open NOV file: %1", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Failed to open NOV file: %1", qFileName);
         return std::nullopt;
     }
 
@@ -139,12 +139,12 @@ std::optional<FileInfo> readNovFileIndex(const QString& fileName, bool allowTemp
     Footer footer;
     if (!file.seek(file.size() - sizeof(footer)))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file, failed to read header, %1", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file, failed to read header, %1", qFileName);
         return std::nullopt;
     }
     if (file.read((char*)&footer, sizeof(footer)) != sizeof(footer))
     {
-        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read header", fileName);
+        NX_WARNING(NX_SCOPE_TAG, "Invalid nov file: %1, failed to read header", qFileName);
         return std::nullopt;
     }
     file.seek(0);
@@ -154,7 +154,7 @@ std::optional<FileInfo> readNovFileIndex(const QString& fileName, bool allowTemp
         : parseVerson1(std::move(file), extension == "exe");
 
     if (info)
-        NX_DEBUG(NX_SCOPE_TAG, "Parsed NOV file: %1", fileName);
+        NX_DEBUG(NX_SCOPE_TAG, "Parsed NOV file: %1", qFileName);
 
     return info;
 }
@@ -167,9 +167,9 @@ int FileInfo::totalIndexHeaderSize()
         + sizeof(Footer);
 }
 
-bool checkPassword(const QString& password, const CryptoInfo& cryptoInfo)
+bool checkPassword(const std::string& password, const CryptoInfo& cryptoInfo)
 {
-    return nx::crypt::checkSaltedPassword(password,
+    return nx::crypt::checkSaltedPassword(QString::fromStdString(password),
         cryptoInfo.passwordSalt, cryptoInfo.passwordHash);
 }
 

@@ -16,8 +16,6 @@ namespace {
 
 static const int IO_BUFFER_SIZE = 1024 * 1024;
 
-// TODO: #sivanov Move out to a common place with launcher.exe.
-static const qint64 MAGIC = 0x73a0b934820d4055ll;
 
 struct FileDescriptor
 {
@@ -161,14 +159,9 @@ QSet<QString> calculateFileList(const QDir& sourceRoot)
  * / INDEX PTR: 8 bytes /
  * /--------------------/
  * / NOV file           /
- * / NOV PTR: 8 bytes   /
- * /--------------------/
- * / MAGIC: 8 bytes     /
  * /--------------------/
  */
-QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
-    const QString& dstName,
-    ExportMode exportMode)
+QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(const QString& dstName)
 {
     static const QString kLauncherFile(":/launcher.exe");
 
@@ -206,12 +199,6 @@ QnNovLauncher::ErrorCode QnNovLauncher::createLaunchingFile(
     // Position where video data will start.
     const qint64 novPos = dstFile.pos();
     NX_VERBOSE(typeid(QnNovLauncher), "Nov file is located at %1", novPos);
-
-    if (exportMode == ExportMode::standaloneClient)
-    {
-        dstFile.write((const char*)&novPos, sizeof(qint64)); // nov file start
-        dstFile.write((const char*)&MAGIC, sizeof(qint64)); // magic
-    }
 
     return ErrorCode::Ok;
 }
