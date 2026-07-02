@@ -770,7 +770,7 @@
     <name>ObjectDetailsSheet</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
   </context>
   <context>

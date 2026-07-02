@@ -767,7 +767,7 @@
     <name>ObjectDetailsSheet</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>細節</translation>
     </message>
   </context>
   <context>

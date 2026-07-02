@@ -293,7 +293,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Sök efter %1</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     <name>ObjectDetailsSheet</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
   </context>
   <context>
@@ -976,7 +976,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>VÄLJ %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1648,7 +1648,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Tillbaka till välkomstskärmen</translation>
     </message>
   </context>
 </TS>

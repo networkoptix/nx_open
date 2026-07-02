@@ -1958,7 +1958,7 @@
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
-      <translation type="unfinished">JSON RPC subscription update interval (milliseconds, 0 = disabled).</translation>
+      <translation>JSON RPC サブスクリプション更新間隔 (ミリ秒、 0 = 無効)。</translation>
     </message>
   </context>
 </TS>
