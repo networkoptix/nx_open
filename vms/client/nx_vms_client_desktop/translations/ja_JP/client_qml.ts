@@ -974,7 +974,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation>自動較正に失敗しました</translation>
+      <translation>自動補正に失敗しました</translation>
     </message>
   </context>
   <context>
