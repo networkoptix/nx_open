@@ -7,6 +7,7 @@
 #include <QtNetwork/QSslConfiguration>
 
 #include <nx/kit/ini_config.h>
+#include <nx/network/nx_network_ini.h>
 #include <nx/network/ssl/certificate.h>
 
 namespace nx::vms::common {
@@ -71,6 +72,25 @@ AbstractCertificateVerifier::AbstractCertificateVerifier(QObject* parent): QObje
                     continue;
                 }
                 loadTrustedCertificate(f.readAll(), fileName);
+            }
+
+            // Additional roots from a configured directory (e.g. a debugging TLS interceptor CA).
+            const std::string extraDir(nx::network::ini().extraTrustedCertificatesDir);
+            if (!extraDir.empty())
+            {
+                const QDir extraFolder(QString::fromStdString(extraDir));
+                for (const auto& fileInfo: extraFolder.entryInfoList({"*.pem"}, QDir::Files))
+                {
+                    QFile f(fileInfo.absoluteFilePath());
+                    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+                    {
+                        NX_WARNING(this, "Cannot open extra trusted certificate %1",
+                            fileInfo.absoluteFilePath());
+                        continue;
+                    }
+                    NX_INFO(this, "Loading extra trusted certificate %1", fileInfo.fileName());
+                    loadTrustedCertificate(f.readAll(), fileInfo.fileName());
+                }
             }
         });
 }

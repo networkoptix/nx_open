@@ -148,6 +148,7 @@ private:
     void reloadIni();
 
     void initializeNetworking(const ArgumentParser& arguments);
+    void applyRedirectHosts();
 
     void initializeCloudConnectivity(const std::string& customCloudHost);
     void deinitializeCloudConnectivity();

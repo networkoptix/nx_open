@@ -417,8 +417,43 @@ void SocketGlobals::initializeNetworking(const ArgumentParser& arguments)
         []() { NX_ASSERT(!aioService().isInAnyAioThread()); });
 
     m_impl->addressResolver = std::make_unique<AddressResolver>();
+
+    applyRedirectHosts();
+
     m_impl->httpGlobalContext = std::make_unique<http::GlobalContext>();
     m_impl->debugIniReloadTimer = std::make_unique<aio::Timer>();
+}
+
+void SocketGlobals::applyRedirectHosts()
+{
+    const std::string_view redirectHosts(ini().redirectHosts);
+    if (redirectHosts.empty())
+        return;
+
+    std::vector<std::string_view> redirects;
+    nx::utils::split(redirectHosts, ',', std::back_inserter(redirects));
+    for (const auto& entry: redirects)
+    {
+        const auto eq = entry.find('=');
+        if (eq == std::string_view::npos)
+            continue;
+
+        const HostAddress host{entry.substr(0, eq)};
+        const SocketAddress parsed{entry.substr(eq + 1)};
+
+        // addFixedAddress requires a numeric endpoint; a HostAddress built from a string is not
+        // recognized as an IP (its numeric fields stay empty), so rebuild it from the IPv4 value.
+        const auto ipV4 = HostAddress::ipV4from(parsed.address.toString());
+        if (!ipV4)
+        {
+            NX_WARNING(this, "redirectHosts: %1 is not an IPv4 address, ignoring", parsed);
+            continue;
+        }
+
+        const SocketAddress endpoint(HostAddress(*ipV4), parsed.port);
+        m_impl->addressResolver->addFixedAddress(host, endpoint);
+        NX_INFO(this, "Redirecting host %1 to %2", host, endpoint);
+    }
 }
 
 void SocketGlobals::initializeCloudConnectivity(const std::string& customCloudHost)
