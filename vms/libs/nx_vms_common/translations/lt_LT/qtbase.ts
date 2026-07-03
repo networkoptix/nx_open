@@ -519,7 +519,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Ištrinti</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -565,7 +565,7 @@ Please verify the correct file name was given.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
@@ -704,7 +704,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation type="unfinished">&amp;Close</translation>
+      <translation>&amp;Uždaryti</translation>
     </message>
     <message>
       <source>Close without Saving</source>
@@ -831,7 +831,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -905,7 +905,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1088,7 +1088,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
   </context>
   <context>
@@ -1137,7 +1137,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Select All</source>
