@@ -41,6 +41,7 @@ public:
     std::shared_ptr<AbstractLogger> main();
 
     void setMainLogger(std::unique_ptr<AbstractLogger> logger);
+    void setMainLogger(std::shared_ptr<AbstractLogger> logger);
 
     /**
      * Add a logger to the collection.

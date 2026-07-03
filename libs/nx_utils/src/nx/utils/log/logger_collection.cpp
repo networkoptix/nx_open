@@ -47,6 +47,11 @@ std::shared_ptr<AbstractLogger> LoggerCollection::main()
 
 void LoggerCollection::setMainLogger(std::unique_ptr<AbstractLogger> logger)
 {
+    setMainLogger(std::shared_ptr<AbstractLogger>(std::move(logger)));
+}
+
+void LoggerCollection::setMainLogger(std::shared_ptr<AbstractLogger> logger)
+{
     if (!logger)
         return;
 
