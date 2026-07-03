@@ -160,7 +160,7 @@ Rectangle
 
         preview: preview
 
-        visible: opacity > 0 && !preview.cannotDecryptMedia
+        visible: opacity > 0 && !d.fullscreenLayout && !preview.cannotDecryptMedia
             && root.dataState === Preview.DataState.Available
         opacity: d.hasControls ? 1 : 0
     }
