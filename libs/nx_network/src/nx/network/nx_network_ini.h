@@ -27,8 +27,15 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
         "File to store TLS keys used to decrypt traffic dumps. Same as SSLKEYLOGFILE environment "
         "variable in cURL or Chrome. Used by the function set with SSL_CTX_set_keylog_callback.");
 
+    NX_INI_STRING("", extraTrustedCertificatesDir,
+        "Path to a directory with additional trusted root TLS certificates (*.pem), loaded on "
+        "startup in addition to the built-in ones.");
+
     NX_INI_FLAG(false, httpClientTraffic, "Trace HTTP traffic for nx::network::http::AsyncHttpClient");
     NX_INI_STRING("", disableHosts, "Comma-separated list of forbidden IPs and domains");
+
+    NX_INI_STRING("", redirectHosts,
+        "Comma-separated host=ip:port entries; each host is resolved to the given endpoint.");
 
     NX_INI_INT(10'000'000, minSocketSendDurationUs,
         "Minimum duration of socket send() to log as WARNING, in microseconds. Lesser durations\n"
