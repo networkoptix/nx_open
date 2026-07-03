@@ -1234,7 +1234,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>dienos</translation>
     </message>
     <message>
       <source>wks</source>
@@ -1294,11 +1294,11 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Numerus: Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>dienos</numerusform>
+        <numerusform>dienos</numerusform>
+        <numerusform>dienos</numerusform>
+        <numerusform>dienos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1354,7 +1354,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Dienos</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1456,7 +1456,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message>
       <source>Multiple groups</source>
@@ -1793,7 +1793,7 @@
     </message>
     <message>
       <source>Event log period (days).</source>
-      <translation type="unfinished">Event log period (days).</translation>
+      <translation>Įvykių žurnalo laikotarpis (dienomis).</translation>
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
@@ -1953,7 +1953,7 @@
     </message>
     <message>
       <source>Default video codec.</source>
-      <translation type="unfinished">Default video codec.</translation>
+      <translation>Numatytasis vaizdo kodekas.</translation>
     </message>
     <message>
       <source>Default codec for export video.</source>
