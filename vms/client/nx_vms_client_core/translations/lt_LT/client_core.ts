@@ -403,7 +403,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Debesis</translation>
     </message>
     <message>
       <source>Local</source>

@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Atlikta</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -309,7 +309,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Area Width</source>
@@ -393,11 +393,11 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Redaguoti</translation>
     </message>
   </context>
   <context>
@@ -758,7 +758,7 @@
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Redaguoti prisijungimo duomenis</translation>
     </message>
     <message>
       <source>Audio</source>
@@ -1058,7 +1058,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>
@@ -1255,7 +1255,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Size</source>
@@ -1309,7 +1309,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>
@@ -1335,7 +1335,7 @@
     </message>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Išvalyti</translation>
     </message>
     <message>
       <source>View...</source>
@@ -1550,7 +1550,7 @@
     <name>LogsManagementWidget</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Atlikta</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -1578,7 +1578,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>Atsisiųsti visą ataskaitą</translation>
     </message>
   </context>
   <context>
@@ -1679,7 +1679,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
     <message>
       <source>Browse</source>
@@ -1889,7 +1889,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2509,7 +2509,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2555,7 +2555,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>

@@ -199,7 +199,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -211,7 +211,7 @@
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Įveskite serverio adresą</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -338,7 +338,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -373,7 +373,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
   </context>
   <context>
@@ -563,7 +563,7 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>
@@ -879,7 +879,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>
@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Atlikta</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -1118,7 +1118,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -1364,7 +1364,7 @@
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Įveskite serverio adresą</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -1391,7 +1391,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Debesis</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1520,7 +1520,7 @@
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>

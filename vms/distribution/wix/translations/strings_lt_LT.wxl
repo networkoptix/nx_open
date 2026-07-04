@@ -12,16 +12,16 @@
 /norestart   - suppress any attempts to restart. By default UI will prompt before restart.
 /log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
+  <String Id="ClientAndServer">Klientas ir serveris</String>
+  <String Id="ClientOnly">Tik klientui</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
   <String Id="ServerOnly">Server only</String>
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
-  <String Id="HelpCloseButton">Close</String>
+  <String Id="HelpCloseButton">Uždaryti</String>
   <String Id="InstallOptionsButton">Options</String>
   <String Id="InstallInstallButton">Install</String>
-  <String Id="InstallCloseButton">Close</String>
+  <String Id="InstallCloseButton">Uždaryti</String>
   <String Id="InstallAcceptCheckbox">I agree to the</String>
   <String Id="InstallLicenseLinkText">End User License Agreement</String>
   <String Id="OptionsHeader">Setup Options</String>
@@ -36,20 +36,20 @@
   <String Id="ModifyHeader">Modify Setup</String>
   <String Id="ModifyRepairButton">Repair</String>
   <String Id="ModifyUninstallButton">Uninstall</String>
-  <String Id="ModifyCloseButton">Close</String>
+  <String Id="ModifyCloseButton">Uždaryti</String>
   <String Id="SuccessHeader">Setup Successful</String>
   <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
   <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
   <String Id="SuccessLaunchButton">Launch</String>
   <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
   <String Id="SuccessRestartButton">Restart</String>
-  <String Id="SuccessCloseButton">Close</String>
+  <String Id="SuccessCloseButton">Uždaryti</String>
   <String Id="FailureHeader">Setup Failed</String>
   <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the</String>
   <String Id="FailureHyperlinkLogTextLink">log file</String>
   <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software</String>
   <String Id="FailureRestartButton">Restart</String>
-  <String Id="FailureCloseButton">Close</String>
+  <String Id="FailureCloseButton">Uždaryti</String>
   <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
   <String Id="FilesInUseHeader">Files In Use</String>
   <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
