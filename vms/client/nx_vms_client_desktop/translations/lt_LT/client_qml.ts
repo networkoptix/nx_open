@@ -663,7 +663,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Key</source>
@@ -705,7 +705,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>
@@ -736,7 +736,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -829,7 +829,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Atlikta</translation>
     </message>
   </context>
   <context>
@@ -851,7 +851,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Išvalyti</translation>
     </message>
     <message>
       <source>OK</source>
@@ -1104,7 +1104,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupGeneralTab</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Info</source>
@@ -1462,7 +1462,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Redaguoti</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
@@ -1668,7 +1668,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>No Entries</source>
@@ -1871,7 +1871,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1911,7 +1911,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
   </context>
   <context>
@@ -2043,7 +2043,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>
@@ -2117,7 +2117,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Atlikta</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -2286,7 +2286,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
   </context>
   <context>
@@ -2795,7 +2795,7 @@ Press Alt + Click to follow object</translation>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Redaguoti</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -2807,7 +2807,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -2900,7 +2900,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Debesis</translation>
     </message>
     <message>
       <source>Login</source>
@@ -3006,7 +3006,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Info</source>
@@ -3126,11 +3126,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Dublikatas</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>No Entries</source>
