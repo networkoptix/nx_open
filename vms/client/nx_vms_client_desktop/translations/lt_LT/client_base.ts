@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>Sukurti paskyrą...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Išvalyti pasirinkimą</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
@@ -377,7 +377,7 @@
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation type="unfinished">Edit Bookmark...</translation>
+      <translation>Redaguoti žymę...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
@@ -429,7 +429,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -645,7 +645,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -905,7 +905,7 @@
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Ištrinti žymę...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
@@ -1125,7 +1125,7 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -1611,7 +1611,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
@@ -2303,7 +2303,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Data</translation>
     </message>
     <message>
       <source>Time</source>
@@ -3375,7 +3375,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Server not found</source>
@@ -3625,7 +3625,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -3637,7 +3637,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -3981,7 +3981,7 @@ License Key: %2</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Information</source>
@@ -4561,7 +4561,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -4755,7 +4755,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>cloud</source>
-      <translation type="unfinished">cloud</translation>
+      <translation>debesis</translation>
     </message>
     <message>
       <source>Path</source>
@@ -5293,7 +5293,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesModel</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message>
       <source>Custom access rights</source>
@@ -6083,7 +6083,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Warning</source>
@@ -6316,7 +6316,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>UserGroupsWidget::Private</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -6374,7 +6374,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>UserListWidget::Private</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -6394,7 +6394,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Redaguoti</translation>
     </message>
     <message>
       <source>Multiple users share the same login, causing login failures. To resolve this issue, either update the affected user logins or disable/delete duplicates.</source>
@@ -6457,7 +6457,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -6777,7 +6777,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>IŠJUNGTA</translation>
     </message>
   </context>
   <context>
@@ -7360,7 +7360,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsEditorWidget</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -7387,7 +7387,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraHotspotsItemModel</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Color</source>
@@ -7995,7 +7995,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CommonMessageBar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>
@@ -8117,7 +8117,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter password...</source>
-      <translation type="unfinished">Enter password...</translation>
+      <translation>Įveskite slaptažodį...</translation>
     </message>
     <message>
       <source>Administrator password</source>
@@ -8924,7 +8924,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>Group name cannot be empty</source>
@@ -8973,7 +8973,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
@@ -9098,7 +9098,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>Pasirinktinis numeris, kurį galima priskirti išdėstymui, kad būtų galima greitai jį identifikuoti ir pasiekti</translation>
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
@@ -9124,7 +9124,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>IŠJUNGTA</translation>
     </message>
   </context>
   <context>
@@ -9359,7 +9359,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Warning</source>
@@ -9371,7 +9371,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>Derinimas</translation>
     </message>
     <message>
       <source>Verbose</source>
@@ -10016,7 +10016,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -11056,7 +11056,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Neturi įtakos serverio užmegztiems ryšiams.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -11592,7 +11592,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>
@@ -11700,7 +11700,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Data</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -11839,7 +11839,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -11934,7 +11934,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -12731,7 +12731,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
     <message>
       <source>Name</source>
@@ -12916,7 +12916,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Pasirinktinis</translation>
     </message>
   </context>
   <context>
@@ -13013,7 +13013,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Ištrinti</translation>
     </message>
     <message>
       <source>WHEN</source>
