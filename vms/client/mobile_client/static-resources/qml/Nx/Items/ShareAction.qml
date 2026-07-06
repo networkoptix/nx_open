@@ -76,7 +76,7 @@ Action
                 onContinued:
                 {
                     appContext.settings.showHowShareWorksNotification = !doNotShowAgain
-                    shareBookmarkSheet.showSheet()
+                    shareBookmarkSheet.open()
                 }
             }
         }
