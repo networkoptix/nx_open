@@ -291,7 +291,7 @@ ListView
                 : (sectionItem.isFirstSection && !sectionItem.headerVisible
                    ? 0
                    : (siteList.cellsInRow == 1 ? 16 : 24))
-            Layout.bottomMargin: 8
+            Layout.bottomMargin: 12
             Layout.fillWidth: true
 
             color: ColorTheme.colors.light16
