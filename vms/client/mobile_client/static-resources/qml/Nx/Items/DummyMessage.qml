@@ -46,14 +46,18 @@ Pane
             Text
             {
                 id: title
+
                 width: parent.width
-                topPadding: 8
-                leftPadding: 16
-                rightPadding: 16
+
+                topPadding: 24
+                leftPadding: 12
+                rightPadding: 12
+
+                font.pixelSize: 16
+                font.weight: Font.Medium
+
                 horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 22
-                lineHeight: 1.25
-                color: ColorTheme.colors.light16
+                color: ColorTheme.colors.light4
                 wrapMode: Text.WordWrap
                 visible: !!text
             }
@@ -61,14 +65,15 @@ Pane
             Text
             {
                 id: description
-                topPadding: 8
-                leftPadding: 16
-                rightPadding: 16
+
+                topPadding: 16
+                leftPadding: 12
+                rightPadding: 12
+
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
-                font.pixelSize: 14
-                lineHeight: 1.25
-                color: ColorTheme.colors.dark16
+                font.pixelSize: 12
+                color: ColorTheme.colors.light12
                 wrapMode: Text.WordWrap
                 visible: !!text
             }

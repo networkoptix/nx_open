@@ -258,7 +258,6 @@ AdaptiveScreen
             anchors.centerIn: parent
             width: Math.min(parent.width, 247)
             title: qsTr("No Devices")
-            titleColor: ColorTheme.colors.light4
             description:
             {
                 return windowContext.deprecatedUiController.resource
@@ -267,9 +266,7 @@ AdaptiveScreen
                         "Add devices with the desktop client, " +
                         "or request access to existing devices")
             }
-            descriptionColor: ColorTheme.colors.light10
-            descriptionFontPixelSize: 15
-            image: "image://skin/64x64/Outline/camera.svg?primary=light10"
+            image: "image://skin/64x64/Outline/nodevices.svg?primary=light10"
             visible: camerasGrid.count === 0
                 && windowContext.sessionManager.hasActiveSession
         }
