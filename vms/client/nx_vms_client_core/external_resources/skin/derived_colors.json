@@ -334,11 +334,11 @@
     "mobileTimeline": {
         "background": "dark5",
         "chunks": {
-            "background": "#162E18",
-            "recording": "#47A44B",
-            "motion": "#EF5350",
-            "analytics": "#FFC61A",
-            "bookmarks": "#349EF4",
+            "background": "dark8",
+            "recording": "attention.green_light.setAlpha(127)",
+            "motion": "attention.red",
+            "analytics": "attention.yellow_dark",
+            "bookmarks": "attention.blue",
             "lastSecond": "light1.setAlpha(77)"
         },
         "scale": {
