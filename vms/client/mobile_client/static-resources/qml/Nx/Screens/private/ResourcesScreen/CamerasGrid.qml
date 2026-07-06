@@ -316,6 +316,11 @@ Item
 
                     sourceComponent: Item
                     {
+                        // Exposes the nested CameraItem's player so preview players can be
+                        // stopped from outside, releasing the shared hardware decoder slots
+                        // before another screen starts its own playback.
+                        property alias mediaPlayer: cameraItem.mediaPlayer
+
                         function setPlayerActive(active)
                         {
                             cameraItem.setPlayerActive(active)
