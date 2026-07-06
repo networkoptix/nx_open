@@ -86,6 +86,17 @@ HttpHeaders::iterator insertHeader(HttpHeaders* const headers, HttpHeader newHea
     return headers->emplace(std::move(newHeader));
 }
 
+void insertWarning(HttpHeaders* headers, std::string message)
+{
+    if (!NX_ASSERT(headers))
+        return;
+
+    for (size_t pos = 0; (pos = message.find('"', pos)) != std::string::npos; pos += 2)
+        message.replace(pos, 1, "\\\"");
+
+    headers->emplace("Warning", "199 - \"" + message + "\"");
+}
+
 void removeHeader(HttpHeaders* const headers, const std::string& name)
 {
     headers->erase(name);
