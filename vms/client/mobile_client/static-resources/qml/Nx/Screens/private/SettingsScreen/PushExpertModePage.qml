@@ -204,13 +204,12 @@ BaseSettingsPage
             {
                 id: checkbox
 
-
                 width: parent ? parent.width : 0
                 height: 56
                 topPadding: 16
                 bottomPadding: 16
 
-                text: model.systemName
+                text: NxGlobals.toHtmlEscaped(model.systemName)
                 font.pixelSize: 18
                 backgroundRadius: 8
                 iconSource: "image://skin/24x24/Outline/cloud.svg?primary=%1"
