@@ -8,6 +8,7 @@ import QtQml
 import Nx.Controls
 import Nx.Common
 import Nx.Core
+import Nx.Core.Controls
 import Nx.Items
 import Nx.Mobile
 import Nx.Mobile.Controls
@@ -55,6 +56,24 @@ AdaptiveScreen
                 target: contentItem === videoScreenLoader.item ? videoScreenLoader.item.motionAreaButton : null
             }
         ]
+
+    toolBar.titleControl
+    {
+        leftPadding: recordingStatusIndicator.sourcePath ? recordingStatusIndicator.width : 0
+        horizontalAlignment: Qt.AlignLeft
+    }
+
+    RecordingStatusIndicator
+    {
+        id: recordingStatusIndicator
+
+        parent: toolBar.titleControl
+        anchors.verticalCenter: parent.verticalCenter
+
+        resource: resourcesScreen.contentItem === videoScreenLoader.item
+            ? videoScreenLoader.item.controller.resource
+            : null
+    }
 
     contentItem: LayoutController.isTablet && resourceHelper.isCamera
         ? videoScreenLoader.item

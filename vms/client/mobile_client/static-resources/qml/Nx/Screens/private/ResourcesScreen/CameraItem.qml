@@ -12,6 +12,7 @@ import Nx.Items
 import Nx.Mobile
 import Nx.Screens
 import Nx.Settings
+import Nx.Ui
 
 import nx.vms.api
 import nx.vms.client.mobile
@@ -138,8 +139,8 @@ Control
             color: ColorTheme.transparent(ColorTheme.colors.dark6, 0.6)
 
             x: margin
-            y: parent.height - height - margin
-            height: 26
+            y: margin
+            height: LayoutController.isTabletLayout ? 32 : 22
 
             width:
             {
@@ -178,7 +179,8 @@ Control
 
                 text: (!!mediaResourceHelper.crossSystemName ? "../" : "") + cameraItem.resourceName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: 12
+                font.pixelSize: LayoutController.isTabletLayout ? 16 : 12
+                font.weight: Font.Medium
                 elide: Text.ElideRight
                 color: ColorTheme.colors.light4
             }
