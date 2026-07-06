@@ -109,6 +109,8 @@ HttpHeaders::iterator insertOrReplaceHeader(
 NX_NETWORK_API HttpHeaders::iterator insertHeader(
     HttpHeaders* const headers, HttpHeader newHeader);
 
+NX_NETWORK_API void insertWarning(HttpHeaders* headers, std::string message);
+
 NX_NETWORK_API void removeHeader(
     HttpHeaders* const headers, const std::string& name);
 

@@ -885,9 +885,8 @@ void OpenApiSchema::validateOrThrow(const QJsonObject& path,
             {
                 for (const QString& u: unused)
                 {
-                    headers->emplace("Warning",
-                        nx::format("199 - \"Unused parameter: '%1'\"", unescapeName(u))
-                            .toStdString());
+                    nx::network::http::insertWarning(headers,
+                        nx::format("Unused parameter: '%1'", unescapeName(u)).toStdString());
                 }
             }
 

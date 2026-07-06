@@ -55,6 +55,25 @@ TEST(HttpTypesHeader, read_missing_header)
     ASSERT_FALSE(readHeader(headers, "Header3", &value));
 }
 
+TEST(HttpTypesHeader, insertWarning)
+{
+    HttpHeaders headers;
+
+    insertWarning(&headers, R"(Quote: "value")");
+    insertWarning(&headers, "Second warning");
+
+    auto [it, end] = headers.equal_range("Warning");
+    ASSERT_NE(it, end);
+    EXPECT_EQ(R"(199 - "Quote: \"value\"")", it->second);
+
+    ++it;
+    ASSERT_NE(it, end);
+    EXPECT_EQ(R"(199 - "Second warning")", it->second);
+
+    ++it;
+    EXPECT_EQ(it, end);
+}
+
 TEST(HttpTypesHeader, parseHeader)
 {
     ASSERT_EQ(HttpHeader("Name", "Value"), parseHeader("Name: Value"));
