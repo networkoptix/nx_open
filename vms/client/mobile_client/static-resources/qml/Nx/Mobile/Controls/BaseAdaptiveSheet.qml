@@ -174,8 +174,9 @@ Drawer
             anchors.bottomMargin: footer.visible ? footer.height : 20
 
             z: 1
-            interactive: control.interactive
+            interactive: control.interactive && contentHeight > height
             contentHeight: contentColumn.height
+            pressDelay: 50 //< Prefers scrolling over dragging the sheet.
 
             Item
             {
