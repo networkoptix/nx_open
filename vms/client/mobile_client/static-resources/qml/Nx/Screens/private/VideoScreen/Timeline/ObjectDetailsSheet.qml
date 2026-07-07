@@ -41,8 +41,8 @@ BaseAdaptiveSheet
         width: parent.width + parent.leftPadding + parent.rightPadding
         height: contentChildren.reduce((h, child) => Math.max(h, child.implicitHeight), 0)
 
-        // Prevents locking the swipeView position when dragging the sheet.
-        interactive: sheet.position >= 0.99
+        // Prevents locking the swipeView position when dragging or scrolling the sheet.
+        interactive: sheet.position >= 0.99 && !sheet.contentDragging
 
         onCurrentIndexChanged:
             pageNavigationBar.index = currentIndex

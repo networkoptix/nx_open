@@ -22,6 +22,7 @@ Drawer
     property bool closeAutomatically: true
     property bool alwaysShowCloseButton: false
     readonly property alias availableContentHeight: flickable.height
+    readonly property alias contentDragging: flickable.dragging
 
     x: (parent.width - width) / 2
     edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
