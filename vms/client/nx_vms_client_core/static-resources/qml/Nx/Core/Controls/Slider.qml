@@ -149,10 +149,10 @@ QtQuickControls.Slider
     {
         x: slider.leftPadding + (slider.horizontal
             ? slider.visualPosition * (slider.availableWidth - width)
-            : 0)
+            : (slider.availableWidth - slider.handleSize) / 2)
 
         y: slider.topPadding + (slider.horizontal
-            ? 0
+            ? (slider.availableHeight - slider.handleSize) / 2
             : slider.visualPosition * (slider.availableHeight - height))
 
         implicitWidth: slider.handleSize

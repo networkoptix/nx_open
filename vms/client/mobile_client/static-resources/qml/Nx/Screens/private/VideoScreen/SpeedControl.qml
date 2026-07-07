@@ -104,8 +104,8 @@ Rectangle
             opacity: (speedControl.enabled && !enabled) ? 0.3 : 1.0
             enabled: !(speedControl.forced1x && speedControl.disabledWhenForced1x)
 
-            Layout.alignment: Qt.AlignVCenter
             Layout.fillWidth: true
+            Layout.fillHeight: true
             Layout.rightMargin: expanded && !displayCollapseButton ? 18 : 0
 
             from: parameters.minSliderValue
