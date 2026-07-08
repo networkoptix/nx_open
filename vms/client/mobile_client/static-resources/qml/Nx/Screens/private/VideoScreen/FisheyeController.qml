@@ -12,6 +12,9 @@ NxObject
     property PinchArea pinchArea: null
     property MouseArea mouseArea: null
 
+    // Panning (rotation) only makes sense when the dewarped image is zoomed in.
+    readonly property bool rotationAllowed: interactor && interactor.scalePower >= 0.001
+
     readonly property bool enableAnimation:
         mouseArea
         && pinchArea
@@ -193,8 +196,9 @@ NxObject
                     else
                     {
                         mouseAreaHandler.draggingStarted =
-                            Math.abs(mouse.x - mouseAreaHandler.pressX) > mouseArea.drag.threshold
-                            || Math.abs(mouse.y - mouseAreaHandler.pressY) > mouseArea.drag.threshold
+                            controller.rotationAllowed
+                            && (Math.abs(mouse.x - mouseAreaHandler.pressX) > mouseArea.drag.threshold
+                                || Math.abs(mouse.y - mouseAreaHandler.pressY) > mouseArea.drag.threshold)
 
                         if (mouseAreaHandler.draggingStarted)
                         {

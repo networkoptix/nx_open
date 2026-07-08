@@ -43,6 +43,8 @@ Item
     property real allowedBottomMargin: d.allowedBottomMargin(contentWidth, contentHeight)
 
     property bool interactive: true
+    property bool inputAreasEnabled: interactive
+
     property bool doubleClickZoom: true
     readonly property alias flickable: flick
     readonly property real contentScale: Geometry.scaleFactor(
@@ -356,7 +358,7 @@ Item
 
         parent: flick
         anchors.fill: parent
-        enabled: control.interactive
+        enabled: control.inputAreasEnabled
 
         MouseArea
         {
@@ -364,7 +366,7 @@ Item
 
             propagateComposedEvents: true
             anchors.fill: parent
-            enabled: control.interactive
+            enabled: control.inputAreasEnabled
         }
     }
 

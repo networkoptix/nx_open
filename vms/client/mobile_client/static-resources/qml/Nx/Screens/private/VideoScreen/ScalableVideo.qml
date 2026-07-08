@@ -17,6 +17,9 @@ ScalableContentHolder
 
     readonly property alias fisheyeMode: fisheyeModeController.fisheyeMode
 
+    readonly property bool zoomedOut: Math.abs(contentScale - 1.0) < 0.01
+        && (!fisheyeMode || interactor.scalePower < 0.001)
+
     property bool showMotion: false
 
     property alias mediaPlayer: videoContent.mediaPlayer
@@ -30,6 +33,8 @@ ScalableContentHolder
     signal hideRoiHint()
 
     interactive: !fisheyeMode
+    inputAreasEnabled: interactive || fisheyeMode
+
     content: videoContent
 
     function getMoveViewportData(position)
@@ -78,10 +83,7 @@ ScalableContentHolder
     {
         id: fisheyeModeController
 
-        property bool fisheyeModeInternal:
-            !roiController.motionSearchMode
-            && resourceHelper.fisheyeParams.enabled
-
+        property bool fisheyeModeInternal: resourceHelper.fisheyeParams.enabled
         property bool fisheyeMode: false
         Component.onCompleted: fisheyeMode = fisheyeModeInternal
 
@@ -200,7 +202,7 @@ ScalableContentHolder
         {
             id: motionDisplay
 
-            readonly property bool showMotion: control.showMotion && !control.fisheyeMode
+            readonly property bool showMotion: control.showMotion
 
             visible: motionDisplay.showMotion
             parent: videoContent.videoOutput

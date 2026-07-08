@@ -610,7 +610,7 @@ Page
         camerasModel: modernVideoScreen.camerasModel
         controller: controller
 
-        interactive: !video.roiController.drawingRoi && Math.abs(video.scale - 1.0) < 0.01
+        interactive: !video.roiController.drawingRoi && video.zoomedOut
     }
 
     Item
