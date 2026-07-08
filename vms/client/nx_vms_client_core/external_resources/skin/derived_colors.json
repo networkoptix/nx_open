@@ -310,25 +310,25 @@
     },
 
     "attention": {
-        "yellow": "#dfbf20",
-        "yellow_light": "#e5cc4d",
-        "yellow_dark": "#b2991a",
-        "yellow_bg": "#594c0d",
+        "yellow": "#ffca28",
+        "yellow_light": "#ffce38",
+        "yellow_dark": "#ffc61a",
+        "yellow_bg": "#4d3a00",
 
-        "red": "#df2020",
-        "red_light": "#e54d4d",
-        "red_dark": "#b21a1a",
-        "red_bg": "#590d0d",
+        "red": "#ef5350",
+        "red_light": "#f06360",
+        "red_dark": "#ee4744",
+        "red_bg": "#460806",
 
-        "blue": "#208fdf",
-        "blue_light": "#4da6e5",
-        "blue_dark": "#1a73b2",
-        "blue_bg": "#0d3959",
+        "blue": "#42a5f5",
+        "blue_light": "#51acf6",
+        "blue_dark": "#349ef4",
+        "blue_bg": "#042a49",
 
-        "green": "#40df20",
-        "green_light": "#66e54d",
-        "green_dark": "#33b21a",
-        "green_bg": "#1a590d"
+        "green": "#4caf50",
+        "green_light": "#54b558",
+        "green_dark": "#47a44b",
+        "green_bg": "#183519"
     },
 
     "mobileTimeline": {
