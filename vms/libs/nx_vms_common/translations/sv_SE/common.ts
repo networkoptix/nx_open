@@ -2020,11 +2020,11 @@
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Origin.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Origin.</translation>
+      <translation>HTTP-header: Access-Control-Allow-Origin.</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Credentials.</source>
-      <translation type="unfinished">HTTP header: Access-Control-Allow-Credentials.</translation>
+      <translation>HTTP-header: Access-Control-Allow-Credentials.</translation>
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
