@@ -19,9 +19,14 @@ const float pi = 3.1415926;
 
 vec4 texture2DBlackBorder(vec2 coord)
 {
-    /* Turn outside areas to black without conditional operator: */
-    bool isInside = all(bvec4(coord.x >= 0.0, coord.x <= 1.0, coord.y >= 0.0, coord.y <= 1.0));
-    return texture(sourceTexture, coord) * vec4(vec3(float(isInside)), 1.0);
+    /* Turn outside areas to black without conditional operators or boolean vectors:
+     * float(all(bvec4(...))) is miscompiled to constant 0 by some PowerVR/IMG drivers
+     * (e.g. Google Pixel 10, Motorola G66), which turned the whole dewarped image black. step()
+     * keeps the logic branchless and bool-free. */
+    vec2 inside = step(vec2(0.0), coord) * step(coord, vec2(1.0));
+    float mask = inside.x * inside.y;
+    vec4 color = texture(sourceTexture, coord);
+    return vec4(color.rgb * mask, color.a);
 }
 
 /* Projection functions should be written with the following consideration:
