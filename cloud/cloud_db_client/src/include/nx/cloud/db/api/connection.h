@@ -160,6 +160,6 @@ public:
 
 extern "C"
 {
-    nx::cloud::db::api::ConnectionFactory* createConnectionFactory();
+    nx::cloud::db::api::ConnectionFactory* createConnectionFactory(int idleConnectionsLimit = 0);
     void destroyConnectionFactory(nx::cloud::db::api::ConnectionFactory* factory);
 }

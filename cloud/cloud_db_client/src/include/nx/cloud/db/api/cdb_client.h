@@ -12,8 +12,9 @@ namespace nx::cloud::db::api {
 class CdbClient
 {
 public:
-    CdbClient():
-        m_connectionFactory(createConnectionFactory())
+    CdbClient(int idleConnectionsLimit = 0):
+        m_connection(nullptr),
+        m_connectionFactory(createConnectionFactory(idleConnectionsLimit))
     {
     }
 
@@ -26,6 +27,11 @@ public:
     void setCloudUrl(const std::string& url)
     {
         m_connectionFactory->setCloudUrl(url);
+    }
+
+    void setIdleConnectionsLimit(int limit)
+    {
+        m_idleConnectionsLimit = limit;
     }
 
     void setCredentials(
@@ -84,11 +90,18 @@ public:
             m_connection->setRequestTimeout(timeout);
     }
 
+    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        if (createConnectionIfNeeded())
+            m_connection->bindToAioThread(aioThread);
+    }
+
 private:
-    nx::cloud::db::api::ConnectionFactory* m_connectionFactory;
     std::unique_ptr<api::Connection> m_connection;
+    nx::cloud::db::api::ConnectionFactory* m_connectionFactory;
     std::optional<nx::network::http::Credentials> m_credentials;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
+    int m_idleConnectionsLimit = 0;
 
     bool createConnectionIfNeeded()
     {

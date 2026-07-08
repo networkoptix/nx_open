@@ -11,9 +11,10 @@ namespace nx::cloud::db::client {
 
 Connection::Connection(
     const nx::Url& baseUrl,
-    nx::network::ssl::AdapterFunc adapterFunc)
+    nx::network::ssl::AdapterFunc adapterFunc,
+    int idleConnectionsLimit /* =0 */)
     :
-    m_requestExecutor(baseUrl, std::move(adapterFunc)),
+    m_requestExecutor(baseUrl, std::move(adapterFunc), idleConnectionsLimit),
     m_accountManager(&m_requestExecutor),
     m_systemManager(&m_requestExecutor),
     m_organizationManager(&m_requestExecutor),

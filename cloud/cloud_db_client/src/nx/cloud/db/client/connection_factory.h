@@ -12,7 +12,7 @@ class ConnectionFactory:
     public api::ConnectionFactory
 {
 public:
-    ConnectionFactory();
+    ConnectionFactory(int clientIdleConnectionsLimit = 0);
     virtual ~ConnectionFactory() override;
 
     virtual void connect(
@@ -29,6 +29,7 @@ public:
 
 private:
     nx::Url m_cloudUrl;
+    int m_clientIdleConnectionsLimit = 0;
 };
 
 } // nx::cloud::db::client
