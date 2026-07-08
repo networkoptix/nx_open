@@ -19,7 +19,7 @@ NxObject
     function open()
     {
         if (!d.sheet)
-            d.sheet = delegate.createObject(loader)
+            d.sheet = delegate.createObject(mainWindow.contentItem)
 
         d.sheet.open()
     }
