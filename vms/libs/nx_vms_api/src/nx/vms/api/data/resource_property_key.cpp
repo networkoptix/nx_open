@@ -13,6 +13,7 @@ const QString kOsInfo("osInfo");
 const QString kPhysicalMemory("physicalMemory");
 const QString kGuidConflictDetected("guidConflictDetected");
 const QString kDeploymentCode("deploymentCode");
+const QString kDeployedViaDeploymentService("deployedViaDeploymentService");
 const QString kBrand("productNameShort");
 const QString kFullVersion("fullVersion");
 const QString kPublicationType("publicationType");
