@@ -33,7 +33,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackTitle,
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(BaseObjectRegion,
     (json)(sql_record)(csv_record), BaseObjectRegion_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(AnalyticsAttribute,
-    (json)(sql_record)(csv_record), AnalyticsAttribute_Fields)
+    (json)(ubjson)(sql_record)(csv_record), AnalyticsAttribute_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackV4,
     (json), ObjectTrackV4_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ObjectTrackFilterFreeText,

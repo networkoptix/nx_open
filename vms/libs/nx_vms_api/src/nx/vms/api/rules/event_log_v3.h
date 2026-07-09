@@ -3,10 +3,10 @@
 #pragma once
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/network/http/http_types.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
+#include "../data/analytics_data.h"
 #include "../types/event_rule_types.h"
 
 namespace nx::vms::api::rules {
@@ -61,10 +61,13 @@ struct NX_VMS_API EventParametersV3
      * depending on this text.
      */
     QString description;
+
+    /**%apidoc[opt] Attributes of Analytics Events and Objects. */
+    std::vector<nx::vms::api::AnalyticsAttribute> attributes;
 };
 #define EventParametersV3_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)
+    (reasonCode)(inputPortId)(caption)(description)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(EventParametersV3, (ubjson)(json), NX_VMS_API);
 NX_REFLECTION_INSTRUMENT(EventParametersV3, EventParametersV3_Fields)
 
