@@ -13,7 +13,6 @@
 #include "../data/server_time_period.h"
 #include "aggregated_info.h"
 #include "event_log_fwd.h"
-#include "event_log_v3.h"
 
 namespace nx::vms::api::rules {
 
@@ -127,10 +126,6 @@ std::string NX_VMS_API toString(const EventLogRecord& record);
 
 // Helper functions for log data sorting & merging.
 inline quint64 getTimestamp(const EventLogRecord& record) { return record.timestampMs.count(); }
-inline quint64 getLegacyTimestamp(const EventLogRecordV3& record)
-{
-    return record.eventParams.eventTimestampUsec / 1000;
-}
 
 } // namespace nx::vms::rules
 
