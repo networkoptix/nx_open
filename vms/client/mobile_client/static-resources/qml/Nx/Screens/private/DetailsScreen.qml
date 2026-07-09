@@ -311,6 +311,18 @@ Page
     onResourceChanged: d.updateCurrentEvent()
     onObjectDataChanged: d.updateCurrentEvent()
 
+    ChunkProvider
+    {
+        id: archiveProvider
+
+        onLoadingChanged: d.evaluateArchive()
+        onPeriodsUpdated: (contentType) =>
+        {
+            if (contentType === ChunkProvider.RecordingContent)
+                d.evaluateArchive()
+        }
+    }
+
     QtObject
     {
         id: d
@@ -325,16 +337,30 @@ Page
                 preview.interval.startTimeMs = 0
                 preview.interval.durationMs = 0
                 preview.interval.setPosition(0)
+                archiveProvider.resource = null
+                preview.dataState = Preview.DataState.Checking
                 return
             }
 
             preview.interval.stop()
+            preview.interval.startTimeMs = 0
+            preview.interval.durationMs = 0
 
             if (!eventDetailsScreen.resource)
-                return;
+            {
+                archiveProvider.resource = null
+                return
+            }
 
             preview.interval.resource = eventDetailsScreen.resource
 
+            preview.dataState = Preview.DataState.Checking
+            archiveProvider.resource = eventDetailsScreen.resource
+            evaluateArchive()
+        }
+
+        function startPlayback()
+        {
             const paddingTimeMs =
                 eventDetailsScreen.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
                     ? CoreSettings.iniConfigValue("previewPaddingTimeMs")
@@ -346,6 +372,29 @@ Page
             preview.interval.setPosition(preview.interval.startTimeMs)
 
             preview.interval.play(preview.interval.startTimeMs) //< Loads the stream anyway.
+        }
+
+        function evaluateArchive()
+        {
+            if (!archiveProvider.resource || !objectData)
+                return
+
+            if (archiveProvider.hasArchive(objectData.startTimeMs))
+            {
+                if (preview.dataState !== Preview.DataState.Available)
+                {
+                    preview.dataState = Preview.DataState.Available
+                    startPlayback()
+                }
+            }
+            else if (!archiveProvider.loading)
+            {
+                preview.dataState = Preview.DataState.NoData
+            }
+            else
+            {
+                preview.dataState = Preview.DataState.Checking
+            }
         }
 
         function goToCamera()

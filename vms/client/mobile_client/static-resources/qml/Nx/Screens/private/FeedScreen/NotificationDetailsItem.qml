@@ -115,17 +115,6 @@ Item
         onShowFullscreen: root.fullscreenButtonClicked()
     }
 
-    CircleBusyIndicator
-    {
-        anchors.centerIn: preview
-
-        width: 32
-        height: 32
-
-        color: ColorTheme.colors.light1
-        visible: preview.visible && preview.dataState === Preview.DataState.Checking
-    }
-
     Flickable
     {
         id: notificationDetailsFlickable

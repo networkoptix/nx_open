@@ -81,7 +81,7 @@ Rectangle
 
         audioEnabled: audioController.audioEnabled
         scalable: true
-        hasPreloader: true
+        hasPreloader: root.dataState !== Preview.DataState.NoData
         preloaderColor: ColorTheme.colors.light10
         preloaderDotRadius: 6
         aspectRatio: 0 //< No forced aspect ratio.
