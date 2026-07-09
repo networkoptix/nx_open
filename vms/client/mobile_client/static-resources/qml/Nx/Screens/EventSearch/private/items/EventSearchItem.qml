@@ -44,7 +44,7 @@ Control
         radius: 6
         color: control.selected ? ColorTheme.colors.dark6 : ColorTheme.colors.dark8
         border.width: 1
-        border.color:control.selected ? ColorTheme.colors.brand : color
+        border.color: control.selected ? ColorTheme.colors.brand : color
     }
 
     contentItem: RowLayout
@@ -104,6 +104,7 @@ Control
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
                 maximumLineCount: LayoutController.isTablet ? 3 : 2
+                verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light4
                 font.pixelSize: LayoutController.isTablet ? 18 : 16
@@ -120,9 +121,10 @@ Control
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
+                verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light10
-                font.pixelSize: 16
+                font.pixelSize: LayoutController.isTablet ? 16 : 14
                 font.weight: Font.Normal
                 lineHeight: 1.25
             }
@@ -136,6 +138,7 @@ Control
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
                 maximumLineCount: 1
+                verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light10
                 font.pixelSize: LayoutController.isTablet ? 16 : 14
@@ -154,6 +157,7 @@ Control
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
                 maximumLineCount: 1
+                verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light16
                 font.pixelSize: 14

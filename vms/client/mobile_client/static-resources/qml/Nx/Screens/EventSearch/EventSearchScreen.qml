@@ -401,7 +401,7 @@ AdaptiveScreen
             anchors.fill: parent
             anchors.leftMargin: 20
             anchors.rightMargin: 20
-            anchors.topMargin: LayoutController.isTabletLayout ? 16 : 52
+            anchors.topMargin: LayoutController.isTabletLayout ? 20 : 68
 
             ColumnLayout
             {
@@ -591,7 +591,7 @@ AdaptiveScreen
             id: portraitSearchProxy
 
             anchors.top: parent.top
-            anchors.topMargin: 8
+            anchors.topMargin: 16
             anchors.left: parent.left
             anchors.leftMargin: 20
             anchors.right: parent.right
@@ -606,7 +606,7 @@ AdaptiveScreen
 
             readonly property bool portraitMode: height > width
 
-            y: portraitSearchProxy.visible ? searchField.height + 16 : 16
+            y: portraitSearchProxy.visible ? searchField.height + 32 : 20
             height: parent.height - y
             width: parent.width
             leftMargin: 20
