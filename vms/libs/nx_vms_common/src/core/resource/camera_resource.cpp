@@ -801,9 +801,8 @@ bool QnVirtualCameraResource::ping()
 {
     auto sock =
         nx::network::SocketFactory::createStreamSocket(nx::network::ssl::kAcceptAnyCertificate);
-    return sock->connect(
-        {getHostAddress(), nx::network::http::DEFAULT_HTTP_PORT},
-        getNetworkTimeout());
+
+    return sock->connect({getHostAddress(), httpPort()}, getNetworkTimeout());
 }
 
 void QnVirtualCameraResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
