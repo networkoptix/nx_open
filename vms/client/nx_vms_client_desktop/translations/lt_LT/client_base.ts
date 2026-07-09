@@ -1041,7 +1041,7 @@
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Prisijungti prie svetainės</translation>
     </message>
     <message>
       <source>Site Administration...</source>
@@ -1584,7 +1584,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Prisijungti prie svetainės</translation>
     </message>
   </context>
   <context>
@@ -2045,7 +2045,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Tęsti</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -2524,7 +2524,7 @@ License Key: %2</translation>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>Create and Share...</source>
@@ -3082,7 +3082,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -10565,7 +10565,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Connected</source>
-      <translation type="unfinished">Connected</translation>
+      <translation>Prijungtas</translation>
     </message>
     <message>
       <source>Powered</source>
@@ -11309,7 +11309,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Tęsti</translation>
     </message>
     <message>
       <source>I trust this server</source>
@@ -12158,7 +12158,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>New Link - %1</source>

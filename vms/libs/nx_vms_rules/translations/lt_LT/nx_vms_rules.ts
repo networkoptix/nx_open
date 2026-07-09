@@ -660,7 +660,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Turinys</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -1185,7 +1185,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Turinys</translation>
     </message>
     <message>
       <source>Internal HTTPS Request</source>

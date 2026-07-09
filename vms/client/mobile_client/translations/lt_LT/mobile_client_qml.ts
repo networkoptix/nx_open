@@ -177,7 +177,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>Prisijungti prie %1 naudojant svetainės savininko paskyrą</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Tęsti</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -1344,7 +1344,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>Prisijungti prie svetainės</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1513,7 +1513,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Tęsti</translation>
     </message>
   </context>
   <context>
