@@ -160,12 +160,18 @@ BaseAdaptiveSheet
                         font.pixelSize: 16
                         font.weight: Font.Normal
                         color: ColorTheme.colors.light10
-                        text: modelData?.description ?? ""
+                        text: NxGlobals.toHtmlWithLinks(modelData?.description ?? "")
                         width: parent.width
                         wrapMode: Text.Wrap
                         elide: Text.ElideRight
                         textFormat: Text.StyledText
                         visible: !!text
+
+                        onLinkActivated: (link) =>
+                        {
+                            Workflow.openDialog(
+                                "qrc:/qml/Nx/Web/LinkAboutToOpenDialog.qml", {"link": link});
+                        }
                     }
                 }
 
