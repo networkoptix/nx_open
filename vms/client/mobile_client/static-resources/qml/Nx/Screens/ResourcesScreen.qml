@@ -169,7 +169,11 @@ AdaptiveScreen
 
     rightPanel
     {
-        title: qsTr("Timeline")
+        title:
+        {
+            let displayedDataType = rightPanel.item?.displayedDataType ?? ""
+            return displayedDataType || qsTr("Timeline")
+        }
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
         interactive: true

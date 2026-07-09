@@ -885,6 +885,20 @@ Page
     {
         id: navigator
 
+        readonly property string displayedDataType:
+        {
+            if (!timeline.visible)
+                return ""
+
+            switch(timeline.objectsType)
+            {
+                case Timeline.ObjectsLoader.ObjectsType.motion: return qsTr("Motion")
+                case Timeline.ObjectsLoader.ObjectsType.bookmarks: return qsTr("Bookmarks")
+                case Timeline.ObjectsLoader.ObjectsType.analytics: return qsTr("Objects")
+                default: return ""
+            }
+        }
+
         DataTimeline
         {
             id: timeline
