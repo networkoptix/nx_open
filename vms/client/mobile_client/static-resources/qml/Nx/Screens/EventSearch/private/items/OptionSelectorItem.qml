@@ -79,6 +79,7 @@ Item
             }
 
             contentHeight: delegateLoader.height
+            clip: true
 
             Loader
             {
