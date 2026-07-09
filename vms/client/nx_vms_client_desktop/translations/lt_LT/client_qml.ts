@@ -740,7 +740,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Sukurti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1766,7 +1766,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Sukurti</translation>
     </message>
   </context>
   <context>
