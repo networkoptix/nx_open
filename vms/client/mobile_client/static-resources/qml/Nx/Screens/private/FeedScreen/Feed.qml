@@ -265,10 +265,14 @@ Item
             {
                 id: delegate
 
+                readonly property bool animateActivation: feed.filtered && !notification.selected
+
                 width: notifications.width
 
                 revealDistance: 100
                 activationDistance: 100
+
+                activationAnimation: animateActivation ? activationAnimation : null
 
                 contentItem: Notification
                 {
@@ -314,12 +318,18 @@ Item
                         ? "image://skin/20x20/Solid/eye_off.svg"
                         : "image://skin/20x20/Solid/eye.svg"
 
+                    function apply()
+                    {
+                        model.viewed = !model.viewed
+                    }
+
                     onClicked:
                     {
                         feedState.setViewed(model.id, !model.viewed)
                         feedState.update()
 
-                        model.viewed = !model.viewed
+                        if (!animateActivation)
+                            apply()
                     }
 
                     Behavior on viewed
@@ -331,9 +341,34 @@ Item
                         }
                     }
                 }
+
+                ParallelAnimation
+                {
+                    id: activationAnimation
+
+                    NumberAnimation
+                    {
+                        target: delegate.revealedItem
+                        property: "opacity"
+                        to: 0
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+
+                    NumberAnimation
+                    {
+                        target: notification
+                        property: "x"
+                        to: -notifications.width
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+
+                    onFinished: delegate.revealedItem.apply()
+                }
             }
 
-            displaced: Transition
+            removeDisplaced: Transition
             {
                 NumberAnimation
                 {
