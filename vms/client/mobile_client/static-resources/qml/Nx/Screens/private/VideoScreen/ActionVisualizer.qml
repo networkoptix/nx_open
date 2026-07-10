@@ -21,19 +21,18 @@ Loader
 
     active: !!action
     sourceComponent: action?.visualizer || defaultVisualizer
-    visible: opacity > 0
     state: "hidden"
 
     component ActionVisualizerControl: Control
     {
-        implicitHeight: 28
+        implicitHeight: 30
         horizontalPadding: 12
 
         background: Rectangle
         {
             opacity: externalMode ? 0.7 : 1.0
             radius: 24
-            color: ColorTheme.colors.dark14
+            color: externalMode ? "#0D1012" : (action?.color ?? ColorTheme.colors.light1)
         }
     }
 
@@ -58,7 +57,7 @@ Loader
 
                     sourcePath: control.iconSource
                     sourceSize: Qt.size(20, 20)
-                    primaryColor: ColorTheme.colors.light4
+                    primaryColor: externalMode ? ColorTheme.colors.light1 : ColorTheme.colors.dark4
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -66,10 +65,12 @@ Loader
                 {
                     id: textItem
 
+                    height: parent.height
+
                     text: control.text
-                    color: ColorTheme.colors.light4
+                    color: externalMode ? ColorTheme.colors.light1 : ColorTheme.colors.dark4
                     font.pixelSize: 14
-                    anchors.verticalCenter: parent.verticalCenter
+                    verticalAlignment: Qt.AlignVCenter
                 }
             }
         }
@@ -83,7 +84,8 @@ Loader
         {
             contentItem: VoiceSpectrumItem
             {
-                color: ColorTheme.colors.brand
+                color: externalMode ? ColorTheme.colors.light1 : ColorTheme.colors.dark4
+                lineSpacing: 2
                 implicitWidth: 142
                 implicitHeight: 16
             }
@@ -111,11 +113,15 @@ Loader
             from: "visible"
             to: "hidden"
 
-            NumberAnimation
+            SequentialAnimation
             {
-                property: "opacity"
-                duration: 160
-                onFinished: action = null
+                NumberAnimation
+                {
+                    property: "opacity"
+                    duration: 160
+                }
+
+                ScriptAction { script: action = null }
             }
         },
         Transition
@@ -132,30 +138,31 @@ Loader
         }
     ]
 
-    function show(visualizer, text, icon)
+    function show(visualizer, text, icon, color)
     {
         control.action = {
             visualizer: visualizer,
             text: text,
-            icon: icon
+            icon: icon,
+            color: color
         }
         state = "visible"
     }
 
-    function showResult(text, icon)
+    function showResult(text, icon, color)
     {
         hideTimer.restart()
-        show(defaultVisualizer, text, icon)
+        show(defaultVisualizer, text, icon, color)
     }
 
     function showSuccess(text)
     {
-        showResult(text, "image://skin/20x20/Outline/checkmark.svg")
+        showResult(text, "image://skin/20x20/Outline/check.svg", ColorTheme.colors.green)
     }
 
     function showFailure(text)
     {
-        showResult(text, "image://skin/20x20/Outline/terminate.svg")
+        showResult(text, "image://skin/20x20/Outline/close_medium.svg", ColorTheme.colors.red)
     }
 
     function showActivity(visualizer, text)
@@ -166,11 +173,7 @@ Loader
 
     function showHint(text, icon, keepOpened)
     {
-        if (!keepOpened)
-            hideTimer.restart()
-        else
-            hideTimer.stop()
-
+        hideTimer.restart()
         show(defaultVisualizer, text, icon)
     }
 

@@ -37,6 +37,7 @@ AdaptiveSheet
         id: hintControl
 
         parent: externalMode ? externalVisualizerContainer : sheet.titleCustomArea
+        y: externalMode ? 0 : (parent.height - height) / 2
         externalMode: sheet.externalMode
     }
 
@@ -58,17 +59,16 @@ AdaptiveSheet
             readonly property bool available: model.enabled && sheet.available
             readonly property bool prolonged: model.type === CameraButton.Type.prolonged
             readonly property string iconSource: model.iconPath
-            readonly property string hintText: model.hint || model.name
+            readonly property string hintText:
+                prolonged ? qsTr("Press and hold") : (model.hint || model.name)
 
-            readonly property var visualizer: sheet.externalMode
-                && model.group === CameraButtonController.ButtonGroup.twoWayAudio
+            readonly property var visualizer:
+                model.group === CameraButtonController.ButtonGroup.twoWayAudio
                     ? hintControl.voiceVisualizer
                     : hintControl.defaultVisualizer
 
             readonly property string visualizerText:
-                model.group === CameraButtonController.ButtonGroup.twoWayAudio
-                    ? qsTr("Speak...")
-                    : model.name
+                prolonged ? qsTr("Press and hold") : model.name
 
             parent: externalMode ? externalButtonContainer : sheetLayout
 
@@ -103,13 +103,6 @@ AdaptiveSheet
                     enabled: !prolonged && available
 
                     onTapped: Qt.callLater(startAction)
-                    onPressedChanged:
-                    {
-                        if (pressed)
-                            hintControl.showHint(hintText, iconSource, /*keepOpened*/ true)
-                        else
-                            hintControl.hide()
-                    }
                 }
 
                 TapHandler
@@ -128,7 +121,7 @@ AdaptiveSheet
                     onTapped:
                     {
                         if (!fullyActivated)
-                            Qt.callLater(() => hintControl.showHint(hintText, iconSource))
+                            Qt.callLater(() => hintControl.showHint(hintText))
                     }
 
                     onPressedChanged:
@@ -175,14 +168,25 @@ AdaptiveSheet
 
                 if (!controller.startAction(model.id))
                 {
-                    hintControl.showFailure(hintText)
+                    hintControl.showFailure(qsTr("Error"))
                     return
                 }
 
                 if (model.group === CameraButtonController.ButtonGroup.twoWayAudio)
                     windowContext.ui.windowHelpers.requestRecordAudioPermissionIfNeeded()
 
-                hintControl.showActivity(visualizer, visualizerText, iconSource)
+                if (prolonged)
+                    hintControl.showActivity(visualizer, visualizerText)
+                else
+                    showActivityTimer.start()
+            }
+
+            Timer
+            {
+                id: showActivityTimer
+
+                interval: 150
+                onTriggered: hintControl.showActivity(visualizer, visualizerText)
             }
 
             function stopAction()
@@ -202,16 +206,19 @@ AdaptiveSheet
                     if (id !== model.id)
                         return
 
+                    showActivityTimer.stop()
+
                     if (!success)
-                        hintControl.showFailure(hintText)
+                        hintControl.showFailure(qsTr("Error"))
                     else if (!prolonged)
                         hintControl.showSuccess(hintText)
                     else if (controller.actionIsActive(model.id) && delegate.down)
-                        hintControl.showActivity(visualizer, visualizerText, iconSource)
+                        hintControl.showActivity(visualizer, visualizerText)
                 }
 
                 function onActionCancelled(id)
                 {
+                    showActivityTimer.stop()
                     hintControl.hide()
                 }
             }
