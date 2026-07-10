@@ -43,6 +43,10 @@ struct NX_NETWORK_API Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(false, traceIoObjectsLifetime,
         "Enables reporting creation stack traces of dangling HTTP clients during server shutdown");
+
+    NX_INI_INT(5, cloudDbIdleConnectionsLimit,
+        "Maximum number of idle connections to the Cloud kept open for reuse by subsequent "
+        "requests. 0 disables connection reuse.");
 };
 
 NX_NETWORK_API Ini& ini();
