@@ -395,6 +395,27 @@ BaseSettingsPage
                 onValueModified: appContext.settings.sidePanelWidth = value
             }
         }
+
+        Row
+        {
+            spacing: 8
+
+            Text
+            {
+                text: "Content area minimum width"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            QuickControls.SpinBox
+            {
+                from: 300
+                to: 700
+                value: appContext.settings.contentAreaMinWidth
+                onValueModified: appContext.settings.contentAreaMinWidth = value
+            }
+        }
     }
 
     ItemSelectionDialog

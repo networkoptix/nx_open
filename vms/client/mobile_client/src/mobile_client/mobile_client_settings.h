@@ -73,6 +73,7 @@ public:
         LeftHandedMode,
 
         SidePanelWidth,
+        ContentAreaMinWidth,
 
         VariableCount
     };
@@ -221,7 +222,12 @@ private:
         QN_DECLARE_RW_PROPERTY(
             int,
             sidePanelWidth, setSidePanelWidth,
-            SidePanelWidth, 360)
+            SidePanelWidth, 320)
+
+        QN_DECLARE_RW_PROPERTY(
+            int,
+            contentAreaMinWidth, setContentAreaMinWidth,
+            ContentAreaMinWidth, 500)
 
     QN_END_PROPERTY_STORAGE()
 

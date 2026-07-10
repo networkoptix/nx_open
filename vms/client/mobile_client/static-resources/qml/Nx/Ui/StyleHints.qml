@@ -20,5 +20,5 @@ QtObject
     // Minimum width of the content area between the side panels on tablet layout. If a panel
     // would push the content area below this threshold, the auto-close logic in AdaptiveScreen
     // hides one of the panels.
-    readonly property int contentAreaMinimumWidth: 560
+    readonly property int contentAreaMinimumWidth: appContext.settings.contentAreaMinWidth
 }
