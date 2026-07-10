@@ -345,15 +345,12 @@ Page
 
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
-    rightControl: IconButton
+    rightControl: ToolBarButton
     {
         id: menuButton
 
-        icon.source: lp("/images/more_vert.png")
-        onClicked:
-        {
-            menu.open()
-        }
+        icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+        onClicked: menu.open()
     }
 
     // Anchor item for the kebab menu in non-fullscreen state. Defaults to the toolBar's

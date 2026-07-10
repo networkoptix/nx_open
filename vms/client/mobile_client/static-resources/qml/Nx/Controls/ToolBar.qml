@@ -3,7 +3,7 @@
 import QtQuick
 import QtQuick.Layouts
 
-import Nx.Controls
+import Nx.Mobile.Controls
 import Nx.Mobile.Ui
 import Nx.Core
 
@@ -40,15 +40,13 @@ ToolBarBase
         width: 32
         height: 32
 
-        IconButton
+        ToolBarButton
         {
             id: leftButton
-            anchors.centerIn: parent
 
-            padding: 0
+            anchors.centerIn: parent
             visible: icon.source != ""
             onClicked: toolBar.leftButtonClicked()
-            alwaysCompleteHighlightAnimation: false
         }
     }
 

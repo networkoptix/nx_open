@@ -8,7 +8,7 @@ Text
 {
     font.pixelSize: 18
     font.weight: 500
-    color: ColorTheme.colors.light1
+    color: ColorTheme.colors.light4
     elide: Text.ElideRight
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter

@@ -166,7 +166,7 @@ Page
 
         anchors.centerIn: parent
 
-        icon.source: lp("/images/more_vert.png")
+        icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
         onClicked:
         {
             menu.x = 0
