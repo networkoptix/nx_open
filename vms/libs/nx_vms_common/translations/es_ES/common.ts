@@ -590,22 +590,22 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Esta cámara no se encuentra actualmente en el diseño seleccionado</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Esta cámara no está disponible actualmente en algunos de los diseños seleccionados</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Los usuarios no tienen acceso al diseño seleccionado</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado</translation>
     </message>
   </context>
   <context>
@@ -915,22 +915,22 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Servicios de grabación locales</numerusform>
+        <numerusform>%n Servicios de grabación locales</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Servicios de grabación locales</numerusform>
+        <numerusform>%n/%1 Servicios de grabación locales</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Servicios de grabación locales</translation>
     </message>
   </context>
   <context>
@@ -959,33 +959,33 @@
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 y %2 no tienen %3 permiso para algunas de las cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>Los grupos %n no tienen %1 permiso para algunas de las cámaras seleccionadas</numerusform>
+        <numerusform>Los grupos %n no tienen %1 permiso para algunas de las cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>El grupo %1 no tiene permisos %2 para algunas de las cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>Los usuarios de %n no tienen permisos %1 para algunas de las cámaras seleccionadas</numerusform>
+        <numerusform>Los usuarios de %n no tienen permisos %1 para algunas de las cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>El usuario %1 no tiene permisos %2 para algunas de las cámaras seleccionadas</translation>
     </message>
   </context>
   <context>
@@ -1060,7 +1060,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ninguno de los roles de usuario seleccionados contiene usuarios</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1333,11 +1333,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>La dirección de correo electrónico no está configurada para todos los usuarios seleccionados.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>La dirección de correo electrónico no está configurada para algunos usuarios seleccionados.</translation>
     </message>
   </context>
   <context>
@@ -1356,7 +1356,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Vista en directo</translation>
     </message>
   </context>
   <context>
@@ -1367,7 +1367,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Póngase en contacto con su socio de canal para obtener ayuda.</translation>
     </message>
   </context>
   <context>
@@ -1401,7 +1401,7 @@
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>Hace %n horas</numerusform>
+        <numerusform>hace %n horas</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
@@ -1480,11 +1480,11 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Número máximo de registros de eventos que se conservarán en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20 % superior al valor especificado.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Si se deben almacenar en caché algunos fotogramas para la transmisión principal. Valores: &apos;sí&apos; - siempre habilitado (puede usar mucha RAM), &apos;no&apos; - siempre deshabilitado excepto cuando lo requiere la reproducción (por ejemplo, HLS), &apos;automático&apos; - similar a &apos;no&apos;, pero se activa cuando mejora la experiencia del usuario (por ejemplo, cuando algún complemento de análisis está trabajando en la cámara).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
