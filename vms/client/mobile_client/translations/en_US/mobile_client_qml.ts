@@ -19,11 +19,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Speak...</source>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Press and hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1632,6 +1636,10 @@
     </message>
     <message>
         <source>Go to Live to activate soft triggers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
