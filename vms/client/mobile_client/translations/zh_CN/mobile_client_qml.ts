@@ -19,12 +19,16 @@
       <translation>已按计划禁用</translation>
     </message>
     <message>
-      <source>Speak...</source>
-      <translation type="unfinished">Speak...</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>撤消</translation>
+    </message>
+    <message>
+      <source>Press and hold</source>
+      <translation type="unfinished">Press and hold</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -1632,6 +1636,10 @@
     <message>
       <source>Go to Live to activate soft triggers</source>
       <translation type="unfinished">Go to Live to activate soft triggers</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

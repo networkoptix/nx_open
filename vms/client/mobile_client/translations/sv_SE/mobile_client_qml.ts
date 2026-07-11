@@ -19,12 +19,16 @@
       <translation>Inaktiverad enligt schema</translation>
     </message>
     <message>
-      <source>Speak...</source>
-      <translation>Tala...</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Press and hold</source>
+      <translation type="unfinished">Press and hold</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -1633,6 +1637,10 @@
     <message>
       <source>Go to Live to activate soft triggers</source>
       <translation>Gå till Live för att aktivera mjuka utlösare</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

@@ -198,7 +198,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado</translation>
     </message>
     <message>
       <source>For</source>

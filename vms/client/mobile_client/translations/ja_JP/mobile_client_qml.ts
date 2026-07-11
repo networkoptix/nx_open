@@ -19,12 +19,16 @@
       <translation>スケジュールにより無効</translation>
     </message>
     <message>
-      <source>Speak...</source>
-      <translation>話す...</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Press and hold</source>
+      <translation type="unfinished">Press and hold</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -1632,6 +1636,10 @@
     <message>
       <source>Go to Live to activate soft triggers</source>
       <translation>ソフトトリガーを利用するには、ライブ映像を再生してください。</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

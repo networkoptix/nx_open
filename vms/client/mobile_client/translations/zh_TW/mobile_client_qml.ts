@@ -19,12 +19,16 @@
       <translation>已依據排程停用</translation>
     </message>
     <message>
-      <source>Speak...</source>
-      <translation>說話...</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>取消</translation>
+    </message>
+    <message>
+      <source>Press and hold</source>
+      <translation type="unfinished">Press and hold</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -1632,6 +1636,10 @@
     <message>
       <source>Go to Live to activate soft triggers</source>
       <translation>前往 Live 啟動軟體觸發</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>

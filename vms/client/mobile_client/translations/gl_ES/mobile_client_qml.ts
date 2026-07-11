@@ -19,12 +19,16 @@
       <translation>Desactivado por horario programado</translation>
     </message>
     <message>
-      <source>Speak...</source>
-      <translation>Falar...</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>Press and hold</source>
+      <translation type="unfinished">Press and hold</translation>
+    </message>
+    <message>
+      <source>Error</source>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -1633,6 +1637,10 @@
     <message>
       <source>Go to Live to activate soft triggers</source>
       <translation>Vaia a En directo para activar disparadores suaves</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>
