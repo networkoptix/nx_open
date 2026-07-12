@@ -24,11 +24,11 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Tryk og hold</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Fejl</translation>
     </message>
   </context>
   <context>
@@ -1640,7 +1640,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Bevægelse</translation>
     </message>
   </context>
   <context>

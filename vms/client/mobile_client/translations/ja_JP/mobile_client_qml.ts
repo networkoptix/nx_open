@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>エラー</translation>
     </message>
   </context>
   <context>
@@ -1639,7 +1639,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>モーション</translation>
     </message>
   </context>
   <context>

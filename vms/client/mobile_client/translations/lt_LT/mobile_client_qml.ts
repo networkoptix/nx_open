@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Klaida</translation>
     </message>
   </context>
   <context>
