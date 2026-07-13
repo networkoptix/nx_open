@@ -160,6 +160,7 @@ BaseAdaptiveSheet
                         font.pixelSize: 16
                         font.weight: Font.Normal
                         color: ColorTheme.colors.light10
+                        linkColor: ColorTheme.colors.brand_core
                         text: NxGlobals.toHtmlWithLinks(modelData?.description ?? "")
                         width: parent.width
                         wrapMode: Text.Wrap

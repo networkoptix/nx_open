@@ -164,6 +164,7 @@ Page
                     visible: !!text
 
                     color: ColorTheme.colors.light10
+                    linkColor: ColorTheme.colors.brand_core
                     font.pixelSize: 14
                     font.weight: Font.Normal
                     wrapMode: Text.Wrap

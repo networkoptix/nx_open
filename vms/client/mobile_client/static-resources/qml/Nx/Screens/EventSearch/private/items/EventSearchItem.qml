@@ -124,6 +124,7 @@ Control
                 verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light10
+                linkColor: ColorTheme.colors.brand_core
                 font.pixelSize: LayoutController.isTablet ? 16 : 14
                 font.weight: Font.Normal
                 lineHeight: 1.25
