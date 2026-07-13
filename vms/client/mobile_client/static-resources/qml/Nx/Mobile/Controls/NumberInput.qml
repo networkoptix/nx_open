@@ -37,7 +37,13 @@ Item
         textField.clear()
     }
 
+    function commit()
+    {
+        control.value = d.getValidatedValue(textField.text)
+    }
+
     implicitHeight: textField.height
+
     onValueChanged:
     {
         if (d.getValue(textField.text) !== value)
@@ -74,21 +80,21 @@ Item
         onActiveFocusChanged:
         {
             if (!activeFocus)
-                control.value = d.getValidatedValue(text)
+                control.commit()
         }
 
-        onAccepted: d.applyValue(text)
-        Keys.onEnterPressed: d.applyValue(text)
-        Keys.onReturnPressed: d.applyValue(text)
+        onAccepted: d.applyValue()
+        Keys.onEnterPressed: d.applyValue()
+        Keys.onReturnPressed: d.applyValue()
     }
 
     NxObject
     {
         id: d
 
-        function applyValue(text)
+        function applyValue()
         {
-            control.value = d.getValidatedValue(text)
+            control.commit()
             control.applyRequested()
         }
 

@@ -41,6 +41,12 @@ OptionSelector
             toInput.value = undefined
         }
 
+        function apply()
+        {
+            fromInput.commit()
+            toInput.commit()
+        }
+
         NumberInput
         {
             id: fromInput
