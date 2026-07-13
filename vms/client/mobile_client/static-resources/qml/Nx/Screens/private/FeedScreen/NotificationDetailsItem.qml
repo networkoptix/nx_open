@@ -17,73 +17,11 @@ Item
 {
     id: root
 
+    readonly property string title: resourceHelper.resourceName || qsTr("Details")
     readonly property bool hasPreview: d.currentCamera !== null
     property alias notification: d.notification
 
     signal fullscreenButtonClicked
-
-    Rectangle
-    {
-        id: cameraBar
-
-        width: parent.width
-        height: 64
-
-        color: ColorTheme.colors.dark6
-        visible: !!d.currentCamera
-
-        RowLayout
-        {
-            anchors.fill: parent
-            anchors.leftMargin: 20
-            anchors.rightMargin: 20
-            spacing: 20
-
-            IconButton
-            {
-                Layout.alignment: Qt.AlignVCenter
-
-                visible: d.resourceCount > 1
-                enabled: d.currentIndex > 0
-                compact: true
-
-                icon.source: "image://skin/24x24/Outline/arrow_left_2px.svg?primary=light10"
-                icon.width: 24
-                icon.height: 24
-
-                onClicked: d.selectResource(d.currentIndex - 1)
-            }
-
-            Text
-            {
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignVCenter
-
-                text: resourceHelper.resourceName
-                horizontalAlignment: Text.AlignHCenter
-                elide: Text.ElideRight
-
-                font.pixelSize: 18
-                font.weight: Font.Medium
-                color: ColorTheme.colors.light4
-            }
-
-            IconButton
-            {
-                Layout.alignment: Qt.AlignVCenter
-
-                visible: d.resourceCount > 1
-                enabled: d.currentIndex < d.resourceCount - 1
-                compact: true
-
-                icon.source: "image://skin/24x24/Outline/arrow_right_2px.svg?primary=light10"
-                icon.width: 24
-                icon.height: 24
-
-                onClicked: d.selectResource(d.currentIndex + 1)
-            }
-        }
-    }
 
     Preview
     {
@@ -97,22 +35,21 @@ Item
             interval.setPosition(0)
         }
 
-        y: cameraBar.visible ? cameraBar.height : 0
         width: parent.width
-        height:
-        {
-            if (d.portraitOrientation)
-                return heightForWidth(width)
+        height: d.portraitOrientation ? root.height * 0.35 : root.height
 
-            return root.height
-        }
-        withNavigationControls: false
+        withNavigationControls: d.resourceCount > 1
+        hasPrevious: d.currentIndex > 0
+        hasNext: d.currentIndex < d.resourceCount - 1
+
         visible: interval.resource
         fullscreenLayout: !d.portraitOrientation
 
         onShowOnCamera: d.showOnCamera()
 
         onShowFullscreen: root.fullscreenButtonClicked()
+        onPrevious: d.selectResource(d.currentIndex - 1)
+        onNext: d.selectResource(d.currentIndex + 1)
     }
 
     Flickable
@@ -121,9 +58,7 @@ Item
 
         anchors.fill: parent
         anchors.margins: 20
-        anchors.topMargin: 20
-            + (cameraBar.visible ? cameraBar.height : 0)
-            + (preview.visible ? preview.height : 0)
+        anchors.topMargin: 20 + (preview.visible ? preview.height : 0)
 
         contentHeight: notificationDetailsColumn.implicitHeight
         clip: true

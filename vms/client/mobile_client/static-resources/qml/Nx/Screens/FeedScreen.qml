@@ -50,7 +50,7 @@ AdaptiveScreen
 
     rightPanel
     {
-        title: qsTr("Details")
+        title: notificationDetailsItem.title
         color: ColorTheme.colors.dark5
         interactive: true
         item: LayoutController.isTabletLayout && feed.selectedNotification
