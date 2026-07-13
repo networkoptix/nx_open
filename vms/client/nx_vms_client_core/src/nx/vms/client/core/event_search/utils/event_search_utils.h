@@ -46,6 +46,14 @@ public:
         SystemContext* context,
         bool alwaysShowDate = false);
 
+    Q_INVOKABLE static QString timeText(
+        qint64 timestampMs,
+        nx::vms::client::core::SystemContext* context);
+
+    Q_INVOKABLE static QString dateText(
+        qint64 timestampMs,
+        nx::vms::client::core::SystemContext* context);
+
     static QString timeFromNowText(
         const std::chrono::microseconds& timestampMs,
         SystemContext* context);

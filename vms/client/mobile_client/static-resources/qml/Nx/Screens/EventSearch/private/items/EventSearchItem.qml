@@ -29,7 +29,6 @@ Control
     property var timestampMs
     property alias title: titleItem.text
     property alias extraText: extraTextItem.text
-    property alias eventTimestampText: eventTimeItem.text
     property bool shared: false
     property bool selected: false
 
@@ -149,29 +148,49 @@ Control
                 text: control.resource.name
             }
 
-            Text
+            RowLayout
             {
-                id: eventTimeItem
-
+                visible: control.timestampMs > 0
                 width: parent.width
-                visible: text.length
-                elide: Text.ElideRight
-                wrapMode: Text.Wrap
-                maximumLineCount: 1
-                verticalAlignment: Qt.AlignVCenter
+                spacing: 8
 
-                color: ColorTheme.colors.light16
-                font.pixelSize: 14
-                font.weight: LayoutController.isTablet ? Font.Medium : Font.Normal
-                lineHeight: 1.25
-
-                text:
+                Text
                 {
-                    return EventSearchUtils.timestampText(
-                        control.timestampMs,
-                        windowContext.mainSystemContext,
-                        /*alwaysShowDate*/ true)
+                    id: timeLabel
+
+                    text: EventSearchUtils.timeText(
+                        control.timestampMs, windowContext.mainSystemContext)
+
+                    color: ColorTheme.colors.light16
+                    font.pixelSize: 14
+                    font.weight: LayoutController.isTablet ? Font.Medium : Font.Normal
+                    lineHeight: 1.25
+                    elide: Text.ElideRight
+                    verticalAlignment: Qt.AlignVCenter
+
+                    Layout.fillWidth: true
+                    Layout.maximumWidth: Math.ceil(implicitWidth)
                 }
+
+                Text
+                {
+                    id: dateLabel
+
+                    text: EventSearchUtils.dateText(
+                        control.timestampMs, windowContext.mainSystemContext)
+
+                    color: ColorTheme.colors.light16
+                    font.pixelSize: 14
+                    font.weight: LayoutController.isTablet ? Font.Medium : Font.Normal
+                    lineHeight: 1.25
+                    elide: Text.ElideRight
+                    verticalAlignment: Qt.AlignVCenter
+
+                    Layout.fillWidth: true
+                    Layout.maximumWidth: Math.ceil(implicitWidth)
+                }
+
+                Item { Layout.fillWidth: true }
             }
         }
     }

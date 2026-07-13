@@ -14,6 +14,8 @@
 
 namespace nx::vms::client::core {
 
+using namespace std::chrono;
+
 EventSearchUtils::EventSearchUtils(QObject* parent):
     base_type(parent)
 {
@@ -87,7 +89,6 @@ QString EventSearchUtils::timestampText(
 QString EventSearchUtils::timeFromNowText(
     const std::chrono::microseconds& timestamp, SystemContext* context)
 {
-    using namespace std::chrono;
     if (timestamp <= 0ms || !NX_ASSERT(context))
         return {};
 
@@ -111,7 +112,6 @@ QString EventSearchUtils::timestampText(
     SystemContext* context,
     bool alwaysShowDate)
 {
-    using namespace std::chrono;
     if (timestampMs <= 0ms || !NX_ASSERT(context))
         return {};
 
@@ -123,6 +123,24 @@ QString EventSearchUtils::timestampText(
 
     // Display both date and time for all other days.
     return nx::vms::time::toString(dateTime, nx::vms::time::Format::dd_MM_yy_hh_mm_ss);
+}
+
+QString EventSearchUtils::timeText(qint64 timestampMs, SystemContext* context)
+{
+    if (timestampMs <= 0 || !NX_ASSERT(context))
+        return {};
+
+    const QDateTime dateTime = context->serverTimeWatcher()->displayTime(timestampMs);
+    return nx::vms::time::toString(dateTime.time());
+}
+
+QString EventSearchUtils::dateText(qint64 timestampMs, SystemContext* context)
+{
+    if (timestampMs <= 0 || !NX_ASSERT(context))
+        return {};
+
+    const QDateTime dateTime = context->serverTimeWatcher()->displayTime(timestampMs);
+    return nx::vms::time::toString(dateTime.date(), nx::vms::time::Format::dd_MM_yyyy);
 }
 
 } // namespace nx::vms::client::core
