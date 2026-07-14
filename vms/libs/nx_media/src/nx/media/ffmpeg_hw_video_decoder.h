@@ -31,6 +31,13 @@ public:
 
     static QSize maxResolution(const AVCodecID codec);
 
+    /**
+     * Whether the process-wide back-off armed by a recent hardware decoder resource failure
+     * is currently active. While active, isCompatible() returns false and newly created
+     * decoders fall back to software.
+     */
+    static bool isHardwareTemporarilyUnavailable();
+
     virtual bool sendPacket(const QnConstCompressedVideoDataPtr& packet) override;
     virtual bool receiveFrame(VideoFramePtr* decodedFrame) override;
     virtual int currentFrameNumber() const override;

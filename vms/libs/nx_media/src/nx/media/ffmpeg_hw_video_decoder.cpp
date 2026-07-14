@@ -51,11 +51,6 @@ int64_t steadyNowMs()
         std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
-bool isHardwareTemporarilyUnavailable()
-{
-    return steadyNowMs() < g_hardwareAvailableAtMs.load(std::memory_order_relaxed);
-}
-
 void noteHardwareDecoderFailure()
 {
     g_hardwareAvailableAtMs.store(
@@ -228,6 +223,11 @@ bool FfmpegHwVideoDecoder::isCompatible(
 QSize FfmpegHwVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 {
     return {8192, 8192};
+}
+
+bool FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable()
+{
+    return steadyNowMs() < g_hardwareAvailableAtMs.load(std::memory_order_relaxed);
 }
 
 bool FfmpegHwVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packet)

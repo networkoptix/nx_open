@@ -2,15 +2,19 @@
 
 #include "seamless_video_decoder.h"
 
+#include <algorithm>
+#include <chrono>
 #include <deque>
 
 #include <nx/media/h264_utils.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_frame.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_video_decoder.h"
+#include "ffmpeg_hw_video_decoder.h"
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 
@@ -20,6 +24,10 @@ namespace media {
 namespace {
 
 constexpr int kMaxHarwdareDecoderErrors = 10;
+
+/** Throttling of hardware decoder retries after the process-wide back-off expires. */
+constexpr std::chrono::milliseconds kMinHardwareRetryDelay(5000);
+constexpr std::chrono::milliseconds kMaxHardwareRetryDelay(60000);
 
 /**
  * This data is used to compare current and previous frame so as to reset video decoder if needed.
@@ -86,6 +94,21 @@ public:
     bool allowSoftwareDecoderFallback = true;
     bool isSoftwareFallbackMode = false;
     bool resetDecoder = false;
+
+    /**
+     * Set when the current decoder is software only because the process-wide hardware back-off
+     * (see FfmpegHwVideoDecoder) was armed; cleared when a hardware retry is issued or the
+     * decoder is recreated.
+     */
+    bool pendingHardwareRetry = false;
+
+    /**
+     * Throttles hardware retries: the delay doubles on every issued retry and resets once the
+     * decoder proves hardware or the stream parameters genuinely change.
+     */
+    nx::utils::ElapsedTimer hardwareRetryTimer;
+    std::chrono::milliseconds hardwareRetryDelay{0};
+
     SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 
     SeamlessVideoDecoder::FrameHandler handler;
@@ -248,13 +271,63 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
             isSimilarParams = false;
     }
 
+    // A decoder that ended up as software because the process-wide hardware back-off was armed
+    // (see FfmpegHwVideoDecoder) is otherwise never recreated while the stream parameters stay
+    // the same. Once the back-off expires, retry hardware from the next key frame.
+    if (d->videoDecoder
+        && d->allowHardwareAcceleration
+        && !d->isSoftwareFallbackMode)
+    {
+        if (d->videoDecoder->capabilities().testFlag(
+            AbstractVideoDecoder::Capability::hardwareAccelerated))
+        {
+            if (d->hardwareRetryTimer.isValid())
+            {
+                // The retried decoder has proven hardware: the next back-off episode starts
+                // throttling from scratch.
+                d->hardwareRetryTimer.invalidate();
+                d->hardwareRetryDelay = std::chrono::milliseconds::zero();
+            }
+        }
+        else if (FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable())
+        {
+            if (!d->pendingHardwareRetry)
+            {
+                NX_DEBUG(this, "Software decoding is forced by the hardware back-off, will retry");
+                d->pendingHardwareRetry = true;
+            }
+        }
+        else if (d->pendingHardwareRetry
+            && frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)
+            && d->hardwareRetryTimer.hasExpired(d->hardwareRetryDelay))
+        {
+            NX_DEBUG(this, "Hardware back-off has expired, retrying hardware decoder");
+            d->pendingHardwareRetry = false;
+            d->resetDecoder = true;
+            d->hardwareRetryTimer.restart();
+            d->hardwareRetryDelay = std::min(
+                std::max(d->hardwareRetryDelay * 2, kMinHardwareRetryDelay),
+                kMaxHardwareRetryDelay);
+        }
+    }
+
     if (!isSimilarParams || (d->resetDecoder && frame->flags & QnAbstractMediaData::MediaFlags_AVKey))
     {
+        const bool hwUnavailableBeforeRecreate =
+            FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable();
+
         if (!isSimilarParams && d->isSoftwareFallbackMode)
         {
             d->isSoftwareFallbackMode = false;
             setAllowHardwareAcceleration(true);
             NX_DEBUG(this, "The video stream has been changed, the hardware decoder is back on");
+        }
+
+        if (!isSimilarParams)
+        {
+            // A genuinely new stream starts the hardware retry throttling from scratch.
+            d->hardwareRetryTimer.invalidate();
+            d->hardwareRetryDelay = std::chrono::milliseconds::zero();
         }
 
         d->resetDecoder = false;
@@ -295,6 +368,20 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
         }
         if (d->videoDecoder)
             d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
+
+        // Sampling the back-off state both before and after the creation closes the races with
+        // arming/expiry happening while the registry selects a decoder.
+        d->pendingHardwareRetry = d->allowHardwareAcceleration
+            && !d->videoDecoder->capabilities().testFlag(
+                AbstractVideoDecoder::Capability::hardwareAccelerated)
+            && (hwUnavailableBeforeRecreate
+                || FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable());
+        if (d->pendingHardwareRetry)
+        {
+            NX_DEBUG(this, "Created a software decoder because hardware is temporarily"
+                " unavailable, will retry hardware when the back-off expires");
+        }
+
         d->decoderFrameOffset = d->frameNumber;
         d->sar = 1.0;
 
