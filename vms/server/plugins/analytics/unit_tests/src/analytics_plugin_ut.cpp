@@ -299,6 +299,7 @@ public:
     virtual IString* getDataDir() const override { return new nx::sdk::String(); }
     virtual const char* cloudToken() const override { return ""; }
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber* /*subscriber*/) override {}
+    virtual void doSetServiceUsageQuantities(const nx::sdk::IStringMap*) override {}
 
     virtual void doSendHttpRequest(
         HttpDomainName requestDomain,

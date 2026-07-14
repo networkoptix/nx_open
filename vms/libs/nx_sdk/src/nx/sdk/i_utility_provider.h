@@ -8,6 +8,8 @@
 
 namespace nx::sdk {
 
+class IStringMap;
+
 /**
  * Represents an object which the plugin can use for calling back to access some data and
  * functionality provided by the process that uses the plugin.
@@ -169,7 +171,7 @@ public:
     virtual IString* supportedVectorizationModels() const = 0;
 };
 
-class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider6>
+class IUtilityProvider7: public Interface<IUtilityProvider7, IUtilityProvider6>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider7"); }
@@ -184,6 +186,25 @@ public:
     public: std::string dataDir() const { return Ptr(getDataDir())->str(); }
 };
 
-using IUtilityProvider7 = IUtilityProvider;
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider7>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
+
+    /** Called by setServiceUsageQuantities((). */
+    protected: virtual void doSetServiceUsageQuantities(const IStringMap* values) = 0;
+
+    /**
+     * Sets a map of service ids to their usage quantities.
+     * @param values String map of key-values where key is a service uuid serialized as string and
+     * value is a service usage qunatity count serialized as string.
+     */
+    public: void setServiceUsageQuantities(const IStringMap* values)
+    {
+        doSetServiceUsageQuantities(values);
+    }
+};
+
+using IUtilityProvider8 = IUtilityProvider;
 
 } // namespace nx::sdk
