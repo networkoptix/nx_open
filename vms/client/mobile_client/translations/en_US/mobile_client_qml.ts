@@ -534,10 +534,6 @@
         <source>Period</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Details</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>FiltersItem</name>
@@ -765,6 +761,13 @@
     </message>
     <message>
         <source>No data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotificationDetailsItem</name>
+    <message>
+        <source>Details</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
