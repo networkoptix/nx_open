@@ -30,6 +30,10 @@ BaseAdaptiveSheet
 
     property var dateFormatter: ((timestampMs) => new Date(timestampMs).toLocaleString())
 
+    property bool keepStateOnClose: false
+
+    signal searchRequested(string text)
+
     spacing: 16
     bottomPadding: (pageNavigationBar.count > 1) ? 0 : 20
 
@@ -91,9 +95,10 @@ BaseAdaptiveSheet
                             detailsLoader.setSource(Qt.resolvedUrl("../../DetailsScreen.qml"),
                             {
                                 "objectsType": sheet.objectsType,
-                                "objectData": Qt.binding(() => sheet.model[sheet.currentIndex]),
+                                "objectData": Qt.binding(() =>
+                                    sheet.model?.[sheet.currentIndex] ?? null),
                                 "resource": Qt.binding(() =>
-                                    sheet.model[sheet.currentIndex]?.resource ?? null),
+                                    sheet.model?.[sheet.currentIndex]?.resource ?? null),
                                 "withShowOnCamera": false,
                                 "hasNext": Qt.binding(() => sheet.currentIndex + 1 < sheet.count),
                                 "hasPrevious": Qt.binding(() => sheet.currentIndex > 0),
@@ -323,6 +328,11 @@ BaseAdaptiveSheet
                 if (nextIndex < swipeView.count)
                     swipeView.setCurrentIndex(nextIndex)
             }
+
+            function onSearchRequested(text)
+            {
+                sheet.searchRequested(text)
+            }
         }
 
         IconButton
@@ -367,7 +377,7 @@ BaseAdaptiveSheet
     {
         id: stateController
 
-        states: 
+        states:
         [
             State
             {
@@ -383,7 +393,7 @@ BaseAdaptiveSheet
             }
         ]
 
-        transitions: 
+        transitions:
         [
             Transition
             {
@@ -405,6 +415,9 @@ BaseAdaptiveSheet
 
     onClosed:
     {
+        if (keepStateOnClose)
+            return
+
         stateController.state = ""
         detailsLoader.source = ""
     }

@@ -929,6 +929,12 @@ Page
             id: timelineObjectSheet
 
             property var data: null //< Store a copy of the value to keep its data in memory.
+            property bool restoreOnActivation: false
+            readonly property bool screenActive: modernVideoScreen.activePage
+
+            keepStateOnClose: restoreOnActivation
+            enter.enabled: !restoreOnActivation
+            exit.enabled: !restoreOnActivation
 
             height: LayoutController.isPortrait
                 ? Math.min(implicitHeight, navigator.height)
@@ -939,7 +945,32 @@ Page
                 timestampMs, timeline.timeZone))
 
             onDataChanged: model = data?.perObjectData
-            onClosed: model = null
+
+            onOpened: restoreOnActivation = false
+            onClosed:
+            {
+                if (!restoreOnActivation)
+                    data = null
+            }
+
+            onSearchRequested: (text) =>
+            {
+                Workflow.openEventSearchScreen(
+                    /*push*/ true,
+                    /*selectedResourceId*/ null,
+                    camerasModel,
+                    timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics,
+                    /*searchText*/ text)
+
+                restoreOnActivation = true
+                close()
+            }
+
+            onScreenActiveChanged:
+            {
+                if (restoreOnActivation)
+                    open()
+            }
         }
 
         Rectangle
