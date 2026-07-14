@@ -69,4 +69,16 @@ void StringMap::initLookupCache() const
     }
 }
 
+std::map<std::string, std::string> toStdMap(const Ptr<const IStringMap>& sdkMap)
+{
+    std::map<std::string, std::string> result;
+    if (!sdkMap)
+        return result;
+
+    for (int i = 0; i < sdkMap->count(); ++i)
+        result[sdkMap->key(i)] = sdkMap->value(i);
+
+    return result;
+}
+
 } // namespace nx::sdk

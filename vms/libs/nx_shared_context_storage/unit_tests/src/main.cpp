@@ -32,8 +32,8 @@ public:
         return new nx::sdk::String("[\"1\", \"2\", \"3\"]");
     }
 
-    virtual void subscribeForCloudTokenUpdate(
-        nx::sdk::ICloudTokenSubscriber* /*subscriber*/) override {}
+    virtual void subscribeForCloudTokenUpdate(nx::sdk::ICloudTokenSubscriber*) override {}
+    virtual void doSetServiceUsageQuantities(const nx::sdk::IStringMap*) override {}
 
     virtual const nx::sdk::IString* getServerSdkVersion() const override
     {

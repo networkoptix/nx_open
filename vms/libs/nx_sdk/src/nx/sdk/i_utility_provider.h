@@ -11,6 +11,8 @@
 
 namespace nx::sdk {
 
+class IStringMap;
+
 /**
  * Represents an object which the plugin can use for calling back to access some data and
  * functionality provided by the process that uses the plugin.
@@ -193,6 +195,19 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
 
     virtual IString* cloudOrgId() const = 0;
+
+    /** Called by setServiceUsageQuantities((). */
+    protected: virtual void doSetServiceUsageQuantities(const IStringMap* values) = 0;
+
+    /**
+     * Sets a map of service ids to their usage quantities.
+     * @param values String map of key-values where key is a service uuid serialized as string and
+     * value is a service usage qunatity count serialized as string.
+     */
+    public: void setServiceUsageQuantities(const IStringMap* values)
+    {
+        doSetServiceUsageQuantities(values);
+    }
 
     /** Called by sharedContextValue */
     protected: virtual IString* getSharedContextValue(const char* id, const char* key) const = 0;

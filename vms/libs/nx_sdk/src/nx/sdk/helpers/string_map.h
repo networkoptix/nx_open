@@ -43,4 +43,6 @@ private:
     mutable std::vector<const char*> m_lookupCache;
 };
 
+std::map<std::string, std::string> toStdMap(const nx::sdk::Ptr<const nx::sdk::IStringMap>& sdkMap);
+
 } // namespace nx::sdk
