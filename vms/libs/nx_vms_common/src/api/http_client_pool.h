@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include <memory>
 #include <optional>
-
-#include <QtCore/QSharedPointer>
+#include <string>
 
 #include <nx/network/http/http_async_client.h>
 #include <nx/string.h>
@@ -38,7 +38,7 @@ public:
         Method method;
         nx::Url url;
         nx::network::http::HttpHeaders headers;
-        nx::String contentType;
+        std::string contentType;
         nx::String messageBody;
         nx::network::http::AuthType authType = nx::network::http::AuthType::authBasicAndDigest;
         std::optional<nx::network::http::Credentials> credentials;
@@ -70,7 +70,7 @@ public:
         {}
 
     public:
-        using milliseconds = std::chrono::milliseconds;
+        using SharedPtr = std::shared_ptr<Context>;
 
         virtual ~Context() = default;
 
@@ -109,7 +109,7 @@ public:
         int handle = 0;
 
         /** Callback to be called when response is received. */
-        nx::MoveOnlyFunc<void (QSharedPointer<Context> context)> completionFunc;
+        nx::MoveOnlyFunc<void (SharedPtr context)> completionFunc;
 
         /** Check if there is any response. */
         bool hasResponse() const;
@@ -142,7 +142,7 @@ public:
          * Get total time for request.
          * It measures time between sending request and receiving full response.
          */
-        milliseconds getTimeElapsed() const;
+        std::chrono::milliseconds getTimeElapsed() const;
 
         /**
          * Sends request using httpClient.
@@ -166,7 +166,7 @@ public:
         mutable nx::Mutex mutex;
     };
 
-    using ContextPtr = QSharedPointer<Context>;
+    using ContextPtr = Context::SharedPtr;
 
 public:
     ClientPool();

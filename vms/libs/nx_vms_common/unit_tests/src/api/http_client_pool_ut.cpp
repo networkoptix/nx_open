@@ -49,7 +49,7 @@ public:
     int doGet(
         ClientPool* clientPool,
         const nx::Url& url,
-        std::function<void (QSharedPointer<ClientPool::Context> context)> completionFunc)
+        std::function<void (ClientPool::ContextPtr context)> completionFunc)
     {
         auto context = clientPool->createContext(nx::Uuid(), nullptr);
         context->request.method = Method::get;

@@ -909,8 +909,6 @@ void QnAuditLogDialog::updateData()
 
 void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
 {
-    using nx::network::rest::UbjsonResult;
-
     m_requests.clear();
 
     m_allData.clear();
@@ -932,21 +930,24 @@ void QnAuditLogDialog::query(qint64 fromMsec, qint64 toMsec)
         nx::vms::api::ResourceStatus::online);
     for (const QnMediaServerResourcePtr& server: onlineServers)
     {
-        auto callback = nx::utils::guarded(this,
-            [this, id = server->getId()](bool success, rest::Handle handle, UbjsonResult result)
+        auto callback =
+            [this, id = server->getId()](
+                bool success,
+                rest::Handle handle,
+                rest::ResultWithData<QnLegacyAuditRecordList> result)
             {
-                success &= (result.errorId == nx::network::rest::ErrorId::ok);
+                success &= (result.error == nx::network::rest::ErrorId::ok);
                 if (!success)
                     NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
-                at_gotdata(success, handle, id, result.deserialized<QnLegacyAuditRecordList>());
-            });
 
+                at_gotdata(success, handle, id, std::move(result.data));
+            };
 
         auto handle = api->getAuditLogRecords(
             std::chrono::milliseconds(fromMsec),
             std::chrono::milliseconds(toMsec),
             std::move(callback),
-            thread(),
+            this,
             server->getId());
 
         if (handle > 0)

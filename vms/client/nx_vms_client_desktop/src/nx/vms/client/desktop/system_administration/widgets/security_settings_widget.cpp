@@ -543,11 +543,11 @@ void SecuritySettingsWidget::applyChanges()
 
     resetWarnings();
 
-    const auto callback = nx::utils::guarded(this,
+    const auto callback =
         [this](
             bool success,
             rest::Handle requestId,
-            const rest::EmptyResponseType& /*response*/)
+            rest::ErrorOrData<nx::vms::api::AesKeyData> /*response*/)
         {
             NX_ASSERT(m_currentRequest == requestId || m_currentRequest == 0);
             m_currentRequest = 0;
@@ -560,7 +560,7 @@ void SecuritySettingsWidget::applyChanges()
                 return;
             }
             m_archivePasswordState = ArchivePasswordState::set;
-        });
+        };
 
     if (m_archivePasswordState == ArchivePasswordState::changed
         || m_archivePasswordState == ArchivePasswordState::failedToSet)
@@ -572,7 +572,7 @@ void SecuritySettingsWidget::applyChanges()
                 /*makeCurrent*/ true,
                 /*salt*/ QByteArray(),
                 callback,
-                thread());
+                this);
         }
     }
 }

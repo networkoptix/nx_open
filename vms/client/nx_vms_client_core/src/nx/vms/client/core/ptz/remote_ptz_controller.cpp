@@ -160,7 +160,6 @@ bool RemotePtzController::sendRequest(
         body,
         std::move(callback),
         this->thread(),
-        /*timeouts*/ {},
         server->getId());
 
     return true;

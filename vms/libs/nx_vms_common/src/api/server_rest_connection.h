@@ -2,11 +2,7 @@
 
 #pragma once
 
-#include <expected>
-
 #include <analytics/db/analytics_db_types.h>
-#include <api/helpers/request_helpers_fwd.h>
-#include <api/http_client_pool.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/camera_list_reply.h>
 #include <api/model/getnonce_reply.h>
@@ -18,7 +14,6 @@
 #include <api/model/virtual_camera_prepare_data.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/api/mediaserver/requests_fwd.h>
-#include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/rest/auth_result.h>
 #include <nx/network/rest/params.h>
@@ -48,6 +43,7 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/overlapped_id_data.h>
 #include <nx/vms/api/data/remote_archive_synchronization_status.h>
+#include <nx/vms/api/data/storage_encryption_data.h>
 #include <nx/vms/api/data/storage_init_result.h>
 #include <nx/vms/api/data/storage_scan_info.h>
 #include <nx/vms/api/data/storage_space_data.h>
@@ -59,11 +55,12 @@
 #include <nx/vms/api/data/user_model.h>
 #include <nx/vms/api/rules/acknowledge.h>
 #include <nx/vms/api/rules/soft_trigger.h>
-#include <nx/vms/event/event_fwd.h>
 #include <nx/vms/utils/abstract_session_token_helper.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_diagnostics.h>
 
+#include "helpers/request_helpers_fwd.h"
+#include "http_client_pool.h"
 #include "rest_types.h"
 
 namespace nx::vms::common {
@@ -75,22 +72,18 @@ class SystemContext;
 
 namespace rest {
 
-using MultiServerTimeData = ResultWithData<nx::vms::api::ServerTimeReplyList>;
-
 /**
  * Class for HTTP requests to mediaServer.
  * This class can be used either for client and server side.
- * Class calls callback methods from IO thread. So, caller code should be thread-safe.
- * Client MUST NOT make requests in callbacks as it will cause a deadlock.
- * This class limits number of underlying requests using separate http clients pool with 8 threads.
+ * Class calls callback methods from IO thread, if the AsyncHandlerExecutor is not provided.
+ * Client MUST NOT make requests in callbacks processed in IO thread as it will cause a deadlock.
+ * This class limits number of underlying requests using HTTP client pool provided in constructor.
  */
 class NX_VMS_COMMON_API ServerConnection: public QObject
 {
 public:
     using Timeouts = nx::network::http::AsyncClient::Timeouts;
-    using AbstractCertificateVerifier = nx::vms::common::AbstractCertificateVerifier;
-
-    using ErrorOrEmpty = rest::ErrorOrEmpty;
+    using ErrorOrEmpty = rest::ErrorOrEmpty; //< TODO: #amalov Remove alias.
 
 public:
     /**
@@ -98,10 +91,12 @@ public:
      * MediaServerResource to get authentication data.
      * @param systemContext ServerConnection takes a lot of objects from it.
      * @param serverId resource Id of the mediaserver.
+     * @param userId to impersonate. Used on server-side only.
      */
     ServerConnection(
         nx::vms::common::SystemContext* systemContext,
-        const nx::Uuid& serverId);
+        nx::Uuid serverId,
+        nx::Uuid userId = {});
 
     /**
      * Used to send REST requests to the mediaserver when we still do not have proper resource pool
@@ -116,7 +111,7 @@ public:
         nx::network::http::ClientPool* httpClientPool,
         const nx::Uuid& serverId,
         const nx::Uuid& auditId,
-        AbstractCertificateVerifier* certificateVerifier,
+        nx::vms::common::AbstractCertificateVerifier* certificateVerifier,
         nx::network::SocketAddress address,
         nx::network::http::Credentials credentials);
 
@@ -135,17 +130,39 @@ public:
      */
     void updateCredentials(nx::network::http::Credentials credentials);
 
-    void setUserId(const nx::Uuid& userId);
-
     nx::Uuid serverId() const;
 
-    using PostCallback = Callback<EmptyResponseType>;   // use this type for POST requests without result data
-
     /**
-     * Default callback type for GET requests without result data.
+     * Cancel running request by known requestId. If request is canceled, callback isn't called.
+     * If target thread has been used then callback may be called after 'cancelRequest' in case of
+     * data already received and queued to a target thread.
+     * If ServerConnection is destroyed all running requests are canceled, no callbacks called.
+     *
+     * Note that this effectively means that YOU ARE NEVER SAFE, even if you've cancelled all your
+     * requests in your destructor. Better bulletproof your callbacks with `guarded`.
      */
-    using GetCallback = Callback<nx::network::rest::JsonResult>;
+    void cancelRequest(Handle requestId);
 
+public: // Generic request methods.
+    Handle jsonRpcBatchCall(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        std::vector<nx::vms::api::JsonRpcRequest> requests,
+        JsonRpcBatchResultCallback&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        std::optional<Timeouts> timeouts = {});
+
+    template <typename ResultType>
+    Handle sendRequest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::Method method,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const nx::String& body,
+        Callback<ResultType>&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        nx::network::http::HttpHeaders customHeaders = {});
+
+public: // Specific request methods.
     /**
     * Load information about cross-server archive
     * @return value > 0 on success or <= 0 if it isn't started.
@@ -175,7 +192,7 @@ public:
 
     Handle getServerLocalTime(
         const nx::Uuid& serverId,
-        Callback<nx::network::rest::JsonResult> callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
@@ -194,7 +211,7 @@ public:
     Handle sendStatisticsUsingServer(
         const nx::Uuid& proxyServerId,
         const QnSendStatisticsRequestData& statisticsData,
-        PostCallback callback,
+        EmptyResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
@@ -249,7 +266,7 @@ public:
         const QByteArray& md5,
         const QUrl& url,
         const QString& peerPolicy,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
@@ -265,8 +282,6 @@ public:
      * @param md5 MD5 hash of the file, as text (32-character hex string).
      * @param ttl TTL for the upload, in milliseconds. Pass 0 for infinity.
      */
-    using AddUploadCallback = Callback<nx::network::rest::JsonResult>;
-
     Handle addFileUpload(
         const nx::Uuid& serverId,
         const QString& fileName,
@@ -275,20 +290,20 @@ public:
         const QByteArray& md5,
         qint64 ttl,
         bool recreateIfExists,
-        AddUploadCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle removeFileDownload(
         const nx::Uuid& serverId,
         const QString& fileName,
         bool deleteData,
-        PostCallback callback = nullptr,
+        EmptyResultCallback callback = nullptr,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle fileChunkChecksums(
         const nx::Uuid& serverId,
         const QString& fileName,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle downloadFileChunk(
@@ -313,28 +328,28 @@ public:
         const QString& fileName,
         int index,
         const QByteArray& data,
-        PostCallback callback,
+        EmptyResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle downloadsStatus(
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle fileDownloadStatus(
         const nx::Uuid& serverId,
         const QString& fileName,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getTimeOfServersAsync(
-        Callback<MultiServerTimeData> callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
+        Callback<ResultWithData<nx::vms::api::ServerTimeReplyList>> callback,
+        nx::utils::AsyncHandlerExecutor executor);
 
     Handle eventLog(
         const nx::vms::api::rules::EventLogFilter& filter,
         Callback<ErrorOrData<nx::vms::api::rules::EventLogRecordList>> callback,
         nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = std::nullopt);
+        std::optional<Timeouts> timeouts = {});
 
     Handle createSoftTrigger(
         const nx::vms::api::rules::SoftTriggerData& data,
@@ -386,25 +401,25 @@ public:
     Handle addVirtualCamera(
         const nx::Uuid& serverId,
         const QString& name,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle prepareVirtualCameraUploads(
         const QnVirtualCameraResourcePtr& camera,
         const QnVirtualCameraPrepareData& data,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle virtualCameraStatus(
         const QnVirtualCameraResourcePtr& camera,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle lockVirtualCamera(
         const QnVirtualCameraResourcePtr& camera,
         const QnUserResourcePtr& user,
         qint64 ttl,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle extendVirtualCameraLock(
@@ -412,13 +427,13 @@ public:
         const QnUserResourcePtr& user,
         const nx::Uuid& token,
         qint64 ttl,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle releaseVirtualCameraLock(
         const QnVirtualCameraResourcePtr& camera,
         const nx::Uuid& token,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
@@ -441,19 +456,19 @@ public:
         const nx::Uuid& token,
         const QString& uploadId,
         qint64 startTimeMs,
-        PostCallback callback,
+        EmptyResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /** Get statistics for server health monitor. */
     Handle getStatistics(
         const nx::Uuid& serverId,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getAuditLogRecords(
         std::chrono::milliseconds from,
         std::chrono::milliseconds to,
-        UbJsonResultCallback callback,
+        Callback<ResultWithData<QnLegacyAuditRecordList>> callback,
         nx::utils::AsyncHandlerExecutor executor = {},
         std::optional<nx::Uuid> proxyToServer = {});
 
@@ -501,7 +516,7 @@ public:
 
     Handle executeAnalyticsAction(
         const nx::vms::api::AnalyticsAction& action,
-        Callback<nx::network::rest::JsonResult> callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getRemoteArchiveSynchronizationStatus(
@@ -597,7 +612,7 @@ public:
 
     Handle getPluginInformation(
         const nx::Uuid& serverId,
-        GetCallback callback,
+        JsonResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     /**
@@ -643,8 +658,8 @@ public:
         const QString& password,
         bool makeCurrent,
         const QByteArray& salt,
-        PostCallback&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
+        Callback<ErrorOrData<nx::vms::api::AesKeyData>> callback,
+        nx::utils::AsyncHandlerExecutor executor);
 
     Handle startArchiveRebuild(
         const nx::Uuid& serverId,
@@ -828,13 +843,13 @@ public:
 
     Handle undoReplaceDevice(
         const nx::Uuid& deviceId,
-        PostCallback&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {});
+        Callback<ErrorOrEmpty> callback,
+        nx::utils::AsyncHandlerExecutor executor);
 
     Handle debug(
         const QString& action,
         const QString& value,
-        PostCallback callback,
+        EmptyResultCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
     Handle getLookupLists(
@@ -846,41 +861,7 @@ public:
         Callback<ErrorOrEmpty> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    Handle jsonRpcBatchCall(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        std::vector<nx::vms::api::JsonRpcRequest> requests,
-        JsonRpcBatchResultCallback&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = {});
-
-    /** Sends POST request with a response to be a JSON */
-    Handle postJsonResult(
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const QByteArray& body,
-        JsonResultCallback&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<Timeouts> timeouts = {},
-        std::optional<nx::Uuid> proxyToServer = {});
-
-    template <typename ResultType>
-    Handle sendRequest(
-        nx::vms::common::SessionTokenHelperPtr helper,
-        nx::network::http::Method method,
-        const QString& action,
-        const nx::network::rest::Params& params,
-        const nx::String& body,
-        Callback<ResultType>&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        const nx::network::http::HttpHeaders& customHeaders = {});
-
-    Handle getUbJsonResult(
-        const QString& action,
-        nx::network::rest::Params params,
-        UbJsonResultCallback&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<nx::Uuid> proxyToServer = {});
-
+public: // Deprecated generic request methods. Do not use with modern API.
     Handle getJsonResult(
         const QString& action,
         nx::network::rest::Params params,
@@ -894,17 +875,15 @@ public:
         DataCallback callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    /**
-     * Cancel running request by known requestId. If request is canceled, callback isn't called.
-     * If target thread has been used then callback may be called after 'cancelRequest' in case of
-     * data already received and queued to a target thread.
-     * If ServerConnection is destroyed all running requests are canceled, no callbacks called.
-     *
-     * Note that this effectively means that YOU ARE NEVER SAFE, even if you've cancelled all your
-     * requests in your destructor. Better bulletproof your callbacks with `guarded`.
-     */
-    void cancelRequest(Handle requestId);
+    Handle postJsonResult(
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const QByteArray& body,
+        JsonResultCallback&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        std::optional<nx::Uuid> proxyToServer = {});
 
+public: // Debugging methods.
     enum class DebugFlag
     {
         none = 0,
@@ -921,55 +900,40 @@ public:
     static void setDebugFlag(DebugFlag flag, bool on);
 
 private:
-    using ContextPtr = nx::network::http::ClientPool::ContextPtr;
-
-    ContextPtr prepareContext(
-        const nx::network::http::ClientPool::Request& request,
-        nx::MoveOnlyFunc<void (ContextPtr)> callback,
-        std::optional<Timeouts> timeouts = std::nullopt);
-
-    QUrl prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
+    nx::Url prepareUrl(const QString& path, const nx::network::rest::Params& params) const;
 
     /**
-     * Fills in http request header with parameters like authentication or proxy.
-     * It will fall back to prepareDirectRequest if directUrl is not empty.
+     * Prepares HTTP request data in ClientPool format. Combines method arguments and internally
+     * stored data like auth and certificate verification.
      *
      * @param method HTTP method, like {GET, PUT, POST, ...}
-     * @param url path to requested resource, like /ec2/updateStatus/
+     * @param url path and parameters, like /rest/v1/servers/id/info?_with=id,status
      * @param contentType content type according to HTTP reference.
      * @param messageBody message payload.
+     * @param customHeaders add or override headers.
      * @return generated request.
      */
     nx::network::http::ClientPool::Request prepareRequest(
         nx::network::http::Method method,
-        const QUrl& url,
-        const nx::String& contentType = nx::String(),
-        const nx::String& messageBody = nx::String());
-
-    /** Same as prepareRequest, but JSON-oriented. */
-    nx::network::http::ClientPool::Request prepareRestRequest(
-        nx::network::http::Method method,
-        const QUrl& url,
-        const nx::String& messageBody = {});
-
-    /** Passes Context to ClientPool. */
-    Handle sendRequest(const nx::network::http::ClientPool::ContextPtr& context);
+        const nx::Url& url,
+        std::string_view contentType = {},
+        const nx::String& messageBody = nx::String(),
+        const nx::network::http::HttpHeaders& customHeaders = {});
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 
-    /**
-     * Generic requests, for the types, that should not be exposed to common library.
-     */
+private: // Generic requests, instantiated in cpp only.
     template<typename ResultType> Handle executeGet(
         const QString& path,
         const nx::network::rest::Params& params,
         Callback<ResultType> callback,
         nx::utils::AsyncHandlerExecutor executor,
         std::optional<nx::Uuid> proxyToServer = {},
-        std::optional<Timeouts> timeouts = std::nullopt);
+        std::optional<Timeouts> timeouts = {});
 
+    // Params, no body.
     template <typename ResultType> Handle executePost(
         const QString& path,
         const nx::network::rest::Params& params,
@@ -977,61 +941,41 @@ private:
         nx::utils::AsyncHandlerExecutor executor,
         std::optional<nx::Uuid> proxyToServer = {});
 
-    /**
-     * Send POST request with json-encoded data with no parameters.
-     * @param path Url path.
-     * @param messageBody Json document.
-     * @param callback Callback.
-     * @param executor Thread for the callback. If not passed, callback will be handled in any
-     *     of the AIO threads.
-     * @param proxyToServer Id of the server, which must handle the request.
-     */
+    // Body, no params.
     template <typename ResultType>
     Handle executePost(
         const QString& path,
         const nx::String& messageBody,
         Callback<ResultType>&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
+        nx::utils::AsyncHandlerExecutor executor,
         std::optional<nx::Uuid> proxyToServer = {});
 
-    /**
-     * This overload should only be used if API requires custom message body so parameters can only
-     * be passed by URL.
-     */
+    // Params and body.
     template <typename ResultType> Handle executePost(
         const QString& path,
         const nx::network::rest::Params& params,
-        const nx::String& contentType,
+        std::string_view contentType,
         const nx::String& messageBody,
         Callback<ResultType> callback,
         nx::utils::AsyncHandlerExecutor executor,
-        std::optional<Timeouts> timeouts = {},
         std::optional<nx::Uuid> proxyToServer = {});
 
-    /**
-     * This overload should only be used if API requires custom message body so parameters can only
-     * be passed by URL.
-     */
     template <typename ResultType> Handle executePut(
         const QString& path,
         const nx::network::rest::Params& params,
-        const nx::String& contentType,
+        std::string_view contentType,
         const nx::String& messageBody,
         Callback<ResultType> callback,
         nx::utils::AsyncHandlerExecutor executor,
         std::optional<nx::Uuid> proxyToServer = {});
 
-    /**
-     * This overload should be used only if an API requires a custom message body so its parameters
-     * can be passed only by URL.
-     */
     template <typename ResultType> Handle executePatch(
         const QString& path,
         const nx::network::rest::Params& params,
-        const nx::String& contentType,
         const nx::String& messageBody,
         Callback<ResultType> callback,
-        nx::utils::AsyncHandlerExecutor executor);
+        nx::utils::AsyncHandlerExecutor executor,
+        nx::vms::common::SessionTokenHelperPtr helper = {});
 
     template <typename ResultType> Handle executeDelete(
         const QString& path,

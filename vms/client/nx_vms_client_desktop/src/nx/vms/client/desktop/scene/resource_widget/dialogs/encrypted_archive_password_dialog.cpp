@@ -57,11 +57,11 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(
             if (!ui->inputField->isValid())
                 return;
 
-            const auto callback = nx::utils::guarded(this,
-                [this](bool, rest::Handle, const rest::EmptyResponseType&)
+            const auto callback =
+                [this](bool, rest::Handle, rest::ErrorOrData<nx::vms::api::AesKeyData>)
                 {
                     accept();
-                });
+                };
 
             auto systemContext = SystemContext::fromResource(mediaResource);
             if (!NX_ASSERT(systemContext))
@@ -75,7 +75,7 @@ EncryptedArchivePasswordDialog::EncryptedArchivePasswordDialog(
                     /*makeCurrent*/ false,
                     QByteArray::fromBase64(ui->salt->text().toUtf8()),
                     callback,
-                    thread());
+                    this);
             }
         });
 }

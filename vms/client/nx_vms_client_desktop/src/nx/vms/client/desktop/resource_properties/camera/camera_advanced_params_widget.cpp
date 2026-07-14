@@ -424,7 +424,6 @@ bool CameraAdvancedParamsWidget::sendSetCameraParams(const QnCameraAdvancedParam
         QJson::serialized(body),
         callback,
         thread(),
-        /*timeouts*/ {},
         d->selectedServer);
     return m_paramRequestHandle != 0;
 }

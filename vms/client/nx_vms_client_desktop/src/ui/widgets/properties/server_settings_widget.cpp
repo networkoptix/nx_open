@@ -107,8 +107,6 @@ public:
 
     void query(const nx::Uuid& serverId)
     {
-        using nx::network::rest::UbjsonResult;
-
         if (!NX_ASSERT(q))
             return;
 
@@ -122,28 +120,27 @@ public:
         if (!NX_ASSERT(api))
             return;
 
-        auto callback = nx::utils::guarded(q,
-            [this](bool success, rest::Handle handle, UbjsonResult result)
+        const auto callback =
+            [this](
+                bool success,
+                rest::Handle handle,
+                rest::ResultWithData<QnLegacyAuditRecordList> result)
             {
-                success &= (result.errorId == nx::network::rest::ErrorId::ok);
+                success &= (result.error == nx::network::rest::ErrorId::ok);
                 if (!success)
                     NX_WARNING(this, "Audit log cannot be loaded: %1", result.errorString);
 
-                processData(success, handle, result.deserialized<QnLegacyAuditRecordList>());
-            });
+                processData(success, handle, std::move(result.data));
+            };
 
         static const auto kLookupInterval = std::chrono::seconds{60};
         const auto now = qnSyncTime->value();
 
-        const auto onlineServers = q->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online);
-        for (const QnMediaServerResourcePtr& server: onlineServers)
+        for (const auto& server: q->resourcePool()->getAllServers(
+            nx::vms::api::ResourceStatus::online))
         {
             auto handle = api->getAuditLogRecords(
-                now - kLookupInterval,
-                now,
-                callback,
-                q->thread(),
-                server->getId());
+                now - kLookupInterval, now, callback, q.get(), server->getId());
 
             if (handle > 0)
                 requests << handle;
@@ -156,14 +153,14 @@ public:
     }
 
 private:
-    void processData(bool success, int requestNum, const QnLegacyAuditRecordList& records)
+    void processData(bool success, int requestNum, QnLegacyAuditRecordList&& records)
     {
         if (!requests.contains(requestNum))
             return;
 
         requests.remove(requestNum);
         if (success)
-            m_data << records;
+            m_data.append(std::move(records));
 
         if (requests.isEmpty())
             evalResult();

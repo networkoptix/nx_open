@@ -45,12 +45,15 @@ public:
         if (m_currentRequest != 0)
             return;
 
-        if (!q->connection())
+        const auto api = q->connectedServerApi();
+        if (!api)
             return;
 
-        const auto callback = nx::utils::guarded(this,
-            [this]
-            (bool success, rest::Handle handle, rest::MultiServerTimeData data)
+        const auto callback =
+            [this](
+                bool success,
+                rest::Handle handle,
+                rest::ResultWithData<nx::vms::api::ServerTimeReplyList> data)
             {
                 if (m_currentRequest != handle)
                     return;
@@ -75,12 +78,12 @@ public:
 
                 if (m_store)
                     m_store->setTimeOffsets(offsetList, syncTime - rtt);
-            });
+            };
 
         m_tickCount = 0;
         m_elapsedTimer.restart();
 
-        m_currentRequest = q->connectedServerApi()->getTimeOfServersAsync(callback, thread());
+        m_currentRequest = api->getTimeOfServersAsync(std::move(callback), q);
         m_store->setBaseTime(m_store->state().baseTime + m_store->state().elapsedTime);
     }
 

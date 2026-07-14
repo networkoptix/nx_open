@@ -159,7 +159,6 @@ void PoeController::Private::setPowered(const PoeController::PowerModes& value)
         QJson::serialized(value),
         handleReplyCallback,
         QThread::currentThread(),
-        /*timeouts*/ {},
         server->getId());
 
     emit q->updatingPoweringModesChanged();

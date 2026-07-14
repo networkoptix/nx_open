@@ -158,8 +158,8 @@ void ClientPool::Context::readHttpResponse(AsyncClient* httpClient)
 struct HttpConnection
 {
     HttpConnection(
-        std::unique_ptr<AsyncClient> client = nullptr,
-        QSharedPointer<ClientPool::Context> context = {})
+        std::unique_ptr<AsyncClient> client = {},
+        ClientPool::ContextPtr context = {})
         :
         client(std::move(client)),
         context(context)
@@ -186,7 +186,7 @@ struct HttpConnection
 
     std::unique_ptr<AsyncClient> client;
     QElapsedTimer idleTimeout;
-    QSharedPointer<ClientPool::Context> context;
+    ClientPool::ContextPtr context;
     nx::Uuid lastAdapterFuncId;
 };
 
@@ -415,7 +415,7 @@ struct ClientPool::Private
 
     void onHttpClientDone(int handle)
     {
-        QSharedPointer<Context> context;
+        ClientPool::ContextPtr context;
         // We are most probably inside AioThread.
         {
             NX_MUTEX_LOCKER lock(&mutex);
@@ -547,7 +547,7 @@ int ClientPool::sendRequest(ContextPtr context)
 
 bool ClientPool::terminate(int handle)
 {
-    QSharedPointer<Context> context;
+    ContextPtr context;
     std::unique_ptr<AsyncClient> client;
     {
         NX_MUTEX_LOCKER lock(&d->mutex);
