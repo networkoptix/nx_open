@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include <QtCore/QString>
@@ -46,6 +47,7 @@ struct NX_RTP_API Sdp
         int serverPort = 0;
         int payloadType = -1; //< RTP payload type number
         MediaType mediaType = MediaType::Unknown;
+        std::string protocol;
         QString control;
         bool sendOnly = false;
         uint32_t ssrc = 0;
@@ -66,6 +68,7 @@ struct NX_RTP_API Sdp
     void parse(const QString& sdp);
 
     QString controlUrl;
+    std::string range;
     std::vector<Media> media;
     RtpMap preferredMap;
 

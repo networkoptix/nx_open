@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#include <vector>
+
 #include <nx/utils/byte_array.h>
 #include <srtp2/srtp.h>
 
@@ -17,6 +19,7 @@ struct EncryptionData
 {
     uint8_t clientKeyAndSalt[kSrtpKeyAndSaltLen];
     uint8_t serverKeyAndSalt[kSrtpKeyAndSaltLen];
+    std::vector<uint8_t> mki; //< Master Key Identifier.
 };
 
 class NX_VMS_COMMON_API SrtpEncryptor

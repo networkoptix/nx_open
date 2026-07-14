@@ -116,6 +116,10 @@ Sdp::Media parseMedia(QStringList& lines, const Sdp::RtpMap& preferredMap)
     QStringList trackParams = line.mid(2).split(' ');
     media.mediaType = mediaTypeFromString(trackParams[0]);
 
+    // SDP media description format: m=<media> <port> <proto> <fmt> ...
+    if (trackParams.size() >= 3)
+        media.protocol = trackParams[2].toStdString();
+
     if (trackParams.size() >= 4)
         media.rtpmap.codecName = findCodecById(trackParams[3].toInt());
 
@@ -176,6 +180,7 @@ Sdp::Media parseMedia(QStringList& lines, const Sdp::RtpMap& preferredMap)
 void Sdp::parse(const QString& sdpData)
 {
     controlUrl.clear();
+    range.clear();
     media.clear();
     QHostAddress sessionConnectionAddress;
     QStringList lines = sdpData.split('\n');
@@ -189,10 +194,13 @@ void Sdp::parse(const QString& sdpData)
         else
         {
             const static QString kControlUrlPrefix = "a=control:";
+            const static QString kRangePrefix = "a=range:";
             if (line.startsWith("c=", Qt::CaseInsensitive))
                 sessionConnectionAddress = parseConnectionAddress(line);
             else if (line.startsWith(kControlUrlPrefix, Qt::CaseInsensitive))
                 controlUrl = line.mid(kControlUrlPrefix.length());
+            else if (line.startsWith(kRangePrefix, Qt::CaseInsensitive))
+                range = line.mid(kRangePrefix.length()).toStdString();
             lines.pop_front();
         }
     }
@@ -221,6 +229,7 @@ QString Sdp::Media::toString() const
     return "{serverPort: " + QString::number(serverPort)
         + "; payloadType: " + QString::number(payloadType)
         + "; mediaType: " + nx::rtp::toString(mediaType)
+        + "; protocol: " + QString::fromStdString(protocol)
         + "; control: " + control
         + "; sendOnly: " + QString::number(sendOnly)
         + "; ssrc: " + QString::number(ssrc)
@@ -232,7 +241,8 @@ QString Sdp::Media::toString() const
 
 QString Sdp::toString() const
 {
-    return nx::format("{controlUrl: %1; media: [%2]").args(controlUrl, containerString(media));
+    return nx::format("{controlUrl: %1; range: %2; media: [%3]")
+        .args(controlUrl, QString::fromStdString(range), containerString(media));
 }
 
 } // namespace nx::rtp
