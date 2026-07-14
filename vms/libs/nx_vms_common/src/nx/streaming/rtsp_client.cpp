@@ -6,6 +6,10 @@
     #include <sys/ioctl.h>
 #endif
 
+#include <algorithm>
+#include <cstring>
+#include <string_view>
+
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <nx/branding.h>
@@ -16,12 +20,15 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/rtp/rtp.h>
+#include <nx/streaming/mikey.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/auth/time_based_nonce_provider.h>
+#include <rtsp/srtp_encryptor.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 
@@ -48,6 +55,11 @@ auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
     }
     return std::make_tuple(key.trimmed(), value.trimmed());
 };
+
+bool equalsIgnoreCase(std::string_view left, std::string_view right)
+{
+    return nx::utils::stricmp(left, right) == 0;
+}
 
 void configureUdpSocket(
     std::unique_ptr<nx::network::AbstractDatagramSocket>& socket,
@@ -867,61 +879,122 @@ bool QnRtspClient::sendSetup()
         {
             continue; // skip unknown metadata e.t.c
         }
-        nx::network::http::Request request;
-        auto setupUrl = track.sdpMedia.control == "*"
-                ? nx::Url()
-                : nx::Url(track.sdpMedia.control);
-
-        request.requestLine.method = kSetupCommand;
-        if( setupUrl.isRelative() )
-        {
-            // SETUP postfix should be written after url query params. It's invalid url, but it's required according to RTSP standard
-            request.requestLine.url = m_contentBase
-                    + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
-                    + setupUrl.toString();
-        }
-        else
-        {
-            // full track url in a prefix
-            request.requestLine.url = setupUrl;
-        }
-        request.requestLine.version = nx::network::rtsp::rtsp_1_0;
-        addCommonHeaders(request.headers);
-
-        {   //generating transport header
-            nx::String transportStr = "RTP/AVP/";
-            transportStr += m_actualTransport == nx::vms::api::RtpTransportType::tcp
-                ? "TCP"
-                : "UDP";
-
-            transportStr += m_actualTransport == nx::vms::api::RtpTransportType::multicast
-                ? ";multicast;"
-                : ";unicast;";
-
-            if (!track.ioDevice->setTransport(m_actualTransport))
-                return false;
-
-            if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
+        auto createSetupRequest =
+            [&](
+                nx::streaming::rtsp::MikeyPolicyMode mikeyPolicyMode,
+                nx::network::http::Request* request,
+                std::shared_ptr<nx::rtsp::SrtpEncryptor>* srtpDecryptor)
             {
+                *request = nx::network::http::Request();
+                srtpDecryptor->reset();
+
+                auto setupUrl = track.sdpMedia.control == "*"
+                    ? nx::Url()
+                    : nx::Url(track.sdpMedia.control);
+
+                request->requestLine.method = kSetupCommand;
+                if (setupUrl.isRelative())
+                {
+                    // SETUP postfix should be written after url query params. It's invalid url,
+                    // but it's required according to RTSP standard.
+                    request->requestLine.url = m_contentBase
+                            + ((m_contentBase.endsWith(lit("/")) || setupUrl.isEmpty()) ? lit("") : lit("/"))
+                            + setupUrl.toString();
+                }
+                else
+                {
+                    // Full track url in a prefix.
+                    request->requestLine.url = setupUrl;
+                }
+                request->requestLine.version = nx::network::rtsp::rtsp_1_0;
+                addCommonHeaders(request->headers);
+
+                // Generating transport header.
+                nx::String transportStr = "RTP/AVP/";
+                if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savp"))
+                    transportStr = "RTP/SAVP/";
+                else if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savpf"))
+                    transportStr = "RTP/SAVPF/";
+                transportStr += m_actualTransport == nx::vms::api::RtpTransportType::tcp
+                    ? "TCP"
+                    : "UDP";
+
                 transportStr += m_actualTransport == nx::vms::api::RtpTransportType::multicast
-                    ? "port="
-                    : "client_port=";
+                    ? ";multicast;"
+                    : ";unicast;";
 
-                transportStr += track.ioDevice->getUdpSockets().getPortsString();
-            }
-            else
-            {
-                track.interleaved = QPair<int,int>(i * SDP_TRACK_STEP, i * SDP_TRACK_STEP + 1);
-                transportStr += QLatin1String("interleaved=") + QString::number(track.interleaved.first) + QLatin1Char('-') + QString::number(track.interleaved.second);
-            }
-            request.headers.insert(nx::network::http::HttpHeader("Transport", transportStr));
+                if (!track.ioDevice->setTransport(m_actualTransport))
+                    return false;
+
+                if (m_actualTransport != nx::vms::api::RtpTransportType::tcp)
+                {
+                    transportStr += m_actualTransport == nx::vms::api::RtpTransportType::multicast
+                        ? "port="
+                        : "client_port=";
+
+                    transportStr += track.ioDevice->getUdpSockets().getPortsString();
+                }
+                else
+                {
+                    track.interleaved = QPair<int,int>(i * SDP_TRACK_STEP, i * SDP_TRACK_STEP + 1);
+                    transportStr += QLatin1String("interleaved=") + QString::number(track.interleaved.first) + QLatin1Char('-') + QString::number(track.interleaved.second);
+                }
+                request->headers.insert(nx::network::http::HttpHeader("Transport", transportStr));
+
+                if (auto mikey = nx::streaming::rtsp::makeClientManagedMikey(
+                    track.sdpMedia,
+                    request->requestLine.url,
+                    mikeyPolicyMode))
+                {
+                    request->headers.insert(nx::network::http::HttpHeader("KeyMgmt", mikey->keyMgmtHeader));
+                    auto newSrtpDecryptor = std::make_shared<nx::rtsp::SrtpEncryptor>();
+                    if (!newSrtpDecryptor->init(mikey->encryptionData))
+                        return false;
+                    *srtpDecryptor = std::move(newSrtpDecryptor);
+                    NX_VERBOSE(this, "Created SRTP decryptor for SDP track %1", i);
+                }
+
+                if(!m_SessionId.isEmpty())
+                    request->headers.insert(nx::network::http::HttpHeader("Session", m_SessionId.toLatin1()));
+
+                return true;
+            };
+
+        nx::network::http::Request request;
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpDecryptor;
+        if (!createSetupRequest(
+            nx::streaming::rtsp::MikeyPolicyMode::rfc,
+            &request,
+            &srtpDecryptor))
+        {
+            return false;
         }
-
-        if(!m_SessionId.isEmpty())
-            request.headers.insert(nx::network::http::HttpHeader("Session", m_SessionId.toLatin1()));
 
         QByteArray response;
-        if (!sendRequestAndReceiveResponse(std::move(request), response))
+        auto setupResult = sendRequestAndReceiveResponse(std::move(request), response);
+        if (!setupResult && srtpDecryptor)
+        {
+            nx::network::rtsp::RtspResponse rtspResponse;
+            if (rtspResponse.parse(nx::ConstBufferRefType(response.data(), response.size()))
+                && static_cast<nx::network::rtsp::StatusCodeValue>(
+                       rtspResponse.statusLine.statusCode) ==
+                   nx::network::rtsp::StatusCode::keyManagementFailure)
+            {
+                NX_VERBOSE(this, "RFC MIKEY SETUP failed, retry GStreamer-compatible MIKEY");
+                if (!createSetupRequest(
+                    nx::streaming::rtsp::MikeyPolicyMode::gstreamerCompatibility,
+                    &request,
+                    &srtpDecryptor))
+                {
+                    return false;
+                }
+
+                response.clear();
+                setupResult = sendRequestAndReceiveResponse(std::move(request), response);
+            }
+        }
+
+        if (!setupResult)
         {
             if (m_transport == nx::vms::api::RtpTransportType::automatic
                 && m_actualTransport == nx::vms::api::RtpTransportType::tcp)
@@ -934,6 +1007,7 @@ bool QnRtspClient::sendSetup()
                 return false;
         }
 
+        track.srtpDecryptor = srtpDecryptor;
         track.setupSuccess = true;
         if (!parseSetupResponse(response, &track, i))
             return false;
@@ -1048,27 +1122,32 @@ void QnRtspClient::addRangeHeader( nx::network::http::Request* const request, qi
     {
         nx::network::rtsp::header::Range range;
 
-        //There is no guarantee that every RTSP server understands utc ranges.
-        //RFC requires only npt ranges support.
         range.type =
             [&]()
             {
-                switch (m_dateTimeFormat)
+                if (m_additionAttrs.contains(Qn::EC2_INTERNAL_RTP_FORMAT))
+                    return nx::network::rtsp::header::Range::Type::nxClock;
+
+                if (m_dateTimeFormat == DateTimeFormat::ISO)
                 {
-                    case DateTimeFormat::Numeric:
-                        if (!m_additionAttrs.contains(Qn::EC2_INTERNAL_RTP_FORMAT)
-                            && startPos == DATETIME_NOW)
-                        {
-                            // Use rfc format for cameras if it not configured.
-                            return nx::network::rtsp::header::Range::Type::npt;
-                        }
-                        return nx::network::rtsp::header::Range::Type::nxClock;
-                    case DateTimeFormat::ISO:
-                        return nx::network::rtsp::header::Range::Type::clock;
+                    // For archive requests, explicitly use 'clock' regardless of the advertised
+                    // range type, since there is no straightforward way to convert a UTC timestamp
+                    // to NPT.
+                    return nx::network::rtsp::header::Range::Type::clock;
                 }
 
-                NX_ASSERT(false);
-                return nx::network::rtsp::header::Range::Type{};
+                if (nx::utils::startsWith(m_sdp.range, "npt=", nx::utils::CaseSensitivity::off))
+                    return nx::network::rtsp::header::Range::Type::npt;
+                else if (nx::utils::startsWith(m_sdp.range, "clock=", nx::utils::CaseSensitivity::off))
+                    return nx::network::rtsp::header::Range::Type::clock;
+
+                if (startPos == DATETIME_NOW)
+                {
+                    // Use npt for Live if no range header from server.
+                    return nx::network::rtsp::header::Range::Type::npt;
+                }
+
+                return nx::network::rtsp::header::Range::Type::clock;
             }();
 
         range.startUs = startPos;
@@ -1093,7 +1172,22 @@ nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qin
 {
     nx::network::http::Request request;
     request.requestLine.method = kPlayCommand;
-    request.requestLine.url = m_contentBase;
+
+    bool hasSrtpTrack = false;
+    for (const auto& track: m_sdpTracks)
+    {
+        if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savp")
+            || equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savpf"))
+        {
+            hasSrtpTrack = true;
+            break;
+        }
+    }
+
+    const nx::Url sessionControlUrl(m_sdp.controlUrl);
+    request.requestLine.url = hasSrtpTrack && sessionControlUrl.isValid()
+        ? sessionControlUrl
+        : nx::Url(m_contentBase);
     request.requestLine.version = nx::network::rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx::network::http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
@@ -1203,8 +1297,40 @@ bool QnRtspClient::sendKeepAlive()
 
 void QnRtspClient::sendBinaryResponse(const quint8* buffer, int size)
 {
-    if (m_tcpSock)
-        m_tcpSock->send(buffer, size);
+    if (!m_tcpSock)
+        return;
+
+    if (size > int(sizeof(FrameHeader)) && buffer[0] == '$')
+    {
+        const int channelNumber = buffer[1];
+        if (auto srtpEncryptor = srtpEncryptorForChannel(channelNumber))
+        {
+            nx::utils::ByteArray encrypted;
+            encrypted.write(reinterpret_cast<const char*>(buffer), size);
+
+            if (!srtpEncryptor->encryptPacket(&encrypted, sizeof(FrameHeader)))
+            {
+                NX_WARNING(this,
+                    "Failed to encrypt outgoing RTSP interleaved packet on channel %1",
+                    channelNumber);
+                return;
+            }
+
+            const int encryptedPayloadSize = encrypted.size() - sizeof(FrameHeader);
+            auto data = reinterpret_cast<quint8*>(encrypted.data());
+            data[2] = quint8((encryptedPayloadSize >> 8) & 0xff);
+            data[3] = quint8(encryptedPayloadSize & 0xff);
+
+            NX_VERBOSE(this,
+                "Send encrypted RTSP packet channel=%1 size=%2",
+                channelNumber,
+                encrypted.size());
+            m_tcpSock->send(encrypted.constData(), encrypted.size());
+            return;
+        }
+    }
+
+    m_tcpSock->send(buffer, size);
 }
 
 void QnRtspClient::processTextData(const QByteArray& textData)
@@ -1323,23 +1449,36 @@ int QnRtspClient::readBinaryResponse(quint8* data, int maxDataSize)
         return 0;
 
     const int dataLen = (m_responseBuffer[2] << 8) + m_responseBuffer[3] + sizeof(FrameHeader);
+    const int channelNumber = m_responseBuffer[1];
     if (maxDataSize < dataLen)
         return -2; // not enough buffer
+    quint8* const packetStart = data;
+    quint8* writePtr = packetStart;
     const int copyLen = std::min<int>(dataLen, m_responseBufferLen);
-    memcpy(data, m_responseBuffer, copyLen);
+    memcpy(writePtr, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)
         memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
-    data += copyLen;
+    writePtr += copyLen;
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        const int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        const int bytesRead = readSocketWithBuffering(writePtr, dataRestLen, true);
         if (bytesRead <= 0)
             return bytesRead;
         dataRestLen -= bytesRead;
-        data += bytesRead;
+        writePtr += bytesRead;
     }
-    return dataLen;
+
+    int decryptedLen = dataLen;
+    if (!decryptPacketIfNeeded(
+        srtpEncryptorForChannel(channelNumber).get(),
+        packetStart,
+        &decryptedLen))
+    {
+        return -1;
+    }
+
+    return decryptedLen;
 }
 
 quint8* QnRtspClient::prepareDemuxedData(std::vector<nx::utils::ByteArray*>& demuxedData, int channel, int reserve)
@@ -1386,26 +1525,80 @@ int QnRtspClient::readBinaryResponse(std::vector<nx::utils::ByteArray*>& demuxed
     const int dataLen = (m_responseBuffer[2] << 8) + m_responseBuffer[3] + sizeof(FrameHeader);
     const int copyLen = qMin(dataLen, m_responseBufferLen);
     channelNumber = m_responseBuffer[1];
-    quint8* data = prepareDemuxedData(demuxedData, channelNumber, dataLen);
+    const int initialSize = demuxedData.size() > (size_t) channelNumber && demuxedData[channelNumber]
+        ? demuxedData[channelNumber]->size()
+        : 0;
+    quint8* const packetStart = prepareDemuxedData(demuxedData, channelNumber, dataLen);
+    quint8* writePtr = packetStart;
 
-    memcpy(data, m_responseBuffer, copyLen);
+    memcpy(writePtr, m_responseBuffer, copyLen);
     if (m_responseBufferLen > copyLen)
         memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
-    data += copyLen;
+    writePtr += copyLen;
     m_responseBufferLen -= copyLen;
 
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        const int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        const int bytesRead = readSocketWithBuffering(writePtr, dataRestLen, true);
         if (bytesRead <= 0)
             return bytesRead;
 
         dataRestLen -= bytesRead;
-        data += bytesRead;
+        writePtr += bytesRead;
     }
 
     demuxedData[channelNumber]->finishWriting(dataLen);
-    return dataLen;
+    int decryptedLen = dataLen;
+    if (!decryptPacketIfNeeded(
+        srtpEncryptorForChannel(channelNumber).get(),
+        packetStart,
+        &decryptedLen))
+    {
+        demuxedData[channelNumber]->resize(initialSize);
+        return -1;
+    }
+
+    demuxedData[channelNumber]->resize(initialSize + decryptedLen);
+    return decryptedLen;
+}
+
+std::shared_ptr<nx::rtsp::SrtpEncryptor> QnRtspClient::srtpEncryptorForChannel(
+    int channelNumber) const
+{
+    if (channelNumber < 0 || channelNumber >= (int) m_rtpToTrack.size())
+        return nullptr;
+
+    const auto& channel = m_rtpToTrack[channelNumber];
+    if (channel.trackIndex < 0 || channel.trackIndex >= (int) m_sdpTracks.size())
+        return nullptr;
+
+    return m_sdpTracks[channel.trackIndex].srtpDecryptor;
+}
+
+bool QnRtspClient::decryptPacketIfNeeded(
+    nx::rtsp::SrtpEncryptor* srtpDecryptor,
+    quint8* data,
+    int* inOutSize)
+{
+    constexpr int frameHeaderSize = sizeof(FrameHeader);
+
+    if (!data || !inOutSize || *inOutSize < frameHeaderSize || data[0] != '$') //< Non-binary data.
+        return false;
+
+    if (!srtpDecryptor)
+        return true;
+
+    int payloadSize = *inOutSize - frameHeaderSize;
+    if (payloadSize <= 0)
+        return false;
+
+    if (!srtpDecryptor->decryptPacket(data + frameHeaderSize, &payloadSize))
+        return false;
+
+    *inOutSize = payloadSize + frameHeaderSize;
+    data[2] = quint8((payloadSize >> 8) & 0xff);
+    data[3] = quint8(payloadSize & 0xff);
+    return true;
 }
 
 bool QnRtspClient::processTcpRtcpData(const quint8* data, int size)

@@ -2,6 +2,8 @@
 
 #include "srtp_encryptor.h"
 
+#include <cstring>
+
 #include <QtCore/QtEndian>
 
 #include <nx/rtp/rtp.h>
@@ -10,6 +12,12 @@
 using namespace nx::rtp;
 
 namespace nx::rtsp {
+
+namespace {
+
+constexpr int kSrtpAuthTagSize = 10;
+
+} // namespace
 
 class SrtpInit
 {
@@ -101,7 +109,7 @@ bool SrtpEncryptor::encryptPacket(nx::utils::ByteArray* data, int offset)
         }
     }
 
-    data->reserve(data->size() + SRTP_MAX_TRAILER_LEN);
+    data->reserve(data->size() + SRTP_MAX_TRAILER_LEN + m_masterKeys.mki.size());
     int size = data->size() - offset;
     bool result = encryptPacket((uint8_t*)data->data() + offset, &size);
     data->resize(size + offset);
@@ -118,7 +126,20 @@ bool SrtpEncryptor::encryptPacket(uint8_t* data, int* inOutSize)
         NX_WARNING(this, "Outgoing SRTCP packet is a replay");
     else if (error)
         NX_WARNING(this, "SRTCP protect error, status=%1", (int) error);
-    NX_VERBOSE(this, "Protected SRTCP packet size=%1", *inOutSize);
+
+    if (!error && !m_masterKeys.mki.empty())
+    {
+        const int mkiSize = (int) m_masterKeys.mki.size();
+        const int mkiOffset = *inOutSize - kSrtpAuthTagSize;
+        memmove( //< Buffers can overlap.
+            data + mkiOffset + mkiSize,
+            data + mkiOffset,
+            kSrtpAuthTagSize);
+        memcpy(data + mkiOffset, m_masterKeys.mki.data(), mkiSize);
+        *inOutSize += mkiSize;
+    }
+
+    NX_VERBOSE(this, "Protected SRTP/SRTCP packet size=%1", *inOutSize);
 
     return error == 0;
 }
@@ -126,13 +147,35 @@ bool SrtpEncryptor::encryptPacket(uint8_t* data, int* inOutSize)
 bool SrtpEncryptor::decryptPacket(uint8_t* data, int* inOutSize)
 {
     nx::rtp::RtpHeader* packet = (nx::rtp::RtpHeader*)(data);
+    const bool useMki = !m_masterKeys.mki.empty();
+    const int mkiSize = (int) m_masterKeys.mki.size();
+    if (useMki && *inOutSize > mkiSize + kSrtpAuthTagSize)
+    {
+        // libsrtp is configured with a single negotiated master key, so remove MKI before
+        // passing the packet to libsrtp.
+        const int mkiOffset = *inOutSize - kSrtpAuthTagSize - mkiSize;
+        if (memcmp(data + mkiOffset, m_masterKeys.mki.data(), mkiSize) != 0)
+        {
+            NX_WARNING(this, "Unexpected SRTP MKI: %1",
+                QByteArray(
+                    reinterpret_cast<const char*>(data + mkiOffset),
+                    mkiSize).toHex());
+            return false;
+        }
+        memmove( //< Buffers can overlap.
+            data + mkiOffset,
+            data + mkiOffset + mkiSize,
+            kSrtpAuthTagSize);
+        *inOutSize -= mkiSize;
+    }
+
     srtp_err_status_t error = packet->isRtcp()
         ? srtp_unprotect_rtcp(m_srtpIn, data, inOutSize)
         : srtp_unprotect(m_srtpIn, data, inOutSize);
     if (error == srtp_err_status_replay_fail)
         NX_WARNING(this, "Incoming SRTCP packet is a replay");
     else if (error)
-        NX_WARNING(this, "SRTCP unprotect error, status=%1", (int)error);
+        NX_WARNING(this, "SRTCP unprotect error, status=%1", (int) error);
     NX_VERBOSE(this, "Unprotected SRTCP packet size=%1", *inOutSize);
 
     return error == 0;

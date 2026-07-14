@@ -59,6 +59,8 @@ NX_RTP_API int buildClientRtcpReport(
     int bufferLen,
     const std::optional<std::string>& cname = {});
 
+NX_RTP_API uint64_t unixTimestampToNtpTimestamp(std::chrono::microseconds timestamp);
+
 class NX_RTP_API RtcpSenderReporter
 {
 public:

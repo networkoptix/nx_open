@@ -40,13 +40,13 @@ CameraDiagnostics::Result probeStreamWithTcpConnect(
 {
     using namespace nx::network;
     bool isSslRequired =
-        (url.scheme().toLower().toUtf8() == rtsp::kSecureUrlSchemeName);
+        (url.scheme().toLower().toUtf8() == nx::network::rtsp::kSecureUrlSchemeName);
 
     auto tcpSocket = SocketFactory::createStreamSocket(
         nx::network::ssl::kAcceptAnyCertificate,
         isSslRequired,
         useCloud ? NatTraversalSupport::enabled : NatTraversalSupport::disabled);
-    SocketAddress targetAddress = url::getEndpoint(url, rtsp::DEFAULT_RTSP_PORT);
+    SocketAddress targetAddress = url::getEndpoint(url, nx::network::rtsp::DEFAULT_RTSP_PORT);
     if (!tcpSocket->connect(targetAddress, std::chrono::duration_cast<std::chrono::milliseconds>(timeout)))
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
     return CameraDiagnostics::NoErrorResult();

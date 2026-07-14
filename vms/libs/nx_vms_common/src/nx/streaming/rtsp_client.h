@@ -34,6 +34,8 @@ extern "C" {
 
 class QnRtspClient;
 
+namespace nx::rtsp { class SrtpEncryptor; }
+
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
@@ -173,6 +175,7 @@ public:
         nx::rtp::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpDecryptor;
     };
     QnRtspClient(const Config& config);
 
@@ -362,6 +365,12 @@ private:
     CameraDiagnostics::Result sendOptions();
     CameraDiagnostics::Result sendDescribe();
     bool sendKeepAlive();
+    std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptorForChannel(
+        int channelNumber) const;
+    bool decryptPacketIfNeeded(
+        nx::rtsp::SrtpEncryptor* srtpDecryptor,
+        quint8* data,
+        int* inOutSize);
 
     bool readTextResponse(QByteArray &response);
     void fillRequestAuthorization(nx::network::http::Request* request);
