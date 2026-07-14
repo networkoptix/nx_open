@@ -533,10 +533,6 @@
       <source>Period</source>
       <translation>週期</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>細節</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -765,6 +761,13 @@
     <message>
       <source>No data</source>
       <translation>無資料</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>

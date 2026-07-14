@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>長押し</translation>
     </message>
     <message>
       <source>Error</source>
@@ -533,10 +533,6 @@
       <source>Period</source>
       <translation>期間</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>詳細</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -765,6 +761,13 @@
     <message>
       <source>No data</source>
       <translation>データがありません</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>

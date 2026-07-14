@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Naciśnij i przytrzymaj</translation>
     </message>
     <message>
       <source>Error</source>
@@ -297,7 +297,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Szukaj według %1</translation>
     </message>
   </context>
   <context>
@@ -536,10 +536,6 @@
       <source>Period</source>
       <translation>Okres</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>Szczegóły</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -768,6 +764,13 @@
     <message>
       <source>No data</source>
       <translation>Brak danych</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
@@ -1658,7 +1661,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Powrót do ekranu powitalnego</translation>
     </message>
   </context>
 </TS>

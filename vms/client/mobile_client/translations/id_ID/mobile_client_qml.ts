@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Tekan dan tahan</translation>
     </message>
     <message>
       <source>Error</source>
@@ -533,10 +533,6 @@
       <source>Period</source>
       <translation>Periode</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>Detail</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -765,6 +761,13 @@
     <message>
       <source>No data</source>
       <translation>Tidak ada data</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>

@@ -534,10 +534,6 @@
       <source>Period</source>
       <translation>Periyot</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>Detaylar</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -766,6 +762,13 @@
     <message>
       <source>No data</source>
       <translation>Veri bulunamadı</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>

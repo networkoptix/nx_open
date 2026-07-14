@@ -533,10 +533,6 @@
       <source>Period</source>
       <translation>Khoảng thời gian</translation>
     </message>
-    <message>
-      <source>Details</source>
-      <translation>Chi tiết</translation>
-    </message>
   </context>
   <context>
     <name>FiltersItem</name>
@@ -765,6 +761,13 @@
     <message>
       <source>No data</source>
       <translation>Không có dữ liệu</translation>
+    </message>
+  </context>
+  <context>
+    <name>NotificationDetailsItem</name>
+    <message>
+      <source>Details</source>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
