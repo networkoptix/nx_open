@@ -274,7 +274,7 @@ AdaptiveScreen
             {
                 Workflow.openEventSearchScreen(
                     /*push*/ true,
-                    screen.customResourceId,
+                    /*selectedResourceId*/ null,
                     screen.camerasModel,
                     screen.analyticsSearchMode,
                     /*searchText*/ text)
