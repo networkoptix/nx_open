@@ -607,7 +607,9 @@ Page
         camerasModel: modernVideoScreen.camerasModel
         controller: controller
 
-        interactive: !video.roiController.drawingRoi && video.zoomedOut
+        interactive: !video.roiController.drawingRoi
+            && !(d.ptzMode && d.fullscreen)
+            && video.zoomedOut
     }
 
     Item
