@@ -56,9 +56,6 @@ NX_BUILD_INFO_API QString applicationPlatform();
 NX_BUILD_INFO_API QString applicationPlatformNew();
 NX_BUILD_INFO_API QString applicationPlatformModification();
 
-/** Addition to the version string for MetaVMS, or an empty string for non-MetaVMS builds. */
-NX_BUILD_INFO_API QString usedMetaVersion();
-
 NX_BUILD_INFO_API bool isArm();
 
 NX_BUILD_INFO_API bool isAndroid();

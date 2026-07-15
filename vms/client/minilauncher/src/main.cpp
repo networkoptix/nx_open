@@ -1,15 +1,15 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <array>
+#include <iostream>
+#include <locale>
 #include <string>
 #include <vector>
-#include <locale>
-#include <iostream>
 
-#include <Windows.h>
 #include <Shlwapi.h>
-#include <shlobj.h>
+#include <Windows.h>
 #include <shellapi.h>
+#include <shlobj.h>
 
 #include "version.h"
 
@@ -44,14 +44,70 @@ std::wstring toStandardPath(const std::wstring& path)
     return result;
 }
 
+// Branding values are not compiled into the code to keep it brand-neutral; they are read from
+// the VERSIONINFO resource of this executable, where the rebranding tooling can patch them.
+std::wstring queryOwnVersionInfoString(const wchar_t* key)
+{
+    wchar_t ownPath[MAX_PATH];
+    if (GetModuleFileNameW(nullptr, ownPath, MAX_PATH) == 0)
+        return std::wstring();
+
+    const DWORD size = GetFileVersionInfoSizeW(ownPath, /*lpdwHandle*/ nullptr);
+    if (size == 0)
+        return std::wstring();
+
+    std::vector<char> data(size);
+    if (!GetFileVersionInfoW(ownPath, /*dwHandle*/ 0, size, data.data()))
+        return std::wstring();
+
+    struct LangAndCodePage
+    {
+        WORD language;
+        WORD codePage;
+    };
+    LangAndCodePage* translations = nullptr;
+    UINT translationsSize = 0;
+    if (!VerQueryValueW(
+            data.data(), L"\\VarFileInfo\\Translation", (void**) &translations, &translationsSize)
+        || translationsSize < sizeof(LangAndCodePage))
+    {
+        return std::wstring();
+    }
+
+    wchar_t subBlock[128];
+    swprintf(subBlock,
+        std::size(subBlock),
+        L"\\StringFileInfo\\%04x%04x\\%ls",
+        translations[0].language,
+        translations[0].codePage,
+        key);
+
+    wchar_t* value = nullptr;
+    UINT valueLength = 0;
+    if (!VerQueryValueW(data.data(), subBlock, (void**) &value, &valueLength) || !value)
+        return std::wstring();
+
+    return std::wstring(value);
+}
+
+/**
+ * @return Empty string if the shared applauncher location cannot be determined; the caller falls
+ *     back to the applauncher installed next to this binary.
+ */
 std::wstring getSharedApplauncherDir()
 {
+    static const std::wstring organizationName = queryOwnVersionInfoString(L"CompanyName");
+    static const std::wstring customizationId = queryOwnVersionInfoString(L"CustomizationId");
+    if (organizationName.empty() || customizationId.empty())
+        return std::wstring();
+
     wchar_t result[MAX_PATH];
-    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, result)))
-    {
-        // Append product-specific path
-        PathAppend(result, L"\\" QN_ORGANIZATION_NAME  L"\\applauncher\\"  QN_CUSTOMIZATION_NAME);
-    }
+    if (FAILED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, result)))
+        return std::wstring();
+
+    // Append product-specific path.
+    const std::wstring subPath = L"\\" + organizationName + L"\\applauncher\\" + customizationId;
+    PathAppend(result, subPath.c_str());
     return std::wstring(closeDirPath(result));
 }
 
@@ -137,9 +193,12 @@ Version getSharedApplauncherVersion()
 {
     Version result = {0, 0, 0, 0};
 
-    const auto applauncherPath = getFullFileName(
-        getSharedApplauncherDir(),
-        QN_APPLAUNCHER_VERSION_FILE);
+    const auto sharedApplauncherDir = getSharedApplauncherDir();
+    if (sharedApplauncherDir.empty())
+        return result;
+
+    const auto applauncherPath =
+        getFullFileName(sharedApplauncherDir, QN_APPLAUNCHER_VERSION_FILE);
 
     auto versionFile = _wfopen(applauncherPath.c_str(), L"r");
     if (versionFile)

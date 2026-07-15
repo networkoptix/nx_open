@@ -253,7 +253,7 @@ def main():
                 a,
                 target_dir=bin_dir,
                 source_dir=src_bin_dir,
-                file_list=["external.dat"])
+                file_list=["external.dat", "server_external.dat"])
 
         if withAnalyticsServer:
             archiveFiles(

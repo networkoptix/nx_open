@@ -9,6 +9,7 @@ nx_add_target(minilauncher EXECUTABLE SIGNED
         "minilauncher.rc"
     PUBLIC_LIBS
         shlwapi.lib
+        version.lib #< For reading branding values from the VERSIONINFO resource.
     FOLDER utils
 )
 
