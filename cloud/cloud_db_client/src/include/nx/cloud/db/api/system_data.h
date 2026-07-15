@@ -44,6 +44,26 @@ std::string getAttrValueOr(
 void setAttrValue(
     AttributesList& attrs, const std::string& name, const std::string& value);
 
+enum class SystemStatus
+{
+    invalid = 0,
+
+    /**%apidoc Site has been bound but not a single request from
+     * that system has been received by cloud.
+     */
+    notActivated,
+
+    activated,
+    deleted_,
+    beingMerged,
+    deletedByMerge,
+
+    /**%apidoc Site has been created by the Deployment Service (e.g. for the QR code
+     * deployment) and not a single request from that system has been received by cloud.
+     */
+    deploymentReady,
+};
+
 /**
  * Information required to register system in cloud.
  */
@@ -64,6 +84,16 @@ struct SystemRegistrationData
 
     /**%apidoc Non-empty if system must be bound to an organization. */
     std::optional<std::string> organizationId;
+
+    /**%apidoc[opt]
+     * Initial status of the newly created Site, `notActivated` by default.
+     * %value[unused] invalid
+     * %value[unused] activated
+     * %value[unused] deleted_
+     * %value[unused] beingMerged
+     * %value[unused] deletedByMerge
+     */
+    SystemStatus initialStatus = SystemStatus::notActivated;
 };
 
 /**
@@ -93,21 +123,6 @@ struct SystemAttributesUpdate
      * Required and MUST be valid if changing system2faEnabled setting.
      */
     std::optional<std::string> mfaCode;
-};
-
-enum class SystemStatus
-{
-    invalid = 0,
-
-    /**%apidoc System has been bound but not a single request from
-     * that system has been received by cloud.
-     */
-    notActivated,
-
-    activated,
-    deleted_,
-    beingMerged,
-    deletedByMerge,
 };
 
 struct SystemData

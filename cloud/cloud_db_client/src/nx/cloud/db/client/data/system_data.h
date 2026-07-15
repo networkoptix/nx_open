@@ -14,7 +14,8 @@
 
 namespace nx::cloud::db::api {
 
-NX_REFLECTION_INSTRUMENT(SystemRegistrationData, (id)(name)(customization)(opaque)(organizationId))
+NX_REFLECTION_INSTRUMENT(SystemRegistrationData,
+    (id)(name)(customization)(opaque)(organizationId)(initialStatus))
 
 // TODO: #akolesnikov Replace this and similar functions with nx::reflect::urlencoded.
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const systemData);
@@ -26,7 +27,8 @@ NX_REFLECTION_INSTRUMENT_ENUM(SystemStatus,
     activated,
     deleted_,
     beingMerged,
-    deletedByMerge
+    deletedByMerge,
+    deploymentReady
 )
 
 // TODO: #akolesnikov Add corresponding parser/serializer to fusion and remove this function.

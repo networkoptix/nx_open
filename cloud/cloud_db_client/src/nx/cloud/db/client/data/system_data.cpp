@@ -3,6 +3,7 @@
 #include "system_data.h"
 
 #include <nx/network/url/query_parse_helper.h>
+#include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/log/assert.h>
 
 #include "../field_name.h"
@@ -18,6 +19,7 @@ MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, id)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, name)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, customization)
 MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, opaque)
+MAKE_FIELD_NAME_STR_CONST(SystemRegistrationData, initialStatus)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const data)
 {
@@ -41,6 +43,18 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemRegistrationData* const d
     // Optional field.
     url::deserializeField(urlQuery, SystemRegistrationData_opaque_field, &data->opaque);
 
+    // Optional field.
+    if (urlQuery.hasQueryItem(SystemRegistrationData_initialStatus_field))
+    {
+        bool parsed = false;
+        const auto status = nx::reflect::fromString<SystemStatus>(
+            urlQuery.queryItemValue(SystemRegistrationData_initialStatus_field).toStdString(),
+            &parsed);
+        if (!parsed)
+            return false;
+        data->initialStatus = status;
+    }
+
     return true;
 }
 
@@ -51,6 +65,10 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
     url::serializeField(urlQuery, SystemRegistrationData_name_field, data.name);
     url::serializeField(urlQuery, SystemRegistrationData_customization_field, data.customization);
     url::serializeField(urlQuery, SystemRegistrationData_opaque_field, data.opaque);
+    url::serializeField(
+        urlQuery,
+        SystemRegistrationData_initialStatus_field,
+        nx::reflect::toString(data.initialStatus));
 }
 
 //-------------------------------------------------------------------------------------------------
