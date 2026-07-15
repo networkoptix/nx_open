@@ -1890,7 +1890,7 @@
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
-      <translation type="unfinished">JSON RPC subscription update interval (milliseconds, 0 = disabled).</translation>
+      <translation>JSON RPC 訂閱更新間隔（毫秒，0 = 停用）。</translation>
     </message>
   </context>
 </TS>
