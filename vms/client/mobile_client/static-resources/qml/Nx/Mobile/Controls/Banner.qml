@@ -100,6 +100,8 @@ Control
             height: 1
             color: ColorTheme.colors.dark9
         }
+
+        MultiPointTouchArea { anchors.fill: parent }
     }
 
     contentItem: GridLayout
@@ -168,7 +170,6 @@ Control
 
             Layout.row: 1
             Layout.column: 1
-            Layout.fillWidth: true
             Layout.preferredHeight: 24
         }
     }
