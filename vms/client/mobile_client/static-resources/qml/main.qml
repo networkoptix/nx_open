@@ -125,25 +125,28 @@ Controls.ApplicationWindow
 
         BannerSource
         {
-            active: !!text
+            id: siteConnectionBanner
+
+            text: qsTr("Connection lost. Reconnecting...")
+            active: windowContext.sessionManager.hasReconnectingSession
             type: Banner.Error
-            modal: windowContext.sessionManager.hasReconnectingSession
-            text: windowContext.sessionManager.hasReconnectingSession
-                ? qsTr("Connection lost. Reconnecting...")
-                : d.showCloudOfflineWarning
-                    ? qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
-                        .arg(appContext.appInfo.cloudName())
-                    : ""
-
-            action: windowContext.sessionManager.hasReconnectingSession ? stopSessionAction : null
-
-            Controls.Action
+            modal: true
+            action: Controls.Action
             {
-                id: stopSessionAction
-
                 text: qsTr("Back to Welcome Screen")
                 onTriggered: windowContext.sessionManager.stopSessionByUser()
             }
+        }
+
+        BannerSource
+        {
+            id: cloudConnectionBanner
+
+            text: qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
+                .arg(appContext.appInfo.cloudName())
+
+            active: d.showCloudOfflineWarning && !siteConnectionBanner.active
+            type: Banner.Error
         }
 
         onCloudOfflineChanged:
