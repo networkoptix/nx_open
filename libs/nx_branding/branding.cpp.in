@@ -280,4 +280,9 @@ QString customOpenSourceLibrariesUrl()
     return R"(${customization.customOpenSourceLibrariesUrl})";
 }
 
+QString metaVersionSuffix()
+{
+    return R"(${usedMetaVersion})";
+}
+
 } // namespace nx::branding

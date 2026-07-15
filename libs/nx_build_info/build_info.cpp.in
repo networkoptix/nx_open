@@ -79,11 +79,6 @@ QString applicationPlatformModification()
     return "${modification}";
 }
 
-QString usedMetaVersion()
-{
-    return "${usedMetaVersion}";
-}
-
 bool isArm()
 {
     #if defined(__arm__) || defined(__aarch64__)

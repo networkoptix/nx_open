@@ -109,8 +109,8 @@ void initApplication(const QnStartupParameters& startupParams)
 
     QString applicationVersion = !startupParams.engineVersion.isEmpty()
         ? startupParams.engineVersion : nx::build_info::vmsVersion();
-    if (!nx::build_info::usedMetaVersion().isEmpty())
-        applicationVersion += " " + nx::build_info::usedMetaVersion();
+    if (!nx::branding::metaVersionSuffix().isEmpty())
+        applicationVersion += " " + nx::branding::metaVersionSuffix();
 
     QApplication::setApplicationVersion(applicationVersion);
     QApplication::setStartDragDistance(kStarDragDistance);
