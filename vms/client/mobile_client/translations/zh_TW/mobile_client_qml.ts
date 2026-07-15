@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>長按</translation>
     </message>
     <message>
       <source>Error</source>
@@ -297,7 +297,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>以 %1 搜尋</translation>
     </message>
   </context>
   <context>
@@ -767,7 +767,7 @@
     <name>NotificationDetailsItem</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>細節</translation>
     </message>
   </context>
   <context>
@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>已選 %1/%2</translation>
     </message>
   </context>
   <context>
@@ -1658,7 +1658,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>返回歡迎畫面</translation>
     </message>
   </context>
 </TS>

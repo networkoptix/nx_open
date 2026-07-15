@@ -767,7 +767,7 @@
     <name>NotificationDetailsItem</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detail</translation>
     </message>
   </context>
   <context>

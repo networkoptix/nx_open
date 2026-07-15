@@ -5720,11 +5720,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>刪除雲端佈局失敗</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>已失去雲端連線，請稍後再試。</translation>
     </message>
   </context>
   <context>
