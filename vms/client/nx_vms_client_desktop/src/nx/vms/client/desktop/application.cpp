@@ -416,7 +416,8 @@ void setGraphicsSettings()
     if (nx::build_info::isLinux())
     {
         // Workaround for a crash within Chromium rendering due to graphic driver issue.
-        if (gpuInfo.name.toLower().contains("intel") || gpuInfo.name.toLower().contains("vmware"))
+        if (gpuInfo.name.toLower().contains("intel") || gpuInfo.name.toLower().contains("vmware")
+            || gpuInfo.name.isEmpty())
         {
             if (graphicsApi == GraphicsApi::opengl)
                 qputenv(kChromiumFlags, qgetenv(kChromiumFlags) + " --disable-gpu-compositing");
