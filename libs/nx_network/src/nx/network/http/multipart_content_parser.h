@@ -21,12 +21,22 @@ public:
     virtual size_t flush() override;
 
     /**
+     * Some cameras (e.g. Axis) declare the boundary already prefixed with "--" in the
+     * Content-Type header. Such cameras may then use that very string as the body
+     * delimiter without prepending an extra "--", deviating from RFC 2046.
+     * When enabled, both variants are accepted: the parser switches to the verbatim
+     * interpretation on the first boundary if the stream turns out to use it.
+     * Disabled by default (standard-compliant behavior only).
+     * NOTE: Must be called before the first body byte is fed to processData()
+     */
+    void setBoundaryMayContainLeadingDashes(bool value) noexcept;
+    /**
      * @param Expected to be similar to "multipart/x-mixed-replace;boundary=some_boundary".
      * @return False, if contentType does not specify multipart content.
      * NOTE: After this method has been called, no MultipartContentParser::setBoundary call is needed.
     */
     bool setContentType(const std::string& contentType);
-    void setBoundary(const std::string& boundary);
+    void setBoundary(std::string boundary);
     void setForceParseAsBinary(bool force);
 
     /**
@@ -77,7 +87,9 @@ private:
     nx::Buffer m_supposedBoundary;
     nx::network::http::HttpHeaders m_currentFrameHeaders;
     bool m_forceParseAsBinary = false;
+    bool m_boundaryMayContainLeadingDashes = false;
 
+    void updateBoundaryDelimiters(std::string startBoundary);
     bool processLine(const ConstBufferRefType& lineBuffer);
 
     bool readUnsizedBinaryData(

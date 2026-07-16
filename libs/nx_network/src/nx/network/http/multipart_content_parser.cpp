@@ -150,9 +150,9 @@ bool MultipartContentParser::setContentType(const std::string& str)
     return true;
 }
 
-void MultipartContentParser::setBoundary(const std::string& boundary)
+void MultipartContentParser::setBoundary(std::string boundary)
 {
-    m_boundary = boundary;
+    m_boundary = std::move(boundary);
 
     // Dropping starting and trailing quotes.
     while (!m_boundary.empty() && m_boundary[0] == '"')
@@ -160,10 +160,15 @@ void MultipartContentParser::setBoundary(const std::string& boundary)
     while (!m_boundary.empty() && m_boundary[m_boundary.size() - 1] == '"')
         m_boundary.erase(m_boundary.size() - 1, 1);
 
-    m_startBoundaryLine = "--" + m_boundary/*+"\r\n"*/; //--boundary\r\n
+    updateBoundaryDelimiters("--" + m_boundary);
+}
+
+void MultipartContentParser::updateBoundaryDelimiters(std::string startBoundary)
+{
+    m_startBoundaryLine = std::move(startBoundary);
     m_startBoundaryForUnsizedBinaryParsing = "\r\n" + m_startBoundaryLine + "\r\n";
     m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF = "\r\n" + m_startBoundaryLine;
-    m_endBoundaryLine = "--" + m_boundary + "--" /*"\r\n"*/;
+    m_endBoundaryLine = m_startBoundaryLine + "--";
     m_endBoundaryForUnsizedBinaryParsing =
         m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF + "--";
 }
@@ -178,6 +183,11 @@ bool MultipartContentParser::processLine(const ConstBufferRefType& lineBuffer)
     switch (m_state)
     {
         case waitingBoundary:
+            if (m_boundaryMayContainLeadingDashes && nx::utils::startsWith(m_boundary, "--")
+                && (lineBuffer == m_boundary || lineBuffer == m_boundary + "--"))
+            {
+                updateBoundaryDelimiters(m_boundary);
+            }
             if (lineBuffer == m_startBoundaryLine || lineBuffer == m_endBoundaryLine)
             {
                 m_state = lineBuffer == m_startBoundaryLine ? readingHeaders : eofReached;
@@ -376,6 +386,11 @@ bool MultipartContentParser::eof() const
 void MultipartContentParser::setForceParseAsBinary(bool force)
 {
     m_forceParseAsBinary = force;
+}
+
+void MultipartContentParser::setBoundaryMayContainLeadingDashes(bool value) noexcept
+{
+    m_boundaryMayContainLeadingDashes = value;
 }
 
 } // namespace nx::network::http

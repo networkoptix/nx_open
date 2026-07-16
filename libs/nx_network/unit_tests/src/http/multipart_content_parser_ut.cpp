@@ -6,9 +6,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/multipart_content_parser.h>
-#include <nx/utils/random.h>
-
 #include <nx/utils/byte_stream/custom_output_stream.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp20.h>
 
 namespace nx::network::http::test {
@@ -76,6 +75,50 @@ protected:
     void thenFramesWereReported(const std::vector<Frame>& expected)
     {
         ASSERT_EQ(expected, m_parsedFrames);
+    }
+
+    // Builds a single multipart part: the delimiter line followed by an image/jpeg body.
+    static nx::Buffer makePart(const nx::Buffer& delimiter, const nx::Buffer& frameData)
+    {
+        return "\r\n" + delimiter
+            + "\r\n"
+              "Content-Type: image/jpeg\r\n"
+              "\r\n"
+            + frameData;
+    }
+
+    struct ParseResult
+    {
+        std::deque<nx::Buffer> frames;
+        bool eof = false;
+    };
+
+    // Feeds the whole buffer to a parser in a single chunk and collects the reported frames.
+    static ParseResult parseBuffer(
+        const nx::Buffer& testData,
+        const std::string& boundary,
+        bool boundaryMayContainLeadingDashes)
+    {
+        nx::network::http::MultipartContentParser parser;
+        parser.setBoundaryMayContainLeadingDashes(boundaryMayContainLeadingDashes);
+        parser.setContentType("multipart/x-mixed-replace;boundary=" + boundary);
+
+        ParseResult result;
+        auto decodedFramesProcessor = [&result](const ConstBufferRefType& data)
+        {
+            result.frames.push_back(nx::Buffer(data));
+        };
+
+        parser.setNextFilter(
+            std::make_shared<
+                nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)>>(
+                decodedFramesProcessor));
+
+        parser.processData(testData);
+        parser.flush();
+
+        result.eof = parser.eof();
+        return result;
     }
 
 private:
@@ -428,6 +471,66 @@ TEST_F(HttpMultipartContentParser, empty_frame_is_reported_timely)
     givenFrames(frames);
     whenParse();
     thenFramesWereReported(frames);
+}
+
+TEST_F(HttpMultipartContentParser, boundaryWithLeadingDashesIsParsedWhenEnabled)
+{
+    const nx::Buffer frame1 = "a\rb";
+    const nx::Buffer frame2 = "c\rd";
+
+    const nx::Buffer testData = makePart("--fbdr", frame1) + makePart("--fbdr", frame2);
+
+    // The declared boundary already contains the leading "--".
+    const auto result = parseBuffer(testData, "--fbdr", /*boundaryMayContainLeadingDashes*/ true);
+
+    ASSERT_EQ(2U, result.frames.size());
+    ASSERT_EQ(result.frames[0], frame1);
+    ASSERT_EQ(result.frames[1], frame2);
+}
+
+TEST_F(HttpMultipartContentParser, boundaryWithLeadingDashesPrependedIsParsedWhenEnabled)
+{
+    const nx::Buffer frame1 = "a\rb";
+    const nx::Buffer frame2 = "c\rd";
+
+    // The camera prepends the standard "--" to the already dash-prefixed declared boundary, so
+    // the actual delimiter is "----fbdr" (RFC-compliant use of a dash-prefixed boundary value).
+    const nx::Buffer testData = makePart("----fbdr", frame1) + makePart("----fbdr", frame2);
+
+    // The declared boundary already contains the leading "--".
+    const auto result = parseBuffer(testData, "--fbdr", /*boundaryMayContainLeadingDashes*/ true);
+
+    ASSERT_EQ(2U, result.frames.size());
+    ASSERT_EQ(result.frames[0], frame1);
+    ASSERT_EQ(result.frames[1], frame2);
+}
+
+TEST_F(HttpMultipartContentParser, boundaryWithLeadingDashesEndBoundaryReachesEofWhenEnabled)
+{
+    const nx::Buffer frame1 = "a\rb";
+
+    // Verbatim (no extra "--" prepended) boundary usage, terminated by the closing end boundary.
+    const nx::Buffer testData = makePart("--fbdr", frame1) + "\r\n--fbdr--";
+
+    const auto result = parseBuffer(testData, "--fbdr", /*boundaryMayContainLeadingDashes*/ true);
+
+    // Reaching the closing boundary reports an empty terminating part (see other eof tests).
+    ASSERT_EQ(2U, result.frames.size());
+    ASSERT_EQ(result.frames[0], frame1);
+    ASSERT_TRUE(result.frames[1].empty());
+    ASSERT_TRUE(result.eof);
+}
+
+TEST_F(HttpMultipartContentParser, boundaryWithLeadingDashesIsNotParsedByDefault)
+{
+    const nx::Buffer frame1 = "a\rb";
+
+    const nx::Buffer testData = makePart("--fbdr", frame1) + "\r\n--fbdr--";
+
+    const auto result = parseBuffer(testData, "--fbdr", /*boundaryMayContainLeadingDashes*/ false);
+
+    ASSERT_TRUE(result.frames.empty());
+    ASSERT_FALSE(result.eof);
 }
 
 } // namespace nx::network::http::test
