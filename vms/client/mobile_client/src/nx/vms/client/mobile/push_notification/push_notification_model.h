@@ -3,7 +3,6 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
-#include <QtCore/QSet>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/vms/client/mobile/push_notification/details/push_notification_storage.h>
@@ -56,15 +55,15 @@ private:
  * Text filter (regex) is always active and matches against the notification title and description
  * regardless of the current viewed-status filter.
  *
- * Viewed-status filter has three modes: All, Viewed, and Unviewed. When a notification is marked
- * as read while the Unviewed filter is active, it stays visible in the list until either the
- * filter is switched or the feed is fully refreshed, so it doesn't unexpectedly disappear from the
- * user's view.
+ * Viewed-status filter has three modes: All, Viewed, and Unviewed. Additionally, filterExceptionId
+ * may be used to exclude a notification from the viewed-status filtering.
  */
 class PushNotificationFilterModel: public QSortFilterProxyModel
 {
     Q_OBJECT
-    Q_PROPERTY(Filter filter MEMBER m_filter NOTIFY filterChanged)
+    Q_PROPERTY(Filter filter READ filter WRITE setFilter NOTIFY filterChanged)
+    Q_PROPERTY(QString filterExceptionId
+        READ filterExceptionId WRITE setFilterExceptionId NOTIFY filterExceptionIdChanged)
 
 public:
     enum Filter
@@ -77,20 +76,25 @@ public:
 
 public:
     PushNotificationFilterModel(QObject* parent = nullptr);
-    static void registerQmlType();
 
-    virtual bool setData(
-        const QModelIndex& index, const QVariant& value, int role) override;
+    Filter filter() const { return m_filter; }
+    void setFilter(Filter value);
+
+    QString filterExceptionId() const { return m_filterExceptionId; }
+    void setFilterExceptionId(const QString& value);
+
+    static void registerQmlType();
 
 protected:
     virtual bool filterAcceptsRow(int row, const QModelIndex& parent) const override;
 
 signals:
     void filterChanged();
+    void filterExceptionIdChanged();
 
 private:
     Filter m_filter = Filter::All;
-    QSet<QString> m_recentlyEditedIds;
+    QString m_filterExceptionId;
 };
 
 } // namespace nx::vms::client::mobile

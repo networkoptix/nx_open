@@ -134,17 +134,29 @@ void PushNotificationModel::registerQmlType()
     qmlRegisterType<PushNotificationModel>("nx.vms.client.mobile", 1, 0, "PushNotificationModel");
 }
 
-bool PushNotificationFilterModel::setData(
-    const QModelIndex& index, const QVariant& value, int role)
+PushNotificationFilterModel::PushNotificationFilterModel(QObject* parent):
+    QSortFilterProxyModel(parent)
 {
-    if (role == PushNotificationModel::ViewedRole)
-    {
-        const QString id = index.data(PushNotificationModel::IdRole).toString();
-        if (!id.isEmpty())
-            m_recentlyEditedIds.insert(id);
-    }
+}
 
-    return QSortFilterProxyModel::setData(index, value, role);
+void PushNotificationFilterModel::setFilter(Filter value)
+{
+    if (m_filter == value)
+        return;
+
+    m_filter = value;
+    invalidate();
+    emit filterChanged();
+}
+
+void PushNotificationFilterModel::setFilterExceptionId(const QString& value)
+{
+    if (m_filterExceptionId == value)
+        return;
+
+    m_filterExceptionId = value;
+    invalidateFilter();
+    emit filterExceptionIdChanged();
 }
 
 bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& parent) const
@@ -155,15 +167,10 @@ bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& p
     auto hasFilterMatch =
         [&]()
         {
-            if (m_filter == Filter::All)
-                return true;
-
             const bool isViewedFilter = (m_filter == Filter::Viewed);
-            if (index.data(Roles::ViewedRole).toBool() == isViewedFilter)
-                return true;
-
-            const QString id = index.data(Roles::IdRole).toString();
-            return m_recentlyEditedIds.contains(id);
+            return m_filter == Filter::All
+                || index.data(Roles::ViewedRole).toBool() == isViewedFilter
+                || index.data(Roles::IdRole).toString() == m_filterExceptionId;
         };
 
     auto hasRegExpMatch =
@@ -176,23 +183,6 @@ bool PushNotificationFilterModel::filterAcceptsRow(int row, const QModelIndex& p
         };
 
     return hasRegExpMatch() && hasFilterMatch();
-}
-
-PushNotificationFilterModel::PushNotificationFilterModel(QObject* parent):
-    QSortFilterProxyModel(parent)
-{
-    connect(this, &PushNotificationFilterModel::filterChanged, this,
-        [this]()
-        {
-            m_recentlyEditedIds.clear();
-            invalidate();
-        });
-
-    connect(this, &PushNotificationFilterModel::modelAboutToBeReset, this,
-        [this]()
-        {
-            m_recentlyEditedIds.clear();
-        });
 }
 
 void PushNotificationFilterModel::registerQmlType()

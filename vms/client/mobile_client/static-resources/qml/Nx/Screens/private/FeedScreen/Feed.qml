@@ -250,6 +250,9 @@ Item
 
                 filter: appContext.pushManager.lastUsedFilter
                 filterRegularExpression: search.regExp
+                filterExceptionId: LayoutController.isTabletLayout && feed.selectedNotification
+                    ? feed.selectedNotification.id
+                    : ""
 
                 sourceModel: PushNotificationModel
                 {
