@@ -114,16 +114,12 @@ void SessionManager::Private::startSession(
         {
             q->stopSessionByUser();
 
-            auto error = core::errorDescription(
+            const auto error = core::errorDescription(
                 core::RemoteConnectionErrorCode::sessionExpired,
                 /*moduleInformation*/ {}, /*engineVersion*/ {});
 
-            executeLater(
-                [this, error]()
-                {
-                    emit q->windowContext()->deprecatedUiController()->genericError(
-                        error.shortText, error.longText);
-                }, q);
+            emit q->windowContext()->deprecatedUiController()->genericError(
+                error.shortText, error.longText);
         }, Qt::QueuedConnection);
 
     connect(session.get(), &Session::finishedWithError, this,

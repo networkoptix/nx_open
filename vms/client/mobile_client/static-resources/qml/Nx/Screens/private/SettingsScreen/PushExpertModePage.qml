@@ -315,6 +315,7 @@ BaseSettingsPage
 
         function openErrorDialog(title, message = "")
         {
+            // The page owns the dialog: errors may arrive while the page is being destroyed.
             Workflow.openDialog(
                 "qrc:/qml/Nx/Mobile/Popups/StandardPopup.qml",
                 {
@@ -322,7 +323,8 @@ BaseSettingsPage
                     "messages": [message],
                     "icon": "image://skin/48x48/Solid/warning.svg?primary=yellow",
                     "accentedOkButton": true
-                })
+                },
+                pushExpertModePage)
         }
 
         function tryApplyAndReturn(successCallback)

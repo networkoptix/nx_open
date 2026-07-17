@@ -1201,7 +1201,8 @@ Page
     {
         id: mediaDownloadBackend
         resource: controller.resource
-        onErrorOccurred: Workflow.openStandardPopup(title, description)
+        // The screen owns the dialog: errors may arrive while the screen is being destroyed.
+        onErrorOccurred: Workflow.openStandardPopup(title, description, modernVideoScreen)
     }
 
     DownloadMediaDurationSheet

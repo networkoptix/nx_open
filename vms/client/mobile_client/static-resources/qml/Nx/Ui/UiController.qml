@@ -39,17 +39,19 @@ NxObject
 
         function onGenericError(title, errorText)
         {
-            Workflow.openStandardPopup(title, errorText)
+            // Defer, so a dialog emitted alongside a screen stack change (e.g. on forced
+            // logout) is created after the change and owned by the screen which survives it.
+            Qt.callLater(() => Workflow.openStandardPopup(title, errorText))
         }
 
         function onTwoFactorAuthError(title, errorText)
         {
-            Workflow.openDialog(
+            Qt.callLater(() => Workflow.openDialog(
                 Qt.resolvedUrl("../Web/TwoFactorAuthenticationErrorDialog.qml"),
                 {
                     "title": title,
                     "messages": [errorText]
-                })
+                }))
         }
     }
 

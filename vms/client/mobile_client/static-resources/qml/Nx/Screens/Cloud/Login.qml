@@ -70,8 +70,9 @@ Page
                 "%1 is the short cloud name (like 'Cloud')")
                     .arg(appContext.appInfo.cloudName())
             const message = appContext.pushManager.checkConnectionErrorText()
+            // The screen owns the dialog: errors may arrive while the screen is being destroyed.
             const warning = Workflow.openStandardDialog(title, message,
-                ["OK"], /*disableAutoClose*/ true)
+                ["OK"], /*disableAutoClose*/ true, screen)
             warning.buttonClicked.connect(
                 function(buttonId)
                 {

@@ -223,10 +223,16 @@ function openMenuScreen()
     stackView.replace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))
 }
 
-function openDialog(path, properties)
+function openDialog(path, properties, owner)
 {
     var component = Qt.createComponent(path)
-    var dialog = component.createObject(mainWindow.contentItem, properties ? properties : {})
+    // The owner (the current screen by default) owns the dialog so that the dialog cannot
+    // outlive it. Otherwise, when the screen stack is replaced (e.g. switching to the
+    // Welcome Screen on session stop), an open modal dialog would stay on top with a
+    // destroyed creation context and permanently block the UI.
+    var dialog = component.createObject(
+        owner ?? stackView?.currentItem ?? mainWindow.contentItem,
+        properties ? properties : {})
     if (dialog)
         dialog.open()
     else
@@ -234,7 +240,8 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableAutoClose = false)
+function openStandardDialog(
+    title, message = "", buttonsModel = ["OK"], disableAutoClose = false, owner)
 {
     return openDialog(
         "../Dialogs/StandardDialog.qml",
@@ -243,18 +250,20 @@ function openStandardDialog(title, message = "", buttonsModel = ["OK"], disableA
             "message": message,
             "disableAutoClose": disableAutoClose,
             "buttonsModel": buttonsModel
-        }
+        },
+        owner
     )
 }
 
-function openStandardPopup(title, message)
+function openStandardPopup(title, message, owner)
 {
     return openDialog(
         "../Mobile/Popups/StandardPopup.qml",
         {
             "title": title,
             "messages": [message]
-        }
+        },
+        owner
     )
 }
 

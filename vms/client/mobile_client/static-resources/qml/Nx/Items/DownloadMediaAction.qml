@@ -54,7 +54,10 @@ Action
         {
             id: mediaDownloadBackend
 
-            onErrorOccurred: (title, description) => Workflow.openStandardDialog(title, description)
+            // The action owns the dialog: errors may arrive while the action is being destroyed.
+            onErrorOccurred: (title, description) =>
+                Workflow.openStandardDialog(title, description,
+                    /*buttonsModel*/ undefined, /*disableAutoClose*/ undefined, control)
         }
     }
 }
