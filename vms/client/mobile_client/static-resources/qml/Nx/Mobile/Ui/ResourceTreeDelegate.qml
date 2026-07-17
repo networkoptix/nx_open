@@ -14,7 +14,8 @@ TreeViewDelegate
 {
     id: delegateItem
 
-    implicitWidth: treeView.width
+    implicitWidth: leftMargin + (depth + 1) * indentation + spacing
+        + contentRow.implicitWidth + rightMargin
     implicitHeight: 40
     background: null
 
@@ -112,7 +113,6 @@ TreeViewDelegate
                     : model.display
                 horizontalAlignment: Text.AlignLeft
                 elide: Text.ElideRight
-                width: contentItem.width - rightMargin - x
                 color: ColorTheme.colors.light10
                 font.pixelSize: 14
                 font.family: "Roboto"

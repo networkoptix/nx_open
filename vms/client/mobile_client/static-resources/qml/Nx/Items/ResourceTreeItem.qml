@@ -117,6 +117,9 @@ Item
                 rowSpacing: 4
                 model: searchModel
 
+                columnWidthProvider: (column) => Math.max(implicitColumnWidth(column), width)
+                onWidthChanged: Qt.callLater(forceLayout)
+
                 // Source model indexes to which the view was expanded on the most recent
                 // saveExpandedState() call.
                 property var storedExpandedState: []
