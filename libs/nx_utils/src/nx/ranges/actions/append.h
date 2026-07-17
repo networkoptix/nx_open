@@ -2,17 +2,23 @@
 
 #pragma once
 
+#include <cassert>
+#include <ranges>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+
 #include <nx/concepts/ranges.h>
-#include <nx/ranges/std_compat.h>
 
-namespace nx::actions {
+namespace nx {
 
-namespace detail {
-
+// TODO: #skolesnik Consider moving this function to a general container utility because
+// `nx/ranges/actions/append.h` is a confusing include for a namespace-level helper.
 template<typename C, typename T>
 constexpr void appendOne(C* c, T&& v)
     requires nx::ranges::CanAppendOne<C, T&&>
 {
+    assert(c);
     auto& containerRef = *c;
 
     if constexpr (nx::ranges::CanEmplaceBack<C, T&&>)
@@ -25,7 +31,7 @@ constexpr void appendOne(C* c, T&& v)
         (void) containerRef.insert(std::forward<T>(v));
 }
 
-} // namespace detail
+namespace actions {
 
 template<typename... Elements>
 struct AppendClosure
@@ -45,7 +51,7 @@ struct AppendClosure
         std::apply(
             [&](auto const&... xs)
             {
-                (detail::appendOne(containerPtr, xs), ...);
+                (nx::appendOne(containerPtr, xs), ...);
             },
             elements);
 
@@ -64,7 +70,8 @@ struct AppendClosure
         std::apply(
             [&](auto&&... xs)
             {
-                (detail::appendOne(containerPtr, std::forward<decltype(xs)>(xs)), ...);
+                (nx::appendOne(
+                    containerPtr, std::forward<decltype(xs)>(xs)), ...);
             },
             std::move(elements));
 
@@ -106,10 +113,10 @@ Move/copy explicitly:
 */
 template<typename C, typename... Elements>
 constexpr std::remove_reference_t<C> append(C&& c, Elements&&... xs)
-    requires(!std::is_lvalue_reference_v<C>) && (sizeof...(Elements) > 0)
+    requires(!std::is_lvalue_reference_v<C>) && (0 != sizeof...(Elements))
     && (nx::ranges::CanAppendOne<std::remove_reference_t<C>, Elements &&> && ...)
 {
-    (detail::appendOne(&c, std::forward<Elements>(xs)), ...);
+    (nx::appendOne(&c, std::forward<Elements>(xs)), ...);
     return std::forward<C>(c);
 }
 
@@ -138,4 +145,5 @@ constexpr AppendClosure<std::decay_t<First>, std::decay_t<Rest>...> append(
     };
 }
 
-} // namespace nx::actions
+} // namespace actions
+} // namespace nx

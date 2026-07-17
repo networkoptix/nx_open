@@ -10,6 +10,7 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/reflect/json/utils.h>
 
 namespace nx::network::rest {
 
@@ -158,7 +159,17 @@ Params Params::fromJson(const rapidjson::Value& value)
 {
     Params params;
     for (auto it = value.MemberBegin(); it != value.MemberEnd(); ++it)
-        params.insert(it->name.GetString(), valueToString(it->value));
+    {
+        if (it->value.IsArray())
+        {
+            for (const auto& arrayItem: it->value.GetArray())
+                params.insert(it->name.GetString(), valueToString(arrayItem));
+        }
+        else
+        {
+            params.insert(it->name.GetString(), valueToString(it->value));
+        }
+    }
 
     return params;
 }
@@ -176,7 +187,9 @@ QString Params::valueToString(const rapidjson::Value& value)
         case rapidjson::kTrueType:
             return kTrue;
         case rapidjson::kNumberType:
-            return QString::number(value.GetDouble());
+            // Preserve integer precision when forwarding JSON-RPC timestamps as URL parameters.
+            return QString::fromStdString(
+                nx::reflect::json_detail::getStringRepresentation(value));
         case rapidjson::kStringType:
             return value.GetString();
         case rapidjson::kArrayType:

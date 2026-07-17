@@ -15,8 +15,14 @@
 #include <QtCore/QVector>
 
 #include <nx/utils/string.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx::utils::test {
+
+TEST(GTestNameString, normalizesNonAlphanumericCharacters)
+{
+    EXPECT_EQ("server_a_camera_1", normalizedGTestNameString("server-a camera.1"));
+}
 
 TEST(replaceStrings, emptySubstitutionsLeaveIntact)
 {
