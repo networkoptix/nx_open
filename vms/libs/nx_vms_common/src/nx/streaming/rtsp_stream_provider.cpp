@@ -375,6 +375,11 @@ bool RtspStreamProvider::processData(
             return false;
         }
     }
+    else
+    {
+        errorCount = 0;
+        m_lastRtpParseResult = result; //< success == true
+    }
 
     if (m_gotData)
         m_demuxedData[channel]->clear();
@@ -771,6 +776,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
     m_gotSomeFrame = false;
+    m_lastRtpParseResult = {true};
     m_RtpSession.setTransport(getRtpTransport());
     m_RtpSession.setCloudConnectEnabled(m_cloudConnectEnabled);
 
