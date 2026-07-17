@@ -97,6 +97,7 @@ const QString kVideoLayout("videoLayout");
 const QString kRepeatIntervalForSendVideoEncoderMS("repeatIntervalForSendVideoEncoderMS");
 const QString kMulticastIsSupported("multicastIsSupported");
 const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
+const QString kUseVideoEncoderTokenChannelMapping("useVideoEncoderTokenChannelMapping");
 
 const QString kFixWrongUri("fixWrongUri");
 const QString kFixWrongUriScheme("fixWrongUriScheme");

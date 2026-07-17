@@ -134,6 +134,7 @@ NX_VMS_COMMON_API extern const QString kVideoLayout;
 NX_VMS_COMMON_API extern const QString kRepeatIntervalForSendVideoEncoderMS;
 NX_VMS_COMMON_API extern const QString kMulticastIsSupported;
 NX_VMS_COMMON_API extern const QString kOnvifIgnoreMedia2;
+NX_VMS_COMMON_API extern const QString kUseVideoEncoderTokenChannelMapping;
 
 NX_VMS_COMMON_API extern const QString kFixWrongUri;
 NX_VMS_COMMON_API extern const QString kFixWrongUriScheme;
