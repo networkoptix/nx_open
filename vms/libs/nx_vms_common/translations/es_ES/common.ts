@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Cantidad máxima de conexiones HTTP que utilizan transcodificación para el servidor. Chrome abre 2 conexiones a la vez y luego cierra la primera. Recomendamos establecer el valor de este parámetro&apos;en 2 o más.</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1506,11 +1506,11 @@
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>El ID del sitio local, si es nulo, significa que el sitio aún no está configurado.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Habilitar o deshabilitar la creación de nuevas solicitudes de registro de integración</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1542,7 +1542,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>URL de la API del servidor de informes de fallos anónimos.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
@@ -1550,11 +1550,11 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>Intervalo de actualización de la información de almacenamiento del dispositivo.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>Intervalo de actualización de estado del sitio (segundos, 1 s-1 h).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
@@ -1562,7 +1562,7 @@
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>Política de acceso a la conexión proxy.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1598,7 +1598,7 @@
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>ID del sitio en la nube.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
@@ -1606,7 +1606,7 @@
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>Habilitar la autenticación de dos factores (2FA) para el sitio</translation>
     </message>
     <message>
       <source>Site name.</source>
@@ -1614,23 +1614,23 @@
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>Último ID de fusión del sistema maestro.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>ID de fusión del último sitio esclavo.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>Deshabilitar proveedores de dispositivos.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>Optimiza la configuración de la cámara.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>Las miniaturas se actualizan automáticamente.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
@@ -1646,7 +1646,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>Periodo de registro de auditoría (días, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -1654,47 +1654,47 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Número máximo de marcadores. Un valor menor o igual a 0 es infinito.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>Implementar HTTPS (cifrado del tráfico de datos).</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>Implementar RTSPS (cifrado de tráfico de vídeo).</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>Mostrar las contraseñas de los dispositivos almacenadas en VMS para que los administradores puedan acceder a ellas (para páginas web).</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>Activar autodescubrimiento.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>Habilitar notificaciones de actualización automática.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>Habilitar notificaciones de actualización.</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>Habilitar la asignación de puertos UPNP.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>Configuración de copia de seguridad.</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>Anulación del host en la nube.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation type="unfinished">Enable cross-domain policy.</translation>
+      <translation>Habilitar la política entre dominios.</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
@@ -1750,31 +1750,31 @@
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>Número máximo de subprocesos para la sincronización remota de archivos (&lt;=0 - automático, máximo 32).</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>Actualizar la URL del archivo releases.json.</translation>
     </message>
     <message>
       <source>Target update information.</source>
-      <translation type="unfinished">Target update information.</translation>
+      <translation>Información actualizada de Target.</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation type="unfinished">Installed update information.</translation>
+      <translation>Información de actualización instalada.</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation type="unfinished">Downloader peers for files.</translation>
+      <translation>El descargador busca pares para los archivos.</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation type="unfinished">Client update settings.</translation>
+      <translation>Configuración de actualización del cliente.</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>Límite de hilos para la sincronización del archivo de la cámara.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -1782,19 +1782,19 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>Configuración de pixelación.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>Duración del token de sesión de autorización (segundos).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>Aplicar límite de sesión para tokens de Cloud.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation type="unfinished">Session token count limit on a single Server.</translation>
+      <translation>Límite de tokens de sesión en un solo servidor.</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
