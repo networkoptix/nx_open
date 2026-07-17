@@ -311,11 +311,16 @@ Drawer
     {
         id: d
 
-        readonly property int extraTopMargin:
-            (LayoutController.isPortrait ? 15 : 0) + control.SafeArea.margins.top
+        // SafeArea attached to the sheet itself resolves to the popup item, whose margins are
+        // not recalculated on device rotation while the sheet is open (Qt 6.9 bug). The overlay
+        // margins are updated reliably, use them instead.
+        readonly property int extraTopMargin: LayoutController.isPortrait
+            ? 15
+            : control.parent.SafeArea.margins.top
 
-        readonly property int extraBottomMargin:
-            d.keyboardHeight > 0 ? d.keyboardHeight : control.SafeArea.margins.bottom
+        readonly property int extraBottomMargin: d.keyboardHeight > 0
+            ? d.keyboardHeight
+            : control.parent.SafeArea.margins.bottom
 
         // Temporary solution. Will be fixed properly after UI refactor.
         readonly property real keyboardHeight: Qt.platform.os === "android"
