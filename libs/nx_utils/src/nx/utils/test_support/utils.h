@@ -2,9 +2,27 @@
 
 #pragma once
 
+#include <cctype>
+#include <ranges>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 #include <tuple>
+
+#include <nx/ranges.h>
 #include <nx/utils/string.h>
+
+namespace nx::utils::test {
+
+inline std::string normalizedGTestNameString(std::string_view value)
+{
+    return value
+        | std::views::transform(
+            [](char c) { return std::isalnum(static_cast<unsigned char>(c)) ? c : '_'; })
+        | nx::ranges::to<std::string>();
+}
+
+} // namespace nx::utils::test
 
 /** Creates gmock checker that verifies argument type with dynamic_cast. */
 #define GMOCK_DYNAMIC_TYPE_MATCHER(T) ::testing::WhenDynamicCastTo<T>(::testing::An<T>())

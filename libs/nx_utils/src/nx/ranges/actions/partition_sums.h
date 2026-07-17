@@ -166,7 +166,7 @@ struct PartitionSums: std::ranges::range_adaptor_closure<PartitionSums<Materiali
                         if constexpr (movableRange)
                         {
                             ((Is == detail::sumIndex(elem)
-                                  ? nx::actions::detail::appendOne(
+                                  ? nx::appendOne(
                                         std::addressof(std::get<Is>(acc)),
                                         detail::get<Is>(std::forward<Elem>(elem)))
                                   : void()),
@@ -174,10 +174,9 @@ struct PartitionSums: std::ranges::range_adaptor_closure<PartitionSums<Materiali
                         }
                         else
                         {
-                            ((Is == detail::sumIndex(elem) ? nx::actions::detail::appendOne(
-                                                                 std::addressof(std::get<Is>(acc)),
-                                                                 detail::get<Is>(elem))
-                                                           : void()),
+                            ((Is == detail::sumIndex(elem)
+                                ? nx::appendOne(std::addressof(std::get<Is>(acc)), detail::get<Is>(elem))
+                                : void()),
                              ...);
                         }
 

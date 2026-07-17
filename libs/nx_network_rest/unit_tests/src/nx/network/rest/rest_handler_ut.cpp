@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <gtest/gtest.h>
+#include <rapidjson/document.h>
 
 #include <nx/kit/ini_config.h>
 #include <nx/network/rest/handler.h>
@@ -61,6 +62,14 @@ TEST_F(RestParamsTest, DuplicateConversions)
     testFrom(
         {{"a", "1"}, {"b", "hello"}, {"b", "world"}, {"c", "true"}},
         "a=1&b=hello&b=world&c=true");
+}
+
+TEST_F(RestParamsTest, FromJsonPreservesIntegerPrecision)
+{
+    rapidjson::Document json;
+    json.Parse(R"json({"timestamp":1753178494108})json");
+
+    EXPECT_EQ(Params({{"timestamp", "1753178494108"}}), Params::fromJson(json));
 }
 
 TEST_F(RestParamsTest, SpecialCharactersConversions)
