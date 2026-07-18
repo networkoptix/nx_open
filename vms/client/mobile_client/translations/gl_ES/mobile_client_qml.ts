@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Manter premido</translation>
     </message>
     <message>
       <source>Error</source>
@@ -768,7 +768,7 @@
     <name>NotificationDetailsItem</name>
     <message>
       <source>Details</source>
-      <translation>Detalles</translation>
+      <translation>Details</translation>
     </message>
   </context>
   <context>
