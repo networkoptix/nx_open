@@ -556,7 +556,11 @@ struct OrganizationsModel::Private
             || std::any_of(newSystems.cbegin(), newSystems.cend(), needsUpdate);
 
         if (!hasChanges)
+        {
+            if (orgNode->systemCount < 0)
+                updateOrganizationSystemCount(orgNode, static_cast<int>(cachedSystems.size()));
             return;
+        }
 
         for (const auto& [systemId, _]: cachedSystems)
         {
@@ -590,7 +594,7 @@ struct OrganizationsModel::Private
         }
 
         cachedSystems = std::move(newSystems);
-        updateOrganizationSystemCount(orgNode, static_cast<int>(data.size()));
+        updateOrganizationSystemCount(orgNode, static_cast<int>(cachedSystems.size()));
     }
 
     QModelIndex sitesRoot() const
