@@ -152,6 +152,9 @@ AdaptiveScreen
     {
         id: settingsNavigation
 
+        contentWidth: width
+        contentHeight: settingsNavigationContent.height
+
         ColumnLayout
         {
             id: settingsNavigationContent
@@ -242,15 +245,19 @@ AdaptiveScreen
 
             SettingsNavigationItem
             {
+                Layout.bottomMargin: developerSettingsPage.activated ? 0 : 20
+
                 page: appInfoPage
                 icon.source: "image://skin/24x24/Solid/info.svg?primary=light1"
             }
 
             SettingsNavigationItem
             {
+                Layout.bottomMargin: 20
+
                 page: developerSettingsPage
                 icon.source: "image://skin/24x24/Solid/developer_settings.svg?primary=light1"
-                visible: settingsScreen.contentItem === page
+                visible: developerSettingsPage.activated
             }
         }
     }
@@ -297,7 +304,10 @@ AdaptiveScreen
     DeveloperSettingsPage
     {
         id: developerSettingsPage
+
         objectName: "developerSettingsPage"
+
+        property bool activated: settingsScreen.contentItem === developerSettingsPage
     }
 
     Connections
