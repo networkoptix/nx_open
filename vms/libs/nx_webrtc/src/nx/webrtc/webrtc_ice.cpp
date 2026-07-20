@@ -12,8 +12,8 @@ using namespace nx::network;
 using namespace nx;
 
 Ice::Ice(SessionPool* sessionPool, const SessionConfig& config):
-    AbstractDataChannelDelegate(config),
-    m_sessionPool(sessionPool)
+    m_sessionPool(sessionPool),
+    m_dataChannel(this, kDefaultSctpPort, config)
 {
 }
 
@@ -257,12 +257,23 @@ bool Ice::handleDtls(const uint8_t* data, int size)
         m_session = sessionPtr;
 
         m_dataChannel.openDataChannel("nx-channel", "");
-
-        // Start streaming.
-        if (!session->transceiver()->start(this, m_sessionDescription->dtls.get()))
-            return false;
     }
     return true;
+}
+
+void Ice::onDataChannelOpened()
+{
+    NX_CRITICAL(m_sessionDescription);
+    auto session = m_session.lock();
+    if (!session)
+        return;
+
+    // Start streaming.
+    if (!session->transceiver()->start(this, m_sessionDescription->dtls.get()))
+    {
+        NX_DEBUG(this, "Failed to start streaming");
+        stopUnsafe();
+    }
 }
 
 bool Ice::handleSrtp(const uint8_t* data, int size)

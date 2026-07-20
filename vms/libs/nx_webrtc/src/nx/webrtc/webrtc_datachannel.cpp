@@ -30,15 +30,6 @@ constexpr size_t kDataChannelFragment = 0x4000;
 
 } // namespace
 
-AbstractDataChannelDelegate::AbstractDataChannelDelegate(const SessionConfig& config):
-    m_dataChannel(this, kDefaultSctpPort, config)
-{
-}
-
-AbstractDataChannelDelegate::~AbstractDataChannelDelegate()
-{
-}
-
 DataChannel::DataChannel(
     AbstractDataChannelDelegate* ice,
     uint16_t sctpPort,
@@ -470,13 +461,10 @@ bool DataChannel::handleRead()
                     NX_DEBUG(this, "Missing SCTP recv info");
                     return false;
                 }
-                bool openedBefore = m_dataChannelOpened;
                 bool ret = processReceivedData(
                     (int) info.rcv_sid,
                     (PayloadId) ntohl(info.rcv_ppid));
                 m_lastMessage.clear();
-                if (!openedBefore && m_dataChannelOpened)
-                    return ret && flushSavedMessages();
                 return ret;
             }
         }
@@ -661,49 +649,18 @@ bool DataChannel::closeStream(int streamId)
 
 bool DataChannel::writeString(const std::string& data, int streamId)
 {
+    NX_ASSERT(m_dataChannelOpened, "Writing to a data channel before it is open");
     if (streamId < 0)
         streamId = defaultStream();
-    return writeUserMessage({Message::Type::string, streamId, data, true});
+    return writeMessage({Message::Type::string, streamId, data, true});
 }
 
 bool DataChannel::writeBinary(const std::string& data, int streamId)
 {
+    NX_ASSERT(m_dataChannelOpened, "Writing to a data channel before it is open");
     if (streamId < 0)
         streamId = defaultStream();
-    return writeUserMessage({Message::Type::binary, streamId, data, true});
-}
-
-bool DataChannel::flushSavedMessages()
-{
-    NX_ASSERT(m_dataChannelOpened);
-    while (!m_savedQueue.empty())
-    {
-        if (!writeMessage(m_savedQueue.front()))
-            return false;
-        m_savedQueue.pop();
-    }
-    return true;
-}
-
-bool DataChannel::writeUserMessage(Message&& message)
-{
-    if (!m_dataChannelOpened)
-    {
-        constexpr int kSavedQueueLimit = 64;
-
-        if (m_savedQueue.size() >= kSavedQueueLimit)
-        {
-            NX_DEBUG(this, "Saved queue size overflow: %1", m_savedQueue.size());
-            return false;
-        }
-        NX_TRACE(this, "Saved message with type %1", (int) message.type);
-        m_savedQueue.emplace(std::move(message));
-        return true;
-    }
-    else
-    {
-        return writeMessage(message);
-    }
+    return writeMessage({Message::Type::binary, streamId, data, true});
 }
 
 bool DataChannel::writeMessage(Message message)
@@ -994,7 +951,11 @@ bool DataChannel::processReceivedMessage(const Message& message)
                 case MessageType::open:
                     return processOpenMessage(message);
                 case MessageType::ack:
-                    m_dataChannelOpened = true;
+                    if (!m_dataChannelOpened)
+                    {
+                        m_dataChannelOpened = true;
+                        m_ice->onDataChannelOpened();
+                    }
                     NX_DEBUG(
                         this,
                         "Opened local Data Channel with stream %1, label %2, protocol %3",
@@ -1074,6 +1035,7 @@ bool DataChannel::processOpenMessage(const Message& message)
     {
         m_defaultStreamId = message.streamId;
         m_dataChannelOpened = true;
+        m_ice->onDataChannelOpened();
     }
 
     NX_DEBUG(this, "Opened remote Data Channel with stream %1, label %2, protocol %3",
