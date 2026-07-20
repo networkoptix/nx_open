@@ -12,11 +12,11 @@ BaseOption
 
     property int checkState: Qt.Unchecked
 
-    onClicked: customAreaItem.toggle()
-
     customArea: Switch
     {
+        // Self-toggle would sever the checkState binding; the owner changes state via clicked().
+        toggleOnClick: false
         checkState: control.checkState
-        onCheckStateChanged: control.checkState = checkState
+        onClicked: control.clicked()
     }
 }

@@ -25,8 +25,7 @@ Item
 
     readonly property bool hasActiveFilters: !timeSelector.isDefaultValue
         || !deviceSelector.isDefaultValue
-        || (!!controller?.bookmarkSearchSetup
-            && sharedOnlySelector.checkState !== Qt.Unchecked)
+        || (controller?.bookmarkSearchSetup?.searchSharedOnly ?? false)
         || (analyticSelectorsLoader.item?.hasActiveFilters ?? false)
 
     function clearAll()
@@ -35,7 +34,7 @@ Item
         deviceSelector.value = deviceSelector.unselectedValue
 
         if (controller && controller.bookmarkSearchSetup)
-            sharedOnlySelector.checkState = Qt.Unchecked
+            controller.bookmarkSearchSetup.searchSharedOnly = false
 
         if (analyticSelectorsLoader.item)
             analyticSelectorsLoader.item.clearAll()
@@ -94,10 +93,15 @@ Item
                 checkState: (controller?.bookmarkSearchSetup?.searchSharedOnly ?? false)
                     ? Qt.Checked
                     : Qt.Unchecked
-                onCheckStateChanged:
+                onClicked:
                 {
+                    // The clicked signal is sent before toggling the check state, so checkState
+                    // still holds the old value here.
                     if (controller && controller.bookmarkSearchSetup)
-                        controller.bookmarkSearchSetup.searchSharedOnly = checkState === Qt.Checked
+                    {
+                        controller.bookmarkSearchSetup.searchSharedOnly =
+                            checkState !== Qt.Checked
+                    }
                 }
             }
         }
