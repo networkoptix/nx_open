@@ -98,8 +98,6 @@ private:
     bool processOpenMessage(const Message& message);
     bool sendStreamReset(int streamId);
     bool writeMessage(Message message);
-    bool writeUserMessage(Message&& message); /**< Used by writeString() and writeBinary(). */
-    bool flushSavedMessages();
     static void usrsctpDebugCallback(const char* format, ...);
     static int usrsctpWriteCallback(
         void* ptr,
@@ -126,20 +124,16 @@ private:
     std::string m_label;
     std::string m_protocol;
     std::queue<Message> m_outputQueue;
-    std::queue<Message> m_savedQueue;
 };
 
 class NX_WEBRTC_API AbstractDataChannelDelegate
 {
 public:
-    AbstractDataChannelDelegate(const SessionConfig& config);
-    virtual ~AbstractDataChannelDelegate();
+    virtual ~AbstractDataChannelDelegate() = default;
+    virtual void onDataChannelOpened() = 0;
     virtual void writeDataChannelPacket(const uint8_t* data, int size) = 0;
     virtual void onDataChannelString(const std::string& data, int streamId) = 0;
     virtual void onDataChannelBinary(const std::string& data, int streamId) = 0;
-
-protected:
-    DataChannel m_dataChannel;
 };
 
 } // namespace nx::webrtc

@@ -21,7 +21,7 @@ class TestDataChannelStreamer: public AbstractDataChannelDelegate
 public:
     TestDataChannelStreamer(TestDataChannel* testDataChannel, Type type)
         :
-        AbstractDataChannelDelegate(SessionConfig()),
+        m_dataChannel(this, kDefaultSctpPort, SessionConfig()),
         m_testDataChannel(testDataChannel),
         m_type(type)
     {}
@@ -29,6 +29,7 @@ public:
     {
         m_dataChannel.reset();
     }
+    void onDataChannelOpened() override {}
     virtual void writeDataChannelPacket(const uint8_t* data, int size);
     virtual void onDataChannelString(const std::string& data, int /*streamId*/)
     {
@@ -52,6 +53,7 @@ public:
     }
     std::string lastString() const { return m_lastString; }
 private:
+    DataChannel m_dataChannel;
     TestDataChannel* m_testDataChannel = nullptr;
     Type m_type = Type::client;
     std::string m_lastString;

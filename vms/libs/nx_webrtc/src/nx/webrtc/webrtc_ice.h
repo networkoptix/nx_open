@@ -52,6 +52,7 @@ public:
     void writePacket(const char* data, int size, bool foreground);
 
     // API for DataChannel.
+    virtual void onDataChannelOpened() override final;
     virtual void writeDataChannelPacket(const uint8_t* data, int size) override final;
     virtual void onDataChannelString(const std::string& data, int streamId) override final;
     virtual void onDataChannelBinary(const std::string& data, int streamId) override final;
@@ -105,6 +106,7 @@ protected:
     nx::webrtc::SessionPool* m_sessionPool = nullptr;
 
     Stage m_stage = binding;
+    DataChannel m_dataChannel;
 
 private:
     std::weak_ptr<Session> m_session;
