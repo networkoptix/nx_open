@@ -21,6 +21,8 @@ enum NALUnitType
     nuDummy
 };
 
+constexpr int kNalUnitHeaderLength = 1;
+
 inline int nalType(const uint8_t nal)
 {
     return int(nal & 0x1F);
@@ -50,7 +52,7 @@ public:
     virtual ~NALUnit() {
         delete [] m_nalBuffer;
     }
-    int deserialize(uint8_t* buffer, uint8_t* end);
+    int deserialize(const uint8_t* buffer, const uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
     virtual int serialize(uint8_t* dstBuffer);
     //void setBuffer(uint8_t* buffer, uint8_t* end);

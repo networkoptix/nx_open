@@ -71,9 +71,9 @@ bool isIFrame(const uint8_t* data, int dataLen)
     }
 }
 
-int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
+int NALUnit::deserialize(const uint8_t* buffer, const uint8_t* end)
 {
-    if (end == buffer)
+    if (buffer >= end)
         return NOT_ENOUGHT_BUFFER;
 
     //NX_ASSERT((*buffer & 0x80) == 0);
