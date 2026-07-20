@@ -103,7 +103,7 @@ BaseAdaptiveSheet
                                 "hasNext": Qt.binding(() => sheet.currentIndex + 1 < sheet.count),
                                 "hasPrevious": Qt.binding(() => sheet.currentIndex > 0),
                                 "toolBar.visible": true,
-                                "rightControl": [closeDetailsButton]
+                                "rightControl": [menuButton, closeDetailsButton]
                             })
                         }
                     }
@@ -335,19 +335,28 @@ BaseAdaptiveSheet
             }
         }
 
-        IconButton
+        ToolBarButton
         {
             id: closeDetailsButton
 
-            compact: true
             visible: false
 
             icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
-            icon.width: 24
-            icon.height: 24
 
             onClicked:
                 detailsLoader.item.leftButtonClicked()
+        }
+
+        ToolBarButton
+        {
+            id: menuButton
+
+            visible: !!detailsLoader.item?.menu
+
+            icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+
+            onClicked:
+                detailsLoader.item.menu.popup(menuButton, 0, menuButton.height)
         }
 
         states: [
