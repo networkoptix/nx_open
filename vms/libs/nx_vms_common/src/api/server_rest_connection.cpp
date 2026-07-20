@@ -77,12 +77,11 @@ namespace {
 using HandleCallback = nx::MoveOnlyFunc<void(rest::Handle)>;
 
 constexpr auto kJsonRpcPath = "/jsonrpc";
-
-const std::string_view kJson = nx::network::http::header::ContentType::kJson.value;
+const std::string_view kJson =
+    Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
 
 void proxyRequestUsingServer(
-    nx::network::http::ClientPool::Request& request,
-    nx::Uuid proxyServerId)
+    nx::network::http::ClientPool::Request& request, nx::Uuid proxyServerId)
 {
     if (proxyServerId.isNull())
         return;
@@ -676,7 +675,7 @@ Handle ServerConnection::putServerLogSettings(
         prepareUrl(
             QString("/rest/v2/servers/%1/logSettings").arg(serverId.toSimpleString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(settings));
 
     using Context = ResultContext<ErrorOrEmpty>;
@@ -733,7 +732,7 @@ Handle ServerConnection::addCamera(
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v4/devices"), {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(device));
 
     proxyRequestUsingServer(request, targetServerId);
@@ -757,7 +756,7 @@ Handle ServerConnection::patchCamera(
 {
     auto request = prepareRequest(nx::network::http::Method::patch,
         prepareUrl(NX_FMT("/rest/v4/devices/%1", device.id), {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(device));
 
     proxyRequestUsingServer(request, targetServerId);
@@ -781,7 +780,7 @@ Handle ServerConnection::searchCamera(
 {
     auto request = prepareRequest(nx::network::http::Method::post,
         prepareUrl(QString("/rest/v3/devices/*/searches/"), {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(deviceSearchData));
 
     proxyRequestUsingServer(request, targetServerId);
@@ -896,7 +895,7 @@ Handle ServerConnection::setOverlappedId(
     return executePost(
         "/api/overlappedIds",
         nx::network::rest::Params(),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         QJson::serialized(request),
         JsonResultCallback(
             [callback = std::move(callback)](
@@ -1291,7 +1290,7 @@ Handle ServerConnection::getCameraCredentials(
     const auto request = prepareRequest(
         nx::network::http::Method::get,
         prepareUrl(nx::format("/rest/v1/devices/%1", deviceId), {{"_with", "credentials"}}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
+        kJson);
 
     return d->executeRequest(
         /*helper*/ nullptr,
@@ -1574,11 +1573,10 @@ Handle ServerConnection::postJsonResult(
     nx::utils::AsyncHandlerExecutor executor,
     std::optional<nx::Uuid> proxyToServer)
 {
-    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json);
     return executePost<nx::network::rest::JsonResult>(
         action,
         params,
-        contentType,
+        kJson,
         body,
         std::move(callback),
         executor,
@@ -1781,7 +1779,7 @@ Handle ServerConnection::jsonRpcBatchCall(
     auto request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl(kJsonRpcPath, /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(requests));
 
     auto internalCallback =
@@ -2108,7 +2106,7 @@ Handle ServerConnection::setLdapSettingsAsync(
         prepareUrl(
             "/rest/v3/ldap/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(settings));
 
     using Context = ResultContext<ErrorOrData<nx::vms::api::LdapSettings>>;
@@ -2172,7 +2170,7 @@ Handle ServerConnection::syncLdapAsync(
         prepareUrl(
             "/rest/v3/ldap/sync",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
+        kJson);
 
     using Context = ResultContext<ErrorOrEmpty>;
 
@@ -2194,7 +2192,7 @@ Handle ServerConnection::resetLdapAsync(
         prepareUrl(
             "/rest/v3/ldap/settings",
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json));
+        kJson);
 
     using Context = ResultContext<ErrorOrEmpty>;
 
@@ -2218,7 +2216,7 @@ Handle ServerConnection::saveUserAsync(
         prepareUrl(
             QString("/rest/v4/users/%1").arg(userData.id.toSimpleString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(userData));
 
     using Context = ResultContext<ErrorOrData<nx::vms::api::UserModelV3>>;
@@ -2283,7 +2281,7 @@ Handle ServerConnection::saveGroupAsync(
         prepareUrl(
             QString("/rest/v4/userGroups/%1").arg(groupData.id.toSimpleString()),
             /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(groupData));
 
     using Context = ResultContext<ErrorOrData<nx::vms::api::UserGroupModel>>;
@@ -2339,7 +2337,7 @@ Handle ServerConnection::putStoredFile(const nx::vms::api::StoredFileData& store
 {
     return executePut(nx::format("/rest/v4/storedFiles/%1", storedFileData.path),
         {},
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         nx::reflect::json::serialize(storedFileData),
         std::move(callback),
         executor);
@@ -2361,7 +2359,7 @@ Handle ServerConnection::createTicket(
     auto request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl("/rest/v3/login/tickets", {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         {});
 
     using Context = ResultContext<ErrorOrData<nx::vms::api::LoginSession>>;
@@ -2444,7 +2442,7 @@ Handle ServerConnection::replaceDevice(
     auto request = prepareRequest(
         nx::network::http::Method::post,
         prepareUrl(nx::format("/rest/v2/devices/%1/replace", deviceToBeReplacedId), /*params*/ {}),
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         QJson::serialized(requestData));
 
     return d->executeRequest(
@@ -2555,7 +2553,7 @@ Handle ServerConnection::saveLookupList(
     return executePut(
         nx::format("/rest/v4/lookupLists/%1").arg(lookupList.id),
         {},
-        Qn::serializationFormatToHttpContentType(Qn::SerializationFormat::json),
+        kJson,
         QByteArray::fromStdString(nx::reflect::json::serialize(lookupList)),
         std::move(callback),
         executor);
