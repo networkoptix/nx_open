@@ -191,18 +191,13 @@ class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider7>
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider8"); }
 
-    /** Called by setServiceUsageQuantities((). */
-    protected: virtual void doSetServiceUsageQuantities(const IStringMap* values) = 0;
-
     /**
      * Sets a map of service ids to their usage quantities.
+     * @param engineId Engine id that is assigned to an engine using IEngineInfo.
      * @param values String map of key-values where key is a service uuid serialized as string and
      * value is a service usage qunatity count serialized as string.
      */
-    public: void setServiceUsageQuantities(const IStringMap* values)
-    {
-        doSetServiceUsageQuantities(values);
-    }
+    public: virtual void setServiceUsageQuantities(const char* engineId, const IStringMap* values) = 0;
 };
 
 using IUtilityProvider8 = IUtilityProvider;
