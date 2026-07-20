@@ -6,6 +6,7 @@
 
 #include <nx/utils/datetime.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
+#include <utils/common/synctime.h>
 
 namespace {
 
@@ -27,9 +28,14 @@ qint64 chooseNearestTimeMs(
         ? jumpTimeMs < targetTimeMs
         : jumpTimeMs > targetTimeMs;
 
-    return useJumpTime && periods.containTime(jumpTimeMs) && jumpTimeMs <= QDateTime::currentMSecsSinceEpoch()
-        ? jumpTimeMs
-        : targetTimeMs;
+    if (useJumpTime
+        && periods.containTime(jumpTimeMs)
+        && jumpTimeMs <= qnSyncTime->currentMSecsSinceEpoch())
+    {
+        return jumpTimeMs;
+    }
+
+    return targetTimeMs;
 }
 
 qint64 getChunkTime(

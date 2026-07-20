@@ -31,6 +31,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/long_runable_cleanup.h>
+#include <utils/common/synctime.h>
 
 #include "audio_output.h"
 #include "frame_metadata.h"
@@ -1085,7 +1086,7 @@ void Player::setAutoJumpPolicy(AutoJumpPolicy policy)
 
 void Player::setPosition(qint64 value)
 {
-    if (d->speed >= 0 && value > QDateTime::currentMSecsSinceEpoch())
+    if (d->speed >= 0 && value > qnSyncTime->currentMSecsSinceEpoch())
         value = kLivePosition;
 
     NX_DEBUG(this, "setPosition(%1: %2)",
