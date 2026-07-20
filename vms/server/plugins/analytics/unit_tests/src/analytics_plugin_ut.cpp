@@ -304,7 +304,7 @@ public:
     }
     virtual const char* cloudToken() const override { return ""; }
     virtual void subscribeForCloudTokenUpdate(ICloudTokenSubscriber*) override {}
-    virtual void doSetServiceUsageQuantities(const nx::sdk::IStringMap*) override {}
+    virtual void setServiceUsageQuantities(const char*, const nx::sdk::IStringMap*) override {}
 
     virtual void doSendHttpRequest(
         HttpDomainName requestDomain,

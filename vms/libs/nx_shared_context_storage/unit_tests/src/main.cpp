@@ -33,7 +33,7 @@ public:
     }
 
     virtual void subscribeForCloudTokenUpdate(nx::sdk::ICloudTokenSubscriber*) override {}
-    virtual void doSetServiceUsageQuantities(const nx::sdk::IStringMap*) override {}
+    virtual void setServiceUsageQuantities(const char*, const nx::sdk::IStringMap*) override {}
 
     virtual const nx::sdk::IString* getServerSdkVersion() const override
     {
