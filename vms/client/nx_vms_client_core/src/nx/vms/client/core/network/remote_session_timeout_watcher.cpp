@@ -191,7 +191,7 @@ void RemoteSessionTimeoutWatcher::tick()
 
     // Try to disconnect user gracefully before session ends.
     if (timeLeft && (*timeLeft - kForceDisconnectTime < kTimerInterval))
-        QTimer::singleShot(*timeLeft - kForceDisconnectTime, [this]() { tick(); });
+        QTimer::singleShot(*timeLeft - kForceDisconnectTime, this, [this]() { tick(); });
 
     const bool isTimeToNotify = timeLeft && *timeLeft <= kFirstNotificationTime;
     const bool isTimeToLastNotify = timeLeft && *timeLeft <= kLastNotificationTime;
