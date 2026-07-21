@@ -221,6 +221,8 @@ Rectangle
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: preview.bottom
+        anchors.leftMargin: LayoutController.fullscreen ? 16 : 0
+        anchors.rightMargin: LayoutController.fullscreen ? 16 : 0
         anchors.bottomMargin: LayoutController.fullscreen ? 8 : - (height / 2) + 2
 
         preview: preview
@@ -238,7 +240,7 @@ Rectangle
         anchors.bottom: parent.bottom
         anchors.bottomMargin: LayoutController.fullscreen ? 36 : 0
 
-        height: 68
+        height: LayoutController.fullscreen ? 48 : 68
 
         RowLayout
         {
@@ -336,8 +338,8 @@ Rectangle
             ? "image://skin/24x24/Outline/exit_fullscreen_mode.svg"
             : "image://skin/24x24/Outline/fullscreen_view_mode.svg"
 
-        implicitWidth: LayoutController.fullscreen ? 44 : 24
-        implicitHeight: LayoutController.fullscreen ? 44 : 24
+        implicitWidth: LayoutController.fullscreen ? 48 : 24
+        implicitHeight: LayoutController.fullscreen ? 48 : 24
 
         opacity: preview.cannotDecryptMedia
             ? 0.0
@@ -379,6 +381,9 @@ Rectangle
         opacity: d.controlsOpacity
         enabled: root.hasPrevious && opacity > 0
         rounded: LayoutController.fullscreen
+
+        implicitWidth: 44
+        implicitHeight: 44
 
         icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
         icon.width: LayoutController.fullscreen ? 32 : 24
@@ -425,6 +430,9 @@ Rectangle
         opacity: d.controlsOpacity
         enabled: root.hasNext && opacity > 0
         rounded: LayoutController.fullscreen
+
+        implicitWidth: 44
+        implicitHeight: 44
 
         icon.source: "image://skin/24x24/Outline/chunk_future.svg"
         icon.width: LayoutController.fullscreen ? 32 : 24
@@ -537,8 +545,8 @@ Rectangle
         property bool rounded: false
         property bool transparent: rounded || LayoutController.fullscreen
 
-        implicitWidth: 44
-        implicitHeight: 44
+        implicitWidth: LayoutController.fullscreen ? 48 : 44
+        implicitHeight: LayoutController.fullscreen ? 48 : 44
 
         type: Button.Type.Interface
         radius: rounded ? width / 2 : 6

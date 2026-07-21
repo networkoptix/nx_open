@@ -16,7 +16,7 @@ Slider
     readonly property real handlePosition:
         visualPosition * (width - leftPadding - rightPadding) + leftPadding - handle.width / 2
 
-    height: 36
+    implicitHeight: 24
 
     leftPadding: 12
     rightPadding: 12
