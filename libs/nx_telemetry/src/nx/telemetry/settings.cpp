@@ -10,6 +10,7 @@ void Settings::load(const SettingsReader& settings, const QString& prefix)
 {
     QnSettingsGroupReader group(settings, prefix);
     endpoint = group.value("endpoint").toString().toStdString();
+    environment = group.value("environment").toString().toStdString();
     maxQueueSize = group.value("maxQueueSize", QVariant::fromValue(maxQueueSize)).toULongLong();
     maxExportBatchSize =
         group.value("maxExportBatchSize", QVariant::fromValue(maxExportBatchSize)).toULongLong();

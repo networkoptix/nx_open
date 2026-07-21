@@ -18,6 +18,11 @@ class NX_TELEMETRY_API Settings
 public:
     std::string endpoint;
 
+    /**
+     * Deployment environment (e.g. prod/staging), exported as resource attribute on telemetry.
+     */
+    std::string environment;
+
     /** The maximum buffer/queue size. After the size is reached, spans are dropped. */
     size_t maxQueueSize = 2048;
 
@@ -29,6 +34,7 @@ public:
 
     void load(const SettingsReader& settings, const QString& prefix = QStringLiteral("telemetry"));
 };
-NX_REFLECTION_INSTRUMENT(Settings, (endpoint)(maxQueueSize)(maxExportBatchSize)(scheduleDelay))
+NX_REFLECTION_INSTRUMENT(Settings,
+    (endpoint)(environment)(maxQueueSize)(maxExportBatchSize)(scheduleDelay))
 
 } // namespace nx::telemetry

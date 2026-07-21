@@ -83,6 +83,7 @@ nx_libraries = [
     'nx_media_core',
     'nx_network',
     'nx_network_rest',
+    'nx_prometheus',
     'nx_reflect',
     'nx_rtp',
     'nx_telemetry',

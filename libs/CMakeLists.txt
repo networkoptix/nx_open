@@ -17,6 +17,7 @@ add_subdirectory(nx_network)
 
 if(NOT EMSCRIPTEN)
     # Libs are currently not adjusted for Emscripten due to their dependencies.
+    add_subdirectory(nx_prometheus)
     add_subdirectory(nx_telemetry)
     add_subdirectory(nx_network_rest)
 endif()

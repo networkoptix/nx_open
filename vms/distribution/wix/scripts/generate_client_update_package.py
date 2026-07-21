@@ -84,6 +84,7 @@ nx_libraries = [
     'nx_reflect',
     'nx_network',
     'nx_network_rest',
+    'nx_prometheus',
     'nx_telemetry',
     'nx_json_rpc',
     'nx_kit',

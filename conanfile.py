@@ -220,6 +220,8 @@ class NxOpenConan(ConanFile):
         if not self.isEmscripten:
             self.requires("cpptrace/0.8.3" "#336ded531d0cad8ec579eb05079591e0")
 
+            self.requires("prometheus-cpp/1.1.0" "#ea9b101cb785943adb40ad82eda7856c")
+
             self.requires("opentelemetry-cpp/1.17.0" "#183f60506ee6fae5b404f14ecd9d52b8")
             # OpenTelemetry dependencies.
             self.requires("c-ares/1.34.3" "#1f1b2f929424608c837837ea6379ae15")

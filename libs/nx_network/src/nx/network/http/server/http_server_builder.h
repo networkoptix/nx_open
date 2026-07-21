@@ -2,12 +2,15 @@
 
 #pragma once
 
+#include <string>
+
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "multi_endpoint_server.h"
-#include "rest/http_server_rest_message_dispatcher.h"
 #include "settings.h"
+
+namespace nx::prometheus { class Registry; }
 
 namespace nx::network::http::server {
 
@@ -27,10 +30,16 @@ public:
      * and is used with the SSL listener(s). If no certificatePath was specified, then
      * the default SSL context (ssl::Context::instance()) is used.
      * SSL context (if initialized) is encapsulated in the returned object.
+     *
+     * If metricsRegistry is provided, the server records golden-signal Prometheus metrics
+     * for each request (see MetricsRequestHandler). The serverName is used for metric labeling;
+     * an empty value omits the server-name label.
      */
     static std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> build(
         const Settings& settings,
-        AbstractRequestHandler* requestHandler);
+        AbstractRequestHandler* requestHandler,
+        nx::prometheus::Registry* metricsRegistry = nullptr,
+        std::string serverName = "");
 
     /**
      * Same as Builder::build, but throws on error.
@@ -38,7 +47,9 @@ public:
      */
     static std::unique_ptr<MultiEndpointServer> buildOrThrow(
         const Settings& settings,
-        AbstractRequestHandler* requestHandler);
+        AbstractRequestHandler* requestHandler,
+        nx::prometheus::Registry* metricsRegistry = nullptr,
+        std::string serverName = "");
 
 private:
     struct Context;

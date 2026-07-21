@@ -6,6 +6,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "https_server_context.h"
+#include "metrics_request_handler.h"
 #include "settings.h"
 
 namespace nx::network::http::server {
@@ -14,8 +15,8 @@ namespace rest { class MessageDispatcher; }
 
 class AbstractAuthenticationManager;
 
-// NOTE: This class is implemented in the header because exporting it leads to some weird link error
-// on mswin. TODO: #akolesnikov try exporting it after switch to vs2019.
+// NOTE: This class is implemented in the header because exporting it leads to some weird link
+// error on mswin. TODO: #akolesnikov try exporting it after switch to vs2019.
 
 /**
  * Listens for incoming HTTP connections on multiple local endpoints.
@@ -29,31 +30,40 @@ class MultiEndpointServer:
 
 public:
     template<typename... Args>
-    MultiEndpointServer(
-        AbstractRequestHandler* requestHandler,
-        Args&&... args)
-        :
-        base_type(
-            requestHandler,
-            std::forward<Args>(args)...)
+    MultiEndpointServer(AbstractRequestHandler* requestHandler, Args&&... args):
+        base_type(requestHandler, std::forward<Args>(args)...)
     {
+    }
+
+    virtual ~MultiEndpointServer() override
+    {
+        pleaseStopSync();
+        forEachListener(&HttpStreamSocketServer::closeAllConnections);
     }
 
     virtual network::http::server::HttpStatistics httpStatistics() const override
     {
-        return m_httpStatsProvider
-            ? m_httpStatsProvider->httpStatistics()
-            : network::http::server::HttpStatistics();
+        return m_httpStatsProvider ? m_httpStatsProvider->httpStatistics()
+                                   : network::http::server::HttpStatistics();
     }
 
-    void setTcpBackLogSize(int tcpBackLogSize)
-    {
-        m_tcpBackLogSize = tcpBackLogSize;
-    }
+    void setTcpBackLogSize(int tcpBackLogSize) { m_tcpBackLogSize = tcpBackLogSize; }
 
     void setExtraSuccessResponseHeaders(HttpHeaders responseHeaders)
     {
         m_extraSuccessResponseHeaders = std::move(responseHeaders);
+    }
+
+    /**
+     * Takes ownership of the objects behind the golden-signal metrics wiring created by
+     * Builder. They must outlive the request handling, hence live here.
+     */
+    void setRequestMetrics(
+        std::unique_ptr<HttpRequestMetrics> metrics,
+        std::unique_ptr<AbstractRequestHandler> metricsRequestHandler)
+    {
+        m_httpRequestMetrics = std::move(metrics);
+        m_metricsRequestHandler = std::move(metricsRequestHandler);
     }
 
     bool listen()
@@ -74,18 +84,12 @@ public:
     /**
      * @return List of URLs containing scheme and endpoint only.
      */
-    const std::vector<nx::Url>& urls() const
-    {
-        return m_urls;
-    }
+    const std::vector<nx::Url>& urls() const { return m_urls; }
 
     // TODO: #akolesnikov Remove this function! URL list should be auto-generated.
     // Though, this requires some refactoring in some nx::network::server classes.
     // Relying on Builder to set this properly.
-    void setUrls(std::vector<nx::Url> urls)
-    {
-        m_urls = std::move(urls);
-    }
+    void setUrls(std::vector<nx::Url> urls) { m_urls = std::move(urls); }
 
     /**
      * @return HTTPS url (if any), otherwise - any other URL.
@@ -93,8 +97,12 @@ public:
     nx::Url preferredUrl() const
     {
         auto it = std::find_if(
-            m_urls.begin(), m_urls.end(),
-            [](const auto& url) { return url.scheme() == network::http::kSecureUrlSchemeName; });
+            m_urls.begin(),
+            m_urls.end(),
+            [](const auto& url)
+            {
+                return url.scheme() == network::http::kSecureUrlSchemeName;
+            });
 
         return it != m_urls.end() ? *it : m_urls.front();
     }
@@ -104,6 +112,8 @@ private:
     std::vector<nx::Url> m_urls;
     std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
     HttpHeaders m_extraSuccessResponseHeaders;
+    std::unique_ptr<HttpRequestMetrics> m_httpRequestMetrics;
+    std::unique_ptr<AbstractRequestHandler> m_metricsRequestHandler;
 
     void initializeHttpStatisticsProvider()
     {
@@ -114,8 +124,7 @@ private:
                 providers.emplace_back(listener);
             });
 
-        m_httpStatsProvider =
-            std::make_unique<SummingStatisticsProvider>(std::move(providers));
+        m_httpStatsProvider = std::make_unique<SummingStatisticsProvider>(std::move(providers));
     }
 
     void propagateExtraResponseHeaders()
@@ -130,16 +139,14 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class MultiEndpointSslServer:
-    public MultiEndpointServer
+class MultiEndpointSslServer: public MultiEndpointServer
 {
     using base_type = MultiEndpointServer;
 
 public:
     MultiEndpointSslServer(
         AbstractRequestHandler* requestHandler,
-        std::unique_ptr<HttpsServerContext> httpsContext)
-        :
+        std::unique_ptr<HttpsServerContext> httpsContext):
         base_type(
             requestHandler,
             httpsContext ? &httpsContext->context() : ssl::Context::instance()),
@@ -147,10 +154,7 @@ public:
     {
     }
 
-    virtual ~MultiEndpointSslServer() override
-    {
-        listeners().clear();
-    }
+    virtual ~MultiEndpointSslServer() override { listeners().clear(); }
 
 private:
     std::unique_ptr<HttpsServerContext> m_httpsContext;

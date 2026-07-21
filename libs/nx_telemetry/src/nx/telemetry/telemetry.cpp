@@ -52,10 +52,12 @@ void init(const InitAttributes& attributes, const Settings& settings)
     );
 
     auto resource = sdk::resource::OTELResourceDetector().Detect();
-    resource = resource.Merge(sdk::resource::Resource::Create({
-        {"service.name", attributes.serviceName},
-        {"service.version", attributes.serviceVersion},
-    }));
+    resource = resource.Merge(
+        sdk::resource::Resource::Create({
+            {"service.name", attributes.serviceName},
+            {"service.version", attributes.serviceVersion},
+            {"deployment.environment", settings.environment},
+        }));
 
     auto provider = shared_ptr<trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));

@@ -150,6 +150,12 @@ struct NX_NETWORK_API RequestResult
 
     ConnectionEvents connectionEvents;
 
+    /**
+     * The route template the request was matched to (e.g. /account/{accountId}).
+     * Empty if the request did not reach a registered handler (e.g., 404 or auth rejection).
+     */
+    std::string pathTemplate;
+
     RequestResult(StatusCode::Value statusCode);
 
     RequestResult(

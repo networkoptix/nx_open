@@ -5,6 +5,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include "https_server_context.h"
+#include "metrics_request_handler.h"
 
 namespace nx::network::http::server {
 
@@ -25,10 +26,23 @@ struct Builder::Context
 
 std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder::build(
     const Settings& settings,
-    AbstractRequestHandler* requestHandler)
+    AbstractRequestHandler* requestHandler,
+    nx::prometheus::Registry* metricsRegistry,
+    std::string serverName)
 {
     if (settings.endpoints.empty() && settings.ssl.endpoints.empty())
         throw std::runtime_error("No HTTP endpoint to listen");
+
+    std::unique_ptr<HttpRequestMetrics> httpRequestMetrics;
+    std::unique_ptr<MetricsRequestHandler> metricsRequestHandler;
+    if (metricsRegistry)
+    {
+        httpRequestMetrics =
+            std::make_unique<HttpRequestMetrics>(metricsRegistry, std::move(serverName));
+        metricsRequestHandler =
+            std::make_unique<MetricsRequestHandler>(requestHandler, httpRequestMetrics.get());
+        requestHandler = metricsRequestHandler.get();
+    }
 
     std::unique_ptr<MultiEndpointServer> server;
     if (!settings.endpoints.empty())
@@ -70,16 +84,21 @@ std::tuple<std::unique_ptr<MultiEndpointServer>, SystemError::ErrorCode> Builder
         }
     }
 
+    server->setRequestMetrics(std::move(httpRequestMetrics), std::move(metricsRequestHandler));
+
     return {std::move(server), SystemError::noError};
 }
 
 std::unique_ptr<MultiEndpointServer> Builder::buildOrThrow(
     const Settings& settings,
-    AbstractRequestHandler* requestHandler)
+    AbstractRequestHandler* requestHandler,
+    nx::prometheus::Registry* metricsRegistry,
+    std::string serverName)
 {
     std::unique_ptr<MultiEndpointServer> server;
     SystemError::ErrorCode err = SystemError::noError;
-    std::tie(server, err) = build(settings, requestHandler);
+    std::tie(server, err) =
+        build(settings, requestHandler, metricsRegistry, std::move(serverName));
     if (!server)
         throw std::system_error(err, std::system_category());
 
