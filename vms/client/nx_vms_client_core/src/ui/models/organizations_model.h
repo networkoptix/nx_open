@@ -52,6 +52,7 @@ public:
         IsAdministratorRole,
         PathFromRootRole,
         TabSectionRole,
+        HasExpandableChildrenRole,
 
         RolesCount
     };
@@ -119,7 +120,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = {}) const override;
     QModelIndex parent(const QModelIndex &index) const override;
 
-    bool hasChildren(const QModelIndex &parent = QModelIndex()) const;
+    bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
     Q_INVOKABLE QStringList childSystemIds(const QModelIndex& parent = QModelIndex()) const;
     Q_INVOKABLE bool hasFolders(const QModelIndex& parent = QModelIndex()) const;
 

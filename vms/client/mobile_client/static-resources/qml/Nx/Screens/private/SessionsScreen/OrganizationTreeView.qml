@@ -172,7 +172,7 @@ Item
         property var nodeData
         property int nodeType: nodeData?.type ?? OrganizationsModel.None
         property int nodeLevel: nodeData?.level ?? 0
-        property bool hasChildren: nodeData?.hasChildren ?? false
+        property bool hasChildren: nodeData?.hasExpandableChildren ?? false
         property bool isExpanded: nodeData?.expanded ?? false
         property bool isSelected: false
 

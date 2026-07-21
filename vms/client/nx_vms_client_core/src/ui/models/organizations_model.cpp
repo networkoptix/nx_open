@@ -2,6 +2,7 @@
 
 #include "organizations_model.h"
 
+#include <algorithm>
 #include <ranges>
 
 #include <nx/utils/coro/task_utils.h>
@@ -169,6 +170,16 @@ struct TreeNode
     bool hasChildren() const
     {
         return !children.empty();
+    }
+
+    bool hasExpandableChildren() const
+    {
+        return std::ranges::any_of(
+            children,
+            [](const auto& child)
+            {
+                return child->type != OrganizationsModel::System;
+            });
     }
 
     nx::Uuid id;
@@ -981,6 +992,8 @@ QVariant OrganizationsModel::data(const QModelIndex& index, int role) const
             return true;
         case IsAccessDeniedRole:
             return !node->accessible;
+        case HasExpandableChildrenRole:
+            return node->hasExpandableChildren();
         default:
             if (node->type == OrganizationsModel::System && d->sitesModel)
             {
@@ -1109,6 +1122,7 @@ QHash<int, QByteArray> OrganizationsModel::roleNames() const
         {IsAccessDeniedRole, "isAccessDenied"},
         {IsAdministratorRole, "isAdministrator"},
         {PathFromRootRole, "pathFromRoot"},
+        {HasExpandableChildrenRole, "hasExpandableChildren"}
     };
 
     auto roles = QnSystemsModel::kRoleNames;
