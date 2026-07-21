@@ -85,6 +85,9 @@ public:
             const nx::vms::api::ImageCorrectionData& data);
 
         const ImageCorrectionResult& imageCorrectionResult() const;
+        //!Returns image correction parameters, analysing the decoded frame if not done yet
+        ImageCorrectionResult updateImageCorrection(
+            const nx::vms::api::ImageCorrectionData& data, const QRectF& textureRect) const;
 
         /** Returns decoded frame if we don't use OpenGL textures (in case of RHI or software) */
         CLConstVideoDecoderOutputPtr decodedFrame() const { return m_decodedFrame; }
