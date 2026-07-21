@@ -21,6 +21,9 @@ Column
 
     property string valueRoleId //< Role name for the value to be extracted from the model.
 
+    // Optional: (modelData) => base skin icon url (without color params) shown before the text.
+    property var iconSourceAccessor: null
+
     spacing: 4
 
     signal applyRequested()
@@ -47,6 +50,17 @@ Column
             width: parent.width
             backgroundRadius: 8
             text: d.getTextValue(index)
+            indicator: null
+            icon.source:
+            {
+                if (!control.iconSourceAccessor)
+                    return ""
+
+                const source = control.iconSourceAccessor(modelData)
+                return source
+                    ? `${source}?primary=${checked ? "brand_core" : "light10"}`
+                    : ""
+            }
             checked: d.selectedIndex === index
             onCheckedChanged:
             {

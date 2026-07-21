@@ -38,37 +38,16 @@ OptionSelector
             value = null
     }
 
-    visualDelegate: ColoredImage
-    {
-        id: visualDelegateItem
-
-        property var data
-        property Text textValueItem
-
-        width: !!data
-            ? 32
-            : 20
-        height: width
-        sourceSize: Qt.size(width, height)
-        visible: sourcePath !== ""
-        primaryColor: textValueItem
-            ? textValueItem.color
-            : "transparent"
-        sourcePath:
-        {
-            if (!textValueItem)
-                return ""
-
-            return !!data
-                ? IconManager.iconUrl(data["iconSource"])
-                : (control.value && IconManager.iconUrl(control.value["iconSource"])) ?? ""
-        }
-    }
-
-    screenDelegate: GridEditor
+    screenDelegate: RadioGroupEditor
     {
         model: control.objectTypes
-        visualDelegate: control.visualDelegate
         selector: control
+        iconSourceAccessor: (data) =>
+        {
+            const source = data
+                ? data["iconSource"]
+                : (control.value && control.value["iconSource"])
+            return source ? IconManager.iconUrl(source) : ""
+        }
     }
 }

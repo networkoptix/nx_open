@@ -70,6 +70,8 @@ T.RadioButton
 
     contentItem: RowLayout
     {
+        spacing: control.spacing
+
         Image
         {
             id: icon
