@@ -71,6 +71,8 @@ BaseOption
         }
     }
 
+    textItem.color: isDefaultValue ? ColorTheme.colors.light10 : ColorTheme.colors.light1
+
     customArea: Image
     {
         id: selectorImage
