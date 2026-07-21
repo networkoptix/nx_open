@@ -153,12 +153,16 @@ bool BookmarkSearchListModel::Private::requestFetch(
         return false;
 
     if (requestIds.value(mode))
+    {
+        NX_VERBOSE(this, "Request is ignored (already in progress).");
         return false; //< Corresponding request is in progress.
+    }
 
     const auto sortOrder = EventSearch::sortOrderFromDirection(request.direction);
 
     if (q->isFilterDegenerate())
     {
+        NX_VERBOSE(this, "Filter is degenerate, request isn't necessary.");
         bookmarks.clear();
         return true;
     }
@@ -189,24 +193,43 @@ bool BookmarkSearchListModel::Private::requestFetch(
                 completionHandler(result, ranges, timeWindow);
         };
 
-    return !!requestIds.setValue(mode, bookmarksManager->getBookmarksAroundPointAsync(
+    NX_VERBOSE(q, "Requesting bookmarks around point:\n"
+        "    centralPoint: %1\n    text filter: %2\n    sort: %3, limit: %4",
+        nx::utils::timestampToDebugString(filter.centralTimePointMs->count()),
+        filter.text,
+        QVariant::fromValue(sortOrder).toString(),
+        filter.limit);
+
+    const auto requestId = requestIds.setValue(mode, bookmarksManager->getBookmarksAroundPointAsync(
         filter, bookmarks,
         [this, mode, request, completionHandler = safeCompletionHandler]
             (bool success, rest::Handle id, BookmarkFetchedData&& data)
         {
-            if (requestIds.value(mode) != id)
+            if (!id)
                 return;
+
+            NX_VERBOSE(this, "Received reply on request %1, success=%2, result has %3 elements",
+                id, success, data.data.size());
+
+            if (requestIds.value(mode) != id)
+            {
+                NX_VERBOSE(this, "Response is ignored because request %1 was cancelled", id);
+                return;
+            }
 
             requestIds.resetValue(mode);
 
             const auto applyFetchedData =
-                [this, direction = request.direction](BookmarkFetchedData&& fetched,
+                [this, mode, direction = request.direction](BookmarkFetchedData&& fetched,
                     const OptionalTimePeriod& timePeriod)
                 {
+                    NX_VERBOSE(this, "Applying fetched data: %1",
+                        fetched.toString<nx::vms::common::QnBookmarkFacade>());
+
                     // Explicitly update fetched time window in case of dynamic update.
                     q->setFetchedTimeWindow(timePeriod);
-                    updateEventSearchData<nx::vms::common::QnBookmarkFacade>(
-                        q, bookmarks, fetched, direction);
+                    updateEventSearchData<nx::vms::common::QnBookmarkFacade>(q, bookmarks, fetched,
+                        direction, mode == detail::MultiRequestIdHolder::Mode::dynamic);
                 };
 
             if (!success)
@@ -226,6 +249,15 @@ bool BookmarkSearchListModel::Private::requestFetch(
 
             q->setFetchedTimeWindow(fetchedWindow);
         }));
+
+    if (requestId)
+    {
+        NX_VERBOSE(this, "Request %1 is sent", requestId);
+        return true;
+    }
+
+    NX_WARNING(this, "Failed to send request");
+    return false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -277,6 +309,10 @@ bool BookmarkSearchListModel::hasAccessRights() const
 
 void BookmarkSearchListModel::dynamicUpdate(const qint64& centralPointMs)
 {
+    NX_VERBOSE(this, "dynamicUpdate(): centralPoint=%1, current rowCount=%2",
+        nx::utils::timestampToDebugString(centralPointMs),
+        rowCount());
+
     d->requestFetch({
         .direction = EventSearch::FetchDirection::newer,
         .centralPointUs = milliseconds(centralPointMs),
@@ -374,8 +410,17 @@ bool BookmarkSearchListModel::requestFetch(
     const FetchRequest& request,
     const FetchCompletionHandler& completionHandler)
 {
-    // Cancel dynamic update request.
-    d->requestIds.resetValue(detail::MultiRequestIdHolder::Mode::dynamic);
+    NX_VERBOSE(this, "requestFetch(): direction=%1, centralPoint=%2, current rowCount=%3",
+        request.direction,
+        nx::utils::timestampToDebugString(request.centralPointUs.count() / 1000),
+        rowCount());
+
+    if (const auto id = d->requestIds.value(detail::MultiRequestIdHolder::Mode::dynamic))
+    {
+        // Cancel dynamic update request.
+        NX_VERBOSE(this, "Cancelling dynamic update request %1", id);
+        d->requestIds.resetValue(detail::MultiRequestIdHolder::Mode::dynamic);
+    }
 
     return d->requestFetch(request, completionHandler, detail::MultiRequestIdHolder::Mode::fetch);
 }

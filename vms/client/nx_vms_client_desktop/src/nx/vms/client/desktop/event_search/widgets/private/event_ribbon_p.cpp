@@ -655,7 +655,7 @@ void EventRibbon::Private::closeExpiredTiles()
     for (const auto& index: std::as_const(expired))
         m_model->removeRow(index.row());
 
-    NX_VERBOSE(q, "Expired %1 tiles", expired.size());
+    NX_DEBUG(q, "Expired %1 tiles", expired.size());
     NX_ASSERT(expired.size() == (oldDeadlineCount - m_deadlines.size()));
 };
 
@@ -820,7 +820,7 @@ void EventRibbon::Private::insertNewTiles(
         }
     }
 
-    NX_VERBOSE(q, "%1 tiles inserted at position %2, new count is %3, update %4, scrollDown is %5",
+    NX_DEBUG(q, "%1 tiles inserted at position %2, new count is %3, update %4, scrollDown is %5",
         count, index, m_tiles.size(), updateMode, scrollDown);
 
     if (m_updating)
@@ -926,7 +926,7 @@ void EventRibbon::Private::removeTiles(int first, int count, UpdateMode updateMo
 
     doUpdateView();
 
-    NX_VERBOSE(q, "%1 tiles removed at position %2, new count is %3, updateMode %4",
+    NX_DEBUG(q, "%1 tiles removed at position %2, new count is %3, updateMode %4",
         count, first, m_tiles.size(), updateMode);
 
     if (m_updating)
@@ -1593,7 +1593,7 @@ void EventRibbon::Private::loadNextPreview()
 
             if (tile->preview->tryLoad())
             {
-                NX_VERBOSE(this, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
+                NX_VERBOSE(q, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
                     tile->preview->requestData().timestampMs,
                     tile->preview->requestData().objectTrackId);
 
@@ -1627,7 +1627,7 @@ bool EventRibbon::Private::loadPreviewIfAllowed(core::ResourceThumbnailProvider*
     if (!allowed)
         return false;
 
-    NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
+    NX_VERBOSE(q, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
         provider->requestData().timestampMs,
         provider->requestData().objectTrackId);
 

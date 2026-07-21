@@ -1704,7 +1704,7 @@ bool AnalyticsSearchListModel::requestFetch(
     const FetchRequest& request,
     const FetchCompletionHandler& completionHandler)
 {
-    NX_VERBOSE(this, "requestFetch(): direction=`%1`, centralPoint=`%2`",
+    NX_VERBOSE(this, "requestFetch(): direction=%1, centralPoint=%2",
         request.direction,
         nx::utils::timestampToDebugString(request.centralPointUs.count() / 1000));
     if (!(d->data.empty()

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/utils/datetime.h>
+#include <nx/utils/log/format.h>
 #include <nx/vms/client/core/event_search/models/fetch_request.h>
 #include <nx/vms/client/core/event_search/utils/detail/sorting_order_check.h>
 
@@ -32,6 +34,10 @@ struct FetchedData
 
     Container data;
     FetchedDataRanges ranges;
+
+    // For debug.
+    template<class Facade>
+    QString toString() const;
 };
 
 /**
@@ -234,6 +240,47 @@ FetchedData<Container> makeFetchedDataInternal(
 } // namespace detail
 
 /** Implementation section */
+
+template<typename Container>
+template<class Facade>
+QString FetchedData<Container>::toString() const
+{
+    if (data.empty())
+        return "empty";
+
+    auto startMs = Facade::startTime(*std::begin(data));
+    auto endMs = Facade::startTime(*std::prev(std::end(data)));
+    const bool reverse = startMs > endMs;
+    if (reverse)
+        std::swap(startMs, endMs);
+
+    const auto rangeToString =
+        [this, reverse](const FetchedDataRanges::ItemsRange& range) -> QString
+        {
+            if (!range.length)
+                return "empty";
+
+            const auto rangeBegin = std::next(std::begin(data), range.offset);
+            auto startMs = Facade::startTime(*rangeBegin);
+            auto endMs = Facade::startTime(*std::next(rangeBegin, range.length - 1));
+            if (reverse)
+                std::swap(startMs, endMs);
+
+            return nx::format("[%1, %2] ([%3, %4])",
+                range.offset,
+                range.offset + range.length - 1,
+                nx::utils::timestampToDebugString(startMs),
+                nx::utils::timestampToDebugString(endMs));
+        };
+
+    return nx::format("size=%1 [%2, %3], body=%4, tail=%5",
+        data.size(),
+        nx::utils::timestampToDebugString(startMs),
+        nx::utils::timestampToDebugString(endMs),
+        rangeToString(ranges.body),
+        rangeToString(ranges.tail));
+}
+
 template<typename Facade,
     typename Container,
     typename CurrentContainer>

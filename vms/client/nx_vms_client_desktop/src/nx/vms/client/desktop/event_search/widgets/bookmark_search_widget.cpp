@@ -30,7 +30,7 @@ using nx::vms::client::core::AccessController;
 
 namespace {
 
-static constexpr milliseconds kVisiblePeriodUpdateInterval = 15s;
+static constexpr milliseconds kPollingInterval = 30s;
 static constexpr milliseconds kDelayAfterViewUpdate = 1s;
 static constexpr milliseconds kUpdateTimerResolution = 500ms;
 
@@ -58,10 +58,9 @@ public: //< Overrides 'private:' in macro above.
     void updateVisiblePeriod(BookmarkSearchWidget* q)
     {
         if (q->isVisible()
-            && sinceLastRequest.hasExpired(kVisiblePeriodUpdateInterval)
+            && sinceLastRequest.hasExpired(kPollingInterval)
             && sinceViewUpdated.hasExpired(kDelayAfterViewUpdate))
         {
-
             sinceLastRequest.restart();
             model->dynamicUpdate(q->currentCentralPointMs().count());
         }
