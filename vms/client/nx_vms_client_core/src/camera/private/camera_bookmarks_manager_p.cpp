@@ -13,6 +13,7 @@
 #include <nx/fusion/serialization/ubjson.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/datetime.h>
 #include <nx/vms/api/data/bookmark_models.h>
@@ -386,54 +387,127 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(
         makeUbjsonResponseWrapper(this, callback));
 }
 
-int QnCameraBookmarksManagerPrivate::getBookmarkstAroundPointHeuristic(
+int QnCameraBookmarksManagerPrivate::getBookmarksAroundPoint_compatibilityMode(
     const QnCameraBookmarkSearchFilter& filter,
-    const QnCameraBookmarkList& source,
-    int maxTriesCount,
-    BookmarksAroundPointCallbackType callback)
+    BookmarksCallbackType callback)
 {
+    if (!NX_ASSERT(filter.centralTimePointMs.has_value()))
+        return {};
+
     using namespace nx::vms::client::core;
 
-    nx::vms::common::GetBookmarksRequestData requestData;
-    requestData.format = Qn::SerializationFormat::ubjson;
-    requestData.filter = filter;
+    const bool validRange = filter.endTimeMs == milliseconds{}
+        || filter.startTimeMs <= filter.endTimeMs;
 
-    const auto handler = makeUbjsonResponseWrapper(this, BookmarksCallbackType(
-        [this, source, callback, filter, maxTriesCount]
-            (bool success, rest::Handle requestId, QnCameraBookmarkList bookmarks)
+    const auto startTimeMs = validRange ? filter.startTimeMs : filter.endTimeMs;
+    const auto endTimeMs = validRange ? filter.endTimeMs : filter.startTimeMs;
+    const auto effectiveEndTimeMs = endTimeMs != milliseconds{} ? endTimeMs : milliseconds::max();
+
+    const auto centralTimePointMs =
+        std::clamp(*filter.centralTimePointMs, startTimeMs - 1ms, effectiveEndTimeMs);
+
+    const bool forwardLookup = centralTimePointMs < effectiveEndTimeMs;
+    const bool backwardLookup = centralTimePointMs >= startTimeMs;
+
+    struct Context
+    {
+        int completed = 0;
+        int expected = 0;
+        bool success = true;
+        rest::Handle forwardHandle = {};
+        rest::Handle backwardHandle = {};
+        rest::Handle resultHandle = {};
+        QnCameraBookmarkList forwardData;
+        QnCameraBookmarkList backwardData;
+        BookmarksCallbackType callback;
+    };
+
+    const auto context = std::make_shared<Context>();
+    context->callback = std::move(callback);
+    context->expected = (forwardLookup ? 1 : 0) + (backwardLookup ? 1 : 0);
+
+    const auto commonCallback =
+        [context, order = filter.orderBy.order](
+            bool success, rest::Handle handle, QnCameraBookmarkList result)
         {
-            if (!requestId)
-                return;
-
-            if (!success)
+            if (handle == kInvalidRequestId)
             {
-                callback(/*success*/ false, requestId, {});
-                return;
-            }
-
-            const auto direction = EventSearch::directionFromSortOrder(filter.orderBy.order);
-            auto fetched = makeFetchedData<nx::vms::common::QnBookmarkFacade>(
-                source, bookmarks, FetchRequest{direction, *filter.centralTimePointMs});
-            const auto checkResult = checkFetchedData(fetched, filter.limit, direction);
-
-            if (checkResult.result == CheckResult::dataFound)
-            {
-                truncateFetchedData(fetched, direction, filter.limit);
-                callback(/*success*/ true, requestId, std::move(fetched));
-            }
-            else if (checkResult.nextCentralPointMs.count() && maxTriesCount > 0)
-            {
-                QnCameraBookmarkSearchFilter updatedFilter = filter;
-                updatedFilter.startTimeMs = checkResult.nextCentralPointMs;
-                getBookmarkstAroundPointHeuristic(updatedFilter, source, maxTriesCount - 1, callback);
+                context->success = false;
+                ++context->completed;
             }
             else
             {
-                callback(/*success*/ false, requestId,  BookmarkFetchedData{});
-            }
-        }));
+                if (!NX_ASSERT(handle == context->forwardHandle
+                    || handle == context->backwardHandle))
+                {
+                    return;
+                }
 
-    return sendGetRequest("/ec2/bookmarks", requestData, handler);
+                // Store received data in the context.
+                context->success &= success;
+                ++context->completed;
+
+                if (handle == context->forwardHandle)
+                    context->forwardData = std::move(result);
+                else
+                    context->backwardData = std::move(result);
+            }
+
+            if (context->completed < context->expected)
+                return;
+
+            // Both requests are completed (or failed) at this point.
+
+            if (!context->success)
+            {
+                context->callback(/*success*/ false, context->resultHandle, {});
+                return;
+            }
+
+            // Merge received data.
+            const bool ascending = order == Qt::AscendingOrder;
+            if (ascending)
+                std::reverse(context->backwardData.begin(), context->backwardData.end());
+            else
+                std::reverse(context->forwardData.begin(), context->forwardData.end());
+
+            std::vector<QnCameraBookmarkList> lists;
+            lists.reserve(2);
+            lists.push_back(std::move(context->forwardData));
+            lists.push_back(std::move(context->backwardData));
+
+            auto mergedList = nx::utils::algorithm::merge_sorted_lists(std::move(lists),
+                [](const QnCameraBookmark& b) { return std::make_tuple(b.startTimeMs, b.guid); },
+                order);
+
+            context->callback(/*success*/ true, context->resultHandle, std::move(mergedList));
+        };
+
+    if (forwardLookup)
+    {
+        QnCameraBookmarkSearchFilter forwardFilter(filter);
+        forwardFilter.orderBy.order = Qt::AscendingOrder;
+        forwardFilter.limit /= 2;
+        forwardFilter.startTimeMs = centralTimePointMs + 1ms;
+        forwardFilter.endTimeMs = endTimeMs;
+        forwardFilter.centralTimePointMs = {};
+        context->resultHandle = context->forwardHandle = getBookmarksAsync(
+            forwardFilter, commonCallback);
+    }
+
+    if (backwardLookup)
+    {
+        QnCameraBookmarkSearchFilter backwardFilter(filter);
+        backwardFilter.orderBy.order = Qt::DescendingOrder;
+        backwardFilter.limit /= 2;
+        backwardFilter.startTimeMs = startTimeMs;
+        backwardFilter.endTimeMs = centralTimePointMs;
+        backwardFilter.centralTimePointMs = {};
+        context->resultHandle = context->backwardHandle = getBookmarksAsync(
+            backwardFilter, commonCallback);
+    }
+
+    return context->resultHandle;
 }
 
 int QnCameraBookmarksManagerPrivate::getBookmarkTagsAsync(

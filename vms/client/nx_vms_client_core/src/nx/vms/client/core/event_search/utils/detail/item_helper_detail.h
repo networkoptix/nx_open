@@ -41,19 +41,17 @@ void insertTail(
     current.insert(current.begin() + start, fetchedBegin, fetchedEnd);
 }
 
-/**
- * Updates current data by a new one. Inserts new items, removes deleted and updates the changed
- * ones. Emits all needed model signals.
- */
 template<
     typename Accessor,
     typename OldDataContainer,
-    typename FetchedData,
+    typename NewDataContainer,
     typename Model>
-void updateBody(
+void updateRange(
     Model* model,
     OldDataContainer& old,
-    FetchedData& fetched)
+    NewDataContainer& fetched,
+    int offset,
+    int length)
 {
     const auto removeItems =
         [model, &old](auto begin, auto end)
@@ -67,15 +65,14 @@ void updateBody(
             return old.erase(begin, end);
         };
 
-    if (fetched.data.empty())
+    if (fetched.empty())
     {
         removeItems(old.begin(), old.end());
         return;
     }
 
-    auto fetchedBegin = fetched.data.begin() + fetched.ranges.body.offset;
-    auto fetchedEnd = fetched.data.begin() + fetched.ranges.body.offset
-        + fetched.ranges.body.length;
+    auto fetchedBegin = fetched.begin() + offset;
+    const auto fetchedEnd = fetchedBegin + length;
 
     const auto insertItems =
         [model, &old](auto position, auto begin, auto end)
@@ -184,6 +181,37 @@ void updateBody(
             }
         }
     }
+}
+
+/**
+* Updates current data by a new body. Inserts new items, removes deleted and updates the changed
+* ones. Emits all needed model signals.
+*/
+template<
+    typename Accessor,
+    typename OldDataContainer,
+    typename FetchedData,
+    typename Model>
+void updateBody(
+    Model* model,
+    OldDataContainer& old,
+    FetchedData& fetched)
+{
+    updateRange<Accessor>(model, old, fetched.data, fetched.ranges.body.offset,
+        fetched.ranges.body.length);
+}
+
+template<
+    typename Accessor,
+    typename OldDataContainer,
+    typename NewDataContainer,
+    typename Model>
+void updateAll(
+    Model* model,
+    OldDataContainer& old,
+    NewDataContainer& fetched)
+{
+    updateRange<Accessor>(model, old, fetched, 0, (int) fetched.size());
 }
 
 } // namespace nx::vms::client::core::detail

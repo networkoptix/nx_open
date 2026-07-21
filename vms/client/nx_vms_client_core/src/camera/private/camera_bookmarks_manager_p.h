@@ -48,15 +48,11 @@ public:
     int getBookmarksAsync(const QnCameraBookmarkSearchFilter& filter, BookmarksCallbackType callback);
 
     /**
-     *  Gathers bookmarks around specified time point using usual bookmarks request. Heuristically
-     *  extends (or shrinks) request time period to find appropriate data. Tries it maxTriesCount
-     *  times maximum.
+     * Gathers bookmarks around specified time point using compatibility bookmark request.
      */
-    int getBookmarkstAroundPointHeuristic(
+    int getBookmarksAroundPoint_compatibilityMode(
         const QnCameraBookmarkSearchFilter& filter,
-        const QnCameraBookmarkList& source,
-        int maxTriesCount,
-        BookmarksAroundPointCallbackType callback);
+        BookmarksCallbackType callback);
 
     int getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback);
 

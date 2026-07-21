@@ -151,7 +151,8 @@ template<typename Facade,
 void updateEventSearchData(Model* model,
     DataContainer& current,
     FetchedData& fetched,
-    EventSearch::FetchDirection direction)
+    EventSearch::FetchDirection direction,
+    bool dynamicUpdate = false)
 {
     const auto getLogStr =
         [](const auto beginIt, const auto endIt)
@@ -165,18 +166,26 @@ void updateEventSearchData(Model* model,
             return nx::format("{%1}", result.join(","));
         };
 
-    NX_TRACE(model, "*** Update data, direction=%1 ***\n"
-        "Current data (%1):\n%2\n"
-        "Fetched data (%3):\n%4\n"
-        "Body offset: %5, length: %6\n"
-        "Tail offset: %7, length: %8",
+    NX_TRACE(model, "*** Update data, direction=%1, dynamicUpdate=%2 ***\n"
+        "Current data (%3):\n%4\n"
+        "Fetched data (%5):\n%6\n"
+        "Body offset: %7, length: %8\n"
+        "Tail offset: %9, length: %10",
+        direction, dynamicUpdate,
         current.size(), getLogStr(current.cbegin(), current.cend()),
         fetched.data.size(), getLogStr(fetched.data.cbegin(), fetched.data.cend()),
         fetched.ranges.body.offset, fetched.ranges.body.length,
         fetched.ranges.tail.offset, fetched.ranges.tail.length);
 
-    detail::updateBody<Facade>(model, current, fetched);
-    detail::insertTail(model, current, fetched, direction);
+    if (dynamicUpdate)
+    {
+        detail::updateAll<Facade>(model, current, fetched.data);
+    }
+    else
+    {
+        detail::updateBody<Facade>(model, current, fetched);
+        detail::insertTail(model, current, fetched, direction);
+    }
 }
 
 template<typename Facade, typename Container>

@@ -39,12 +39,9 @@ int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
 
     NX_ASSERT(filter.orderBy.column == nx::vms::api::BookmarkSortField::startTime);
 
-    static const auto kCentralPointSupportApiVersion = nx::utils::SoftwareVersion(6, 0);
-    if (d->systemContext()->moduleInformation().version < kCentralPointSupportApiVersion)
-    {
-        // Emulate request around the point using a usual bookmarks request.
-        return d->getBookmarkstAroundPointHeuristic(filter, source, /*triesCount*/ 10, bookmarkCallback);
-    }
+    static const auto kCentralPointSupportApiVersion = nx::utils::SoftwareVersion(6, 1, 4);
+    const bool centralPointSupported =
+        d->systemContext()->moduleInformation().version >= kCentralPointSupportApiVersion;
 
     auto bookmarksCallback = BookmarksCallbackType(
         [callback = std::move(bookmarkCallback), source, filter]
@@ -57,7 +54,9 @@ int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
             callback(success, id, std::move(fetched));
         });
 
-    return getBookmarksAsync(filter, std::move(bookmarksCallback));
+    return centralPointSupported
+        ? getBookmarksAsync(filter, std::move(bookmarksCallback))
+        : d->getBookmarksAroundPoint_compatibilityMode(filter, std::move(bookmarksCallback));
 }
 
 int QnCameraBookmarksManager::getBookmarkTagsAsync(int maxTags, BookmarkTagsCallbackType callback)

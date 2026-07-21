@@ -343,7 +343,7 @@ FetchRequest AbstractSearchListModel::requestForDirection(
                 : d->fetchedTimeWindow->endTime());
         }();
 
-    NX_VERBOSE(this, "requestForDirection(): direction=`%1`, centralPoint=`%2`",
+    NX_VERBOSE(this, "requestForDirection(): direction=%1, centralPoint=%2",
         direction,
         nx::utils::timestampToDebugString(centralPointUs.count() / 1000));
     return {.direction = direction, .centralPointUs = centralPointUs};
