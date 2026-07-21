@@ -530,6 +530,27 @@ const ImageCorrectionResult& DecodedPictureToOpenGLUploader::UploadedPicture::im
     return m_imgCorrection;
 }
 
+ImageCorrectionResult DecodedPictureToOpenGLUploader::UploadedPicture::updateImageCorrection(
+    const nx::vms::api::ImageCorrectionData& data, const QRectF& textureRect) const
+{
+    auto result = m_imgCorrection;
+    if (result.pixels == 0 && m_decodedFrame)
+    {
+        result.analyseImage(
+            m_decodedFrame->data[0],
+            m_decodedFrame->width,
+            m_decodedFrame->height,
+            m_decodedFrame->linesize[0],
+            data,
+            textureRect);
+    }
+    else
+    {
+        result.update(data);
+    }
+    return result;
+}
+
 void DecodedPictureToOpenGLUploader::UploadedPicture::setDecodedFrame(
     CLConstVideoDecoderOutputPtr frame)
 {
@@ -1328,6 +1349,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
         if (frame->memoryType() == MemoryType::VideoMemory)
             return renderVideoMemory(emptyPictureBuf, frame);
+
+        emptyPictureBuf->setDecodedFrame(frame);
     }
     else
     {

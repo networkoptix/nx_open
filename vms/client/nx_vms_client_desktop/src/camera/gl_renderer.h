@@ -71,7 +71,6 @@ public:
     void setImageCorrectionParams(const nx::vms::api::ImageCorrectionData& params) { m_imgCorrectParam = params; }
     void setFisheyeController(QnFisheyePtzController* controller);
     bool isFisheyeEnabled() const;
-    nx::vms::api::ImageCorrectionData getImageCorrectionParams() const { return m_imgCorrectParam; }
 
     void setPaused(bool value) { m_paused = value; }
     bool isPaused() const { return m_paused; }

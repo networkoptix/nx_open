@@ -595,7 +595,11 @@ bool QnGLRenderer::drawVideoTextures(
             {
                 auto parameters = picLock->imageCorrectionResult();
                 if (isPaused() || (picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage))
-                    parameters.update(m_decodedPictureProvider.getImageCorrection());
+                {
+                    // Compute parameters on the fly.
+                    parameters = picLock->updateImageCorrection(
+                        m_decodedPictureProvider.getImageCorrection(), textureRect);
+                }
                 program.loadGammaCorrection(parameters);
                 if (m_histogramConsumer)
                     m_histogramConsumer->setHistogramData(parameters);
@@ -732,7 +736,11 @@ bool QnGLRenderer::drawVideoTextures(
     {
         auto parameters = picLock->imageCorrectionResult();
         if (isPaused() || (picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage))
-            parameters.update(m_decodedPictureProvider.getImageCorrection());
+        {
+            // Compute parameters on the fly.
+            parameters = picLock->updateImageCorrection(
+                m_decodedPictureProvider.getImageCorrection(), textureRect);
+        }
         program->loadGammaCorrection(parameters);
         if (m_histogramConsumer)
             m_histogramConsumer->setHistogramData(parameters);
