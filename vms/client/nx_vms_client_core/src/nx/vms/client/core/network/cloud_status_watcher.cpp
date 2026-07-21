@@ -16,6 +16,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/async_handler_executor.h>
+#include <nx/utils/deadline_timer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
@@ -47,7 +48,10 @@ namespace {
 
 static constexpr auto kSystemUpdateInterval = 100s;
 static constexpr auto kReconnectInterval = 5s;
+// Systems update request starts timer of 30 sec. It sends another try for 6 times if previous one
+// is not finished successfully.
 static constexpr int kUpdateSystemsTriesCount = 6;
+static constexpr auto kUpdateSystemsRequestTimeout = 30s;
 
 QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
 {
@@ -103,7 +107,8 @@ struct CloudStatusWatcher::Private: public QObject
     std::shared_ptr<Connection> cloudConnection;
     std::unique_ptr<Connection> resendActivationConnection;
 
-    bool hasUpdateSystemsRequest = false;
+    nx::utils::DeadlineTimer updateSystemsRequestTimer;
+    quint64 updateSystemsRequestId = 0;
     CloudStatusWatcher::Status status = CloudStatusWatcher::LoggedOut;
     CloudStatusWatcher::ErrorCode errorCode = CloudStatusWatcher::NoError;
 
@@ -145,8 +150,7 @@ struct CloudStatusWatcher::Private: public QObject
 
     void updateSystems();
 
-    /** @return Whether request was actually sent. */
-    bool updateSystemsInternal(int triesCount);
+    void updateSystemsInternal(int triesCount, quint64 requestId);
     void setCloudSystems(const QnCloudSystemList& newCloudSystems);
     void setRecentCloudSystems(const QnCloudSystemList& newRecentSystems);
     void updateCurrentCloudUserSecuritySettings();
@@ -387,6 +391,7 @@ CloudStatusWatcher::Private::Private(CloudStatusWatcher* parent):
     q(parent),
     recentCloudSystems(appContext()->coreSettings()->recentCloudSystems())
 {
+    updateSystemsRequestTimer.setRemainingTime(0ms);
     QTimer* systemUpdateTimer = new QTimer(this);
     systemUpdateTimer->setInterval(kSystemUpdateInterval);
     systemUpdateTimer->callOnTimeout(
@@ -460,25 +465,28 @@ void CloudStatusWatcher::Private::updateStatusFromResultCode(ResultCode result)
     }
 }
 
-bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
+void CloudStatusWatcher::Private::updateSystemsInternal(int triesCount, quint64 requestId)
 {
-    if (!cloudConnection || m_authData.credentials.authToken.empty())
-        return false;
-
-    if (status == CloudStatusWatcher::LoggedOut)
-        return false;
-
-    if (!checkSuppressed())
-        return false;
-
-    if (triesCount <= 0)
-        return false;
+    if (!cloudConnection || m_authData.credentials.authToken.empty()
+        || status == CloudStatusWatcher::LoggedOut
+        || !checkSuppressed()
+        || triesCount <= 0)
+    {
+        updateSystemsRequestTimer.forceExpire();
+        return;
+    }
 
     auto handler = nx::utils::AsyncHandlerExecutor(this).bind(
-        [this, triesCount](ResultCode result, const SystemDataExList& systemsList)
+        [this, triesCount, requestId](ResultCode result, const SystemDataExList& systemsList)
         {
-            if (!cloudConnection || !checkSuppressed())
+            if (requestId != updateSystemsRequestId)
                 return;
+
+            if (!cloudConnection || !checkSuppressed())
+            {
+                updateSystemsRequestTimer.forceExpire();
+                return;
+            }
 
             QnCloudSystemList cloudSystems;
             if (result == ResultCode::badUsername && triesCount > 0)
@@ -491,8 +499,10 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
                     Try #%1",
                     kUpdateSystemsTriesCount - triesCount + 1);
                 m_tokenUpdater->updateTokenIfNeeded(/* force*/ true);
-                const auto request = [this, tries = triesCount - 1]()
-                { updateSystemsInternal(tries); };
+                const auto request = [this, tries = triesCount - 1, requestId]()
+                {
+                    updateSystemsInternal(tries, requestId);
+                };
                 executeDelayedParented(request, /*delay*/ 10s, this);
                 return;
             }
@@ -507,7 +517,7 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
                 NX_ERROR(this, "Can't update systems list, error '%1'", result);
             }
 
-            hasUpdateSystemsRequest = false;
+            updateSystemsRequestTimer.forceExpire();
             if (status == CloudStatusWatcher::UpdatingCredentials && result != ResultCode::ok)
                 return;
 
@@ -517,24 +527,27 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
     NX_DEBUG(this, "Updating systems list");
     Filter filter;
     filter.nameToValue[FilterField::systemStatus] = "notActivated|activated";
+    updateSystemsRequestTimer.setRemainingTime(kUpdateSystemsRequestTimeout);
     cloudConnection->systemManager()->getSystemsFiltered(filter, std::move(handler));
-    return true;
 }
 
 void CloudStatusWatcher::Private::updateSystems()
 {
-    NX_DEBUG(this, "Try update systems list: has request is %1 ", hasUpdateSystemsRequest);
-
-    if (hasUpdateSystemsRequest)
+    // The timer guards against a request that never got a response, which happens usually during sleep.
+    if (!updateSystemsRequestTimer.hasExpired())
+    {
+        NX_DEBUG(this, "Try update systems list: request is already in progress");
         return;
+    }
 
-    hasUpdateSystemsRequest = updateSystemsInternal(kUpdateSystemsTriesCount);
+    NX_DEBUG(this, "Try update systems list: has request is %1 ", !updateSystemsRequestTimer.hasExpired());
+    updateSystemsInternal(kUpdateSystemsTriesCount, ++updateSystemsRequestId);
 }
 
 void CloudStatusWatcher::Private::resetCloudConnection()
 {
     cloudConnection.reset();
-    hasUpdateSystemsRequest = false;
+    updateSystemsRequestTimer.forceExpire();
 }
 
 void CloudStatusWatcher::Private::updateConnection(AuthMode mode)
@@ -675,6 +688,11 @@ void CloudStatusWatcher::Private::validateAccessToken()
             if (result != ResultCode::ok)
             {
                 updateStatusFromResultCode(result);
+                // updateStatusFromResultCode() may have set status to Offline (e.g. on a
+                // transient network error); schedule a retry of issueAccessToken() so the
+                // connection recovers on its own instead of staying Offline until the next
+                // unrelated trigger (e.g. a manual re-login).
+                scheduleConnectionRetryIfNeeded();
                 return;
             }
 
