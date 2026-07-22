@@ -15,7 +15,7 @@ T.RadioButton
 
     property int backgroundRadius: 0
     property color backgroundColor: ColorTheme.colors.dark6
-    property color checkedBackgroundColor: ColorTheme.colors.dark6
+    property color checkedBackgroundColor: ColorTheme.colors.dark8
     property color backgroundBorderColor: "transparent"
     property int backgroundBorderWidth: 0
     property color textColor: ColorTheme.colors.light10
@@ -31,7 +31,7 @@ T.RadioButton
     font.pixelSize: 16
 
     topPadding: 16
-    bottomPadding: 12
+    bottomPadding: 16
     spacing: 8
     leftPadding: 16
     rightPadding: 16
@@ -111,7 +111,7 @@ T.RadioButton
                 visible: !!text
                 wrapMode: Text.Wrap
                 font.pixelSize: 14
-                color: ColorTheme.colors.light12
+                color: control.checked ? control.checkedTextColor : ColorTheme.colors.light16
             }
         }
     }

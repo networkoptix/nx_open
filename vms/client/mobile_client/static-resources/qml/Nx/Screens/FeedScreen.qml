@@ -128,6 +128,7 @@ AdaptiveScreen
                 height: 56
                 width: parent.width
                 backgroundRadius: 8
+                indicator: null
             }
 
             FilterButton

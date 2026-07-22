@@ -84,16 +84,18 @@ BaseSettingsPage
                 }
             }
 
-
             StyledRadioButton
             {
                 id: recommendedSecurityOptionRadioButton
+
                 width: parent.width
                 checked: appContext.settings.certificateValidationLevel
                     === Certificate.ValidationLevel.recommended
                 text: qsTr("Recommended")
                 extraText: qsTr("Your confirmation will be requested to pin self-signed certificates")
                 visible: line.visible
+                indicator: null
+                backgroundRadius: 8
 
                 onClicked:
                 {
@@ -111,9 +113,9 @@ BaseSettingsPage
                     === Certificate.ValidationLevel.strict
                 text: qsTr("Strict")
                 extraText: qsTr("Connect only servers with public certificates")
-                backgroundRadius: 8
-
                 visible: line.visible
+                indicator: null
+                backgroundRadius: 8
 
                 onClicked:
                 {

@@ -68,7 +68,6 @@ BaseSettingsPage
                 {
                     id: notificationSourceGroup
 
-                    spacing: 4
                     width: parent.width
 
                     LabeledSwitch
@@ -147,6 +146,8 @@ BaseSettingsPage
                         width: parent.width
                         text: qsTr("All Sites")
                         font.pixelSize: 18
+                        indicator: null
+                        backgroundRadius: 8
                     }
 
                     StyledRadioButton
@@ -159,8 +160,9 @@ BaseSettingsPage
 
                         enabled: !appContext.pushManager.userUpdateInProgress
                         text: qsTr("Selected Sites")
-                        backgroundRadius: 8
                         font.pixelSize: 18
+                        indicator: null
+                        backgroundRadius: 8
                     }
                 }
             }

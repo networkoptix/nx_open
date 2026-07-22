@@ -46,7 +46,6 @@ Column
             height: 56
             width: parent.width
             backgroundRadius: 8
-            checkedBackgroundColor: ColorTheme.colors.dark8
             text: d.getTextValue(index)
             checked: d.selectedIndex === index
             onCheckedChanged:
