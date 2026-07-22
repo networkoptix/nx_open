@@ -24,7 +24,8 @@ void registerDeviceBaseHandlers(
      * %permissions Power User.
      */
     reg("rest/v{1-}/devices/:id/changePassword", GlobalPermission::powerUser,
-        std::make_unique<ChangeDevicePasswordHandler>(serverConnector));
+        std::make_unique<ChangeDevicePasswordHandler>(
+            serverModule->systemContext(), serverConnector));
 
     /**%apidoc GET /rest/v{1-2}/devices/{id}/footage
      * Retrieves the info for the recorded chunks for the Device specified by {id}.
@@ -104,7 +105,8 @@ void registerDeviceBaseHandlers(
      * %return:{DeviceDiagnosisList} List of Device Diagnosis information.
      */
     reg("rest/v{1-}/devices/:id/status", GlobalPermission::powerUser,
-        std::make_unique<DeviceDiagnoseHandler>(serverConnector, serverModule->videoCameraPool()));
+        std::make_unique<DeviceDiagnoseHandler>(
+            serverModule->systemContext(), serverConnector, serverModule->videoCameraPool()));
 
     /**%apidoc GET /rest/v{3-}/devices/{id}/resourceData
      * Retrieves the data from Device configuration file (resource_data.json) which is currently in
@@ -201,7 +203,8 @@ void registerDeviceBaseHandlers(
      * %return:{std::map<nx::Uuid, QnCameraAdvancedParams>} Map with an Advanced Parameter manifest per Device.
      */
     reg("rest/v{2-}/devices/:id/advanced/*/manifest", GlobalPermission::none,
-        std::make_unique<DeviceAdvancedManifestHandler>(serverConnector));
+        std::make_unique<DeviceAdvancedManifestHandler>(
+            serverModule->systemContext(), serverConnector));
 
     /**%apidoc GET /rest/v{2-}/devices/{deviceId}/advanced/{id}
      * Retrieves the specified Advanced Parameter of the Device.
@@ -286,7 +289,7 @@ void registerDeviceBaseHandlers(
      */
     reg("rest/v{4-}/devices/:deviceId/io",
         GlobalPermission::none,
-        std::make_unique<DeviceIoHandler>(serverConnector));
+        std::make_unique<DeviceIoHandler>(serverModule->systemContext(), serverConnector));
 
     /**%apidoc[proprietary] POST /rest/v{4-}/devices/{id}/intercom/rejectCall
      * Rejects a call from the specified intercom Device if it is in progress.
