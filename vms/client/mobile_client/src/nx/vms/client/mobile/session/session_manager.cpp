@@ -112,6 +112,12 @@ void SessionManager::Private::startSession(
     connect(session.get(), &Session::expired, q,
         [this]()
         {
+            if (!q->hasSession())
+            {
+                NX_DEBUG(this, "Session::expired ignored: session was already stopped");
+                return;
+            }
+
             q->stopSessionByUser();
 
             const auto error = core::errorDescription(
