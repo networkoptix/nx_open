@@ -149,8 +149,7 @@ AdaptiveScreen
         onClicked: searchToolBar.open()
     }
 
-    titleUnderlineVisible: !LayoutController.isTabletLayout
-        && rootIndex.parent !== NxGlobals.invalidModelIndex()
+    titleUnderlineVisible: breadcrumb.canBeShown
 
     customBackHandler:
         (isEscKeyPressed) =>
@@ -481,8 +480,7 @@ AdaptiveScreen
                 id: breadcrumb
 
                 readonly property bool canBeShown: !LayoutController.isTabletLayout
-                    && sessionsScreen.state === sessionsScreen.inPartnerOrOrgState
-                    && sessionsScreen.rootType !== OrganizationsModel.ChannelPartner
+                    && rootIndex.parent !== NxGlobals.invalidModelIndex()
 
                 Layout.fillWidth: true
 
