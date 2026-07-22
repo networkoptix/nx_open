@@ -7,7 +7,6 @@
 #include <QtCore/QJsonObject>
 
 #include <nx/reflect/json.h>
-#include <nx/utils/buffer.h>
 
 namespace nx::analytics::taxonomy {
 
@@ -19,7 +18,7 @@ namespace nx::analytics::taxonomy {
 
     const auto data = file.readAll();
 
-    return makeDescriptorsTestData(nx::toBufferView(data), outTestData);
+    return makeDescriptorsTestData(data, outTestData);
 }
 
 bool makeDescriptorsTestData(std::string_view body, TestData* outTestData)

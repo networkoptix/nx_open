@@ -161,7 +161,7 @@ struct CloudCrossSystemContextDataLoader::Private
                 }
 
                 auto [result, deserializationResult] =
-                    reflect::json::deserialize<ServerModelV1List>(nx::toBufferView(data));
+                    reflect::json::deserialize<ServerModelV1List>(data);
                 if (!deserializationResult.success)
                 {
                     NX_WARNING(

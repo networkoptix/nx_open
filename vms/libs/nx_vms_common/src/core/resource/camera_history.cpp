@@ -163,7 +163,7 @@ void QnCameraHistoryPool::onServerRuntimeEvent(
         return;
 
     SiteHealthMessage message;
-    if (!NX_ASSERT(nx::reflect::json::deserialize(nx::toBufferView(eventData.eventData), &message)))
+    if (!NX_ASSERT(nx::reflect::json::deserialize(eventData.eventData, &message)))
         return;
 
     const auto healthMessage = message.type;

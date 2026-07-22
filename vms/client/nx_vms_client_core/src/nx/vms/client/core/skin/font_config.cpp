@@ -9,7 +9,6 @@
 
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
-#include <nx/utils/buffer.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/std_string_utils.h>
@@ -60,7 +59,7 @@ FontMap readFontMap(const QString& fileName, const QFont& baseFont)
     }
 
     auto [data, error] = nx::reflect::json::deserialize<std::map<QString, FontRecord>>(
-        nx::toBufferView(file.readAll()));
+        file.readAll());
 
     if (!error.success)
     {

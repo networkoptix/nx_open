@@ -29,7 +29,7 @@ void ServerRuntimeEventConnector::setMessageProcessor(QnCommonMessageProcessor* 
 void ServerRuntimeEventConnector::at_serverRuntimeEventOccurred(
     const ServerRuntimeEventData& eventData)
 {
-    const auto payload = nx::toBufferView(eventData.eventData);
+    const std::string_view payload = eventData.eventData;
 
     switch (eventData.eventType)
     {

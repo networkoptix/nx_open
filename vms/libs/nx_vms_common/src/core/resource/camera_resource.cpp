@@ -331,7 +331,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
         [this]
         {
             return std::get<0>(nx::reflect::json::deserialize<QnIOPortDataList>(
-                nx::toBufferView(getProperty(nx::vms::api::device_properties::kIoSettings).toUtf8())));
+                getProperty(nx::vms::api::device_properties::kIoSettings).toUtf8()));
         }),
     m_cachedHasVideo(
         [this]
