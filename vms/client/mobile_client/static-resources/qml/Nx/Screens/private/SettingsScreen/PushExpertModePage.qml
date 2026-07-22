@@ -321,7 +321,7 @@ BaseSettingsPage
             Workflow.openDialog(
                 "qrc:/qml/Nx/Mobile/Popups/StandardPopup.qml",
                 {
-                    "title": qsTr("At least one site has to be selected"),
+                    "title": title,
                     "messages": [message],
                     "icon": "image://skin/48x48/Solid/warning.svg?primary=yellow",
                     "accentedOkButton": true
@@ -334,7 +334,7 @@ BaseSettingsPage
             const expertMode = expertModeRadioButton.checked
             if (expertMode && !d.selectionModel.selectedSystems.length)
             {
-                openErrorDialog(qsTr("At least one site has to be selected"))
+                openErrorDialog(qsTr("Please select at least one site"))
                 return
             }
 
