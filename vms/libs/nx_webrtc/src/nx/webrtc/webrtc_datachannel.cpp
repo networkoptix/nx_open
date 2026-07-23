@@ -649,7 +649,11 @@ bool DataChannel::closeStream(int streamId)
 
 bool DataChannel::writeString(const std::string& data, int streamId)
 {
-    NX_ASSERT(m_dataChannelOpened, "Writing to a data channel before it is open");
+    if (!m_dataChannelOpened)
+    {
+        NX_VERBOSE(this, "Writing to a data channel that is not open");
+        return false;
+    }
     if (streamId < 0)
         streamId = defaultStream();
     return writeMessage({Message::Type::string, streamId, data, true});
@@ -657,7 +661,11 @@ bool DataChannel::writeString(const std::string& data, int streamId)
 
 bool DataChannel::writeBinary(const std::string& data, int streamId)
 {
-    NX_ASSERT(m_dataChannelOpened, "Writing to a data channel before it is open");
+    if (!m_dataChannelOpened)
+    {
+        NX_VERBOSE(this, "Writing to a data channel that is not open");
+        return false;
+    }
     if (streamId < 0)
         streamId = defaultStream();
     return writeMessage({Message::Type::binary, streamId, data, true});
