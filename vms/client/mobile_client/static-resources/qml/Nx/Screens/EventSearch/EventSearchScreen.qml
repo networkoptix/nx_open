@@ -33,7 +33,6 @@ AdaptiveScreen
     property alias analyticsSearchMode: screenController.analyticsSearchMode
     property alias searchText: searchField.text
 
-    fullscreenToolBar: detailsLoader.item?.fullscreenLayout ?? false
     title: contentItem.title
     longContent: contentItem !== eventSearchMenu
 
@@ -56,7 +55,9 @@ AdaptiveScreen
             screen.contentItem = searchContent
 
         detailsLoader.setSource("")
-        screen.fullscreen = false
+
+        if (screen.isActive)
+            LayoutController.exitFullscreen()
     }
 
     customLeftControl: ToolBarButton
@@ -89,7 +90,7 @@ AdaptiveScreen
                         if (!LayoutController.isTabletLayout)
                             detailsLoader.setSource("")
 
-                        screen.fullscreen = false
+                        LayoutController.exitFullscreen()
                     }
                 }
             },
@@ -240,34 +241,10 @@ AdaptiveScreen
         {
             target: detailsLoader.item ?? null
 
-            function onFullscreenButtonClicked()
+            function onBackClicked()
             {
-                screen.fullscreen = !screen.fullscreen
-
-                if (LayoutController.isTabletLayout)
-                {
-                    if (screen.contentItem === detailsLoader.item) //< Exit fullscreen.
-                    {
-                        screen.contentItem = searchContent
-                        screen.showPanel(rightPanel)
-                    }
-                    else //< Enter fullscreen.
-                    {
-                        screen.contentItem = detailsLoader.item
-                    }
-                }
-                else
-                {
-                    if (CoreUtils.isMobilePlatform())
-                    {
-                        windowContext.ui.windowHelpers.setScreenOrientation(
-                            LayoutController.isPortrait ? Qt.LandscapeOrientation : Qt.PortraitOrientation)
-                    }
-                    else
-                    {
-                        [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
-                    }
-                }
+                if (screen.customBackHandler)
+                    screen.customBackHandler()
             }
 
             function onSearchRequested(text)
@@ -800,28 +777,49 @@ AdaptiveScreen
 
         target: LayoutController
 
+        function onFullscreenChanged()
+        {
+            if (!screen.isActive)
+                return
+
+            // On the mobile layout the details are the content item already; only the tablet
+            // layout swaps the content between the search results and the details.
+            if (!LayoutController.isTabletLayout)
+                return
+
+            if (LayoutController.fullscreen)
+            {
+                if (detailsLoader.item)
+                    screen.contentItem = detailsLoader.item
+            }
+            else if (screen.contentItem === detailsLoader.item)
+            {
+                screen.contentItem = searchContent
+                screen.showPanel(rightPanel)
+            }
+        }
+
         function onIsPortraitChanged()
         {
+            if (!screen.isActive)
+                return
+
             if (screen.contentItem === eventSearchMenu)
                 return
 
             if (LayoutController.isMobile)
+                return
+
+            if (LayoutController.isPortrait)
             {
                 if (screen.contentItem !== detailsLoader.item)
-                    return
+                    screen.closeDetailsPanel()
 
-                screen.fullscreen = !LayoutController.isPortrait
                 return
             }
 
-            if (LayoutController.isTabletLayout && screen.fullscreen)
+            if (LayoutController.fullscreen)
                 return
-
-            if (LayoutController.isPortrait && screen.fullscreen)
-            {
-                screen.fullscreen = false
-                return
-            }
 
             leftPanelPopup.close()
 

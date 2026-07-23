@@ -24,6 +24,10 @@ AdaptiveScreen
 
     title: feed.title
 
+    customBackHandler: contentItem === notificationDetailsItem
+        ? () => d.closeDetails()
+        : null
+
     // The right (Details) panel mirrors `feed.selectedNotification`. Clear the selection whenever
     // AdaptiveScreen closes the panel (close button, auto-close, or cross-close), otherwise
     // `rightPanel.item` stays bound to the same `notificationDetailsItem` and a repeated tap on
@@ -72,10 +76,7 @@ AdaptiveScreen
         visible: feedScreen.contentItem === notificationDetailsItem
         icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
 
-        onClicked:
-        {
-            feedScreen.contentItem = feed
-        }
+        onClicked: d.closeDetails()
     }
 
     customRightControl: IconButton
@@ -157,67 +158,51 @@ AdaptiveScreen
 
         notification: feed.selectedNotification
 
-        onFullscreenButtonClicked:
-        {
-            feedScreen.fullscreen = !feedScreen.fullscreen
-
-            if (LayoutController.isTabletLayout)
-            {
-                if (feedScreen.contentItem === notificationDetailsItem) //< Exit fullscreen.
-                {
-                    feedScreen.contentItem = feed
-                    feedScreen.rightPanel.visible = true
-                }
-                else //< Enter fullscreen.
-                {
-                    feedScreen.contentItem = notificationDetailsItem
-                }
-            }
-            else
-            {
-                if (CoreUtils.isMobilePlatform())
-                {
-                    windowContext.ui.windowHelpers.setScreenOrientation(
-                        LayoutController.isPortrait ? Qt.LandscapeOrientation : Qt.PortraitOrientation)
-                }
-                else
-                {
-                    [mainWindow.width, mainWindow.height] = [mainWindow.height, mainWindow.width]
-                }
-            }
-        }
+        onBackClicked: d.closeDetails()
     }
 
     Connections
     {
         target: LayoutController
 
+        function onFullscreenChanged()
+        {
+            if (!feedScreen.isActive)
+                return
+
+            if (!LayoutController.isTabletLayout)
+                return
+
+            if (LayoutController.fullscreen)
+            {
+                feedScreen.contentItem = notificationDetailsItem
+            }
+            else if (feedScreen.contentItem === notificationDetailsItem)
+            {
+                feedScreen.contentItem = feed
+                feedScreen.showPanel(rightPanel)
+            }
+        }
+
         function onIsPortraitChanged()
         {
+            if (!feedScreen.isActive)
+                return
+
             if (feedScreen.contentItem === feed) //< Feed list fits any orientation.
             {
                 feed.selectedNotification = null
                 return
             }
 
-            if (LayoutController.isMobile && feedScreen.contentItem === notificationDetailsItem)
-            {
-                if (!notificationDetailsItem.hasPreview)
-                    return
-
-                // Enter/exit fullscreen on mobile device rotation.
-                feedScreen.fullscreen = !LayoutController.isPortrait
-                return
-            }
-
-            if (LayoutController.isTabletLayout && screen.fullscreen)
+            if (LayoutController.isMobile)
                 return
 
-            if (LayoutController.isPortrait && screen.fullscreen)
-            {
-                screen.fullscreen = false
+            if (LayoutController.isPortrait)
                 return
-            }
+
+            if (LayoutController.fullscreen)
+                return
 
             feedScreen.contentItem = feed
             if (rightPanel.item)
@@ -232,5 +217,17 @@ AdaptiveScreen
         property bool canFilter: feedState.hasOsPermission
             && feedState.notificationsEnabled
             && (feedState.count !== 0 || feed.searching || feed.filtered)
+
+        function closeDetails()
+        {
+            if (LayoutController.fullscreen)
+                LayoutController.exitFullscreen()
+
+            if (LayoutController.isTabletLayout)
+                return
+
+            feedScreen.contentItem = feed
+            feed.selectedNotification = null
+        }
     }
 }

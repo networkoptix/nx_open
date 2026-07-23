@@ -11,6 +11,7 @@ import Nx.Core.Items
 import Nx.Core.Ui
 import Nx.Mobile.Controls
 import Nx.Screens
+import Nx.Ui
 
 import nx.vms.client.core
 
@@ -18,14 +19,16 @@ Rectangle
 {
     id: root
 
-    property alias fullscreenLayout: d.fullscreenLayout
+    required property string title //< Required for fullscreen title.
+
     property alias interval: preview
 
     property bool activePage: false
     property bool withNavigationControls: true
     property bool withShowOnCamera: true
-    property alias hasPrevious: previousButton.enabled
-    property alias hasNext: nextButton.enabled
+
+    property bool hasPrevious: true
+    property bool hasNext: true
 
     // State of the recorded data for the requested position:
     // - Available: data is present; the player and the playback controls are shown;
@@ -35,7 +38,7 @@ Rectangle
     enum DataState { Available, Checking, NoData }
     property int dataState: Preview.DataState.Available
 
-    signal showFullscreen()
+    signal back()
     signal previous()
     signal next()
     signal showOnCamera()
@@ -51,7 +54,7 @@ Rectangle
                 : width * interval.videoAspectRatio
         }
 
-        return intervalHeight + (d.fullscreenLayout ? 0 : bottomPanel.height + 4)
+        return intervalHeight + (LayoutController.fullscreen ? 0 : bottomPanel.height + 4)
     }
 
     color: ColorTheme.colors.dark3
@@ -75,7 +78,7 @@ Rectangle
         id: preview
 
         anchors.fill: parent
-        anchors.bottomMargin: d.fullscreenLayout
+        anchors.bottomMargin: LayoutController.fullscreen
             ? 0
             : bottomPanel.height
 
@@ -90,17 +93,10 @@ Rectangle
         autoRepeat: false
         color: "transparent"
 
-        onClicked: d.showControls = !d.showControls
-
-        Image
+        onClicked:
         {
-            y: parent.height - height + 1
-            width: parent.width
-            height: 56
-
-            source: lp("/images/timeline_gradient.png")
-            opacity: d.hasControls ? 1 : 0
-            visible: !d.fullscreenLayout && opacity > 0
+            if (LayoutController.fullscreen)
+                d.setControlsVisible(!d.controlsVisible)
         }
 
         VideoDummy
@@ -110,42 +106,111 @@ Rectangle
             state: root.dataState === Preview.DataState.NoData ? "noData" : "cannotDecryptMedia"
         }
 
+        GradientShadow
+        {
+            height: 120
+            width: parent.width
+            from: ColorTheme.transparent("#0D1012", 0.8)
+            opacity: d.controlsOpacity
+            visible: LayoutController.fullscreen
+        }
+
+        GradientShadow
+        {
+            anchors.bottom: parent.bottom
+            height: 120
+            width: parent.width
+            from: ColorTheme.transparent("#0D1012", 0.8)
+            rotation: 180
+            opacity: d.controlsOpacity
+            visible: LayoutController.fullscreen
+        }
+
+        ControlButton
+        {
+            id: backButton
+
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.margins: 16
+
+            opacity: d.controlsOpacity
+            visible: opacity > 0 && LayoutController.fullscreen
+
+            icon.source: "image://skin/24x24/Outline/arrow_back.svg"
+
+            onClicked: root.back()
+        }
+
+        ColumnLayout
+        {
+            anchors.top: parent.top
+            anchors.topMargin: 16
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            spacing: 4
+            opacity: d.controlsOpacity
+            visible: LayoutController.fullscreen && opacity > 0
+
+            Text
+            {
+                Layout.alignment: Qt.AlignHCenter
+
+                text: root.title
+
+                font.pixelSize: 18
+                font.weight: Font.Medium
+
+                color: ColorTheme.colors.light4
+            }
+
+            LayoutItemProxy
+            {
+                target: timestampText
+            }
+        }
+
         RowLayout
         {
             id: centralFullscreenControls
 
             anchors.centerIn: parent
-            visible: d.fullscreenLayout
+            visible: LayoutController.fullscreen
             spacing: 44
 
-            LayoutItemProxy { target: previousButton }
+            LayoutItemProxy
+            {
+                target: previousButton
+                visible: root.withNavigationControls
+            }
 
             LayoutItemProxy { target: playPauseButton }
 
-            LayoutItemProxy { target: nextButton }
+            LayoutItemProxy
+            {
+                target: nextButton
+                visible: root.withNavigationControls
+            }
         }
 
-        RowLayout
+        LayoutItemProxy
         {
-            anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.margins: 12
 
-            visible: !d.fullscreenLayout
+            target: fullscreenButton
+            visible: !LayoutController.fullscreen && root.dataState === Preview.DataState.Available
+        }
 
-            LayoutItemProxy
-            {
-                Layout.fillWidth: true
+        LayoutItemProxy
+        {
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.margins: 12
 
-                target: timestampText
-            }
-
-            LayoutItemProxy
-            {
-                target: fullscreenButton
-                visible: root.dataState === Preview.DataState.Available
-            }
+            target: timestampText
+            visible: !LayoutController.fullscreen
         }
     }
 
@@ -154,15 +219,14 @@ Rectangle
         id: slider
 
         anchors.left: parent.left
-        anchors.bottom: preview.bottom
-        anchors.bottomMargin: - (height / 2) + 2
         anchors.right: parent.right
+        anchors.bottom: preview.bottom
+        anchors.bottomMargin: LayoutController.fullscreen ? 8 : - (height / 2) + 2
 
         preview: preview
 
-        visible: opacity > 0 && !d.fullscreenLayout && !preview.cannotDecryptMedia
-            && root.dataState === Preview.DataState.Available
-        opacity: d.hasControls ? 1 : 0
+        visible: opacity > 0 && root.dataState === Preview.DataState.Available && !preview.cannotDecryptMedia
+        opacity: d.controlsOpacity
     }
 
     Item
@@ -172,12 +236,13 @@ Rectangle
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: LayoutController.fullscreen ? 36 : 0
 
         height: 68
 
         RowLayout
         {
-            visible: !d.fullscreenLayout
+            visible: !LayoutController.fullscreen
             spacing: 8
 
             anchors.fill: parent
@@ -223,21 +288,12 @@ Rectangle
 
         RowLayout
         {
-            anchors.left: parent.left
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 16
             anchors.rightMargin: 16
 
-            visible: d.fullscreenLayout
+            visible: LayoutController.fullscreen && d.controlsOpacity > 0
             spacing: 8
-
-            LayoutItemProxy
-            {
-                Layout.fillWidth: true
-
-                target: timestampText
-            }
 
             LayoutItemProxy
             {
@@ -272,47 +328,30 @@ Rectangle
             slider.value, windowContext.mainSystemContext, /*alwaysShowDate*/ true)
     }
 
-    component ControlButton: Button
-    {
-        property bool rounded: false
-        property bool transparent: rounded || d.fullscreenLayout
-
-        implicitWidth: 44
-        implicitHeight: 44
-
-        type: Button.Type.Interface
-        radius: rounded ? width / 2 : 6
-
-        icon.width: 24
-        icon.height: 24
-
-        backgroundColor: transparent
-            ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
-            : parameters.colors[state]
-
-        foregroundColor: transparent
-            ? ColorTheme.transparent(ColorTheme.colors.light1, enabled ? 1.0 : 0.3)
-            : parameters.textColors[state]
-    }
-
     ControlButton
     {
         id: fullscreenButton
 
-        icon.source: d.fullscreenLayout
+        icon.source: LayoutController.fullscreen
             ? "image://skin/24x24/Outline/exit_fullscreen_mode.svg"
             : "image://skin/24x24/Outline/fullscreen_view_mode.svg"
 
-        implicitWidth: d.fullscreenLayout ? 44 : 24
-        implicitHeight: d.fullscreenLayout ? 44 : 24
+        implicitWidth: LayoutController.fullscreen ? 44 : 24
+        implicitHeight: LayoutController.fullscreen ? 44 : 24
 
-        opacity: !preview.cannotDecryptMedia ? 1.0 : 0.0
+        opacity: preview.cannotDecryptMedia
+            ? 0.0
+            : (LayoutController.fullscreen ? d.controlsOpacity : 1.0)
+
         enabled: opacity > 0 && root.dataState === Preview.DataState.Available
-        backgroundColor: d.fullscreenLayout
+            && (LayoutController.fullscreen || preview.isReady)
+
+        backgroundColor: LayoutController.fullscreen
             ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
             : "transparent"
 
-        onClicked: root.showFullscreen()
+        onClicked: LayoutController.toggleFullscreen(
+            d.verticalVideo ? Qt.PortraitOrientation : Qt.LandscapeOrientation)
     }
 
     ControlButton
@@ -321,6 +360,7 @@ Rectangle
 
         icon.source: "image://skin/24x24/Solid/repeat.svg"
 
+        opacity: d.controlsOpacity
         enabled: root.dataState === Preview.DataState.Available
         checkable: true
         checked: preview.autoRepeat
@@ -336,13 +376,13 @@ Rectangle
     {
         id: previousButton
 
-        opacity: d.hasControls
+        opacity: d.controlsOpacity
         enabled: root.hasPrevious && opacity > 0
-        rounded: d.fullscreenLayout
+        rounded: LayoutController.fullscreen
 
         icon.source: "image://skin/24x24/Outline/chunk_previous.svg"
-        icon.width: d.fullscreenLayout ? 32 : 24
-        icon.height: d.fullscreenLayout ? 32 : 24
+        icon.width: LayoutController.fullscreen ? 32 : 24
+        icon.height: LayoutController.fullscreen ? 32 : 24
 
         onClicked: root.previous()
     }
@@ -351,18 +391,18 @@ Rectangle
     {
         id: playPauseButton
 
-        opacity: d.hasControls && !preview.cannotDecryptMedia ? 1.0 : 0.0
+        opacity: preview.cannotDecryptMedia ? 0.0 : d.controlsOpacity
         enabled: opacity > 0 && root.dataState === Preview.DataState.Available
-        rounded: d.fullscreenLayout
+        rounded: LayoutController.fullscreen
 
-        implicitWidth: d.fullscreenLayout ? 64 : 44
-        implicitHeight: d.fullscreenLayout ? 64 : 44
+        implicitWidth: LayoutController.fullscreen ? 64 : 44
+        implicitHeight: LayoutController.fullscreen ? 64 : 44
 
         icon.source: preview.playingPlayerState && !preview.cannotDecryptMedia
             ? "image://skin/24x24/Outline/pause.svg"
             : "image://skin/24x24/Outline/play_small.svg"
-        icon.width: d.fullscreenLayout ? 64 : 24
-        icon.height: d.fullscreenLayout ? 64 : 24
+        icon.width: LayoutController.fullscreen ? 64 : 24
+        icon.height: LayoutController.fullscreen ? 64 : 24
 
         onClicked:
         {
@@ -382,13 +422,13 @@ Rectangle
     {
         id: nextButton
 
-        opacity: d.hasControls
+        opacity: d.controlsOpacity
         enabled: root.hasNext && opacity > 0
-        rounded: d.fullscreenLayout
+        rounded: LayoutController.fullscreen
 
         icon.source: "image://skin/24x24/Outline/chunk_future.svg"
-        icon.width: d.fullscreenLayout ? 32 : 24
-        icon.height: d.fullscreenLayout ? 32 : 24
+        icon.width: LayoutController.fullscreen ? 32 : 24
+        icon.height: LayoutController.fullscreen ? 32 : 24
 
         onClicked: root.next()
     }
@@ -397,39 +437,82 @@ Rectangle
     {
         id: showOnCameraButton
 
-        opacity: (d.hasControls && root.withShowOnCamera) ? 1 : 0
+        opacity: root.withShowOnCamera ? d.controlsOpacity : 0.0
         enabled: opacity > 0
         icon.source: "image://skin/24x24/Outline/show_on_layout.svg"
 
         onClicked: root.showOnCamera()
     }
 
-    Binding
+    Connections
     {
-        target: d
-        property: "hasControls"
-        value: !d.fullscreenLayout || d.showControls
+        target: LayoutController
+
+        // Each fullscreen session starts with the controls visible.
+        function onFullscreenChanged()
+        {
+            d.setControlsVisible(true)
+        }
+    }
+
+    Timer
+    {
+        id: userInactivityTimer
+
+        interval: 5000
+        repeat: false
+
+        onTriggered: d.setControlsVisible(false)
+    }
+
+    MouseArea
+    {
+        anchors.fill: parent
+
+        onPressed: (mouse) =>
+        {
+            d.reportUserActivity()
+            mouse.accepted = false
+        }
     }
 
     QtObject
     {
         id: d
 
-        function updateStatusBarVisibility()
+        property bool controlsVisible: true
+
+        function setControlsVisible(value)
         {
-            if (d.hasControls)
-                windowContext.ui.windowHelpers.exitFullscreen()
-            else
-                windowContext.ui.windowHelpers.enterFullscreen()
+            controlsVisible = value
+            reportUserActivity()
         }
 
-        property bool fullscreenLayout: false
-        onFullscreenLayoutChanged: d.hasControls = true
+        function reportUserActivity()
+        {
+            if (LayoutController.fullscreen && controlsVisible)
+                userInactivityTimer.restart()
+            else
+                userInactivityTimer.stop()
+        }
 
-        property bool hasControls: true
-        onHasControlsChanged: updateStatusBarVisibility()
+        property real controlsOpacity: !LayoutController.fullscreen || controlsVisible
+            ? 1.0
+            : 0.0
 
-        property bool showControls: true
+        Behavior on controlsOpacity
+        {
+            NumberAnimation
+            {
+                duration: 300
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+        readonly property bool verticalVideo: preview.isReady
+            && (preview.videoRotation === 0 || preview.videoRotation === 180
+                ? preview.videoAspectRatio < 1
+                : preview.videoAspectRatio > 1)
 
         property int exclusionAreaY: root.activePage
             ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
@@ -447,5 +530,28 @@ Rectangle
     Component.onCompleted:
     {
         d.updateGestureExclusionArea()
+    }
+
+    component ControlButton: Button
+    {
+        property bool rounded: false
+        property bool transparent: rounded || LayoutController.fullscreen
+
+        implicitWidth: 44
+        implicitHeight: 44
+
+        type: Button.Type.Interface
+        radius: rounded ? width / 2 : 6
+
+        icon.width: 24
+        icon.height: 24
+
+        backgroundColor: transparent
+            ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
+            : parameters.colors[state]
+
+        foregroundColor: transparent
+            ? ColorTheme.transparent(ColorTheme.colors.light1, enabled ? 1.0 : 0.3)
+            : parameters.textColors[state]
     }
 }

@@ -24,12 +24,6 @@ FocusScope
     // entity will not retrigger `onItemChanged` and the panel will not reopen.
     signal panelClosed(Item panel)
 
-    // Whether only the contentItem is visible.
-    property bool fullscreen: false
-
-    // Whether tool bar visible in the fullscreen mode.
-    property bool fullscreenToolBar: false
-
     // Whether the screen content require a lot of space. The given property is a hint for
     // the parent container to provide the maximum amount of available space.
     property bool longContent: false
@@ -79,6 +73,9 @@ FocusScope
     // (e.g. when the user selects an item and the matching panel should become visible).
     function showPanel(panel)
     {
+        if (LayoutController.fullscreen)
+            return
+
         const opposite = panel === leftPanel ? rightPanel : leftPanel
         if (opposite.visible && !d.fitsBothPanels)
             d.closePanel(opposite)
@@ -107,7 +104,6 @@ FocusScope
         rightControl: root.customRightControl
             ? [root.customRightControl, menuButton]
             : [menuButton]
-        useGradientBackground: root.fullscreen
     }
 
     Item
@@ -163,7 +159,7 @@ FocusScope
 
     Binding
     {
-        when: root.fullscreen
+        when: LayoutController.fullscreen
         restoreMode: Binding.RestoreBindingOrValue
 
         leftPanel.visible: false
@@ -182,7 +178,7 @@ FocusScope
         {
             Layout.fillWidth: true
             target: toolBar
-            visible: !root.fullscreen
+            visible: !LayoutController.fullscreen
         }
 
         ProxyItem
@@ -239,7 +235,7 @@ FocusScope
                 {
                     Layout.fillWidth: true
                     target: toolBar
-                    visible: !root.fullscreen
+                    visible: !LayoutController.fullscreen
                 }
 
                 ProxyItem
@@ -276,16 +272,6 @@ FocusScope
         }
     }
 
-    ProxyItem
-    {
-        id: fullscreenToolbarProxy
-
-        width: parent.width
-        target: toolBar
-        background.color: "transparent"
-        visible: root.fullscreen && root.fullscreenToolBar
-    }
-
     NxControls.Button
     {
         anchors.left: parent.left
@@ -304,7 +290,7 @@ FocusScope
         icon.width: 24
         icon.height: 24
         visible: LayoutController.isTabletLayout
-            && !root.fullscreen
+            && !LayoutController.fullscreen
             && root.hasLeftPanel
             && root.leftPanel.interactive
             && leftPanel.isHidden
@@ -340,7 +326,7 @@ FocusScope
         icon.width: 24
         icon.height: 24
         visible: LayoutController.isTabletLayout
-            && !root.fullscreen
+            && !LayoutController.fullscreen
             && root.hasRightPanel
             && root.rightPanel.interactive
             && rightPanel.isHidden

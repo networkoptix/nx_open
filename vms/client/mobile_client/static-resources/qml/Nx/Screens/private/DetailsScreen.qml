@@ -35,7 +35,6 @@ Page
     property QnCameraListModel camerasModel: null
     required property Timeline.AbstractObjectData objectData
     required property Resource resource
-    readonly property alias fullscreenLayout: preview.fullscreenLayout
     readonly property Menu menu: menu.available ? menu : null
     property alias hasNext: preview.hasNext
     property alias hasPrevious: preview.hasPrevious
@@ -44,7 +43,7 @@ Page
     property bool showPreviewImage: !LayoutController.isTabletLayout
         && objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
 
-    signal fullscreenButtonClicked()
+    signal backClicked()
     signal searchRequested(string text)
     signal nextClicked()
     signal previousClicked()
@@ -58,21 +57,17 @@ Page
     {
         id: preview
 
-        width: parent.width
-        height:
-        {
-            if (d.portraitOrientation)
-                return heightForWidth(width)
+        title: eventDetailsScreen.title
 
-            return eventDetailsScreen.height
-        }
-        fullscreenLayout: !d.portraitOrientation
+        width: parent.width
+
+        height: LayoutController.fullscreen ? eventDetailsScreen.height : eventDetailsScreen.height * 0.45
         activePage: eventDetailsScreen.activePage
 
         onNext: eventDetailsScreen.nextClicked()
         onPrevious: eventDetailsScreen.previousClicked()
-        onShowFullscreen: eventDetailsScreen.fullscreenButtonClicked()
         onShowOnCamera: d.goToCamera()
+        onBack: eventDetailsScreen.backClicked()
     }
 
     GridLayout
@@ -327,8 +322,6 @@ Page
     QtObject
     {
         id: d
-
-        readonly property bool portraitOrientation: eventDetailsScreen.width < eventDetailsScreen.height
 
         function updateCurrentEvent()
         {

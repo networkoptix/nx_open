@@ -21,7 +21,7 @@ Item
     readonly property bool hasPreview: d.currentCamera !== null
     property alias notification: d.notification
 
-    signal fullscreenButtonClicked
+    signal backClicked()
 
     Preview
     {
@@ -35,21 +35,21 @@ Item
             interval.setPosition(0)
         }
 
+        title: root.title
+
         width: parent.width
-        height: d.portraitOrientation ? root.height * 0.35 : root.height
+        height: LayoutController.fullscreen ? root.height : root.height * 0.45
 
         withNavigationControls: d.resourceCount > 1
         hasPrevious: d.currentIndex > 0
         hasNext: d.currentIndex < d.resourceCount - 1
 
         visible: interval.resource
-        fullscreenLayout: !d.portraitOrientation
 
         onShowOnCamera: d.showOnCamera()
-
-        onShowFullscreen: root.fullscreenButtonClicked()
         onPrevious: d.selectResource(d.currentIndex - 1)
         onNext: d.selectResource(d.currentIndex + 1)
+        onBack: root.backClicked()
     }
 
     Flickable
@@ -134,7 +134,6 @@ Item
     {
         id: d
 
-        readonly property bool portraitOrientation: root.width < root.height
         property var notification
 
         // Ids of the resolvable resources from the notification url, in their original order.

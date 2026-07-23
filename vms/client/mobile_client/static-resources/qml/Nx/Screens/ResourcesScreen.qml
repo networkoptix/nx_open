@@ -30,6 +30,18 @@ AdaptiveScreen
 
     property alias filterIds: camerasGrid.filterIds
 
+    function closeVideoScreen()
+    {
+        LayoutController.exitFullscreen()
+
+        videoScreenLoader.item.controller.stop()
+
+        if (!resourceHelper.isLayout)
+            windowContext.deprecatedUiController.resource = null
+
+        resourcesScreen.contentItem = camerasGrid
+    }
+
     // Persist `false` whenever AdaptiveScreen closes a panel (close button, auto-close, or
     // cross-close). The matching "open → persist `true`" is handled by each panel's
     // `onVisibleChanged` below.
@@ -40,8 +52,6 @@ AdaptiveScreen
         else if (panel === rightPanel)
             appContext.settings.timelinePanelVisible = false
     }
-
-    fullscreen: videoScreenLoader.item?.fullscreen ?? false
 
     toolBar.controls:
         [
@@ -100,15 +110,7 @@ AdaptiveScreen
                 PropertyChanges
                 {
                     leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
-                    leftControl.onClicked:
-                    {
-                        videoScreenLoader.item.controller.stop()
-
-                        if (!resourceHelper.isLayout)
-                            windowContext.deprecatedUiController.resource = null
-
-                        resourcesScreen.contentItem = camerasGrid
-                    }
+                    leftControl.onClicked: resourcesScreen.closeVideoScreen()
                 }
             },
             State
@@ -313,6 +315,8 @@ AdaptiveScreen
                 // The visible kebab button lives in resourcesScreen's toolBar (above), so
                 // anchor the menu to it instead of VideoScreen's hidden internal kebab.
                 menuAnchor: kebabMenuButton
+
+                onBackClicked: resourcesScreen.closeVideoScreen()
 
                 Component.onCompleted:
                 {

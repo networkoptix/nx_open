@@ -53,7 +53,7 @@ Item
 
             target: screenNavigationBar
 
-            visible: !stackView.fullscreen
+            visible: !LayoutController.fullscreen
                 && !stackView.longContent
                 && windowContext.sessionManager.hasActiveSession
                 && [Controller.ResourcesScreen,
@@ -79,7 +79,7 @@ Item
             Layout.fillHeight: true
             target: screenNavigationBar
 
-            visible: !stackView.fullscreen
+            visible: !LayoutController.fullscreen
                 && windowContext.sessionManager.hasActiveSession
                 && [Controller.ResourcesScreen,
                     Controller.EventSearchScreen,
@@ -103,7 +103,6 @@ Item
 
         objectName: "mainStackView"
 
-        readonly property bool fullscreen: currentItem?.fullscreen || false
         readonly property bool longContent: currentItem?.longContent || false
 
         function restoreActiveFocus()

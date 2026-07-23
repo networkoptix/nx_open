@@ -49,13 +49,13 @@ Page
     // Whether this is an auxiliary video screen or the primary video screen.
     property bool auxiliary: false
 
+    signal backClicked()
+
     backgroundColor: "black"
     clip: false
 
     LayoutMirroring.enabled: appContext.settings.leftHandedMode
     LayoutMirroring.childrenInherit: true
-
-    readonly property bool fullscreen: d.fullscreen
 
     states:
     [
@@ -63,7 +63,7 @@ Page
         {
             name: "withoutNavigator"
 
-            when: !modernVideoScreen.ownsNavigator && !d.fullscreen
+            when: !modernVideoScreen.ownsNavigator && !LayoutController.fullscreen
 
             AnchorChanges
             {
@@ -93,7 +93,7 @@ Page
 
             when: modernVideoScreen.ownsNavigator
                 && !LayoutController.isPortrait
-                && !d.fullscreen
+                && !LayoutController.fullscreen
 
             AnchorChanges
             {
@@ -139,7 +139,7 @@ Page
 
             when: modernVideoScreen.ownsNavigator
                 && LayoutController.isPortrait
-                && !d.fullscreen
+                && !LayoutController.fullscreen
 
             AnchorChanges
             {
@@ -170,7 +170,7 @@ Page
         {
             name: "fullscreen"
 
-            when: d.fullscreen
+            when: LayoutController.fullscreen
 
             PropertyChanges
             {
@@ -289,6 +289,18 @@ Page
 
         property bool forceVideoPause: downloadMediaSheet.opened
 
+        // Whether the displayed video (with the camera rotation applied) is vertical.
+        readonly property bool verticalVideo:
+        {
+            const aspectRatio = controller.mediaPlayer.aspectRatio
+            if (aspectRatio <= 0)
+                return false //< Not known yet; the default (forced landscape) applies.
+
+            return Geometry.isRotated90(controller.resourceHelper.customRotation)
+                ? aspectRatio > 1
+                : aspectRatio < 1
+        }
+
         readonly property bool canViewArchive: controller.accessRightsHelper.canViewArchive
         readonly property bool hasArchive: canViewArchive && cameraChunkProvider.bottomBound >= 0
 
@@ -309,26 +321,8 @@ Page
         property int mode: VideoScreenUtils.VideoScreenMode.Navigation
         readonly property bool ptzMode: mode === VideoScreenUtils.VideoScreenMode.Ptz
 
-        property bool restorePortraitScreenOrientation: false
-        property bool fullscreen: false
-
         readonly property bool hasChunkNavigation:
             modernVideoScreen.selectedObjectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
-
-        Connections
-        {
-            target: LayoutController
-
-            function onIsPortraitChanged()
-            {
-                // The screen orientation changed due phone rotation. Orientation lock is off.
-                if (d.fullscreen && LayoutController.isPortrait)
-                {
-                    d.restorePortraitScreenOrientation = false
-                    d.fullscreen = false
-                }
-            }
-        }
 
         Timer
         {
@@ -578,7 +572,7 @@ Page
 
         onClicked:
         {
-            if (d.fullscreen)
+            if (LayoutController.fullscreen)
                 fullscreenControlsOverlay.toggle()
         }
 
@@ -668,20 +662,16 @@ Page
 
         onBackButtonClicked:
         {
-            d.restorePortraitScreenOrientation = false
+            if (!modernVideoScreen.StackView.view)
+            {
+                modernVideoScreen.backClicked()
+                return
+            }
+
             Workflow.popCurrentScreen()
-            d.fullscreen = false
         }
 
-        onExitFullscreenButtonClicked:
-        {
-            d.fullscreen = false
-            if (d.restorePortraitScreenOrientation)
-            {
-                windowContext.ui.windowHelpers.setScreenOrientation(Qt.PortraitOrientation)
-                d.restorePortraitScreenOrientation = false
-            }
-        }
+        onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
 
         onActionsButtonClicked:
         {
@@ -1270,19 +1260,8 @@ Page
                 backgroundColor: "transparent"
                 icon.source: "image://skin/24x24/Outline/full_screen.svg"
 
-                onClicked:
-                {
-                    d.fullscreen = true
-                    if (LayoutController.isPortrait)
-                    {
-                        // If fullscreen mode was entered from portrait orientation - always restore
-                        // portrait orientation back, to avoid orientation change with orientation
-                        // lock enabled simply by going to the fullscreen and back.
-                        d.restorePortraitScreenOrientation = true
-                        windowContext.ui.windowHelpers.setScreenOrientation(
-                            Qt.LandscapeOrientation)
-                    }
-                }
+                onClicked: LayoutController.enterFullscreen(
+                    d.verticalVideo ? Qt.PortraitOrientation : Qt.LandscapeOrientation)
 
                 // To block camera swipe if the button is dragged.
                 DragHandler { target: null }
@@ -1337,7 +1316,7 @@ Page
             customRotation: controller.resourceHelper.customRotation
 
             active: d.ptzMode
-            overlayStyle: d.fullscreen
+            overlayStyle: LayoutController.fullscreen
             opacity: d.controlsOpacity
 
             onActiveChanged:
