@@ -170,7 +170,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             needToStop = true;
         }
         else if (result->dataType == QnAbstractMediaData::VIDEO &&
-            result->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
+            result->isKeyFrame() &&
             (int)result->channelNumber == m_nextChannelNum)
         {
             m_nextChannelNum = (m_nextChannelNum + 1) % m_channelCount;

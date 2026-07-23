@@ -58,11 +58,6 @@ double requestedTimeDivergence(
         / request.tolerance.count();
 }
 
-bool isKeyFrame(const QnCompressedVideoDataPtr& encodedFrame)
-{
-    return encodedFrame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
-}
-
 } // namespace
 
 struct ArchiveFrameExtractor::Private
@@ -213,7 +208,7 @@ struct ArchiveFrameExtractor::Private
             }
             else
             {
-                if (isKeyFrame(streamWorker.currentFrame))
+                if (streamWorker.currentFrame->isKeyFrame())
                 {
                     streamWorker.lastKeyFrameTime =
                         microseconds(streamWorker.currentFrame->timestamp);
@@ -243,7 +238,7 @@ struct ArchiveFrameExtractor::Private
             streamWorker.currentFrame = getNextVideoData();
             if (streamWorker.currentFrame)
             {
-                if (isKeyFrame(streamWorker.currentFrame))
+                if (streamWorker.currentFrame->isKeyFrame())
                 {
                     streamWorker.lastGopDuration =
                         microseconds(streamWorker.currentFrame->timestamp)

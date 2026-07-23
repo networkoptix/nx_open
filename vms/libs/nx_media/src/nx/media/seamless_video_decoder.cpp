@@ -298,7 +298,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
             }
         }
         else if (d->pendingHardwareRetry
-            && frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey)
+            && frame->isKeyFrame()
             && d->hardwareRetryTimer.hasExpired(d->hardwareRetryDelay))
         {
             NX_DEBUG(this, "Hardware back-off has expired, retrying hardware decoder");

@@ -318,8 +318,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
     m_streamIndexToLastDts[streamIndex] = packet->dts;
 
     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.get());
-    if (video && video->pts != AV_NOPTS_VALUE
-        && !video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    if (video && video->pts != AV_NOPTS_VALUE && !video->isKeyFrame())
     {
         auto pts = video->pts - timestampOffsetUsec;
         packet->pts = av_rescale_q(
@@ -330,7 +329,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         packet->pts = packet->dts;
     }
 
-    if ((md->flags & AV_PKT_FLAG_KEY) && md->dataType != QnAbstractMediaData::GENERIC_METADATA)
+    if (md->isKeyFrame() && md->dataType != QnAbstractMediaData::GENERIC_METADATA)
         packet->flags |= AV_PKT_FLAG_KEY;
 
     if (!metadataPacketData.isEmpty())

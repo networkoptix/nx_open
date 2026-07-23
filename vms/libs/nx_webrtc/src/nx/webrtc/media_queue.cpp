@@ -22,7 +22,7 @@ void MediaQueue::clearTillLastGopUnsafe()
     {
         bool isKeyFrame = false;
         if (const auto* video = dynamic_cast<const QnCompressedVideoData*>(media->get()))
-            isKeyFrame = video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+            isKeyFrame = video->isKeyFrame();
 
         if (isKeyFrame)
         {
@@ -90,7 +90,7 @@ void MediaQueue::putData(const QnConstAbstractMediaDataPtr& media)
 
     if (const auto& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media))
     {
-        const bool isKeyFrame = video->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+        const bool isKeyFrame = video->isKeyFrame();
         if (m_keyDataFound.size() <= video->channelNumber)
             m_keyDataFound.resize(video->channelNumber + 1);
         if (isKeyFrame)

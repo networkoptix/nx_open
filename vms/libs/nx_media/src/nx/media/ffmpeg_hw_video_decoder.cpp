@@ -115,7 +115,7 @@ public:
 
     void initContext(const QnConstCompressedVideoDataPtr& frame)
     {
-        if (!frame || !frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        if (!frame || !frame->isKeyFrame())
             return;
 
         QSize frameSize(frame->width, frame->height);

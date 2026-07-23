@@ -180,7 +180,7 @@ void QnAbstractArchiveStreamReader::runCycleImpl()
 
     if (videoData && needKeyData(videoData->channelNumber))
     {
-        if (videoData->flags & AV_PKT_FLAG_KEY)
+        if (videoData->isKeyFrame())
         {
             m_gotKeyFrame.at(videoData->channelNumber)++;
         }

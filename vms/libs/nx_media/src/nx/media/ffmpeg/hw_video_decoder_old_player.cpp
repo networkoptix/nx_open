@@ -107,7 +107,7 @@ bool HwVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& d
     if (!nx::media::ffmpeg::HwVideoDecoder::isCompatible(data->compressionType, size, true))
         return false;
 
-    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    if (!data->isKeyFrame())
     {
         NX_ERROR(NX_SCOPE_TAG,
             "Failed to check FFmpeg HW decoder compatibility, input frame is not a key frame");

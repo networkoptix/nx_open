@@ -396,7 +396,7 @@ bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     NX_DEBUG(this, "Reset video decoder: %1", data);
-    if (!data || !(data->flags & AV_PKT_FLAG_KEY))
+    if (!data || !data->isKeyFrame())
     {
         m_needRecreate = true;
         return true; // can't reset right now
@@ -473,7 +473,7 @@ bool QnFfmpegVideoDecoder::decode(
 {
     if (data && m_codecId != data->compressionType)
     {
-        if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        if (!data->isKeyFrame())
         {
             NX_DEBUG(this,
                 "Decoding should start from key frame, skip. codec: %1, timestamp: %2",
@@ -502,7 +502,7 @@ bool QnFfmpegVideoDecoder::decode(
             return false;
         }
 
-        if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
+        if (m_newDecodeMode != DecodeMode_NotDefined && data->isKeyFrame())
         {
             m_decodeMode = m_newDecodeMode;
             m_newDecodeMode = DecodeMode_NotDefined;
@@ -524,7 +524,7 @@ bool QnFfmpegVideoDecoder::decode(
                     m_lightModeFrameCounter = 0;
 
             }
-            else if (!(data->flags & AV_PKT_FLAG_KEY))
+            else if (!data->isKeyFrame())
             {
                 if (m_decodeMode == DecodeMode_Fastest)
                     return false;
@@ -533,7 +533,7 @@ bool QnFfmpegVideoDecoder::decode(
             }
         }
 
-        if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
+        if (m_needRecreate && data->isKeyFrame())
         {
             if (!resetDecoder(data))
                 return false;

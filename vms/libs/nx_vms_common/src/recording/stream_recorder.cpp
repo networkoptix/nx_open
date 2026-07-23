@@ -80,7 +80,7 @@ qint64 QnStreamRecorder::isMainStreamKeyFrame(const QnConstAbstractMediaDataPtr&
         return md->dataType == QnAbstractMediaData::AUDIO;
     return md->dataType == QnAbstractMediaData::VIDEO
         && md->channelNumber == 0
-        && md->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+        && md->isKeyFrame();
 }
 
 void QnStreamRecorder::updateProgress(qint64 timestampUs)
@@ -244,7 +244,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
-    if (vd && !m_gotKeyFrame[vd->channelNumber] && !(vd->flags & AV_PKT_FLAG_KEY))
+    if (vd && !m_gotKeyFrame[vd->channelNumber] && !vd->isKeyFrame())
     {
         NX_VERBOSE(
             this, "saveData(): VIDEO; skip data. Timestamp: %1 (%2ms)",
@@ -280,7 +280,7 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     }
 
     int channel = md->channelNumber;
-    if (md->flags & AV_PKT_FLAG_KEY)
+    if (md->isKeyFrame())
         m_gotKeyFrame[channel] = true;
 
     int streamIndex = getStreamIndex(md);

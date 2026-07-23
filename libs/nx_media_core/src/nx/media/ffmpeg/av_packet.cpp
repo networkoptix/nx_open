@@ -29,7 +29,7 @@ AvPacket::AvPacket(const QnAbstractMediaData* data)
     m_packet->data = (unsigned char*)data->data();
     m_packet->size = static_cast<int>(data->dataSize());
     m_packet->dts = m_packet->pts = data->timestamp;
-    if (data->flags & QnAbstractMediaData::MediaFlags_AVKey)
+    if (data->isKeyFrame())
         m_packet->flags = AV_PKT_FLAG_KEY;
 
     // TODO: Check is it really necessary

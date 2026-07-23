@@ -59,7 +59,7 @@ QnCompressedVideoDataPtr H2645Mp4ToAnnexB::processVideoData(
             return nullptr;
     }
 
-    if (!m_newContext || videoData->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+    if (!m_newContext || videoData->isKeyFrame())
     {
         // Reading sequence header from extradata.
         if (codecId == AV_CODEC_ID_H264)

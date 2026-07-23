@@ -150,7 +150,7 @@ void Reader::pushFrame(QnAbstractMediaDataPtr media)
     if (!media)
         return;
     NX_MUTEX_LOCKER lock(&m_mutex);
-    const bool isKeyframe = media->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey);
+    const bool isKeyframe = media->isKeyFrame();
     m_queue.emplace_back(std::move(media));
     if (m_queue.size() > m_maxSize)
     {

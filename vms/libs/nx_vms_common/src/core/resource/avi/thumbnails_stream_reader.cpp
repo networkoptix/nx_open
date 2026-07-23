@@ -105,7 +105,7 @@ void QnThumbnailsStreamReader::run()
 
         if (videoData && needKeyData())
         {
-            if (videoData->flags & AV_PKT_FLAG_KEY)
+            if (videoData->isKeyFrame())
                 m_gotKeyFrame.at(videoData->channelNumber)++;
             else
                 continue; // need key data but got not key data
