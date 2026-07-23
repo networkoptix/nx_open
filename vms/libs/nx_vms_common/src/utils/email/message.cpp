@@ -26,8 +26,8 @@ Attachment::Attachment(
     Attachment(std::move(filename), std::move(mimetype))
 {
     QFile contentFile(contentFilename);
-    contentFile.open(QIODevice::ReadOnly);
-    content = contentFile.readAll();
+    if (contentFile.open(QIODevice::ReadOnly))
+        content = contentFile.readAll();
     NX_ASSERT(!content.isEmpty(), "Unable to read '%1' from file '%2'", filename, contentFilename);
 }
 
@@ -38,8 +38,8 @@ Attachment::Attachment(
     :
     Attachment(std::move(filename), std::move(mimetype))
 {
-    io.open(QIODevice::ReadOnly);
-    content = io.readAll();
+    if (io.open(QIODevice::ReadOnly))
+        content = io.readAll();
     NX_ASSERT(!content.isEmpty(), "Unable to read '%1' from %2", filename, &io);
 }
 

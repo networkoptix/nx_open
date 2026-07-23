@@ -322,7 +322,8 @@ void InstallationManager::createGhostsForVersion(const nx::utils::SoftwareVersio
         QFile ghost(targetDir.absoluteFilePath(ghostVersionString));
         if (!ghost.exists())
         {
-            ghost.open(QFile::WriteOnly);
+            if (!ghost.open(QFile::WriteOnly))
+                NX_WARNING(this, "Cannot create ghost file: %1", ghost.fileName());
             ghost.close();
         }
     }

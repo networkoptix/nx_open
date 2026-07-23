@@ -7,15 +7,19 @@
 #include <QtGui/QTransform>
 
 #include <nx/utils/log/assert.h>
-#include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 
 namespace nx::vms::common {
 
 QRectF Geometry::maxBoundingRect()
 {
-    const qreal d = kMaxValidQPainterPathCoordinate / 4;
-    return QRectF(QPointF(-d, -d), QPointF(d, d));
+    // Using reasonable limits to avoid assertions on integer rounding in Qt numeric helpers like
+    // qFloor or qCeil. See qCheckedFPConversionToInteger() in qnumeric.h for the details.
+
+    constexpr auto minLimit = std::numeric_limits<int>::min();
+    constexpr auto maxLimit = std::numeric_limits<int>::max();
+
+    return QRectF(QPointF(minLimit, minLimit), QPointF(maxLimit, maxLimit));
 }
 
 QPointF Geometry::cwiseAdd(const QPointF& l, const QPointF& r)

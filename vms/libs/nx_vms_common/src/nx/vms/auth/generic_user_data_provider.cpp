@@ -88,7 +88,7 @@ AuthResult GenericUserDataProvider::authorize(
             responseHash.addData(ha2);
             const QByteArray calcResponse = responseHash.result().toHex();
 
-            if (calcResponse != authorizationHeader.digest->params["response"])
+            if (std::string_view(calcResponse) != authorizationHeader.digest->params["response"])
             {
                 NX_VERBOSE(this, "Wrong digest for %1", res);
                 return Auth_WrongPassword;

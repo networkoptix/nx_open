@@ -30,9 +30,13 @@ public:
 
     virtual void addBindValue(const QVariant& value) noexcept = 0;
     virtual void addBindValue(std::string_view value) noexcept = 0;
-    virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept = 0;
-    virtual void bindValue(int pos, const QVariant& value) noexcept = 0;
+    void addBindValue(const QByteArray& value) noexcept;
+
+    virtual void bindValue(std::string_view placeholder, const QVariant& value) noexcept = 0;
     virtual void bindValue(std::string_view placeholder, std::string_view value) noexcept = 0;
+    void bindValue(std::string_view placeholder, const QByteArray& value) noexcept;
+
+    virtual void bindValue(int pos, const QVariant& value) noexcept = 0;
     virtual void bindValue(int pos, std::string_view value) noexcept = 0;
 
     virtual void exec() = 0;
@@ -97,7 +101,7 @@ public:
 
     virtual void addBindValue(const QVariant& value) noexcept override;
     virtual void addBindValue(std::string_view value) noexcept override;
-    virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept override;
+    virtual void bindValue(std::string_view placeholder, const QVariant& value) noexcept override;
     virtual void bindValue(int pos, const QVariant& value) noexcept override;
     virtual void bindValue(std::string_view placeholder, std::string_view value) noexcept override;
     virtual void bindValue(int pos, std::string_view value) noexcept override;

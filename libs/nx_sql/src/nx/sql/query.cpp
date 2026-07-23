@@ -14,6 +14,18 @@
 
 namespace nx::sql {
 
+void AbstractSqlQuery::addBindValue(const QByteArray& value) noexcept
+{
+    addBindValue(QVariant(value));
+}
+
+void AbstractSqlQuery::bindValue(std::string_view placeholder, const QByteArray& value) noexcept
+{
+    bindValue(placeholder, QVariant(value));
+}
+
+//-------------------------------------------------------------------------------------------------
+
 SqlQuery::SqlQuery(QSqlDatabase connection):
     m_sqlQuery(connection),
     m_driverType(rdbmsDriverTypeFromString(connection.driverName().toStdString()))
@@ -67,9 +79,9 @@ void SqlQuery::addBindValue(std::string_view value) noexcept
     m_sqlQuery.addBindValue(QString::fromUtf8(value.data(), value.size()));
 }
 
-void SqlQuery::bindValue(const QString& placeholder, const QVariant& value) noexcept
+void SqlQuery::bindValue(std::string_view placeholder, const QVariant& value) noexcept
 {
-    m_sqlQuery.bindValue(placeholder, value);
+    m_sqlQuery.bindValue(QString::fromUtf8(placeholder.data(), placeholder.size()), value);
 }
 
 void SqlQuery::bindValue(int pos, const QVariant& value) noexcept
@@ -77,13 +89,9 @@ void SqlQuery::bindValue(int pos, const QVariant& value) noexcept
     m_sqlQuery.bindValue(pos, value);
 }
 
-void SqlQuery::bindValue(
-    std::string_view placeholder,
-    std::string_view value) noexcept
+void SqlQuery::bindValue(std::string_view placeholder, std::string_view value) noexcept
 {
-    bindValue(
-        QString::fromUtf8(placeholder.data(), placeholder.size()),
-        QString::fromUtf8(value.data(), value.size()));
+    bindValue(placeholder, QString::fromUtf8(value.data(), value.size()));
 }
 
 void SqlQuery::bindValue(int pos, std::string_view value) noexcept
@@ -286,5 +294,6 @@ DBResult SqlQuery::getLastError()
 //            return result;
 //    }
 //}
+
 
 } // namespace nx::sql

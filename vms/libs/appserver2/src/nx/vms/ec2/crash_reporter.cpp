@@ -215,15 +215,20 @@ void CrashReporter::scanAndReportByTimer()
 
 bool CrashReporter::send(const nx::Url& serverApi, const QFileInfo& crash)
 {
-    auto filePath = crash.absoluteFilePath();
+    const auto filePath = crash.absoluteFilePath();
     QFile file(filePath);
-    file.open(QFile::ReadOnly);
-    auto content = file.readAll();
+    QByteArray content;
+
+    if (file.open(QFile::ReadOnly))
+        content = file.readAll();
+
     if (content.size() == 0)
     {
         NX_WARNING(this, "Error: %1 is not readable or empty: %2", filePath, file.errorString());
         return false;
     }
+
+    file.close();
 
     auto httpClient = nx::network::http::AsyncHttpClient::create(nx::network::ssl::kDefaultCertificateCheck);
     auto report = new ReportData(crash, *this, httpClient.get());

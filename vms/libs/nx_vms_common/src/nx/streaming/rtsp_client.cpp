@@ -75,16 +75,6 @@ void configureUdpSocket(
 
 QString extractRtspParam(const QString& buffer, const QString& paramName);
 
-const QByteArray QnRtspClient::kPlayCommand("PLAY");
-const QByteArray QnRtspClient::kSetupCommand("SETUP");
-const QByteArray QnRtspClient::kOptionsCommand("OPTIONS");
-const QByteArray QnRtspClient::kDescribeCommand("DESCRIBE");
-const QByteArray QnRtspClient::kSetParameterCommand("SET_PARAMETER");
-const QByteArray QnRtspClient::kGetParameterCommand("GET_PARAMETER");
-const QByteArray QnRtspClient::kPauseCommand("PAUSE");
-const QByteArray QnRtspClient::kTeardownCommand("TEARDOWN");
-
-
 int64_t nextRtspMessage(const uint8_t* data, int64_t size, int maxChannelNumber)
 {
     int i = 0;
@@ -748,10 +738,9 @@ void QnRtspClient::addCommonHeaders(nx::network::http::HttpHeaders& headers)
 }
 
 void QnRtspClient::addAdditionalHeaders(
-    const QString& requestName,
-    nx::network::http::HttpHeaders* outHeaders)
+    std::string_view requestName, nx::network::http::HttpHeaders* outHeaders)
 {
-    for (const auto& header: m_additionalHeaders[requestName])
+    for (const auto& header: m_additionalHeaders[std::string(requestName)])
         nx::network::http::insertOrReplaceHeader(outHeaders, header);
 }
 
@@ -2116,9 +2105,10 @@ void QnRtspClient::setDateTimeFormat(const DateTimeFormat& format)
     m_dateTimeFormat = format;
 }
 
-void QnRtspClient::addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header)
+void QnRtspClient::addRequestHeader(
+    std::string_view requestName, const nx::network::http::HttpHeader& header)
 {
-    nx::network::http::insertOrReplaceHeader(&m_additionalHeaders[requestName], header);
+    nx::network::http::insertOrReplaceHeader(&m_additionalHeaders[std::string(requestName)], header);
 }
 
 QElapsedTimer QnRtspClient::lastReceivedDataTimer() const

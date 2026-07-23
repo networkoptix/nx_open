@@ -1914,6 +1914,9 @@ workbench::timeline::TimeMarker::TimeContent QnTimeSlider::tooltipTimeContent(
 
 void QnTimeSlider::updateLineCommentPixmap(int line)
 {
+    if (qFuzzyIsNull(m_totalLineStretch))
+        return;
+
     int maxHeight = qFloor((kLineBarHeightPixels - 2.0) * m_lineData[line].stretch / m_totalLineStretch);
     if (maxHeight <= 0)
         return;

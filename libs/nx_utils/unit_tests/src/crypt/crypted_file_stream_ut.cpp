@@ -116,7 +116,8 @@ TEST(CryptedFileStream, EmbeddedMode)
     const auto fileName = TestOptions::temporaryDirectoryPath() + dummyName;
 
     QFile File(fileName);
-    File.open(QIODevice::WriteOnly);
+    ASSERT_TRUE(File.open(QIODevice::WriteOnly));
+
     for (int i = 0; i < 5; i++)
         File.write(buffer, bufferSize);
     File.close();

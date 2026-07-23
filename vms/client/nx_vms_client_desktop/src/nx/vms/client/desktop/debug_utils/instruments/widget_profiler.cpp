@@ -12,9 +12,9 @@ void WidgetProfiler::saveWidgetsReport(const QString& filePath,
     const QWidget* parent /*= nullptr*/)
 {
     QFile file(filePath);
-    file.open(QFile::WriteOnly | QFile::Truncate);
-    if (!file.isOpen())
+    if (!file.open(QFile::WriteOnly | QFile::Truncate))
         return;
+
     QTextStream textStream(&file);
     textStream.setEncoding(QStringConverter::Utf8);
     textStream << "WIDGET COUNT BY TYPE" << Qt::endl << Qt::endl << getWidgetStatistics() << Qt::endl;

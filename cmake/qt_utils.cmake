@@ -67,6 +67,11 @@ find_package(OpenSSL REQUIRED)
 add_library(WrapOpenSSL::WrapOpenSSL INTERFACE IMPORTED)
 target_link_libraries(WrapOpenSSL::WrapOpenSSL INTERFACE OpenSSL::OpenSSL)
 
+# Qt 6.11 no longer auto-loads private module packages (Qt6::CorePrivate, Qt6::GuiPrivate, etc.)
+# when their public counterpart is found. Without them the deprecated Qt6<Module>_PRIVATE_INCLUDE_DIRS
+# variables (used throughout the project) stay empty and private headers fail to resolve. Opt back in.
+set(QT_FIND_PRIVATE_MODULES ON)
+
 find_package(Qt6
     COMPONENTS
         LinguistTools

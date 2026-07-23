@@ -181,7 +181,7 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.tool_requires("qt-host/6.9.1" "#fb49032a3883914d5ec1430d063eeaf9")
+        self.tool_requires("qt-host/6.11.1" "#c722220adaed5864c9b7a60ad8a57436")
         self.tool_requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
         self.tool_requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
         self.tool_requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
@@ -207,9 +207,9 @@ class NxOpenConan(ConanFile):
             self.tool_requires("doxygen/1.8.14" "#e4d349d41cd2ea37812b3f284bd88784")
 
         if self.isAndroid:
-            self.tool_requires("openjdk/18.0.1" "#d7cdae72f654bff4968cebe42d6530da")
+            self.tool_requires("openjdk/21.0.2" "#d88f18471ccb8ae72ad96b33b5948a5a")
             if "ANDROID_HOME" not in os.environ:
-                self.tool_requires("android-sdk/34" "#e304daf9254e7af886b5e153714c5a79")
+                self.tool_requires("android-sdk/36" "#df48d907a34c749a77cb0cb56eea488d")
             if "ANDROID_NDK" not in os.environ:
                 self.tool_requires("android-ndk/r29" "#8b725cb46c0e050cf2e168084e7b99fa")
         elif not self.isEmscripten:
@@ -234,7 +234,7 @@ class NxOpenConan(ConanFile):
         self.requires("boost/1.89.0" "#130a884f1529433238f4f2dc98d94ac8")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
-        self.requires("qt/6.9.1" "#8d0e28d33d1e4d306020bfb86ed2d0f6")
+        self.requires("qt/6.11.1" "#9f66d37f9dff57be97c629cf70fd182a")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
         self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
 

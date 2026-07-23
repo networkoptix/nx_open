@@ -120,7 +120,8 @@ public:
     void setDateTimeFormat(const QnRtspClient::DateTimeFormat& format);
 
     QnRtspClient& rtspClient();
-    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
+    void addRequestHeader(
+        std::string_view requestName, const nx::network::http::HttpHeader& header);
     void setRtpFrameTimeoutMs(int value);
     void setConnectionTimeout(std::chrono::milliseconds timeout);
     std::chrono::milliseconds connectionTimeout() const;

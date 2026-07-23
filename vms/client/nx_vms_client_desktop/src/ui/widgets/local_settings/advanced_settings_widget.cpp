@@ -442,7 +442,9 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
         if (!safeFilePath.isEmpty())
         {
             QFile lock(safeFilePath);
-            lock.open(QFile::ReadWrite);
+            if (!lock.open(QFile::ReadWrite))
+                NX_WARNING(this, "Cannot lock background image file: %1", safeFilePath);
+
             nx::vms::client::desktop::file_cache::clearLocalCache();
             lock.close();
         }

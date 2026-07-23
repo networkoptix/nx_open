@@ -25,12 +25,13 @@ public:
     void addTab(const QString& name, const QUrl& url, QWidget* widget);
     bool openSubpage(const QUrl& url);
 
-    // Called from QML when user clicks on menu item.
-    Q_INVOKABLE void setCurrentTab(int idx);
-
     bool backupAndRestoreIsVisible() const;
     void updateBackupAndRestoreTabVisibility();
     QList<QnAbstractPreferencesWidget*> tabs() const;
+
+public slots:
+    // Called from QML when user clicks on menu item.
+    Q_INVOKABLE void setCurrentTab(int idx);
 
 private:
     AdvancedSystemSettingsWidget* const q = nullptr;

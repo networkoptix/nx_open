@@ -1052,8 +1052,7 @@ void RtspStreamProvider::setDateTimeFormat(const QnRtspClient::DateTimeFormat& f
 }
 
 void RtspStreamProvider::addRequestHeader(
-    const QString& requestName,
-    const nx::network::http::HttpHeader& header)
+    std::string_view requestName, const nx::network::http::HttpHeader& header)
 {
     m_RtpSession.addRequestHeader(requestName, header);
 }

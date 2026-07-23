@@ -9,7 +9,7 @@ compiler.cppstd=20
 build_type=RelWithDebInfo
 
 os=Android
-os.api_level=26
+os.api_level=28
 
 [options]
 qt/*:qtwebengine=False
@@ -24,4 +24,4 @@ boost/*:header_only = True
 *:android-ndk/r29
 ffmpeg/*:android-standalone-toolchain/r29
 libmp3lame/*:android-standalone-toolchain/r29
-qt/*:android-sdk/34, openjdk/18.0.1
+qt/*:android-sdk/36, openjdk/21.0.2

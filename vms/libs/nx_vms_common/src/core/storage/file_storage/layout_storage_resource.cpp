@@ -496,12 +496,20 @@ nx::Mutex& QnLayoutFileStorageResource::streamMutex()
 // The one who requests to remove this function will become a permanent maintainer of this class.
 void QnLayoutFileStorageResource::dumpStructure()
 {
-    qDebug() << "Logging" << getUrl();
-    QFile file(getUrl());
-    file.open(QIODevice::ReadOnly);
+    qDebug() << "Dumping: " << getUrl();
 
     if (m_info.entries.size() == 0)
+    {
+        qDebug() << "No entries in the layout file";
         return;
+    }
+
+    QFile file(getUrl());
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Cannot open file: " << getUrl();
+        return;
+    }
 
     for(uint32_t i = 0; i < m_info.entries.size(); i++)
     {

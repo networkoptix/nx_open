@@ -47,13 +47,11 @@ namespace
         return kResult;
     }
 
-    bool writeToFile(const QString &absoluteFileName
-        , const QByteArray &data)
+    bool writeToFile(const QString& absoluteFileName, const QByteArray& data)
     {
         QFile output(absoluteFileName);
 
-        output.open(QIODevice::WriteOnly);
-        if (!output.isOpen())
+        if (!output.open(QIODevice::WriteOnly))
             return false;
 
         const qint64 writtenSize = output.write(data);

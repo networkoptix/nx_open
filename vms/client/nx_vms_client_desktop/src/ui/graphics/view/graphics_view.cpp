@@ -165,6 +165,10 @@ void QnGraphicsView::paintRhi()
     if (!d->renderingItem)
         return;
 
+    const auto viewportRect = viewport()->rect();
+    if (!viewportRect.isValid())
+        return;
+
     auto paintDevice = d->renderingItem->paintDevice();
     const auto pixelRatio = d->quickWidget->quickWindow()->effectiveDevicePixelRatio();
 
@@ -173,7 +177,7 @@ void QnGraphicsView::paintRhi()
     paintDevice->clear();
 
     QPainter painter(paintDevice);
-    render(&painter, viewport()->rect());
+    render(&painter, viewportRect);
 
     // renderingItem->update() won't work because renderingItem rendering is triggered by
     // QQuickWindow's beforeRendering() and beforeRenderPassRecording() signals.

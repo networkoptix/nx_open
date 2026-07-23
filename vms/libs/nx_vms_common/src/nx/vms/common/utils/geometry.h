@@ -15,14 +15,6 @@ class NX_VMS_COMMON_API Geometry: public QObject
     Q_OBJECT
 
 public:
-    /**
-     * QPainterPath declines addition of elements when its coordinates are greater than this value
-     * (copy-pasted from Qt code, because it is not exposed as a constant).
-     * QGraphicsScene uses QPainterPath to check item intersections, even for bounding rects. Thus
-     * items should not use coordinates greater than this value.
-     */
-    static constexpr qreal kMaxValidQPainterPathCoordinate = 1e128;
-
     Q_INVOKABLE static QRectF maxBoundingRect();
 
     /* Some coefficient-wise arithmetic functions follow. */

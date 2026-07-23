@@ -2,18 +2,15 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtGui/QImage>
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 10, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(6, 12, 0))
 
-    QT_BEGIN_NAMESPACE
+QT_BEGIN_NAMESPACE
 
-    extern Q_WIDGETS_EXPORT void qt_blurImage(
-        QImage& image,
-        qreal radius,
-        bool improvedQuality,
-        int transposed = 0);
+extern Q_GUI_EXPORT void qt_blurImage(
+    QImage& image, qreal radius, bool improvedQuality, int transposed = 0);
 
-    QT_END_NAMESPACE
+QT_END_NAMESPACE
 
 #endif

@@ -311,8 +311,13 @@ if(compilerMsvc)
         # Inherits via dominance.
         /wd4250
 
+        # Macro expansion producing 'defined' has undefined behavior:
+        # * gtest while including "um\winbase.h(9531,5)
+        # * QT_COMPILER_SUPPORTS_HERE(AVX2) macro
+        /wd5105
+
         # -----------------------------------------------------------------------------------------
-        # Treat the following warnigns as errors.
+        # Treat the following warnings as errors.
 
         # Function is recursive on all control paths, will cause runtime stack overflow.
         /we4717
@@ -365,13 +370,6 @@ if(compilerMsvc)
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(/wd4250)
-
-        # Avoid the following warning when building gtest:
-        # "um\winbase.h(9531,5): warning C5105: macro expansion producing 'defined' has undefined
-        # behavior"
-        add_compile_options(/wd5105)
-
         # Avoid unnamed objects with custom construction and destruction. Suppressing this warning
         # as it is displayed very frequently in common places, e.g. in `QObject::connect` calls.
         add_compile_options(/wd26444)
@@ -474,6 +472,7 @@ if(NOT compilerMsvc)
         -Wno-ignored-qualifiers
         -Wno-dangling-else #< Skip, because style guide require "if else" without braces for single line bodies.
         -Wno-error=deprecated-declarations #< Used in code and can't stop build.
+        -Wno-error=expansion-to-defined #< QT_COMPILER_SUPPORTS_HERE(*) macro, /wd5105 analog.
         $<$<COMPILE_LANGUAGE:CXX>:-Werror=reorder>
         $<$<COMPILE_LANGUAGE:CXX>:-Werror=delete-non-virtual-dtor>
         $<$<COMPILE_LANGUAGE:CXX>:-Werror=conversion-null>

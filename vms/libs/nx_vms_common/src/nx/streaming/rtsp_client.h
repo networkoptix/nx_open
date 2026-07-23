@@ -141,14 +141,15 @@ public:
         bool sleepIfEmptySocket = false;
     };
 
-    static const QByteArray kPlayCommand;
-    static const QByteArray kSetupCommand;
-    static const QByteArray kOptionsCommand;
-    static const QByteArray kDescribeCommand;
-    static const QByteArray kSetParameterCommand;
-    static const QByteArray kGetParameterCommand;
-    static const QByteArray kPauseCommand;
-    static const QByteArray kTeardownCommand;
+    static constexpr std::string_view kPlayCommand = "PLAY";
+    static constexpr std::string_view kSetupCommand = "SETUP";
+    static constexpr std::string_view kOptionsCommand = "OPTIONS";
+    static constexpr std::string_view kDescribeCommand = "DESCRIBE";
+    static constexpr std::string_view kSetParameterCommand = "SET_PARAMETER";
+    static constexpr std::string_view kGetParameterCommand = "GET_PARAMETER";
+    static constexpr std::string_view kPauseCommand = "PAUSE";
+    static constexpr std::string_view kTeardownCommand = "TEARDOWN";
+
     static constexpr int kResponseBufferLength = 1024 * 65;
 
     enum class DateTimeFormat
@@ -335,7 +336,8 @@ public:
 
     void setDateTimeFormat(const DateTimeFormat& format);
     void setScaleHeaderEnabled(bool value);
-    void addRequestHeader(const QString& requestName, const nx::network::http::HttpHeader& header);
+    void addRequestHeader(
+        std::string_view requestName, const nx::network::http::HttpHeader& header);
 
     bool processTcpRtcpData(const quint8* data, int size);
 
@@ -387,7 +389,8 @@ private:
     nx::network::http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendRequestInternal(nx::network::http::Request&& request);
     void addCommonHeaders(nx::network::http::HttpHeaders& headers);
-    void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
+    void addAdditionalHeaders(
+        std::string_view requestName, nx::network::http::HttpHeaders* outHeaders);
     QString parseContentBase(const QString& buffer);
     void setTcpSocket(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
     CameraDiagnostics::Result parseErrorResponse(const nx::network::rtsp::RtspResponse& response);
@@ -448,7 +451,7 @@ private:
     nx::String m_serverInfo;
     DateTimeFormat m_dateTimeFormat = DateTimeFormat::Numeric;
     bool m_scaleHeaderEnabled = true;
-    using RequestName = QString;
+    using RequestName = std::string;
     QMap<RequestName, nx::network::http::HttpHeaders> m_additionalHeaders;
     QElapsedTimer m_lastReceivedDataTimer;
     std::set<QString> m_additionalSupportedCodecs;

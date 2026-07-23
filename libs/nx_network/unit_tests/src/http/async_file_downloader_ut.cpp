@@ -324,7 +324,7 @@ protected:
                 donePromise->set_value(!contextPtr->downloader->failed());
             });
 
-        context->file->open();
+        EXPECT_TRUE(context->file->open());
 
         return context;
     }

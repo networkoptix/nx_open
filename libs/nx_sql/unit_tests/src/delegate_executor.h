@@ -36,7 +36,7 @@ public:
         return m_delegate->addBindValue(value);
     }
 
-    virtual void bindValue(const QString& placeholder, const QVariant& value) noexcept override
+    virtual void bindValue(std::string_view placeholder, const QVariant& value) noexcept override
     {
         return m_delegate->bindValue(placeholder, value);
     }

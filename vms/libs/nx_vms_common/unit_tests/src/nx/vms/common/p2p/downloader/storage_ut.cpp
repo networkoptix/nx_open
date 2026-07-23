@@ -328,11 +328,10 @@ TEST_F(DistributedFileDownloaderStorageTest, updateCorruptedFile)
         ResultCode::ok);
 
     QByteArray data;
-
     {
         QFile file(testFilePath);
-        file.open(QFile::ReadOnly);
-        data = file.readAll();
+        if (file.open(QFile::ReadOnly))
+            data = file.readAll();
         file.close();
     }
 
@@ -382,8 +381,8 @@ TEST_F(DistributedFileDownloaderStorageTest, setChunkSizeToCorruptedFile)
     QByteArray data;
     {
         QFile file(testFilePath);
-        file.open(QFile::ReadOnly);
-        data = file.readAll();
+        if (file.open(QFile::ReadOnly))
+            data = file.readAll();
         file.close();
     }
 

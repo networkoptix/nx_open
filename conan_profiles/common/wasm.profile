@@ -26,7 +26,7 @@ ffmpeg/*:mp3lame=False
 boost/*:header_only=True
 
 [tool_requires]
-emsdk/3.1.72
+emsdk/4.0.10
 nodejs/20.16.0
 
 [buildenv]

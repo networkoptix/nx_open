@@ -2,6 +2,7 @@
 
 #include "two_way_audio_button.h"
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QTimer>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 #include <qt_graphics_items/graphics_label.h>

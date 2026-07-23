@@ -1691,29 +1691,3 @@ struct ci_less
 };
 
 } // namespace nx::utils
-
-//-------------------------------------------------------------------------------------------------
-// Convenience comparison operators for Qt types against STL types.
-
-#if defined(QT_CORE_LIB)
-
-inline bool operator==(const QByteArray& left, std::string_view right)
-{ return left == QByteArray::fromRawData(right.data(), (int)right.size()); }
-
-inline bool operator==(const QByteArray& left, const std::string& right)
-{ return left == QByteArray::fromRawData(right.data(), (int)right.size()); }
-
-inline bool operator==(const QString& left, const std::string& right)
-{ return left == right.c_str(); }
-
-inline bool operator==(const QString& left, std::string_view right)
-{ return left == QByteArray::fromRawData(right.data(), (int) right.size()); }
-
-//-------------------------------------------------------------------------------------------------
-// std::string_view vs const char*. Needed since previous introducing "QString == std::string_view"
-// makes "std::string_view == const char*" ambiguous.
-
-inline bool operator==(std::string_view left, const char* right)
-{ return left == std::string_view(right); }
-
-#endif // #if defined(QT_CORE_LIB)
