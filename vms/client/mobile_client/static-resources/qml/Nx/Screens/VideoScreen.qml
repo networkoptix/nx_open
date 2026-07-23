@@ -1346,6 +1346,7 @@ Page
 
             popup: ptz.sheet
             parent: modernVideoScreen.contentItem
+            active: opened && !LayoutController.fullscreen
 
             anchors.top: (parent === modernVideoScreen.contentItem) ? navigationBar.top : undefined
             anchors.bottom: parent.bottom

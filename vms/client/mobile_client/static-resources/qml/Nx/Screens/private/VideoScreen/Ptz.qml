@@ -77,10 +77,10 @@ Item
 
         onClosed:
         {
-            if (control.overlayStyle)
-                return
-
-            control.closed()
+            if (!control.overlayStyle)
+                control.closed()
+            else if (control.state === "presets")
+                control.reset()
         }
 
         Overlay.modeless: Item { }
@@ -186,7 +186,7 @@ Item
         anchors.margins: 16
 
         target: panel
-        visible: control.active && control.state === "default" && control.overlayStyle
+        visible: control.active && control.state !== "moveOnTap" && control.overlayStyle
         opacity: control.opacity
 
         Button
