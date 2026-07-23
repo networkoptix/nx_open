@@ -23,13 +23,14 @@ Drawer
     property bool alwaysShowCloseButton: false
     readonly property alias availableContentHeight: flickable.height
     readonly property alias contentDragging: flickable.dragging
+    readonly property bool bottomEdge: edge === Qt.BottomEdge
 
     x: (parent.width - width) / 2
     edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
-    width: LayoutController.isPortrait ? Math.min(parent.width, 640) : StyleHints.sheetWidth
+    width: bottomEdge ? Math.min(parent.width, 640) : StyleHints.sheetWidth
     height:
     {
-        if (!LayoutController.isPortrait)
+        if (!bottomEdge)
             return parent.height
 
         const availableHeight = parent.height
@@ -70,7 +71,7 @@ Drawer
             height: 2 * radius
             radius: parent.kCornerRadius
             color: parent.kBackgroundColor
-            visible: LayoutController.isPortrait
+            visible: control.bottomEdge
         }
 
         Rectangle
@@ -80,17 +81,17 @@ Drawer
             height: parent.height
             radius: parent.kCornerRadius
             color: parent.kBackgroundColor
-            visible: !LayoutController.isPortrait
+            visible: !control.bottomEdge
         }
 
         Rectangle
         {
             id: mainAreaBackground
 
-            x: LayoutController.isPortrait ? 0 : parent.kCornerRadius
-            y: LayoutController.isPortrait ? parent.kCornerRadius : 0
-            width: parent.width - (LayoutController.isPortrait ? 0 : parent.kCornerRadius)
-            height: parent.height - (LayoutController.isPortrait ? parent.kCornerRadius : 0)
+            x: control.bottomEdge ? 0 : parent.kCornerRadius
+            y: control.bottomEdge ? parent.kCornerRadius : 0
+            width: parent.width - (control.bottomEdge ? 0 : parent.kCornerRadius)
+            height: parent.height - (control.bottomEdge ? parent.kCornerRadius : 0)
             color: parent.kBackgroundColor
         }
 
@@ -102,7 +103,7 @@ Drawer
             width: 42
             height: 3
             y: 8
-            visible: LayoutController.isPortrait
+            visible: control.bottomEdge
 
             color: ColorTheme.colors.dark15
         }
@@ -314,7 +315,7 @@ Drawer
         // SafeArea attached to the sheet itself resolves to the popup item, whose margins are
         // not recalculated on device rotation while the sheet is open (Qt 6.9 bug). The overlay
         // margins are updated reliably, use them instead.
-        readonly property int extraTopMargin: LayoutController.isPortrait
+        readonly property int extraTopMargin: control.bottomEdge
             ? 15
             : control.parent.SafeArea.margins.top
 

@@ -71,6 +71,14 @@ Item
 
         contentSpacing: 0
 
+        edge: control.overlayStyle || LayoutController.isPortrait
+            ? Qt.BottomEdge
+            : Qt.RightEdge
+
+        width: bottomEdge
+            ? Math.min(parent.width, control.overlayStyle ? 360 : 640)
+            : StyleHints.sheetWidth
+
         interactive: !panel.joystick.active
         closePolicy: Popup.NoAutoClose
         modal: false
@@ -95,7 +103,7 @@ Item
             currentIndex: sheet.currentPage?.StackLayout.index ?? -1
 
             width: parent.width
-            height: LayoutController.isPortrait
+            height: sheet.bottomEdge
                 ? Math.max(sheet.currentPage?.implicitHeight ?? 0, preferredHeight)
                 : Math.max(sheet.currentPage?.implicitHeight ?? 0, sheet.availableContentHeight)
 
