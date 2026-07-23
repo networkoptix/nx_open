@@ -329,7 +329,7 @@ void StorageRecordingContext::writeData(const QnConstAbstractMediaDataPtr& media
         packet->pts = packet->dts;
     }
 
-    if ((md->flags & AV_PKT_FLAG_KEY) && md->dataType != QnAbstractMediaData::GENERIC_METADATA)
+    if (md->isKeyFrame() && md->dataType != QnAbstractMediaData::GENERIC_METADATA)
         packet->flags |= AV_PKT_FLAG_KEY;
 
     if (!metadataPacketData.isEmpty())

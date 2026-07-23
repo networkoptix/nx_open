@@ -151,7 +151,7 @@ bool RtspStreamProvider::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 
         if (m_gotKeyDataInfo.size() <= mediaData->channelNumber)
             m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
-        if (mediaData->flags & AV_PKT_FLAG_KEY)
+        if (mediaData->isKeyFrame())
             m_gotKeyDataInfo[mediaData->channelNumber] = true;
         return m_gotKeyDataInfo[mediaData->channelNumber];
     }

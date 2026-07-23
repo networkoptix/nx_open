@@ -574,7 +574,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         m_lastIgnoreTime = data->timestamp;
 
     NX_VERBOSE(this, "Display frame: %1", data);
-    m_isLive = data->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
+    m_isLive = data->isLive();
     const bool needReinitDecoders = m_needReinitDecoders.exchange(false);
 
     if (needReinitDecoders)

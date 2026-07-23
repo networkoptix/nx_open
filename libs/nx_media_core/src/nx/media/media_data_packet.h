@@ -127,7 +127,7 @@ public:
 
 public:
     QnAbstractMediaData(DataType _dataType);
-    virtual ~QnAbstractMediaData();
+    virtual ~QnAbstractMediaData() = default;
 
     virtual QnAbstractMediaData* clone() const = 0;
 
@@ -136,24 +136,26 @@ public:
 
     virtual void setData(nx::utils::ByteArray&& buffer) = 0;
 
-    bool isLQ() const;
-    bool isLive() const;
+    bool isLQ() const { return flags & MediaFlags_LowQuality; }
+    bool isLive() const { return flags & MediaFlags_LIVE; }
+    bool isKeyFrame() const { return flags & MediaFlags_AVKey; }
 
-    const CodecParametersConstPtr& getContext() const;
+    const CodecParametersConstPtr& getContext() const { return context; }
 
     QString idForToStringFromPtr() const;
 
 public:
-    QnAbstractStreamDataProvider* dataProvider;
+    QnAbstractStreamDataProvider* dataProvider = nullptr;
     DataType dataType;
     nx::Uuid deviceId;
-    AVCodecID compressionType;
-    mutable MediaFlags flags;
+    AVCodecID compressionType = AV_CODEC_ID_NONE;
+    mutable MediaFlags flags = MediaFlags_None;
     // Video or audio channel number. Some devices might have more than one sensor.
-    quint32 channelNumber;
+    quint32 channelNumber = 0;
     CodecParametersConstPtr context;
-    int opaque;
+    int opaque = 0;
     std::vector<uint8_t> encryptionData; //< Its non-empty in case of packet is encrypted.
+
 protected:
     void assign(const QnAbstractMediaData* other);
 };

@@ -225,7 +225,7 @@ QnAbstractMediaDataPtr QnNovArchiveDelegate::getNextData()
         {
             if (data->timestamp < m_skipFramesBeforeTime)
                 continue;
-            else if (data->flags & AV_PKT_FLAG_KEY)
+            else if (data->isKeyFrame())
                 m_skipFramesBeforeTime = AV_NOPTS_VALUE;
             else
                 continue;

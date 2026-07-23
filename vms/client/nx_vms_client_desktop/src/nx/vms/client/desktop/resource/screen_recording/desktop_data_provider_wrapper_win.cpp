@@ -62,7 +62,7 @@ void DesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
                 auto itr = m_needKeyData.find(dp);
                 if (itr != m_needKeyData.end())
                 {
-                    if (media->flags | AV_PKT_FLAG_KEY)
+                    if (media->isKeyFrame())
                         m_needKeyData.erase(itr);
                     else
                         continue; // skip data

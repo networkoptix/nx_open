@@ -79,7 +79,7 @@ QnConstAbstractMediaDataPtr QnRtspFfmpegEncoder::transcodeVideoPacket(QnConstAbs
     if (!transcodedMedia)
         return QnConstAbstractMediaDataPtr();
     transcodedMedia->opaque = media->opaque;
-    if (media->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (media->isLive())
         transcodedMedia->flags |= QnAbstractMediaData::MediaFlags_LIVE;
     return transcodedMedia;
 }
@@ -153,8 +153,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     flags |= m_additionFlags;
 
     int cseq = m_media->opaque;
-    bool isLive = m_media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (isLive) {
+    if (m_media->isLive()) {
         cseq = m_liveMarker;
         if (!m_gotLivePacket)
             flags |= QnAbstractMediaData::MediaFlags_BOF;

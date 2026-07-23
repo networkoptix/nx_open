@@ -114,7 +114,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (video)
         {
             video->channelNumber = 0; // ignore layout info
-            if (!m_firstFrameDisplayed || ((video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100)) // max display rate 10 fps
+            if (!m_firstFrameDisplayed || (video->isKeyFrame() && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100)) // max display rate 10 fps
             {
                 QnVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->display(video, true, QnFrameScaler::factor_any);
                 if (!m_firstFrameDisplayed)
@@ -127,7 +127,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
                 }
                 m_lastDisplayTime = qnSyncTime->currentMSecsSinceEpoch();
             }
-            if (video->flags & AV_PKT_FLAG_KEY)
+            if (video->isKeyFrame())
                 m_lastKeyFrame = video;
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime2 > 100) // max display rate 10 fps

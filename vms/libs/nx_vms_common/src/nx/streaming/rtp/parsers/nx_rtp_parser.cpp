@@ -291,7 +291,7 @@ Result QnNxRtpParser::processData(
 
         if (rtpHeader.marker)
         {
-            if (m_nextDataPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
+            if (m_nextDataPacket->isLive())
                 m_position = DATETIME_NOW;
             else
                 m_position = m_nextDataPacket->timestamp;

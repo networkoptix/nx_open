@@ -19,17 +19,7 @@ bool isLowMediaQuality(MediaQuality q)
 }
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType ):
-    dataProvider(nullptr),
-    dataType(_dataType),
-    compressionType(AV_CODEC_ID_NONE),
-    flags(MediaFlags_None),
-    channelNumber(0),
-    context(0),
-    opaque(0)
-{
-}
-
-QnAbstractMediaData::~QnAbstractMediaData()
+    dataType(_dataType)
 {
 }
 
@@ -45,21 +35,6 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
     context = other->context;
     opaque = other->opaque;
     encryptionData = other->encryptionData;
-}
-
-bool QnAbstractMediaData::isLQ() const
-{
-    return flags & MediaFlags_LowQuality;
-}
-
-bool QnAbstractMediaData::isLive() const
-{
-    return flags & MediaFlags_LIVE;
-}
-
-const CodecParametersConstPtr& QnAbstractMediaData::getContext() const
-{
-    return context;
 }
 
 AVMediaType toAvMediaType(QnAbstractMediaData::DataType dataType)

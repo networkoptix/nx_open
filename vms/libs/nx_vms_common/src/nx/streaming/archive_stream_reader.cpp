@@ -436,7 +436,7 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
         if (mediaData->dataType != QnAbstractMediaData::AUDIO)
             return false;
     }
-    return !(mediaData->flags & QnAbstractMediaData::MediaFlags_LIVE);
+    return !mediaData->isLive();
 }
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
@@ -710,7 +710,7 @@ begin_label:
             bool isKeyFrame = false;
             if (videoData)
             {
-                isKeyFrame = m_currentData->flags & AV_PKT_FLAG_KEY;
+                isKeyFrame = m_currentData->isKeyFrame();
                 if (videoData->context)
                 {
                     if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
@@ -840,7 +840,7 @@ begin_label:
         } // negative speed
     } // videoData || eof
 
-    if (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (m_currentData->isLive())
         setSkipFramesToTime(0, true);
 
     if (videoData) // in case of video packet
@@ -997,7 +997,11 @@ begin_label:
     }
 
     if (m_currentData)
-        m_latPacketTime = (m_currentData->flags & QnAbstractMediaData::MediaFlags_LIVE) ? DATETIME_NOW : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
+    {
+        m_latPacketTime = m_currentData->isLive()
+            ? DATETIME_NOW
+            : qMin(qnSyncTime->currentUSecsSinceEpoch(), m_currentData->timestamp);
+    }
     return m_currentData;
 }
 

@@ -356,8 +356,6 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 
     if (isVideoCamera)
     {
-        //bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-        //bool isPrebuffer = media->flags & QnAbstractMediaData::MediaFlags_FCZ;
         if (m_speed < 1.0 || m_singleShotMode)
             return;
         if (m_firstAfterJumpTime == AV_NOPTS_VALUE) {
@@ -430,11 +428,11 @@ void QnCamDisplay::hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float s
                 {
                     ; //setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fastest);
                 }
-                else if (vd->flags & AV_PKT_FLAG_KEY)
+                else if (vd->isKeyFrame())
                     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
             }
         }
-        else if (vd->flags & AV_PKT_FLAG_KEY)
+        else if (vd->isKeyFrame())
         {
             if (m_lightCpuMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
                 setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Fast);
@@ -484,7 +482,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     quint64 currentTime = vd->timestamp;
 
     m_totalFrames++;
-    if (vd->flags & AV_PKT_FLAG_KEY)
+    if (vd->isKeyFrame())
         m_iFrames++;
     bool isPrebuffering = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
 
@@ -545,7 +543,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             // This function is used for LIVE mode and archive playback with external synchronization
             // like NVR. Don't increase buffer for archive mode to make item synchronization more
             /// precise.
-            if (m_liveMaxLenReached && vd->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
+            if (m_liveMaxLenReached && vd->isLive())
                 m_liveBufferSizeUsec = qMin(maximumLiveBufferUsec(), m_liveBufferSizeUsec * 1.2);
             m_liveMaxLenReached = false;
             NX_VERBOSE(this, "Increase live buffer size to %1 ms because of empty input buffer",
@@ -770,8 +768,9 @@ bool QnCamDisplay::isAudioBuffering() const
 
 bool QnCamDisplay::doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed)
 {
-    if (ad->flags & QnAbstractMediaData::MediaFlags_LIVE)
+    if (ad->isLive())
         return true; // no delay for audio live is required
+
     if (isAudioBuffering())
         return true;
 
@@ -1186,7 +1185,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     {
         m_lastQueuedVideoTime = video->timestamp;
 
-        if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
+        if (video->isLive()
             && m_dataQueue.size() > 0
             && video->timestamp - m_lastVideoPacketTime > m_liveBufferSizeUsec)
         {
@@ -1443,11 +1442,9 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
     {
-        bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-
         m_timeMutex.lock();
-        if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode && m_speed > 0);
+        if (media->isLive() != m_isRealTimeSource && !m_buffering)
+            onRealTimeStreamHint(media->isLive() && !m_singleShotMode && m_speed > 0);
         m_timeMutex.unlock();
     }
 
@@ -1488,7 +1485,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         //    return true; // jump finished, but old data received
         if (media->flags & QnAbstractMediaData::MediaFlags_BOF)
             m_bofReceived = true;
-        else if (m_jumpTime == DATETIME_NOW && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && (media->flags & AV_PKT_FLAG_KEY))
+        else if (m_jumpTime == DATETIME_NOW && media->isLive() && media->isKeyFrame())
             m_bofReceived = true;
 
         if (!m_bofReceived)

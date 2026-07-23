@@ -351,7 +351,7 @@ bool Transcoder::checkForMseEof(QnConstAbstractMediaDataPtr media)
         if (media->dataType == QnAbstractMediaData::VIDEO)
         {
             constexpr int kMinVideoInGop = 7; //< Special const for strange small GOPs.
-            if (media->flags & AV_PKT_FLAG_KEY)
+            if (media->isKeyFrame())
             {
                 if (m_audioPacketsCount == 0 && m_videoPacketsCount > kMinVideoInGop)
                 {
