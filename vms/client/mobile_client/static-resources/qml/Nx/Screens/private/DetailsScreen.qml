@@ -32,7 +32,6 @@ Page
 
     property var uuid
     property int objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
-    property QnCameraListModel camerasModel: null
     required property Timeline.AbstractObjectData objectData
     required property Resource resource
     readonly property Menu menu: menu.available ? menu : null
@@ -47,6 +46,7 @@ Page
     signal searchRequested(string text)
     signal nextClicked()
     signal previousClicked()
+    signal showOnCameraRequested(Resource resource, real timestampMs)
 
     title: eventDetailsScreen.resource?.name ?? qsTr("Preview")
     toolBar.visible: false
@@ -66,8 +66,12 @@ Page
 
         onNext: eventDetailsScreen.nextClicked()
         onPrevious: eventDetailsScreen.previousClicked()
-        onShowOnCamera: d.goToCamera()
         onBack: eventDetailsScreen.backClicked()
+        onShowOnCamera:
+        {
+            eventDetailsScreen.showOnCameraRequested(
+                interval.resource, eventDetailsScreen.objectData?.startTimeMs ?? 0)
+        }
     }
 
     GridLayout
@@ -389,17 +393,6 @@ Page
             {
                 preview.dataState = Preview.DataState.Checking
             }
-        }
-
-        function goToCamera()
-        {
-            Workflow.openVideoScreen(
-                preview.interval.resource,
-                undefined,
-                preview.interval.startTimeMs,
-                camerasModel,
-                eventDetailsScreen.objectsType,
-                /*isAuxiliary*/ true)
         }
     }
 

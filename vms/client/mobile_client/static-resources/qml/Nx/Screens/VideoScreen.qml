@@ -958,6 +958,12 @@ Page
                 close()
             }
 
+            onShowOnCameraRequested: (resource, timestampMs) =>
+            {
+                controller.start(resource, timestampMs)
+                close()
+            }
+
             onScreenActiveChanged:
             {
                 if (restoreOnActivation)

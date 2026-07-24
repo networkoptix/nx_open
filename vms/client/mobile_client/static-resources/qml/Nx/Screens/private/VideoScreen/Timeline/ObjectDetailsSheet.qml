@@ -3,6 +3,7 @@
 import QtQuick
 import QtQuick.Controls
 
+import Nx.Common
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
@@ -33,6 +34,7 @@ BaseAdaptiveSheet
     property bool keepStateOnClose: false
 
     signal searchRequested(string text)
+    signal showOnCameraRequested(Resource resource, real timestampMs)
 
     spacing: 16
     bottomPadding: (pageNavigationBar.count > 1) ? 0 : 20
@@ -99,7 +101,7 @@ BaseAdaptiveSheet
                                     sheet.model?.[sheet.currentIndex] ?? null),
                                 "resource": Qt.binding(() =>
                                     sheet.model?.[sheet.currentIndex]?.resource ?? null),
-                                "withShowOnCamera": false,
+                                "withShowOnCamera": true,
                                 "hasNext": Qt.binding(() => sheet.currentIndex + 1 < sheet.count),
                                 "hasPrevious": Qt.binding(() => sheet.currentIndex > 0),
                                 "toolBar.visible": true,
@@ -332,6 +334,11 @@ BaseAdaptiveSheet
             function onSearchRequested(text)
             {
                 sheet.searchRequested(text)
+            }
+
+            function onShowOnCameraRequested(resource, timestampMs)
+            {
+                sheet.showOnCameraRequested(resource, timestampMs)
             }
         }
 

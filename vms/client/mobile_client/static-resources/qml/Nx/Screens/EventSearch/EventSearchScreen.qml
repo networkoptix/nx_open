@@ -247,6 +247,19 @@ AdaptiveScreen
                     screen.customBackHandler()
             }
 
+            function onShowOnCameraRequested(resource, timestampMs)
+            {
+                Workflow.openVideoScreen(
+                    resource,
+                    /*screenshotUrl*/ undefined,
+                    timestampMs,
+                    screen.camerasModel,
+                    screen.analyticsSearchMode
+                        ? ObjectsLoader.ObjectsType.analytics
+                        : ObjectsLoader.ObjectsType.bookmarks,
+                    /*isAuxiliary*/ true)
+            }
+
             function onSearchRequested(text)
             {
                 Workflow.openEventSearchScreen(
@@ -638,7 +651,6 @@ AdaptiveScreen
                         "objectsType": screenController.analyticsSearchMode
                             ? ObjectsLoader.ObjectsType.analytics
                             : ObjectsLoader.ObjectsType.bookmarks,
-                        "camerasModel": screen.camerasModel,
                         "objectData": objectData,
                         "hasNext": Qt.binding(() => view.currentIndex > 0),
                         "hasPrevious": Qt.binding(() => view.currentIndex < view.count - 1),
