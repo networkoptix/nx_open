@@ -2,10 +2,14 @@
 
 #include "named_pipe_socket.h"
 
+#include <poll.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <sys/time.h>
+
+#include <chrono>
+
+#include <nx/utils/time.h>
 
 #include "named_pipe_socket_unix.h"
 
@@ -86,33 +90,43 @@ SystemError::ErrorCode NamedPipeSocket::read(
     void* buf,
     unsigned int bytesToRead,
     unsigned int* const bytesRead,
-    int timeoutMs)
+    const int timeoutMs)
 {
-    timeval timeout{ timeoutMs / 1000, timeoutMs % 1000 };
+    if (m_impl->hPipe < 0)
+        return SystemError::badDescriptor;
+
+    using namespace std::chrono;
+
+    const auto deadline = monotonicTime() + milliseconds(timeoutMs);
 
     for (;;)
     {
-        fd_set readFds;
-        FD_ZERO(&readFds);
-        FD_SET(m_impl->hPipe, &readFds);
+        int remainingTimeoutMs = -1; //< Negative timeout means infinite wait for poll().
+        if (timeoutMs >= 0)
+        {
+            const auto remainingMs = ceil<milliseconds>(deadline - monotonicTime()).count();
+            remainingTimeoutMs = remainingMs > 0 ? (int)remainingMs : 0;
+        }
 
-        if (select(m_impl->hPipe + 1, &readFds, nullptr, nullptr, &timeout) == 1)
-        {
-            const ssize_t numberOfBytesRead = ::read(m_impl->hPipe, buf, bytesToRead);
-            if (numberOfBytesRead < 0)
-            {
-                const int errCode = errno;
-                if (errCode == EINTR)
-                    continue;
-                return errCode;
-            }
-            *bytesRead = (unsigned int) numberOfBytesRead;
-            return SystemError::noError;
-        }
-        else
-        {
+        struct pollfd pollDescriptor { m_impl->hPipe, POLLIN, 0 };
+        ssize_t result = ::poll(&pollDescriptor, 1, remainingTimeoutMs);
+
+        if (result == 0)
             return SystemError::timedOut;
+
+        if (result > 0)
+            result = ::read(m_impl->hPipe, buf, bytesToRead);
+
+        if (result < 0)
+        {
+            const int errCode = errno;
+            if (errCode == EINTR)
+                continue;
+            return errCode;
         }
+
+        *bytesRead = (unsigned int)result;
+        return SystemError::noError;
     }
 }
 
