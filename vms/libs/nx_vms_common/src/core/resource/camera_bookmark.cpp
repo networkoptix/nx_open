@@ -19,6 +19,8 @@ namespace {
 using namespace std::chrono;
 using namespace nx::vms::common;
 
+using nx::utils::algorithm::merge_sorted_lists;
+
 using BinaryPredicate =
     std::function<bool (const CameraBookmark& first, const CameraBookmark& second)> ;
 
@@ -111,7 +113,7 @@ CameraBookmarkList getSparseBookmarks(
     toMergeLists.push_back(createListFromIters(valuableBookmarksIters));
     toMergeLists.push_back(getSparseByIters(nonValuableBookmarksIters, nonValuableBookmarkToAddCount));
 
-    return nx::utils::algorithm::merge_sorted_lists(std::move(toMergeLists), pred, limit);
+    return merge_sorted_lists(std::move(toMergeLists), pred, limit);
 }
 
 } // namespace
@@ -203,14 +205,37 @@ nx::Uuid CameraBookmark::systemUserId()
     return nx::Uuid::fromStringSafe("{51723d00-51bd-4420-8116-75e5f85dfcf4}");
 }
 
-CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemContext,
-    const MultiServerCameraBookmarkList& source,
+CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
+    SystemContext* systemContext,
+    MultiServerCameraBookmarkList source,
+    const CameraBookmarkSearchFilter& filter)
+{
+    if (filter.centralTimePointMs)
+    {
+        return mergeCameraBookmarks(
+            systemContext,
+            std::move(source),
+            filter.orderBy,
+            *filter.centralTimePointMs,
+            filter.limit);
+    }
+
+    return mergeCameraBookmarks(
+        systemContext,
+        std::move(source),
+        filter.orderBy,
+        filter.minVisibleLengthMs,
+        filter.limit);
+}
+
+CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
+    SystemContext* systemContext,
+    MultiServerCameraBookmarkList source,
     const BookmarkSortOrder& sortOrder,
     const std::optional<milliseconds>& minVisibleLength,
     int limit)
 {
-    NX_ASSERT(limit > 0, "Limit should be greater than 0!");
-    if (limit <= 0)
+    if (!NX_ASSERT(limit > 0, "Limit should be greater than 0!"))
         return {};
 
     const auto pred = createBookmarkSortPredicate(sortOrder.column,
@@ -219,6 +244,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemCon
 
     const int intermediateLimit =
         minVisibleLength ? CameraBookmarkSearchFilter::kNoLimit : limit;
+
     CameraBookmarkList result;
 
     switch (sortOrder.column)
@@ -228,15 +254,14 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemCon
         case nx::vms::api::BookmarkSortField::cameraName:
         case nx::vms::api::BookmarkSortField::tags:
         {
-            auto bookmarksList = sortEachList(systemContext, source, sortOrder);
-            result =
-                nx::utils::algorithm::merge_sorted_lists(std::move(bookmarksList), pred, limit);
+            auto bookmarksList = sortEachList(systemContext, std::move(source), sortOrder);
+            result = merge_sorted_lists(std::move(bookmarksList), pred, limit);
             break;
         }
         default:
         {
             // All data by other columns is sorted by database.
-            result = nx::utils::algorithm::merge_sorted_lists(source, pred, intermediateLimit);
+            result = merge_sorted_lists(std::move(source), pred, intermediateLimit);
         }
     }
 
@@ -244,6 +269,65 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(SystemContext* systemCon
         return result;
 
     return getSparseBookmarks(result, minVisibleLength, limit, pred);
+}
+
+CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
+    SystemContext* systemContext,
+    QnMultiServerCameraBookmarkList source,
+    const BookmarkSortOrder& sortOrder,
+    std::chrono::milliseconds centralTimePointMs,
+    int limit)
+{
+    if (!NX_ASSERT(limit > 0, "Limit should be greater than 0!"))
+        return {};
+
+    const auto startTimePred = createBookmarkSortPredicate(
+        nx::vms::api::BookmarkSortField::startTime, sortOrder.order, /*resourcePool*/ nullptr);
+
+    // Sorting by anything other than `startTimeMs` with the central point isn't used by the client
+    // applications, but is supported at the API level. However, to properly apply `limit` we need
+    // to sort by `startTimeMs`, and sort back after merging and clipping.
+    if (sortOrder.column != nx::vms::api::BookmarkSortField::startTime)
+    {
+        for (auto& list: source)
+            std::sort(list.begin(), list.end(), startTimePred);
+    }
+
+    auto result = merge_sorted_lists(std::move(source), startTimePred,
+        CameraBookmarkSearchFilter::kNoLimit);
+
+    using TimestampCompFunc = std::function<bool(milliseconds, milliseconds)>;
+    const auto timestampComp = sortOrder.order == Qt::AscendingOrder
+        ? TimestampCompFunc{std::less<milliseconds>()}
+        : TimestampCompFunc{std::greater<milliseconds>()};
+
+    const auto it = std::lower_bound(result.begin(), result.end(), centralTimePointMs,
+        [timestampComp](const QnCameraBookmark& l, milliseconds r)
+        {
+            return timestampComp(l.startTimeMs, r);
+        });
+
+    const int leftLimit = limit / 2;
+    const int rightLimit = limit - leftLimit;
+
+    const int leftCount = (int) std::distance(result.begin(), it);
+    const int rightCount = (int) std::distance(it, result.end());
+
+    if (rightCount > rightLimit)
+        result.erase(std::next(it, rightLimit), result.end());
+
+    if (leftCount > leftLimit)
+        result.erase(result.begin(), std::prev(it, leftLimit));
+
+    if (sortOrder.column != nx::vms::api::BookmarkSortField::startTime)
+    {
+        const auto pred = createBookmarkSortPredicate(sortOrder.column, sortOrder.order,
+            systemContext ? systemContext->resourcePool() : nullptr);
+
+        std::sort(result.begin(), result.end(), pred);
+    }
+
+    return result;
 }
 
 CameraBookmarkDb::CameraBookmarkDb(const CameraBookmark& bookmark):
@@ -422,9 +506,9 @@ QVariantList bookmarkListToVariantList(const CameraBookmarkList& bookmarks)
 
 CameraBookmarkList variantListToBookmarkList(const QVariantList& list)
 {
-    QnCameraBookmarkList result;
+    CameraBookmarkList result;
     for  (const auto& v : list)
-        result.push_back(v.value<QnCameraBookmark>());
+        result.push_back(v.value<CameraBookmark>());
     return result;
 }
 

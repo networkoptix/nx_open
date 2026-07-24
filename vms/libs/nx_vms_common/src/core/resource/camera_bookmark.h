@@ -91,7 +91,7 @@ struct NX_VMS_COMMON_API CameraBookmark
     std::chrono::milliseconds endTime() const;
 
     /**%apidoc[opt]:stringArray List of tags attached to the Bookmark. */
-    QnCameraBookmarkTags tags;
+    CameraBookmarkTags tags;
 
     /**%apidoc Device id. */
     nx::Uuid cameraId;
@@ -120,12 +120,22 @@ struct NX_VMS_COMMON_API CameraBookmark
     bool operator==(const CameraBookmark& other) const = default;
 
     static QString tagsToString(
-        const QnCameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));
+        const CameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));
 
-    static QnCameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
-        const QnMultiServerCameraBookmarkList& source,
+    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+        MultiServerCameraBookmarkList source,
+        const CameraBookmarkSearchFilter& filter);
+
+    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+        MultiServerCameraBookmarkList source,
         const BookmarkSortOrder& sortOrder = BookmarkSortOrder::defaultOrder,
         const std::optional<std::chrono::milliseconds>& minVisibleLength = std::nullopt,
+        int limit = std::numeric_limits<int>::max());
+
+    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+        MultiServerCameraBookmarkList source,
+        const BookmarkSortOrder& sortOrder,
+        std::chrono::milliseconds centralTimePointMs,
         int limit = std::numeric_limits<int>::max());
 
     static nx::Uuid systemUserId();
@@ -250,8 +260,8 @@ struct NX_VMS_COMMON_API CameraBookmarkTag
 
     bool isValid() const { return !name.isEmpty(); }
 
-    static QnCameraBookmarkTagList mergeCameraBookmarkTags(
-        const QnMultiServerCameraBookmarkTagList& source,
+    static CameraBookmarkTagList mergeCameraBookmarkTags(
+        const MultiServerCameraBookmarkTagList& source,
         int limit = std::numeric_limits<int>::max());
 };
 #define CameraBookmarkTag_Fields (name)(count)
@@ -263,8 +273,8 @@ NX_VMS_COMMON_API bool operator<(const CameraBookmark& first, std::chrono::milli
 NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const CameraBookmark& bookmark);
 
 NX_VMS_COMMON_API QString bookmarkToString(const CameraBookmark& bookmark);
-NX_VMS_COMMON_API QVariantList bookmarkListToVariantList(const QnCameraBookmarkList& bookmarks);
-NX_VMS_COMMON_API QnCameraBookmarkList variantListToBookmarkList(const QVariantList& list);
+NX_VMS_COMMON_API QVariantList bookmarkListToVariantList(const CameraBookmarkList& bookmarks);
+NX_VMS_COMMON_API CameraBookmarkList variantListToBookmarkList(const QVariantList& list);
 
 QN_FUSION_DECLARE_FUNCTIONS(BookmarkSortOrder, (json))
 QN_FUSION_DECLARE_FUNCTIONS(CameraBookmarkSearchFilter, (json), NX_VMS_COMMON_API)
@@ -291,17 +301,14 @@ Q_DECLARE_TYPEINFO(nx::vms::common::CameraBookmark, Q_MOVABLE_TYPE);
 // we want to transition the whole system to use the namespaced version.
 
 using QnBookmarkSortOrder = nx::vms::common::BookmarkSortOrder;
-using QnCameraBookmark = nx::vms::common::CameraBookmark;
-using QnCameraBookmarkSearchFilter = nx::vms::common::CameraBookmarkSearchFilter;
-using QnCameraBookmarkTag = nx::vms::common::CameraBookmarkTag;
 
 static const auto bookmarkToString =
-    [](const QnCameraBookmark& bookmark)
+    [](const nx::vms::common::CameraBookmark& bookmark)
     {
         return nx::vms::common::bookmarkToString(bookmark);
     };
 static const auto bookmarkListToVariantList =
-    [](const QnCameraBookmarkList& bookmarks)
+    [](const nx::vms::common::CameraBookmarkList& bookmarks)
     {
         return nx::vms::common::bookmarkListToVariantList(bookmarks);
     };
