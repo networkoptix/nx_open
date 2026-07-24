@@ -61,7 +61,7 @@ Page
 
         width: parent.width
 
-        height: LayoutController.fullscreen ? eventDetailsScreen.height : eventDetailsScreen.height * 0.45
+        height: LayoutController.fullscreen ? eventDetailsScreen.height : StyleHints.previewHeight
         activePage: eventDetailsScreen.activePage
 
         onNext: eventDetailsScreen.nextClicked()

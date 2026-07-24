@@ -38,7 +38,7 @@ Item
         title: root.title
 
         width: parent.width
-        height: LayoutController.fullscreen ? root.height : root.height * 0.45
+        height: LayoutController.fullscreen ? root.height : StyleHints.previewHeight
 
         withNavigationControls: d.resourceCount > 1
         hasPrevious: d.currentIndex > 0
