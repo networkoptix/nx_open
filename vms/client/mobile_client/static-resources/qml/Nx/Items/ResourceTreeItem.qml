@@ -112,13 +112,32 @@ Item
             {
                 id: treeView
 
+                property real maxDelegateWidth: 0
+
+                function reportDelegateWidth(delegateWidth)
+                {
+                    if (delegateWidth > maxDelegateWidth)
+                    {
+                        maxDelegateWidth = delegateWidth
+                        Qt.callLater(forceLayout)
+                    }
+                }
+
+                function resetColumnWidths()
+                {
+                    maxDelegateWidth = 0
+                    Qt.callLater(forceLayout)
+                }
+
                 width: parent.width
                 clip: true
                 rowSpacing: 4
                 model: searchModel
 
-                columnWidthProvider: (column) => Math.max(implicitColumnWidth(column), width)
-                onWidthChanged: Qt.callLater(forceLayout)
+                columnWidthProvider: (column) =>
+                    Math.max(implicitColumnWidth(column), maxDelegateWidth, width)
+
+                onWidthChanged: resetColumnWidths()
 
                 // Source model indexes to which the view was expanded on the most recent
                 // saveExpandedState() call.
@@ -135,6 +154,9 @@ Item
                             return searchModel.filterRegularExpression
                     }
 
+                    onImplicitWidthChanged: treeView.reportDelegateWidth(implicitWidth)
+                    Component.onCompleted: treeView.reportDelegateWidth(implicitWidth)
+
                     TapHandler
                     {
                         acceptedButtons: Qt.LeftButton
@@ -150,7 +172,10 @@ Item
                             }
 
                             if (hasChildren)
+                            {
                                 treeView.toggleExpanded(row)
+                                treeView.resetColumnWidths()
+                            }
                             else if (delegateItem.isCamera)
                                 control.cameraSelected(resource)
                             else if (delegateItem.isLayout || delegateItem.isAllDevices)
@@ -196,11 +221,14 @@ Item
 
                         navigateToIndex = undefined
                     }
+
+                    resetColumnWidths()
                 }
 
                 function expandAll()
                 {
                     expandRecursively(-1, -1)
+                    resetColumnWidths()
                 }
 
                 function expandDefault()
@@ -212,6 +240,8 @@ Item
                         expandToIndex(searchModel.mapFromSource(
                             treeModel.resourceIndex(windowContext.deprecatedUiController.resource)))
                     }
+
+                    resetColumnWidths()
                 }
             }
         }
