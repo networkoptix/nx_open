@@ -329,7 +329,7 @@ BaseSettingsPage
                 pushExpertModePage)
         }
 
-        function tryApplyAndReturn(successCallback)
+        function tryApplyAndReturn()
         {
             const expertMode = expertModeRadioButton.checked
             if (expertMode && !d.selectionModel.selectedSystems.length)

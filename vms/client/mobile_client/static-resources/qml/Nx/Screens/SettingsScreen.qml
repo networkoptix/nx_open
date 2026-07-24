@@ -35,11 +35,18 @@ AdaptiveScreen
             contentItem = settingsNavigation
     }
 
-    function setContentItem(newItem)
+    function setContentItem(newItem, saveSettings = true)
     {
         if (contentItem === settingsNavigation)
         {
             contentItem = newItem
+            return
+        }
+
+        if (!saveSettings)
+        {
+            saveSettingsHandler.target = null
+            settingsScreen.contentItem = newItem
             return
         }
 
@@ -290,6 +297,19 @@ AdaptiveScreen
     {
         id: pushExpertModePage
         objectName: "pushExpertModePage"
+
+        onSettingsSaved:
+        {
+            if (LayoutController.isTabletLayout)
+                return
+
+            if (saveSettingsHandler.target === pushExpertModePage)
+                return
+
+            // Handle `Done` button click.
+            if (settingsScreen.contentItem === pushExpertModePage)
+                settingsScreen.setContentItem(settingsNavigation, /*saveSettings*/ false)
+        }
     }
 
     AppInfoPage
