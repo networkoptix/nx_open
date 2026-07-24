@@ -41,8 +41,10 @@ depends:
   - "libxcomposite1 (>= 1:0.4.5)"
   - "libxi6 (>= 2:1.7.10)"
   - "libxkbfile1 (>= 1:1.1.0)"
+  - "libxml2 (>= 2.9.10)"
   - "libxrandr2 (>= 2:1.5.2)"
   - "libxrender1 (>= 1:0.9.10)"
+  - "libxslt1.1 (>= 1.1.34)"
   - "libxtst6 (>= 2:1.2.3)"
     # DEB package dependencies.
   - "debconf (>= 0.5)"
