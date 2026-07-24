@@ -20,7 +20,11 @@
 namespace {
 
 static const int STORE_QUEUE_SIZE = 50;
-static const int kPrebufferHardLimit = 2000; //< Near 1 minute of video buffer for 30fps.
+
+// Video at 30fps: 30 * 60 = 1800 packets/min.
+// Audio (e.g. G.711, 20ms/frame): 50 * 60 = 3000 packets/min.
+// Combined: ~4800 + metadata packets, rounded up to 5000; x2 safety margin => 10000.
+static const int kPrebufferHardLimit = 10000;
 
 } // namespace
 
