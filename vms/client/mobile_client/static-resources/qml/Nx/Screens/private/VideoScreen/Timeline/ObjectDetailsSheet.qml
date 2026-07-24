@@ -369,7 +369,7 @@ BaseAdaptiveSheet
                 {
                     target: detailsLoader.item
 
-                    title: qsTr("Details")
+                    title: detailsLoader.item?.resource?.name ?? qsTr("Details")
                     leftButtonIcon.source: ""
                     leftButtonEnabled: false
                 }

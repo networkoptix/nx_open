@@ -214,7 +214,7 @@ AdaptiveScreen
 
     rightPanel
     {
-        title: qsTr("Details")
+        title: detailsLoader.item?.resource?.name ?? qsTr("Details")
         interactive: true
         color: ColorTheme.colors.dark4
         item: detailsLoader.item
