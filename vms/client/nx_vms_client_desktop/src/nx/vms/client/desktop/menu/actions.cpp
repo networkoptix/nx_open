@@ -139,12 +139,14 @@ void initialize(Manager* manager, Action* root)
     factory(NextLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .shortcut("Ctrl+Tab");
+        .shortcut("Ctrl+Tab")
+        .shortcut({"Meta+Tab"}, Builder::Mac, /*replaceExisting*/ true);
 
     factory(PreviousLayoutAction)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
-        .shortcut("Ctrl+Shift+Tab");
+        .shortcut("Ctrl+Shift+Tab")
+        .shortcut({"Meta+Shift+Tab"}, Builder::Mac, /*replaceExisting*/ true);
 
     factory(SelectAllAction)
         .flags(GlobalHotkey)
