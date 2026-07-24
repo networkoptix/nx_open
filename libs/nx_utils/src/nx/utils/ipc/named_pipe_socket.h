@@ -38,12 +38,13 @@ public:
 
     /**
      * Reads in synchronous mode.
+     * @param timeoutMs if negative, can wait indefinitely. Ignored on Windows.
      */
     SystemError::ErrorCode read(
         void* buf,
         unsigned int bytesToRead,
         unsigned int* const bytesRead,
-        int timeoutMs = 3000);
+        const int timeoutMs = 3000);
 
     SystemError::ErrorCode flush();
 
