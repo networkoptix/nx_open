@@ -41,7 +41,7 @@ int QnCameraBookmarksManager::getBookmarksAroundPointAsync(
 
     NX_ASSERT(filter.orderBy.column == nx::vms::api::BookmarkSortField::startTime);
 
-    static const auto kCentralPointSupportApiVersion = nx::utils::SoftwareVersion(6, 1, 4);
+    static const auto kCentralPointSupportApiVersion = nx::utils::SoftwareVersion(6, 1, 3);
     const bool centralPointSupported =
         d->systemContext()->moduleInformation().version >= kCentralPointSupportApiVersion;
 
