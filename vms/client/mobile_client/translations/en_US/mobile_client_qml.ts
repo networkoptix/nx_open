@@ -966,10 +966,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>At least one site has to be selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -983,6 +979,10 @@
     </message>
     <message>
         <source>SELECTED %1/%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select at least one site</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
