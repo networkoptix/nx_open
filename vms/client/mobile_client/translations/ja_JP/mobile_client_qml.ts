@@ -965,10 +965,6 @@
       <translation>選択されたサイト</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>少なくとも1つのサイトを選択する必要があります</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>はい</translation>
     </message>
@@ -983,6 +979,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation>選択済み %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

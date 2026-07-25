@@ -966,10 +966,6 @@
       <translation>Sitios seleccionados</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>Hai que seleccionar polo menos un sitio</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>Si</translation>
     </message>
@@ -984,6 +980,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation>SELECCIONADO %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

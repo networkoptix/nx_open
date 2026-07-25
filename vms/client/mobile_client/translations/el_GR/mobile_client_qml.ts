@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="hu_HU" sourcelanguage="en">
+<TS version="2.1" language="el_GR" sourcelanguage="en">
   <context>
     <name>ActionButtonsHint</name>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Ütemezés alapján letiltva</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
   </context>
   <context>
@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Ütemezés alapján letiltva</translation>
+      <translation type="unfinished">Disabled by schedule</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Press and hold</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Error</source>
-      <translation>Hiba</translation>
+      <translation type="unfinished">Error</translation>
     </message>
   </context>
   <context>
@@ -42,7 +42,7 @@
     <name>AppInfoPage</name>
     <message>
       <source>About</source>
-      <translation>Névjegy</translation>
+      <translation type="unfinished">About</translation>
     </message>
   </context>
   <context>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation>Nincs rögzítés</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
@@ -114,31 +114,31 @@
     <name>BooleanSelector</name>
     <message>
       <source>Yes</source>
-      <translation>Igen</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nem</translation>
+      <translation type="unfinished">No</translation>
     </message>
   </context>
   <context>
     <name>CameraSettingsScreen</name>
     <message>
       <source>Camera Settings</source>
-      <translation>Kamera beállítások</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation>Audio</translation>
+      <translation type="unfinished">Audio</translation>
     </message>
     <message>
       <source>Change Quality</source>
-      <translation>Minőség megváltozása</translation>
+      <translation type="unfinished">Change Quality</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>Unknown video quality</comment>
-      <translation>Ismeretlen</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
   <context>
@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
@@ -192,35 +192,35 @@
     <name>ComboBox</name>
     <message>
       <source>Cancel</source>
-      <translation>Mégsem</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation>Csatlakozás a szerverhez</translation>
+      <translation type="unfinished">Connect to Server</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Törlés</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation>Szerver címek és bejelentkezési adatok megmaradnak. Az összes kapcsolat adatainak törléséhez törölje a mentett felhasználókat.</translation>
+      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Kapcsolat törlése?</translation>
+      <translation type="unfinished">Delete connection?</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation>Adja meg a szerver címét</translation>
+      <translation type="unfinished">Enter server address</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation>&quot;%1&quot; login törlése?</translation>
+      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -235,65 +235,65 @@
     <name>DeprecatedVideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation>Nem tartozik mozgásérzékelési adat ehhez a kamerához</translation>
+      <translation type="unfinished">No motion data for this camera</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation>Nem található mozgás a kiválasztott területen</translation>
+      <translation type="unfinished">No motion found in the selected area</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation>Nem található mozgás a látható területen</translation>
+      <translation type="unfinished">No motion found in the visible area</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation>Nincs rögzítés</translation>
+      <translation type="unfinished">No Archive</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>ÉLŐ</translation>
+      <translation type="unfinished">LIVE</translation>
     </message>
   </context>
   <context>
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation>Terület</translation>
+      <translation type="unfinished">Area</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Kamera beállítások</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objektumok</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
+      <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation>A terület kiválasztásához először engedélyezze a mozgáskeresést</translation>
+      <translation type="unfinished">Enable motion search first to select an area</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Érvénytelen egyéni terület. Kérjük, rajzoljon egy megfelelőt.</translation>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
-      <translation>Előnézet</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Search by %1</source>
@@ -304,7 +304,7 @@
     <name>DeveloperSettingsPage</name>
     <message>
       <source>Developer Settings</source>
-      <translation>Fejlesztői beállítások</translation>
+      <translation type="unfinished">Developer Settings</translation>
     </message>
     <message>
       <source>Copy Client ID</source>
@@ -320,49 +320,49 @@
     </message>
     <message>
       <source>Log Level</source>
-      <translation>Rendszernapló szintje</translation>
+      <translation type="unfinished">Log Level</translation>
     </message>
   </context>
   <context>
     <name>DeviceSelector</name>
     <message>
       <source>Device</source>
-      <translation>Eszköz</translation>
+      <translation type="unfinished">Device</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégsem</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation type="unfinished">Close</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation>Igen</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nem</translation>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Megszakít</translation>
+      <translation type="unfinished">Abort</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation>Próbálja újra</translation>
+      <translation type="unfinished">Retry</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Kapcsolódás</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
   </context>
   <context>
@@ -377,7 +377,7 @@
     <name>DownloadMediaAction</name>
     <message>
       <source>Download</source>
-      <translation>Letöltés</translation>
+      <translation type="unfinished">Download</translation>
     </message>
   </context>
   <context>
@@ -396,7 +396,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -407,30 +407,30 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objektumok</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
   </context>
   <context>
     <name>EventSearchScreen</name>
     <message>
       <source>Objects</source>
-      <translation>Objektumok</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation>Nincsenek objektumok</translation>
+      <translation type="unfinished">No objects</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation>Nincsenek könyvjelzők</translation>
+      <translation type="unfinished">No bookmarks</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
@@ -446,7 +446,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation>Részletek</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <source>Reset All</source>
@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation>Törlés</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>
@@ -473,7 +473,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation>Beállítások</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -485,7 +485,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation>Nincs találat</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -513,7 +513,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Mind</translation>
+      <translation type="unfinished">All</translation>
     </message>
     <message>
       <source>Feed</source>
@@ -528,7 +528,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Mind</translation>
+      <translation type="unfinished">All</translation>
     </message>
     <message>
       <source>Period</source>
@@ -561,22 +561,22 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation>Hogyan működik</translation>
+      <translation type="unfinished">How it works</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégsem</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation>Folyatatás</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -587,33 +587,33 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Ismeretlen</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation>Nagy felbontás</translation>
+      <translation type="unfinished">Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Alacsony felbontás</translation>
+      <translation type="unfinished">Lo-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation>Keyfr + alacsony felbontás</translation>
+      <translation type="unfinished">Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation>Egyedi felbontás</translation>
+      <translation type="unfinished">Custom-Res</translation>
     </message>
     <message>
       <source>%1 fps</source>
       <comment>%1 is a count of frames per second</comment>
-      <translation>%1 fps</translation>
+      <translation type="unfinished">%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
       <comment>%1 is a mebgabits per second</comment>
-      <translation>%1 Mbps</translation>
+      <translation type="unfinished">%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -628,11 +628,11 @@
     </message>
     <message>
       <source>Show previews in the cameras list</source>
-      <translation>Az előnézetek megjelenítése a kamerák listájában</translation>
+      <translation type="unfinished">Show previews in the cameras list</translation>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>Szerveridő</translation>
+      <translation type="unfinished">Server Time</translation>
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
@@ -655,18 +655,18 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Megnyitás</translation>
+      <translation type="unfinished">Open</translation>
     </message>
     <message>
       <source>Open external link in browser?</source>
@@ -678,25 +678,25 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Nem lehet kapcsolódni ehhez: %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Bejelentkezés</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Kapcsolódás</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
   </context>
   <context>
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation>Szétkapcsolás</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect from %1?</source>
@@ -705,7 +705,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -716,7 +716,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Szétkapcsolás</translation>
+      <translation type="unfinished">Disconnect</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
@@ -739,11 +739,11 @@
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation>A kamera mozgatásához érintse meg a kijelzőt</translation>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation>MÉGSE</translation>
+      <translation type="unfinished">CANCEL</translation>
     </message>
   </context>
   <context>
@@ -761,58 +761,58 @@
     </message>
     <message>
       <source>No data</source>
-      <translation>Nincs adat</translation>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>
     <name>NotificationDetailsItem</name>
     <message>
       <source>Details</source>
-      <translation>Részletek</translation>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
     <name>ObjectDetailsSheet</name>
     <message>
       <source>Details</source>
-      <translation>Részletek</translation>
+      <translation type="unfinished">Details</translation>
     </message>
   </context>
   <context>
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation>Nézet</translation>
+      <translation type="unfinished">View</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objektumok</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Mozgás</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation>Bármely</translation>
+      <translation type="unfinished">Any</translation>
     </message>
   </context>
   <context>
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
-      <translation>Jelszó</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
@@ -823,7 +823,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Teljesítmény</translation>
+      <translation type="unfinished">Performance</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -880,11 +880,11 @@
     <name>PresetSheet</name>
     <message>
       <source>PTZ Presets</source>
-      <translation>PTZ presetek</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Bezárás</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -913,18 +913,18 @@
     </message>
     <message>
       <source>PTZ Presets</source>
-      <translation>PTZ presetek</translation>
+      <translation type="unfinished">PTZ Presets</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
     <name>PtzSheet</name>
     <message>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -943,11 +943,11 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation>Figylemeztetések</translation>
+      <translation type="unfinished">Notifications</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation>Kész</translation>
+      <translation type="unfinished">Done</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -967,15 +967,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation>Igen</translation>
+      <translation type="unfinished">Yes</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Nem</translation>
+      <translation type="unfinished">No</translation>
     </message>
     <message>
       <source>Save changes?</source>
-      <translation>Menti a módosításokat?</translation>
+      <translation type="unfinished">Save changes?</translation>
     </message>
     <message>
       <source>SELECTED %1/%2</source>
@@ -990,23 +990,23 @@
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation>Video minőség</translation>
+      <translation type="unfinished">Video Quality</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Ismeretlen</translation>
+      <translation type="unfinished">Unknown</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation>Legnagyobb sebesség</translation>
+      <translation type="unfinished">Highest speed</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation>Legjobb minőség</translation>
+      <translation type="unfinished">Best quality</translation>
     </message>
     <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation>Transzkódolás nem támogatott ennél a kameránál.</translation>
+      <translation type="unfinished">Transcoding is not supported for this camera.</translation>
     </message>
     <message>
       <source>Transcoding is disabled by the Server.</source>
@@ -1025,14 +1025,14 @@
     </message>
     <message>
       <source>To</source>
-      <translation>Kinek</translation>
+      <translation type="unfinished">To</translation>
     </message>
   </context>
   <context>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Type</source>
-      <translation>Típus</translation>
+      <translation type="unfinished">Type</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -1043,18 +1043,18 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Nincs találat</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
-      <translation>Beolvasás...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>Csatlakozás...</translation>
+      <translation type="unfinished">Connecting...</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
@@ -1062,7 +1062,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation>Források</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -1082,7 +1082,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation>Össze eszköz</translation>
+      <translation type="unfinished">All Devices</translation>
     </message>
   </context>
   <context>
@@ -1096,14 +1096,14 @@
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>Keresés</translation>
+      <translation type="unfinished">Search</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation>Biztonság</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -1111,7 +1111,7 @@
     </message>
     <message>
       <source>Automatically log in to servers</source>
-      <translation>Automatikus bejelentkezés a kiszolgálókra</translation>
+      <translation type="unfinished">Automatically log in to servers</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
@@ -1119,11 +1119,11 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Megtart</translation>
+      <translation type="unfinished">Keep</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Törlés</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -1131,7 +1131,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation>Ajánlott</translation>
+      <translation type="unfinished">Recommended</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -1150,19 +1150,19 @@
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Login</source>
-      <translation>Felhasználónév</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Jelszó</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation>Hosztok</translation>
+      <translation type="unfinished">Hosts</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Felhasználók</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <source>Host: Port</source>
@@ -1173,11 +1173,11 @@
     <name>SessionsScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation>Nincs találat</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Keresés</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <source>Organizations</source>
@@ -1197,7 +1197,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation>Bejelentkezés</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1245,14 +1245,14 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation>Források</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Beállítások</translation>
+      <translation type="unfinished">Settings</translation>
     </message>
   </context>
   <context>
@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Share</source>
-      <translation>Megosztás</translation>
+      <translation type="unfinished">Share</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
@@ -1271,7 +1271,7 @@
     </message>
     <message>
       <source>Bookmark created</source>
-      <translation>Könyvjelző létrehozva</translation>
+      <translation type="unfinished">Bookmark created</translation>
     </message>
     <message>
       <source>Cannot share bookmark</source>
@@ -1286,11 +1286,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation>Név</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;Leírás</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
@@ -1298,7 +1298,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégsem</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Create &amp; Share</source>
@@ -1353,23 +1353,23 @@
     </message>
     <message>
       <source>Login</source>
-      <translation>Felhasználónév</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Jelszó</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Mégsem</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Kapcsolódás</translation>
+      <translation type="unfinished">Connect</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation>Adja meg a szerver címét</translation>
+      <translation type="unfinished">Enter server address</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -1388,7 +1388,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation>Nincs találat</translation>
+      <translation type="unfinished">Nothing Found</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1396,11 +1396,11 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Felhő</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation>Bejelentkezés</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Log In to Cloud</source>
@@ -1411,15 +1411,15 @@
     <name>SiteListItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>NEM KOMPATIBILIS</translation>
+      <translation type="unfinished">INCOMPATIBLE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation type="unfinished">OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>NEM ELÉRHETŐ</translation>
+      <translation type="unfinished">UNREACHABLE</translation>
     </message>
     <message>
       <source>NEW</source>
@@ -1461,7 +1461,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>Lejár</translation>
+      <translation type="unfinished">Expires</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -1472,7 +1472,7 @@
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
   </context>
   <context>
@@ -1480,11 +1480,11 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>%1 Fiók</translation>
+      <translation type="unfinished">%1 Account</translation>
     </message>
     <message>
       <source>Log out</source>
-      <translation>Kijelentkezés</translation>
+      <translation type="unfinished">Log out</translation>
     </message>
     <message>
       <source>Open %1</source>
@@ -1503,7 +1503,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1514,49 +1514,49 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Mégse</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation>Folyatatás</translation>
+      <translation type="unfinished">Continue</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Cannot load video</source>
-      <translation>A videót nem lehet betölteni</translation>
+      <translation type="unfinished">Cannot load video</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation>Nincs lejátszható videó-stream</translation>
+      <translation type="unfinished">Cannot play any video stream</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation>Nincs elegendő licensz</translation>
+      <translation type="unfinished">Not enough licenses</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation>Jelszó szükséges</translation>
+      <translation type="unfinished">Password required</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation>Túl sok kapcsolat</translation>
+      <translation type="unfinished">Too many connections</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation>I / O interfész még nem támogatott</translation>
+      <translation type="unfinished">I/O interface not supported yet</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation>Nincs élő stream</translation>
+      <translation type="unfinished">No live stream</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
@@ -1568,11 +1568,11 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation>Bejelentkezés</translation>
+      <translation type="unfinished">Log In</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation>Offline</translation>
+      <translation type="unfinished">Offline</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation>Jogosulatlan</translation>
+      <translation type="unfinished">Unauthorized</translation>
     </message>
     <message>
       <source>Unsupported</source>
@@ -1588,34 +1588,34 @@
     </message>
     <message>
       <source>No data</source>
-      <translation>Nincs adat</translation>
+      <translation type="unfinished">No data</translation>
     </message>
   </context>
   <context>
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation>Terület</translation>
+      <translation type="unfinished">Area</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
+      <translation type="unfinished">Tap and hold to select an area</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Érvénytelen egyéni terület. Kérjük, rajzoljon egy megfelelőt.</translation>
+      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Kamera beállítások</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
+      <translation type="unfinished">Bookmarks</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation>Objektumok</translation>
+      <translation type="unfinished">Objects</translation>
     </message>
     <message>
       <source>PTZ Mode</source>
@@ -1643,7 +1643,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation>Mozgás</translation>
+      <translation type="unfinished">Motion</translation>
     </message>
   </context>
   <context>
@@ -1651,7 +1651,7 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation>Nem lehet kapcsolódni ehhez: %1</translation>
+      <translation type="unfinished">Cannot connect to %1</translation>
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>

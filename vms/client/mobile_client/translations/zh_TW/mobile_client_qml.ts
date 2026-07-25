@@ -965,10 +965,6 @@
       <translation>已選擇的站點</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>請至少選擇一個站點(site)</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>是</translation>
     </message>
@@ -983,6 +979,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation>已選 %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

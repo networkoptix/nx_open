@@ -965,10 +965,6 @@
       <translation>Site yang Dipilih</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>Setidaknya satu site harus dipilih</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>Ya</translation>
     </message>
@@ -983,6 +979,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation>TERPILIH %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

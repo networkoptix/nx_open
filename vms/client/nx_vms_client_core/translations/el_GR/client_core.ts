@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="lt_LT" sourcelanguage="en">
+<TS version="2.1" language="el_GR" sourcelanguage="en">
   <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <comment>Language name that will be displayed to the user.</comment>
-      <translation>Lietuvių</translation>
+      <translation>Ελληνικά</translation>
     </message>
   </context>
   <context>
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation>Lietuvių</translation>
+      <translation type="unfinished">New Site</translation>
     </message>
   </context>
   <context>
@@ -229,8 +229,6 @@
       <translation type="unfinished">
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>
     <message>
@@ -333,14 +331,12 @@
     </message>
     <message>
       <source>Any</source>
-      <translation>Bet kuris</translation>
+      <translation type="unfinished">Any</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
@@ -403,7 +399,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation>Debesis</translation>
+      <translation type="unfinished">Cloud</translation>
     </message>
     <message>
       <source>Local</source>
@@ -510,7 +506,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation>Kamera</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
   </context>
   <context>

@@ -966,10 +966,6 @@
       <translation>Utvalgte nettsteder</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>Minst ett nettsted må velges</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>Ja</translation>
     </message>
@@ -984,6 +980,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation type="unfinished">SELECTED %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

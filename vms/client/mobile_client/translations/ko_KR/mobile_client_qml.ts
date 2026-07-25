@@ -965,10 +965,6 @@
       <translation>선택된 사이트</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>최소한 하나의 사이트를 선택해야 합니다</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>예</translation>
     </message>
@@ -983,6 +979,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation type="unfinished">SELECTED %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>

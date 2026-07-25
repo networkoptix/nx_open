@@ -968,10 +968,6 @@
       <translation>Wybrane witryny</translation>
     </message>
     <message>
-      <source>At least one site has to be selected</source>
-      <translation>Należy wybrać co najmniej jedną witrynę</translation>
-    </message>
-    <message>
       <source>Yes</source>
       <translation>Tak</translation>
     </message>
@@ -986,6 +982,10 @@
     <message>
       <source>SELECTED %1/%2</source>
       <translation>WYBRANE %1/%2</translation>
+    </message>
+    <message>
+      <source>Please select at least one site</source>
+      <translation type="unfinished">Please select at least one site</translation>
     </message>
   </context>
   <context>
