@@ -8239,7 +8239,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Lietuvių</translation>
     </message>
   </context>
   <context>
@@ -9825,7 +9825,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Lietuvių</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -12735,7 +12735,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Lietuvių</translation>
     </message>
   </context>
   <context>

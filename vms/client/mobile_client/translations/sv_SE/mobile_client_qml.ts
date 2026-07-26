@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Välj minst en sajt</translation>
     </message>
   </context>
   <context>
