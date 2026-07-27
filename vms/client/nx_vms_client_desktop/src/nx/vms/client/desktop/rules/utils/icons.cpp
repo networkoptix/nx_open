@@ -156,7 +156,7 @@ std::pair<QIcon, QIcon::Mode> selectButtonIcon(
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
-    common::getUsersAndGroups(context, field->ids(), users, groups);
+    common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), field->ids(), users, groups);
 
     const auto usersCount = users.size() + additionalCount;
 
@@ -209,7 +209,7 @@ std::pair<QIcon, QIcon::Mode> selectButtonIcon(SystemContext* context, vms::rule
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
-    common::getUsersAndGroups(context, field->ids(), users, groups);
+    common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), field->ids(), users, groups);
 
     if (users.empty() && groups.empty())
         return getIcon(ResourceIconCache::User, QIcon::Mode::Disabled);

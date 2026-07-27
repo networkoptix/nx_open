@@ -1501,7 +1501,7 @@ std::future<UpdateContents> ServerUpdateTool::checkForUpdate(
     }
 
     return std::async(std::launch::async,
-        [updateUrl = nx::vms::common::update::releaseListUrl(systemContext()),
+        [updateUrl = nx::vms::common::update::releaseListUrl(systemContext()->globalSettings()),
             api,
             infoParams]() -> UpdateContents
         {

@@ -347,7 +347,7 @@ void TileInteractionHandler::executePluginAction(
     if (!systemContext->connectedServerApi())
         return;
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext);
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext->resourcePool(), systemContext->runtimeInfoManager());
     const auto actionDescriptor = descriptorManager.descriptor(actionTypeId.toStdString());
     if (!actionDescriptor)
         return;

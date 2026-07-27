@@ -363,7 +363,7 @@ void SubjectSelectionDialog::setCheckedSubjects(const QSet<nx::Uuid>& ids)
 {
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
-    nx::vms::common::getUsersAndGroups(system(), ids, users, groupIds);
+    nx::vms::common::getUsersAndGroups(system()->resourcePool(), system()->userGroupManager(), ids, users, groupIds);
 
     QSet<nx::Uuid> userIds;
     bool nonCustomUsers = false;

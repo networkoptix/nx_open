@@ -10,7 +10,6 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx/vms/common/system_context_aware.h>
 #include <recording/time_period.h>
 
 class QnCommonMessageProcessor;
@@ -35,14 +34,12 @@ namespace nx::vms::api { struct ServerRuntimeEventData; }
  *  All methods that require camera history to operate are non-reliable.
  *
  */
-class NX_VMS_COMMON_API QnCameraHistoryPool:
-    public QObject,
-    public nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API QnCameraHistoryPool: public QObject
 {
     Q_OBJECT
 
 public:
-    QnCameraHistoryPool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
+    QnCameraHistoryPool(QnResourcePool* resourcePool, QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool() override;
 
     /** Reset information about camera footage presence on different servers. */
@@ -195,6 +192,7 @@ private:
         const nx::Uuid& cameraId,
         const nx::vms::api::CameraHistoryItemDataList& historyDetails) const;
 private:
+    QnResourcePool* const m_resourcePool;
     int m_historyCheckDelay;
     mutable nx::Mutex m_mutex;
     QMap<nx::Uuid, QSet<nx::Uuid>> m_archivedCamerasByServer; // Server to cameras map.

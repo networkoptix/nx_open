@@ -54,16 +54,13 @@ nx::vms::api::CameraHistoryItemDataList::const_iterator getMediaServerOnTimeInte
 
 // ------------------- CameraHistory Pool ------------------------
 
-QnCameraHistoryPool::QnCameraHistoryPool(
-    nx::vms::common::SystemContext* context,
-    QObject *parent)
-    :
+QnCameraHistoryPool::QnCameraHistoryPool(QnResourcePool* resourcePool, QObject *parent):
     QObject(parent),
-    nx::vms::common::SystemContextAware(context),
+    m_resourcePool(resourcePool),
     m_historyCheckDelay(kDefaultHistoryCheckDelay),
     m_mutex(nx::Mutex::Recursive)
 {
-    connect(resourcePool(), &QnResourcePool::statusChanged, this,
+    connect(m_resourcePool, &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource)
         {
             NX_VERBOSE(this,
@@ -131,7 +128,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr c
 
             m_camerasToCheck.remove(id);
 
-            auto cam = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+            auto cam = m_resourcePool->getResourceById<QnVirtualCameraResource>(id);
             if (!cam)
                 return;
 
@@ -178,7 +175,7 @@ void QnCameraHistoryPool::onServerRuntimeEvent(
 
         if (healthMessage == MessageType::remoteArchiveSyncError)
         {
-            for (const auto& camera: resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
+            for (const auto& camera: m_resourcePool->getResourcesByIds<QnVirtualCameraResource>(
                 message.resourceIds))
             {
                 cameras.insert(camera->getId());
@@ -202,9 +199,6 @@ void QnCameraHistoryPool::onServerRuntimeEvent(
 
 bool QnCameraHistoryPool::isCameraHistoryValid(const QnVirtualCameraResourcePtr& camera) const
 {
-    if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
-        return false;
-
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_historyValidCameras.contains(camera->getId());
 }
@@ -232,7 +226,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const nx::Uuid& cameraId) {
 
     if (requestToTerminate)
     {
-        auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        auto server = m_resourcePool->getResourceById<QnMediaServerResource>(
             requestToTerminate->serverId);
         if (NX_ASSERT(server))
             server->restConnection()->cancelRequest(requestToTerminate->handle);
@@ -250,7 +244,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
     if (!NX_ASSERT(camera))
         return StartResult::failed;
 
-    if (!NX_ASSERT(camera->systemContext() == this->systemContext()))
+    if (!NX_ASSERT(camera->resourcePool() == m_resourcePool))
         return StartResult::failed;
 
     const auto api = connectedServerApi();
@@ -454,19 +448,19 @@ nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers
 
 QnVirtualCameraResourcePtr QnCameraHistoryPool::toCamera(const nx::Uuid& guid) const
 {
-    return resourcePool()->getResourceById<QnVirtualCameraResource>(guid);
+    return m_resourcePool->getResourceById<QnVirtualCameraResource>(guid);
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(nx::Uuid guid) const
 {
-    return resourcePool()->getResourceById<QnMediaServerResource>(guid);
+    return m_resourcePool->getResourceById<QnMediaServerResource>(guid);
 }
 
 rest::ServerConnectionPtr QnCameraHistoryPool::connectedServerApi() const
 {
-    if (const auto mbc = messageBusConnection())
+    if (const auto mbc = m_messageProcessor ? m_messageProcessor->connection() : nullptr)
     {
-        if (const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        if (const auto server = m_resourcePool->getResourceById<QnMediaServerResource>(
             mbc->moduleInformation().id))
         {
             return server->restConnection();

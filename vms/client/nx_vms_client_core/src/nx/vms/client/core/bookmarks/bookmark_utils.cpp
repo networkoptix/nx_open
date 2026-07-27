@@ -102,7 +102,7 @@ bool bookmarkSharingAvailable(SystemContext* context)
     if (!NX_ASSERT(context && context->mode() == SystemContext::Mode::client))
         return false;
 
-    if (!nx::vms::common::saas::saasInitialized(context))
+    if (!nx::vms::common::saas::saasInitialized(context->saasServiceManager()))
         return false;
 
     if (context->saasServiceManager()->saasSuspendedOrShutDown())

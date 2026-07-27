@@ -6,7 +6,6 @@
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/saas/saas_service_manager.h>
 #include <nx/vms/common/system_context.h>
-#include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::common::saas {
 
@@ -14,12 +13,8 @@ using namespace nx::vms::api;
 
 namespace {
 
-bool servicesOverused(SystemContext* systemContext, const QString& seriviceType)
+bool servicesOverused(ServiceManager* saasServiceManager, const QString& seriviceType)
 {
-    if (!NX_ASSERT(systemContext))
-        return false;
-
-    const auto saasServiceManager = systemContext->saasServiceManager();
     if (!NX_ASSERT(saasServiceManager))
         return false;
 
@@ -32,41 +27,45 @@ bool servicesOverused(SystemContext* systemContext, const QString& seriviceType)
 
 } // namespace
 
+bool saasInitialized(const ServiceManager* saasServiceManager)
+{
+    return saasServiceManager->saasState() != SaasState::uninitialized;
+}
+
 bool saasInitialized(const SystemContext* systemContext)
 {
-    return systemContext->saasServiceManager()->saasState() != SaasState::uninitialized;
+    return saasInitialized(systemContext->saasServiceManager());
 }
 
-bool saasServicesOperational(SystemContext* systemContext)
+bool saasServicesOperational(ServiceManager* saasServiceManager)
 {
-    return systemContext->saasServiceManager()->saasServiceOperational();
+    return saasServiceManager->saasServiceOperational();
 }
 
-bool crossSiteNotificationsAllowed(SystemContext* systemContext)
+bool crossSiteNotificationsAllowed(ServiceManager* saasServiceManager)
 {
-    const auto saas = systemContext->saasServiceManager();
-    return saasServicesOperational(systemContext)
-        && saas->hasFeature(nx::vms::api::SaasTierLimitName::crossSiteAllowed);
+    return saasServicesOperational(saasServiceManager)
+        && saasServiceManager->hasFeature(nx::vms::api::SaasTierLimitName::crossSiteAllowed);
 }
 
-bool localRecordingServicesOverused(SystemContext* systemContext)
+bool localRecordingServicesOverused(ServiceManager* saasServiceManager)
 {
     return servicesOverused(
-        systemContext,
+        saasServiceManager,
         nx::vms::api::SaasService::kLocalRecordingServiceType);
 }
 
-bool cloudStorageServicesOverused(SystemContext* systemContext)
+bool cloudStorageServicesOverused(ServiceManager* saasServiceManager)
 {
     return servicesOverused(
-        systemContext,
+        saasServiceManager,
         nx::vms::api::SaasService::kCloudRecordingType);
 }
 
-bool integrationServicesOverused(SystemContext* systemContext)
+bool integrationServicesOverused(ServiceManager* saasServiceManager)
 {
     return servicesOverused(
-        systemContext,
+        saasServiceManager,
         nx::vms::api::SaasService::kAnalyticsIntegrationServiceType);
 }
 

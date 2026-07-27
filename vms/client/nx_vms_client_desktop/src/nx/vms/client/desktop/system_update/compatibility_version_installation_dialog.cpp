@@ -324,7 +324,7 @@ void CompatibilityVersionInstallationDialog::startUpdate()
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
     const nx::Url updateUrl = nx::vms::common::update::releaseListUrl(
-        m_private->clientUpdateTool->systemContext());
+        m_private->clientUpdateTool->systemContext()->globalSettings());
 
     m_private->checkingUpdates = true;
 

@@ -194,7 +194,8 @@ void UserNotificationSettingsManager::onLicensingModeChanged()
 void UserNotificationSettingsManager::updateSupportedTypes()
 {
     m_supportedMessageTypes = nx::utils::toQList(allMessageTypes(
-        {isMessageVisibleInSettings, isMessageApplicableForLicensingMode(systemContext())}));
+        {isMessageVisibleInSettings,
+            isMessageApplicableForLicensingMode(systemContext()->saasServiceManager())}));
 
     m_supportedEventTypes = filterEvents(systemContext(), kVisibleEventFilters);
 }

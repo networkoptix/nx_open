@@ -5,16 +5,12 @@
 #include <gtest/gtest.h>
 
 #include <core/resource_access/permissions_cache.h>
-#include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/test_support/test_context.h>
 
 namespace nx::core::access {
 namespace test {
 
 using namespace Qn;
-using namespace nx::vms::common::test;
-
-class PermissionsCacheTest: public ContextBasedTest
+class PermissionsCacheTest: public ::testing::Test
 {
 protected:
     static constexpr int kRoleSubjectsCount = 200;

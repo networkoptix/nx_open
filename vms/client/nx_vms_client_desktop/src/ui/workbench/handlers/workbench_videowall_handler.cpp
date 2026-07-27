@@ -1658,7 +1658,7 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts(const QnVideoWallResource
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
-    if (nx::vms::common::saas::saasInitialized(systemContext()))
+    if (nx::vms::common::saas::saasInitialized(systemContext()->saasServiceManager()))
     {
         if (systemContext()->saasServiceManager()->saasShutDown())
         {

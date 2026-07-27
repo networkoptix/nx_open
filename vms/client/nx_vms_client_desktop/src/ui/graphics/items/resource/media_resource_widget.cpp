@@ -2625,7 +2625,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (qnRuntime->isVideoWallMode())
     {
-        if (nx::vms::common::saas::saasInitialized(systemContext()))
+        if (nx::vms::common::saas::saasInitialized(systemContext()->saasServiceManager()))
         {
             if (systemContext()->saasServiceManager()->saasShutDown())
                 return Qn::SaasShutDown;

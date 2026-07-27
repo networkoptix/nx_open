@@ -103,7 +103,8 @@ ResourceData actionUserData(SystemContext* systemContext, const EventLogModelDat
         else
         {
             QnUserResourceList users;
-            nx::vms::common::getUsersAndGroups(systemContext, selection.ids, users, result.groups);
+            nx::vms::common::getUsersAndGroups(systemContext->resourcePool(),
+                systemContext->userGroupManager(), selection.ids, users, result.groups);
 
             result.resources = users.filtered<QnResource>();
 

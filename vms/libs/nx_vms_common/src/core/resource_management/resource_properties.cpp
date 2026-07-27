@@ -3,17 +3,16 @@
 #include "resource_properties.h"
 
 #include <nx/utils/qt_helpers.h>
-#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
 #include <nx/utils/log/log.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(
-    nx::vms::common::SystemContext* context,
+    std::function<ec2::AbstractECConnectionPtr()> messageBusConnection,
     QObject* parent)
     :
     QObject(parent),
-    nx::vms::common::SystemContextAware(context)
+    m_messageBusConnection(std::move(messageBusConnection))
 {
 }
 
@@ -34,7 +33,7 @@ bool QnResourcePropertyDictionary::saveParams(const nx::Uuid& resourceId)
     if( params.empty() )
         return true;
 
-    ec2::AbstractECConnectionPtr conn = messageBusConnection();
+    ec2::AbstractECConnectionPtr conn = m_messageBusConnection();
     if (!conn)
     {
         NX_WARNING(this, "%1: No connection", __func__);
@@ -71,7 +70,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
 {
     if (data.empty())
         return -1; // nothing to save
-    ec2::AbstractECConnectionPtr conn = messageBusConnection();
+    ec2::AbstractECConnectionPtr conn = m_messageBusConnection();
     if (!conn)
         return -1; // not connected to ec2
     int requestId = conn->getResourceManager(nx::network::rest::kSystemSession)->save(

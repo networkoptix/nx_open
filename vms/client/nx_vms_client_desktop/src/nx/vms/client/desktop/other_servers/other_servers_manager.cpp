@@ -64,7 +64,7 @@ struct OtherServersManager::Private
         auto moduleInformation = server->getModuleInformation();
 
         if (status != nx::vms::api::ResourceStatus::offline
-            && helpers::serverBelongsToCurrentSystem(moduleInformation, q->systemContext())
+            && helpers::serverBelongsToCurrentSystem(moduleInformation, q->systemContext()->globalSettings())
             && nx::vms::common::ServerCompatibilityValidator::isCompatible(moduleInformation))
         {
             removeOtherServer(server->getId());

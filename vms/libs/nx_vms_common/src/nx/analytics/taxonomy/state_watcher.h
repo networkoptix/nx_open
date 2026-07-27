@@ -4,19 +4,22 @@
 
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/system_context_aware.h>
+
+class QnResourcePool;
+class QnResourcePropertyDictionary;
 
 namespace nx::analytics::taxonomy {
 
 class State;
 class DescriptorContainer;
 
-class StateWatcher: public AbstractStateWatcher, public nx::vms::common::SystemContextAware
+class StateWatcher: public AbstractStateWatcher
 {
 public:
     StateWatcher(
         DescriptorContainer* taxonomyDescriptorContainer,
-        nx::vms::common::SystemContext* systemContext,
+        QnResourcePool* resourcePool,
+        QnResourcePropertyDictionary* resourcePropertyDictionary,
         QObject* parent = nullptr);
 
     virtual std::shared_ptr<AbstractState> state() const override;
@@ -28,6 +31,8 @@ private:
 
 private:
     DescriptorContainer* const m_taxonomyDescriptorContainer;
+    QnResourcePool* const m_resourcePool;
+    QnResourcePropertyDictionary* const m_resourcePropertyDictionary;
     mutable nx::Mutex m_mutex;
     mutable std::shared_ptr<AbstractState> m_state;
 };

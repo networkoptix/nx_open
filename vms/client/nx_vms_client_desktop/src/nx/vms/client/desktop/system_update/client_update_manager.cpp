@@ -253,7 +253,7 @@ void ClientUpdateManager::Private::checkForUpdate()
 
     updateContentsFuture = std::async(std::launch::async,
         [weakApi = std::weak_ptr(connectedServerApi()),
-            url = nx::vms::common::update::releaseListUrl(systemContext()),
+            url = nx::vms::common::update::releaseListUrl(systemContext()->globalSettings()),
             params = std::move(params),
             callback = std::move(callback)]() mutable
         {

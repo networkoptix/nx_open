@@ -8,11 +8,11 @@
 
 using namespace nx::vms::common;
 
-QnCameraNamesWatcher::QnCameraNamesWatcher(SystemContext* systemContext):
+QnCameraNamesWatcher::QnCameraNamesWatcher(QnResourcePool* resourcePool):
     base_type(nullptr),
-    SystemContextAware(systemContext),
-    m_names()
+    m_resourcePool(resourcePool)
 {
+    NX_ASSERT(m_resourcePool);
 }
 
 QnCameraNamesWatcher::~QnCameraNamesWatcher()
@@ -25,13 +25,11 @@ QString QnCameraNamesWatcher::getCameraName(const nx::Uuid& cameraId)
     if (it != m_names.end())
         return *it;
 
-    const auto& resPool = resourcePool();
-
-    const auto cameraResource = resPool->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto cameraResource = m_resourcePool->getResourceById<QnVirtualCameraResource>(cameraId);
     if (!cameraResource)
         return nx::format("<%1>", tr("Removed camera"));
 
-    connect(resPool, &QnResourcePool::resourcesRemoved, this,
+    connect(m_resourcePool, &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             for (const auto& resource: resources)

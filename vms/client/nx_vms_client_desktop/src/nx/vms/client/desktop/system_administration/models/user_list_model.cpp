@@ -117,7 +117,7 @@ QStringList userGroupNamesSorted(const QnUserResourcePtr & user)
         return {};
 
     return nx::vms::common::userGroupNames(
-        user->systemContext(),
+        user->systemContext()->userGroupManager(),
         utils::unique_sorted(user->allGroupIds()),
         [](const auto& g1, const auto& g2)
         {

@@ -15,7 +15,7 @@
 
 #include "camera_bookmark_fwd.h"
 
-namespace nx::vms::common { class SystemContext; }
+class QnResourcePool;
 
 namespace nx::vms::common {
 
@@ -122,17 +122,17 @@ struct NX_VMS_COMMON_API CameraBookmark
     static QString tagsToString(
         const CameraBookmarkTags& tags, const QString& delimiter = QStringLiteral(", "));
 
-    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+    static CameraBookmarkList mergeCameraBookmarks(QnResourcePool* resourcePool,
         MultiServerCameraBookmarkList source,
         const CameraBookmarkSearchFilter& filter);
 
-    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+    static CameraBookmarkList mergeCameraBookmarks(QnResourcePool* resourcePool,
         MultiServerCameraBookmarkList source,
         const BookmarkSortOrder& sortOrder = BookmarkSortOrder::defaultOrder,
         const std::optional<std::chrono::milliseconds>& minVisibleLength = std::nullopt,
         int limit = std::numeric_limits<int>::max());
 
-    static CameraBookmarkList mergeCameraBookmarks(nx::vms::common::SystemContext* systemContext,
+    static CameraBookmarkList mergeCameraBookmarks(QnResourcePool* resourcePool,
         MultiServerCameraBookmarkList source,
         const BookmarkSortOrder& sortOrder,
         std::chrono::milliseconds centralTimePointMs,

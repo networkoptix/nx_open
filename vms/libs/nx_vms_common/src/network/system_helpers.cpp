@@ -89,30 +89,31 @@ QString getSystemName(const nx::vms::api::ModuleInformation& info)
         : info.systemName;
 }
 
-nx::Uuid currentSystemLocalId(const nx::vms::common::SystemContext* context)
+nx::Uuid currentSystemLocalId(const nx::vms::common::SystemSettings* globalSettings)
 {
-    if (!context)
+    if (!globalSettings)
         return nx::Uuid();
 
-    return context->globalSettings()->localSystemId();
+    return globalSettings->localSystemId();
 }
 
 bool serverBelongsToCurrentSystem(
-    const nx::vms::api::ModuleInformation& info, const nx::vms::common::SystemContext* context)
+    const nx::vms::api::ModuleInformation& info,
+    const nx::vms::common::SystemSettings* globalSettings)
 {
     return !isNewSystem(info)
-        && (getLocalSystemId(info) == currentSystemLocalId(context));
+        && (getLocalSystemId(info) == currentSystemLocalId(globalSettings));
 }
 
 bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server)
 {
-    return serverBelongsToCurrentSystem(server->getModuleInformation(), server->systemContext());
+    return serverBelongsToCurrentSystem(server->getModuleInformation(),
+        server->systemContext()->globalSettings());
 }
 
-bool currentSystemIsNew(const nx::vms::common::SystemContext* context)
+bool currentSystemIsNew(const nx::vms::common::SystemSettings* globalSettings)
 {
-    const auto& settings = context->globalSettings();
-    return settings->localSystemId().isNull();
+    return globalSettings->localSystemId().isNull();
 }
 
 QString serverCloudHost(const QString& systemId, const nx::Uuid& serverId)

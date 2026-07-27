@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <functional>
 #include <optional>
 
 #include <nx/network/http/http_types.h>
@@ -13,16 +14,16 @@
 #include <nx/utils/byte_array.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/system_context_aware.h>
+#include <nx/utils/uuid.h>
 
+class QnResourcePool;
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
+namespace nx::vms::common { class SystemSettings; }
 
 static constexpr char kRfc4571Stun[] = "RFC4571+STUN";
 
-class NX_VMS_COMMON_API QnTCPConnectionProcessor:
-    public QnLongRunnable,
-    public /*mixin*/ nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API QnTCPConnectionProcessor: public QnLongRunnable
 {
     using base_type = QnLongRunnable;
 
@@ -39,6 +40,9 @@ public:
     QnTCPConnectionProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         int maxTcpRequestSize);
 
     virtual ~QnTCPConnectionProcessor();
@@ -116,6 +120,12 @@ public:
     nx::network::rest::AuthSession authSession() const;
 
     QnTcpListener* owner() const;
+    const nx::vms::common::SystemSettings* globalSettings() const
+    {
+        return m_globalSettings();
+    }
+    QnResourcePool* resourcePool() const { return m_resourcePool; }
+    nx::Uuid peerId() const { return m_peerId; }
 
     static void logRequestOrResponse(
         const QByteArray& logMessage,
@@ -161,13 +171,18 @@ protected:
         QnTCPConnectionProcessorPrivate* d_ptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         int maxTcpRequestSize);
 
     /** For inherited classes without a TCP server socket only. */
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* dptr,
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
-        nx::vms::common::SystemContext* systemContext,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         int maxTcpRequestSize);
 
     int maxTcpRequestSize() const { return m_maxTcpRequestSize; }
@@ -179,6 +194,11 @@ protected:
         nx::network::http::StatusCode::Value httpResult,
         const nx::network::rest::Result& result,
         const QByteArray& messageBody = {});
+
+private:
+    const nx::Uuid m_peerId;
+    const std::function<const nx::vms::common::SystemSettings*()> m_globalSettings;
+    QnResourcePool* const m_resourcePool;
 
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);

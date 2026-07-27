@@ -10,29 +10,31 @@ namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::common::saas {
 
+class ServiceManager;
+
 /**
- * @return True if the system described by the given systemContext is a SaaS system.
+ * @return True if the service manager belongs to a SaaS system.
  */
+NX_VMS_COMMON_API bool saasInitialized(const ServiceManager* saasServiceManager);
 NX_VMS_COMMON_API bool saasInitialized(const SystemContext* systemContext);
 
 /**
- * @return True if the system described by the given systemContext is a SaaS system and this system
- *     formally in the operational state, e.g. can use SaaS services. This includes suspended state
- *     as well.
+ * @return True if the service manager belongs to a SaaS system that is formally operational,
+ *     including the suspended state.
  */
-NX_VMS_COMMON_API bool saasServicesOperational(SystemContext* systemContext);
+NX_VMS_COMMON_API bool saasServicesOperational(ServiceManager* saasServiceManager);
 
 /**
- * @return True if the system described by the given systemContext is a SaaS system and this system
- *     formally in the operational state, and sending cross-site notifications is enabled as well.
+ * @return True if the service manager belongs to an operational SaaS system where sending
+ *     cross-site notifications is enabled.
  */
-NX_VMS_COMMON_API bool crossSiteNotificationsAllowed(SystemContext* systemContext);
+NX_VMS_COMMON_API bool crossSiteNotificationsAllowed(ServiceManager* saasServiceManager);
 
-NX_VMS_COMMON_API bool localRecordingServicesOverused(SystemContext* systemContext);
+NX_VMS_COMMON_API bool localRecordingServicesOverused(ServiceManager* saasServiceManager);
 
-NX_VMS_COMMON_API bool cloudStorageServicesOverused(SystemContext* systemContext);
+NX_VMS_COMMON_API bool cloudStorageServicesOverused(ServiceManager* saasServiceManager);
 
-NX_VMS_COMMON_API bool integrationServicesOverused(SystemContext* systemContext);
+NX_VMS_COMMON_API bool integrationServicesOverused(ServiceManager* saasServiceManager);
 
 class NX_VMS_COMMON_API StringsHelper
 {

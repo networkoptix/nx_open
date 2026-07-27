@@ -325,7 +325,7 @@ void NotificationListWidget::Private::changeHeaderItemsVisibilityIfNeeded()
 
     if (auto user = system()->user(); user && user->isCloud()
         && qnCloudStatusWatcher->cloudSystems().size() > 1
-        && saas::crossSiteNotificationsAllowed(system())
+        && saas::crossSiteNotificationsAllowed(system()->saasServiceManager())
         && appContext()->cloudServiceChecker()->hasService(
             nx::vms::client::core::CloudService::cloud_notifications))
     {

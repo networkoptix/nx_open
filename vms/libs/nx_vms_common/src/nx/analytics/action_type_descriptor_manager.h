@@ -6,14 +6,15 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/common/system_context_aware.h>
+
+class QnRuntimeInfoManager;
 
 namespace nx::analytics {
 
-class NX_VMS_COMMON_API ActionTypeDescriptorManager: public nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API ActionTypeDescriptorManager final
 {
 public:
-    ActionTypeDescriptorManager(nx::vms::common::SystemContext* systemContext);
+    ActionTypeDescriptorManager(QnResourcePool* resourcePool, QnRuntimeInfoManager* runtimeInfoManager);
 
     std::optional<nx::vms::api::analytics::ActionTypeDescriptor> descriptor(
         const nx::vms::api::analytics::ActionTypeId& actionTypeId) const;
@@ -21,6 +22,10 @@ public:
     nx::vms::api::analytics::ActionTypeDescriptorMap availableObjectActionTypeDescriptors(
         const nx::vms::api::analytics::ObjectTypeId& objectTypeId,
         const QnVirtualCameraResourcePtr& device) const;
+
+private:
+    QnResourcePool* const m_resourcePool;
+    QnRuntimeInfoManager* const m_runtimeInfoManager;
 };
 
 } // namespace nx::analytics

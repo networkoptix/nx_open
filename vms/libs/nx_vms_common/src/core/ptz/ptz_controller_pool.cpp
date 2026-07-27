@@ -73,9 +73,9 @@ private:
 //-------------------------------------------------------------------------------------------------
 // QnPtzControllerPool methods
 
-QnPtzControllerPool::QnPtzControllerPool(SystemContext* systemContext, QObject* parent):
+QnPtzControllerPool::QnPtzControllerPool(QnResourcePool* resourcePool, QObject* parent):
     QObject(parent),
-    SystemContextAware(systemContext),
+    m_resourcePool(resourcePool),
     d(new Private())
 {
     d->q = this;
@@ -99,7 +99,7 @@ QnPtzControllerPool::~QnPtzControllerPool()
 
 void QnPtzControllerPool::init()
 {
-    connect(resourcePool(),
+    connect(m_resourcePool,
         &QnResourcePool::resourcesAdded,
         this,
         [this] (const QnResourceList& resources)
@@ -107,7 +107,7 @@ void QnPtzControllerPool::init()
             for (const auto& resource: resources)
                 registerResource(resource);
         });
-    connect(resourcePool(),
+    connect(m_resourcePool,
         &QnResourcePool::resourcesRemoved,
         this,
         [this] (const QnResourceList& resources)
@@ -116,7 +116,7 @@ void QnPtzControllerPool::init()
                 unregisterResource(resource);
         });
 
-    for (const QnResourcePtr& resource: resourcePool()->getResources())
+    for (const QnResourcePtr& resource: m_resourcePool->getResources())
         registerResource(resource);
 }
 

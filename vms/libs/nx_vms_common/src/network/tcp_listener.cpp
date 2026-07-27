@@ -11,7 +11,6 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
-#include <nx/vms/common/system_context.h>
 
 #include "tcp_connection_processor.h"
 
@@ -25,6 +24,7 @@ namespace {
 class QnTcpListenerPrivate
 {
 public:
+    std::weak_ptr<nx::metric::Storage> metrics;
     nx::network::SocketGlobals::InitGuard socketGlobalsInitGuard;
     std::unique_ptr<nx::network::AbstractStreamServerSocket> serverSocket;
     nx::network::SocketAddress localEndpoint;
@@ -77,15 +77,14 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
 }
 
 QnTcpListener::QnTcpListener(
-    nx::vms::common::SystemContext* systemContext,
+    std::weak_ptr<nx::metric::Storage> metrics,
     int maxTcpRequestSize,
     const QHostAddress& address,
     int port,
     int maxConnections,
     bool useSSL)
     :
-    nx::vms::common::SystemContextAware(systemContext),
-    d_ptr(new QnTcpListenerPrivate()),
+    d_ptr(new QnTcpListenerPrivate{.metrics = std::move(metrics)}),
     m_maxTcpRequestSize(maxTcpRequestSize)
 {
     Q_D(QnTcpListener);
@@ -336,14 +335,13 @@ void QnTcpListener::run()
             auto clientSocket = d->serverSocket->accept();
             if (clientSocket)
             {
-                if (systemContext())
+                if (const auto metrics = d->metrics.lock())
                 {
-                    systemContext()->metrics()->tcpConnections().total()++;
+                    metrics->tcpConnections().total()++;
                     clientSocket->setBeforeDestroyCallback(
-                        [weakRef = std::weak_ptr<nx::metric::Storage>(systemContext()->metrics())]
-                        ()
+                        [weakMetrics = d->metrics]()
                         {
-                            if (auto metrics = weakRef.lock())
+                            if (const auto metrics = weakMetrics.lock())
                                 metrics->tcpConnections().total()--;
                         });
                 }

@@ -455,18 +455,18 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::saasLocalRecordingServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(systemContext())
-                && saas::localRecordingServicesOverused(systemContext());
+                && saas::saasInitialized(systemContext()->saasServiceManager())
+                && saas::localRecordingServicesOverused(systemContext()->saasServiceManager());
 
         case SystemHealthIndex::saasCloudStorageServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(systemContext())
-                && saas::cloudStorageServicesOverused(systemContext());
+                && saas::saasInitialized(systemContext()->saasServiceManager())
+                && saas::cloudStorageServicesOverused(systemContext()->saasServiceManager());
 
         case SystemHealthIndex::saasIntegrationServicesOverused:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(systemContext())
-                && saas::integrationServicesOverused(systemContext());
+                && saas::saasInitialized(systemContext()->saasServiceManager())
+                && saas::integrationServicesOverused(systemContext()->saasServiceManager());
 
         case SystemHealthIndex::saasInSuspendedState:
             return hasPowerUserPermissions()
@@ -479,7 +479,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
 
         case SystemHealthIndex::saasTierIssue:
             return hasPowerUserPermissions()
-                && saas::saasInitialized(systemContext())
+                && saas::saasInitialized(systemContext()->saasServiceManager())
                 && systemContext()->saasServiceManager()->isTierGracePeriodStarted();
 
         case SystemHealthIndex::notificationLanguageDiffers:

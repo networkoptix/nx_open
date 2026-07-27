@@ -13,8 +13,8 @@
 namespace nx::vms::client::core {
 namespace ptz {
 
-ControllerPool::ControllerPool(common::SystemContext* systemContext, QObject* parent):
-    base_type(systemContext, parent)
+ControllerPool::ControllerPool(QnResourcePool* resourcePool, QObject* parent):
+    base_type(resourcePool, parent)
 {
     init();
 }

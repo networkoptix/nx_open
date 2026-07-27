@@ -6,15 +6,14 @@
 #include <nx/utils/impl_ptr.h>
 
 class QnResourcePool;
-
-namespace nx::vms::common { class SystemContext; }
+class QnResourcePropertyDictionary;
 
 namespace nx::analytics::taxonomy {
 
 class NX_VMS_COMMON_API ResourceSupportProxy: public AbstractResourceSupportProxy
 {
 public:
-    ResourceSupportProxy(nx::vms::common::SystemContext* systemContext);
+    ResourceSupportProxy(QnResourcePool* resourcePool, QnResourcePropertyDictionary* resourcePropertyDictionary);
 
     ~ResourceSupportProxy();
 

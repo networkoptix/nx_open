@@ -66,7 +66,7 @@ void QnAttachToVideowallDialog::updateLicencesUsage()
 {
     const auto systemContext = m_videowall->systemContext();
 
-    if (nx::vms::common::saas::saasInitialized(systemContext))
+    if (nx::vms::common::saas::saasInitialized(systemContext->saasServiceManager()))
     {
         using namespace nx::vms::common;
 

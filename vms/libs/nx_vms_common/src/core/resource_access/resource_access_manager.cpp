@@ -133,8 +133,7 @@ QnResourceAccessManager::QnResourceAccessManager(
             QnUserResourceList affectedUsers;
             QSet<nx::Uuid> affectedGroupIds;
 
-            getUsersAndGroups(systemContext(), recursiveSubjectsWithChangedParents, affectedUsers,
-                affectedGroupIds);
+            getUsersAndGroups(resourcePool(), userGroupManager(), recursiveSubjectsWithChangedParents, affectedUsers, affectedGroupIds);
 
             if (!affectedUsers.empty())
                 emit permissionsDependencyChanged(affectedUsers);
@@ -1095,7 +1094,7 @@ bool QnResourceAccessManager::canCreateUser(
     if ((newPermissions & ~kAssignableGlobalPermissions) != 0)
         return false;
 
-    if (!nx::vms::common::allUserGroupsExist(systemContext(), targetGroups))
+    if (!nx::vms::common::allUserGroupsExist(systemContext()->userGroupManager(), targetGroups))
         return false;
 
     const auto effectivePermissions = accumulatePermissions(newPermissions, targetGroups);
@@ -1117,7 +1116,7 @@ bool QnResourceAccessManager::canModifyUser(
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!nx::vms::common::allUserGroupsExist(systemContext(), update.groupIds))
+    if (!nx::vms::common::allUserGroupsExist(systemContext()->userGroupManager(), update.groupIds))
         return false;
 
     if ((update.permissions & ~kAssignableGlobalPermissions) != 0)

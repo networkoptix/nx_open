@@ -3,20 +3,19 @@
 #include "tools.h"
 
 #include <nx/branding.h>
-#include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/update/nx_system_updates_ini.h>
 
 namespace nx::vms::common::update {
 
-nx::Url releaseListUrl(SystemContext* context)
+nx::Url releaseListUrl(SystemSettings* globalSettings)
 {
     QString value = ini().releaseListUrl;
 
     if (value.isEmpty())
     {
-        if (context && !context->globalSettings()->customReleaseListUrl().isEmpty())
-            return context->globalSettings()->customReleaseListUrl();
+        if (globalSettings && !globalSettings->customReleaseListUrl().isEmpty())
+            return globalSettings->customReleaseListUrl();
 
         if (!branding::customReleaseListUrl().isEmpty())
             return branding::customReleaseListUrl();

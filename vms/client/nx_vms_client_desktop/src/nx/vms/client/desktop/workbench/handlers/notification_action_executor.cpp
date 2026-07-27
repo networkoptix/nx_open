@@ -227,7 +227,7 @@ void NotificationActionExecutor::reinitializeCrossSystemNotificationsListener()
 
     const auto user = context()->user();
 
-    if (user && user->isCloud() && common::saas::crossSiteNotificationsAllowed(systemContext()))
+    if (user && user->isCloud() && common::saas::crossSiteNotificationsAllowed(systemContext()->saasServiceManager()))
     {
         m_listener = std::make_unique<CrossSystemNotificationsListener>();
         connect(m_listener.get(),

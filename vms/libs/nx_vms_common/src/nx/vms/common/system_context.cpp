@@ -24,7 +24,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->resourcePool = std::make_unique<QnResourcePool>(this);
     d->resourceDataPool = std::make_unique<QnResourceDataPool>();
     d->resourceStatusDictionary = std::make_unique<QnResourceStatusDictionary>();
-    d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
+    d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(
+        [this]() -> ec2::AbstractECConnectionPtr { return messageBusConnection(); });
 
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
@@ -50,9 +51,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->showreelManager = std::make_unique<ShowreelManager>();
     d->eventRuleManager = std::make_unique<nx::vms::event::RuleManager>();
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
-    d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
-        d->analyticsDescriptorContainer.get(),
-        this);
+    d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(d->analyticsDescriptorContainer.get(), d->resourcePool.get(), d->resourcePropertyDictionary.get());
 
     d->metrics = std::make_shared<nx::metric::Storage>();
     d->lookupListManager = std::make_unique<LookupListManager>();
@@ -71,8 +70,8 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
 
         case Mode::client:
         case Mode::unitTests:
-            d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(this);
-            d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(this);
+            d->deviceLicenseUsageWatcher = std::make_unique<DeviceLicenseUsageWatcher>(d->licensePool.get(), d->runtimeInfoManager.get(), d->resourcePool.get());
+            d->videoWallLicenseUsageWatcher = std::make_unique<VideoWallLicenseUsageWatcher>(d->licensePool.get(), d->runtimeInfoManager.get(), d->resourcePool.get());
             break;
     }
 
@@ -85,7 +84,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
         });
     }
 
-    d->cameraNamesWatcher = std::make_unique<QnCameraNamesWatcher>((this));
+    d->cameraNamesWatcher = std::make_unique<QnCameraNamesWatcher>(d->resourcePool.get());
 }
 
 SystemContext::~SystemContext()

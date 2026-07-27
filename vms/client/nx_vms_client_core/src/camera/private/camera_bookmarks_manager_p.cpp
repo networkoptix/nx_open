@@ -679,7 +679,7 @@ void QnCameraBookmarksManagerPrivate::handleQueryReply(
     {
         NX_ASSERT(query->filter().orderBy == QnBookmarkSortOrder::defaultOrder);
         bookmarks = QnCameraBookmark::mergeCameraBookmarks(
-            query->systemContext(), {query->cachedBookmarks(), bookmarks});
+            query->systemContext()->resourcePool(), {query->cachedBookmarks(), bookmarks});
     }
     query->setCachedBookmarks(bookmarks);
     const bool limitExceeded =

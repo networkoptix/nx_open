@@ -108,7 +108,7 @@ struct UserGroupListModel::Private
     QStringList getParentGroupNames(const UserGroupData& group) const
     {
         return nx::vms::common::userGroupNames(
-            q->systemContext(),
+            q->systemContext()->userGroupManager(),
             nx::utils::toQSet(group.parentGroupIds),
             [](const auto& g1, const auto& g2)
             {

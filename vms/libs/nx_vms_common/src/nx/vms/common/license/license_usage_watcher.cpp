@@ -8,15 +8,13 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
-#include <nx/vms/common/system_context.h>
 
 namespace nx::vms::common {
 
-LicenseUsageWatcher::LicenseUsageWatcher(SystemContext* context, QObject* parent):
-    base_type(parent),
-    SystemContextAware(context)
+LicenseUsageWatcher::LicenseUsageWatcher(QnLicensePool* licensePool, QnRuntimeInfoManager* runtimeInfoManager, QObject* parent):
+    base_type(parent)
 {
-    connect(context->licensePool(), &QnLicensePool::licensesChanged, this,
+    connect(licensePool, &QnLicensePool::licensesChanged, this,
         &LicenseUsageWatcher::licenseUsageChanged);
 
     // Call update if server was added or removed or changed its status.
@@ -28,17 +26,15 @@ LicenseUsageWatcher::LicenseUsageWatcher(SystemContext* context, QObject* parent
         };
 
     // Ignoring runtimeInfoChanged as hardwareIds must not change in runtime.
-    connect(context->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded, this,
         updateIfServerStatusChanged);
-    connect(context->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         updateIfServerStatusChanged);
 }
 
-DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QObject* parent):
-    base_type(context, parent)
+DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(QnLicensePool* licensePool, QnRuntimeInfoManager* runtimeInfoManager, QnResourcePool* resourcePool, QObject* parent):
+    base_type(licensePool, runtimeInfoManager, parent)
 {
-    const auto& resPool = context->resourcePool();
-
     // Listening to all changes that can affect licenses usage.
     auto connectToCamera =
         [this](const QnVirtualCameraResourcePtr& camera)
@@ -66,10 +62,10 @@ DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QOb
             }
         };
 
-    connect(resPool, &QnResourcePool::resourcesAdded, this, updateIfNeeded);
-    connect(resPool, &QnResourcePool::resourcesRemoved, this, updateIfNeeded);
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this, updateIfNeeded);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this, updateIfNeeded);
 
-    connect(resPool, &QnResourcePool::resourcesAdded, this,
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this,
         [connectToCamera](const QnResourceList& resources)
         {
             for (const auto& resource: resources)
@@ -79,7 +75,7 @@ DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QOb
             }
         });
 
-    connect(resPool, &QnResourcePool::resourcesRemoved, this,
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this,
         [this](const QnResourceList& resources)
         {
             for (const auto& resource: resources)
@@ -89,15 +85,16 @@ DeviceLicenseUsageWatcher::DeviceLicenseUsageWatcher(SystemContext* context, QOb
             }
         });
 
-    for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
+    for (const auto& camera: resourcePool->getAllCameras(QnResourcePtr(), true))
         connectToCamera(camera);
 }
 
 VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
-    SystemContext* context,
-    QObject* parent)
-    :
-    base_type(context, parent)
+    QnLicensePool* licensePool,
+    QnRuntimeInfoManager* runtimeInfoManager,
+    QnResourcePool* resourcePool,
+    QObject* parent):
+    base_type(licensePool, runtimeInfoManager, parent)
 {
     auto connectTo =
         [this](const QnVideoWallResourcePtr& videowall)
@@ -138,11 +135,9 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
             }
         };
 
-    const auto& resPool = context->resourcePool();
-
-    connect(resPool, &QnResourcePool::resourcesAdded, this, resourcesAdded);
-    connect(resPool, &QnResourcePool::resourcesRemoved, this, resourcesRemoved);
-    for (const auto& videowall: resPool->getResources<QnVideoWallResource>())
+    connect(resourcePool, &QnResourcePool::resourcesAdded, this, resourcesAdded);
+    connect(resourcePool, &QnResourcePool::resourcesRemoved, this, resourcesRemoved);
+    for (const auto& videowall: resourcePool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 }
 

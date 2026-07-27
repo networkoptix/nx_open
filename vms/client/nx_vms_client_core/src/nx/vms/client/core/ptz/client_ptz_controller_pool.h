@@ -14,7 +14,7 @@ class ControllerPool: public QnPtzControllerPool
 
 public:
     ControllerPool(
-        common::SystemContext* systemContext,
+        QnResourcePool* resourcePool,
         QObject* parent = nullptr);
 
 protected:

@@ -16,11 +16,14 @@ using namespace nx::network;
 ListenerTcp::ListenerTcp(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner,
+    nx::Uuid peerId,
+    std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+    QnResourcePool* resourcePool,
     SessionPool* sessionPool,
     int64_t maxTcpRequestSize)
     :
-    QnTCPConnectionProcessor(
-        std::move(socket), owner, maxTcpRequestSize),
+    QnTCPConnectionProcessor(std::move(socket), owner, peerId,
+        std::move(globalSettings), resourcePool, maxTcpRequestSize),
     m_sessionPool(sessionPool)
 {
     setObjectName(nx::toString(this));

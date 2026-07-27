@@ -7,12 +7,12 @@
 #include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/camera/camera_history_pool.h>
 #include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/cross_system/cross_system_ptz_controller_pool.h>
 #include <nx/vms/client/core/ini.h>
@@ -47,7 +47,7 @@ SystemContext::SystemContext(Mode mode, nx::Uuid peerId, QObject* parent):
     d->analyticsAttributeHelper = std::make_unique<
         analytics::AttributeHelper>(analyticsTaxonomyStateWatcher());
 
-    setCameraHistoryPool(new CameraHistoryPool(this));
+    setCameraHistoryPool(new QnCameraHistoryPool(resourcePool()));
 
     switch (mode)
     {
@@ -234,9 +234,9 @@ QnPtzControllerPool* SystemContext::ptzControllerPool() const
     {
         SystemContext* context = const_cast<SystemContext*>(this);
         if (mode() == Mode::crossSystem)
-            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(context);
+            d->ptzControllerPool = std::make_unique<CrossSystemPtzControllerPool>(context->resourcePool());
         else
-            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(context);
+            d->ptzControllerPool = std::make_unique<ptz::ControllerPool>(context->resourcePool());
     }
 
     return d->ptzControllerPool.get();

@@ -2831,7 +2831,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
     {
         QStringList debugState = {
             nx::format("ReleaseListUrl=<a href=\"%1\">%1</a>",
-                common::update::releaseListUrl(systemContext())),
+                common::update::releaseListUrl(systemContext()->globalSettings())),
             nx::format("UpdateGeneratorUrl=<a href=\"%1\">%1</a>",
                 common::update::updateGeneratorUrl()),
             nx::format("Widget=%1", toString(m_widgetState)),

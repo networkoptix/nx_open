@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_map>
 
 #include <QtCore/QObject>
@@ -10,15 +11,14 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/thread/long_runnable.h>
-#include <nx/vms/common/system_context_aware.h>
+
+namespace nx::metric { struct Storage; }
 
 class QnTCPConnectionProcessor;
 
 class QnTcpListenerPrivate;
 
-class NX_VMS_COMMON_API QnTcpListener:
-    public QnLongRunnable,
-    public /*mixin*/ nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API QnTcpListener: public QnLongRunnable
 {
     Q_OBJECT;
 
@@ -37,7 +37,7 @@ public:
     void processNewConnection(std::unique_ptr<nx::network::AbstractStreamSocket> socket);
 
     explicit QnTcpListener(
-        nx::vms::common::SystemContext* systemContext,
+        std::weak_ptr<nx::metric::Storage> metrics,
         int maxTcpRequestSize,
         const QHostAddress& address,
         int port,

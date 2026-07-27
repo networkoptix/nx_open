@@ -24,6 +24,8 @@ enum class DiscoveryMode
 /**
  * Interface for resource searcher plugins.
  */
+// TODO: #skolesnik QnAbstractResourceSearcher itself only requires SystemSettings, but
+// SystemContext cannot be replaced because derived searchers use other context dependencies.
 class NX_VMS_COMMON_API QnAbstractResourceSearcher:
     public QnResourceFactory,
     public nx::vms::common::SystemContextAware

@@ -609,11 +609,9 @@ QVariant RulesTableModel::sourceUserData(const ConstRulePtr& rule, int role) con
 
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
-    nx::vms::common::getUsersAndGroups(
-        appContext()->currentSystemContext(),
-        sourceUserField->ids(),
-        users,
-        groups);
+    const auto systemContext = appContext()->currentSystemContext();
+    nx::vms::common::getUsersAndGroups(systemContext->resourcePool(),
+        systemContext->userGroupManager(), sourceUserField->ids(), users, groups);
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(nx::utils::toQSet(users.ids()));
@@ -824,11 +822,9 @@ QVariant RulesTableModel::targetUserData(const ConstRulePtr& rule, int role) con
 
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
-    nx::vms::common::getUsersAndGroups(
-        appContext()->currentSystemContext(),
-        targetUserField->ids(),
-        users,
-        groups);
+    const auto systemContext = appContext()->currentSystemContext();
+    nx::vms::common::getUsersAndGroups(systemContext->resourcePool(),
+        systemContext->userGroupManager(), targetUserField->ids(), users, groups);
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(nx::utils::toQSet(users.ids()));

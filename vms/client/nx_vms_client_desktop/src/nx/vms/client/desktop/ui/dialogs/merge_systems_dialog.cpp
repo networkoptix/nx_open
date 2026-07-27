@@ -383,7 +383,7 @@ void MergeSystemsDialog::at_mergeTool_systemFound(
         moduleInformation.id);
     if (server
         && server->getStatus() == nx::vms::api::ResourceStatus::online
-        && helpers::serverBelongsToCurrentSystem(moduleInformation, system()))
+        && helpers::serverBelongsToCurrentSystem(moduleInformation, system()->globalSettings()))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {

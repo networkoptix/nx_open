@@ -15,14 +15,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/common/system_context.h>
-#include <nx/vms/common/system_context_aware.h>
 
 using nx::vms::api::analytics::DeviceAgentManifest;
 using nx::vms::api::analytics::EngineManifest;
-using nx::vms::common::SystemContext;
-using nx::vms::common::SystemContextAware;
-
 namespace api = nx::vms::api;
 
 namespace nx::analytics::taxonomy {
@@ -98,21 +93,23 @@ SupportInfo extractSupportInfo(
 
 struct ResourceSupportProxy::Private:
     public QObject,
-    public Qn::EnableSafeDirectConnection,
-    public SystemContextAware
+    public Qn::EnableSafeDirectConnection
 {
     ResourceSupportProxy* q = nullptr;
+    QnResourcePool* const resourcePool;
+    QnResourcePropertyDictionary* const resourcePropertyDictionary;
     mutable std::map<nx::Uuid, std::map<nx::Uuid, SupportInfo>> supportInfoCache;
     mutable nx::Mutex mutex;
 
-    Private(ResourceSupportProxy* q, SystemContext* systemContext):
-        SystemContextAware(systemContext),
-        q(q)
+    Private(ResourceSupportProxy* q, QnResourcePool* resourcePool, QnResourcePropertyDictionary* resourcePropertyDictionary):
+        q(q),
+        resourcePool(resourcePool),
+        resourcePropertyDictionary(resourcePropertyDictionary)
     {
-        directConnect(resourcePropertyDictionary(),
+        directConnect(resourcePropertyDictionary,
             &QnResourcePropertyDictionary::propertyChanged,
             [this](auto... args) { manifestsMaybeUpdated(args...); });
-        directConnect(resourcePropertyDictionary(),
+        directConnect(resourcePropertyDictionary,
             &QnResourcePropertyDictionary::propertyRemoved,
             [this](auto... args) { manifestsMaybeUpdated(args...); });
     }
@@ -145,7 +142,6 @@ struct ResourceSupportProxy::Private:
         if (supportInfoCache.contains(deviceId))
             return;
 
-        const auto* resourcePool = systemContext()->resourcePool();
         const QnVirtualCameraResourcePtr device =
             resourcePool->getResourceById<QnVirtualCameraResource>(deviceId);
 
@@ -253,8 +249,8 @@ struct ResourceSupportProxy::Private:
     }
 };
 
-ResourceSupportProxy::ResourceSupportProxy(SystemContext* systemContext):
-    d(new Private(this, systemContext))
+ResourceSupportProxy::ResourceSupportProxy(QnResourcePool* resourcePool, QnResourcePropertyDictionary* resourcePropertyDictionary):
+    d(new Private(this, resourcePool, resourcePropertyDictionary))
 {
 }
 

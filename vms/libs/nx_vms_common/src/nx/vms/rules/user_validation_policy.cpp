@@ -23,7 +23,7 @@ QnUserResourceList buildUserList(
 {
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
-    nx::vms::common::getUsersAndGroups(context, subjects, users, groupIds);
+    nx::vms::common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), subjects, users, groupIds);
 
     for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
     {
@@ -85,7 +85,7 @@ void QnSubjectValidationPolicy::analyze(
     if (allUsers)
         users = allVisibleUsers(resourcePool());
     else
-        nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+        nx::vms::common::getUsersAndGroups(resourcePool(), userGroupManager(), subjects, users, groupIds);
 
     for (const auto& id: groupIds)
     {
@@ -132,7 +132,7 @@ QValidator::State QnSubjectValidationPolicy::validity(bool allUsers,
     if (allUsers)
         users = allVisibleUsers(resourcePool());
     else
-        nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+        nx::vms::common::getUsersAndGroups(resourcePool(), userGroupManager(), subjects, users, groupIds);
 
     if (users.empty() && !groupIds.empty())
     {
@@ -202,7 +202,7 @@ QString QnSubjectValidationPolicy::calculateAlert(
 
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
-    nx::vms::common::getUsersAndGroups(systemContext(), subjects, users, groupIds);
+    nx::vms::common::getUsersAndGroups(resourcePool(), userGroupManager(), subjects, users, groupIds);
 
     if (users.empty() && !groupIds.empty())
     {

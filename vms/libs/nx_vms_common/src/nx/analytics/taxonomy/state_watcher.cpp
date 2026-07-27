@@ -8,18 +8,14 @@
 #include <nx/analytics/taxonomy/state.h>
 
 using namespace nx::vms::api::analytics;
-using namespace nx::vms::common;
 
 namespace nx::analytics::taxonomy {
 
-StateWatcher::StateWatcher(
-    DescriptorContainer* taxonomyDescriptorContainer,
-    SystemContext* systemContext,
-    QObject* parent)
-    :
+StateWatcher::StateWatcher(DescriptorContainer* taxonomyDescriptorContainer, QnResourcePool* resourcePool, QnResourcePropertyDictionary* resourcePropertyDictionary, QObject* parent):
     AbstractStateWatcher(parent),
-    SystemContextAware(systemContext),
     m_taxonomyDescriptorContainer(taxonomyDescriptorContainer),
+    m_resourcePool(resourcePool),
+    m_resourcePropertyDictionary(resourcePropertyDictionary),
     m_state(std::make_shared<State>())
 {
     connect(m_taxonomyDescriptorContainer, &DescriptorContainer::descriptorsUpdated,
@@ -41,7 +37,7 @@ void StateWatcher::at_descriptorsUpdated()
 {
     StateCompiler::Result result = StateCompiler::compile(
         currentDescriptors(),
-        std::make_unique<ResourceSupportProxy>(systemContext()));
+        std::make_unique<ResourceSupportProxy>(m_resourcePool, m_resourcePropertyDictionary));
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);

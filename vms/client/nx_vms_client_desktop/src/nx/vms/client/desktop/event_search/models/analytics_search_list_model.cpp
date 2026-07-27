@@ -66,7 +66,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::contextMenu(
     if (!cameraResource)
         return {};
 
-    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext());
+    const nx::analytics::ActionTypeDescriptorManager descriptorManager(systemContext()->resourcePool(), systemContext()->runtimeInfoManager());
     const auto actionByEngine = descriptorManager.availableObjectActionTypeDescriptors(
         track.objectTypeId,
         cameraResource);

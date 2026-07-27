@@ -1629,7 +1629,7 @@ void ActionHandler::moveResourcesToServer(
         }
     }
 
-    if (nx::vms::common::saas::saasInitialized(systemContext()))
+    if (nx::vms::common::saas::saasInitialized(systemContext()->saasServiceManager()))
     {
         const auto serviceManager = systemContext()->saasServiceManager();
         if (auto limitLeft = serviceManager->camerasTierLimitLeft(server->getId()))

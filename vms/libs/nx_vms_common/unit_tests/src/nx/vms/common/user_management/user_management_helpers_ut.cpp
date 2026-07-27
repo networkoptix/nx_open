@@ -74,35 +74,39 @@ TEST_F(UserManagementHelpersTest, getUsersAndGroups)
 
     QnUserResourceList users;
     UserGroupDataList groups;
-    getUsersAndGroups(systemContext(), requestedIds, users, groups);
+    getUsersAndGroups(resourcePool(), userGroupManager(), requestedIds, users, groups);
     EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
     EXPECT_EQ(groups, UserGroupDataList(
         {d.specialPowerUsers, *PredefinedUserGroups::find(kPowerUsersGroupId)}));
 
     QSet<nx::Uuid> groupIds;
-    getUsersAndGroups(systemContext(), requestedIds, users, groupIds);
+    getUsersAndGroups(resourcePool(), userGroupManager(), requestedIds, users, groupIds);
     EXPECT_EQ(users, QnUserResourceList({d.powerUser, d.specialPowerUser}));
     EXPECT_EQ(groupIds, QSet<nx::Uuid>({d.specialPowerUsers.id, kPowerUsersGroupId}));
 }
 
 TEST_F(UserManagementHelpersTest, allGroupsExist)
 {
-    EXPECT_TRUE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+    EXPECT_TRUE(allUserGroupsExist(
+        systemContext()->userGroupManager(), std::initializer_list<nx::Uuid>({
         kLiveViewersGroupId, kAdministratorsGroupId, d.specialPowerUsers.id, d.specialViewers.id})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+    EXPECT_FALSE(allUserGroupsExist(
+        systemContext()->userGroupManager(), std::initializer_list<nx::Uuid>({
         d.specialPowerUsers.id, /*invalid*/ nx::Uuid{}})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+    EXPECT_FALSE(allUserGroupsExist(
+        systemContext()->userGroupManager(), std::initializer_list<nx::Uuid>({
         d.specialPowerUsers.id, /*unknown*/ nx::Uuid::createUuid()})));
 
-    EXPECT_FALSE(allUserGroupsExist(systemContext(), std::initializer_list<nx::Uuid>({
+    EXPECT_FALSE(allUserGroupsExist(
+        systemContext()->userGroupManager(), std::initializer_list<nx::Uuid>({
         d.specialPowerUsers.id, /*user*/ d.specialViewer->getId()})));
 }
 
 TEST_F(UserManagementHelpersTest, groupNames)
 {
-    EXPECT_EQ(userGroupNames(systemContext(), std::initializer_list<nx::Uuid>({
+    EXPECT_EQ(userGroupNames(systemContext()->userGroupManager(), std::initializer_list<nx::Uuid>({
         d.specialWorkers.id, /*invalid*/ nx::Uuid{}, d.specialPowerUsers.id, d.specialViewers.id})),
         QStringList({d.specialWorkers.name, d.specialPowerUsers.name, d.specialViewers.name}));
 
@@ -131,12 +135,12 @@ TEST_F(UserManagementHelpersTest, groupsWithParents)
     const auto group4 = createUserGroup("Group 4", {group2.id, group3.id});
     const auto group5 = createUserGroup("Group 5", group3.id);
 
-    EXPECT_EQ(userGroupsWithParents(systemContext(),
+    EXPECT_EQ(userGroupsWithParents(systemContext()->accessSubjectHierarchy(),
         std::initializer_list<nx::Uuid>({group4.id, d.specialPowerUsers.id})),
         QSet<nx::Uuid>({group4.id, group3.id, group2.id, group1.id,
             d.specialPowerUsers.id, d.specialWorkers.id, kPowerUsersGroupId}));
 
-    EXPECT_EQ(userGroupsWithParents(systemContext(),
+    EXPECT_EQ(userGroupsWithParents(systemContext()->accessSubjectHierarchy(),
         std::initializer_list<nx::Uuid>({group5.id, d.specialViewers.id})),
         QSet<nx::Uuid>({group5.id, group3.id, group1.id,
             d.specialViewers.id, d.specialWorkers.id, kViewersGroupId}));

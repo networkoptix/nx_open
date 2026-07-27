@@ -153,7 +153,7 @@ void QnCloudManagementWidget::loadDataToUi()
 
     if (linked)
     {
-        const auto saasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
+        const auto saasInitialized = nx::vms::common::saas::saasInitialized(systemContext()->saasServiceManager());
         const auto saasServiceManager = systemContext()->saasServiceManager();
 
         const auto accountText = saasInitialized
@@ -320,7 +320,7 @@ void QnCloudManagementWidget::onDisconnectSuccess()
 
 bool QnCloudManagementWidget::confirmCloudDisconnect()
 {
-    const auto isSaasInitialized = nx::vms::common::saas::saasInitialized(systemContext());
+    const auto isSaasInitialized = nx::vms::common::saas::saasInitialized(systemContext()->saasServiceManager());
     const auto isCloudUser = context()->user()->isCloud();
 
     QnSessionAwareMessageBox messageBox(this);

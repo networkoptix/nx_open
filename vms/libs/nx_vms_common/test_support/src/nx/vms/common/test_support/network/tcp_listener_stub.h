@@ -7,8 +7,8 @@
 class TcpListenerStub: public QnTcpListener
 {
 public:
-    TcpListenerStub(nx::vms::common::SystemContext* systemContext) :
-        QnTcpListener(systemContext, /*maxTcpRequestSize*/ 0, QHostAddress::Any, /*port*/ 0)
+    TcpListenerStub():
+        QnTcpListener(/*nullptr*/ {}, /*maxTcpRequestSize*/ 0, QHostAddress::Any, /*port*/ 0)
     {
     }
 

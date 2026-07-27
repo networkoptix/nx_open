@@ -8,7 +8,7 @@
 struct QnCloudSystem;
 
 namespace nx::vms::api { struct ModuleInformation; }
-namespace nx::vms::common { class SystemContext; }
+namespace nx::vms::common { class SystemSettings; }
 
 namespace helpers {
 
@@ -34,13 +34,13 @@ NX_VMS_COMMON_API bool isCloudSystem(const nx::vms::api::ModuleInformation& info
 
 NX_VMS_COMMON_API QString getSystemName(const nx::vms::api::ModuleInformation& info);
 
-NX_VMS_COMMON_API nx::Uuid currentSystemLocalId(const nx::vms::common::SystemContext* context);
+NX_VMS_COMMON_API nx::Uuid currentSystemLocalId(const nx::vms::common::SystemSettings* globalSettings);
 
-NX_VMS_COMMON_API bool currentSystemIsNew(const nx::vms::common::SystemContext* context);
+NX_VMS_COMMON_API bool currentSystemIsNew(const nx::vms::common::SystemSettings* globalSettings);
 
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(
     const nx::vms::api::ModuleInformation& info,
-    const nx::vms::common::SystemContext* context);
+    const nx::vms::common::SystemSettings* globalSettings);
 
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server);
 

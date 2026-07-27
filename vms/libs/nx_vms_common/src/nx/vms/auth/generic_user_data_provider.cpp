@@ -10,12 +10,11 @@
 #include <nx/network/app_info.h>
 #include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/system_context.h>
 
 using namespace nx::network::rest;
 
-GenericUserDataProvider::GenericUserDataProvider(nx::vms::common::SystemContext* systemContext):
-    SystemContextAware(systemContext)
+GenericUserDataProvider::GenericUserDataProvider(QnResourcePool* resourcePool):
+    m_resourcePool(resourcePool)
 {
 }
 
@@ -27,10 +26,10 @@ GenericUserDataProvider::~GenericUserDataProvider()
 std::pair<QnResourcePtr, bool> GenericUserDataProvider::findResByName(
     const nx::String& nxUserName) const
 {
-    if (auto r = resourcePool()->userByName(nxUserName); r.first || r.second)
+    if (auto r = m_resourcePool->userByName(nxUserName); r.first || r.second)
         return r;
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+    auto server = m_resourcePool->getResourceById<QnMediaServerResource>(
         nx::Uuid::fromStringSafe(nxUserName));
     if (server)
         return {server, /*hasClash*/ false};

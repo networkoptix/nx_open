@@ -194,6 +194,11 @@ private:
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
+// TODO: #skolesnik QnLicensePool itself only uses common::SystemContext::runtimeInfoManager(), but
+// must remain SystemContextAware because nx::vms::license::hasUniqueLicenses() and
+// nx::vms::license::remoteLicensesConflict() use common::SystemContext::licensePool(),
+// common::SystemContext::messageBusConnection() and common::SystemContext::runtimeInfoManager()
+// via Validator.
 class NX_VMS_COMMON_API QnLicensePool:
     public QObject,
     public nx::vms::common::SystemContextAware

@@ -11,14 +11,14 @@
 namespace nx::vms::client::core {
 
 CrossSystemPtzControllerPool::CrossSystemPtzControllerPool(
-    nx::vms::common::SystemContext* systemContext,
+    QnResourcePool* resourcePool,
     QObject* parent)
     :
-    base_type(systemContext, parent)
+    base_type(resourcePool, parent)
 {
     // Delay controller initialization for the cross-system cameras until they are actually placed
     // on the scene.
-    connect(resourcePool(),
+    connect(m_resourcePool,
         &QnResourcePool::resourceRemoved,
         this,
         &CrossSystemPtzControllerPool::unregisterResource);

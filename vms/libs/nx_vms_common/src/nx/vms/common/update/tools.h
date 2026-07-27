@@ -5,11 +5,11 @@
 #include <nx/utils/software_version.h>
 #include <nx/utils/url.h>
 
-namespace nx::vms::common { class SystemContext; }
+namespace nx::vms::common { class SystemSettings; }
 
 namespace nx::vms::common::update {
 
-NX_VMS_COMMON_API nx::Url releaseListUrl(SystemContext* context);
+NX_VMS_COMMON_API nx::Url releaseListUrl(SystemSettings* globalSettings);
 NX_VMS_COMMON_API nx::Url updateGeneratorUrl();
 NX_VMS_COMMON_API QString passwordForBuild(const QString& build);
 

@@ -484,9 +484,7 @@ void MembersModel::readUsersAndGroups()
 
     std::set<nx::Uuid> memberUsers;
     std::set<nx::Uuid> memberGroups;
-    nx::vms::common::getUsersAndGroups(systemContext(),
-        m_subjectContext->subjectHierarchy()->directMembers(m_subjectId),
-        memberUsers, memberGroups, /*includeHidden*/ false);
+    nx::vms::common::getUsersAndGroups(systemContext()->resourcePool(), systemContext()->userGroupManager(), m_subjectContext->subjectHierarchy()->directMembers(m_subjectId), memberUsers, memberGroups, /*includeHidden*/ false);
 
     m_subjectMembers.users =
         {std::make_move_iterator(memberUsers.begin()), std::make_move_iterator(memberUsers.end())};

@@ -8,6 +8,7 @@
 
 #include <nx/vms/api/data/site_health_message.h>
 
+namespace nx::vms::common::saas { class ServiceManager; }
 namespace nx::vms::common { class SystemContext; }
 
 // TODO: #sivanov refactor settings storage - move to User Settings tab on server.
@@ -32,11 +33,10 @@ NX_VMS_COMMON_API bool isMessageIntercom(MessageType message);
 
 /**
  * @return Predicate that returns true for system health message types that can be displayed
- *     under the terms of currently applied licensing model. The system is described by the given
- *     system context.
+ *     under the licensing model reported by the given SaaS service manager.
  */
 NX_VMS_COMMON_API MessageTypePredicate isMessageApplicableForLicensingMode(
-    nx::vms::common::SystemContext* systemContext);
+    nx::vms::common::saas::ServiceManager* saasServiceManager);
 
 /**
  *  @return Set of system health message types for which each of the passed predicates returns

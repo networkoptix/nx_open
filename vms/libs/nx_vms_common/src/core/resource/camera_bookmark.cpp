@@ -5,12 +5,12 @@
 #include <QtCore/QMap>
 #include <QtCore5Compat/QLinkedList>
 
+#include <core/resource_management/resource_pool.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/algorithm/merge_sorted_lists.h>
 #include <nx/vms/common/bookmark/bookmark_helpers.h>
 #include <nx/vms/common/bookmark/bookmark_sort.h>
 #include <nx/vms/common/resource/bookmark_filter.h>
-#include <nx/vms/common/system_context.h>
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/synctime.h>
 
@@ -25,11 +25,10 @@ using BinaryPredicate =
     std::function<bool (const CameraBookmark& first, const CameraBookmark& second)> ;
 
 MultiServerCameraBookmarkList sortEachList(
-    SystemContext* systemContext,
+    QnResourcePool* resourcePool,
     MultiServerCameraBookmarkList sources,
     const BookmarkSortOrder& sortProp)
 {
-    const auto resourcePool = systemContext->resourcePool();
     for (auto& source: sources)
         nx::vms::common::sortBookmarks(source, sortProp.column, sortProp.order, resourcePool);
 
@@ -206,14 +205,14 @@ nx::Uuid CameraBookmark::systemUserId()
 }
 
 CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
-    SystemContext* systemContext,
+    QnResourcePool* resourcePool,
     MultiServerCameraBookmarkList source,
     const CameraBookmarkSearchFilter& filter)
 {
     if (filter.centralTimePointMs)
     {
         return mergeCameraBookmarks(
-            systemContext,
+            resourcePool,
             std::move(source),
             filter.orderBy,
             *filter.centralTimePointMs,
@@ -221,7 +220,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
     }
 
     return mergeCameraBookmarks(
-        systemContext,
+        resourcePool,
         std::move(source),
         filter.orderBy,
         filter.minVisibleLengthMs,
@@ -229,7 +228,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
 }
 
 CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
-    SystemContext* systemContext,
+    QnResourcePool* resourcePool,
     MultiServerCameraBookmarkList source,
     const BookmarkSortOrder& sortOrder,
     const std::optional<milliseconds>& minVisibleLength,
@@ -240,7 +239,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
 
     const auto pred = createBookmarkSortPredicate(sortOrder.column,
         sortOrder.order,
-        systemContext ? systemContext->resourcePool() : nullptr); //< For unit test flexibility.
+        resourcePool); //< Can be null for unit test flexibility.
 
     const int intermediateLimit =
         minVisibleLength ? CameraBookmarkSearchFilter::kNoLimit : limit;
@@ -254,7 +253,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
         case nx::vms::api::BookmarkSortField::cameraName:
         case nx::vms::api::BookmarkSortField::tags:
         {
-            auto bookmarksList = sortEachList(systemContext, std::move(source), sortOrder);
+            auto bookmarksList = sortEachList(resourcePool, std::move(source), sortOrder);
             result = merge_sorted_lists(std::move(bookmarksList), pred, limit);
             break;
         }
@@ -272,7 +271,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
 }
 
 CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
-    SystemContext* systemContext,
+    QnResourcePool* resourcePool,
     QnMultiServerCameraBookmarkList source,
     const BookmarkSortOrder& sortOrder,
     std::chrono::milliseconds centralTimePointMs,
@@ -322,7 +321,7 @@ CameraBookmarkList CameraBookmark::mergeCameraBookmarks(
     if (sortOrder.column != nx::vms::api::BookmarkSortField::startTime)
     {
         const auto pred = createBookmarkSortPredicate(sortOrder.column, sortOrder.order,
-            systemContext ? systemContext->resourcePool() : nullptr);
+            resourcePool);
 
         std::sort(result.begin(), result.end(), pred);
     }

@@ -12,10 +12,10 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 #include <network/tcp_listener.h>
+#include <nx/metric/metrics_storage.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/vms/common/test_support/test_context.h>
 #include <recording/time_period_list.h>
 
 namespace {
@@ -33,9 +33,18 @@ public:
     TestConnectionProcessor(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         int maxTcpRequestSize)
         :
-        QnTCPConnectionProcessor(std::move(socket), owner, maxTcpRequestSize)
+        QnTCPConnectionProcessor(
+            std::move(socket),
+            owner,
+            peerId,
+            std::move(globalSettings),
+            resourcePool,
+            maxTcpRequestSize)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -62,18 +71,24 @@ class TestTcpListener: public QnTcpListener
 {
 public:
     TestTcpListener(
-        nx::vms::common::SystemContext* systemContext,
+        const std::shared_ptr<nx::metric::Storage>& metrics,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         int maxTcpRequestSize,
         const QHostAddress& address,
         int port)
         :
         QnTcpListener(
-            systemContext,
+            metrics,
             maxTcpRequestSize,
             address,
             port,
             DEFAULT_MAX_CONNECTIONS,
-            /*useSSL*/ false)
+            /*useSSL*/ false),
+        m_peerId(peerId),
+        m_globalSettings(std::move(globalSettings)),
+        m_resourcePool(resourcePool)
     {
     }
 
@@ -87,18 +102,32 @@ protected:
         std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket,
         int maxTcpRequestSize) override
     {
-        return new TestConnectionProcessor(std::move(clientSocket), this, maxTcpRequestSize);
+        return new TestConnectionProcessor(
+            std::move(clientSocket),
+            this,
+            m_peerId,
+            m_globalSettings,
+            m_resourcePool,
+            maxTcpRequestSize);
     }
+
+private:
+    const nx::Uuid m_peerId;
+    const std::function<const nx::vms::common::SystemSettings*()> m_globalSettings;
+    QnResourcePool* const m_resourcePool;
 };
 
 
 TEST(TcpConnectionProcessor, sendAsyncData)
 {
-    nx::vms::common::test::Context context;
-
-    // QnTcpListener uses systemContext()->moduleGuid().
     TestTcpListener tcpListener(
-        context.systemContext(), kMaxTcpRequestSize, QHostAddress::Any, /*port*/ 0);
+        std::make_shared<nx::metric::Storage>(),
+        nx::Uuid::createUuid(),
+        [] { return nullptr; },
+        nullptr,
+        kMaxTcpRequestSize,
+        QHostAddress::Any,
+        /*port*/ 0);
     tcpListener.start();
 
     QElapsedTimer timer;

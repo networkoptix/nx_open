@@ -421,9 +421,8 @@ GroupSettingsDialogState GroupSettingsDialog::createState(const nx::Uuid& groupI
 
         std::set<nx::Uuid> users;
 
-        nx::vms::common::getUsersAndGroups(systemContext(),
-            subjectHierarchy->directMembers(groupId),
-            users, state.groups, /*includeHidden*/ false);
+        nx::vms::common::getUsersAndGroups(resourcePool(), userGroupManager(),
+            subjectHierarchy->directMembers(groupId), users, state.groups, /*includeHidden*/ false);
 
         state.users =
             {std::make_move_iterator(users.begin()), std::make_move_iterator(users.end())};

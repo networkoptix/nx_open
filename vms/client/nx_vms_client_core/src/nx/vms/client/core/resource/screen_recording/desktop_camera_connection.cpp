@@ -33,7 +33,7 @@ namespace nx::vms::client::core {
 class DesktopCameraConsumer: public QnAbstractDataConsumer
 {
 public:
-    DesktopCameraConsumer(DesktopCameraConnectionProcessor* owner):
+    DesktopCameraConsumer(DesktopCameraConnectionProcessor* owner, nx::metric::Storage* metrics):
         QnAbstractDataConsumer(50),
         m_owner(owner),
         m_needVideoData(false)
@@ -42,7 +42,7 @@ public:
         {
             m_serializers[i].reset(new QnRtspFfmpegEncoder(
                 DecoderConfig(),
-                owner->systemContext()->metrics().get()));
+                metrics));
             m_serializers[i]->setAdditionFlags(0);
             m_serializers[i]->setLiveMarker(true);
             m_serializers[i]->setServerVersion(owner->serverVersion());
@@ -120,7 +120,9 @@ DesktopCameraConnectionProcessor::DesktopCameraConnectionProcessor(
     :
     QnTCPConnectionProcessor(new Private(),
         std::move(socket),
-        desktop->systemContext(),
+        desktop->systemContext()->peerId(),
+        [systemContext = desktop->systemContext()] { return systemContext->globalSettings(); },
+        desktop->systemContext()->resourcePool(),
         kMaxTcpRequestSize),
     d(dynamic_cast<Private*>(d_ptr))
 {
@@ -166,7 +168,7 @@ void DesktopCameraConnectionProcessor::processRequest()
                 NX_WARNING(this, "Desktop camera data provider was not initialized");
                 return;
             }
-            d->dataConsumer = new DesktopCameraConsumer(this);
+            d->dataConsumer = new DesktopCameraConsumer(this, d->desktop->systemContext()->metrics().get());
             d->dataProvider->addDataProcessor(d->dataConsumer);
             d->dataConsumer->start();
             d->dataProvider->start();

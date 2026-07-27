@@ -4,40 +4,41 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/common/system_context_aware.h>
+#include <core/resource/resource_fwd.h>
+#include <licensing/license.h>
+
+class QnRuntimeInfoManager;
 
 namespace nx::vms::common {
 
-class NX_VMS_COMMON_API LicenseUsageWatcher:
-    public QObject,
-    public SystemContextAware
+class NX_VMS_COMMON_API LicenseUsageWatcher: public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    LicenseUsageWatcher(SystemContext* context, QObject* parent = nullptr);
+    LicenseUsageWatcher(QnLicensePool* licensePool, QnRuntimeInfoManager* runtimeInfoManager, QObject* parent = nullptr);
 
 signals:
     void licenseUsageChanged();
 };
 
-class NX_VMS_COMMON_API DeviceLicenseUsageWatcher: public LicenseUsageWatcher
+class NX_VMS_COMMON_API DeviceLicenseUsageWatcher final: public LicenseUsageWatcher
 {
     Q_OBJECT
     using base_type = LicenseUsageWatcher;
 
 public:
-    DeviceLicenseUsageWatcher(SystemContext* context, QObject* parent = nullptr);
+    DeviceLicenseUsageWatcher(QnLicensePool* licensePool, QnRuntimeInfoManager* runtimeInfoManager, QnResourcePool* resourcePool, QObject* parent = nullptr);
 };
 
-class NX_VMS_COMMON_API VideoWallLicenseUsageWatcher: public LicenseUsageWatcher
+class NX_VMS_COMMON_API VideoWallLicenseUsageWatcher final: public LicenseUsageWatcher
 {
     Q_OBJECT
     using base_type = LicenseUsageWatcher;
 
 public:
-    VideoWallLicenseUsageWatcher(SystemContext* context, QObject* parent = nullptr);
+    VideoWallLicenseUsageWatcher(QnLicensePool* licensePool, QnRuntimeInfoManager* runtimeInfoManager, QnResourcePool* resourcePool, QObject* parent = nullptr);
 };
 
 } // namespace nx::vms::common

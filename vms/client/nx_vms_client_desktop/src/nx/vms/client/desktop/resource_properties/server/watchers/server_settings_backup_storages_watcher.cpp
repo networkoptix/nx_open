@@ -38,7 +38,7 @@ bool usesCloudBackupStorage(const QnMediaServerResourcePtr& server)
     if (server.isNull())
         return false;
 
-    const bool emulateCloudStorage = nx::vms::common::saas::saasInitialized(server->systemContext())
+    const bool emulateCloudStorage = nx::vms::common::saas::saasInitialized(server->systemContext()->saasServiceManager())
         && nx::vms::client::desktop::ini().emulateCloudBackupSettingsOnNonCloudStorage;
 
     const auto serverStorages = server->getStorages();

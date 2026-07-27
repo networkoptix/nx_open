@@ -20,6 +20,9 @@ public:
     ListenerTcp(
         std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
+        nx::Uuid peerId,
+        std::function<const nx::vms::common::SystemSettings*()> globalSettings,
+        QnResourcePool* resourcePool,
         SessionPool* sessionPool,
         int64_t maxTcpRequestSize);
 

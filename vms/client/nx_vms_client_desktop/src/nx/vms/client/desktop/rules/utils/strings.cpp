@@ -145,7 +145,7 @@ QString Strings::selectButtonText(
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
-    common::getUsersAndGroups(context, field->ids(), users, groups);
+    common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), field->ids(), users, groups);
 
     return getName(users, groups, additionalCount);
 }
@@ -191,7 +191,7 @@ QString Strings::selectButtonText(SystemContext* context, vms::rules::SourceUser
 
     QnUserResourceList users;
     api::UserGroupDataList groups;
-    common::getUsersAndGroups(context, field->ids(), users, groups);
+    common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), field->ids(), users, groups);
 
     if (users.empty() && groups.empty())
         return selectString();

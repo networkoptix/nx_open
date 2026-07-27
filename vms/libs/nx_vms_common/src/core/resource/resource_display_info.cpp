@@ -156,7 +156,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
         if (const auto user = m_resource.dynamicCast<QnUserResource>())
         {
             const auto names = nx::vms::common::userGroupNames(
-                user->systemContext(),
+                user->systemContext()->userGroupManager(),
                 nx::utils::unique_sorted(user->allGroupIds()));
             switch (names.size())
             {

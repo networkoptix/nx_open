@@ -100,9 +100,9 @@ bool isMessageVisibleInSettings(MessageType message)
     }
 }
 
-MessageTypePredicate isMessageApplicableForLicensingMode(SystemContext* systemContext)
+MessageTypePredicate isMessageApplicableForLicensingMode(nx::vms::common::saas::ServiceManager* saasServiceManager)
 {
-    const auto isSaasSystem = nx::vms::common::saas::saasInitialized(systemContext);
+    const auto isSaasSystem = nx::vms::common::saas::saasInitialized(saasServiceManager);
     return
         [isSaasSystem](const MessageType messageType)
     {

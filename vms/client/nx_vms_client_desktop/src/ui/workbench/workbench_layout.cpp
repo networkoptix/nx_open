@@ -962,7 +962,7 @@ bool QnWorkbenchLayout::isVideoWallReviewLayout() const
 int QnWorkbenchLayout::maximumItemCount() const
 {
     auto result = qnRuntime->maxSceneItems();
-    if (nx::vms::common::saas::saasInitialized(system()))
+    if (nx::vms::common::saas::saasInitialized(system()->saasServiceManager()))
     {
         if (const auto saasItemsLimit = system()->saasServiceManager()->tier().maxItemsInLayout)
             result = std::min(result, saasItemsLimit);

@@ -2,20 +2,19 @@
 
 #pragma once
 
+#include <functional>
+
 #include <nx/utils/move_only_func.h>
 #include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/common/system_context_aware.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/threadsafe_item_storage.h>
 
-class NX_VMS_COMMON_API QnResourcePropertyDictionary:
-    public QObject,
-    public nx::vms::common::SystemContextAware
+class NX_VMS_COMMON_API QnResourcePropertyDictionary: public QObject
 {
     Q_OBJECT
 public:
     QnResourcePropertyDictionary(
-        nx::vms::common::SystemContext* context,
+        std::function<ec2::AbstractECConnectionPtr()> messageBusConnection,
         QObject* parent = nullptr);
 
     bool saveParams(const nx::Uuid& resourceId);
@@ -89,4 +88,5 @@ private:
     std::unordered_map<nx::Uuid, QnResourcePropertyList> m_items;
     std::unordered_map<nx::Uuid, QnResourcePropertyList> m_modifiedItems;
     mutable nx::ReadWriteLock m_readWriteLock;
+    std::function<ec2::AbstractECConnectionPtr()> m_messageBusConnection;
 };

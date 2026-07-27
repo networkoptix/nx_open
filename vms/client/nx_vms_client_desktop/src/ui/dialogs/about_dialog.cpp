@@ -118,7 +118,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(windowContext(), &WindowContext::systemChanged, this, &QnAboutDialog::retranslateUi);
 
-    if (saas::saasInitialized(systemContext()))
+    if (saas::saasInitialized(systemContext()->saasServiceManager()))
         initSaasSupportInfo();
 
     retranslateUi();

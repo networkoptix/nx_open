@@ -28,7 +28,7 @@ CameraSettingsSaasStateWatcher::CameraSettingsSaasStateWatcher(
         [systemContext, store]
         {
             const auto saasManager = systemContext->saasServiceManager();
-            store->setSaasInitialized(saas::saasInitialized(systemContext));
+            store->setSaasInitialized(saas::saasInitialized(systemContext->saasServiceManager()));
             store->setSaasSuspended(saasManager->saasSuspended());
             store->setSaasShutDown(saasManager->saasShutDown());
         };

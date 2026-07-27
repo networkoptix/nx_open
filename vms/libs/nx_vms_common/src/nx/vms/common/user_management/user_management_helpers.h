@@ -30,17 +30,18 @@ inline bool isGroupHidden(const nx::vms::api::UserGroupData& group)
 
 template<typename IdList>
 void getUsersAndGroups(
-    const SystemContext* systemContext,
+    const QnResourcePool* resourcePool,
+    const UserGroupManager* userGroupManager,
     const IdList& idList,
     QnUserResourceList& users,
     nx::vms::api::UserGroupDataList& groups,
     bool includeHidden = true)
 {
-    if (!NX_ASSERT(systemContext))
+    if (!NX_ASSERT(resourcePool) || !NX_ASSERT(userGroupManager))
         return;
 
-    users = systemContext->resourcePool()->getResourcesByIds<QnUserResource>(idList);
-    groups = systemContext->userGroupManager()->getGroupsByIds(idList);
+    users = resourcePool->getResourcesByIds<QnUserResource>(idList);
+    groups = userGroupManager->getGroupsByIds(idList);
 
     if (!includeHidden)
     {
@@ -51,14 +52,15 @@ void getUsersAndGroups(
 
 template<typename IdList, typename GroupIdSet>
 void getUsersAndGroups(
-    const SystemContext* systemContext,
+    const QnResourcePool* resourcePool,
+    const UserGroupManager* userGroupManager,
     const IdList& idList,
     QnUserResourceList& users,
     GroupIdSet& groupIds,
     bool includeHidden = true)
 {
     nx::vms::api::UserGroupDataList groups;
-    getUsersAndGroups(systemContext, idList, users, groups, includeHidden);
+    getUsersAndGroups(resourcePool, userGroupManager, idList, users, groups, includeHidden);
 
     groupIds.clear();
     for (const auto& group: groups)
@@ -67,14 +69,15 @@ void getUsersAndGroups(
 
 template<typename IdList, typename UserIdSet, typename GroupIdSet>
 void getUsersAndGroups(
-    const SystemContext* systemContext,
+    const QnResourcePool* resourcePool,
+    const UserGroupManager* userGroupManager,
     const IdList& idList,
     UserIdSet& userIds,
     GroupIdSet& groupIds,
     bool includeHidden = true)
 {
     QnUserResourceList users;
-    getUsersAndGroups(systemContext, idList, users, groupIds, includeHidden);
+    getUsersAndGroups(resourcePool, userGroupManager, idList, users, groupIds, includeHidden);
 
     userIds.clear();
     for (const auto& user: users)
@@ -86,7 +89,7 @@ QnUserResourceSet allUsers(const SystemContext* context, const IdList& ids)
 {
     QnUserResourceList users;
     QSet<nx::Uuid> groupIds;
-    nx::vms::common::getUsersAndGroups(context, ids, users, groupIds);
+    nx::vms::common::getUsersAndGroups(context->resourcePool(), context->userGroupManager(), ids, users, groupIds);
 
     auto result = nx::utils::toQSet(users);
 
@@ -99,27 +102,26 @@ QnUserResourceSet allUsers(const SystemContext* context, const IdList& ids)
 }
 
 template<typename IdList>
-bool allUserGroupsExist(SystemContext* systemContext, const IdList& groupIds)
+bool allUserGroupsExist(const UserGroupManager* userGroupManager, const IdList& groupIds)
 {
-    if (!NX_ASSERT(systemContext))
+    if (!NX_ASSERT(userGroupManager))
         return false;
 
-    const auto manager = systemContext->userGroupManager();
     return std::ranges::all_of(
         groupIds,
-        [manager](const auto& id) { return manager->contains(id); });
+        [userGroupManager](const auto& id) { return userGroupManager->contains(id); });
 }
 
 template<typename IdList, typename LessFunc>
 QStringList userGroupNames(
-    const SystemContext* systemContext,
+    const UserGroupManager* userGroupManager,
     const IdList& groupIds,
     LessFunc lessFunc)
 {
-    if (!NX_ASSERT(systemContext))
+    if (!NX_ASSERT(userGroupManager))
         return {};
 
-    auto groups = systemContext->userGroupManager()->getGroupsByIds(groupIds);
+    auto groups = userGroupManager->getGroupsByIds(groupIds);
 
     std::ranges::sort(groups, lessFunc);
 
@@ -131,13 +133,13 @@ QStringList userGroupNames(
 }
 
 template<typename IdList>
-QStringList userGroupNames(const SystemContext* systemContext, const IdList& groupIds)
+QStringList userGroupNames(const UserGroupManager* userGroupManager, const IdList& groupIds)
 {
-    if (!NX_ASSERT(systemContext))
+    if (!NX_ASSERT(userGroupManager))
         return {};
 
     QStringList result;
-    for (const auto& group: systemContext->userGroupManager()->getGroupsByIds(groupIds))
+    for (const auto& group: userGroupManager->getGroupsByIds(groupIds))
         result.push_back(group.name);
 
     return result;
@@ -146,24 +148,27 @@ QStringList userGroupNames(const SystemContext* systemContext, const IdList& gro
 inline QStringList userGroupNames(const QnUserResourcePtr& user)
 {
     return user && user->systemContext()
-        ? userGroupNames(user->systemContext(), user->allGroupIds())
+        ? userGroupNames(user->systemContext()->userGroupManager(), user->allGroupIds())
         : QStringList{};
 }
 
 template<typename IdList>
-QSet<nx::Uuid> userGroupsWithParents(SystemContext* systemContext, const IdList& groupIds)
+QSet<nx::Uuid> userGroupsWithParents(
+    nx::core::access::ResourceAccessSubjectHierarchy* accessSubjectHierarchy,
+    const IdList& groupIds)
 {
     QSet<nx::Uuid> result{groupIds.begin(), groupIds.end()};
-    if (!NX_ASSERT(systemContext))
+    if (!NX_ASSERT(accessSubjectHierarchy))
         return result;
 
-    result += systemContext->accessSubjectHierarchy()->recursiveParents(result);
+    result += accessSubjectHierarchy->recursiveParents(result);
     return result;
 }
 
 inline QSet<nx::Uuid> userGroupsWithParents(const QnUserResourcePtr& user)
 {
-    return userGroupsWithParents(user->systemContext(), user->allGroupIds());
+    return userGroupsWithParents(
+        user->systemContext()->accessSubjectHierarchy(), user->allGroupIds());
 }
 
 } // namespace nx::vms::common
