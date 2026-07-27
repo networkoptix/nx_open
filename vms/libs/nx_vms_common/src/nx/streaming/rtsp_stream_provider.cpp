@@ -1157,10 +1157,15 @@ CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
 
     bool videoExist = false;
     bool audioExist = false;
+    bool mediaWillStream = false;
     for (const auto& track : m_RtpSession.getTrackInfo())
     {
-        videoExist |= track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Video;
-        audioExist |= track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Audio;
+        const bool isVideo = track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Video;
+        const bool isAudio = track.sdpMedia.mediaType == nx::rtp::Sdp::MediaType::Audio;
+        videoExist |= isVideo;
+        audioExist |= isAudio;
+        if ((isVideo || isAudio) && m_RtpSession.isMediaTypeEnabled(track.sdpMedia.mediaType))
+            mediaWillStream = true;
     }
 
     if (m_role == Qn::CR_LiveVideo)
@@ -1175,14 +1180,16 @@ CameraDiagnostics::Result RtspResourceStreamProvider::openStream()
     }
 
     m_rtcpReportTimer.restart();
-    if (!audioExist && !videoExist)
+    if (!mediaWillStream)
     {
         if (isEmptyMediaAllowed(m_resource))
         {
+            // Disable the RTP frame timeout so the sparse metadata does not
+            // look like a stalled media stream and cause an endless reopen loop.
             m_rtpFrameTimeoutMs = -1;
             m_RtpSession.setTCPTimeout(m_RtpSession.keepAliveTimeOut());
         }
-        else
+        else if (!audioExist && !videoExist)
         {
             m_RtpSession.stop();
             m_openStreamResult = CameraDiagnostics::NoMediaTrackResult(m_url);
