@@ -409,13 +409,13 @@ TEST_F(TestOrganizationsModel, searchGrouping)
     systemsModel.reset(new QnSystemsModel(controller.get()));
     model.setSystemsModel(systemsModel.get());
 
-    controller->emitSystemDiscovered(LocalSystemDescription::create(
+    ASSERT_TRUE(controller->discoverSystem(LocalSystemDescription::create(
         /*id*/ nx::Uuid::createUuid().toSimpleString(),
         /*localSystemId*/ nx::Uuid::createUuid(),
         /*cloudSystemId*/ QString(),
-        "Local system 1"));
+        "Local system 1")));
 
-    controller->emitSystemDiscovered(QnCloudSystemDescription::create(
+    ASSERT_TRUE(controller->discoverSystem(QnCloudSystemDescription::create(
         QnCloudSystem{
             .cloudId = nx::Uuid::createUuid().toSimpleString(),
             .localId = nx::Uuid::createUuid(),
@@ -429,7 +429,7 @@ TEST_F(TestOrganizationsModel, searchGrouping)
             .system2faEnabled = false,
             .version = "1.0.0",
             .organizationId = {},
-        }));
+        })));
 
     OrganizationsFilterModel filterModel;
     LinearizationListModel linearizationModel;
@@ -476,13 +476,13 @@ TEST_F(TestOrganizationsModel, sitesSearch)
 {
     buildTree();
 
-    controller->emitSystemDiscovered(LocalSystemDescription::create(
+    ASSERT_TRUE(controller->discoverSystem(LocalSystemDescription::create(
         /*id*/ nx::Uuid::createUuid().toSimpleString(),
         /*localSystemId*/ nx::Uuid::createUuid(),
         /*cloudSystemId*/ QString(),
-        "Local system 1"));
+        "Local system 1")));
 
-    controller->emitSystemDiscovered(QnCloudSystemDescription::create(
+    ASSERT_TRUE(controller->discoverSystem(QnCloudSystemDescription::create(
         QnCloudSystem{
             .cloudId = nx::Uuid::createUuid().toSimpleString(),
             .localId = nx::Uuid::createUuid(),
@@ -496,7 +496,7 @@ TEST_F(TestOrganizationsModel, sitesSearch)
             .system2faEnabled = false,
             .version = "1.0.0",
             .organizationId = {},
-        }));
+        })));
 
     OrganizationsFilterModel filterModel;
     LinearizationListModel linearizationModel;

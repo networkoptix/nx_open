@@ -4,6 +4,7 @@
 
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/math/math.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/software_version.h>
@@ -71,7 +72,7 @@ public:
 
     void addSystem(const SystemDescriptionPtr& systemDescription);
 
-    void removeSystem(const QString& systemId, const nx::Uuid& localId);
+    void removeSystem(const QString& systemId);
 
     struct InternalSystemData
     {
@@ -454,6 +455,9 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
 {
     Q_Q(QnSystemsModel);
 
+    if (!NX_ASSERT(!systemIdToRow.contains(systemDescription->id())))
+        return;
+
     const auto data = InternalSystemDataPtr(new InternalSystemData({systemDescription}));
 
     data->connections
@@ -572,36 +576,32 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
     q->endInsertRows();
 }
 
-void QnSystemsModelPrivate::removeSystem(const QString& systemId, const nx::Uuid& localId)
+void QnSystemsModelPrivate::removeSystem(const QString& systemId)
 {
     Q_Q(QnSystemsModel);
 
-    const auto removeIt = std::find_if(internalData.begin(), internalData.end(),
-        [systemId, localId](const InternalSystemDataPtr& value)
-        {
-            const auto& system = value->system;
-            return system->id() == systemId || system->localId() == localId;
-        });
-
-    if (removeIt == internalData.end())
+    const int position = q->getRowIndex(systemId);
+    if (position < 0)
         return;
 
-    const int position = (removeIt - internalData.begin());
+    if (!NX_ASSERT(position < internalData.size()))
+    {
+        systemIdToRow.remove(systemId);
+        return;
+    }
 
     q->beginRemoveRows(QModelIndex(), position, position);
-    internalData.erase(removeIt);
+    internalData.erase(internalData.begin() + position);
+    systemIdToRow.remove(systemId);
+
     // Adjust row numbers in systemId -> row mapping.
-    for (auto it = systemIdToRow.begin(); it != systemIdToRow.end();)
+    for (auto it = systemIdToRow.begin(); it != systemIdToRow.end(); ++it)
     {
         if (it.value() > position)
             it.value()--;
-        if (it.key() == systemId)
-            it = systemIdToRow.erase(it);
-        else
-            ++it;
     }
-    q->endRemoveRows();
 
+    q->endRemoveRows();
     searchServerNamesHostsCache.remove(systemId);
 }
 

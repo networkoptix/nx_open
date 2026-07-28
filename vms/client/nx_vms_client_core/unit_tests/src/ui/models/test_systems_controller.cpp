@@ -68,24 +68,33 @@ void TestSystemsController::emitCloudLoginChanged()
     emit cloudLoginChanged();
 }
 
-void TestSystemsController::emitSystemDiscovered(SystemDescriptionPtr systemDescription)
+int TestSystemsController::findSystem(const QString& systemId) const
 {
-    m_systems.push_back(systemDescription);
+    const auto iter = std::find_if(m_systems.cbegin(), m_systems.cend(),
+        [systemId](const SystemDescriptionPtr& system) { return system->id() == systemId; });
 
-    emit systemDiscovered(systemDescription);
+    return iter != m_systems.cend() ? (int) std::distance(m_systems.cbegin(), iter) : -1;
 }
 
-void TestSystemsController::emitSystemLost(const QString& systemId)
+bool TestSystemsController::discoverSystem(SystemDescriptionPtr systemDescription)
 {
-    auto iter = std::find_if(m_systems.begin(), m_systems.end(),
-        [systemId](SystemDescriptionPtr system){
-            return system->localId() == nx::Uuid(systemId);
-        });
+    if (findSystem(systemDescription->id()) != -1)
+        return false;
 
-    if (iter != m_systems.end())
-        m_systems.erase(iter);
+    m_systems.push_back(systemDescription);
+    emit systemDiscovered(systemDescription);
+    return true;
+}
 
-    emit systemLost(systemId, nx::Uuid(systemId));
+bool TestSystemsController::loseSystem(const QString& systemId)
+{
+    const int index = findSystem(systemId);
+    if (index == -1)
+        return false;
+
+    const auto system = m_systems.takeAt(index);
+    emit systemLost(systemId, system->localId());
+    return true;
 }
 
 } // namespace test

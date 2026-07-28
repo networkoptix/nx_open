@@ -34,8 +34,10 @@ public:
     void emitCloudStatusChanged();
     void emitCloudLoginChanged();
 
-    void emitSystemDiscovered(SystemDescriptionPtr systemDescription);
-    void emitSystemLost(const QString& systemId);
+    bool discoverSystem(SystemDescriptionPtr systemDescription);
+    bool loseSystem(const QString& systemId);
+
+    int findSystem(const QString& systemId) const;
 
 private:
     SystemDescriptionList m_systems;
