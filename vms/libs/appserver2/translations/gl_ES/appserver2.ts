@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Storage with the same url already exists</source>
-      <translation type="unfinished">Storage with the same url already exists</translation>
+      <translation>Xa existe un almacenamento co mesmo URL</translation>
     </message>
     <message>
       <source>User %1 is not allowed to %2 the Showreel with parentId %3</source>
