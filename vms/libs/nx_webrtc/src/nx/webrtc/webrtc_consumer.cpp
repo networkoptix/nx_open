@@ -325,7 +325,7 @@ void Consumer::processNextData()
 
         // Send metadata via datachannel.
         const auto metadata = std::dynamic_pointer_cast<const QnCompressedMetadata>(media);
-        if (metadata && metadata->metadataType == MetadataType::ObjectDetection && m_enableMetadata)
+        if (metadata && metadata->metadataType == MetadataType::ObjectDetection)
         {
             sendMetadata(metadata);
             return;
@@ -412,11 +412,6 @@ void Consumer::putData(const QnConstAbstractMediaDataPtr& data)
 void Consumer::setSendTimestampInterval(std::chrono::milliseconds interval)
 {
     m_sendTimestampInterval = interval;
-}
-
-void Consumer::setEnableMetadata(bool enableMetadata)
-{
-    m_enableMetadata = enableMetadata;
 }
 
 std::string Consumer::idForToStringFromPtr() const

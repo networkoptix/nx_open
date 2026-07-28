@@ -47,6 +47,8 @@ public: // Initialize.
     virtual AVCodecParameters* getVideoCodecParameters() const = 0;
     virtual AVCodecParameters* getAudioCodecParameters() const = 0;
 
+    virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters /*filter*/) = 0;
+
     virtual QnVirtualCameraResourcePtr resource() = 0;
 
 public: // Playback.

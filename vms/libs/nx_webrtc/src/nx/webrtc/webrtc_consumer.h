@@ -55,10 +55,8 @@ public:
     void onDataSent(bool success);
     int64_t lastReportedTimestampUs() { return m_lastReportedTimestampUs; }
     void setSendTimestampInterval(std::chrono::milliseconds interval);
-    void setEnableMetadata(bool enableMetadata);
 
     bool canAcceptData() const;
-
     std::string idForToStringFromPtr() const;
 
 private:
@@ -80,7 +78,6 @@ private:
     Streamer* m_streamer = nullptr;
     int64_t m_lastReportedTimestampUs = AV_NOPTS_VALUE;
     std::chrono::milliseconds m_sendTimestampInterval {1000};
-    bool m_enableMetadata = false;
     bool m_sendInProgress = false;
     const std::string m_sessionId;
 };
