@@ -153,7 +153,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Volume</source>
@@ -470,7 +470,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Κάμερα</translation>
     </message>
     <message>
       <source>Device disconnected</source>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Κάμερα</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
