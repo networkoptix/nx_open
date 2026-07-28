@@ -2080,7 +2080,7 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Buscar semellantes</translation>
     </message>
   </context>
   <context>

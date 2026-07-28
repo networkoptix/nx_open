@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Silakan pilih setidaknya satu site</translation>
     </message>
   </context>
   <context>

@@ -983,7 +983,7 @@
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Por favor, selecciona polo menos un sitio</translation>
     </message>
   </context>
   <context>
@@ -1338,7 +1338,7 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Seleccionar caducidade</translation>
     </message>
     <message>
       <source>Expiration</source>
