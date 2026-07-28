@@ -69,6 +69,7 @@ public:
     void setReader(std::shared_ptr<Reader> reader);
 
     SessionPool* sessionPool() const { return m_sessionPool; }
+    void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) { m_streamDataFilter = filter; }
     void setTranscodingParams(
         nx::vms::api::WebRtcMethod method,
         QnLegacyTranscodingSettings transcodingParams,
@@ -155,6 +156,7 @@ private:
     nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
 
     bool m_stopped = false;
+    nx::vms::api::StreamDataFilters m_streamDataFilter{nx::vms::api::StreamDataFilter::media};
     createDataProviderFactory m_providerFactory;
     int m_version = 1;
 

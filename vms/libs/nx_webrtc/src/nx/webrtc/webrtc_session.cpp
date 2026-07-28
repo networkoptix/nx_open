@@ -217,6 +217,8 @@ AbstractCameraDataProviderPtr Session::createProvider(
     std::optional<float> speedOpt)
 {
     auto provider = m_providerFactory(deviceId, positionMs, stream, speedOpt, m_localUfrag);
+    if (provider)
+        provider->setStreamDataFilter(m_streamDataFilter);
     addProvider(provider);
 
     if (!initializeMuxersInternal())
