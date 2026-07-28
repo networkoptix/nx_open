@@ -1052,7 +1052,7 @@
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Seleccionar caducidade</translation>
     </message>
     <message>
       <source>Expiration</source>
