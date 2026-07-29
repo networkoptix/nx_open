@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
   </context>
   <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Synchronize Users</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
     <message>
       <source>Tile Settings</source>
@@ -336,7 +336,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Αφαίρεση</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -362,7 +362,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Αυτόματο</translation>
     </message>
   </context>
   <context>
@@ -407,7 +407,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarkView</name>
     <message>
       <source>Shared by link</source>
-      <translation type="unfinished">Shared by link</translation>
+      <translation>Κοινοποιήθηκε μέσω συνδέσμου</translation>
     </message>
   </context>
   <context>
@@ -482,7 +482,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>κανένα</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -511,7 +511,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Εκτός σύνδεσης</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -575,7 +575,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
@@ -651,11 +651,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Key</source>
@@ -663,7 +663,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Τιμή</translation>
     </message>
   </context>
   <context>
@@ -674,7 +674,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Υπερευρυγώνιος φακός</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -697,7 +697,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -720,7 +720,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>Create</source>
@@ -728,7 +728,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -740,7 +740,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>Χαρακτηριστικά</translation>
     </message>
     <message>
       <source>Select type</source>
@@ -767,7 +767,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Τιμή</translation>
     </message>
   </context>
   <context>
@@ -815,7 +815,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Done</source>
@@ -845,11 +845,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>
@@ -894,7 +894,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FilterSettingsDialog</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
   </context>
   <context>
@@ -988,7 +988,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Επιστροφή</translation>
     </message>
     <message>
       <source>Finish</source>
@@ -999,7 +999,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Φόρτωση...</translation>
     </message>
   </context>
   <context>
@@ -1021,7 +1021,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1071,7 +1071,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1094,11 +1094,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupGeneralTab</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Πληροφορίες</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1275,14 +1275,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Αφαίρεση</translation>
     </message>
   </context>
   <context>
     <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Έκδοση</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -1309,11 +1309,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Ενσωματώσεις</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
   </context>
   <context>
@@ -1358,7 +1358,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Αποθήκευση</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1366,7 +1366,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Επόμενο</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
@@ -1450,7 +1450,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Επεξεργασία</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
@@ -1458,11 +1458,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Αποσύνδεση</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
     <message>
       <source>Not configured yet</source>
@@ -1554,7 +1554,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>τιμή</translation>
     </message>
   </context>
   <context>
@@ -1593,7 +1593,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Importing</source>
@@ -1632,7 +1632,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
     <message>
       <source>Import</source>
@@ -1644,7 +1644,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -1652,7 +1652,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>No Entries</source>
@@ -1717,7 +1717,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
@@ -1805,7 +1805,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>OpenedTileItem</name>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Διεύθυνση</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
@@ -1813,11 +1813,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -1836,7 +1836,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>Απόρριψη</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
@@ -1851,7 +1851,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Προσαρμοσμένο</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1891,7 +1891,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>Προσαρμοσμένο</translation>
     </message>
   </context>
   <context>
@@ -1902,7 +1902,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Current password</source>
@@ -2023,7 +2023,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -2089,7 +2089,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Done</source>
@@ -2104,11 +2104,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Επόμενο</translation>
     </message>
   </context>
   <context>
@@ -2247,7 +2247,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
@@ -2258,11 +2258,11 @@ Press Alt + Click to follow object</translation>
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -2323,7 +2323,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
@@ -2342,7 +2342,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Διατάξεις</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -2398,7 +2398,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Διατάξεις</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -2418,7 +2418,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Ενσωματώσεις</translation>
     </message>
   </context>
   <context>
@@ -2440,7 +2440,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Κίνηση</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -2493,7 +2493,7 @@ Press Alt + Click to follow object</translation>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Αναζήτηση</translation>
     </message>
   </context>
   <context>
@@ -2522,7 +2522,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>
@@ -2744,7 +2744,7 @@ Press Alt + Click to follow object</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
@@ -2767,7 +2767,7 @@ Press Alt + Click to follow object</translation>
     <name>TileMenu</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Επεξεργασία</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -2779,7 +2779,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -2835,7 +2835,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2851,7 +2851,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Προσθήκη Χρήστη</translation>
     </message>
   </context>
   <context>
@@ -2874,7 +2874,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -2886,7 +2886,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2937,7 +2937,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2976,11 +2976,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Πληροφορίες</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -2988,7 +2988,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Ρυθμίσεις Λογαριασμού</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2996,7 +2996,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Αλλαγή κωδικού πρόσβασής</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
@@ -3100,7 +3100,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>No Entries</source>
@@ -3132,7 +3132,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Απενεργοποίηση</translation>
     </message>
     <message>
       <source>Test events...</source>
@@ -3151,7 +3151,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Υποστήριξη</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>

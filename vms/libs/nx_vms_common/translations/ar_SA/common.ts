@@ -5,23 +5,23 @@
     <name>AccessRightHelper</name>
     <message>
       <source>View Live</source>
-      <translation type="unfinished">View Live</translation>
+      <translation>عرض مباشر</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>تشغيل الصوت</translation>
     </message>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>عرض الأرشيف</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>تصدير الأرشيف</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>عرض الإشارات المرجعية</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>تعديل الإعدادات</translation>
     </message>
   </context>
   <context>
@@ -55,12 +55,12 @@
     <name>BookmarkFacadeStrings</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>تمت إزالة الكاميرا</translation>
     </message>
     <message>
       <source>Site Event</source>
       <comment>Shows that the bookmark was created by a site event</comment>
-      <translation type="unfinished">Site Event</translation>
+      <translation>حدث الموقع</translation>
     </message>
   </context>
   <context>
@@ -179,52 +179,52 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>المسؤولون</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>المستخدمون المتقدمون</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>المشاهدون المتقدمون</translation>
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>المشاهدون</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>مشاهدون البث المباشر</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>يمكن لأعضاء هذه المجموعة مشاهدة مقاطع الفيديو المباشرة ووحدات الإدخال/الإخراج وصفحات الويب.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>بالإضافة إلى الأذونات الممنوحة من قبل مجموعة المشاهدين، يمكن لأعضاء هذه المجموعة رؤية وتفعيل مواقع الكاميرات المتحركة وجولاتها، واستخدام الصوت ثنائي الاتجاه 2، وتشغيل أزرار وحدة الإدخال/الإخراج، وإنشاء وتحرير الإشارات المرجعية، وعرض سجل الأحداث.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>يمكن لأعضاء هذه المجموعة، بالإضافة إلى الأذونات الممنوحة من قبل مجموعة مشاهدين البث المباشر، عرض وتصدير الأرشيف والإشارات المرجعية.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>مشاهدي سلامة الموقع</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>يتمتع أعضاء هذه المجموعة بصلاحيات غير محدودة على الموقع. يمكن للمسؤولين إنشاء وتعديل المستخدمين المتقدمون، ودمج المواقع، وربط أو فصل الموقع عن .</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>يمكن لأعضاء هذه المجموعة، بالإضافة إلى الأذونات الممنوحة من قبل مجموعة المشاهدين المتقدمين، التحكم في معظم إعدادت الموقع، ولكن لا يُسمح لهم بتغيير أي إعدادات متعلقة بالمسؤول، مثل حذف أو تغيير مجموعاتهم وأذوناتهم الخاصة، ولا يمكنهم إنشاء أو تعديل مستخدمين متقدمون آخرين.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>يمكن لأعضاء هذه المجموعة عرض معلومات مراقبة سلامة الموقع وحمل معالج الخادم في الوقت الفعلي (مراقبة الخادم).</translation>
     </message>
   </context>
   <context>
@@ -335,11 +335,11 @@
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation type="unfinished">Media stream is opened but no media data was received.</translation>
+      <translation>تم فتح بث الوسائط ولكن لم يتم استلام أي بيانات وسائط.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation type="unfinished">Unknown error. Please contact support.</translation>
+      <translation>خطأ غير معروف. يرجى التواصل مع الدعم</translation>
     </message>
     <message>
       <source>(unknown)</source>
@@ -347,75 +347,75 @@
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation type="unfinished">Server %1 is not available.</translation>
+      <translation>الخادم %1 غير متاح.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation type="unfinished">Check that Server is up and running.</translation>
+      <translation>تأكد من أن الخادم يعمل بشكل صحيح.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>تلقيت استجابة خاطئة من الخادم %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation type="unfinished">Check if Server is up and has the proper version.</translation>
+      <translation>تحقق مما إذا كان الخادم يعمل ويحتوي على الإصدار المناسب.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation type="unfinished">Cannot connect to http port %1.</translation>
+      <translation>لا يمكن الاتصال بمنفذ HTTP %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation type="unfinished">Finally, try to update firmware. If the problem persists, please contact support.</translation>
+      <translation>أخيرًا، حاول تحديث البرنامج الثابت. إذا استمرت المشكلة، يُرجى الاتصال بالدعم الفني.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation type="unfinished">Failed to configure parameter %1.</translation>
+      <translation>فشل في إعداد المتغير %1.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation type="unfinished">Please contact support.</translation>
+      <translation>يرجى الاتصال بالدعم الفني.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>حدث خطأ في الإدخال/الإخراج. رسالة نظام التشغيل: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
-      <translation type="unfinished">Parameters:</translation>
+      <translation>المُتغيرات</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the device, then restore factory defaults on the web-page.</translation>
+      <translation>يرجى محاولة إعادة تشغيل الجهاز، ثم استعادة إعدادات المصنع الافتراضية من خلال صفحة الويب.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation type="unfinished">Please try to reboot the camera, then restore factory defaults on the web-page.</translation>
+      <translation>يرجى محاولة إعادة تشغيل الكاميرا، ثم استعادة إعدادات المصنع الافتراضية من خلال صفحة الويب.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation type="unfinished">Make sure the device is plugged into the network. Try to reboot the device.</translation>
+      <translation>تأكد من توصيل الجهاز بالشبكة. حاول إعادة تشغيل الجهاز.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation type="unfinished">Make sure the camera is plugged into the network. Try to reboot the camera.</translation>
+      <translation>تأكد من توصيل الكاميرا بالشبكة. حاول إعادة تشغيل الكاميرا.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>طلب الجهاز &quot;%1&quot; فشل مع الخطأ &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>طلب الكاميرا &quot;%1&quot; فشل مع الخطأ &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation type="unfinished">Unknown device issue.</translation>
+      <translation>مشكلة غير معروفة في الجهاز.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation type="unfinished">Unknown camera issue.</translation>
+      <translation>مشكلة غير معروفة في الكاميرا.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
@@ -435,7 +435,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>فشل طلب وحدة الإدخال/الإخراج &quot;%1&quot; مع الخطأ &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -471,35 +471,35 @@
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation type="unfinished">If it does not help, restore factory defaults on the I/O module web-page.</translation>
+      <translation>إذا لم ينجح ذلك، فقم باستعادة إعدادات المصنع الافتراضية على صفحة الويب الخاصة بوحدة الإدخال/الإخراج.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation type="unfinished">Cannot open media URL %1. Failed to connect to media port %2.</translation>
+      <translation>تعذر فتح عنوان الوسائط %1. فشل الاتصال بمنفذ الوسائط %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation type="unfinished">Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</translation>
+      <translation>تعذر فتح عنوان URL %1 للوسائط. الاتصال بالمنفذ %2 تم إغلاقه بشكل غير متوقع.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse device response. URL %1, request name %2.</translation>
+      <translation>تعذر تحليل استجابة الجهاز. عنوان %1، اسم الطلب %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse camera response. URL %1, request name %2.</translation>
+      <translation>تعذر تحليل استجابة الكاميرا. عنوان  %1، اسم الطلب %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation type="unfinished">Could not parse I/O module response. URL %1, request name %2.</translation>
+      <translation>تعذر تحليل استجابة وحدة الإدخال/الإخراج. عنوان  %1، اسم الطلب %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation type="unfinished">No supported media tracks at URL %1.</translation>
+      <translation>لا توجد مسارات وسائط مدعومة على عنوان %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation type="unfinished">Not authorized. URL %1.</translation>
+      <translation>غير مصرح به. عنوان  %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
@@ -576,7 +576,7 @@
     <name>QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>تمت إزالة الكاميرا</translation>
     </message>
   </context>
   <context>
@@ -1590,7 +1590,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message>
       <source>Multiple groups</source>
@@ -1616,7 +1616,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>التكامل</translation>
     </message>
     <message>
       <source>Cloud storage</source>

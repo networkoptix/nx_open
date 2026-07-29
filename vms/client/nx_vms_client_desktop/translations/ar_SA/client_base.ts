@@ -5,23 +5,23 @@
     <name>ActionDurationPickerWidget</name>
     <message>
       <source>For the duration of event</source>
-      <translation type="unfinished">For the duration of event</translation>
+      <translation>طوال مدة الحدث</translation>
     </message>
     <message>
       <source>Of fixed duration</source>
-      <translation type="unfinished">Of fixed duration</translation>
+      <translation>ذات مدة ثابتة</translation>
     </message>
     <message>
       <source>Event occurs</source>
-      <translation type="unfinished">Event occurs</translation>
+      <translation>عند ظهور الحدث</translation>
     </message>
     <message>
       <source>Event starts</source>
-      <translation type="unfinished">Event starts</translation>
+      <translation>عند بدأ الحدث</translation>
     </message>
     <message>
       <source>Event stops</source>
-      <translation type="unfinished">Event stops</translation>
+      <translation>عند توقف الحدث</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>لِ</translation>
     </message>
   </context>
   <context>
@@ -52,12 +52,12 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>أي برنامج إضافي</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 مع %n سمات</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
@@ -79,7 +79,7 @@
       <source>%1 are used</source>
       <comment>Numerus: text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+        <numerusform>%1مستخدم</numerusform>
         <numerusform>%1 are used</numerusform>
         <numerusform>%1 are used</numerusform>
         <numerusform>%1 are used</numerusform>
@@ -91,7 +91,7 @@
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 مطلوب</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -104,15 +104,15 @@
     <name>CellWidget</name>
     <message>
       <source>Canceled</source>
-      <translation type="unfinished">Canceled</translation>
+      <translation>ملغي</translation>
     </message>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>أضيف</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>يضيف</translation>
     </message>
   </context>
   <context>
@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>المصدر</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>جارٍ التحقق من حزمة التحديث</translation>
     </message>
   </context>
   <context>
@@ -847,7 +847,7 @@
     </message>
     <message>
       <source>Page...</source>
-      <translation type="unfinished">Page...</translation>
+      <translation>صفحة...</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
@@ -859,11 +859,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>انتقل إلى علامة التبويب "الكاميرات والموارد"</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>ابحث عن الكاميرات والموارد</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -871,51 +871,51 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>جديد</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>أضف صفحة ويب...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>عرض الخوادم</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>حفظ إعدادات النافذة</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>حفظ إعدادات النوافذ</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>إعدادات النوافذ</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>حفظ الحالة الحالية</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>استعادة الحالة المحفوظة</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>حذف الحالة المحفوظة</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>إغلاق كل النوافذ</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>حذف الإشارة المرجعية...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>حذف الإشارات المرجعية...</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -927,11 +927,11 @@
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>إنشاء مجموعة</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>إزالة مجموعة</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>إعدادات عصا التحكم...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -947,43 +947,43 @@
     </message>
     <message>
       <source>Archive filter...</source>
-      <translation type="unfinished">Archive filter...</translation>
+      <translation>فلتر الأرشيف...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>نسخ نص الإشارة المرجعية</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>نسخ نص الإشارات المرجعية</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>إعدادات صفحة الويب...</translation>
     </message>
     <message>
       <source>Account Security...</source>
-      <translation type="unfinished">Account Security...</translation>
+      <translation>أمان الحساب...</translation>
     </message>
     <message>
       <source>Replace Camera...</source>
-      <translation type="unfinished">Replace Camera...</translation>
+      <translation>استبدل الكاميرا...</translation>
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation type="unfinished">Save Current Layout As Cloud...</translation>
+      <translation>حفظ التخطيط الحالي كسحابة...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
-      <translation type="unfinished">Save Layout As Cloud...</translation>
+      <translation>حفظ التخطيط كسحابة...</translation>
     </message>
     <message>
       <source>Save Cloud Layout</source>
-      <translation type="unfinished">Save Cloud Layout</translation>
+      <translation>حفظ تخطيط السحابة</translation>
     </message>
     <message>
       <source>Save Cloud Layout As...</source>
-      <translation type="unfinished">Save Cloud Layout As...</translation>
+      <translation>حفظ تخطيط السحابة كـ...</translation>
     </message>
     <message>
       <source>Add</source>
@@ -991,7 +991,7 @@
     </message>
     <message>
       <source>Device...</source>
-      <translation type="unfinished">Device...</translation>
+      <translation>جهاز...</translation>
     </message>
     <message>
       <source>Add User...</source>
@@ -999,11 +999,11 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>التكامل...</translation>
     </message>
     <message>
       <source>New Integration...</source>
-      <translation type="unfinished">New Integration...</translation>
+      <translation>تكامل جديد...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
@@ -1011,68 +1011,68 @@
     </message>
     <message>
       <source>Add Showreel...</source>
-      <translation type="unfinished">Add Showreel...</translation>
+      <translation>إضافة عرض...</translation>
     </message>
     <message>
       <source>Add Virtual Camera...</source>
-      <translation type="unfinished">Add Virtual Camera...</translation>
+      <translation>إضافة كاميرا افتراضية...</translation>
     </message>
     <message>
       <source>Integration Settings...</source>
-      <translation type="unfinished">Integration Settings...</translation>
+      <translation>إعدادات التكامل...</translation>
     </message>
     <message>
       <source>Proxied Integration...</source>
-      <translation type="unfinished">Proxied Integration...</translation>
+      <translation>التكامل بالوكالة...</translation>
     </message>
     <message>
       <source>Proxied Web Page...</source>
-      <translation type="unfinished">Proxied Web Page...</translation>
+      <translation>صفحة ويب وسيطة...</translation>
     </message>
     <message>
       <source>Show Proxied Resources</source>
-      <translation type="unfinished">Show Proxied Resources</translation>
+      <translation>عرض الموارد المُوَجَّهة بالوكالة</translation>
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>استيراد من الأجهزة...</translation>
     </message>
     <message>
       <source>User Manual...</source>
-      <translation type="unfinished">User Manual...</translation>
+      <translation>دليل المستخدم...</translation>
     </message>
     <message>
       <source>Convert to Shared Layout</source>
-      <translation type="unfinished">Convert to Shared Layout</translation>
+      <translation>التحويل إلى تخطيط مشترك</translation>
     </message>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>الاتصال بالموقع</translation>
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>إدارة الموقع...</translation>
     </message>
     <message>
       <source>Site Update...</source>
-      <translation type="unfinished">Site Update...</translation>
+      <translation>تحديث الموقع...</translation>
     </message>
     <message>
       <source>Lists Management...</source>
-      <translation type="unfinished">Lists Management...</translation>
+      <translation>إدارة القوائم...</translation>
     </message>
     <message>
       <source>Open Integrations...</source>
-      <translation type="unfinished">Open Integrations...</translation>
+      <translation>التكاملات المفتوحة...</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>دمج المواقع...</translation>
     </message>
     <message>
       <source>Open in</source>
       <comment>The &quot;Open in&quot; menu, which has a submenu</comment>
-      <translation type="unfinished">Open in</translation>
+      <translation>فتح في</translation>
     </message>
     <message>
       <source>New Tab</source>
@@ -1087,7 +1087,7 @@
     <message>
       <source>Dedicated Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">Dedicated Window</translation>
+      <translation>نافذة مخصصة</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -1095,11 +1095,11 @@
     </message>
     <message>
       <source>JavaScript API...</source>
-      <translation type="unfinished">JavaScript API...</translation>
+      <translation>واجهة برمجة تطبيقات جافا سكريبت...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected Site...</source>
-      <translation type="unfinished">Merge to Currently Connected Site...</translation>
+      <translation>دمج مع الموقع المتصل حاليًا...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>تخطيط</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -1115,11 +1115,11 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>شاشة الترحيب</translation>
     </message>
     <message>
       <source>New Welcome Screen</source>
-      <translation type="unfinished">New Welcome Screen</translation>
+      <translation>شاشة ترحيب جديدة</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -1131,13 +1131,13 @@
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+        <numerusform>عرض على العناصر</numerusform>
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
@@ -1150,7 +1150,7 @@
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
         <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
+        <numerusform>كتم صوت العناصر</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
@@ -1162,7 +1162,7 @@
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
         <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>إلغاء كتم العناصر</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
@@ -1171,7 +1171,7 @@
     </message>
     <message>
       <source>Event log...</source>
-      <translation type="unfinished">Event log...</translation>
+      <translation>سجل الأحداث...</translation>
     </message>
   </context>
   <context>
@@ -1210,14 +1210,14 @@
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>معرف الجهاز الخاص بالخادم مع هذا الترخيص لا يتطابق مع معرف الجهاز الذي تم تنشيط الترخيص عليه.</translation>
     </message>
   </context>
   <context>
     <name>DirectParentsModel</name>
     <message>
       <source>LDAP group membership is managed on LDAP server</source>
-      <translation type="unfinished">LDAP group membership is managed on LDAP server</translation>
+      <translation>تتم إدارة عضوية مجموعة LDAP على خادم LDAP</translation>
     </message>
   </context>
   <context>
@@ -1225,101 +1225,101 @@
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Also include</translation>
+      <translation>أضف أيضًا</translation>
     </message>
     <message>
       <source>Begin</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Begin</translation>
+      <translation>يبدأ</translation>
     </message>
     <message>
       <source>Before Event</source>
       <comment>Part of the text, action duration: Begin &lt;time&gt; Before Event</comment>
-      <translation type="unfinished">Before Event</translation>
+      <translation>قبل الحدث</translation>
     </message>
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>نهاية</translation>
     </message>
     <message>
       <source>After Event</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">After Event</translation>
+      <translation>بعد الحدث</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>الرجاء إدخال كلمة مرور صحيحة</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>كلمة المرور غير صالحة.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>تخطيط مشفر</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>الملف %1 مُشفّر. يُرجى إدخال كلمة المرور:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>الرجاء إعادة إدخال كلمة المرور للتخطيط %1:</translation>
     </message>
   </context>
   <context>
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>الصور</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>فيديو</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>جميع الملفات</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>تداخل الصوت والفيديو</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>ماتروسكا</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 الجزء 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 ملف وسائط</translation>
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>ملف وسائط %1 قابل للتنفيذ</translation>
     </message>
   </context>
   <context>
     <name>Groups</name>
     <message>
       <source>Delete group?</source>
-      <translation type="unfinished">Delete group?</translation>
+      <translation>حذف مجموعة؟</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <translation type="unfinished">
         <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>حذف مجموعات %n؟</numerusform>
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
@@ -1331,7 +1331,7 @@
     <name>IntercomManager::Private</name>
     <message>
       <source>%1 Layout</source>
-      <translation type="unfinished">%1 Layout</translation>
+      <translation>%1 تخطيط</translation>
     </message>
   </context>
   <context>
@@ -1346,7 +1346,7 @@
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
-      <translation type="unfinished">To report the issue please contact %1.</translation>
+      <translation>للإبلاغ عن المشكلة، يرجى الاتصال بـ %1.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -1354,7 +1354,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>البيانات المستلمة غير صالحة.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1378,11 +1378,11 @@
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1</translation>
+      <translation>تم تفعيل هذا الترخيص بالفعل وربطه بمعرف الجهاز %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation type="unfinished">This license is already activated and linked to Hardware ID %1 on %2</translation>
+      <translation>تم تفعيل هذا الترخيص بالفعل وربطه بمعرف الجهاز %1 على %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1390,7 +1390,7 @@
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation type="unfinished">To activate License Key manually please contact %1.</translation>
+      <translation>لتفعيل مفتاح الترخيص يدويًا، يرجى الاتصال بـ %1.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1402,15 +1402,15 @@
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>للإبلاغ عن المشكلة يرجى الاتصال بالدعم الإقليمي / دعم الرخصة:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>لتفعيل مفتاح الترخيص يدويًا، يرجى الاتصال بدعم الترخيص الإقليمي الخاص بك:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>معرف الجهاز ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1418,7 +1418,7 @@
     </message>
     <message>
       <source>Failed to activate free license</source>
-      <translation type="unfinished">Failed to activate free license</translation>
+      <translation>فشل تفعيل الترخيص المجاني</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -1427,24 +1427,24 @@
     <message>
       <source>Hardware ID: %1
 License Key: %2</source>
-      <translation type="unfinished">Hardware ID: %1
-License Key: %2</translation>
+      <translation>معرف الجهاز: %1
+مفتاح الترخيص: %2</translation>
     </message>
     <message>
       <source>Copy Parameters</source>
-      <translation type="unfinished">Copy Parameters</translation>
+      <translation>نسخ العوامل</translation>
     </message>
     <message>
       <source>License has already been activated</source>
-      <translation type="unfinished">License has already been activated</translation>
+      <translation>تم تفعيل الترخيص بالفعل</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to %1 to receive the activation file.</translation>
+      <translation>إذا لم يكن موقعك متصل بالإنترنت، يرجى إرسال مفتاح الترخيص المقدم ومعرف الجهاز إلى %1 لاستلام ملف التفعيل.</translation>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation type="unfinished">If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</translation>
+      <translation>إذا لم يكن موقعك متصل بالإنترنت، يرجى إرسال مفتاح الترخيص المقدم ومعرف الجهاز إلى فريق الدعم الاقليمي لاستلام ملف التفعيل.</translation>
     </message>
   </context>
   <context>
@@ -1484,7 +1484,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>يرجى المحاولة مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1541,27 +1541,27 @@ License Key: %2</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>للحصول على مفتاح ترخيص صالح، يرجى الاتصال بـ %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>إذا استمرت المشكلة، يرجى الاتصال بـ %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>يرجى الاتصال بـ %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>للحصول على مفتاح ترخيص صالح، يرجى الاتصال بدعم الترخيص الإقليمي الخاص بك:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>إذا استمرت المشكلة، يرجى الاتصال بدعم الترخيص الإقليمي الخاص بك:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>يرجى الاتصال بدعم الترخيص الإقليمي الخاص بك:</translation>
     </message>
   </context>
   <context>
@@ -1584,13 +1584,13 @@ License Key: %2</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>اسم الملف &quot;%1&quot; محجوز من قِبل نظام التشغيل. يُرجى تجربة اسم آخر.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
       <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>يجب ألا يحتوي اسم الملف على الأحرف المحجوزة التالية:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
         <numerusform>File name must not contain the following reserved characters:</numerusform>
@@ -1603,7 +1603,7 @@ License Key: %2</translation>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>الاتصال بالموقع</translation>
     </message>
   </context>
   <context>
@@ -1622,15 +1622,15 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>عنوان URL غير صالح.</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>نشط</translation>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>لم يتم الإعداد</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1638,26 +1638,26 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>قم بتعيين عنوان بريدك الإلكتروني أو خادم SMTP الخاص بك</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 المستخدمين يتلقون رسائل البريد الإلكتروني</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>%1 غير متاح</translation>
     </message>
     <message>
       <source>Route via %1</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">Route via %1</translation>
+      <translation>المسار عبر %1</translation>
     </message>
     <message>
       <source>Route via SMTP server</source>
-      <translation type="unfinished">Route via SMTP server</translation>
+      <translation>المسار عبر خادم SMTP</translation>
     </message>
     <message>
       <source>Success</source>
@@ -1674,27 +1674,27 @@ License Key: %2</translation>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users will start receiving emails immediately after you apply these settings</translation>
+      <translation>%1 سيبدأ المستخدمون في تلقي رسائل البريد الإلكتروني مباشرة بعد تطبيق هذه الإعدادات</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>لا يمكن الوصول إلى الخادم</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
-      <translation type="unfinished">Username or Password are incorrect</translation>
+      <translation>اسم المستخدم أو كلمة المرور غير صحيحة</translation>
     </message>
     <message>
       <source>Insecure</source>
-      <translation type="unfinished">Insecure</translation>
+      <translation>غير آمن</translation>
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>فشل الاتصال</translation>
     </message>
     <message>
       <source>Username cannot be empty</source>
-      <translation type="unfinished">Username cannot be empty</translation>
+      <translation>لا يمكن ترك اسم المستخدم فارغا</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
@@ -1702,19 +1702,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
-      <translation type="unfinished">Users are receiving emails</translation>
+      <translation>المستخدمون يتلقون رسائل البريد الإلكتروني</translation>
     </message>
     <message>
       <source>Users will start receiving emails right after you apply settings</source>
-      <translation type="unfinished">Users will start receiving emails right after you apply settings</translation>
+      <translation>سيبدأ المستخدمون في تلقي رسائل البريد الإلكتروني مباشرة بعد تطبيق الإعدادات</translation>
     </message>
     <message>
       <source>Unable to test SMTP server</source>
-      <translation type="unfinished">Unable to test SMTP server</translation>
+      <translation>تعذر اختبار خادم SMTP</translation>
     </message>
     <message>
       <source>Additional info required</source>
-      <translation type="unfinished">Additional info required</translation>
+      <translation>معلومات إضافية مطلوبة</translation>
     </message>
     <message>
       <source>Enter a short Site description here.</source>

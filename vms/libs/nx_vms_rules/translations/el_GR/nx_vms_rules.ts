@@ -153,7 +153,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Volume</source>
@@ -470,7 +470,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Κάμερα</translation>
     </message>
     <message>
       <source>Device disconnected</source>
@@ -569,7 +569,7 @@
     <name>nx::vms::rules::EnterFullscreenAction</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Κάμερα</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -693,11 +693,11 @@
     <name>nx::vms::rules::IntegrationAction</name>
     <message>
       <source>Integration Action</source>
-      <translation type="unfinished">Integration Action</translation>
+      <translation>Ενέργεια Ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Integration Action Parameters</source>
-      <translation type="unfinished">Integration Action Parameters</translation>
+      <translation>Παράμετροι Ενέργειας Ενσωμάτωσης</translation>
     </message>
   </context>
   <context>
@@ -1226,7 +1226,7 @@
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Πρόβλημα αποθήκευσης στο %1</translation>
     </message>
     <message>
       <source>Storage Issue</source>
