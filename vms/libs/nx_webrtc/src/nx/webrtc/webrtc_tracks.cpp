@@ -8,6 +8,7 @@
 #include <nx/utils/log/log.h>
 
 #include "webrtc_session.h"
+#include "webrtc_twcc.h"
 
 namespace nx::webrtc {
 
@@ -16,6 +17,29 @@ namespace {
 static const std::string kSendOnlyAttr = "a=sendonly";
 static const std::string kRecvOnlyAttr = "a=recvonly";
 static const std::string kSendRecvAttr = "a=sendrecv";
+
+// Builds the m-line, rtpmap, and optional fmtp lines for a media description.
+// Uses the DTLS-SRTP AVPF profile (RFC 4585) so rtcp-fb directives are honored
+// -- Safari/iOS enforce this strictly, Chrome is lenient -- and a bundled session
+// must not mix AVP and SAVPF across its m-lines.
+std::string makeMediaLines(
+    const std::string& mediaType,
+    uint16_t port,
+    int payloadType,
+    const std::string& codec,
+    int clockRate,
+    const std::string& fmtpParams = {})
+{
+    auto mlines = "m=" + mediaType + " " + std::to_string(port) + " UDP/TLS/RTP/SAVPF " +
+        std::to_string(payloadType) + "\r\n";
+    mlines += "a=rtpmap:" + std::to_string(payloadType) + " " + codec + "/" +
+        std::to_string(clockRate) + "\r\n";
+
+    if (!fmtpParams.empty())
+        mlines += "a=fmtp:" + std::to_string(payloadType) + " " + fmtpParams + "\r\n";
+
+    return mlines;
+}
 
 } // namespace
 
@@ -213,30 +237,38 @@ std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) con
 
 std::string TracksForRecv::getSdpForTrack(const Track* track, uint16_t port) const
 {
-    std::string result;
+    std::string sdp;
     if (track->trackType == TrackType::video)
     {
-        result = NX_FMT(
-            "m=video %1 RTP/AVP %2\r\n"
-            "a=rtpmap:%2 H264/90000\r\n"
-            "a=fmtp:%2 packetization-mode=1\r\n",
+        sdp = makeMediaLines(
+            "video",
             port,
-            track->payloadType)
-            .toStdString();
+            track->payloadType,
+            "H264",
+            90000,
+            "packetization-mode=1");
+
+        // Full intra request: https://datatracker.ietf.org/doc/html/rfc5104#section-4.3.1
+        // `ccm` means `Codec Control Message`.
+        sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " ccm fir\r\n";
+
+        // Transport-wide congestion control: we echo per-packet arrival timing
+        // back to the publisher so its send-side estimator can raise the send
+        // bitrate. Advertising only transport-cc (not goog-remb) makes the
+        // publisher select send-side BWE deterministically. See VMS-62147.
+        sdp += "a=rtcp-fb:" + std::to_string(track->payloadType) + " transport-cc\r\n" +
+            "a=extmap:" + std::to_string(kTransportCcExtId) + " " + kTransportCcUri + "\r\n";
+    }
+    else if (track->trackType == TrackType::audio)
+    {
+        sdp = makeMediaLines("audio", port, track->payloadType, "PCMU", 8000);
     }
     else
     {
-        result = NX_FMT(
-            "m=audio %1 RTP/AVP %2\r\n"
-            "a=rtpmap:%2 PCMU/8000\r\n",
-            port,
-            track->payloadType)
-            .toStdString();
+        NX_DEBUG(this, "Unknown track type %1", (int) track->trackType);
     }
-    // Full intra request: https://datatracker.ietf.org/doc/html/rfc5104#section-4.3.1
-    // `ccm` mean `Codec Control Message`.
-    result += "a=rtcp-fb:" + std::to_string(track->payloadType) + " ccm fir\r\n";
-    return result + base_type::getSdpForTrack(track, port);
+
+    return sdp + base_type::getSdpForTrack(track, port);
 }
 
 TracksForSend::TracksForSend(Session* session) : Tracks(session)
