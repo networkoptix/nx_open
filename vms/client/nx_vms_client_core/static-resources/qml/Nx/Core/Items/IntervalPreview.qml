@@ -99,6 +99,14 @@ Item
             loader.item.content.mediaPlayer.position = position
     }
 
+    function tearDownPlayer()
+    {
+        startTimer.stop()
+        deactivationTimer.stop()
+        loader.active = false
+        loader.previewState = EventSearch.PreviewState.initial
+    }
+
     Loader
     {
         id: loader
@@ -277,18 +285,37 @@ Item
         {
             if (effectivelyActive)
             {
-                start()
+                deactivationTimer.stop()
+                if (!loader.active)
+                    start()
+            }
+            else if (loader.active)
+            {
+                deactivationTimer.restart()
             }
             else
             {
-                stop()
-                loader.active = false
-                loader.previewState = EventSearch.PreviewState.initial
+                control.tearDownPlayer()
             }
         }
 
         onTriggered:
             loader.active = true
+    }
+
+    // Defers destroying the player when the item loses visibility, so a transient hide does not
+    // trigger a costly teardown and reload. This happens, for example, when the item is reparented
+    // between layout proxies on a fullscreen toggle: `visible` briefly drops to false and returns
+    // within a frame. If visibility comes back before this fires, the pending teardown is cancelled
+    // and playback continues seamlessly; otherwise the player is torn down for real.
+    Timer
+    {
+        id: deactivationTimer
+
+        interval: 300
+        repeat: false
+
+        onTriggered: control.tearDownPlayer()
     }
 
     Timer
