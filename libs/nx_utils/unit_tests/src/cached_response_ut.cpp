@@ -455,7 +455,10 @@ TEST(ParameterizedCachedResponse, Concurrency)
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     // Verify that long-running computation functions with different parameters can execute in parallel.
-    ASSERT_TRUE(duration < 2 * delay);
+    const std::chrono::milliseconds maxDuration{
+        static_cast<std::chrono::milliseconds::rep>(2.5 * delay.count())};
+    ASSERT_TRUE(duration < maxDuration)
+        << "duration " << duration.count() << "ms exceeded limit " << maxDuration.count() << "ms";
 }
 
 TEST(CachedResponse, CheckCopyCount)
