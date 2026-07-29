@@ -10,6 +10,7 @@
 #include <rtsp/srtp_encryptor.h>
 
 #include "webrtc_tracks.h"
+#include "webrtc_twcc.h"
 #include "webrtc_utils.h"
 
 namespace nx::webrtc {
@@ -69,6 +70,8 @@ private:
     QnVirtualCameraResourcePtr m_resource;
     nx::rtp::RtcpFirFeedback m_rtcpFir;
     CodecParametersConstPtr m_audioCodecParameters;
+    TwccController m_twcc;
+    uint32_t m_videoMediaSsrc = 0; //< Publisher's video SSRC, target for TWCC feedback.
 };
 
 } // namespace nx::webrtc

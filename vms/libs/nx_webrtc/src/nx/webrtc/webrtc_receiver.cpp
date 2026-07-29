@@ -51,6 +51,16 @@ void Receiver::stop()
 
 bool Receiver::onSrtp(std::vector<uint8_t> buffer)
 {
+    if (!m_ice)
+    {
+        // SRTP can arrive before onDataChannelOpened() calls start(): the streaming
+        // stage and the data-channel-open event are independent. Until start() runs
+        // we have neither the SRTP decryptor nor the ICE transport to reply on, so
+        // drop the packet rather than process undecrypted data or write via a null
+        // m_ice (the latter now happens on the first video packet via TWCC feedback).
+        NX_VERBOSE(this, "Dropping SRTP packet received before start()");
+        return true;
+    }
     if (!m_session->demuxer()->processData((const char*) buffer.data(), buffer.size()))
     {
         NX_VERBOSE(this, "Failed to process SRTP data with size %1", buffer.size());
