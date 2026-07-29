@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Πάρα πολλές προσπάθειες. Δοκιμάστε ξανά σε ένα λεπτό.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -120,7 +120,7 @@
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
       <comment>%1 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">You can enable two-factor authentication in your %1.</translation>
+      <translation>Μπορείτε να ενεργοποιήσετε τον έλεγχο ταυτότητας δύο παραγόντων στο %1.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -169,7 +169,7 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation type="unfinished">To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</translation>
+      <translation>Για να συνδεθείτε σε αυτόν τον ιστότοπο, απενεργοποιήστε την επιλογή &quot;Αίτημα κωδικού επαλήθευσης σε κάθε σύνδεση με τον λογαριασμό σας %1&quot; στον λογαριασμό σας %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
@@ -254,11 +254,11 @@
     <name>nx::vms::client::core::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Μη προσβάσιμο</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Φόρτωση...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
@@ -369,7 +369,7 @@
     <name>nx::vms::client::core::OrganizationsFilterModel</name>
     <message>
       <source>Other results</source>
-      <translation type="unfinished">Other results</translation>
+      <translation>Άλλα αποτελέσματα</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -477,11 +477,11 @@
     <name>nx::vms::client::core::SoftwareTriggerCameraButtonController</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Πατήστε παρατεταμένα για να</translation>
     </message>
     <message>
       <source>press and hold</source>
-      <translation type="unfinished">press and hold</translation>
+      <translation>πατήστε παρατεταμένα</translation>
     </message>
   </context>
   <context>

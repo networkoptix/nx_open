@@ -163,7 +163,7 @@
     </message>
     <message>
       <source>Advanced Viewers</source>
-      <translation type="unfinished">Advanced Viewers</translation>
+      <translation>Προχωρημένες Προβολές</translation>
     </message>
     <message>
       <source>Viewers</source>
@@ -286,7 +286,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -673,7 +673,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Μη έγκυρο</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -1129,7 +1129,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>ημέρες</translation>
     </message>
     <message>
       <source>wks</source>
@@ -1165,25 +1165,25 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>λεπτά</numerusform>
+        <numerusform>λεπτά</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>ώρες</numerusform>
+        <numerusform>ώρες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>days</numerusform>
-        <numerusform>days</numerusform>
+      <translation>
+        <numerusform>ημέρες</numerusform>
+        <numerusform>ημέρες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1319,7 +1319,7 @@
     <name>QnUserResource</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>Προσαρμοσμένο</translation>
     </message>
     <message>
       <source>Multiple groups</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Time synchronization enabled.</source>
-      <translation type="unfinished">Time synchronization enabled.</translation>
+      <translation>Ο συγχρονισμός ώρας είναι ενεργοποιημένος.</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
@@ -1582,7 +1582,7 @@
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests.</translation>
+      <translation>Χρονικό διάστημα συγχρονισμού για αιτήματα δικτύου.</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
@@ -1634,7 +1634,7 @@
     </message>
     <message>
       <source>Send plain-text emails.</source>
-      <translation type="unfinished">Send plain-text emails.</translation>
+      <translation>Αποστολή email απλού κειμένου.</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
@@ -1778,7 +1778,7 @@
     </message>
     <message>
       <source>Watermark settings.</source>
-      <translation type="unfinished">Watermark settings.</translation>
+      <translation>Ρυθμίσεις Υδατογραφήματος.</translation>
     </message>
     <message>
       <source>Pixelation settings.</source>
@@ -1822,7 +1822,7 @@
     </message>
     <message>
       <source>License server.</source>
-      <translation type="unfinished">License server.</translation>
+      <translation>Διακομιστής αδειών.</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>

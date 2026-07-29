@@ -83,7 +83,7 @@
     <name>CameraItem</name>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Απαιτείται πιστοποίηση</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Εκτός σύνδεσης</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -114,11 +114,11 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Πληροφορίες</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Ήχος</translation>
     </message>
     <message>
       <source>Change Quality</source>
@@ -145,7 +145,7 @@
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
@@ -176,7 +176,7 @@
     <name>ComboBox</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>
@@ -187,7 +187,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Εισαγάγετε τη διεύθυνση διακομιστή</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -264,15 +264,15 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ΟΚ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Κλείσιμο</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -389,22 +389,22 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Κλείσιμο</translation>
     </message>
   </context>
   <context>
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Πώς λειτουργεί</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Συνέχεια</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -448,7 +448,7 @@
     <name>InterfaceSettingsScreen</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Διεπαφή</translation>
     </message>
     <message>
       <source>Live previews</source>
@@ -467,7 +467,7 @@
     <name>LayoutSheet</name>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Διατάξεις</translation>
     </message>
   </context>
   <context>
@@ -493,7 +493,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Αποσύνδεση</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
@@ -534,7 +534,7 @@
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
@@ -685,7 +685,7 @@
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Φόρτωση...</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -701,7 +701,7 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
@@ -712,7 +712,7 @@
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Αναζήτηση</translation>
     </message>
   </context>
   <context>
@@ -751,22 +751,22 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Διατήρηση</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -785,11 +785,11 @@
     <name>SessionsScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Αναζήτηση</translation>
     </message>
     <message>
       <source>Organizations</source>
@@ -809,7 +809,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Είσοδος</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -856,7 +856,7 @@
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
     <message>
       <source>Push notifications</source>
@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Διεπαφή</translation>
     </message>
     <message>
       <source>Performance</source>
@@ -919,7 +919,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Create &amp; Share</source>
@@ -978,15 +978,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -994,7 +994,7 @@
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Εισαγάγετε τη διεύθυνση διακομιστή</translation>
     </message>
     <message>
       <source>Login field cannot be empty</source>
@@ -1013,7 +1013,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1025,7 +1025,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Είσοδος</translation>
     </message>
   </context>
   <context>
@@ -1136,7 +1136,7 @@
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Κλείσιμο</translation>
     </message>
   </context>
   <context>
@@ -1151,11 +1151,11 @@
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Διακομιστής εκτός σύνδεσης</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Απαιτείται πιστοποίηση</translation>
     </message>
     <message>
       <source>Camera offline</source>
@@ -1213,7 +1213,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Είσοδος</translation>
     </message>
   </context>
   <context>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>ΖΩΝΤΑΝΑ</translation>
     </message>
   </context>
   <context>

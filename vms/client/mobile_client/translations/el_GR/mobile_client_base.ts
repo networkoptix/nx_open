@@ -53,7 +53,7 @@
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
       <source>Cannot change push notifications settings</source>
-      <translation type="unfinished">Cannot change push notifications settings</translation>
+      <translation>Δεν είναι δυνατή η αλλαγή των ρυθμίσεων ειδοποιήσεων push</translation>
     </message>
     <message>
       <source>Cannot enable push notifications</source>
@@ -68,7 +68,7 @@
     <name>nx::vms::client::mobile::ShareBookmarkBackend</name>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Κάμερα</translation>
     </message>
     <message>
       <source>Expires in %1</source>
@@ -77,11 +77,11 @@
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Σφάλμα</translation>
     </message>
     <message>
       <source>Cannot share bookmark.</source>
-      <translation type="unfinished">Cannot share bookmark.</translation>
+      <translation>Δεν είναι δυνατή η κοινοποίηση του σελιδοδείκτη.</translation>
     </message>
   </context>
   <context>
