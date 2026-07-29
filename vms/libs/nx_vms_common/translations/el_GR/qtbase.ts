@@ -347,7 +347,7 @@ Press ESC to cancel</translation>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Size</source>
@@ -361,7 +361,7 @@ Press ESC to cancel</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -427,7 +427,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation type="unfinished">Go back</translation>
+      <translation>Μετάβαση πίσω</translation>
     </message>
     <message>
       <source>Forward</source>
@@ -655,7 +655,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Size</source>
@@ -669,7 +669,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -739,7 +739,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
@@ -766,14 +766,14 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>Device is not set</source>
@@ -897,7 +897,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message>
       <source>Ignore</source>
@@ -925,7 +925,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -1052,7 +1052,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Σπίτι</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1176,7 +1176,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
   </context>
 </TS>
