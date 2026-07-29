@@ -183,12 +183,24 @@ Page
                 fullscreenControlsOverlay.visible: !d.ptzMode
                 navigatorProxyItem.visible: false
                 navigationBar.visible: false
-                modernVideoScreen.header.visible: false
                 bottomBar.visible: false
                 bottomOverlayControls.visible: false
             }
         }
     ]
+
+    // The header comes from the base Page component and is managed by QQuickPage, so relying on
+    // the fullscreen state's restoreEntryValues to bring it back is fragile: when this screen sits
+    // in the background under another fullscreen screen and the device is rotated, the restore may
+    // be lost and the header stays hidden. Driving the visibility with a plain binding keeps it a
+    // pure function of the fullscreen state and cannot get stuck.
+    Binding
+    {
+        target: modernVideoScreen.header
+        property: "visible"
+        value: !LayoutController.fullscreen
+        restoreMode: Binding.RestoreBindingOrValue
+    }
 
     VideoScreenController
     {
