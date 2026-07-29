@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Λάθος κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>

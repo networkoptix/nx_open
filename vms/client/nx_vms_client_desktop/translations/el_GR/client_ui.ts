@@ -5,11 +5,11 @@
     <name>AboutDialog</name>
     <message>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Σχετικά</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Πληροφορίες</translation>
     </message>
     <message>
       <source>Credits</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Υποστήριξη</translation>
     </message>
     <message>
       <source>Developer</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Αυτόματο</translation>
     </message>
     <message>
       <source>Black level</source>
@@ -111,15 +111,15 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Λήψη</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Done</source>
@@ -150,7 +150,7 @@
     <name>ArchiveLengthWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Αυτόματο</translation>
     </message>
     <message>
       <source>Keep Archive For...</source>
@@ -309,7 +309,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Area Width</source>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Ετικέτες</translation>
     </message>
     <message>
       <source>List of tags divided by commas</source>
@@ -393,11 +393,11 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Κλείσιμο</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Επεξεργασία</translation>
     </message>
   </context>
   <context>
@@ -408,7 +408,7 @@
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>Διάρκεια ζωής</translation>
     </message>
     <message>
       <source>Password protection</source>
@@ -426,7 +426,7 @@
     <name>CameraExpertSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Αυτόματο</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -589,7 +589,7 @@
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
   </context>
   <context>
@@ -701,7 +701,7 @@
     </message>
     <message>
       <source>Back</source>
-      <translation type="unfinished">Back</translation>
+      <translation>Επιστροφή</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -709,7 +709,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Επόμενο</translation>
     </message>
     <message>
       <source>New Device</source>
@@ -758,11 +758,11 @@
     </message>
     <message>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Επεξεργασία διαπιστευτηρίων</translation>
     </message>
     <message>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Ήχος</translation>
     </message>
     <message>
       <source>Enable audio</source>
@@ -795,7 +795,7 @@
     <name>ChangeUserPasswordDialog</name>
     <message>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Αλλαγή κωδικού πρόσβασής</translation>
     </message>
   </context>
   <context>
@@ -861,7 +861,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Open Folder</source>
@@ -892,7 +892,7 @@
     </message>
     <message>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Διεύθυνση</translation>
     </message>
     <message>
       <source>Hint</source>
@@ -900,7 +900,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Θύρα</translation>
     </message>
     <message>
       <source>End IP</source>
@@ -912,15 +912,15 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Αναζήτηση</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -932,7 +932,7 @@
     </message>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Προσθήκη Συσκευών</translation>
     </message>
     <message>
       <source>Default</source>
@@ -951,7 +951,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
   </context>
   <context>
@@ -1038,7 +1038,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Κίνηση</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1058,7 +1058,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -1069,7 +1069,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
   </context>
   <context>
@@ -1106,15 +1106,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Χαμηλή</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Μεσαία</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Υψηλή</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
@@ -1151,7 +1151,7 @@
     <name>FilteredResourceViewWidget</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Κανένα αποτέλεσμα</translation>
     </message>
   </context>
   <context>
@@ -1178,7 +1178,7 @@
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Αφαίρεση</translation>
     </message>
     <message>
       <source>Local Media Folders</source>
@@ -1255,7 +1255,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Size</source>
@@ -1293,7 +1293,7 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Πληροφορίες</translation>
     </message>
     <message>
       <source>Camera name</source>
@@ -1309,7 +1309,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -1427,7 +1427,7 @@
     <name>LicenseNotificationDialog</name>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Προειδοποίηση</translation>
     </message>
     <message>
       <source>License issues:</source>
@@ -1454,7 +1454,7 @@
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Ενεργοποίηση δωρεάν άδειας χρήσης</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -1519,15 +1519,15 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Θύρα</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1550,11 +1550,11 @@
     <name>LogsManagementWidget</name>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Λήψη</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Ρυθμίσεις</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -1562,7 +1562,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Done</source>
@@ -1593,7 +1593,7 @@
     </message>
     <message>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Γλώσσα</translation>
     </message>
     <message>
       <source>Time Mode</source>
@@ -1605,7 +1605,7 @@
     </message>
     <message>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Λειτουργία</translation>
     </message>
     <message>
       <source>Intensity</source>
@@ -1648,11 +1648,11 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Κωδικόs πρόσβασης:</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Σύνδεση:</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1664,7 +1664,7 @@
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation type="unfinished">Take system name and settings from</translation>
+      <translation>Λάβετε το όνομα και τις ρυθμίσεις του συστήματος από</translation>
     </message>
   </context>
   <context>
@@ -1679,7 +1679,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Λήψη</translation>
     </message>
     <message>
       <source>Browse</source>
@@ -1691,7 +1691,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Link copied</source>
@@ -1719,7 +1719,7 @@
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Προσπαθήστε ξανά</translation>
     </message>
   </context>
   <context>
@@ -1733,7 +1733,7 @@
     <name>NewDeviceAdditionDialog</name>
     <message>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Προσθήκη Συσκευών</translation>
     </message>
     <message>
       <source>to</source>
@@ -1749,7 +1749,7 @@
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Θύρα</translation>
     </message>
     <message>
       <source>Hint</source>
@@ -1757,15 +1757,15 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Αναζήτηση</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -1778,8 +1778,8 @@
     <message>
       <source>Enter address, subnet range or subnet mask, login and password
 and click on the &quot;Search&quot; button</source>
-      <translation type="unfinished">Enter address, subnet range or subnet mask, login and password
-and click on the &quot;Search&quot; button</translation>
+      <translation>Εισάγετε διεύθυνση, εύρος υποδικτύου ή μάσκα υποδικτύου, σύνδεση και κωδικό πρόσβασης
+και κάντε κλικ στο κουμπί &quot;Αναζήτηση&quot;</translation>
     </message>
   </context>
   <context>
@@ -1797,7 +1797,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Προσπαθήστε ξανά</translation>
     </message>
   </context>
   <context>
@@ -1808,7 +1808,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Server Address</source>
@@ -1843,7 +1843,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>PasswordDialog</name>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
     <message>
       <source>Username</source>
@@ -1889,7 +1889,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Details</source>
@@ -1994,11 +1994,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Αφαίρεση</translation>
     </message>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Προσθήκη</translation>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
@@ -2135,7 +2135,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Κωδικόs πρόσβασης</translation>
     </message>
   </context>
   <context>
@@ -2201,7 +2201,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Κίνηση</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2252,7 +2252,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Αλλαγή Κωδικού πρόσβασης...</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
@@ -2315,7 +2315,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>Issued by</source>
@@ -2365,7 +2365,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Θύρα</translation>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
@@ -2422,11 +2422,11 @@ and click on the &quot;Search&quot; button</translation>
     <name>StorageConfigWidget</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Προσθήκη Εξωτερικού Χώρου Αποθήκευσης...</translation>
     </message>
     <message>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Τοποθεσίες Αποθήκευσης</translation>
     </message>
     <message>
       <source>Reindex Archive</source>
@@ -2441,14 +2441,14 @@ and click on the &quot;Search&quot; button</translation>
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>
     <name>StorageUrlDialog</name>
     <message>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Προσθήκη Εξωτερικού Χώρου Αποθήκευσης...</translation>
     </message>
     <message>
       <source>Protocol:</source>
@@ -2460,11 +2460,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Σύνδεση:</translation>
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Κωδικόs πρόσβασης:</translation>
     </message>
   </context>
   <context>
@@ -2509,7 +2509,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2555,7 +2555,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Διαγραφή</translation>
     </message>
   </context>
   <context>
@@ -2581,7 +2581,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Add User</source>
-      <translation type="unfinished">Add User</translation>
+      <translation>Προσθήκη Χρήστη</translation>
     </message>
     <message>
       <source>Del</source>
@@ -2629,7 +2629,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Upload Footage</source>
@@ -2648,7 +2648,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>WebpageDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Γενικά</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -2706,7 +2706,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Αφαίρεση</translation>
     </message>
     <message>
       <source>Details...</source>
