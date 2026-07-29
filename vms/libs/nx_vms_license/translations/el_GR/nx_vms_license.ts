@@ -80,7 +80,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
