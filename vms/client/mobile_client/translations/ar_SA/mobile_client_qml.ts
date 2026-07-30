@@ -1067,7 +1067,7 @@
     <name>SiteConnectionSheet</name>
     <message>
       <source>Connect to Site</source>
-      <translation type="unfinished">Connect to Site</translation>
+      <translation>الاتصال بالموقع</translation>
     </message>
     <message>
       <source>Log in as</source>

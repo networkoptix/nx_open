@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Semua</translation>
+      <translation>All</translation>
     </message>
   </context>
   <context>
@@ -956,7 +956,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Semua</translation>
+      <translation>All</translation>
     </message>
     <message>
       <source>Security</source>

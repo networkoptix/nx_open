@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Всі</translation>
+      <translation>Усі</translation>
     </message>
   </context>
   <context>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>Всі</translation>
+      <translation>Усі</translation>
     </message>
     <message>
       <source>Security</source>
