@@ -173,15 +173,6 @@ AdaptiveScreen
         icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
         icon.width: 24
         icon.height: 24
-
-        Indicator
-        {
-            id: rightButtonIndicator
-
-            anchors.topMargin: (rightButton.height - rightButton.icon.height) / 2
-            anchors.rightMargin: (rightButton.width - rightButton.icon.width) / 2
-            visible: !!text
-        }
     }
 
     Connections
@@ -251,13 +242,12 @@ AdaptiveScreen
                 {
                     icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
                     visible: feedStateProvider.count !== 0
-                    onClicked: feed.openFilterMenu()
-                }
 
-                rightButtonIndicator
-                {
-                    visible: feed.filtered
-                    text: ""
+                    indicator.width: 6
+                    indicator.height: 6
+                    indicator.visible: feed.filtered
+
+                    onClicked: feed.openFilterMenu()
                 }
             }
         },
@@ -351,14 +341,18 @@ AdaptiveScreen
                 {
                     visible: !emptyListPlaceholder.visible && !LayoutController.isTabletLayout
                     icon.source: feedStateProvider.buttonIconSource
+
+                    indicator.width: 12
+                    indicator.height: 12
+                    indicator.text: feedStateProvider.buttonIconIndicatorText
+                    indicator.visible: feedStateProvider.buttonIconIndicatorText.length !== 0
+
                     onClicked:
                     {
                         sessionsScreen.contentItem = feed
                         Qt.callLater(() => feed.update()) //< Update after the feed is opened.
                     }
                 }
-
-                rightButtonIndicator.text: feedStateProvider.buttonIconIndicatorText
 
                 systemTabs.visible: false
             }
