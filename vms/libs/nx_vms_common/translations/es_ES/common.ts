@@ -590,22 +590,22 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>Esta cámara no se encuentra actualmente en el diseño seleccionado</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>Esta cámara no está disponible actualmente en algunos de los diseños seleccionados</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>Los usuarios no tienen acceso al diseño seleccionado</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado</translation>
     </message>
   </context>
   <context>
@@ -915,22 +915,22 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+      <translation>
+        <numerusform>%n Servicios de grabación locales</numerusform>
+        <numerusform>%n Servicios de grabación locales</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+      <translation>
+        <numerusform>%n/%1 Servicios de grabación locales</numerusform>
+        <numerusform>%n/%1 Servicios de grabación locales</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Servicios de grabación locales</translation>
     </message>
   </context>
   <context>
@@ -959,33 +959,33 @@
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 y %2 no tienen %3 permiso para algunas de las cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>Los grupos %n no tienen %1 permiso para algunas de las cámaras seleccionadas</numerusform>
+        <numerusform>Los grupos %n no tienen %1 permiso para algunas de las cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>El grupo %1 no tiene permisos %2 para algunas de las cámaras seleccionadas</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+      <translation>
+        <numerusform>Los usuarios de %n no tienen permisos %1 para algunas de las cámaras seleccionadas</numerusform>
+        <numerusform>Los usuarios de %n no tienen permisos %1 para algunas de las cámaras seleccionadas</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>El usuario %1 no tiene permisos %2 para algunas de las cámaras seleccionadas</translation>
     </message>
   </context>
   <context>
@@ -1060,7 +1060,7 @@
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>Ninguno de los roles de usuario seleccionados contiene usuarios</translation>
     </message>
     <message>
       <source>Select at least one user</source>
@@ -1333,11 +1333,11 @@
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>La dirección de correo electrónico no está configurada para todos los usuarios seleccionados.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>La dirección de correo electrónico no está configurada para algunos usuarios seleccionados.</translation>
     </message>
   </context>
   <context>
@@ -1356,7 +1356,7 @@
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>Vista en directo</translation>
     </message>
   </context>
   <context>
@@ -1367,7 +1367,7 @@
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>Póngase en contacto con su socio de canal para obtener ayuda.</translation>
     </message>
   </context>
   <context>
@@ -1401,7 +1401,7 @@
     <message numerus="yes">
       <source>%n hours ago</source>
       <translation type="unfinished">
-        <numerusform>Hace %n horas</numerusform>
+        <numerusform>hace %n horas</numerusform>
         <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
@@ -1480,15 +1480,15 @@
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>Número máximo de registros de eventos que se conservarán en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20 % superior al valor especificado.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>Si se deben almacenar en caché algunos fotogramas para la transmisión principal. Valores: &apos;sí&apos; - siempre habilitado (puede usar mucha RAM), &apos;no&apos; - siempre deshabilitado excepto cuando lo requiere la reproducción (por ejemplo, HLS), &apos;automático&apos; - similar a &apos;no&apos;, pero se activa cuando mejora la experiencia del usuario (por ejemplo, cuando algún complemento de análisis está trabajando en la cámara).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>Cantidad máxima de conexiones HTTP que utilizan transcodificación para el servidor. Chrome abre 2 conexiones a la vez y luego cierra la primera. Recomendamos establecer el valor de este parámetro&apos;en 2 o más.</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
@@ -1509,11 +1509,11 @@
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>El ID del sitio local, si es nulo, significa que el sitio aún no está configurado.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>Habilitar o deshabilitar la creación de nuevas solicitudes de registro de integración</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
@@ -1545,7 +1545,7 @@
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>URL de la API del servidor de informes de fallos anónimos.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
@@ -1553,11 +1553,11 @@
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>Intervalo de actualización de la información de almacenamiento del dispositivo.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>Intervalo de actualización de estado del sitio (segundos, 1 s-1 h).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
@@ -1565,7 +1565,7 @@
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>Política de acceso a la conexión proxy.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1601,7 +1601,7 @@
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>ID del sitio en la nube.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>Habilitar la autenticación de dos factores (2FA) para el sitio</translation>
     </message>
     <message>
       <source>Site name.</source>
@@ -1617,23 +1617,23 @@
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>Último ID de fusión del sistema maestro.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>ID de fusión del último sitio esclavo.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>Deshabilitar proveedores de dispositivos.</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>Optimiza la configuración de la cámara.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>Las miniaturas se actualizan automáticamente.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
@@ -1649,7 +1649,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>Periodo de registro de auditoría (días, 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -1657,71 +1657,71 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>Número máximo de marcadores. Un valor menor o igual a 0 es infinito.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>Implementar HTTPS (cifrado del tráfico de datos).</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>Implementar RTSPS (cifrado de tráfico de vídeo).</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>Mostrar las contraseñas de los dispositivos almacenadas en VMS para que los administradores puedan acceder a ellas (para páginas web).</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>Activar autodescubrimiento.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>Habilitar notificaciones de actualización automática.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>Habilitar notificaciones de actualización.</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>Habilitar la asignación de puertos UPNP.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>Configuración de copia de seguridad.</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>Anulación del host en la nube.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation type="unfinished">Enable cross-domain policy.</translation>
+      <translation>Habilitar la política entre dominios.</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>Habilitar RTSP para Arecont.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>Habilitar el buscador secuencial ONVIF de Flir.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo de la cola P2P (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
+      <translation>Tamaño máximo de todos los clientes P2P (bytes, 32-512 MB).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
+      <translation>Tamaño máximo de la cola de registros (bytes, 6-96 Mb).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
+      <translation>Tamaño máximo de la cola de registros (elementos, 250-4000).</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
@@ -1729,55 +1729,55 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>Duración máxima de la conexión RTSP (segundos).</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>Habilitar la perforación de agujeros UDP en la conexión a la nube.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>Habilitar el uso de relés conectados a la nube.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
+      <translation>Implementar SSL para los relés de conexión a la nube.</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation type="unfinished">Enable recording on EDGE.</translation>
+      <translation>Habilitar la grabación en EDGE.</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation type="unfinished">Enable WebSocket for P2P.</translation>
+      <translation>Habilitar WebSocket para P2P.</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>Número máximo de subprocesos para la sincronización remota de archivos (&lt;=0 - automático, máximo 32).</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>Actualizar la URL del archivo releases.json.</translation>
     </message>
     <message>
       <source>Target update information.</source>
-      <translation type="unfinished">Target update information.</translation>
+      <translation>Información actualizada de Target.</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation type="unfinished">Installed update information.</translation>
+      <translation>Información de actualización instalada.</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation type="unfinished">Downloader peers for files.</translation>
+      <translation>El descargador busca pares para los archivos.</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation type="unfinished">Client update settings.</translation>
+      <translation>Configuración de actualización del cliente.</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>Límite de hilos para la sincronización del archivo de la cámara.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -1785,19 +1785,19 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>Configuración de pixelación.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>Duración del token de sesión de autorización (segundos).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>Aplicar límite de sesión para tokens de Cloud.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation type="unfinished">Session token count limit on a single Server.</translation>
+      <translation>Límite de tokens de sesión en un solo servidor.</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
