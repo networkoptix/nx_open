@@ -37,7 +37,7 @@
     <name>BetaFeaturesScreen</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Χαρακτηριστικά Beta</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -129,7 +129,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Συνεργάτης Καναλιού</translation>
     </message>
   </context>
   <context>
@@ -257,7 +257,7 @@
     <name>DeviceSelector</name>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Συσκευή</translation>
     </message>
   </context>
   <context>
@@ -288,7 +288,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -349,7 +349,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Δεν υπάρχουν σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
   </context>
   <context>
@@ -471,7 +471,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -602,14 +602,14 @@
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Οποιοδήποτε</translation>
     </message>
   </context>
   <context>
     <name>OptionSelectorScreen</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Εκκαθάριση</translation>
     </message>
   </context>
   <context>
@@ -695,11 +695,11 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Τοποθεσίες</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Όλες οι τοποθεσίες</translation>
     </message>
     <message>
       <source>Selected Sites</source>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -756,7 +756,7 @@
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -812,7 +812,7 @@
     <name>SecuritySettingsScreen</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Ασφάλεια</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -890,11 +890,11 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Οργανισμοί</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Τοποθεσίες</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -957,11 +957,11 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Ασφάλεια</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -969,7 +969,7 @@
     </message>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Χαρακτηριστικά Beta</translation>
     </message>
     <message>
       <source>Interface</source>
@@ -1000,7 +1000,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1114,7 +1114,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -1149,7 +1149,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>ΕΚΚΡΕΜΗΣ</translation>
     </message>
   </context>
   <context>
@@ -1191,7 +1191,7 @@
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Αποσύνδεση</translation>
     </message>
     <message>
       <source>Open %1</source>

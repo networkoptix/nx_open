@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>全部</translation>
+      <translation>所有</translation>
     </message>
   </context>
   <context>
@@ -956,7 +956,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation>全部</translation>
+      <translation>所有</translation>
     </message>
     <message>
       <source>Security</source>
