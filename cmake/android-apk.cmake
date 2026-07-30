@@ -52,7 +52,7 @@ function(add_android_apk target)
         set(APK_MIN_SDK_VERSION 26)
     endif()
     if(NOT APK_TARGET_SDK_VERSION)
-        set(APK_TARGET_SDK_VERSION 35)
+        set(APK_TARGET_SDK_VERSION 36)
     endif()
 
     if(CMAKE_HOST_WIN32)
