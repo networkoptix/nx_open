@@ -17,6 +17,7 @@ AdaptiveSheet
 
     property var externalVisualizerContainer
     property var externalButtonContainer
+    property bool overlayStyle: false
     property bool externalMode: actionButtons.count === 1
     readonly property bool hasActions: actionButtons.count > 0
     property bool available: true
@@ -250,7 +251,16 @@ AdaptiveSheet
             parent: externalMode ? null : externalButtonContainer
 
             anchors.fill: parent
+
             opacity: sheet.available ? 1.0 : 0.3
+
+            foregroundColor: overlayStyle
+                ? ColorTheme.colors.light4
+                : parameters.textColors[state]
+
+            backgroundColor: overlayStyle
+                ? ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+                : parameters.colors[state]
 
             icon.source: "image://skin/24x24/Outline/grid_view.svg"
             icon.width: 24

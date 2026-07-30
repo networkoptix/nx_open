@@ -669,8 +669,7 @@ Page
         showPlaybackControls: d.hasArchive
         hasChunkNavigation: d.hasChunkNavigation
 
-        actionsButtonEnabled: controller.playingLive
-        actionsButtonVisible: actionSheet.hasActions
+        actionButtonContainer.visible: actionSheet.hasActions
 
         onBackButtonClicked:
         {
@@ -684,11 +683,6 @@ Page
         }
 
         onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
-
-        onActionsButtonClicked:
-        {
-            actionSheet.open()
-        }
 
         onMenuButtonClicked:
         {
@@ -1184,8 +1178,11 @@ Page
         id: actionSheet
 
         resource: controller.resource
-        externalButtonContainer: actionButtonContainer
+        overlayStyle: modernVideoScreen.state === "fullscreen"
         externalVisualizerContainer: actionVisualizerContainer
+        externalButtonContainer: modernVideoScreen.state === "fullscreen"
+            ? fullscreenControlsOverlay.actionButtonContainer
+            : actionButtonContainer
 
         available: controller.playingLive
         onUnavailableAction: actionBanner.trigger()

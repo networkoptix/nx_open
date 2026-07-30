@@ -21,12 +21,10 @@ Item
 
     property alias menuButtonControl: menuButton
 
-    property alias actionsButtonVisible: actionsButton.visible
-    property alias actionsButtonEnabled: actionsButton.enabled
+    property alias actionButtonContainer: overlayActionButtonContainer
 
     signal backButtonClicked()
     signal menuButtonClicked()
-    signal actionsButtonClicked()
     signal exitFullscreenButtonClicked()
 
     property alias scrubbingActive: speedControl.pressed
@@ -238,13 +236,12 @@ Item
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            OverlayControlButton
+            Item
             {
-                id: actionsButton
+                id: overlayActionButtonContainer
 
-                icon.source: "image://skin/24x24/Outline/grid_view.svg"
-
-                onClicked: control.actionsButtonClicked()
+                width: 48
+                height: 48
             }
         }
 
