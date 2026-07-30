@@ -611,7 +611,7 @@
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Ιστοσελίδα Διακομιστή...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
@@ -907,7 +907,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
@@ -987,7 +987,7 @@
     </message>
     <message>
       <source>Integration...</source>
-      <translation type="unfinished">Integration...</translation>
+      <translation>Ενσωμάτωση...</translation>
     </message>
     <message>
       <source>New Integration...</source>
@@ -1154,7 +1154,7 @@
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Άγνωστο σφάλμα.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1575,7 +1575,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Ενεργό</translation>
     </message>
     <message>
       <source>Not configured</source>
@@ -1618,7 +1618,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>%1 users will start receiving emails immediately after you apply these settings</source>
@@ -2096,7 +2096,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Συσκευές</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -2187,7 +2187,7 @@ License Key: %2</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -2247,7 +2247,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Χρήστης</translation>
     </message>
     <message>
       <source>Activity</source>
@@ -2392,7 +2392,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Συσκευή</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -2609,7 +2609,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -2876,7 +2876,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>Αποτυχία σύνδεσης με τον διακομιστή</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
@@ -3009,7 +3009,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Δημιουργία</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3151,7 +3151,7 @@ License Key: %2</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3159,12 +3159,12 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3289,7 +3289,7 @@ License Key: %2</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3297,7 +3297,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Server</source>
@@ -3356,7 +3356,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Κανάλια</translation>
     </message>
     <message>
       <source>Not verified</source>
@@ -3497,7 +3497,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -3567,7 +3567,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -3594,7 +3594,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -3685,7 +3685,7 @@ License Key: %2</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -3693,7 +3693,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Σπίτι</translation>
     </message>
     <message>
       <source>Details</source>
@@ -3877,7 +3877,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Συσκευή</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -3980,7 +3980,7 @@ License Key: %2</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Δεν υπάρχουν σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Search</source>
@@ -3988,14 +3988,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>Μ/Δ</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -4083,7 +4083,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Όλοι Οι Διακομιστές</translation>
     </message>
     <message>
       <source>Select Servers...</source>
@@ -4173,7 +4173,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Ιστοσελίδα Διακομιστή</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -4300,7 +4300,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
@@ -4387,7 +4387,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -4669,7 +4669,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>cloud</source>
-      <translation type="unfinished">cloud</translation>
+      <translation>cloud</translation>
     </message>
     <message>
       <source>Path</source>
@@ -4677,7 +4677,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Purpose</source>
@@ -4798,7 +4798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -4806,7 +4806,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Ασφάλεια</translation>
     </message>
     <message>
       <source>User Management</source>
@@ -4885,7 +4885,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Μάθετε περισσότερα</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -5274,7 +5274,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
   </context>
   <context>
@@ -5660,7 +5660,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Μετακίνηση</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -6496,7 +6496,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>Επεξεργασία Ρυθμίσεων.</translation>
     </message>
     <message>
       <source>Play Audio</source>
@@ -6945,7 +6945,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchWidget</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Δεν υπάρχουν σελιδοδείκτες</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7075,7 +7075,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>default</source>
-      <translation type="unfinished">default</translation>
+      <translation>προεπιλογή</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7161,7 +7161,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Color</source>
-      <translation type="unfinished">Color</translation>
+      <translation>Χρώμα</translation>
     </message>
     <message>
       <source>Pointed</source>
@@ -7638,7 +7638,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Μάθετε περισσότερα</translation>
     </message>
   </context>
   <context>
@@ -8519,7 +8519,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -8879,7 +8879,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -9095,7 +9095,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Αναλυτικά</translation>
     </message>
     <message>
       <source>Default Logging level</source>
@@ -9196,7 +9196,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
@@ -9269,7 +9269,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
     <message>
       <source>Export List</source>
@@ -9456,7 +9456,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Άγνωστο σφάλμα.</translation>
     </message>
     <message>
       <source>New Site</source>
@@ -9666,7 +9666,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Δοκιμάστε ξανά</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -10134,7 +10134,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Άγνωστο σφάλμα.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -10201,7 +10201,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Κενό</translation>
     </message>
     <message>
       <source>Port</source>
@@ -10217,7 +10217,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Power</source>
@@ -10244,7 +10244,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>URL</source>
@@ -10332,7 +10332,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Learn more...</source>
-      <translation type="unfinished">Learn more...</translation>
+      <translation>Μάθετε περισσότερα...</translation>
     </message>
     <message>
       <source>Auto-refresh integration</source>
@@ -10471,7 +10471,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>Επιβεβαίωση</translation>
     </message>
   </context>
   <context>
@@ -10516,11 +10516,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>Ενεργό</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Σε αναστολή</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -10531,7 +10531,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
   </context>
   <context>
@@ -10730,7 +10730,7 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Παρακολουθεί και καταγράφει όλες τις ενέργειες του χρήστη.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -10746,7 +10746,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Ενεργοποιεί την κρυπτογράφηση κίνησης RTSP.</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10754,7 +10754,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Μάθετε περισσότερα.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10990,7 +10990,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -11006,7 +11006,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -11040,7 +11040,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Message</source>
@@ -11075,7 +11075,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Άγνωστο σφάλμα</translation>
     </message>
     <message>
       <source>Access Link</source>
@@ -11287,7 +11287,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -11477,7 +11477,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -11584,7 +11584,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11687,7 +11687,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Το όνομα σύνδεσης δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
@@ -11715,7 +11715,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Δημιουργία</translation>
     </message>
     <message>
       <source>New Link - %1</source>
@@ -12048,7 +12048,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Ενσωμάτωση</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -12215,7 +12215,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Τίτλος</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12369,7 +12369,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Imported up to</source>
@@ -12377,7 +12377,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Κατάσταση</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12788,7 +12788,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Όλοι Οι Διακομιστές</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -12842,7 +12842,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Τοποθεσία</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
@@ -12864,7 +12864,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SoundPicker</name>
     <message>
       <source>Manage</source>
-      <translation type="unfinished">Manage</translation>
+      <translation>Διαχείριση</translation>
     </message>
   </context>
   <context>
@@ -12962,11 +12962,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Total</source>
@@ -13044,11 +13044,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -13150,7 +13150,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Μετακίνηση</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>

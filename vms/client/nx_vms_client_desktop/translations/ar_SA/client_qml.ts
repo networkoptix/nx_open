@@ -222,7 +222,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>أي برنامج إضافي</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -551,7 +551,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>جديد</translation>
     </message>
   </context>
   <context>
@@ -1222,7 +1222,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>استيراد من الأجهزة</translation>
     </message>
   </context>
   <context>
@@ -1401,7 +1401,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>إعدادات عصا التحكم</translation>
     </message>
     <message>
       <source>joystick</source>
@@ -1891,7 +1891,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
@@ -1931,7 +1931,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Custom</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
   </context>
   <context>
@@ -2033,7 +2033,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PluginSelector</name>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>أي برنامج إضافي</translation>
     </message>
   </context>
   <context>
