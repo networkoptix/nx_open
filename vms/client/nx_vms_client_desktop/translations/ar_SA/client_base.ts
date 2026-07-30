@@ -3253,7 +3253,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>التكاملات المفتوحة</translation>
     </message>
   </context>
   <context>
@@ -5395,7 +5395,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRolesModel</name>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message>
       <source>Custom access rights</source>
@@ -6872,15 +6872,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AccessRightsList</name>
     <message>
       <source>View Archive</source>
-      <translation type="unfinished">View Archive</translation>
+      <translation>عرض الأرشيف</translation>
     </message>
     <message>
       <source>Export Archive</source>
-      <translation type="unfinished">Export Archive</translation>
+      <translation>تصدير الأرشيف</translation>
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>عرض الإشارات المرجعية</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
@@ -6900,7 +6900,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>View Live.</source>
-      <translation type="unfinished">View Live.</translation>
+      <translation>عرض مباشر.</translation>
     </message>
     <message>
       <source>User Input.</source>
@@ -6908,11 +6908,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Edit Settings.</source>
-      <translation type="unfinished">Edit Settings.</translation>
+      <translation>تعديل الإعدادات.</translation>
     </message>
     <message>
       <source>Play Audio</source>
-      <translation type="unfinished">Play Audio</translation>
+      <translation>تشغيل الصوت</translation>
     </message>
     <message>
       <source>Allows users to access an audio stream from a device. Used in combination with View Live and/or View Archive.</source>
@@ -8603,7 +8603,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>إدارة الموقع</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -9316,7 +9316,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>حفظ التخطيط كسحابة</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -9419,7 +9419,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connection failed</source>
-      <translation type="unfinished">Connection failed</translation>
+      <translation>فشل الاتصال</translation>
     </message>
     <message>
       <source>Remove existing LDAP users and groups?</source>
@@ -9948,7 +9948,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>دمج المواقع</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -10904,7 +10904,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>تكامل جديد</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10996,7 +10996,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>%1 تخطيط</translation>
     </message>
     <message>
       <source>%1 video wall</source>
@@ -11144,7 +11144,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::SaasInfoWidget</name>
     <message>
       <source>Active</source>
-      <translation type="unfinished">Active</translation>
+      <translation>نشط</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -12173,7 +12173,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -12268,7 +12268,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
@@ -12768,7 +12768,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>التكامل</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -13274,7 +13274,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom</source>
-      <translation type="unfinished">Custom</translation>
+      <translation>تخصيص</translation>
     </message>
   </context>
   <context>
@@ -13485,7 +13485,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>لِ</translation>
     </message>
     <message>
       <source>Value</source>

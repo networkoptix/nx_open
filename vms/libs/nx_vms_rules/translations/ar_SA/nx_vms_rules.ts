@@ -210,7 +210,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>لِ</translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
@@ -299,7 +299,7 @@
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>تمت إزالة الكاميرا</translation>
     </message>
     <message>
       <source>Removed server</source>

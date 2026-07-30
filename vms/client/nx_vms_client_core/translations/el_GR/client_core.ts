@@ -305,7 +305,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Τοποθεσία</translation>
     </message>
     <message>
       <source>Site (%1)</source>
@@ -333,7 +333,7 @@
     </message>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Οποιοδήποτε</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -381,7 +381,7 @@
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Οργανισμοί</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -389,7 +389,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Τοποθεσίες</translation>
     </message>
     <message>
       <source>Partners</source>

@@ -612,7 +612,7 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Αναλογικό</translation>
     </message>
     <message>
       <source>Professional</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Αναλογικός Κωδικοποιητής</translation>
     </message>
     <message>
       <source>Analog Licenses</source>

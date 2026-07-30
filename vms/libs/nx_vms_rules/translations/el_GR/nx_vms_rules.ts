@@ -363,7 +363,7 @@
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Συμβάν Αναλυτικών Στοιχείων</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Περιεχόμενο</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Περιεχόμενο</translation>
     </message>
     <message>
       <source>Internal HTTPS Request</source>
