@@ -67,7 +67,7 @@ Item
         visible: control.active && !!currentPage
         opacity: control.opacity
         title: currentPage?.title ?? qsTr("PTZ")
-        alwaysShowCloseButton: !footer
+        closeButtonVisible: control.state === "default"
 
         contentSpacing: 0
 

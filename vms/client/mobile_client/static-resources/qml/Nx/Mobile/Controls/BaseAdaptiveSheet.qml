@@ -20,7 +20,7 @@ Drawer
     default property alias data: contentColumn.data
 
     property bool closeAutomatically: true
-    property bool alwaysShowCloseButton: false
+    property bool closeButtonVisible: !control.bottomEdge
     readonly property alias contentDragging: flickable.dragging
     readonly property bool bottomEdge: edge === Qt.BottomEdge
 
@@ -183,8 +183,7 @@ Drawer
                 LayoutItemProxy
                 {
                     target: closeButton
-                    visible: headerProxy.target
-                        && (LayoutController.isTabletLayout || control.alwaysShowCloseButton)
+                    visible: headerProxy.target && control.closeButtonVisible
                 }
             }
         }
@@ -317,8 +316,7 @@ Drawer
             z: header.z + 1 //< Must be over header and flickable.
 
             target: closeButton
-            visible: !headerProxy.target
-                && (LayoutController.isTabletLayout || control.alwaysShowCloseButton)
+            visible: !headerProxy.target && control.closeButtonVisible
         }
 
         IconButton

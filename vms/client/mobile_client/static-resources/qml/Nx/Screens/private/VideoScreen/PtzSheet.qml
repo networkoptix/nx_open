@@ -24,7 +24,7 @@ AdaptiveSheet
     title: qsTr("PTZ")
     titleTextItem.font.pixelSize: 18
 
-    alwaysShowCloseButton: true
+    closeButtonVisible: true
     interactive: visible && !panel.joystick.active
     spacing: 0
     bottomPadding: 0
