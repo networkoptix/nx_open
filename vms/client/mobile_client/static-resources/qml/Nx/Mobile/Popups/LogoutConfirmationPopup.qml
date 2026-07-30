@@ -10,8 +10,7 @@ PopupBase
     title: qsTr("Disconnect")
     messages:
     [
-        qsTr("Are you sure you want to disconnect from %1?", "%1 is a system name")
-            .arg(windowContext.sessionManager.systemName)
+        qsTr("Disconnect %1 from %2?", "%1 is a user, %2 is a system").arg(d.user).arg(d.system)
     ]
     messagesTextAlignment: Text.AlignHCenter
 
@@ -35,4 +34,14 @@ PopupBase
             }
         }
     ]
+
+    QtObject
+    {
+        id: d
+
+        readonly property string user: windowContext.sessionManager.isCloudSession
+            ? cloudUserProfileWatcher.fullName
+            : windowContext.mainSystemContext?.userWatcher.userFullName
+        readonly property string system: windowContext.sessionManager.systemName
+    }
 }

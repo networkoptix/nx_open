@@ -88,7 +88,7 @@ Page
                 text: qsTr("Logged in as %1", "%1 is a user name")
                     .arg(windowContext.sessionManager.isCloudSession
                         ? cloudUserProfileWatcher.fullName
-                        : (windowContext.mainSystemContext?.userWatcher.userName ?? ""))
+                        : (windowContext.mainSystemContext?.userWatcher.userFullName ?? ""))
                 font.pixelSize: 14
                 font.weight: 400
                 color: ColorTheme.colors.light14

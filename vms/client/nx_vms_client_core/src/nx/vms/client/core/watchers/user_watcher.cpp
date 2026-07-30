@@ -70,6 +70,7 @@ void UserWatcher::setUser(const QnUserResourcePtr& user)
 
     emit userChanged(user);
     emit userNameChanged();
+    emit userFullNameChanged();
     emit isAdministratorUserChanged();
 }
 
@@ -81,6 +82,18 @@ bool UserWatcher::isAdministratorUser() const
 QString UserWatcher::userName() const
 {
     return m_user ? m_user->getName() : QString();
+}
+
+QString UserWatcher::userFullName() const
+{
+    if (!m_user)
+        return {};
+
+    auto result = m_user->fullName();
+    if (result.isEmpty())
+        result = m_user->getName();
+
+    return result;
 }
 
 } // namespace nx::vms::client::core

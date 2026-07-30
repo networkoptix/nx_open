@@ -16,12 +16,14 @@ class NX_VMS_CLIENT_CORE_API UserWatcher:
     Q_OBJECT
     /* This property should remain read-only for QML! */
     Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
+    Q_PROPERTY(QString userFullName READ userFullName NOTIFY userFullNameChanged)
 
 public:
     UserWatcher(SystemContext* systemContext, QObject* parent = nullptr);
 
     const QnUserResourcePtr& user() const;
     QString userName() const;
+    QString userFullName() const;
 
     bool isAdministratorUser() const;
 
@@ -31,6 +33,7 @@ private:
 signals:
     void userChanged(const QnUserResourcePtr& user);
     void userNameChanged();
+    void userFullNameChanged();
     void isAdministratorUserChanged();
 
 private:
