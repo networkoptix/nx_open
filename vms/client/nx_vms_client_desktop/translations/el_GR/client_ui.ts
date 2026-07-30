@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Developer</source>
-      <translation type="unfinished">Developer</translation>
+      <translation>Προγραμματιστής</translation>
     </message>
     <message>
       <source>Open source libraries</source>
@@ -168,7 +168,7 @@
     <name>AuditLogDialog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>User actions</source>
@@ -235,7 +235,7 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Κανένα Όριο</translation>
     </message>
     <message>
       <source>Fixed</source>
@@ -278,7 +278,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>Skip Current Queue</source>
@@ -324,7 +324,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -347,7 +347,7 @@
     <name>BookmarksLog</name>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>Bookmark Log</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
   </context>
   <context>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -420,7 +420,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -635,7 +635,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>in</source>
@@ -651,7 +651,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Back</source>
@@ -659,7 +659,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>Next</source>
@@ -890,7 +890,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Προεπιλογή</translation>
     </message>
   </context>
   <context>
@@ -935,7 +935,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>All Servers are offline. Logs are not available.</source>
@@ -1182,7 +1182,7 @@
     </message>
     <message>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Προεπιλογή</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1250,7 +1250,7 @@
     </message>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Εκκαθάριση</translation>
     </message>
     <message>
       <source>View...</source>
@@ -1301,7 +1301,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
     <message>
       <source>Minimum Grid Size</source>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message>
       <source>Open files folder</source>
@@ -1555,7 +1555,7 @@
     <name>MergeSystemsDialog</name>
     <message>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>Διεύθυνση URL διακομιστή:</translation>
     </message>
     <message>
       <source>Password:</source>
@@ -1831,7 +1831,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Όνομα:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
@@ -1996,7 +1996,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Πηγή</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2142,7 +2142,7 @@ and click on the &quot;Search&quot; button</source>
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Ενεργοποίηση αρχείου ελέγχου</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2182,11 +2182,11 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Αναγκάστε τους διακομιστές να δέχονται μόνο κρυπτογραφημένες συνδέσεις</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Κρυπτογράφηση επισκεψιμότητας βίντεο σε υπολογιστές και κινητά client</translation>
     </message>
     <message>
       <source>Manage Users</source>
@@ -2222,7 +2222,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Διαχειριστές</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2283,7 +2283,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>IP Address</source>
@@ -2356,7 +2356,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Επαναδημιουργία ευρετηρίου αρχείου</translation>
     </message>
     <message>
       <source>Reindex Backup</source>
@@ -2609,11 +2609,11 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Ενεργό</translation>
     </message>
     <message>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Ανενεργό</translation>
     </message>
     <message>
       <source>Schedule</source>
@@ -2644,7 +2644,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Νέα Άδεια</translation>
     </message>
   </context>
   <context>

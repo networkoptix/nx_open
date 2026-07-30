@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Change of the User with readonly attribute is forbidden for VMS.</source>
-      <translation type="unfinished">Change of the User with readonly attribute is forbidden for VMS.</translation>
+      <translation>Η αλλαγή του χρήστη με το χαρακτηριστικό μόνο για ανάγνωση απαγορεύεται για το VMS.</translation>
     </message>
     <message>
       <source>Creation of the User with readonly attribute is forbidden for VMS.</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Ο διακομιστής %1 δεν υπάρχει.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>

@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Χωρίς εξουσιοδότηση.</translation>
     </message>
     <message>
       <source>Session expired.</source>

@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>Caption</source>
-      <translation type="unfinished">Caption</translation>
+      <translation>Λεζάντα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Πηγή</translation>
     </message>
     <message>
       <source>Method</source>
@@ -363,7 +363,7 @@
     <name>nx::vms::rules::AnalyticsEvent</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Συμβάν Αναλυτικών Στοιχείων</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -466,7 +466,7 @@
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Συσκευή</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -562,7 +562,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Ενεργό</translation>
     </message>
   </context>
   <context>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Περιεχόμενο</translation>
     </message>
     <message>
       <source>HTTP authentication</source>
@@ -1163,7 +1163,7 @@
     </message>
     <message>
       <source>Content</source>
-      <translation type="unfinished">Content</translation>
+      <translation>Περιεχόμενο</translation>
     </message>
     <message>
       <source>Internal HTTPS Request</source>
@@ -1178,11 +1178,11 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Εικονίδιο</translation>
     </message>
     <message>
       <source>By</source>

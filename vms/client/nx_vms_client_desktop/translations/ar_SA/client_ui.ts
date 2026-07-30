@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>معرف الجهاز ID</translation>
     </message>
   </context>
   <context>
@@ -1571,7 +1571,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>دمج المواقع...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
@@ -1920,7 +1920,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>إدارة الموقع</translation>
     </message>
   </context>
   <context>
@@ -2222,7 +2222,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>المسؤولون</translation>
     </message>
     <message>
       <source>Available to</source>
@@ -2230,7 +2230,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>المستخدمون المتقدمون</translation>
     </message>
   </context>
   <context>
