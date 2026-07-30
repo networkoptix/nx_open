@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
   </context>
   <context>
@@ -415,7 +415,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Δεν υπάρχουν σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
@@ -528,7 +528,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Σε αναστολή</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -713,7 +713,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Column Name</source>
@@ -725,7 +725,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Δημιουργία</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -737,7 +737,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -842,7 +842,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FigureEditorDialog</name>
     <message>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Εκκαθάριση</translation>
     </message>
     <message>
       <source>OK</source>
@@ -864,7 +864,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FilterDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Base DN</source>
@@ -938,7 +938,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Γωνία</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
@@ -1053,7 +1053,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1255,11 +1255,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Ανανέωση</translation>
     </message>
     <message>
       <source>Services Required</source>
@@ -1363,7 +1363,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Προηγούμενο</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1435,7 +1435,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1741,7 +1741,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Δημιουργία</translation>
     </message>
   </context>
   <context>
@@ -1930,7 +1930,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Επιβεβαίωση κωδικού</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2228,11 +2228,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Μάθετε περισσότερα</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2587,7 +2587,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
   </context>
   <context>
@@ -2633,7 +2633,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Χωρίς εξουσιοδότηση</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -2869,7 +2869,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Local</source>
@@ -2877,7 +2877,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Login</source>
@@ -2889,7 +2889,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2999,7 +2999,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Change password</source>
@@ -3092,7 +3092,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Όλες οι τοποθεσίες</translation>
     </message>
   </context>
   <context>

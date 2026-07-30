@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Wybierz co najmniej jedną witrynę</translation>
     </message>
   </context>
   <context>

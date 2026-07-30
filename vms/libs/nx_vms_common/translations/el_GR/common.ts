@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Edit Settings</source>
-      <translation type="unfinished">Edit Settings</translation>
+      <translation>Επεξεργασία Ρυθμίσεων</translation>
     </message>
   </context>
   <context>
@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation type="unfinished">empty</translation>
+      <translation>κενό</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -155,7 +155,7 @@
     <name>PredefinedUserGroups</name>
     <message>
       <source>Administrators</source>
-      <translation type="unfinished">Administrators</translation>
+      <translation>Διαχειριστές</translation>
     </message>
     <message>
       <source>Power Users</source>
@@ -272,7 +272,7 @@
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Επιλογή κάμερας</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -291,7 +291,7 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation type="unfinished">Server has been stopped.</translation>
+      <translation>Ο διακομιστής έχει σταματήσει.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
@@ -303,7 +303,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation type="unfinished">(unknown)</translation>
+      <translation>(άγνωστο)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -612,7 +612,7 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Αναλογικό</translation>
     </message>
     <message>
       <source>Professional</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Αναλογικός Κωδικοποιητής</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -1044,7 +1044,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -1419,7 +1419,7 @@
     </message>
     <message>
       <source>Integration</source>
-      <translation type="unfinished">Integration</translation>
+      <translation>Ενσωμάτωση</translation>
     </message>
     <message>
       <source>Cloud storage</source>
@@ -1652,7 +1652,7 @@
     </message>
     <message>
       <source>OS time change check period.</source>
-      <translation type="unfinished">OS time change check period.</translation>
+      <translation>Περίοδος ελέγχου αλλαγής ώρας λειτουργικού συστήματος.</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
@@ -1660,11 +1660,11 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon.</translation>
+      <translation>Συγχρονισμός χρόνου epsilon. Η νέα τιμή δεν εφαρμόζεται αν ο χρόνος delta είναι μικρότερος από το epsilon.</translation>
     </message>
     <message>
       <source>Cloud owner account.</source>
-      <translation type="unfinished">Cloud owner account.</translation>
+      <translation>Λογαριασμός κατόχου Cloud.</translation>
     </message>
     <message>
       <source>Organization Id.</source>
@@ -1712,11 +1712,11 @@
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
-      <translation type="unfinished">Use Windows line feed in emails.</translation>
+      <translation>Χρήση αλλαγών γραμμής Windows στα email.</translation>
     </message>
     <message>
       <source>Enable audit trail.</source>
-      <translation type="unfinished">Enable audit trail.</translation>
+      <translation>Ενεργοποίηση αρχείου ελέγχου.</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
@@ -1724,7 +1724,7 @@
     </message>
     <message>
       <source>Event log period (days).</source>
-      <translation type="unfinished">Event log period (days).</translation>
+      <translation>Περίοδος καταγραφής συμβάντων (ημέρες).</translation>
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
@@ -1796,7 +1796,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation type="unfinished">RTP timeout (milliseconds).</translation>
+      <translation>Χρονικό όριο RTP (msec).</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
@@ -1884,7 +1884,7 @@
     </message>
     <message>
       <source>Default video codec.</source>
-      <translation type="unfinished">Default video codec.</translation>
+      <translation>Προεπιλεγμένος κωδικοποιητής βίντεο.</translation>
     </message>
     <message>
       <source>Default codec for export video.</source>
@@ -1892,7 +1892,7 @@
     </message>
     <message>
       <source>Low quality screen video codec.</source>
-      <translation type="unfinished">Low quality screen video codec.</translation>
+      <translation>Κωδικοποιητής βίντεο οθόνης χαμηλής ποιότητας.</translation>
     </message>
     <message>
       <source>License server.</source>
@@ -1904,7 +1904,7 @@
     </message>
     <message>
       <source>Meta data storage change policy.</source>
-      <translation type="unfinished">Meta data storage change policy.</translation>
+      <translation>Πολιτική αλλαγής αποθήκευσης μεταδεδομένων.</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
@@ -2000,7 +2000,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Μέγιστος αριθμός αντικειμένων σκηνής (0 σημαίνει προεπιλογή)</translation>
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>

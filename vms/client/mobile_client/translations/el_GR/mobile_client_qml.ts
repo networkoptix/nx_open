@@ -12,7 +12,7 @@
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Ενέργειες</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
@@ -49,7 +49,7 @@
     <name>ArchivePlaceholder</name>
     <message>
       <source>Not Available</source>
-      <translation type="unfinished">Not Available</translation>
+      <translation>Μη Διαθέσιμο</translation>
     </message>
     <message>
       <source>No Archive</source>
@@ -83,7 +83,7 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>Χαρακτηριστικά Beta</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -138,14 +138,14 @@
     <message>
       <source>Unknown</source>
       <comment>Unknown video quality</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
   </context>
   <context>
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>Συνεργάτης Καναλιού</translation>
     </message>
   </context>
   <context>
@@ -327,7 +327,7 @@
     <name>DeviceSelector</name>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Συσκευή</translation>
     </message>
   </context>
   <context>
@@ -358,7 +358,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -430,7 +430,7 @@
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Δεν υπάρχουν σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
@@ -454,7 +454,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Επαναφορά</translation>
     </message>
   </context>
   <context>
@@ -513,7 +513,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
     <message>
       <source>Feed</source>
@@ -528,7 +528,7 @@
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Όλα</translation>
     </message>
     <message>
       <source>Period</source>
@@ -587,7 +587,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -805,7 +805,7 @@
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>Οποιοδήποτε</translation>
     </message>
   </context>
   <context>
@@ -905,7 +905,7 @@
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -924,7 +924,7 @@
     <name>PtzSheet</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -939,7 +939,7 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Τοποθεσίες</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Όλες οι τοποθεσίες</translation>
     </message>
     <message>
       <source>Selected Sites</source>
@@ -994,7 +994,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Άγνωστο</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -1032,7 +1032,7 @@
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Τύπος</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -1103,7 +1103,7 @@
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Ασφάλεια</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -1181,11 +1181,11 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Οργανισμοί</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Τοποθεσίες</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1275,7 +1275,7 @@
     </message>
     <message>
       <source>Cannot share bookmark</source>
-      <translation type="unfinished">Cannot share bookmark</translation>
+      <translation>Δεν είναι δυνατή η κοινοποίηση του σελιδοδείκτη</translation>
     </message>
   </context>
   <context>
@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Όνομα</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1396,7 +1396,7 @@
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>Cloud</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1415,7 +1415,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -1435,7 +1435,7 @@
     </message>
     <message>
       <source>PENDING</source>
-      <translation type="unfinished">PENDING</translation>
+      <translation>ΕΚΚΡΕΜΗΣ</translation>
     </message>
   </context>
   <context>
@@ -1484,7 +1484,7 @@
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Αποσύνδεση</translation>
     </message>
     <message>
       <source>Open %1</source>
@@ -1580,7 +1580,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Χωρίς εξουσιοδότηση</translation>
     </message>
     <message>
       <source>Unsupported</source>
