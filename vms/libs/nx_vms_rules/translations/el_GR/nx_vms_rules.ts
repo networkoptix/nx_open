@@ -125,7 +125,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Προς</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Περιγραφή</translation>
     </message>
     <message>
       <source>Source</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Camera Recording</source>

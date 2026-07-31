@@ -359,7 +359,7 @@
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Εκκαθάριση Επιλογής</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
@@ -567,7 +567,7 @@
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Ρυθμίσεις Κάμερας...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
@@ -1567,7 +1567,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Έλεγχος</translation>
     </message>
     <message>
       <source>URL is not valid.</source>
@@ -2100,7 +2100,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Κάμερες</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -2255,7 +2255,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Ημερομηνία</translation>
     </message>
     <message>
       <source>Time</source>
@@ -2679,7 +2679,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Τρέχων Κωδικός Πρόσβασης</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2751,11 +2751,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
-      <translation>Θα αποσυνδεθείτε από τον ιστότοπο. Ο ιστότοπος θα είναι προσβάσιμος μόνο μέσω τοπικού δικτύου</translation>
+      <translation>Θα αποσυνδεθείτε από την τοποθεσία. τοποθεσία θα είναι προσβάσιμη μόνο μέσω τοπικού δικτύου</translation>
     </message>
     <message>
       <source>The site will be accessible only via local network</source>
-      <translation>Η πρόσβαση στον ιστότοπο θα είναι δυνατή μόνο μέσω τοπικού δικτύου</translation>
+      <translation>Η πρόσβαση στην τοποθεσία θα είναι δυνατή μόνο μέσω τοπικού δικτύου</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
@@ -3105,7 +3105,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Device List</source>
@@ -4257,7 +4257,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Ρυθμίσεις Κάμερας</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -4637,7 +4637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>τοπικά</translation>
     </message>
     <message>
       <source>ram</source>
@@ -4889,7 +4889,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -5714,11 +5714,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Διαγραφή διάταξης?</translation>
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>Διαγραφή χρήστη;</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -6694,7 +6694,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Κάμερες</translation>
     </message>
     <message>
       <source>What to backup</source>
@@ -6829,16 +6829,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
-      <translation type="unfinished">
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
+      <translation>
+        <numerusform>Το αντίγραφο ασφαλείας δεν θα ενεργοποιηθεί για τη %n συσκευή:</numerusform>
+        <numerusform>Το αντίγραφο ασφαλείας δεν θα ενεργοποιηθεί για τις %n συσκευές:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
+      <translation>
+        <numerusform>Απαιτούνται κατάλληλες υπηρεσίες αποθήκευσης στο cloud για την ενεργοποίηση της δημιουργίας αντιγράφου ασφαλείας για αυτό %n.</numerusform>
+        <numerusform>Απαιτούνται κατάλληλες υπηρεσίες αποθήκευσης στο cloud για την ενεργοποίηση της δημιουργίας αντιγράφων ασφαλείας για αυτά %n.</numerusform>
       </translation>
     </message>
   </context>
@@ -7223,17 +7223,17 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use Services</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
+      <translation>
+        <numerusform>Χρήση υπηρεσίας</numerusform>
+        <numerusform>Χρήση Υπηρεσιών</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
-        <numerusform>Use Licenses</numerusform>
+      <translation>
+        <numerusform>Χρήση Άδειας Χρήσης</numerusform>
+        <numerusform>Χρήση Αδειών Χρήσης</numerusform>
       </translation>
     </message>
   </context>
@@ -7479,7 +7479,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Ρυθμίσεις Κάμερας</translation>
     </message>
     <message>
       <source>Cameras Settings</source>
@@ -7634,7 +7634,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
-      <translation>Η πρόσβαση των χρηστών Συνεργατών Καναλιού&apos; διαχειρίζεται σε επίπεδο Οργανισμού και δεν είναι ορατοί στη διαχείριση χρηστών ιστότοπου.</translation>
+      <translation>Η πρόσβαση των χρηστών Εμπορικού Συνεργάτη&apos; διαχειρίζεται σε επίπεδο οργανισμού και οι χρήστες αυτοί δεν εμφανίζονται στη διαχείριση χρηστών της τοποθεσίας.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -7854,7 +7854,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Connect</source>
       <comment>Connect current Site to cloud</comment>
-      <translation type="unfinished">Connect</translation>
+      <translation>Σύνδεση</translation>
     </message>
   </context>
   <context>
@@ -7894,7 +7894,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Σύνδεση</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -7944,7 +7944,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>Ορισμός Κωδικού Πρόσβασης</translation>
     </message>
     <message>
       <source>This camera requires password to be set up</source>
@@ -8245,7 +8245,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Bookmarks</source>
       <comment>Bookmarks tab title</comment>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Events</source>
@@ -8845,7 +8845,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Παρασκήνιο</translation>
     </message>
   </context>
   <context>
@@ -10906,7 +10906,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Σύνδεση παρ' όλα αυτά</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -11358,7 +11358,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Ημερομηνία</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -12242,7 +12242,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Σελιδοδείκτες</translation>
     </message>
     <message>
       <source>High-Res</source>
@@ -12279,7 +12279,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Κάμερες &amp; Συσκευές</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -12682,7 +12682,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::HttpAuthPicker</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Ταυτοποίηση</translation>
     </message>
     <message>
       <source>Login</source>

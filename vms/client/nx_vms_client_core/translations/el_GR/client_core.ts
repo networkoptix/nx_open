@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation>Ο ιστότοπός σας</translation>
+      <translation>Η τοποθεσία σας</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -178,7 +178,7 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Για να συνδεθείτε σε αυτόν τον ιστότοπο, απενεργοποιήστε την επιλογή &quot;Αίτημα κωδικού επαλήθευσης σε κάθε σύνδεση με τον λογαριασμό σας %1&quot; στον λογαριασμό σας %2.</translation>
+      <translation>Για να συνδεθείτε σε αυτή τη τοποθεσία, απενεργοποιήστε την επιλογή &quot;Αίτημα κωδικού επαλήθευσης σε κάθε σύνδεση με τον λογαριασμό σας %1&quot; στον λογαριασμό σας %2.</translation>
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
