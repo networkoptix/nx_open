@@ -52,6 +52,16 @@ Drawer
     topPadding: d.extraTopMargin
     bottomPadding: d.extraBottomMargin
 
+    function resetFocus()
+    {
+        const focusItem = content.ApplicationWindow.activeFocusControl
+        if (!focusItem)
+            return
+
+        focusItem.focus = false
+        Qt.inputMethod.hide()
+    }
+
     Overlay.modal: OverlayBackground
     {
         anchors.fill: parent
@@ -123,6 +133,13 @@ Drawer
             + flickable.anchors.bottomMargin
         clip: true
 
+        MouseArea //< Dismisses the keyboard on a tap outside of the editors.
+        {
+            anchors.fill: parent
+            acceptedButtons: Qt.AllButtons
+            onClicked: control.resetFocus()
+        }
+
         GradientShadow
         {
             id: topShadow
@@ -186,6 +203,13 @@ Drawer
 
                 height: contentColumn.height
                 width: parent.width
+
+                MouseArea //< Dismisses the keyboard on a tap between the content items.
+                {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.AllButtons
+                    onClicked: control.resetFocus()
+                }
 
                 Column
                 {
