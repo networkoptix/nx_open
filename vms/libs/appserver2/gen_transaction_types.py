@@ -18,6 +18,6 @@ for line in args.input:
         dataTypes.add(line.split(',')[2].strip())
 
 args.output.write('#define TransactionDataTypes')
-for dataType in dataTypes:
+for dataType in sorted(dataTypes):
     args.output.write(' \\\n({})'.format(dataType))
 args.output.write('\n')
