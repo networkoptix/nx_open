@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation type="unfinished">&amp;Select All</translation>
+      <translation>&amp;Επιλογή όλων</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -157,7 +157,7 @@
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ναι</translation>
     </message>
     <message>
       <source>Yes to All</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Όχι</translation>
     </message>
     <message>
       <source>No to All</source>
@@ -208,23 +208,23 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Έξοδος</translation>
     </message>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Αποκοπή</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Αντιγραφή</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Επικόλληση</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Επιλογή όλων</translation>
     </message>
   </context>
   <context>
@@ -314,7 +314,7 @@ Press ESC to cancel</translation>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>Π.Μ.</translation>
     </message>
     <message>
       <source>am</source>
@@ -322,11 +322,11 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>Μ.Μ.</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>μ.μ.</translation>
     </message>
   </context>
   <context>
@@ -479,7 +479,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Άνοιγμα</translation>
     </message>
     <message>
       <source>Save As</source>
@@ -495,7 +495,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation type="unfinished">&amp;Open</translation>
+      <translation>&amp;Άνοιγμα</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
@@ -827,7 +827,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Επικόλληση</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -835,7 +835,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Επιλογή όλων</translation>
     </message>
   </context>
   <context>
@@ -873,11 +873,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Άνοιγμα</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation type="unfinished">&amp;Yes</translation>
+      <translation>&amp;Ναι</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
@@ -885,7 +885,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation type="unfinished">&amp;No</translation>
+      <translation>&amp;Όχι</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
@@ -893,7 +893,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Ακύρωση</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -1133,7 +1133,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation type="unfinished">&amp;Paste</translation>
+      <translation>&amp;Επικόλληση</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1141,7 +1141,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Επιλογή όλων</translation>
     </message>
   </context>
   <context>
