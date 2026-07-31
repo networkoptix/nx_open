@@ -701,13 +701,13 @@
       <translation>Rozłącz</translation>
     </message>
     <message>
-      <source>Are you sure you want to disconnect from %1?</source>
-      <comment>%1 is a system name</comment>
-      <translation>Czy na pewno chcesz odłączyć od %1?</translation>
-    </message>
-    <message>
       <source>Cancel</source>
       <translation>Anuluj</translation>
+    </message>
+    <message>
+      <source>Disconnect %1 from %2?</source>
+      <comment>%1 is a user, %2 is a system</comment>
+      <translation type="unfinished">Disconnect %1 from %2?</translation>
     </message>
   </context>
   <context>

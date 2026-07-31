@@ -616,7 +616,7 @@
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Αναγνωριστικό Κάμερας</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -754,7 +754,7 @@
     <name>CameraSettingsGeneralTabWidget</name>
     <message>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Ταυτοποίηση</translation>
     </message>
     <message>
       <source>Edit Credentials</source>
@@ -1144,7 +1144,7 @@
     <name>FilenamePanel</name>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
   </context>
   <context>
@@ -1271,7 +1271,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
   </context>
   <context>
@@ -1331,7 +1331,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
     <message>
       <source>Clear</source>
@@ -1446,7 +1446,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
     <message>
       <source>License will be bound to the current server</source>
@@ -1589,7 +1589,7 @@
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
     <message>
       <source>Language</source>
@@ -1656,7 +1656,7 @@
     </message>
     <message>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Έλεγχος</translation>
     </message>
     <message>
       <source>Merge Sites...</source>
@@ -2081,7 +2081,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
     <message>
       <source>Source</source>

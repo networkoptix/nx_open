@@ -403,7 +403,7 @@
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Τοπικά</translation>
     </message>
   </context>
   <context>
