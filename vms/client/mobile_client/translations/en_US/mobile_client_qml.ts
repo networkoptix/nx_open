@@ -699,12 +699,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to disconnect from %1?</source>
-        <comment>%1 is a system name</comment>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Disconnect %1 from %2?</source>
+        <comment>%1 is a user, %2 is a system</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
