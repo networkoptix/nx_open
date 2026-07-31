@@ -6,62 +6,62 @@
     <message numerus="yes">
       <source>%n Object Types</source>
       <comment>%n is number of types</comment>
-      <translation type="unfinished">
-        <numerusform>%n Object Types</numerusform>
-        <numerusform>%n Object Types</numerusform>
+      <translation>
+        <numerusform>%n Τύπος αντικειμένου</numerusform>
+        <numerusform>%n Τύποι αντικειμένων</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
-      <translation type="unfinished">
-        <numerusform>%n Object Attributes</numerusform>
-        <numerusform>%n Object Attributes</numerusform>
+      <translation>
+        <numerusform>%n Χαρακτηριστικό Αντικειμένου</numerusform>
+        <numerusform>%n Χαρακτηριστικά Αντικειμένου</numerusform>
       </translation>
     </message>
     <message>
       <source>Shared Only</source>
-      <translation type="unfinished">Shared Only</translation>
+      <translation>Μόνο στοιχεία σε κοινή χρήση</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Όλες Οι Κάμερες</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::MediaDownloadBackend</name>
     <message>
       <source>Can&apos;t download video</source>
-      <translation type="unfinished">Can&apos;t download video</translation>
+      <translation>Δεν είναι δυνατή η λήψη βίντεο</translation>
     </message>
     <message>
       <source>Please check a network connection.</source>
-      <translation type="unfinished">Please check a network connection.</translation>
+      <translation>Παρακαλώ ελέγξτε τη σύνδεση δικτύου.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::PtzCameraButtonController</name>
     <message>
       <source>Control PTZ</source>
-      <translation type="unfinished">Control PTZ</translation>
+      <translation>Έλεγχος PTZ</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
       <source>Cannot enable push notifications</source>
-      <translation type="unfinished">Cannot enable push notifications</translation>
+      <translation>Δεν ήταν δυνατή η ενεργοποίηση των push ειδοποιήσεων</translation>
     </message>
     <message>
       <source>Please check your internet connection</source>
-      <translation type="unfinished">Please check your internet connection</translation>
+      <translation>Παρακαλώ ελέγξτε τη σύνδεσή σας στο internet</translation>
     </message>
     <message>
       <source>Cannot change notifications settings</source>
-      <translation type="unfinished">Cannot change notifications settings</translation>
+      <translation>Δεν είναι δυνατή η αλλαγή των ρυθμίσεων ειδοποιήσεων</translation>
     </message>
   </context>
   <context>
@@ -69,7 +69,7 @@
     <message>
       <source>%1 ago</source>
       <comment>notification time, like &apos;1 min ago&apos;</comment>
-      <translation type="unfinished">%1 ago</translation>
+      <translation>%1 πριν</translation>
     </message>
   </context>
   <context>
@@ -81,7 +81,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Λήγει σε %1</translation>
     </message>
     <message>
       <source>Error</source>
@@ -96,23 +96,23 @@
     <name>nx::vms::client::mobile::UiController</name>
     <message>
       <source>Cannot connect to the Server</source>
-      <translation type="unfinished">Cannot connect to the Server</translation>
+      <translation>Δεν είναι δυνατή η σύνδεση με το διακομιστή</translation>
     </message>
     <message>
       <source>Cannot connect to the Site &quot;%1&quot;</source>
       <comment>%1 is a site name</comment>
-      <translation type="unfinished">Cannot connect to the Site &quot;%1&quot;</translation>
+      <translation>Δεν είναι δυνατή η σύνδεση με την τοποθεσία &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Κάμερες &amp; Συσκευές</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Όλες Οι Συσκευές</translation>
     </message>
     <message>
       <source>Layouts</source>

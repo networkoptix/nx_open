@@ -105,48 +105,48 @@
     <message numerus="yes">
       <source>Bytes</source>
       <comment>Numerus: Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform>Bytes</numerusform>
+      <translation>
+        <numerusform>Byte</numerusform>
         <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
-        <numerusform>Kilobytes</numerusform>
+      <translation>
+        <numerusform>Kilobyte</numerusform>
         <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Numerus: Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>Megabyte</numerusform>
         <numerusform>Megabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>Gigabyte</numerusform>
         <numerusform>Gigabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Numerus: Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>Terabyte</numerusform>
         <numerusform>Terabytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>Petabyte</numerusform>
         <numerusform>Petabytes</numerusform>
       </translation>
     </message>
@@ -1288,9 +1288,9 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>Ημέρα</numerusform>
+        <numerusform>Ημέρες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1893,7 +1893,7 @@
     </message>
     <message>
       <source>HTTP header: Origin.</source>
-      <translation type="unfinished">HTTP header: Origin.</translation>
+      <translation>Κεφαλίδα HTTP: Προέλευση.</translation>
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>

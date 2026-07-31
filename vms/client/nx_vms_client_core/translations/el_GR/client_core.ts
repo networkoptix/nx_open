@@ -180,7 +180,7 @@
     <message>
       <source>To log in to this site, disable &quot;Ask for a verification code on every login with your %1 account&quot; in your %2.</source>
       <comment>%1 is the cloud name (like Nx Cloud),%2 is link that leads to /account/security section of Nx Cloud</comment>
-      <translation>Για να συνδεθείτε σε αυτόν τον ιστότοπο, απενεργοποιήστε την επιλογή &quot;Αίτημα κωδικού επαλήθευσης σε κάθε σύνδεση με τον λογαριασμό σας %1&quot; στον λογαριασμό σας %2.</translation>
+      <translation>Για να συνδεθείτε σε αυτή τη τοποθεσία, απενεργοποιήστε την επιλογή &quot;Αίτημα κωδικού επαλήθευσης σε κάθε σύνδεση με τον λογαριασμό σας %1&quot; στον λογαριασμό σας %2.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Τοπικά</translation>
     </message>
   </context>
   <context>
