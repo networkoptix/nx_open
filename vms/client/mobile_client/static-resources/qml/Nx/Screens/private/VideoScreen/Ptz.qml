@@ -68,6 +68,7 @@ Item
         opacity: control.opacity
         title: currentPage?.title ?? qsTr("PTZ")
         closeButtonVisible: control.state === "default"
+        closeAutomatically: control.state === "presets" && control.overlayStyle
 
         contentSpacing: 0
 
@@ -80,7 +81,6 @@ Item
             : StyleHints.sheetWidth
 
         interactive: !panel.joystick.active
-        closePolicy: Popup.NoAutoClose
         modal: false
 
         onClosed:
@@ -163,7 +163,7 @@ Item
                 id: presetSheetPage
 
                 readonly property string title: qsTr("PTZ Presets")
-                readonly property string cancelButtonText: qsTr("Cancel")
+                readonly property string cancelButtonText: qsTr("Close")
 
                 model: presetViewModel.presets
                 currentIndex: presetViewModel.currentPresetIndex
@@ -173,14 +173,10 @@ Item
 
         footer: cancelButton.text ? cancelButton : null
 
-        Button
+        readonly property Item cancelButton: Button
         {
-            id: cancelButton
-
             text: sheet.currentPage?.cancelButtonText ?? ""
             type: Button.LightInterface
-            visible: false
-
             onClicked: control.reset()
         }
     }
