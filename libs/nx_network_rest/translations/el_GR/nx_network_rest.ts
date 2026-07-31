@@ -136,7 +136,7 @@
     </message>
     <message>
       <source>Session expired.</source>
-      <translation type="unfinished">Session expired.</translation>
+      <translation>Η Συνεδρία Έληξε.</translation>
     </message>
     <message>
       <source>Session authorization required.</source>
