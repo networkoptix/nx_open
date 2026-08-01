@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation type="unfinished">Close Tab</translation>
+      <translation>Κλείσιμο Καρτέλας</translation>
     </message>
   </context>
   <context>
@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation type="unfinished">Hide %1</translation>
+      <translation>Απόκρυψη %1</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation type="unfinished">Hide Others</translation>
+      <translation>Απόκρυψη των άλλων</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,15 +28,15 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation type="unfinished">Preferences...</translation>
+      <translation>Προτιμήσεις...</translation>
     </message>
     <message>
       <source>Quit %1</source>
-      <translation type="unfinished">Quit %1</translation>
+      <translation>Έξοδος %1</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation type="unfinished">About %1</translation>
+      <translation>Σχετικά με το %1</translation>
     </message>
   </context>
   <context>
@@ -47,110 +47,110 @@
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation type="unfinished">&amp;Step up</translation>
+      <translation>&amp;Step up</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation type="unfinished">Step &amp;down</translation>
+      <translation>Step &amp;down</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation type="unfinished">Press</translation>
+      <translation>Πιέστε</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation type="unfinished">Increase</translation>
+      <translation>Αύξηση</translation>
     </message>
     <message>
       <source>Decrease</source>
-      <translation type="unfinished">Decrease</translation>
+      <translation>Μείωση</translation>
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation type="unfinished">ShowMenu</translation>
+      <translation>Εμφάνιση Μενού</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation type="unfinished">SetFocus</translation>
+      <translation>Ορισμός Εστίασης</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation type="unfinished">Toggle</translation>
+      <translation>Εναλλαγή</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Κύλιση Αριστερά</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Κύλιση Δεξιά</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Κύλιση Πάνω</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Κύλιση Κάτω</translation>
     </message>
     <message>
       <source>Previous Page</source>
-      <translation type="unfinished">Previous Page</translation>
+      <translation>Προηγούμενη Σελίδα</translation>
     </message>
     <message>
       <source>Next Page</source>
-      <translation type="unfinished">Next Page</translation>
+      <translation>Επόμενη Σελίδα</translation>
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation type="unfinished">Triggers the action</translation>
+      <translation>Ενεργοποιεί την ενέργεια</translation>
     </message>
     <message>
       <source>Increase the value</source>
-      <translation type="unfinished">Increase the value</translation>
+      <translation>Αύξηση της τιμής</translation>
     </message>
     <message>
       <source>Decrease the value</source>
-      <translation type="unfinished">Decrease the value</translation>
+      <translation>Μείωση της τιμής</translation>
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation type="unfinished">Shows the menu</translation>
+      <translation>Εμφανίζει το μενού</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation type="unfinished">Sets the focus</translation>
+      <translation>Ορίζει την εστίαση</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation type="unfinished">Toggles the state</translation>
+      <translation>Εναλλάσσει την κατάσταση</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation type="unfinished">Scrolls to the left</translation>
+      <translation>Κύλιση προς τα αριστερά</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation type="unfinished">Scrolls to the right</translation>
+      <translation>Κύλιση προς τα δεξιά</translation>
     </message>
     <message>
       <source>Scrolls up</source>
-      <translation type="unfinished">Scrolls up</translation>
+      <translation>Κύλιση προς τα πάνω</translation>
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation type="unfinished">Scrolls down</translation>
+      <translation>Κύλιση προς τα κάτω</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation type="unfinished">Goes back a page</translation>
+      <translation>Μετάβαση μιας σελίδας πίσω</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
-      <translation type="unfinished">Goes to the next page</translation>
+      <translation>Μετάβαση στην επόμενη σελίδα</translation>
     </message>
   </context>
   <context>
@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>Yes to All</source>
-      <translation type="unfinished">Yes to All</translation>
+      <translation>Ναι σε όλα</translation>
     </message>
     <message>
       <source>No</source>
@@ -169,14 +169,14 @@
     </message>
     <message>
       <source>No to All</source>
-      <translation type="unfinished">No to All</translation>
+      <translation>Όχι σε όλα</translation>
     </message>
   </context>
   <context>
     <name>QCocoaMenuItem</name>
     <message>
       <source>About Qt</source>
-      <translation type="unfinished">About Qt</translation>
+      <translation>Σχετικά με το Qt</translation>
     </message>
     <message>
       <source>About</source>
@@ -184,23 +184,23 @@
     </message>
     <message>
       <source>Config</source>
-      <translation type="unfinished">Config</translation>
+      <translation>Διαμόρφωση</translation>
     </message>
     <message>
       <source>Preference</source>
-      <translation type="unfinished">Preference</translation>
+      <translation>Προτίμηση</translation>
     </message>
     <message>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Επιλογές</translation>
     </message>
     <message>
       <source>Setting</source>
-      <translation type="unfinished">Setting</translation>
+      <translation>Ρύθμιση</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Ρύθμιση</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -231,83 +231,83 @@
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation type="unfinished">Don&apos;t Save</translation>
+      <translation>Να μην αποθηκευτεί</translation>
     </message>
   </context>
   <context>
     <name>QColorDialog</name>
     <message>
       <source>Hu&amp;e:</source>
-      <translation type="unfinished">Hu&amp;e:</translation>
+      <translation>Hu&amp;e:</translation>
     </message>
     <message>
       <source>&amp;Sat:</source>
-      <translation type="unfinished">&amp;Sat:</translation>
+      <translation>&amp;Sat:</translation>
     </message>
     <message>
       <source>&amp;Val:</source>
-      <translation type="unfinished">&amp;Val:</translation>
+      <translation>&amp;Val:</translation>
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation type="unfinished">&amp;Red:</translation>
+      <translation>&amp;Red:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
-      <translation type="unfinished">&amp;Green:</translation>
+      <translation>&amp;Green:</translation>
     </message>
     <message>
       <source>Bl&amp;ue:</source>
-      <translation type="unfinished">Bl&amp;ue:</translation>
+      <translation>Bl&amp;ue:</translation>
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation type="unfinished">A&amp;lpha channel:</translation>
+      <translation>A&amp;lpha channel:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
 Press ESC to cancel</source>
-      <translation type="unfinished">Cursor at %1, %2
-Press ESC to cancel</translation>
+      <translation>Δείκτης (Cursor) στο %1, %2
+Πατήστε ESC για ακύρωση</translation>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp;Επιλογή Χρώματος Οθόνης</translation>
     </message>
     <message>
       <source>Select Color</source>
-      <translation type="unfinished">Select Color</translation>
+      <translation>Επιλέξτε χρώμα</translation>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation type="unfinished">&amp;Basic colors</translation>
+      <translation>&amp;Βασικά χρώματα</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation type="unfinished">&amp;Custom colors</translation>
+      <translation>&amp;Προσαρμοσμένα χρώματα</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation type="unfinished">&amp;Add to Custom Colors</translation>
+      <translation>&amp;Προσθήκη σε προσαρμοσμένα χρώματα</translation>
     </message>
   </context>
   <context>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation type="unfinished">False</translation>
+      <translation>Ψευδές</translation>
     </message>
     <message>
       <source>True</source>
-      <translation type="unfinished">True</translation>
+      <translation>Αληθές</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>Άνοιγμα του αναδυόμενου μενού επιλογών του σύνθετου πλαισίου</translation>
     </message>
   </context>
   <context>
@@ -318,7 +318,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>π.μ.</translation>
     </message>
     <message>
       <source>PM</source>
@@ -333,7 +333,7 @@ Press ESC to cancel</translation>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Τι είναι αυτό;</translation>
     </message>
   </context>
   <context>
@@ -351,12 +351,12 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Μέγεθος</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Είδος</translation>
     </message>
     <message>
       <source>Type</source>
@@ -365,61 +365,61 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Ημερομηνία Τροποποίησης</translation>
     </message>
   </context>
   <context>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>Το αρχείο προορισμού είναι το ίδιο αρχείο.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation type="unfinished">Source file does not exist.</translation>
+      <translation>Το αρχείο προέλευσης δεν υπάρχει.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation type="unfinished">Destination file exists</translation>
+      <translation>Το αρχείο προορισμού υπάρχει</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
-      <translation type="unfinished">Error while renaming.</translation>
+      <translation>Σφάλμα κατά τη μετονομασία.</translation>
     </message>
     <message>
       <source>Unable to restore from %1: %2</source>
-      <translation type="unfinished">Unable to restore from %1: %2</translation>
+      <translation>Δεν είναι δυνατή η επαναφορά από %1: %2</translation>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>Δεν θα μετονομαστεί το διαδοχικό αρχείο κατά την αντιγραφή μπλοκ</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation type="unfinished">Cannot remove source file</translation>
+      <translation>Δεν είναι δυνατή η κατάργηση του αρχείου προέλευσης</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation type="unfinished">Cannot open %1 for input</translation>
+      <translation>Δεν είναι δυνατό το άνοιγμα του %1 για εισαγωγή</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
-      <translation type="unfinished">Cannot open for output</translation>
+      <translation>Δεν θα μετονομαστεί το διαδοχικό αρχείο κατά την αντιγραφή μπλοκ</translation>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation type="unfinished">Failure to write block</translation>
+      <translation>Αποτυχία εγγραφής μπλοκ</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation type="unfinished">Cannot create %1 for output</translation>
+      <translation>Δεν είναι δυνατή η δημιουργία του %1 για έξοδο</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation type="unfinished">Look in:</translation>
+      <translation>Δείτε σε:</translation>
     </message>
     <message>
       <source>Back</source>
@@ -431,51 +431,51 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation type="unfinished">Forward</translation>
+      <translation>Προώθηση</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation type="unfinished">Go forward</translation>
+      <translation>Μετάβαση Εμπρός</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation type="unfinished">Parent Directory</translation>
+      <translation>Γονικός Κατάλογος</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation type="unfinished">Go to the parent directory</translation>
+      <translation>Μετάβαση στον γονικό κατάλογο</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation type="unfinished">Create New Folder</translation>
+      <translation>Δημιουργία Νέου Φακέλου</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation type="unfinished">Create a New Folder</translation>
+      <translation>Δημιουργία ενός νέου φακέλου</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation type="unfinished">List View</translation>
+      <translation>Προβολή Λίστας</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation type="unfinished">Change to list view mode</translation>
+      <translation>Αλλαγή σε λειτουργία προβολής λίστας</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation type="unfinished">Detail View</translation>
+      <translation>Λεπτομερής προβολή</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation type="unfinished">Change to detail view mode</translation>
+      <translation>Αλλαγή σε λειτουργία λεπτομερούς προβολής</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation type="unfinished">Files of type:</translation>
+      <translation>Αρχεία τύπου:</translation>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation type="unfinished">Find Directory</translation>
+      <translation>Εύρεση Καταλόγου</translation>
     </message>
     <message>
       <source>Open</source>
@@ -483,15 +483,15 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation type="unfinished">Save As</translation>
+      <translation>Αποθήκευση Ως</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation type="unfinished">Directory:</translation>
+      <translation>Κατάλογος:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation type="unfinished">File &amp;name:</translation>
+      <translation>Όνομα &amp;αρχείο:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
@@ -499,7 +499,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation type="unfinished">&amp;Choose</translation>
+      <translation>&amp;Επιλογή</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -507,11 +507,11 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation type="unfinished">All Files (*)</translation>
+      <translation>Όλα τα αρχεία (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>Εμφάνιση </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
@@ -523,45 +523,45 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation type="unfinished">Show &amp;hidden files</translation>
+      <translation>Εμφάνιση &amp;κρυφών αρχείων</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation type="unfinished">&amp;New Folder</translation>
+      <translation>&amp;Νέος Φάκελος</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation type="unfinished">All files (*)</translation>
+      <translation>Όλα τα αρχεία (*)</translation>
     </message>
     <message>
       <source>Directories</source>
-      <translation type="unfinished">Directories</translation>
+      <translation>Φάκελοι</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation type="unfinished">%1
-Directory not found.
-Please verify the correct directory name was given.</translation>
+      <translation>Ο κατάλογος%1
+δεν βρέθηκε.
+Παρακαλώ επιβεβαιώστε ότι δόθηκε το σωστό όνομα καταλόγου.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation type="unfinished">%1 already exists.
-Do you want to replace it?</translation>
+      <translation>Το %1 υπάρχει ήδη.
+Θέλετε να το αντικαταστήσετε;</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-      <translation type="unfinished">%1
-File not found.
-Please verify the correct file name was given.</translation>
+      <translation>Το αρχείο %1
+δεν βρέθηκε.
+Παρακαλώ επιβεβαιώστε ότι δόθηκε το σωστό όνομα αρχείου.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation type="unfinished">New Folder</translation>
+      <translation>Νέος Φάκελος</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -570,20 +570,20 @@ Please verify the correct file name was given.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation>&apos;%1&apos; έχει προστασία εγγραφής.
+Θέλετε να το διαγράψετε ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>Είστε σίγουροι ότι θέλετε να διαγράψετε το &apos;%1&apos;;</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation type="unfinished">Could not delete directory.</translation>
+      <translation>Αδυναμία διαγραφής καταλόγου.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>Πρόσφατες Τοποθεσίες</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -591,67 +591,67 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Ο Υπολογιστής Μου</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>Αρχείο %1</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>Πλαϊνή μπάρα</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation type="unfinished">List of places and bookmarks</translation>
+      <translation>Λίστα με μέρη και σελιδοδείκτες</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation type="unfinished">Files</translation>
+      <translation>Αρχεία</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt+Left</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt+Right</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt+Up</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation type="unfinished">%1 TB</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation type="unfinished">%1 GB</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 MB</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 KB</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation type="unfinished">Invalid filename</translation>
+      <translation>Μη έγκυρο όνομα αρχείου</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;Το όνομα &quot;%1&quot; δεν μπορεί να χρησιμοποιηθεί.&lt;/b&gt;&lt;p&gt;Δοκιμάστε να χρησιμοποιήσετε ένα άλλο όνομα, με λιγότερους χαρακτήρες ή χωρίς σημεία στίξης.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -659,12 +659,12 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Μέγεθος</translation>
     </message>
     <message>
       <source>Kind</source>
       <comment>Match OS X Finder</comment>
-      <translation type="unfinished">Kind</translation>
+      <translation>Είδος</translation>
     </message>
     <message>
       <source>Type</source>
@@ -673,19 +673,19 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation type="unfinished">Date Modified</translation>
+      <translation>Ημερομηνία Τροποποίησης</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>Ο Υπολογιστής Μου</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation type="unfinished">Computer</translation>
+      <translation>Υπολογιστής</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 byte(s)</translation>
     </message>
   </context>
   <context>
@@ -708,7 +708,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation type="unfinished">Close without Saving</translation>
+      <translation>Κλείσιμο χωρίς αποθήκευση</translation>
     </message>
   </context>
   <context>
@@ -716,26 +716,26 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>QT_LAYOUT_DIRECTION</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation type="unfinished">Permission denied</translation>
+      <translation>Η άδεια απορρίφθηκε</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation type="unfinished">Too many open files</translation>
+      <translation>Πάρα πολλά ανοιχτά αρχεία</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation type="unfinished">No such file or directory</translation>
+      <translation>Δεν υπάρχει τέτοιο αρχείο ή κατάλογος</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation type="unfinished">No space left on device</translation>
+      <translation>Δεν υπάρχει χώρος στη συσκευή</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -743,26 +743,26 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation type="unfinished">file to open is a directory</translation>
+      <translation>το αρχείο που θα ανοίξει είναι ένας κατάλογος</translation>
     </message>
   </context>
   <context>
     <name>QImageReader</name>
     <message>
       <source>Invalid device</source>
-      <translation type="unfinished">Invalid device</translation>
+      <translation>Μη έγκυρη συσκευή</translation>
     </message>
     <message>
       <source>File not found</source>
-      <translation type="unfinished">File not found</translation>
+      <translation>Το αρχείο δεν βρέθηκε</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Μη υποστηριζόμενη μορφή εικόνας</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
-      <translation type="unfinished">Unable to read image data</translation>
+      <translation>Αδύνατη η ανάγνωση δεδομένων εικόνας</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -777,49 +777,49 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation type="unfinished">Device is not set</translation>
+      <translation>Η συσκευή δεν έχει ρυθμιστεί</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation type="unfinished">Device not writable</translation>
+      <translation>Η συσκευή δεν είναι εγγράψιμη</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation type="unfinished">Unsupported image format</translation>
+      <translation>Μη υποστηριζόμενη μορφή εικόνας</translation>
     </message>
   </context>
   <context>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation type="unfinished">Enter a value:</translation>
+      <translation>Εισάγετε μια τιμή:</translation>
     </message>
   </context>
   <context>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation type="unfinished">Press shortcut</translation>
+      <translation>Πατήστε τη συντόμευση</translation>
     </message>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Undo</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Redo</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -842,11 +842,11 @@ Do you want to delete it anyway?</translation>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation type="unfinished">Show Details...</translation>
+      <translation>Εμφάνιση λεπτομερειών...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation type="unfinished">Hide Details...</translation>
+      <translation>Απόκρυψη λεπτομερειών...</translation>
     </message>
     <message>
       <source>OK</source>
@@ -854,7 +854,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Βοήθεια</translation>
     </message>
   </context>
   <context>
@@ -869,7 +869,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Save All</source>
-      <translation type="unfinished">Save All</translation>
+      <translation>Αποθήκευση Όλων</translation>
     </message>
     <message>
       <source>Open</source>
@@ -881,7 +881,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation type="unfinished">Yes to &amp;All</translation>
+      <translation>Yes to &amp;All</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -889,7 +889,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation type="unfinished">N&amp;o to All</translation>
+      <translation>N&amp;o to All</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -901,7 +901,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Ignore</source>
-      <translation type="unfinished">Ignore</translation>
+      <translation>Παράβλεψη</translation>
     </message>
     <message>
       <source>Close</source>
@@ -917,7 +917,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Βοήθεια</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -929,7 +929,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Επαναφορά προεπιλογών</translation>
     </message>
   </context>
   <context>
@@ -943,112 +943,112 @@ Do you want to delete it anyway?</translation>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Όλα τα αρχεία (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation type="unfinished">Existing file %1 is not writable</translation>
+      <translation>Το υπάρχον αρχείο %1 δεν είναι εγγράψιμο</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation type="unfinished">Filename refers to a directory</translation>
+      <translation>Το όνομα αρχείου αναφέρεται σε έναν κατάλογο</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation type="unfinished">Writing canceled by application</translation>
+      <translation>Η εγγραφή ακυρώθηκε από την εφαρμογή</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation type="unfinished">Scroll here</translation>
+      <translation>Κύλιση εδώ</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation type="unfinished">Left edge</translation>
+      <translation>Αριστερή άκρη</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Πάνω</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation type="unfinished">Right edge</translation>
+      <translation>Δεξιά άκρη</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Κάτω</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation type="unfinished">Page left</translation>
+      <translation>Αριστερή σελίδα</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation type="unfinished">Page up</translation>
+      <translation>Σελίδα προς τα πάνω</translation>
     </message>
     <message>
       <source>Page right</source>
-      <translation type="unfinished">Page right</translation>
+      <translation>Σελίδα προς τα δεξιά</translation>
     </message>
     <message>
       <source>Page down</source>
-      <translation type="unfinished">Page down</translation>
+      <translation>Σελίδα προς τα κάτω</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation type="unfinished">Scroll left</translation>
+      <translation>Κύλιση αριστερά</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation type="unfinished">Scroll up</translation>
+      <translation>Κύλιση πάνω</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation type="unfinished">Scroll right</translation>
+      <translation>Κύλιση δεξιά</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation type="unfinished">Scroll down</translation>
+      <translation>Κύλιση κάτω</translation>
     </message>
   </context>
   <context>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation type="unfinished">Desktop</translation>
+      <translation>Επιφάνεια Εργασίας</translation>
     </message>
     <message>
       <source>Documents</source>
-      <translation type="unfinished">Documents</translation>
+      <translation>Έγγραφα</translation>
     </message>
     <message>
       <source>Fonts</source>
-      <translation type="unfinished">Fonts</translation>
+      <translation>Γραμματοσειρές</translation>
     </message>
     <message>
       <source>Applications</source>
-      <translation type="unfinished">Applications</translation>
+      <translation>Εφαρμογές</translation>
     </message>
     <message>
       <source>Music</source>
-      <translation type="unfinished">Music</translation>
+      <translation>Μουσική</translation>
     </message>
     <message>
       <source>Movies</source>
-      <translation type="unfinished">Movies</translation>
+      <translation>Ταινίες</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Εικονες</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation type="unfinished">Temporary Directory</translation>
+      <translation>Προσωρινός κατάλογος</translation>
     </message>
     <message>
       <source>Home</source>
@@ -1056,23 +1056,23 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Application Data</source>
-      <translation type="unfinished">Application Data</translation>
+      <translation>Δεδομένα Εφαρμογής</translation>
     </message>
     <message>
       <source>Application Configuration</source>
-      <translation type="unfinished">Application Configuration</translation>
+      <translation>Διαμόρφωση Εφαρμογής</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>Προσωρινή μνήμη</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>Κοινόχρηστα Δεδομένα</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>Χρόνος Εκτέλεσης</translation>
     </message>
     <message>
       <source>Configuration</source>
@@ -1080,11 +1080,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>Κοινόχρηστη διαμόρφωση</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation type="unfinished">Shared Cache</translation>
+      <translation>Κοινόχρηστη προσωρινή μνήμη</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1095,33 +1095,33 @@ Do you want to delete it anyway?</translation>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Κύλιση Αριστερά</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Κύλιση Δεξιά</translation>
     </message>
   </context>
   <context>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>Τι είναι αυτό;</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;Αναίρεση</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;Επαναφορά</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>Cu&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -1129,7 +1129,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>Αντιγραφή &amp;σύνδεση τοποθεσίας</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
@@ -1148,31 +1148,31 @@ Do you want to delete it anyway?</translation>
     <name>QAbstractFileIconProvider</name>
     <message>
       <source>Drive</source>
-      <translation type="unfinished">Drive</translation>
+      <translation>Μονάδα δίσκου</translation>
     </message>
     <message>
       <source>File</source>
-      <translation type="unfinished">File</translation>
+      <translation>Αρχείο</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation type="unfinished">File Folder</translation>
+      <translation>Φάκελος αρχείων</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Folder</translation>
+      <translation>Φάκελος</translation>
     </message>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>Ψευδώνυμο</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Shortcut</translation>
+      <translation>Συντόμευση</translation>
     </message>
     <message>
       <source>Unknown</source>

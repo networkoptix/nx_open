@@ -704,7 +704,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>%2 から %1 を切断しますか?</translation>
     </message>
   </context>
   <context>

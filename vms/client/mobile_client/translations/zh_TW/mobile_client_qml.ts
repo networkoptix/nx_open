@@ -704,7 +704,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>是否將 %1 從 %2 斷開？</translation>
     </message>
   </context>
   <context>
@@ -982,7 +982,7 @@
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>請選擇至少一個站點</translation>
     </message>
   </context>
   <context>

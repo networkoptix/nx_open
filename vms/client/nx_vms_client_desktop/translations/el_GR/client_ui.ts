@@ -13,11 +13,11 @@
     </message>
     <message>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Συντελεστές</translation>
     </message>
     <message>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>Πληροφορίες GPU</translation>
     </message>
     <message>
       <source>Support</source>
@@ -29,26 +29,26 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Βιβλιοθήκες ανοικτού κώδικα</translation>
     </message>
     <message>
       <source>Site Servers</source>
-      <translation type="unfinished">Site Servers</translation>
+      <translation>Διακομιστές Τοποθεσίας</translation>
     </message>
   </context>
   <context>
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Βελτίωση Εικόνας</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Ενεργοποίηση βελτίωσης εικόνας</translation>
     </message>
     <message>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -56,18 +56,18 @@
     </message>
     <message>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Επίπεδο μαύρου</translation>
     </message>
     <message>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Επίπεδο λευκού</translation>
     </message>
   </context>
   <context>
     <name>AdvancedSettingsWidget</name>
     <message>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Μετατροπή ήχου από 5.1 σε 2.1</translation>
     </message>
     <message>
       <source>Double Buffering</source>
@@ -79,11 +79,11 @@
     </message>
     <message>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Εκκαθάριση τοπικής προσωρινής μνήμης</translation>
     </message>
     <message>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Επαναφορά Όλων Των Προειδοποιήσεων</translation>
     </message>
     <message>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
@@ -91,23 +91,23 @@
     </message>
     <message>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Απενεργοποίηση θολώματος</translation>
     </message>
     <message>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Περιορισμός ρυθμού καρέ για εξοικονόμηση CPU</translation>
     </message>
     <message>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Χρήση Αποκωδικοποίησης Βίντεο Υλικού</translation>
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Επικύρωση πιστοποιητικού διακομιστή</translation>
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Διαχείριση Αρχείων Καταγραφής</translation>
     </message>
     <message>
       <source>Download</source>
@@ -123,27 +123,27 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
-      <translation type="unfinished">Open Files Folder</translation>
+      <translation>Άνοιγμα Φακέλου Αρχείων</translation>
     </message>
     <message>
       <source>with</source>
-      <translation type="unfinished">with</translation>
+      <translation>με</translation>
     </message>
     <message>
       <source>Simultaneous Streams</source>
-      <translation type="unfinished">Simultaneous Streams</translation>
+      <translation>Ταυτόχρονες Ροές</translation>
     </message>
     <message>
       <source>Disable multi-threaded decoding if unchecked, enable auto selection if checked.</source>
-      <translation type="unfinished">Disable multi-threaded decoding if unchecked, enable auto selection if checked.</translation>
+      <translation>Απενεργοποιήστε την αποκωδικοποίηση πολλαπλών νημάτων εάν δεν είναι επιλεγμένη, ενεργοποιήστε την αυτόματη επιλογή εάν είναι επιλεγμένη.</translation>
     </message>
     <message>
       <source>Allow Multi-Threaded Decoding</source>
-      <translation type="unfinished">Allow Multi-Threaded Decoding</translation>
+      <translation>Επίτρεψε Αποκωδικοποίηση Πολλαπλών Νημάτων</translation>
     </message>
   </context>
   <context>
@@ -154,15 +154,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Διατήρηση αρχείου για...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Μέγιστο</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Ελάχιστο</translation>
     </message>
   </context>
   <context>
@@ -212,7 +212,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Λεπτομέρειες</translation>
     </message>
     <message>
       <source>Audit Trail</source>
@@ -336,7 +336,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Περιγραφή</translation>
     </message>
     <message>
       <source>Timeout</source>
@@ -743,7 +743,7 @@
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Όλες Οι Κάμερες</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -813,7 +813,7 @@
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Σύνδεση...</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@
     <name>DeviceAdditionDialog</name>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>προς</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Αντικείμενα</translation>
     </message>
     <message>
       <source>Object type</source>
@@ -1076,7 +1076,7 @@
     <name>ExportSettingsDialog</name>
     <message>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Εξαγωγή Βίντεο</translation>
     </message>
     <message>
       <source>Single Camera</source>
@@ -1359,7 +1359,7 @@
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Περικοπή στην αναλογία διαστάσεων της οθόνης</translation>
     </message>
   </context>
   <context>
@@ -1492,7 +1492,7 @@
     <name>LogSettingsDialog</name>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Ενεργοποίηση</translation>
     </message>
     <message>
       <source>Logging Level</source>
@@ -1566,7 +1566,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -1578,7 +1578,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>Λήψη Πλήρους Αναφοράς</translation>
     </message>
   </context>
   <context>
@@ -1737,7 +1737,7 @@
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>προς</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -1893,7 +1893,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Λεπτομέρειες</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
@@ -1901,7 +1901,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Προεπισκόπηση</translation>
     </message>
     <message>
       <source>No preview available</source>
@@ -1935,14 +1935,14 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Προεπισκόπηση</translation>
     </message>
   </context>
   <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Σελιδοδείκτης</translation>
     </message>
   </context>
   <context>
@@ -2193,7 +2193,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -2205,7 +2205,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Αντικείμενα</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
@@ -2228,7 +2228,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>προς</translation>
     </message>
     <message>
       <source>Limit session duration</source>
@@ -2319,7 +2319,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Εκδόθηκε από</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
@@ -2327,7 +2327,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Λήγει</translation>
     </message>
     <message>
       <source>Certificate is expired</source>
@@ -2335,11 +2335,11 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Αποτυπώματα</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Λεπτομέρειες</translation>
     </message>
   </context>
   <context>
@@ -2490,7 +2490,7 @@ and click on the &quot;Search&quot; button</source>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(συνιστάται)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>

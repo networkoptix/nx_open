@@ -705,7 +705,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Afbryd forbindelsen til %1 fra %2?</translation>
     </message>
   </context>
   <context>

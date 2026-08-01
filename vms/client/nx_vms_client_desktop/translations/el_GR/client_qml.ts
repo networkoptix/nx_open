@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Χρήστες</translation>
     </message>
     <message>
       <source>Login Attribute</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Ειδοποιήσεις</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
@@ -151,7 +151,7 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ναι</translation>
     </message>
   </context>
   <context>
@@ -195,11 +195,11 @@
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Δεν υπάρχουν αντικείμενα</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να διαμορφώσετε την ανίχνευση αντικειμένων στις ρυθμίσεις του πρόσθετου της κάμερας</translation>
     </message>
   </context>
   <context>
@@ -222,11 +222,11 @@
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Δεν υπάρχουν αντικείμενα</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να διαμορφώσετε την ανίχνευση αντικειμένων στις ρυθμίσεις του πρόσθετου της κάμερας</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -359,7 +359,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Επικόλληση</translation>
     </message>
   </context>
   <context>
@@ -426,11 +426,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ναι</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Όχι</translation>
     </message>
   </context>
   <context>
@@ -550,14 +550,14 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Σύνδεση με Διακομιστή</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Σύνδεση με Διακομιστή</translation>
     </message>
   </context>
   <context>
@@ -588,7 +588,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Σύνδεση...</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
@@ -686,15 +686,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Αποκοπή</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Αντιγραφή</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Επικόλληση</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -820,7 +820,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
   </context>
   <context>
@@ -1030,7 +1030,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Πόροι</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1057,7 +1057,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Περιγραφή</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -1080,7 +1080,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Πόροι</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1103,7 +1103,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Περιγραφή</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1115,7 +1115,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Χρήστες</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -1142,7 +1142,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupMembersTab</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Χρήστες</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1439,7 +1439,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Χρήστες</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1539,19 +1539,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ναι</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Όχι</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Παρόν</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Απουσία</translation>
     </message>
     <message>
       <source>value</source>
@@ -1586,7 +1586,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Προεπισκόπηση</translation>
     </message>
     <message>
       <source>Import</source>
@@ -1641,7 +1641,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Εξαγωγή</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -1774,11 +1774,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Παρόν</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Απουσία</translation>
     </message>
   </context>
   <context>
@@ -1800,7 +1800,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Αντικείμενα</translation>
     </message>
   </context>
   <context>
@@ -2072,7 +2072,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Αντιγραφή</translation>
     </message>
     <message>
       <source>Filter by</source>
@@ -2098,7 +2098,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -2194,11 +2194,11 @@ Press Alt + Click to follow object</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>από</translation>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>προς</translation>
     </message>
   </context>
   <context>
@@ -2209,7 +2209,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Δευτερεύων τύπος</translation>
     </message>
   </context>
   <context>
@@ -2442,7 +2442,7 @@ Press Alt + Click to follow object</translation>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Ειδοποιήσεις</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -2458,7 +2458,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Αντικείμενα</translation>
     </message>
   </context>
   <context>
@@ -2598,7 +2598,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Ενεργοποίηση</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -2629,7 +2629,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Χωρίς δεδομένα</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -2645,7 +2645,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Δεν υπάρχουν αρκετές άδειες</translation>
     </message>
     <message>
       <source>Server unavailable</source>
@@ -2661,7 +2661,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Πάρα πολλές συνδέσεις</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
@@ -2669,15 +2669,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Απαιτείται κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Δεν υπάρχει ζωντανή ροή</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Μη υποστηριζόμενη έκδοση υλικολογισμικού</translation>
     </message>
   </context>
   <context>
@@ -2850,7 +2850,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Πόροι</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -2952,7 +2952,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Πόροι</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -3103,7 +3103,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>Δημιουργία αντιγράφου</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -3135,7 +3135,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Ενεργοποίηση</translation>
     </message>
     <message>
       <source>Disable</source>

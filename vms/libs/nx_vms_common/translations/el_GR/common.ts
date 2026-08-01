@@ -1243,7 +1243,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Ημέρα</translation>
     </message>
     <message>
       <source>Wks</source>
@@ -1374,7 +1374,7 @@
     </message>
     <message>
       <source>Days</source>
-      <translation type="unfinished">Days</translation>
+      <translation>Ημέρα</translation>
     </message>
     <message>
       <source>Weeks</source>

@@ -13,7 +13,7 @@
     <message>
       <source>On %1 --&gt; %2</source>
       <comment>%1 is the event name, %2 is the action name</comment>
-      <translation type="unfinished">On %1 --&gt; %2</translation>
+      <translation>Στις %1 --&gt; %2</translation>
     </message>
   </context>
   <context>
@@ -41,15 +41,15 @@
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Άγνωστο συμβάν</translation>
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Άγνωστη ενέργεια</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Οποιοδήποτε γεγονός</translation>
     </message>
     <message>
       <source>Analytics events</source>
@@ -125,7 +125,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Προς</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -254,7 +254,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Περιγραφή</translation>
     </message>
     <message>
       <source>Source</source>
@@ -559,7 +559,7 @@
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Camera Recording</source>
