@@ -5,22 +5,22 @@
     <name>ApiErrorStrings</name>
     <message>
       <source>Invalid JSON content.</source>
-      <translation type="unfinished">Invalid JSON content.</translation>
+      <translation>Μη έγκυρο περιεχόμενο JSON.</translation>
     </message>
     <message>
       <source>Unsupported content type.</source>
-      <translation type="unfinished">Unsupported content type.</translation>
+      <translation>Μη υποστηριζόμενος τύπος περιεχομένου.</translation>
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>Μη υποστηριζόμενη κωδικοποίηση χαρακτήρων.</translation>
     </message>
   </context>
   <context>
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist or is unable to login.</source>
-      <translation type="unfinished">This user does not exist or is unable to login.</translation>
+      <translation>Αυτός ο χρήστης δεν υπάρχει ή δεν μπορεί να συνδεθεί.</translation>
     </message>
     <message>
       <source>Wrong password</source>
@@ -28,107 +28,107 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>Ο κωδικός πρόσβασης έχει λήξει. Επικοινωνήστε με τον διαχειριστή της τοποθεσίας σας.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>Ο διακομιστής LDAP δεν είναι προσβάσιμος. Παρακαλώ δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>Το %1 δεν είναι ακόμη προσβάσιμο. Δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Αυτός ο χρήστης έχει απενεργοποιηθεί από το διαχειριστή της τοποθεσίας.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Ο χρήστης είναι κλειδωμένος λόγω πολλών αποτυχημένων προσπαθειών. Παρακαλώ προσπαθήστε ξανά αργότερα.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Αυτή η μέθοδος εξουσιοδότησης απαγορεύεται. Επικοινωνήστε με τον διαχειριστή της τοποθεσίας σας.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Το κλειδί συνεδρίας δεν είναι έγκυρο ή έχει λήξει.</translation>
     </message>
     <message>
       <source>The ticket key is invalid or expired.</source>
-      <translation type="unfinished">The ticket key is invalid or expired.</translation>
+      <translation>Το κλειδί ticket δεν είναι έγκυρο ή έχει λήξει.</translation>
     </message>
     <message>
       <source>More than one user with the same login are presented.</source>
-      <translation type="unfinished">More than one user with the same login are presented.</translation>
+      <translation>Παρουσιάζονται περισσότεροι από ένας χρήστες με τα ίδια στοιχεία σύνδεσης.</translation>
     </message>
     <message>
       <source>Unable to verify LDAP server SSL/TLS certificate.</source>
-      <translation type="unfinished">Unable to verify LDAP server SSL/TLS certificate.</translation>
+      <translation>Δεν είναι δυνατή η επαλήθευση του πιστοποιητικού SSL/TLS του διακομιστή LDAP.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Εσωτερικό σφάλμα διακομιστή (%1). Επικοινωνήστε με τον διαχειριστή της τοποθεσίας σας.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>Το αίτημα δεν είναι εξουσιοδοτημένο λόγω άγνωστου σφάλματος.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>Το κλειδί συνεδρίας είναι πολύ παλιό για αυτή τη τοποθεσία.</translation>
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
-      <translation type="unfinished">No credentials provided when required by endpoint.</translation>
+      <translation>Δεν παρέχθηκαν διαπιστευτήρια ενώ απαιτούνταν από το τελικό σημείο (endpoint).</translation>
     </message>
   </context>
   <context>
     <name>Result</name>
     <message>
       <source>Missing required parameter: %1.</source>
-      <translation type="unfinished">Missing required parameter: %1.</translation>
+      <translation>Λείπει η απαιτούμενη παράμετρος: %1.</translation>
     </message>
     <message>
       <source>Failed to process request.</source>
-      <translation type="unfinished">Failed to process request.</translation>
+      <translation>Αποτυχία επεξεργασίας του αιτήματος.</translation>
     </message>
     <message>
       <source>Forbidden.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Forbidden.</translation>
+      <translation>Απαγορεύεται.</translation>
     </message>
     <message>
       <source>Conflict.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Conflict.</translation>
+      <translation>Σύγκρουση (Conflict).</translation>
     </message>
     <message>
       <source>Bad request.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Εσφαλμένο αίτημα.</translation>
     </message>
     <message>
       <source>Not implemented.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not implemented.</translation>
+      <translation>Δεν έχει υλοποιηθεί.</translation>
     </message>
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Δε βρέθηκε.</translation>
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>Εσωτερικό σφάλμα.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
-      <translation type="unfinished">Unsupported media type.</translation>
+      <translation>Μη υποστηριζόμενος τύπος πολυμέσων.</translation>
     </message>
     <message>
       <source>Service unavailable.</source>
-      <translation type="unfinished">Service unavailable.</translation>
+      <translation>Η υπηρεσία δεν είναι διαθέσιμη.</translation>
     </message>
     <message>
       <source>Unauthorized.</source>
@@ -140,33 +140,33 @@
     </message>
     <message>
       <source>Session authorization required.</source>
-      <translation type="unfinished">Session authorization required.</translation>
+      <translation>Απαιτείται εξουσιοδότηση συνεδρίας.</translation>
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>Η συνεδρία είναι πολύ παλιά σύμφωνα με τη διαμόρφωση της τοποθεσίας.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>Ο πόρος δεν υπάρχει πλέον στον διακομιστή.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not allowed.</translation>
+      <translation>Δεν επιτρέπεται.</translation>
     </message>
     <message>
       <source>Invalid parameter `%1`: %2</source>
       <comment>%1 is name, %2 is value.</comment>
-      <translation type="unfinished">Invalid parameter `%1`: %2</translation>
+      <translation>Μη έγκυρη παράμετρος `%1`: %2</translation>
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Μη εξουσιοδοτημένη υπηρεσία.</translation>
     </message>
     <message>
       <source>Insufficient storage.</source>
-      <translation type="unfinished">Insufficient storage.</translation>
+      <translation>Ανεπαρκής αποθηκευτικός χώρος.</translation>
     </message>
   </context>
 </TS>

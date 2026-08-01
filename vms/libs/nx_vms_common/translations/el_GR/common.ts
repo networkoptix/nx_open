@@ -888,7 +888,7 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
@@ -999,16 +999,16 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n Κάμερες</numerusform>
+        <numerusform>%n Κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n κάμερες</numerusform>
+        <numerusform>%n κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1129,7 +1129,7 @@
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>ελάχιστο</translation>
     </message>
     <message>
       <source>hrs</source>
@@ -1233,7 +1233,7 @@
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>Ελάχιστο</translation>
     </message>
     <message>
       <source>Hrs</source>
@@ -1381,7 +1381,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Νέα τοποθεσία</translation>
     </message>
   </context>
   <context>
@@ -1424,7 +1424,7 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>Εσωτερικό σφάλμα</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
