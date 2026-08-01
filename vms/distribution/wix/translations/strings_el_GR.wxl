@@ -1,71 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1253" Language="1032" Culture="el-gr">
-  <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
+  <String Id="Caption">Ρύθμιση [WixBundleName] - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - εγκαθιστά, επιδιορθώνει, απεγκαθιστά ή δημιουργεί ένα πλήρες τοπικό αντίγραφο του πακέτου στον καθορισμένο κατάλογο. Η εγκατάσταση είναι η προεπιλεγμένη επιλογή.
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/passive | /quiet - εμφανίζει ελάχιστο περιβάλλον χρήστη χωρίς μηνύματα επιβεβαίωσης ή δεν εμφανίζει καθόλου περιβάλλον χρήστη και μηνύματα επιβεβαίωσης. Από προεπιλογή εμφανίζονται το περιβάλλον χρήστη και όλα τα μηνύματα επιβεβαίωσης.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
-  <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
-  <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
-  <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
-  <String Id="HelpHeader">Setup Help</String>
+/norestart - αποτρέπει οποιαδήποτε προσπάθεια επανεκκίνησης. Από προεπιλογή, το περιβάλλον χρήστη ζητά επιβεβαίωση πριν από την επανεκκίνηση.
+/log log.txt - καταγράφει τις πληροφορίες σε συγκεκριμένο αρχείο. Από προεπιλογή δημιουργείται αρχείο καταγραφής στον φάκελο %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Είστε βέβαιοι ότι θέλετε να ακυρώσετε;</String>
+  <String Id="ClientAndServer">Client και διακομιστής</String>
+  <String Id="ClientOnly">Μόνο Client</String>
+  <String Id="ClientOnlyDesc">Η εφαρμογή Client χρησιμοποιείται για την προβολή βίντεο και τη διαχείριση του Συστήματος</String>
+  <String Id="ServerOnly">Μόνο με Διακομιστή</String>
+  <String Id="ServerOnlyDesc">Η εφαρμογή Διακομιστή χρησιμοποιείται για την αποθήκευση πληροφοριών και αρχείων συστήματος</String>
+  <String Id="HelpHeader">Βοήθεια Εγκατάστασης</String>
   <String Id="HelpCloseButton">Κλείσιμο</String>
-  <String Id="InstallOptionsButton">Options</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallOptionsButton">Επιλογές</String>
+  <String Id="InstallInstallButton">Εγκατάσταση</String>
   <String Id="InstallCloseButton">Κλείσιμο</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
-  <String Id="InstallLicenseLinkText">End User License Agreement</String>
-  <String Id="OptionsHeader">Setup Options</String>
-  <String Id="OptionsLocationLabel">Install location:</String>
-  <String Id="OptionsBrowseButton">Browse</String>
+  <String Id="InstallAcceptCheckbox">Συμφωνώ με τoυς</String>
+  <String Id="InstallLicenseLinkText">Άδεια χρήσης τελικού χρήστη</String>
+  <String Id="OptionsHeader">Επιλογές Εγκατάστασης</String>
+  <String Id="OptionsLocationLabel">Τοποθεσία εγκατάστασης:</String>
+  <String Id="OptionsBrowseButton">Περιήγηση</String>
   <String Id="OptionsOkButton">ΟΚ</String>
   <String Id="OptionsCancelButton">Ακύρωση</String>
-  <String Id="ProgressHeader">Setup Progress</String>
+  <String Id="ProgressHeader">Πρόοδος Εγκατάστασης</String>
   <String Id="ProgressLabel">Γίνεται επεξεργασία...</String>
-  <String Id="OverallProgressPackageText">Initializing...</String>
+  <String Id="OverallProgressPackageText">Αρχικοποίηση...</String>
   <String Id="ProgressCancelButton">Ακύρωση</String>
-  <String Id="ModifyHeader">Modify Setup</String>
-  <String Id="ModifyRepairButton">Repair</String>
-  <String Id="ModifyUninstallButton">Uninstall</String>
+  <String Id="ModifyHeader">Τροποποίηση Εγκατάστασης</String>
+  <String Id="ModifyRepairButton">Επιδιόρθωση</String>
+  <String Id="ModifyUninstallButton">Απεγκατάσταση</String>
   <String Id="ModifyCloseButton">Κλείσιμο</String>
-  <String Id="SuccessHeader">Setup Successful</String>
-  <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
-  <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
-  <String Id="SuccessLaunchButton">Launch</String>
-  <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
+  <String Id="SuccessHeader">Επιτυχής Εγκατάσταση</String>
+  <String Id="SuccessUninstallHeader">Η Απεγκατάσταση Ολοκληρώθηκε Επιτυχώς</String>
+  <String Id="SuccessInstallHeader">Η Εγκατάσταση Ολοκληρώθηκε Επιτυχώς</String>
+  <String Id="SuccessLaunchButton">Εκκίνηση</String>
+  <String Id="SuccessRestartText">Πρέπει να επανεκκινήσετε τον υπολογιστή σας πριν χρησιμοποιήσετε το λογισμικό</String>
   <String Id="SuccessRestartButton">Επανεκκίνηση</String>
   <String Id="SuccessCloseButton">Κλείσιμο</String>
-  <String Id="FailureHeader">Setup Failed</String>
-  <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the</String>
-  <String Id="FailureHyperlinkLogTextLink">log file</String>
-  <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software</String>
+  <String Id="FailureHeader">Η εγκατάσταση απέτυχε</String>
+  <String Id="FailureHyperlinkLogText">Ένα ή περισσότερα προβλήματα προκάλεσαν την αποτυχία της εγκατάστασης. Διορθώστε τα προβλήματα και, στη συνέχεια, προσπαθήστε ξανά να τα εγκαταστήσετε. Για περισσότερες πληροφορίες, ανατρέξτε στο</String>
+  <String Id="FailureHyperlinkLogTextLink">αρχείο καταγραφής</String>
+  <String Id="FailureRestartText">Πρέπει να επανεκκινήσετε τον υπολογιστή σας για να ολοκληρώσετε την επαναφορά του λογισμικού</String>
   <String Id="FailureRestartButton">Επανεκκίνηση</String>
   <String Id="FailureCloseButton">Κλείσιμο</String>
-  <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
-  <String Id="FilesInUseHeader">Files In Use</String>
-  <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
-  <String Id="FilesInUseCloseRadioButton">Close the applications and attempt to restart them</String>
-  <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
+  <String Id="WillInstall">Το [WixBundleName] θα εγκατασταθεί στη συσκευή σας</String>
+  <String Id="FilesInUseHeader">Αρχεία Σε Χρήση</String>
+  <String Id="FilesInUseLabel">Οι ακόλουθες εφαρμογές θα πρέπει να διακοπούν για να συνεχιστεί η εγκατάσταση:</String>
+  <String Id="FilesInUseCloseRadioButton">Κλείστε τις εφαρμογές και προσπαθήστε να τις επανεκκινήσετε</String>
+  <String Id="FilesInUseDontCloseRadioButton">Μην κλείσετε τις εφαρμογές. Απαιτείται επανεκκίνηση</String>
   <String Id="FilesInUseOkButton">ΟΚ</String>
   <String Id="FilesInUseCancelButton">Ακύρωση</String>
-  <String Id="Options">Options</String>
-  <String Id="SelectApps">Select applications to be installed:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="Options">Επιλογές</String>
+  <String Id="SelectApps">Επιλέξτε εφαρμογές που θα εγκατασταθούν:</String>
+  <String Id="msierrFirewallCannotConnect">Δεν είναι δυνατή η σύνδεση με το Τείχος προστασίας των Windows (Windows Firewall). ([2] [3] [4] [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Ρύθμιση Του Τείχους Προστασίας Των Windows (Windows Firewall). </String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Ρύθμιση Του Τείχους Προστασίας Των Windows (Windows Firewall). </String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Επαναφορά ρυθμίσεων του Τείχους προστασίας των Windows (Windows Firewall).</String>
+  <String Id="WixExecFirewallExceptionsInstall">Εγκατάσταση ρυθμίσεων του Τείχους προστασίας των Windows (Windows Firewall).</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Επαναφορά ρυθμίσεων του Τείχους προστασίας των Windows (Windows Firewall).</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Κατάργηση ρυθμίσεων του Τείχους προστασίας των Windows (Windows Firewall).</String>
+  <String Id="Product_ArchMismatch_x86">Αυτό το πακέτο έχει σχεδιαστεί για λειτουργικό σύστημα 32-bit. Η εγκατάσταση θα τερματιστεί τώρα.</String>
+  <String Id="Product_ArchMismatch_x64">Αυτό το πακέτο έχει σχεδιαστεί για λειτουργικό σύστημα 64-bit. Η εγκατάσταση θα τερματιστεί τώρα.</String>
 </WixLocalization>
