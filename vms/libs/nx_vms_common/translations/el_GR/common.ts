@@ -1236,7 +1236,7 @@
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>Ημέρα</translation>
     </message>
     <message>
       <source>Wks</source>
