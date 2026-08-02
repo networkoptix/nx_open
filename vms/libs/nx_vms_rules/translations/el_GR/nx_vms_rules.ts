@@ -974,7 +974,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Επικεφαλίδα</translation>
     </message>
     <message>
       <source>Body</source>

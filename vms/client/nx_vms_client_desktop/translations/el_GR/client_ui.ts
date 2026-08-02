@@ -384,7 +384,7 @@
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Επαναφορά προεπιλογών</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Ανίχνευση κίνησης</translation>
     </message>
     <message>
       <source>Media Streaming</source>
@@ -416,7 +416,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Αυτόματη δημιουργία</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -550,7 +550,7 @@
     <name>CameraInfoWidget</name>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Μοντέλο</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Διεύθυνση IP</translation>
     </message>
     <message>
       <source>Ping</source>
@@ -627,7 +627,7 @@
     <name>CameraMotionSettingsWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Ανίχνευση κίνησης</translation>
     </message>
     <message>
       <source>Sensitivity</source>
@@ -878,7 +878,7 @@
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Σταμάτα</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -1166,7 +1166,7 @@
     <name>ImageOverlaySettingsWidget</name>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Εικόνα</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1174,11 +1174,11 @@
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Μέγεθος</translation>
     </message>
     <message>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Διαφάνεια</translation>
     </message>
     <message>
       <source>Default</source>
@@ -1266,7 +1266,7 @@
     </message>
     <message>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Διαφάνεια:</translation>
     </message>
     <message>
       <source>Height:</source>
@@ -1297,7 +1297,7 @@
     </message>
     <message>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Αυτόματη δημιουργία</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1305,7 +1305,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Ελάχιστο μέγεθος πλέγματος</translation>
     </message>
   </context>
   <context>
@@ -1393,7 +1393,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Αναγνωριστικό υλικού</translation>
     </message>
   </context>
   <context>
@@ -1512,7 +1512,7 @@
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Εικόνα</translation>
     </message>
     <message>
       <source>Mode</source>
@@ -1594,7 +1594,7 @@
     </message>
     <message>
       <source>Browse</source>
-      <translation type="unfinished">Browse</translation>
+      <translation>Περιήγηση</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -1882,7 +1882,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Αναπαραγωγή</translation>
     </message>
     <message>
       <source>Add...</source>
@@ -1890,7 +1890,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Μετονομασία...</translation>
     </message>
     <message>
       <source>Delete...</source>
@@ -2038,11 +2038,11 @@ and click on the &quot;Search&quot; button</source>
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Επαναλάβετε Τον Κωδικό Πρόσβασης</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Οι κωδικοί πρόσβασης δεν αντιστοιχούν μεταξύ τους</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2107,7 +2107,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Κίνηση + Lo-Res</translation>
     </message>
     <message>
       <source>Do Not Record</source>
@@ -2287,7 +2287,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Διεύθυνση IP</translation>
     </message>
     <message>
       <source>Port</source>
@@ -2525,7 +2525,7 @@ and click on the &quot;Search&quot; button</source>
     <name>VirtualCameraMotionWidget</name>
     <message>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Ανίχνευση κίνησης</translation>
     </message>
     <message>
       <source>Detect motion</source>
@@ -2655,7 +2655,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Διαφάνεια</translation>
     </message>
     <message>
       <source>Frequency</source>
