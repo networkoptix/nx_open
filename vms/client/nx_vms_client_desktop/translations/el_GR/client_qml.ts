@@ -400,7 +400,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Απενεργοποιημένο</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -667,7 +667,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Κλειδί</translation>
     </message>
     <message>
       <source>Value</source>
@@ -969,7 +969,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Μέγεθος</translation>
     </message>
     <message>
       <source>X Offset</source>
@@ -1025,7 +1025,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupCreateDialog</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Νέα Ομάδα</translation>
     </message>
     <message>
       <source>General</source>
@@ -1056,7 +1056,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupCreateTab</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Νέα Ομάδα</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1339,7 +1339,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Εναλλαγή Σίγασης</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -1347,11 +1347,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Παύση</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Αναπαραγωγή</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -1577,7 +1577,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Αρχείο:</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1918,7 +1918,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Νέος κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>Confirm password</source>
@@ -1926,7 +1926,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Οι κωδικοί πρόσβασης δεν αντιστοιχούν μεταξύ τους</translation>
     </message>
   </context>
   <context>
@@ -2219,7 +2219,7 @@ Press Alt + Click to follow object</translation>
     <name>RemoteAccess</name>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Απενεργοποιημένο</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
@@ -2384,7 +2384,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>ΧΩΡΙΣ ΔΕΔΟΜΕΝΑ</translation>
     </message>
     <message>
       <source>OUTDATED</source>
@@ -2392,7 +2392,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>ΧΩΡΙΣ ΠΡΟΣΒΑΣΗ</translation>
     </message>
   </context>
   <context>
@@ -2780,11 +2780,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Απόκρυψη</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Εμφάνιση</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2803,19 +2803,19 @@ Press Alt + Click to follow object</translation>
     <name>TimeSelector</name>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Οποιαδήποτε στιγμή</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Τελευταία μέρα</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Τελευταίες 7 ημέρες</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Τελευταίες 30 ημέρες</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -2928,7 +2928,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Οι κωδικοί πρόσβασης δεν αντιστοιχούν μεταξύ τους</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
