@@ -353,7 +353,7 @@ void StartupActionsHandler::handleStartupParameters()
         }
     }
 
-    connectToCloudIfNeeded(startupParameters);
+    const bool connectingToCloud = connectToCloudIfNeeded(startupParameters);
     const bool connectingToSystem = connectToSystemIfNeeded(startupParameters, haveInputFiles);
 
     if (!startupParameters.videoWallGuid.isNull())
@@ -378,7 +378,8 @@ void StartupActionsHandler::handleStartupParameters()
         d->delayedDrops.raw = QByteArray::fromBase64(startupParameters.delayedDrop.toLatin1());
     }
 
-    if (connectingToSystem && startupParameters.customUri.isValid())
+    // The cloud credentials are present, so do not require them in the URI.
+    if (connectingToSystem && startupParameters.customUri.isValid(!connectingToCloud))
     {
         d->delayedDrops.resourceIds = startupParameters.customUri.resourceIds;
         d->delayedDrops.timeStampMs = startupParameters.customUri.timestamp;
