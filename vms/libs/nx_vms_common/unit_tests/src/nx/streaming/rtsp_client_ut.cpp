@@ -367,9 +367,10 @@ TEST_P(RtspBadMessages, RecoversFromBadMessages)
     std::unique_ptr socket = std::invoke(
         [streamData]
         {
+            using namespace nx::network;
             std::unique_ptr socket = std::make_unique<AppendableBufferSocket>(streamData);
             EXPECT_TRUE(socket->connect(
-                nx::network::SocketAddress(nx::network::HostAddress::localhost, 554),
+                SocketAddress(HostAddress::localhost, rtsp::DEFAULT_RTSP_PORT),
                 std::chrono::milliseconds::zero()));
             return socket;
         });

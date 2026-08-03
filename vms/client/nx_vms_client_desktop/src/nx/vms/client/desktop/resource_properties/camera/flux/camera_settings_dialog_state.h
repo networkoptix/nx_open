@@ -15,6 +15,7 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/core/resource/using_media2_type.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/url.h>
@@ -339,9 +340,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
         UserEditableMultiple<int> customWebPagePort;
 
-        static constexpr int kDefaultRtspPort = 554;
         UserEditableMultiple<int> customMediaPort;
-        int customMediaPortDisplayValue = kDefaultRtspPort;
+        int customMediaPortDisplayValue = nx::network::rtsp::DEFAULT_RTSP_PORT;
         bool areOnvifSettingsApplicable = false;
         UserEditableMultiple<bool> trustCameraTime;
         UserEditableMultiple<QString> forcedPrimaryProfile;
