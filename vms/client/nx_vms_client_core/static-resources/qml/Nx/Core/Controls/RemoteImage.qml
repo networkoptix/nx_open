@@ -71,8 +71,7 @@ Item
             id: image
 
             readonly property bool isError: !!remoteImage.imagePath
-                && image.status !== Image.Loading
-                && image.paintedWidth === 0
+                && image.status === Image.Error
 
             anchors.fill: imageHolder
             verticalAlignment: Qt.AlignVCenter

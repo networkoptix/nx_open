@@ -96,9 +96,14 @@ public:
         if (!m_watcher)
             return "Request canceled";
 
-        return NX_ASSERT(m_watcher->isFinished())
-            ? std::get<QString>(m_watcher->result())
-            : QString{};
+        if (!NX_ASSERT(m_watcher->isFinished()))
+            return {};
+
+        const auto& [image, error] = m_watcher->result();
+        if (!error.isEmpty())
+            return error;
+
+        return image.isNull() ? "Empty image received" : QString{};
     }
 
     virtual void cancel()
