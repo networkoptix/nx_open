@@ -9,6 +9,7 @@
 
 #include <core/ptz/ptz_constants.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/types/motion_types.h>
 #include <nx/vms/api/types/rtp_types.h>
@@ -44,8 +45,6 @@ void activateLayouts(const std::initializer_list<QWidget*>& widgets)
             layout->activate();
     }
 }
-
-static const int kDefaultRtspPort = 554;
 
 static constexpr qreal kSensitivitySliderResolution = 1000.0;
 
@@ -634,7 +633,7 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     {
         ui->customMediaPortSpinBox->setValue(
             state.expert.customMediaPort() == 0
-                ? kDefaultRtspPort
+                ? nx::network::rtsp::DEFAULT_RTSP_PORT
                 : state.expert.customMediaPortDisplayValue);
     }
     else

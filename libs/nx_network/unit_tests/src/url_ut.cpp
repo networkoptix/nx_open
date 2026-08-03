@@ -3,15 +3,26 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/url/url_parse_helper.h>
 
 namespace nx::network::url::test {
 
 TEST(UrlGetEndpoint, defaultPortCorrespondsToUrlScheme)
 {
-    ASSERT_EQ(80, getEndpoint(nx::Url("http://host/path")).port);
-    ASSERT_EQ(443, getEndpoint(nx::Url("https://host/path")).port);
-    ASSERT_EQ(554, getEndpoint(nx::Url("rtsp://host/path")).port);
+    ASSERT_EQ(
+        nx::network::http::DEFAULT_HTTP_PORT,
+        getEndpoint(nx::Url("http://host/path")).port);
+    ASSERT_EQ(
+        nx::network::http::DEFAULT_HTTPS_PORT,
+        getEndpoint(nx::Url("https://host/path")).port);
+    ASSERT_EQ(
+        nx::network::rtsp::DEFAULT_RTSP_PORT,
+        getEndpoint(nx::Url("rtsp://host/path")).port);
+    ASSERT_EQ(
+        nx::network::rtsp::DEFAULT_RTSPS_PORT,
+        getEndpoint(nx::Url("rtsps://host/path")).port);
 }
 
 TEST(Url, joinPath)

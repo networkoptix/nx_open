@@ -32,8 +32,6 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 
-#define DEFAULT_RTP_PORT 554
-
 static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const std::chrono::seconds kDefaultTcpConnectionTimeout(5);
 static const int SDP_TRACK_STEP = 2;
@@ -491,11 +489,9 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::Url& url, qint64 startTim
             nx::network::ssl::kAcceptAnyCertificate, isSslRequired, m_natTraversal));
 
         m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
-        nx::network::SocketAddress targetAddress;
-        if (m_proxyAddress)
-            targetAddress = *m_proxyAddress;
-        else
-            targetAddress = nx::network::url::getEndpoint(m_url, DEFAULT_RTP_PORT);
+        const nx::network::SocketAddress targetAddress =
+            m_proxyAddress.value_or(
+                nx::network::url::getEndpoint(m_url, nx::network::rtsp::DEFAULT_RTSP_PORT));
 
         if (!m_tcpSock->connect(targetAddress, m_tcpConnectionTimeout))
             return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
@@ -1975,7 +1971,7 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
         addAdditionAttrs(&request);
 
     NX_VERBOSE(this, "Send: %1", request.requestLine.toString());
-    const int port = m_url.port(DEFAULT_RTP_PORT);
+    const int port = m_url.port(nx::network::rtsp::DEFAULT_RTSP_PORT);
 
     if (!m_tcpSock)
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
