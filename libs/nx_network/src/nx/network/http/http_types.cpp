@@ -66,18 +66,18 @@ bool readHeader(
     return true;
 }
 
-HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
+HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, HttpHeader newHeader)
 {
     auto existingHeaderIter = headers->lower_bound(newHeader.first);
     if ((existingHeaderIter != headers->end()) &&
         (nx::utils::stricmp(existingHeaderIter->first, newHeader.first) == 0))
     {
-        existingHeaderIter->second = newHeader.second;  //replacing header
+        existingHeaderIter->second = std::move(newHeader.second);  //replacing header
         return existingHeaderIter;
     }
     else
     {
-        return headers->insert(existingHeaderIter, newHeader);
+        return headers->insert(existingHeaderIter, std::move(newHeader));
     }
 }
 

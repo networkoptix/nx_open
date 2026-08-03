@@ -15,17 +15,19 @@ template<typename BookmarkWithRule>
 common::BookmarkShareableParams shareableParams(
     const BookmarkWithRule& data, bool digestPassword = true)
 {
+    using namespace nx::vms::api;
+
     if constexpr (requires { data.share; })
     {
-        if (data.share && std::holds_alternative<api::BookmarkSharingSettings>(data.share.value()))
+        if (data.share && std::holds_alternative<BookmarkSharingSettings>(data.share.value()))
         {
-            auto& sharingSettings = std::get<api::BookmarkSharingSettings>(data.share.value());
+            auto& sharingSettings = std::get<BookmarkSharingSettings>(data.share.value());
             std::optional<QString> digest;
             if (sharingSettings.password && !sharingSettings.password->isEmpty())
             {
                 if (digestPassword)
                 {
-                    digest = api::BookmarkProtection::getDigest(
+                    digest = BookmarkProtection::getDigest(
                         data.bookmarkId(), data.serverId(), *sharingSettings.password);
                 }
                 else
@@ -63,7 +65,7 @@ Bookmark bookmarkToApi(T&& oldBookmark, nx::Uuid serverId, bool includeDigest = 
     {
         if (std::forward<T>(oldBookmark).shareable())
         {
-            auto share = api::BookmarkSharingSettings{
+            auto share = nx::vms::api::BookmarkSharingSettings{
                 .expirationTimeMs{std::forward<T>(oldBookmark).share.expirationTimeMs}};
 
             if (std::forward<T>(oldBookmark).share.digest)

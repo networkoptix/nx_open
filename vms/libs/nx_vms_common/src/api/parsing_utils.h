@@ -15,8 +15,8 @@ namespace rest {
 
 static constexpr int kMessageBodyLogSize = 50;
 
-bool isSessionExpiredError(nx::network::rest::ErrorId code);
-bool isSessionExpiredError(const nx::json_rpc::Response& response);
+NX_VMS_COMMON_API bool isSessionExpiredError(nx::network::rest::ErrorId code);
+NX_VMS_COMMON_API bool isSessionExpiredError(const nx::json_rpc::Response& response);
 
 // Type helper for parsing function overloading.
 template <typename T>

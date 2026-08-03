@@ -61,6 +61,7 @@
 
 #include "helpers/request_helpers_fwd.h"
 #include "http_client_pool.h"
+#include "parsing_utils.h"
 #include "rest_types.h"
 
 namespace nx::vms::common {
@@ -153,14 +154,31 @@ public: // Generic request methods.
 
     template <typename ResultType>
     Handle sendRequest(
-        nx::vms::common::SessionTokenHelperPtr helper,
         nx::network::http::Method method,
         const QString& action,
         const nx::network::rest::Params& params,
-        const nx::String& body,
-        Callback<ResultType>&& callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        nx::network::http::HttpHeaders customHeaders = {});
+        nx::Buffer body,
+        Callback<ResultType> callback,
+        nx::utils::AsyncHandlerExecutor executor,
+        nx::vms::common::SessionTokenHelperPtr helper = {},
+        nx::network::http::HttpHeaders customHeaders = {})
+    {
+        using Context = ResultContext<ResultType>;
+
+        auto request = prepareRequest(
+            std::move(method),
+            prepareUrl(action, params),
+            nx::network::http::header::ContentType::kJson.value,
+            std::move(body),
+            std::move(customHeaders));
+
+        return executeRequest(
+            helper,
+            request,
+            std::make_unique<Context>(),
+            Context::wrapCallback(std::move(callback)),
+            std::move(executor));
+    }
 
 public: // Specific request methods.
     /**
@@ -862,6 +880,17 @@ public: // Specific request methods.
         nx::utils::AsyncHandlerExecutor executor = {});
 
 public: // Deprecated generic request methods. Do not use with modern API.
+    template <typename ResultType>
+    Handle sendRequest(
+        nx::vms::common::SessionTokenHelperPtr helper,
+        nx::network::http::Method method,
+        const QString& action,
+        const nx::network::rest::Params& params,
+        const nx::String& body,
+        Callback<ResultType>&& callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        nx::network::http::HttpHeaders customHeaders = {});
+
     Handle getJsonResult(
         const QString& action,
         nx::network::rest::Params params,
@@ -917,8 +946,15 @@ private:
         nx::network::http::Method method,
         const nx::Url& url,
         std::string_view contentType = {},
-        const nx::String& messageBody = nx::String(),
-        const nx::network::http::HttpHeaders& customHeaders = {});
+        nx::Buffer messageBody = {},
+        nx::network::http::HttpHeaders customHeaders = {});
+
+    Handle executeRequest(
+        const nx::vms::common::SessionTokenHelperPtr& helper,
+        const nx::network::http::ClientPool::Request& request,
+        std::unique_ptr<BaseResultContext> requestContext,
+        RequestCallback callback,
+        nx::utils::AsyncHandlerExecutor executor);
 
 private:
     struct Private;

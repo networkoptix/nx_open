@@ -7,9 +7,9 @@
 #include <licensing/license_fwd.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/qt_direct_connect.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -242,7 +242,7 @@ private:
      */
     template <typename ServiceParamsType>
     std::map<nx::Uuid, ServiceParamsType> purchasedServices(const QString& serviceType) const;
-    void setSaasStateInternal(api::SaasState saasState, bool waitForDone);
+    void setSaasStateInternal(nx::vms::api::SaasState saasState, bool waitForDone);
 
     std::map<nx::Uuid, int> overusedResourcesUnsafe(
         nx::vms::api::SaasTierLimitName feature) const;

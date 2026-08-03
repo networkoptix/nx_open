@@ -1913,6 +1913,21 @@ Handle NX_VMS_COMMON_API ServerConnection::sendRequest(
     nx::utils::AsyncHandlerExecutor executor,
     nx::network::http::HttpHeaders customHeaders);
 
+Handle ServerConnection::executeRequest(
+    const nx::vms::common::SessionTokenHelperPtr& helper,
+    const nx::network::http::ClientPool::Request& request,
+    std::unique_ptr<BaseResultContext> requestContext,
+    RequestCallback callback,
+    nx::utils::AsyncHandlerExecutor executor)
+{
+    return d->executeRequest(
+        helper,
+        request,
+        std::move(requestContext),
+        std::move(callback),
+        std::move(executor));
+}
+
 Handle ServerConnection::getPluginInformation(
     const nx::Uuid& serverId,
     JsonResultCallback callback,
@@ -3023,8 +3038,8 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     nx::network::http::Method method,
     const nx::Url& url,
     std::string_view contentType,
-    const nx::String& messageBody,
-    const nx::network::http::HttpHeaders& customHeaders)
+    nx::Buffer messageBody,
+    nx::network::http::HttpHeaders customHeaders)
 {
     nx::network::http::ClientPool::Request request;
 
@@ -3044,9 +3059,9 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
         return {};
     }
 
-    request.method = method;
+    request.method = std::move(method);
     request.contentType = contentType;
-    request.messageBody = messageBody;
+    request.messageBody = std::move(messageBody);
 
     QString locale = nx::i18n::TranslationManager::getCurrentThreadLocale();
     if (locale.isEmpty())
@@ -3055,8 +3070,8 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
 
     request.headers.emplace(nx::network::http::header::kUserAgent, prepareUserAgent());
 
-    for (const auto& header: customHeaders)
-        nx::network::http::insertOrReplaceHeader(&request.headers, header);
+    for (auto& header: customHeaders)
+        nx::network::http::insertOrReplaceHeader(&request.headers, std::move(header));
 
     return request;
 }

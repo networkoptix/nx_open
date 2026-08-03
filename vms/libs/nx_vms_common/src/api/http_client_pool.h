@@ -7,7 +7,7 @@
 #include <string>
 
 #include <nx/network/http/http_async_client.h>
-#include <nx/string.h>
+#include <nx/utils/buffer.h>
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::network::http {
@@ -39,7 +39,7 @@ public:
         nx::Url url;
         nx::network::http::HttpHeaders headers;
         std::string contentType;
-        nx::String messageBody;
+        nx::Buffer messageBody;
         nx::network::http::AuthType authType = nx::network::http::AuthType::authBasicAndDigest;
         std::optional<nx::network::http::Credentials> credentials;
         Priority priority = Priority::normal;

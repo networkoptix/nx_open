@@ -95,7 +95,7 @@ NX_NETWORK_API bool readHeader(
  * @return iterator of added element.
  */
 NX_NETWORK_API HttpHeaders::iterator insertOrReplaceHeader(
-    HttpHeaders* const headers, const HttpHeader& newHeader);
+    HttpHeaders* const headers, HttpHeader newHeader);
 
 template<typename HeaderType>
 HttpHeaders::iterator insertOrReplaceHeader(

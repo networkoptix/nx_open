@@ -22,7 +22,6 @@
 
 using namespace std::chrono;
 using namespace nx::vms::api;
-using HttpHeaders = nx::network::http::HttpHeaders;
 
 namespace nx::vms::client::core {
 
@@ -62,64 +61,52 @@ struct CloudCrossSystemContextDataLoader::Private
     void requestUser(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Requesting user");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "User request failed");
+                NX_LOG_RESPONSE(this, success, data, "User request failed.");
+
+                if (!success || !data)
                     return;
-                }
 
-                UserModel result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "User reply cannot be deserialized");
-                    return;
-                }
+                NX_VERBOSE(this, "User loaded successfully, username: %1", data->name);
 
-                NX_VERBOSE(this, "User loaded successfully, username: %1", result.name);
-
-                user = result;
+                user = std::move(*data);
                 updateStatus();
-            });
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<UserModel>>(
+            nx::network::http::Method::get,
             QString("/rest/v3/users/") + QUrl::toPercentEncoding(username),
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestUserGroups(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Requesting userGroups");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "UserGroups request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(this, success, data, "UserGroups request failed.");
 
-                UserGroupDataList result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "UserGroups reply cannot be deserialized");
+                if (!success || !data)
                     return;
-                }
 
                 NX_VERBOSE(this, "UserGroups loaded successfully");
-                userGroups = result;
+                userGroups = std::move(*data);
                 updateStatus();
-            });
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<UserGroupDataList>>(
+            nx::network::http::Method::get,
             QString("/rest/v3/userGroups/"),
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestServers(GroupedTaskQueue::PromisePtr promise)
@@ -151,181 +138,134 @@ struct CloudCrossSystemContextDataLoader::Private
     void requestTaxonomyDescriptors(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating servers taxonomy descriptors data");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "Servers taxonomy descriptors request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(
+                    this, success, data, "Servers taxonomy descriptors request failed.");
 
-                auto [result, deserializationResult] =
-                    reflect::json::deserialize<ServerModelV1List>(data);
-                if (!deserializationResult.success)
-                {
-                    NX_WARNING(
-                        this,
-                        "Servers taxonomy descriptors cannot be deserialized, error: %1",
-                        deserializationResult.errorDescription);
+                if (!success || !data)
                     return;
-                }
 
                 NX_VERBOSE(this, "Servers taxonomy descriptors received");
 
-                serversTaxonomyDescriptors = result;
+                serversTaxonomyDescriptors = std::move(*data);
                 updateStatus();
-            }
-        );
+            };
 
-        connection->getRawResult(
-            QString("/rest/v2/servers?_with=id,parameters.%1")
-                .arg(nx::analytics::kDescriptorsProperty),
-            {},
-            std::move(callback),
-            q);
+        static const auto action = QString("/rest/v2/servers?_with=id,parameters.%1")
+            .arg(nx::analytics::kDescriptorsProperty);
+
+        connection->sendRequest<rest::ErrorOrData<ServerModelV1List>>(
+            nx::network::http::Method::get, action, {}, {}, std::move(callback), q);
     }
 
     void requestServerFootageData(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating server footage data");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "Server footage request failed");
+                NX_LOG_RESPONSE(this, success, data, "Server footage request failed.");
+
+                if (!success || !data)
                     return;
-                }
 
-                ServerFootageDataList result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "Server footage list cannot be deserialized");
-                    return;
-                }
+                NX_VERBOSE(this, "Received %1 server footage entries", data->size());
 
-                NX_VERBOSE(this, "Received %1 server footage entries", result.size());
-
-                serverFootageData = result;
+                serverFootageData = std::move(*data);
                 updateStatus();
-            });
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<ServerFootageDataList>>(
+            nx::network::http::Method::get,
             "/ec2/getCameraHistoryItems",
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestSystemSettings(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating system settings");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "System settings request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(this, success, data, "System settings request failed.");
 
-                auto [result, deserializationResult] =
-                    reflect::json::deserialize<SystemSettings>(data.data());
-                if (!deserializationResult.success)
-                {
-                    NX_WARNING(
-                        this,
-                        "System settings cannot be deserialized, error: %1",
-                        deserializationResult.errorDescription);
+                if (!success || !data)
                     return;
-                }
 
                 NX_VERBOSE(this, "System settings received");
 
-                systemSettings = result;
+                systemSettings = std::move(*data);
                 updateStatus();
-            }
-        );
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<SystemSettings>>(
+            nx::network::http::Method::get,
             "/rest/v2/system/settings",
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestLicenses(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating licenses");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "Licenses request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(this, success, data, "Licenses request failed.");
 
-                auto [result, deserializationResult] =
-                    reflect::json::deserialize<LicenseDataList>(data.data());
-                if (!deserializationResult.success)
-                {
-                    NX_WARNING(
-                        this,
-                        "Licenses cannot be deserialized, error: %1",
-                        deserializationResult.errorDescription);
+                if (!success || !data)
                     return;
-                }
 
                 NX_VERBOSE(this, "Licenses received");
 
-                licenses = result;
+                licenses = std::move(*data);
                 updateStatus();
-            }
-        );
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<LicenseDataList>>(
+            nx::network::http::Method::get,
             "/rest/v2/licenses",
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestCameras(GroupedTaskQueue::PromisePtr promise)
     {
         NX_VERBOSE(this, "Updating cameras");
-        auto callback = nx::utils::guarded(q,
-            [this, promise](bool success, ::rest::Handle, QByteArray data, HttpHeaders)
+        auto callback =
+            [this, promise](bool success, ::rest::Handle, auto data)
             {
-                if (!success)
-                {
-                    NX_WARNING(this, "Cameras request failed");
-                    return;
-                }
+                NX_LOG_RESPONSE(this, success, data, "Cameras request failed.");
 
-                CameraDataExList result;
-                if (!QJson::deserialize(data, &result))
-                {
-                    NX_WARNING(this, "Cameras list cannot be deserialized");
+                if (!success || !data)
                     return;
-                }
 
-                NX_VERBOSE(this, "Received %1 cameras", result.size());
-                cameras = result;
+                NX_VERBOSE(this, "Received %1 cameras", data->size());
+                cameras = std::move(*data);
                 camerasRefreshTimer.restart();
 
                 if (!isFirstTime)
                     emit q->camerasUpdated();
 
                 updateStatus();
-            });
+            };
 
-        connection->getRawResult(
+        connection->sendRequest<rest::ErrorOrData<CameraDataExList>>(
+            nx::network::http::Method::get,
             "/ec2/getCamerasEx",
             {},
+            {},
             std::move(callback),
-            q->thread());
+            q);
     }
 
     void requestData()
