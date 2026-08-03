@@ -26,6 +26,8 @@ T.AbstractButton
 
     property real textIndent: 0 //< Additional text indent from the left.
     property alias textHorizontalAlignment: textItem.horizontalAlignment
+    property alias textElide: textItem.elide
+    property alias textMaximumLineCount: textItem.maximumLineCount
 
     readonly property var parameters: d.parameters[control.type]
 

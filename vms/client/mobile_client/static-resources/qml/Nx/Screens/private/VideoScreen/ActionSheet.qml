@@ -38,7 +38,9 @@ AdaptiveSheet
         id: hintControl
 
         parent: externalMode ? externalVisualizerContainer : sheet.titleCustomArea
-        y: externalMode ? 0 : (parent.height - height) / 2
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: Math.min(implicitWidth, parent.width)
         externalMode: sheet.externalMode
     }
 
@@ -80,6 +82,8 @@ AdaptiveSheet
             opacity: available ? 1.0 : 0.3
             type: externalMode ? Button.Type.Interface : Button.LightInterface
             down: instantActionHandler.pressed || prolongedActionHandler.pressed
+            textElide: Qt.ElideRight
+            textMaximumLineCount: 1
             textHorizontalAlignment: Qt.AlignLeft
             clip: true
 

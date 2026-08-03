@@ -25,18 +25,18 @@ BaseAdaptiveSheet
         {
             id: titleTextItem
 
-            Layout.fillWidth: true
             font.pixelSize: 18
             font.weight: 500
             color: ColorTheme.colors.light4
             wrapMode: Text.Wrap
         }
 
-        Row
+        Item
         {
             id: customArea
 
-            Layout.preferredHeight: titleTextItem.implicitHeight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
         }
     }
 

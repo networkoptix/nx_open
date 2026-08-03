@@ -626,8 +626,10 @@ Page
         anchors.horizontalCenter: cameraSwitcher.horizontalCenter
         anchors.margins: 8
 
-        implicitWidth: childrenRect.width
-        implicitHeight: childrenRect.height
+        width: Math.min(parent.width - anchors.margins * 2, implicitWidth)
+
+        implicitWidth: children[0]?.implicitWidth ?? 0
+        implicitHeight: children[0]?.implicitHeight ?? 0
     }
 
     Rectangle

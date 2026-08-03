@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
@@ -9,7 +10,7 @@ import Nx.Settings
 
 import nx.client.mobile
 
-Loader
+Control
 {
     id: control
 
@@ -19,9 +20,17 @@ Loader
     readonly property Component defaultVisualizer: defaultVisualizer
     readonly property Component voiceVisualizer: voiceVisualizer
 
-    active: !!action
-    sourceComponent: action?.visualizer || defaultVisualizer
+    implicitWidth: loader.item?.implicitWidth ?? 0
+    implicitHeight: loader.item?.implicitHeight ?? 0
     state: "hidden"
+
+    contentItem: Loader
+    {
+        id: loader
+
+        active: !!action
+        sourceComponent: action?.visualizer || defaultVisualizer
+    }
 
     component ActionVisualizerControl: Control
     {
@@ -47,7 +56,7 @@ Loader
             property string text: action.text ?? ""
             property string iconSource: action.icon ?? ""
 
-            contentItem: Row
+            contentItem: RowLayout
             {
                 spacing: 6
 
@@ -55,22 +64,26 @@ Loader
                 {
                     id: icon
 
+                    Layout.alignment: Qt.AlignVCenter
+
                     sourcePath: control.iconSource
                     sourceSize: Qt.size(20, 20)
                     primaryColor: externalMode ? ColorTheme.colors.light1 : ColorTheme.colors.dark4
-                    anchors.verticalCenter: parent.verticalCenter
+                    visible: !!sourcePath
                 }
 
                 Text
                 {
                     id: textItem
 
-                    height: parent.height
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
                     text: control.text
                     color: externalMode ? ColorTheme.colors.light1 : ColorTheme.colors.dark4
                     font.pixelSize: 14
                     verticalAlignment: Qt.AlignVCenter
+                    elide: Qt.ElideRight
                 }
             }
         }

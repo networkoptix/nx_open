@@ -77,6 +77,7 @@ AdaptiveSheet
 
         visible: sheet.isAnalyticsItemMode
         parent: sheet.titleCustomArea
+        anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         padding: 0
 
@@ -149,6 +150,8 @@ AdaptiveSheet
 
         visible: !isAnalyticsItemMode
         parent: sheet.titleCustomArea
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
 
         toggleOnClick: false
 
