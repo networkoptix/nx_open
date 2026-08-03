@@ -20,12 +20,14 @@ struct NX_VMS_API CameraStreamCapability
     int defaultFps = 0;
 
     /**%apidoc
-     * By default availableFps is used. If it is empty, the incoming fps will be clamped to the range [minFps; maxFps]
+     * minFps/maxFps are optional; when set, they take priority over availableFps.
      */
     float minFps = 0.0;
     float maxFps = 0.0;
 
-    /**%apidoc:{std::vector<float>} */
+    /**%apidoc:{std::vector<float>}
+     * If empty, the incoming fps is clamped to the range [minFps; maxFps].
+     */
     std::set<float> availableFps;
 
     QString toString() const;

@@ -922,7 +922,13 @@ float QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) 
             return ok ? std::make_optional((float)intValue) : std::nullopt;
         };
     return streamCapability(streamIndex)
-        .transform([](const auto& caps) { return caps.maxFps; })
+        .transform(
+            [](const auto& caps)
+            {
+                // calcMaxFps() prefers availableFps over maxFps, so it is used only as a
+                // fallback for an invalid fps range.
+                return caps.isRangeFpsValid() ? caps.maxFps : caps.calcMaxFps();
+            })
         .or_else(readMaxFps)
         .value_or(kDefaultMaxFps);
 }
