@@ -21,24 +21,29 @@ Drawer
 
     property bool closeAutomatically: true
     property bool alwaysShowCloseButton: false
-    readonly property alias availableContentHeight: flickable.height
     readonly property alias contentDragging: flickable.dragging
     readonly property bool bottomEdge: edge === Qt.BottomEdge
 
-    x: (parent.width - width) / 2
-    edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
-    width: bottomEdge ? Math.min(parent.width, 640) : StyleHints.sheetWidth
-    height:
+    readonly property real availableSheetHeight:
     {
         if (!bottomEdge)
             return parent.height
 
-        const availableHeight = parent.height
+        return parent.height
             - parent.SafeArea.margins.top //< OS status bar.
             - parent.SafeArea.margins.bottom //< OS navigation bar.
-
-        return Math.min(topPadding + bottomPadding + content.implicitHeight, availableHeight)
     }
+
+    readonly property real availableContentHeight: availableSheetHeight
+        - topPadding - bottomPadding - flickable.anchors.topMargin - flickable.anchors.bottomMargin
+
+    x: (parent.width - width) / 2
+    edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
+    width: bottomEdge ? Math.min(parent.width, 640) : StyleHints.sheetWidth
+
+    height: bottomEdge
+        ? Math.min(topPadding + bottomPadding + content.implicitHeight, availableSheetHeight)
+        : parent.height
 
     closePolicy: closeAutomatically
         ? Popup.CloseOnEscape | Popup.CloseOnReleaseOutside

@@ -31,6 +31,7 @@ class AbstractObjectData: public QObject
     Q_PROPERTY(QString title READ title NOTIFY changed)
     Q_PROPERTY(QString description READ description NOTIFY changed)
     Q_PROPERTY(QString imagePath READ imagePath NOTIFY changed)
+    Q_PROPERTY(QString iconPath READ iconPath NOTIFY changed)
     Q_PROPERTY(QVariant tags READ tags NOTIFY changed)
     Q_PROPERTY(QVariant attributes READ attributes NOTIFY changed)
     Q_PROPERTY(QnResource* resource READ getResource CONSTANT)
@@ -45,6 +46,7 @@ public:
     virtual QString title() const = 0;
     virtual QString description() const = 0;
     virtual QString imagePath() const = 0;
+    virtual QString iconPath() const = 0;
     virtual QVariant tags() const = 0;
     virtual QVariant attributes() const = 0;
     virtual QnResourcePtr resource() const = 0;

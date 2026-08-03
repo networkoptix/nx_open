@@ -21,6 +21,7 @@ public:
     virtual QString title() const override;
     virtual QString description() const override;
     virtual QString imagePath() const override;
+    virtual QString iconPath() const override;
     virtual QVariant tags() const override;
     virtual QVariant attributes() const override;
     virtual QnResourcePtr resource() const override;

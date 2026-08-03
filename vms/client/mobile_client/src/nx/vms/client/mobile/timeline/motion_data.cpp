@@ -12,6 +12,8 @@ namespace nx::vms::client::mobile {
 namespace timeline {
 namespace {
 
+static const QString kIconPath = "image://skin/20x20/Outline/motion.svg";
+
 qint64 getPreviewTimeMs(const QnTimePeriod& motion)
 {
     return motion.startTimeMs + motion.durationMs / 2;
@@ -48,12 +50,19 @@ QString MotionData::title() const
 
 QString MotionData::description() const
 {
-    return {};
+    return HumanReadable::timeSpan(m_motion.duration(),
+        HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
+        HumanReadable::SuffixFormat::Short, " ");
 }
 
 QString MotionData::imagePath() const
 {
     return m_imagePath;
+}
+
+QString MotionData::iconPath() const
+{
+    return kIconPath;
 }
 
 QVariant MotionData::tags() const
@@ -78,18 +87,14 @@ MultiObjectData MotionData::merge(
 {
     if (motions.size() == 1)
     {
-        const auto durationText = HumanReadable::timeSpan(motions.front().duration(),
-            HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
-            HumanReadable::SuffixFormat::Short, " ");
-
         const auto previewTimeMs = getPreviewTimeMs(motions.back());
 
         const auto perObjectData = std::make_shared<MotionData>(motions.front(), resource);
 
         return MultiObjectData{
-            .caption = tr("Motion detected"),
-            .description = durationText,
-            .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
+            .caption = perObjectData->title(),
+            .description = perObjectData->description(),
+            .iconPaths = {kIconPath},
             .imagePaths = {makeImageRequest(resource, previewTimeMs, kLowImageResolution)},
             .positionMs = motions.front().startTimeMs,
             .durationMs = motions.front().durationMs,
@@ -111,7 +116,7 @@ MultiObjectData MotionData::merge(
             .caption = (int) motions.size() > maxMotionsPerBucket
                 ? tr("Motion (>%1)").arg(maxMotionsPerBucket)
                 : tr("Motion (%1)").arg(motions.size()),
-            .iconPaths = {"image://skin/20x20/Outline/motion.svg"},
+            .iconPaths = {kIconPath},
             .imagePaths = imagePaths,
             .positionMs = motions.front().startTimeMs,
             .durationMs = motions.back().startTimeMs - motions.front().startTimeMs,

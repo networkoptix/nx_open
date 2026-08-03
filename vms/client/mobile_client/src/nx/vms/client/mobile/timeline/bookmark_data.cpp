@@ -11,6 +11,12 @@
 namespace nx::vms::client::mobile {
 namespace timeline {
 
+namespace {
+
+static const QString kIconPath = "image://skin/20x20/Outline/bookmark.svg";
+
+} // namespace
+
 using namespace std::chrono;
 
 BookmarkData::BookmarkData(
@@ -50,6 +56,11 @@ QString BookmarkData::description() const
 QString BookmarkData::imagePath() const
 {
     return m_imagePath;
+}
+
+QString BookmarkData::iconPath() const
+{
+    return kIconPath;
 }
 
 QVariant BookmarkData::tags() const
@@ -97,7 +108,7 @@ MultiObjectData BookmarkData::merge(
         return MultiObjectData{
             .caption = perObjectData->title(),
             .description = bookmark.description,
-            .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
+            .iconPaths = {kIconPath},
             .imagePaths = {makeImageRequest(resource, bookmark.startTimeMs.count(),
                 kLowImageResolution)},
             .positionMs = bookmark.startTimeMs.count(),
@@ -138,7 +149,7 @@ MultiObjectData BookmarkData::merge(
 
         return MultiObjectData{
             .caption = title,
-            .iconPaths = {"image://skin/20x20/Outline/bookmark.svg"},
+            .iconPaths = {kIconPath},
             .imagePaths = imagePaths,
             .positionMs = firstPosition.count(),
             .durationMs = duration.count(),

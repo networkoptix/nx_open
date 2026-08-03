@@ -52,10 +52,10 @@ Item
         skeletonWidth: view.width
     }
 
-    signal tapped(Timeline.MultiObjectData modelData)
-    signal singleTapped(Timeline.MultiObjectData modelData)
-    signal doubleTapped(Timeline.MultiObjectData modelData)
-    signal longPressed(Timeline.MultiObjectData modelData)
+    signal tapped(Timeline.MultiObjectData modelData, Item tile)
+    signal singleTapped(Timeline.MultiObjectData modelData, Item tile)
+    signal doubleTapped(Timeline.MultiObjectData modelData, Item tile)
+    signal longPressed(Timeline.MultiObjectData modelData, Item tile)
 
     function timeToPosition(timeMs)
     {
@@ -124,9 +124,9 @@ Item
             id: delegateHolder
 
             property var bucket
-            property Item item
             property bool pooled: false
             property bool fadingOut: false
+            readonly property alias item: delegateLoader.item
             readonly property bool active: !pooled && !fadingOut && !d.forcedSkeletons
             readonly property bool forcedSkeleton: !pooled && !fadingOut && d.forcedSkeletons
 
@@ -280,21 +280,21 @@ Item
                 exclusiveSignals: TapHandler.SingleTap | TapHandler.DoubleTap
 
                 onTapped:
-                    view.tapped(delegateHolder.bucket.data)
+                    view.tapped(delegateHolder.bucket.data, delegateHolder.item)
 
                 onLongPressed:
-                    view.longPressed(delegateHolder.bucket.data)
+                    view.longPressed(delegateHolder.bucket.data, delegateHolder.item)
 
                 onSingleTapped:
                 {
                     if (enabled) //< This signal is delayed, prevent it when it's not desired.
-                        view.singleTapped(delegateHolder.bucket.data)
+                        view.singleTapped(delegateHolder.bucket.data, delegateHolder.item)
                 }
 
                 onDoubleTapped:
                 {
                     if (enabled) //< This signal is delayed, prevent it when it's not desired.
-                        view.doubleTapped(delegateHolder.bucket.data)
+                        view.doubleTapped(delegateHolder.bucket.data, delegateHolder.item)
                 }
             }
         }

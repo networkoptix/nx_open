@@ -30,7 +30,10 @@ Rectangle
     readonly property alias labelFormatter: timeScale.labelFormatter
 
     property ChunkProvider chunkProvider
+
     property alias objectsType: objects.objectsType
+    property alias tileHeight: objects.tileHeight
+    property alias tileSpacing: objects.spacing
 
     property real zoomMultiplier: 1.5
 
@@ -44,7 +47,7 @@ Rectangle
 
     property bool interactive: true
 
-    signal detailsRequested(Timeline.MultiObjectData data)
+    signal detailsRequested(Timeline.MultiObjectData data, Item item)
 
     color: ColorTheme.colors.mobileTimeline.background
 
@@ -406,12 +409,12 @@ Rectangle
                     timeline.setPosition(modelData.positionMs)
             }
 
-            onLongPressed: (modelData) =>
+            onLongPressed: (modelData, tile) =>
             {
                 if (isZoomable(modelData))
                     zoomToTile(modelData)
                 else
-                    timeline.detailsRequested(modelData)
+                    timeline.detailsRequested(modelData, tile)
             }
 
             preloaderDelegate: Component

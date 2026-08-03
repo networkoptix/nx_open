@@ -43,7 +43,7 @@ ObjectType* objectTypeById(
     return taxonomy ? taxonomy->objectTypeById(objectTypeId) : nullptr;
 }
 
-QString iconPath(ObjectType* objectType)
+QString getIconPath(ObjectType* objectType)
 {
     const auto iconManager = core::analytics::IconManager::instance();
 
@@ -65,7 +65,7 @@ std::tuple<QStringList /*names*/, QStringList /*iconPaths*/> objectTypeInfos(
     for (const auto& track: tracks)
     {
         const auto objectType = objectTypeById(taxonomy, track.objectTypeId);
-        const auto path = iconPath(objectType);
+        const auto path = getIconPath(objectType);
         const auto name = objectType ? QString::fromStdString(objectType->name()) : "";
 
         if (!alreadyAddedNames.contains(name) && names.size() < limit)
@@ -187,12 +187,19 @@ QString AnalyticsData::title() const
 
 QString AnalyticsData::description() const
 {
-    return {};
+    return HumanReadable::timeSpan(milliseconds(durationMs()),
+        HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
+        HumanReadable::SuffixFormat::Short, " ");
 }
 
 QString AnalyticsData::imagePath() const
 {
     return m_imagePath;
+}
+
+QString AnalyticsData::iconPath() const
+{
+    return m_iconPath;
 }
 
 QVariant AnalyticsData::tags() const
@@ -225,6 +232,10 @@ void AnalyticsData::update(analytics::db::ObjectTrack track)
     m_attributes = preprocessAttributes(systemContext, m_track);
     m_title = core::bookmarks::bookmarkNameFromObjectTrack(m_track, systemContext);
 
+    const auto objectType =
+        objectTypeById(systemContext->analyticsTaxonomyState(), m_track.objectTypeId);
+
+    m_iconPath = getIconPath(objectType);
     emit changed();
 }
 
@@ -251,15 +262,10 @@ MultiObjectData AnalyticsData::merge(
 
         const auto perObjectData = std::make_shared<AnalyticsData>(track, resource);
 
-        const auto durationText = HumanReadable::timeSpan(
-            milliseconds{perObjectData->durationMs()},
-            HumanReadable::Hours | HumanReadable::Minutes | HumanReadable::Seconds,
-            HumanReadable::SuffixFormat::Short, " ");
-
         return MultiObjectData{
             .caption = perObjectData->title(),
-            .description = durationText,
-            .iconPaths = {iconPath(objectType)},
+            .description = perObjectData->description(),
+            .iconPaths = {getIconPath(objectType)},
             .imagePaths = {makeAnalyticsImageRequest(resource, track, kLowImageResolution)},
             .positionMs = perObjectData->startTimeMs(),
             .durationMs = perObjectData->durationMs(),

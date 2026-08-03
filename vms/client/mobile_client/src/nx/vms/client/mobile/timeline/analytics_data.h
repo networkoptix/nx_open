@@ -22,6 +22,7 @@ public:
     virtual QString title() const override;
     virtual QString description() const override;
     virtual QString imagePath() const override;
+    virtual QString iconPath() const override;
     virtual QVariant tags() const override;
     virtual QVariant attributes() const override;
     virtual QnResourcePtr resource() const override;
@@ -39,6 +40,7 @@ private:
     analytics::db::ObjectTrack m_track;
     QString m_title;
     QString m_imagePath;
+    QString m_iconPath;
     core::analytics::AttributeList m_attributes;
     QnResourcePtr m_resource;
 };

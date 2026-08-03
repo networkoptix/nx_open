@@ -908,75 +908,47 @@ Page
             chunkProvider: cameraChunkProvider
             objectsType: modernVideoScreen.selectedObjectsType
 
-            interactive: !objectsTypeSheet.opened && !timelineObjectSheet.opened
-                && !ptz.active && !actionSheet.opened && !downloadMediaSheet.opened
+            interactive: !objectsTypeSheet.opened
+                && !objectSelectionSheet.opened
+                && !objectActionsMenu.opened
+                && !ptz.active
+                && !actionSheet.opened
+                && !downloadMediaSheet.opened
 
             timeZone: video.resourceHelper.timeZone
 
-            onDetailsRequested: (data) =>
+            onDetailsRequested: (data, tile) =>
             {
-                if (!data?.perObjectData)
+                if (!data?.perObjectData || !tile)
                     return
 
-                timelineObjectSheet.fallbackImagePaths = data.imagePaths ?? []
-                timelineObjectSheet.data = data
-                timelineObjectSheet.open()
+                const invokerRect = objectActionsMenu.parent.mapFromItem(tile,
+                    0, 0, tile.width, tile.height)
+
+                objectActionsMenu.resource = controller.resource
+                objectActionsMenu.objectsType = timeline.objectsType
+                objectActionsMenu.multiObjectData = data
+                objectActionsMenu.adjustPosition(invokerRect, objectActionsMenu.indent)
+                objectActionsMenu.open()
             }
         }
 
-        Timeline.ObjectDetailsSheet
+        Timeline.ObjectSelectionSheet
         {
-            id: timelineObjectSheet
+            id: objectSelectionSheet
 
-            property var data: null //< Store a copy of the value to keep its data in memory.
-            property bool restoreOnActivation: false
-            readonly property bool screenActive: modernVideoScreen.activePage
+            objectsType: objectActionsMenu.objectsType
+            tileHeight: timeline.tileHeight
+        }
 
-            keepStateOnClose: restoreOnActivation
-            enter.enabled: !restoreOnActivation
-            exit.enabled: !restoreOnActivation
+        Timeline.ObjectActionsMenu
+        {
+            id: objectActionsMenu
 
-            height: LayoutController.isPortrait
-                ? Math.min(implicitHeight, navigator.height)
-                : parent.height //< Overlay height.
-
-            objectsType: timeline.objectsType
-            dateFormatter: ((timestampMs) => timeline.labelFormatter.objectTimestamp(
-                timestampMs, timeline.timeZone))
-
-            onDataChanged: model = data?.perObjectData
-
-            onOpened: restoreOnActivation = false
-            onClosed:
-            {
-                if (!restoreOnActivation)
-                    data = null
-            }
-
-            onSearchRequested: (text) =>
-            {
-                Workflow.openEventSearchScreen(
-                    /*push*/ true,
-                    /*selectedResourceId*/ null,
-                    camerasModel,
-                    timeline.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics,
-                    /*searchText*/ text)
-
-                restoreOnActivation = true
-                close()
-            }
-
-            onShowOnCameraRequested: (resource, timestampMs) =>
-            {
-                controller.start(resource, timestampMs)
-                close()
-            }
-
-            onScreenActiveChanged:
-            {
-                if (restoreOnActivation)
-                    open()
-            }
+            property real indent: 8
+            selector: objectSelectionSheet
+            parent: modernVideoScreen.contentItem
+            minimumDownloadDurationMs: timeline.minimumDurationMs
         }
 
         Rectangle
