@@ -5,7 +5,7 @@
     <name>BasicAction</name>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Κείμενο επεξήγησης</translation>
     </message>
   </context>
   <context>
@@ -21,23 +21,23 @@
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n φορά, πρώτα: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n φορές, πρώτα: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
-        <numerusform>First occurrence: %1 on %2 (%n times total)</numerusform>
+      <translation>
+        <numerusform>Πρώτη εμφάνιση: %1 στις %2 (%n φορά συνολικά)</numerusform>
+        <numerusform>Πρώτη εμφάνιση: %1 στις %2 (%n φορές συνολικά)</numerusform>
       </translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">Time: %1 on %2</translation>
+      <translation>Ώρα: %1 στις %2</translation>
     </message>
     <message>
       <source>Unknown event</source>
@@ -53,75 +53,75 @@
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Συμβάντα αναλύσεων</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Κάθε συμβάν αναλύσεων</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Προβλήματα κάμερας</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Προβλήματα συσκευής</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Όλα τα προβλήματα της κάμερας</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Όλα τα προβλήματα συσκευής</translation>
     </message>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Συμβάντα διακομιστή</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Κάθε συμβάν διακομιστή</translation>
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Παρέχεται μη έγκυρος τύπος πεδίου</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Μη αναμενόμενη πολιτική επικύρωσης</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
-      <translation type="unfinished">Select at least one Server</translation>
+      <translation>Επιλέξτε τουλάχιστον έναν διακομιστή</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Επιλέξτε τουλάχιστον έναν χρήστη</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Επιλέξτε ακριβώς μία κάμερα</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Επιλέξτε τουλάχιστον μία συσκευή</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Επιλέξτε τουλάχιστον μία κάμερα</translation>
     </message>
     <message>
       <source>Not all servers are suitable</source>
-      <translation type="unfinished">Not all servers are suitable</translation>
+      <translation>Δεν είναι όλοι οι διακομιστές κατάλληλοι</translation>
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Δεν υπάρχουν κατάλληλοι διακομιστές</translation>
     </message>
     <message>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Στις</translation>
     </message>
     <message>
       <source>To</source>
@@ -129,27 +129,27 @@
     </message>
     <message>
       <source>Occurs At</source>
-      <translation type="unfinished">Occurs At</translation>
+      <translation>Συμβαίνει στις</translation>
     </message>
     <message>
       <source>Begin When</source>
-      <translation type="unfinished">Begin When</translation>
+      <translation>Έναρξη όταν</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Διάρκεια</translation>
     </message>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Χρόνος πριν την εγγραφή</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Χρόνος μετά την εγγραφή</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Διάστημα ενέργειας</translation>
     </message>
     <message>
       <source>State</source>
@@ -157,19 +157,19 @@
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Ένταση</translation>
     </message>
     <message>
       <source>Rewind</source>
-      <translation type="unfinished">Rewind</translation>
+      <translation>Επιστροφή</translation>
     </message>
     <message>
       <source>On Layout</source>
-      <translation type="unfinished">On Layout</translation>
+      <translation>Στη Διάταξη</translation>
     </message>
     <message>
       <source>Event Devices</source>
-      <translation type="unfinished">Event Devices</translation>
+      <translation>Συσκευές Συμβάντων</translation>
     </message>
     <message>
       <source>Of Type</source>
@@ -177,11 +177,11 @@
     </message>
     <message>
       <source>And Caption</source>
-      <translation type="unfinished">And Caption</translation>
+      <translation>Και Λεζάντα</translation>
     </message>
     <message>
       <source>And Description</source>
-      <translation type="unfinished">And Description</translation>
+      <translation>Και Περιγραφή</translation>
     </message>
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
@@ -190,15 +190,15 @@
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>Η επιλεγμένη τοπική διάταξη μπορεί να εμφανιστεί μόνο στον κάτοχό της %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Κανένας από τους επιλεγμένους χρήστες δεν έχει πρόσβαση στην επιλεγμένη διάταξη</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Ορισμένοι χρήστες δεν έχουν πρόσβαση στην επιλεγμένη διάταξη</translation>
     </message>
     <message>
       <source>For</source>
@@ -206,31 +206,31 @@
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>Η τιμή του χρόνου δεν μπορεί να είναι αρνητική</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>Η διάρκεια δεν μπορεί να είναι μικρότερη από μηδέν</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>Η τιμή δεν μπορεί να είναι μικρότερη από %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>Η τιμή δεν μπορεί να είναι μεγαλύτερη από %1</translation>
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Προς χρήστες</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Field &quot;%1&quot; should be an object</source>
-      <translation type="unfinished">Field &quot;%1&quot; should be an object</translation>
+      <translation>Το πεδίο &quot;%1&quot; πρέπει να είναι τύπου αντικειμένου</translation>
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Event: %1 is not registered</source>
-      <translation type="unfinished">Event: %1 is not registered</translation>
+      <translation>Συμβάν: Το %1 δεν έχει καταχωρηθεί</translation>
     </message>
     <message>
       <source>Action: %1 is not registered</source>
-      <translation type="unfinished">Action: %1 is not registered</translation>
+      <translation>Ενέργεια: Το %1 δεν έχει καταχωρηθεί</translation>
     </message>
     <message>
       <source>Rule validation failed: %1</source>
@@ -519,43 +519,43 @@
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>Διένεξη IP (Conflict) Κάμερας στο %1</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>Διένεξη IP (Conflict) Συσκευής</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>Διένεξη IP (Conflict) Κάμερας</translation>
     </message>
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Συσκευή #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Κάμερα #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceOutputAction</name>
     <message>
       <source>Output ID</source>
-      <translation type="unfinished">Output ID</translation>
+      <translation>Αναγνωριστικό εξόδου</translation>
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Έξοδος Συσκευής</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Ποιότητα</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -563,7 +563,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Εγγραφή από κάμερα</translation>
     </message>
     <message>
       <source>On</source>
@@ -578,71 +578,71 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Ορισμός σε πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Ορισμός για</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ExitFullscreenAction</name>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Έξοδος από πλήρη οθόνη</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Αποτυχία Ανεμιστήρα</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Αποτυχία ανεμιστήρα στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>Γενικό συμβάν</translation>
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Παράλειψη καταγραφής</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Και Πηγή</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>Γενικό συμβάν στο %1</translation>
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Σχετικές συσκευές:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>Σχετικές κάμερες:</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAction</name>
     <message>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Τύπος περιεχομένου</translation>
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Αίτημα HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>
@@ -650,22 +650,22 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>Πιστοποίηση HTTP</translation>
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>Προσαρμοσμένες κεφαλίδες</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Τα πεδία χρήστη και κωδικού πρόσβασης πρέπει να συμπληρωθούν σε περίπτωση επιλογής μεθόδου ελέγχου ταυτότητας basic ή digest</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>Το πεδίο διακριτικού πρέπει να συμπληρωθεί σε περίπτωση επιλογής τύπου ελέγχου ταυτότητας bearer</translation>
     </message>
   </context>
   <context>
@@ -673,17 +673,17 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <comment>Numerus form depends on the amount of invalid headers</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Μία κεφαλίδα δεν είναι έγκυρη</numerusform>
+        <numerusform>Ορισμένες από τις κεφαλίδες δεν είναι έγκυρες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Η κεφαλίδα δεν είναι έγκυρη</numerusform>
+        <numerusform>Όλες οι κεφαλίδες δεν είναι έγκυρες</numerusform>
       </translation>
     </message>
   </context>
@@ -691,33 +691,33 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>Μη επιτρεπόμενη μέθοδος HTTP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Για Πρόσθετο</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Και Το Επίπεδο Είναι</translation>
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Διαγνωστικό Ενσωμάτωσης στο %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Διαγνωστικό Ενσωμάτωσης</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Επιλογή διάταξης</translation>
     </message>
   </context>
   <context>
@@ -725,243 +725,243 @@
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n φορά)</numerusform>
+        <numerusform>%1 (%n φορές)</numerusform>
       </translation>
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>Αποτυχία σύνδεσης με τον διακομιστή LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>Αποτυχία ολοκλήρωσης του συγχρονισμού εντός χρονικού ορίου %1.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>Δεν υπάρχουν λογαριασμοί χρηστών στον διακομιστή LDAP που να ταιριάζουν με τις ρυθμίσεις συγχρονισμού.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>Ορισμένοι χρήστες ή ομάδες LDAP δεν βρέθηκαν στη βάση δεδομένων LDAP.</translation>
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>Πρόβλημα συγχρονισμού LDAP στο %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>Πρόβλημα συγχρονισμού LDAP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>Πρόβλημα Άδειας Χρήσης</translation>
     </message>
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>Δεν υπάρχουν αρκετές άδειες στο %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>Η εγγραφή έχει απενεργοποιηθεί στις ακόλουθες συσκευές:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>Η εγγραφή έχει απενεργοποιηθεί στις ακόλουθες κάμερες:</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>Ανίχνευση κίνησης %1</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>Ανίχνευση κίνησης στην κάμερα</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>Πρόβλημα δικτύου</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>Δεν ελήφθησαν δεδομένα κατά τη διάρκεια του τελευταίου %n δευτερολέπτου.</numerusform>
+        <numerusform>Δεν ελήφθησαν δεδομένα κατά τα τελευταία %n δευτερόλεπτα.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>Σφάλμα RTP στην κύρια ροή (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>Σφάλμα RTP στη δευτερεύουσα ροή (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>Εντοπίστηκε απώλεια πακέτου RTP.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>Η ώρα της κάμερας επανήλθε στο κανονικό.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>Η συσκευή δεν ανταποκρίνεται στα αιτήματα δικτύου.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>Η διεύθυνση %1 χρησιμοποιείται ήδη από τον χρήστη %2 στην κύρια ροή.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>Η διεύθυνση %1 χρησιμοποιείται ήδη από τον χρήστη %2 στη δευτερεύουσα ροή.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>Εντοπίστηκε διένεξη (Conflict) στη διεύθυνση multicast.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>Η διεύθυνση δικτύου %1 δεν είναι διεύθυνση multicast.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>Η σύνδεση με την κάμερα (κύρια ροή) διακόπηκε απροσδόκητα.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>Η σύνδεση με την κάμερα (δευτερεύουσα ροή) διακόπηκε απροσδόκητα.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>Η σύνδεση με τη συσκευή διακόπηκε απροσδόκητα.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>Αποτυχία εξαναγκασμού στη χρήση της ώς της κάμερας, καθώς καθυστερεί πάρα πολύ. Θα χρησιμοποιηθεί αντί αυτού η ώρα της τοποθεσίας.</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>Πρόβλημα δικτύου στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Εμφάνιση Ειδοποίησης στην Επιφάνεια Εργασίας</translation>
     </message>
     <message>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Υποχρεωτική επιβεβαίωση</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Η λίστα δεν έχει επιλεγεί</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Η λίστα με το δοσμένο αναγνωριστικό &apos;%1&apos; δεν υπάρχει</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>Η λίστα με το δεδομένο αναγνωριστικό &apos;%1&apos; έχει μη έγκυρο τύπο αντικειμένου - &apos;%2&apos;, αναμενόταν - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::OpenLayoutAction</name>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Άνοιγμα Διάταξης</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>Δεν είναι δυνατός ο ορισμός μηδενικής διάρκειας για την κατάσταση συμβάντος `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>Δεν είναι δυνατός ο ορισμός μη μηδενικής διάρκειας για την κατάσταση συμβάντος `%1`</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Έκτακτη εγγραφή</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>Αναπαραγωγή Ήχου</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PoeOverBudgetEvent</name>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Κατανάλωση</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>Υπέρβαση ισχύος PoE</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>Υπέρβαση ισχύος PoE στο %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>Τρέχουσα κατανάλωση ισχύος: %1 watts</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>Ανώτερο όριο κατανάλωσης: %1 watts</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>Χαμηλότερο όριο κατανάλωσης: %1 watts</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>Εκτέλεση προεπιλογής PTZ</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>Προεπιλογή PTZ</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>Εκτέλεση σε χρήστες</translation>
     </message>
   </context>
   <context>
@@ -976,18 +976,18 @@
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>Αποστολή Ειδοποίησης Στο Κινητό</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>Ήχος</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>Επανάληψη Ήχου</translation>
     </message>
   </context>
   <context>
@@ -1034,11 +1034,11 @@
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>Πρόβλημα Υπηρεσιών</translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>Η μετεγκατάσταση των αδειών χρήσης απέτυχε.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
@@ -1046,114 +1046,114 @@
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>Πρόβλημα Υπηρεσιών στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>Μήνυμα Email</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>Αποστολή Email</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
-      <translation type="unfinished">Additional Recipients</translation>
+      <translation>Επιπλέον παραλήπτες</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Σφάλμα Πιστοποιητικού Διακομιστή</translation>
     </message>
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>Σφάλμα πιστοποιητικού %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>Διένεξη Διακομιστή (Conflict)</translation>
     </message>
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 Διένεξη (Conflict)</translation>
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>Ανακαλύφθηκε ένας διακομιστής με το ίδιο αναγνωριστικό στο ίδιο τοπικό δίκτυο</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>Οι διακομιστές στο ίδιο τοπικό δίκτυο έχουν διένεξη (Conflict) στις ακόλουθες συσκευές</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>Διακομιστής: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>Αποτυχία Διακομιστή</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>Η σύνδεση με τον διακομιστή έχει χαθεί.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>Ο διακομιστής σταμάτησε απροσδόκητα.</translation>
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 Αποτυχία</translation>
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>Η τοπική βάση δεδομένων βρέθηκε κατεστραμμένη και δεν ήταν δυνατή η ανάκτησή της. Έχει αρχικοποιηθεί μια νέα κενή βάση δεδομένων. Ένα αντίγραφο ασφαλείας της κατεστραμμένης βάσης δεδομένων έχει αποθηκευτεί για αναφορά.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>Ο Διακομιστής Ξεκίνησε</translation>
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 Ξεκίνησε</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>Εμφάνιση στη διάταξη συναγερμού</translation>
     </message>
     <message>
       <source>Alarm: %1</source>
-      <translation type="unfinished">Alarm: %1</translation>
+      <translation>Συναγερμός: %1</translation>
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>Αναγκαστικό άνοιγμα διάταξης συναγερμού</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>Τελικό σημείο</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1161,14 +1161,14 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>Εσωτερικό αίτημα HTTPS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1180,220 +1180,220 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>Από</translation>
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>Χρήστης: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>Δεν έχει επιλεγεί ήχος</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>Ομιλία</translation>
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Κείμενο</translation>
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>Στη Συσκευή</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation>Η κατάσταση `%1` δεν είναι έγκυρη για το συμβάν `%2` και την ενέργεια `%3` με τις δεδομένες παραμέτρους</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Πρόβλημα Αποθήκευσης</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>Παρουσιάστηκε σφάλμα εισόδου/εξόδου στο %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>Ο δίσκος HDD/SSD &quot;%1&quot; είναι πλήρης. Ο δίσκος περιέχει πάρα πολλά δεδομένα που δεν διαχειρίζεται το VMS.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>Ο δίσκος συστήματος &quot;%1&quot; είναι σχεδόν γεμάτος.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Ο χώρος αποθήκευσης αναλυτικών στοιχείων &quot;%1&quot; είναι εκτός σύνδεσης.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Ο χώρος αποθήκευσης αναλυτικών στοιχείων &quot;%1&quot; είναι σχεδόν πλήρης.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>Η δημιουργία αντιγράφων ασφαλείας της αρχειοθέτησης απέτυχε. Η δημιουργία αντιγράφου ασφαλείας του αρχείου %1 απέτυχε.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>Σφάλμα βάσης δεδομένων στον χώρο αποθήκευσης Αναλυτικών στοιχείων &quot;%1&quot;: ανεπαρκή δικαιώματα στο σημείο προσάρτησης.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>Δεν είναι δυνατή η αρχικοποίηση της κρυπτογράφησης AES ενώ η εγγραφή είναι ενεργοποιημένη στο αρχείο πολυμέσων. Τα δεδομένα εγγράφονται χωρίς κρυπτογράφηση.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>Σφάλμα RAID: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>Δεν υπάρχει αρκετή ταχύτητα HDD/SSD/δικτύου για εγγραφή σε %1.</translation>
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>Σφάλμα αποθήκευσης εισόδου/εξόδου στο %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>Αποθήκευση Πολύ αργή στο %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>Ο δίσκος αποθήκευσης είναι πλήρης στις %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>Ο δίσκος συστήματος είναι σχεδόν πλήρης στις %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>Ο χώρος αποθήκευσης Αναλυτικών στοιεχίων είναι εκτός σύνδεσης στο %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>Ο χώρος αποθήκευσης αναλυτικών στοιχείων είναι σχεδόν πλήρης στο %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>Σφάλμα δικαιωμάτων αποθήκευσης αναλυτικών στοιχείων στο %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>Η κρυπτογράφηση αποθήκευσης απέτυχε στο %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>Σφάλμα αποθήκευσης RAID στο %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>Απέτυχε η δημιουργία αντιγράφου ασφαλείας του αρχείου στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>Αποτυχία λήψης περιγραφής συμβάντος</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>Το συμβάν δεν διαθέτει κάμερα πηγής</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Επιλέξτε τουλάχιστον μία διάταξη</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetServerFieldValidator</name>
     <message>
       <source>Select online server</source>
-      <translation type="unfinished">Select online server</translation>
+      <translation>Επιλογή διαδικτυακού διακομιστή</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>Η λίστα δεν έχει επιλεγεί</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>Η λίστα με το δοσμένο αναγνωριστικό &apos;%1&apos; δεν υπάρχει</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>Η λίστα με το αναγνωριστικό &apos;%1&apos; δεν είναι γενικού τύπου λίστα</translation>
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>Μη έγκυρη συμβολοσειρά UUID</translation>
     </message>
     <message>
       <source>Enter at least one keyword</source>
-      <translation type="unfinished">Enter at least one keyword</translation>
+      <translation>Εισαγάγετε τουλάχιστον μία λέξη-κλειδί</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>Εμφάνιση Επικάλυψης Κειμένου</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>Προσαρμοσμένο κείμενο</translation>
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>Εμφάνιση σε</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>Η διεύθυνση Url δεν μπορεί να είναι κενή</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>Η διεύθυνση Url πρέπει να είναι έγκυρη</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>Η διεύθυνση Url δεν πρέπει να περιέχει χρήστη ή κωδικό πρόσβασης</translation>
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>Το τελικό σημείο δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Το τελικό σημείο δεν πρέπει να περιέχει οποιοδήποτε κενό</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>Εγγραφή στο αρχείο καταγραφής</translation>
     </message>
   </context>
 </TS>

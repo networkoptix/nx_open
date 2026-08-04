@@ -771,10 +771,33 @@
     </message>
   </context>
   <context>
-    <name>ObjectDetailsSheet</name>
+    <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation>Details</translation>
+      <translation type="unfinished">Details</translation>
+    </message>
+    <message>
+      <source>Share</source>
+      <translation type="unfinished">Share</translation>
+    </message>
+    <message>
+      <source>Select what to share</source>
+      <translation type="unfinished">Select what to share</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation type="unfinished">Download</translation>
+    </message>
+    <message>
+      <source>Select what to download</source>
+      <translation type="unfinished">Select what to download</translation>
+    </message>
+  </context>
+  <context>
+    <name>ObjectSelectionSheet</name>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>

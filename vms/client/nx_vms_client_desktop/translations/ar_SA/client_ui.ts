@@ -558,7 +558,7 @@
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>لا ترسل أمر إيقاف الكاميرا المتحركة</translation>
     </message>
     <message>
       <source>Do not record audio</source>
@@ -1244,7 +1244,7 @@
     </message>
     <message>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>التدوير الافتراضي</translation>
     </message>
   </context>
   <context>
