@@ -215,11 +215,11 @@
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Επιλέξτε τουλάχιστον μία συσκευή</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Επιλέξτε τουλάχιστον μία κάμερα</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 devices</source>
@@ -568,7 +568,7 @@
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Επιλέξτε ακριβώς μία κάμερα</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
@@ -586,7 +586,7 @@
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Επιλέξτε ακριβώς μία κάμερα</translation>
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
@@ -605,7 +605,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>Ορισμένοι χρήστες δεν έχουν πρόσβαση στην επιλεγμένη διάταξη</translation>
     </message>
   </context>
   <context>
@@ -1064,7 +1064,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>Επιλέξτε τουλάχιστον έναν χρήστη</translation>
     </message>
   </context>
   <context>
