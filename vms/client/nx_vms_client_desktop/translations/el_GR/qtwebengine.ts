@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation type="unfinished">General file operation failure</translation>
+      <translation>Γενικό σφάλμα κατά τη λειτουργία αρχείου</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>The file size exceeds the file system limitation</source>
-      <translation type="unfinished">The file size exceeds the file system limitation</translation>
+      <translation>Το μέγεθος του αρχείου υπερβαίνει το όριο του συστήματος αρχείων</translation>
     </message>
     <message>
       <source>The file is infected with a virus</source>
@@ -45,11 +45,11 @@
     </message>
     <message>
       <source>File seek past the end of a file (resuming previously interrupted download)</source>
-      <translation type="unfinished">File seek past the end of a file (resuming previously interrupted download)</translation>
+      <translation>Το αρχείο αναζητά μετά το τέλος ενός αρχείου (συνέχιση της λήψης που είχε διακοπεί προηγουμένως)</translation>
     </message>
     <message>
       <source>The partial file did not match the expected hash</source>
-      <translation type="unfinished">The partial file did not match the expected hash</translation>
+      <translation>Το μερικό αρχείο δεν αντιστοιχεί στην αναμενόμενη τιμή hash</translation>
     </message>
     <message>
       <source>General network failure</source>
@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>Το αίτημα δικτύου δεν ήταν έγκυρο (για παράδειγμα, το URL ή το σχήμα URI δεν είναι έγκυρο)</translation>
     </message>
     <message>
       <source>General server failure</source>
@@ -164,26 +164,26 @@
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Εσοχή</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Μείωση εσοχής</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Εισαγωγή &amp;ταξινομημένης λίστας</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Εισαγωγή &amp;μη ταξινομημένης λίστας</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Stop</source>
-      <translation>Σταμάτα</translation>
+      <translation>Διακοπή</translation>
     </message>
     <message>
       <source>Reload and Bypass Cache</source>
@@ -211,7 +211,7 @@
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation type="unfinished">Open link in new background tab</translation>
+      <translation>Άνοιγμα συνδέσμου σε νέα καρτέλα στο παρασκήνιο</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -247,23 +247,23 @@
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation type="unfinished">&amp;Indent</translation>
+      <translation>&amp;Εσοχή</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation type="unfinished">&amp;Outdent</translation>
+      <translation>&amp;Μείωση εσοχής</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation type="unfinished">Insert &amp;Ordered List</translation>
+      <translation>Εισαγωγή &amp;ταξινομημένης λίστας</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation type="unfinished">Insert &amp;Unordered List</translation>
+      <translation>Εισαγωγή &amp;μη ταξινομημένης λίστας</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Είστε βέβαιοι ότι θέλετε να φύγετε από αυτήν τη σελίδα; Οι αλλαγές που κάνατε ενδέχεται να μην αποθηκευτούν.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -279,7 +279,7 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Επιλέξτε φάκελο για μεταφόρτωση</translation>
     </message>
   </context>
   <context>
@@ -318,109 +318,109 @@
     </message>
     <message>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Επιλογή όλων</translation>
     </message>
     <message>
       <source>Paste and match style</source>
-      <translation type="unfinished">Paste and match style</translation>
+      <translation>Επικόλληση και ταίριασμα μορφοποίησης</translation>
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation type="unfinished">Open link in new window</translation>
+      <translation>Άνοιγμα συνδέσμου σε νέο παράθυρο</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation type="unfinished">Open link in new tab</translation>
+      <translation>Άνοιγμα συνδέσμου σε νέα καρτέλα</translation>
     </message>
     <message>
       <source>Copy link address</source>
-      <translation type="unfinished">Copy link address</translation>
+      <translation>Αντιγραφή διεύθυνσης συνδέσμου</translation>
     </message>
     <message>
       <source>Save link</source>
-      <translation type="unfinished">Save link</translation>
+      <translation>Αποθήκευση συνδέσμου</translation>
     </message>
     <message>
       <source>Copy image</source>
-      <translation type="unfinished">Copy image</translation>
+      <translation>Αντιγραφή εικόνας</translation>
     </message>
     <message>
       <source>Copy image address</source>
-      <translation type="unfinished">Copy image address</translation>
+      <translation>Αντιγραφή διεύθυνσης εικόνας</translation>
     </message>
     <message>
       <source>Save image</source>
-      <translation type="unfinished">Save image</translation>
+      <translation>Αποθήκευση εικόνας</translation>
     </message>
     <message>
       <source>Copy media address</source>
-      <translation type="unfinished">Copy media address</translation>
+      <translation>Αντιγραφή διεύθυνσης πολυμέσων</translation>
     </message>
     <message>
       <source>Show controls</source>
-      <translation type="unfinished">Show controls</translation>
+      <translation>Εμφάνιση στοιχείων ελέγχου</translation>
     </message>
     <message>
       <source>Loop</source>
-      <translation type="unfinished">Loop</translation>
+      <translation>Επανάληψη</translation>
     </message>
     <message>
       <source>Save media</source>
-      <translation type="unfinished">Save media</translation>
+      <translation>Αποθήκευση πολυμέσων</translation>
     </message>
     <message>
       <source>Inspect</source>
-      <translation type="unfinished">Inspect</translation>
+      <translation>Επιθεώρηση</translation>
     </message>
     <message>
       <source>Exit full screen</source>
-      <translation type="unfinished">Exit full screen</translation>
+      <translation>Έξοδος από πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Save page</source>
-      <translation type="unfinished">Save page</translation>
+      <translation>Αποθήκευση σελίδας</translation>
     </message>
     <message>
       <source>View page source</source>
-      <translation type="unfinished">View page source</translation>
+      <translation>Προβολή πηγαίου κώδικα σελίδας</translation>
     </message>
   </context>
   <context>
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Σύνδεση με τον διακομιστή μεσολάβησης &quot;%1&quot; χρησιμοποιώντας:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Εισάγετε όνομα χρήστη και κωδικό πρόσβασης για &quot;%1&quot; στο %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>
-      <translation type="unfinished">Javascript Alert - %1</translation>
+      <translation>Ειδοποίηση Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation type="unfinished">Javascript Confirm - %1</translation>
+      <translation>Επιβεβαίωση Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation type="unfinished">Javascript Prompt - %1</translation>
+      <translation>Προτροπή Javascript - %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>
-      <translation type="unfinished">Are you sure you want to leave this page?</translation>
+      <translation>Είστε βέβαιοι ότι θέλετε να φύγετε από αυτή τη σελίδα;</translation>
     </message>
     <message>
       <source>Changes that you made may not be saved.</source>
-      <translation type="unfinished">Changes that you made may not be saved.</translation>
+      <translation>Οι αλλαγές που έκανες ενδέχεται να μην αποθηκευτούν.</translation>
     </message>
   </context>
   <context>
     <name>WebContentsAdapter</name>
     <message>
       <source>HTTP-POST data can only be sent over HTTP(S) protocol</source>
-      <translation type="unfinished">HTTP-POST data can only be sent over HTTP(S) protocol</translation>
+      <translation>Τα δεδομένα HTTP-POST μπορούν να αποσταλούν μόνο μέσω πρωτοκόλλου HTTP(S)</translation>
     </message>
   </context>
 </TS>
