@@ -425,6 +425,14 @@ AdaptiveScreen
             iconColor: LayoutController.isTabletLayout ? "dark1" : "light4"
             cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
         }
+
+        onSelectedNotificationChanged:
+        {
+            if (!selectedNotification || !selectedNotification.url)
+                return
+
+            windowContext.uriHandler.handleUrl(selectedNotification.url)
+        }
     }
 
     NavigationPanel
