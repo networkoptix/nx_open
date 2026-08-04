@@ -17,7 +17,7 @@ struct NX_VMS_API CameraStreamCapability
     float minBitrateKbps = 0;
     float maxBitrateKbps = 0;
     float defaultBitrateKbps = 0;
-    int defaultFps = 0;
+    float defaultFps = 0;
 
     /**%apidoc
      * minFps/maxFps are optional; when set, they take priority over availableFps.
