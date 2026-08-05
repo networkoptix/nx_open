@@ -2508,7 +2508,7 @@ Press Alt + Click to follow object</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Επιλογή διάταξης</translation>
     </message>
   </context>
   <context>
@@ -3118,7 +3118,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Κανόνες Συμβάντος</translation>
     </message>
     <message>
       <source>%1 selected:</source>
