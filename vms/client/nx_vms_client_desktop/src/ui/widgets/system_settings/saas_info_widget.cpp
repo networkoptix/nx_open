@@ -255,13 +255,11 @@ void SaasInfoWidget::loadDataToUi()
 
 void SaasInfoWidget::showEvent(QShowEvent*)
 {
-    d->servicesUsageModel->setCamerasChangesTracking(systemContext(), true);
     d->tierUsageModel->setResourcesChangesTracking(systemContext(), true);
 }
 
 void SaasInfoWidget::hideEvent(QHideEvent*)
 {
-    d->servicesUsageModel->setCamerasChangesTracking(systemContext(), false);
     d->tierUsageModel->setResourcesChangesTracking(systemContext(), false);
 }
 

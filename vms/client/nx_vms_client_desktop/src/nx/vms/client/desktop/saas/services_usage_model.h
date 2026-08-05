@@ -7,10 +7,7 @@
 #include <client/client_globals.h>
 #include <nx/utils/impl_ptr.h>
 
-class QnResourcePool;
-
 namespace nx::vms::common::saas { class ServiceManager; };
-namespace nx::vms::client::desktop { class SystemContext; };
 
 namespace nx::vms::client::desktop::saas {
 
@@ -53,14 +50,6 @@ public:
 
     virtual QModelIndex parent(const QModelIndex& index) const override;
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-
-    /**
-     * Sets whether the model should track changes of relevant properties of camera resources to
-     * notify about services usage count changes. It's worth stopping track camera changes if
-     * there is no visible item view using this model as a source.
-     */
-    void setCamerasChangesTracking(SystemContext* systemContext, bool enabled);
-    bool isTrackingCamerasChanges() const;
 
 private:
     struct Private;
