@@ -27,7 +27,28 @@ Controls.ApplicationWindow
     property alias banner: windowBanner
 
     visible: true
-    background: Rectangle { color: ColorTheme.colors.dark4 }
+    background: Rectangle
+    {
+        color: ColorTheme.colors.dark4
+
+        Rectangle
+        {
+            y: windowParams.topMargin - height
+            width: parent.width
+            height: 1
+            color: ColorTheme.colors.dark7
+            visible: windowParams.topMargin > 0
+        }
+
+        Rectangle
+        {
+            y: parent.height - windowParams.bottomMargin
+            width: parent.width
+            height: 1
+            color: ColorTheme.colors.dark7
+            visible: windowParams.bottomMargin > 0
+        }
+    }
 
     function lp(path)
     {
