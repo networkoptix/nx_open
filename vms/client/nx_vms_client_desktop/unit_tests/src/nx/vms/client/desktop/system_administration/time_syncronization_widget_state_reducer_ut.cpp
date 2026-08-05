@@ -210,7 +210,8 @@ TEST_F(TimeSynchronizationWidgetReducerTest, disableSyncWithInternetWithManyServ
     ASSERT_EQ(result.status, State::Status::notSynchronized);
 }
 
-// Enabling and disabling internet sync must keep the selected time server.
+// Enabling and disabling internet sync must keep the selected time server and thus return to the
+// saved values.
 TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServer)
 {
     const auto id = nx::Uuid::createUuid();
@@ -224,12 +225,14 @@ TEST_F(TimeSynchronizationWidgetReducerTest, keepOldSelectedServer)
     std::tie(changed, afterEnabled) = Reducer::setSyncTimeWithInternet(std::move(state), true);
     ASSERT_TRUE(changed);
     ASSERT_EQ(afterEnabled.status, State::Status::synchronizedWithInternet);
+    ASSERT_TRUE(afterEnabled.hasChanges);
 
     State result;
     std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterEnabled), false);
     ASSERT_TRUE(changed);
     ASSERT_EQ(result.primaryServer, id);
     ASSERT_EQ(result.status, State::Status::synchronizedWithSelectedServer);
+    ASSERT_FALSE(result.hasChanges);
 }
 
 // Disabling sync when sync with internet
@@ -378,6 +381,177 @@ TEST_F(TimeSynchronizationWidgetReducerTest, removePrimaryServer)
 
     assertIsActual(result);
     ASSERT_EQ(result.status, State::Status::notSynchronized);
+}
+
+// Freshly loaded state has nothing to apply.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterInitialization)
+{
+    const auto id = nx::Uuid::createUuid();
+    const auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    ASSERT_FALSE(state.hasChanges);
+    ASSERT_FALSE(state.differsFromSavedSettings());
+}
+
+// Synchronization is disabled by the invalid primary server, but this is not a user change.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterInitializationByInvalidServer)
+{
+    const auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ nx::Uuid::createUuid(),
+        /*servers*/ {server(), server()});
+
+    ASSERT_EQ(state.status, State::Status::notSynchronized);
+    ASSERT_FALSE(state.hasChanges);
+    ASSERT_FALSE(state.differsFromSavedSettings());
+}
+
+// Turning internet sync off and on again returns to the saved values, so nothing is to apply.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterInternetSyncToggledBack)
+{
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ nx::Uuid(),
+        /*servers*/ {server(), server()});
+
+    bool changed = false;
+    State afterDisabled;
+    std::tie(changed, afterDisabled) = Reducer::setSyncTimeWithInternet(std::move(state), false);
+    ASSERT_TRUE(changed);
+    ASSERT_TRUE(afterDisabled.hasChanges);
+
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterDisabled), true);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.status, State::Status::synchronizedWithInternet);
+    ASSERT_FALSE(result.hasChanges);
+}
+
+// The same for a single server site, where disabling internet sync selects the only server.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterInternetSyncToggledBackSingleServer)
+{
+    const auto id = nx::Uuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ nx::Uuid(),
+        /*servers*/ {server(id)});
+
+    bool changed = false;
+    State afterDisabled;
+    std::tie(changed, afterDisabled) = Reducer::setSyncTimeWithInternet(std::move(state), false);
+    ASSERT_TRUE(changed);
+    ASSERT_TRUE(afterDisabled.hasChanges);
+
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterDisabled), true);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.status, State::Status::synchronizedWithInternet);
+    ASSERT_FALSE(result.hasChanges);
+}
+
+// Disabling sync and enabling it back returns to the saved values.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterSyncDisabledAndEnabledBack)
+{
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ nx::Uuid(),
+        /*servers*/ {server(), server()});
+
+    bool changed = false;
+    State afterDisabled;
+    std::tie(changed, afterDisabled) = Reducer::disableSync(std::move(state));
+    ASSERT_TRUE(changed);
+    ASSERT_TRUE(afterDisabled.hasChanges);
+
+    State result;
+    std::tie(changed, result) = Reducer::setSyncTimeWithInternet(std::move(afterDisabled), true);
+    ASSERT_TRUE(changed);
+    ASSERT_FALSE(result.hasChanges);
+}
+
+// Selecting the saved primary server back must not leave the state modified.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterPrimaryServerSelectedBack)
+{
+    const auto id = nx::Uuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+    State afterInternetSync;
+    std::tie(changed, afterInternetSync) =
+        Reducer::setSyncTimeWithInternet(std::move(state), true);
+    ASSERT_TRUE(changed);
+    ASSERT_TRUE(afterInternetSync.hasChanges);
+
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(afterInternetSync), id);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.primaryServer, id);
+    ASSERT_FALSE(result.hasChanges);
+}
+
+// Real changes must still be detected.
+TEST_F(TimeSynchronizationWidgetReducerTest, hasChangesAfterAnotherServerSelected)
+{
+    const auto id = nx::Uuid::createUuid();
+    const auto anotherId = nx::Uuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server(anotherId)});
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::selectServer(std::move(state), anotherId);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.primaryServer, anotherId);
+    ASSERT_TRUE(result.hasChanges);
+}
+
+// Removing the selected server reverts the state to the saved values, so nothing is to apply.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterSelectedServerRemoved)
+{
+    const auto id = nx::Uuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ false,
+        /*primaryTimeServer*/ nx::Uuid(),
+        /*servers*/ {server(id), server()});
+
+    bool changed = false;
+    State afterSelected;
+    std::tie(changed, afterSelected) = Reducer::selectServer(std::move(state), id);
+    ASSERT_TRUE(changed);
+    ASSERT_TRUE(afterSelected.hasChanges);
+
+    State result;
+    std::tie(changed, result) = Reducer::removeServer(std::move(afterSelected), id);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+    ASSERT_FALSE(result.hasChanges);
+}
+
+// Removing the saved time server is not a user change, so there is still nothing to apply.
+TEST_F(TimeSynchronizationWidgetReducerTest, noChangesAfterSavedServerRemoved)
+{
+    const auto id = nx::Uuid::createUuid();
+    auto state = Reducer::initialize(State(),
+        /*isTimeSynchronizationEnabled*/ true,
+        /*primaryTimeServer*/ id,
+        /*servers*/ {server(id), server()});
+    ASSERT_FALSE(state.hasChanges);
+
+    bool changed = false;
+    State result;
+    std::tie(changed, result) = Reducer::removeServer(std::move(state), id);
+    ASSERT_TRUE(changed);
+    ASSERT_EQ(result.status, State::Status::notSynchronized);
+    ASSERT_TRUE(result.differsFromSavedSettings());
+    ASSERT_FALSE(result.hasChanges);
 }
 
 TEST_F(TimeSynchronizationWidgetReducerTest, removeArbitaryServer)

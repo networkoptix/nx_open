@@ -227,6 +227,9 @@ void TimeSynchronizationWidget::applyChanges()
 
     // The "has changes" flag is intentionally not cleared here. On a successful save the system
     // settings change and the timeSynchronizationSettingsChanged subscription reloads the page.
+    // The flag is not set while the values are equal to the loaded ones (see
+    // State::differsFromSavedSettings), so a user edit cannot request an apply which changes
+    // nothing.
 }
 
 bool TimeSynchronizationWidget::hasChanges() const
