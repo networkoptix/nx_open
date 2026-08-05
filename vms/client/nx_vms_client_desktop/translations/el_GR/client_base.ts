@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Διάρκεια</translation>
     </message>
     <message>
       <source>For</source>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>User...</source>
-      <translation type="unfinished">User...</translation>
+      <translation>Χρήστης...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
@@ -232,7 +232,7 @@
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation type="unfinished">Open Layout...</translation>
+      <translation>Άνοιγμα Διάταξης...</translation>
     </message>
     <message>
       <source>Folder...</source>
@@ -276,7 +276,7 @@
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Έξοδος από πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Minimize</source>
@@ -331,7 +331,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Κανόνες Συμβάντος...</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -379,7 +379,7 @@
     </message>
     <message>
       <source>Server...</source>
-      <translation type="unfinished">Server...</translation>
+      <translation>Διακομιστής...</translation>
     </message>
     <message>
       <source>Open</source>
@@ -1370,7 +1370,7 @@
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Σφάλμα δικτύου</translation>
     </message>
     <message>
       <source>License activated</source>
@@ -1847,7 +1847,7 @@ License Key: %2</translation>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Είστε βέβαιοι ότι θέλετε να φύγετε από αυτήν τη σελίδα; Οι αλλαγές που κάνατε ενδέχεται να μην αποθηκευτούν.</translation>
     </message>
   </context>
   <context>
@@ -2243,7 +2243,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Διάρκεια</translation>
     </message>
     <message>
       <source>User</source>
@@ -2408,7 +2408,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
@@ -2633,7 +2633,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>ID</source>
@@ -3093,7 +3093,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Κανόνες Συμβάντος</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3202,7 +3202,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Διάρκεια</translation>
     </message>
     <message>
       <source>Open circuit</source>
@@ -3301,7 +3301,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3321,7 +3321,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Ο διακομιστής δεν βρέθηκε</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -3493,7 +3493,7 @@ License Key: %2</translation>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Στιγμιότυπο οθόνης</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -3919,7 +3919,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Έξοδος από πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
@@ -3942,11 +3942,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>Invalid URL</source>
@@ -5848,7 +5848,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Preset</source>
-      <translation type="unfinished">Preset</translation>
+      <translation>Προεπιλογή</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -6702,7 +6702,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Ποιότητα</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -6798,7 +6798,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Ποιότητα</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
@@ -7288,7 +7288,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraReplacementDialog</name>
     <message>
       <source>Failed to replace camera</source>
-      <translation type="unfinished">Failed to replace camera</translation>
+      <translation>Αποτυχία αντικατάστασης κάμερας</translation>
     </message>
     <message>
       <source>Abort camera replacement?</source>
@@ -8374,7 +8374,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Κείμενο</translation>
     </message>
     <message>
       <source>Reset Speed</source>
@@ -8927,7 +8927,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
-      <translation type="unfinished">Cannot connect to LDAP server</translation>
+      <translation>Δεν είναι δυνατή η σύνδεση με τον διακομιστή LDAP</translation>
     </message>
     <message>
       <source>All LDAP users and groups will be deleted.&lt;br&gt;&lt;br&gt;LDAP settings will be also deleted.</source>
@@ -10213,7 +10213,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Κατανάλωση</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10248,7 +10248,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -10947,7 +10947,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Δεν υπάρχουν κατάλληλοι διακομιστές</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -11037,7 +11037,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Σφάλμα δικτύου.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -11358,7 +11358,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Διακομιστής</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -11431,7 +11431,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Σφάλμα δικτύου</translation>
     </message>
   </context>
   <context>
@@ -12097,7 +12097,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Επιλέξτε φάκελο για μεταφόρτωση</translation>
     </message>
     <message>
       <source>Developer Tools</source>
@@ -12434,7 +12434,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Ορισμός σε πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
@@ -12446,7 +12446,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Άνοιγμα Διάταξης</translation>
     </message>
     <message>
       <source>Modifier</source>
@@ -12834,7 +12834,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>Επιλέξτε τουλάχιστον μία διάταξη</translation>
     </message>
     <message>
       <source>Select at least one User</source>
