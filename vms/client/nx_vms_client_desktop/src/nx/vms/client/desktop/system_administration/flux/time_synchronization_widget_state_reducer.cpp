@@ -33,13 +33,16 @@ State TimeSynchronizationWidgetReducer::initialize(
     // Actualize primary time server against servers list.
     state.primaryServer = actualPrimaryServer(state).id;
     state.lastPrimaryServer = state.primaryServer;
-    state.hasChanges = false;
 
     // If invalid server was passed, disable synchronization.
     if (primaryTimeServer != state.primaryServer)
         state.enabled = false;
 
     state.status = actualStatus(state);
+
+    state.savedEnabled = state.enabled;
+    state.savedPrimaryServer = state.primaryServer;
+    state.hasChanges = false;
 
     return state;
 }
@@ -94,7 +97,7 @@ Result TimeSynchronizationWidgetReducer::setSyncTimeWithInternet(
         state.primaryServer = nx::Uuid();
         state.status = State::Status::notSynchronized;
     }
-    state.hasChanges = true;
+    state.hasChanges = state.differsFromSavedSettings();
     return {true, std::move(state)};
 }
 
@@ -107,7 +110,7 @@ Result TimeSynchronizationWidgetReducer::disableSync(State state)
     state.enabled = false;
     state.primaryServer = nx::Uuid();
     state.status = State::Status::notSynchronized;
-    state.hasChanges = true;
+    state.hasChanges = state.differsFromSavedSettings();
     return {true, std::move(state)};
 }
 
@@ -123,7 +126,7 @@ Result TimeSynchronizationWidgetReducer::selectServer(State state, const nx::Uui
         state.enabled = false;
 
     state.status = actualStatus(state);
-    state.hasChanges = true;
+    state.hasChanges = state.differsFromSavedSettings();
     return {true, std::move(state)};
 }
 
@@ -156,6 +159,10 @@ Result TimeSynchronizationWidgetReducer::removeServer(State state, const nx::Uui
         state.primaryServer = actualPrimaryServer(state).id;
         state.status = actualStatus(state);
         state.commonTimezoneOffset = state.calcCommonTimezoneOffset();
+
+        if (!state.differsFromSavedSettings())
+            state.hasChanges = false;
+
         return {true, std::move(state)};
     }
 

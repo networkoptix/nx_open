@@ -31,6 +31,9 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
     bool enabled = true;
     nx::Uuid primaryServer;
 
+    bool savedEnabled = true;
+    nx::Uuid savedPrimaryServer;
+
     // Previous selected time server.
     nx::Uuid lastPrimaryServer;
 
@@ -58,6 +61,11 @@ struct TimeSynchronizationWidgetState: AbstractFluxState
     {
         return status == Status::synchronizedWithInternet
             || status == Status::noInternetConnection;
+    }
+
+    bool differsFromSavedSettings() const
+    {
+        return enabled != savedEnabled || primaryServer != savedPrimaryServer;
     }
 
     milliseconds calcCommonTimezoneOffset() const
