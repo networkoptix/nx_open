@@ -774,11 +774,11 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detail</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Bagikan</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <source>Select what to download</source>
@@ -797,7 +797,7 @@
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel</translation>
     </message>
   </context>
   <context>

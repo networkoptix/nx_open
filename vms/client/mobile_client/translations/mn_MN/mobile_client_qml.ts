@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Хуваалцах</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Татаж авах</translation>
     </message>
     <message>
       <source>Select what to download</source>
@@ -798,7 +798,7 @@
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>

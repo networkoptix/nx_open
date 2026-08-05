@@ -774,11 +774,11 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>配置信息</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>共享</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>下载</translation>
     </message>
     <message>
       <source>Select what to download</source>
@@ -797,7 +797,7 @@
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>

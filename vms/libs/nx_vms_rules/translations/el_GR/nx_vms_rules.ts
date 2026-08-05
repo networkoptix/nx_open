@@ -173,7 +173,7 @@
     </message>
     <message>
       <source>Of Type</source>
-      <translation type="unfinished">Of Type</translation>
+      <translation>Τύπου</translation>
     </message>
     <message>
       <source>And Caption</source>
@@ -186,7 +186,7 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Το πεδίο %1 πρέπει να παρέχεται για τη δεδομένη πολιτική επικύρωσης</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
@@ -202,7 +202,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Για</translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
@@ -234,7 +234,7 @@
     </message>
     <message>
       <source>Unable to deserialize properties for field: %1</source>
-      <translation type="unfinished">Unable to deserialize properties for field: %1</translation>
+      <translation>Δεν ήταν δυνατή η αποσειριοποίηση των ιδιοτήτων του πεδίου: %1</translation>
     </message>
     <message>
       <source>Event: %1 is not registered</source>
@@ -246,7 +246,7 @@
     </message>
     <message>
       <source>Rule validation failed: %1</source>
-      <translation type="unfinished">Rule validation failed: %1</translation>
+      <translation>Η επικύρωση του Κανόνα απέτυχε: %1</translation>
     </message>
     <message>
       <source>Caption</source>
@@ -262,75 +262,75 @@
     </message>
     <message>
       <source>Method</source>
-      <translation type="unfinished">Method</translation>
+      <translation>Μέθοδος</translation>
     </message>
     <message>
       <source>Select Integration Action</source>
-      <translation type="unfinished">Select Integration Action</translation>
+      <translation>Επιλογή Ενέργειας Ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Integration not found for Integration Action %1</source>
-      <translation type="unfinished">Integration not found for Integration Action %1</translation>
+      <translation>Δεν βρέθηκε ενσωμάτωση για Ενέργεια Ενσωμάτωσης %1</translation>
     </message>
     <message>
       <source>Unsupported JSON value type in key %1</source>
-      <translation type="unfinished">Unsupported JSON value type in key %1</translation>
+      <translation>Μη υποστηριζόμενος τύπος τιμής JSON στο κλειδί %1</translation>
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>Συνολικός αριθμός συμβάντων</translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>Το θέμα αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>Η συσκευή αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Removed camera</source>
-      <translation type="unfinished">Removed camera</translation>
+      <translation>Η κάμερα αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>Διακομιστής αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>Η διάταξη αφαιρέθηκε</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <comment>Numerus form depend on devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>Η επιλεγμένη συσκευή αφαιρέθηκε</numerusform>
+        <numerusform>Οι επιλεγμένες συσκευές αφαιρέθηκαν</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>Η επιλεγμένη κάμερα αφαιρέθηκε</numerusform>
+        <numerusform>Οι επιλεγμένες κάμερες αφαιρέθηκαν</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <comment>Numerus form depend on servers count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>Ο επιλεγμένος διακομιστής αφαιρέθηκε</numerusform>
+        <numerusform>Οι επιλεγμένοι διακομιστές αφαιρέθηκαν</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <comment>Numerus form depend on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>Η επιλεγμένη διάταξη αφαιρέθηκε</numerusform>
+        <numerusform>Οι επιλεγμένες διατάξεις αφαιρέθηκαν</numerusform>
       </translation>
     </message>
     <message>
@@ -343,24 +343,24 @@
     <name>nx::vms::rules::AcknowledgeAction</name>
     <message>
       <source>Acknowledge</source>
-      <translation type="unfinished">Acknowledge</translation>
+      <translation>Αναγνωρίζω</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>Δεν επιτρέπεται κενό κείμενο</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation type="unfinished">Invalid email address %1</translation>
+      <translation>Μη έγκυρη διεύθυνση email %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      <translation>
+        <numerusform>Η επιπλέον διεύθυνση email %n από τις %1 είναι μη έγκυρη</numerusform>
+        <numerusform>Οι %n από τις %1 επιπλέον διευθύνσεις ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρες</numerusform>
       </translation>
     </message>
   </context>
@@ -373,101 +373,101 @@
     <message>
       <source>%1 at %2</source>
       <comment>Analytics Event at some camera</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 στο %2</translation>
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>Και χαρακτηριστικά</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>Δεν έχει επιλεγεί ο τύπος συμβάντος Αναλύσεων</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Ανιχνεύτηκε Αντικείμενο</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Ανιχνεύθηκε Αντικείμενο Αναλύσεων</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>Και Το Αντικείμενο</translation>
     </message>
     <message>
       <source>%1 at %2</source>
       <comment>Object %1 is detected at camera %2</comment>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 στο %2</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>Ο τύπος αντικειμένου ανάλυσης δεν είναι επιλεγμένος</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>Δημιουργία Σελιδοδείκτη</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>Προσθήκη Ετικετών</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BuzzerAction</name>
     <message>
       <source>Buzzer</source>
-      <translation type="unfinished">Buzzer</translation>
+      <translation>Βομβητής</translation>
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>Περιορισμός ρυθμού ενεργειών</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>Θύρα Εισόδου: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>Είσοδος στο %1</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>Σήμα εισόδου στη Συσκευή</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>Με Αναγνωριστικό</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>Σήμα Εισόδου στην Κάμερα</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>Η Συσκευή Αποσυνδέθηκε</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>Η Κάμερα Αποσυνδέθηκε</translation>
     </message>
     <message>
       <source>Device</source>
@@ -479,42 +479,42 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Η συσκευή αποσυνδέθηκε</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Η κάμερα αποσυνδέθηκε</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>Η μονάδα εισόδου/εξόδου αποσυνδέθηκε</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Η συσκευή αποσυνδέθηκε στο %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Η κάμερα αποσυνδέθηκε στο %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>Η μονάδα εισόδου/εξόδου αποσυνδέθηκε στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>Διεύθυνση σε διένεξη (Conflict): %1</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>Διένεξη IP (Conflict) Συσκευής στο %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
@@ -972,7 +972,7 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Κείμενο</translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
@@ -994,42 +994,42 @@
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>Ειδοποιήσεις του πεδίου φίλτρου συμβάντων `%1`:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>Ειδοποιήσεις του πεδίου δημιουργίας ενεργειών `%1`:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>Ο κανόνας δεν έχει ολοκληρωθεί. Απαιτούνται ένα φίλτρο και ένα εργαλείο δημιουργίας</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>Το δεδομένο φίλτρο δεν είναι συμβατό με το δεδομένο εργαλείο δημιουργίας</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Η εγγραφή στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η εγγραφή σε κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud στα κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή στα κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message>
@@ -1042,7 +1042,7 @@
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>Η εισαγωγή των αδειών χρήσης παραλείφθηκε. Μια νέα προσπάθεια μετεγκατάστασης θα προγραμματιστεί αυτόματα για αργότερα.</translation>
     </message>
     <message>
       <source>Services Issue on %1</source>

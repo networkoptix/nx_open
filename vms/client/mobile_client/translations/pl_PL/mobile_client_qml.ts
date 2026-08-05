@@ -707,7 +707,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Odłączyć %1 od %2?</translation>
     </message>
   </context>
   <context>
@@ -777,30 +777,30 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Szczegóły</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Udostępnij</translation>
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Wybierz, co chcesz udostępnić</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Pobierz</translation>
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Wybierz, co chcesz pobrać</translation>
     </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>

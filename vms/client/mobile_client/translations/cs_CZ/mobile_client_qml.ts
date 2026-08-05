@@ -777,11 +777,11 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaily</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Sdílet</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Stáhnout</translation>
     </message>
     <message>
       <source>Select what to download</source>
@@ -800,7 +800,7 @@
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Zrušit</translation>
     </message>
   </context>
   <context>

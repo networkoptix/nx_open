@@ -789,7 +789,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Atsisiųsti</translation>
     </message>
     <message>
       <source>Select what to download</source>
@@ -800,7 +800,7 @@
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Atšaukti</translation>
     </message>
   </context>
   <context>

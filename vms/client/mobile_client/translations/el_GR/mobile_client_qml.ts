@@ -775,30 +775,30 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Λεπτομέρειες</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Κοινή χρήση</translation>
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Επιλέξτε τι θα μοιραστείτε</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Λήψη</translation>
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Επιλέξτε τι θα κατεβάσετε</translation>
     </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>

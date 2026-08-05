@@ -774,30 +774,30 @@
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>共有</translation>
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>共有する内容を選択してください</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>ダウンロード</translation>
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>ダウンロードする項目を選択してください</translation>
     </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
