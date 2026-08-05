@@ -13,12 +13,10 @@ extern "C" {
 } // extern "C"
 
 #include <nx/codec/h264/common.h>
-#include <nx/codec/h264/sequence_parameter_set.h>
 #include <nx/codec/nal_units.h>
 #include <nx/media/codec_parameters.h>
 #include <nx/media/ffmpeg/av_packet.h>
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
-#include <nx/media/ffmpeg/old_api.h>
 #include <nx/media/ffmpeg/shared_memory_frame_allocator.h>
 #include <nx/media/utils.h>
 #include <nx/metric/metrics_storage.h>
@@ -259,11 +257,9 @@ QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(
     m_lightModeFrameCounter(0),
     m_currentWidth(-1),
     m_currentHeight(-1),
-    m_checkH264ResolutionChange(false),
     m_forceSliceDecoding(-1),
     m_prevSampleAspectRatio( 1.0 ),
     m_prevTimestamp(AV_NOPTS_VALUE),
-    m_spsFound(false),
     m_mtDecodingPolicy(config.mtDecodePolicy),
     m_useMtDecoding(config.mtDecodePolicy == MultiThreadDecodePolicy::enabled),
     m_needRecreate(false),
@@ -331,10 +327,6 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
         // ignoring deblocking filter type 1 for better performance between H264 slices.
         m_context->flags2 |= AV_CODEC_FLAG2_FAST;
     }
-    m_checkH264ResolutionChange =
-        m_context->thread_count > 1 &&
-        m_context->codec_id == AV_CODEC_ID_H264 &&
-        (!m_context->extradata_size || m_context->extradata[0] == 0);
 
     if (m_config.forceGrayscaleDecoding)
         m_context->flags |= AV_CODEC_FLAG_GRAY;
@@ -403,7 +395,9 @@ bool QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     }
 
     avcodec_free_context(&m_context);
-    m_spsFound = false;
+    // Any backlog belongs to the decoder instance being replaced; carrying it over could hand
+    // out frames with a stale resolution/codec after this reset.
+    m_outputFrames.clear();
     m_opened = openDecoder(data);
     m_needRecreate = false;
     return m_opened;
@@ -446,22 +440,89 @@ void QnFfmpegVideoDecoder::setGreyOnlyMode(bool value)
         m_context->flags &= ~AV_CODEC_FLAG_GRAY;
 }
 
-int QnFfmpegVideoDecoder::decodeVideo(
-    AVCodecContext *avctx,
-    AVFrame *picture,
-    int *got_picture_ptr,
-    const AVPacket *avpkt)
+bool QnFfmpegVideoDecoder::decodeVideo(const QnConstCompressedVideoDataPtr& data)
 {
-    m_lastDecodeResult = nx::media::ffmpeg::old_api::decode(avctx, picture, got_picture_ptr, avpkt);
+    nx::media::ffmpeg::AvPacket avPacket(data.get());
+    auto packet = avPacket.get();
+    packet->pts = AV_NOPTS_VALUE;
+    if (data && isImage(data))
+        packet->flags = AV_PKT_FLAG_KEY;
+
+    // Frames are retrieved in the drain loop below, right after this send.
+    m_lastDecodeResult = avcodec_send_packet(m_context, packet);
+    if (m_lastDecodeResult == AVERROR_EOF)
+        m_lastDecodeResult = 0;
+
     if (m_lastDecodeResult < 0)
     {
         NX_DEBUG(this, "Ffmpeg decoder error: %1",
             nx::media::ffmpeg::avErrorToString(m_lastDecodeResult));
+        return false;
     }
-    if (m_lastDecodeResult > 0 && m_metrics)
-        m_metrics->decodedPixels() += picture->width * picture->height;
+    // A single avcodec_send_packet() can make more than one frame available (reordering
+    // catching up, flushing, etc). Pull all of them out now and queue them, so the decoder's
+    // output queue is empty by the next call -- keeping avcodec_send_packet() from ever
+    // refusing the next packet with EAGAIN -- and so no ready frame is left behind.
+    while (true)
+    {
+        CLVideoDecoderOutputPtr frame(new CLVideoDecoderOutput());
+        m_lastDecodeResult = avcodec_receive_frame(m_context, frame.get());
+        if (m_lastDecodeResult == AVERROR(EAGAIN) || m_lastDecodeResult == AVERROR_EOF)
+        {
+            // No more frames are ready right now -- done draining successfully.
+            m_lastDecodeResult = 0;
+            break;
+        }
 
-    return m_lastDecodeResult;
+        if (m_lastDecodeResult < 0)
+        {
+            NX_DEBUG(this, "Ffmpeg decoder error: %1",
+                nx::media::ffmpeg::avErrorToString(m_lastDecodeResult));
+            return false;
+        }
+        if (m_metrics)
+            m_metrics->decodedPixels() += frame->width * frame->height;
+
+        if (!finalizeDecodedFrame(data, frame.get()))
+            return false;
+
+        m_outputFrames.push_back(frame);
+    }
+    return true;
+}
+
+bool QnFfmpegVideoDecoder::finalizeDecodedFrame(
+    const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutput* outFrame)
+{
+    if (m_config.forceRgbaFormat && outFrame->format != AV_PIX_FMT_RGBA)
+    {
+        CLVideoDecoderOutput tmpFrame;
+        tmpFrame.reallocate(outFrame->width, outFrame->height, AV_PIX_FMT_RGBA);
+        if (data)
+            tmpFrame.pkt_dts = data->timestamp;
+
+        if (outFrame->convertTo(&tmpFrame))
+        {
+            outFrame->copyFrom(&tmpFrame);
+            outFrame->sample_aspect_ratio = getSampleAspectRatio();
+            outFrame->flags = m_lastFlags;
+            outFrame->channel = m_lastChannelNumber;
+            return m_context->pix_fmt != AV_PIX_FMT_NONE;
+        }
+    }
+
+    outFrame->format = CLVideoDecoderOutput::fixDeprecatedPixelFormat(m_context->pix_fmt);
+    outFrame->sample_aspect_ratio = getSampleAspectRatio();
+    outFrame->flags = m_lastFlags;
+    outFrame->channel = m_lastChannelNumber;
+    // In case of b-frames stream ffmpeg gives last flushed frames with AV_NOPTS_VALUE, so use
+    // m_prevFrameDuration to get frame pts.
+    if (!data && outFrame->pkt_dts == AV_NOPTS_VALUE)
+    {
+        outFrame->pkt_dts = m_prevTimestamp + m_prevFrameDuration;
+        m_prevTimestamp = outFrame->pkt_dts;
+    }
+    return m_context->pix_fmt != AV_PIX_FMT_NONE;
 }
 
 // The input buffer must be AV_INPUT_BUFFER_PADDING_SIZE larger than the actual bytes read because
@@ -487,9 +548,7 @@ bool QnFfmpegVideoDecoder::decode(
     if (!m_opened)
         return false;
 
-    CLVideoDecoderOutput* const outFrame = outFramePtr->data();
-    int got_picture = 0;
-    outFrame->clean();
+    outFramePtr->data()->clean();
 
     if (data)
     {
@@ -539,50 +598,11 @@ bool QnFfmpegVideoDecoder::decode(
                 return false;
         }
 
-        nx::media::ffmpeg::AvPacket avPacket(data.get());
-        auto packet = avPacket.get();
-        packet->pts = AV_NOPTS_VALUE;
-        if (isImage(data))
-            packet->flags = AV_PKT_FLAG_KEY;
-
         // ### handle errors
         if (m_context->pix_fmt == -1)
             m_context->pix_fmt = AVPixelFormat(0);
 
-        bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
-        // workaround ffmpeg crash
-        if (m_checkH264ResolutionChange && packet->size > 4 && dataWithNalPrefixes)
-        {
-            const quint8* dataEnd = packet->data + packet->size;
-            const quint8* curPtr = packet->data;
-            // New version scan whole data to find SPS unit.
-            // It is slower but some cameras do not put SPS the beginning of a data.
-            while (curPtr < dataEnd - 2)
-            {
-                const int nalLen = curPtr[2] == 0x01 ? 3 : 4;
-                if (curPtr + nalLen >= dataEnd)
-                    break;
-
-                const auto nalUnitType = nx::media::h264::nalType(curPtr[nalLen]);
-                if (nalUnitType == nx::media::h264::nuSPS)
-                {
-                    nx::media::h264::SequenceParameterSet sps;
-                    const quint8* end = nx::media::nal::findNALWithStartCode(curPtr+nalLen, dataEnd);
-                    sps.decodeBuffer(curPtr + nalLen, end);
-                    sps.deserialize();
-                    processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
-                    m_spsFound = true;
-                    break;
-                }
-                curPtr = nx::media::nal::findNALWithStartCode(curPtr + nalLen, dataEnd);
-            }
-            if (!m_spsFound && m_context->extradata_size == 0)
-            {
-                NX_DEBUG(this, "SPS not found, codec: %1", data->compressionType);
-                return false; // no sps has found yet. skip frame
-            }
-        }
-        else if (data->context)
+        if (data->context)
         {
             if (data->context->getWidth() != 0 && data->context->getHeight() != 0)
                 processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
@@ -590,74 +610,51 @@ bool QnFfmpegVideoDecoder::decode(
 
         if(m_context->codec)
         {
-            decodeVideo(m_context, outFrame, &got_picture, packet);
-            if (!got_picture && data->flags & QnAbstractMediaData::MediaFlags_StillImage)
-                decodeVideo(m_context, outFrame, &got_picture, nullptr);
+            if (!decodeVideo(data))
+                return false;
+
+            if (m_outputFrames.empty() && data->flags & QnAbstractMediaData::MediaFlags_StillImage)
+            {
+                if (!decodeVideo(nullptr))
+                    return false;
+            }
         }
 
-        if (got_picture)
+        if (m_mtDecodingPolicy == MultiThreadDecodePolicy::autoDetect)
         {
-            if (m_mtDecodingPolicy == MultiThreadDecodePolicy::autoDetect)
+            if (m_context->width <= 3500)
+                setMultiThreadDecoding(false);
+            else
             {
-                if (m_context->width <= 3500)
-                    setMultiThreadDecoding(false);
-                else
+                int64_t frameDistance = data->timestamp - m_prevTimestamp;
+                if (frameDistance > 0)
                 {
-                    qint64 frameDistance = data->timestamp - m_prevTimestamp;
-                    if (frameDistance > 0)
-                    {
-                        const double fps = 1'000'000.0 / frameDistance;
-                        qint64 megapixels = m_context->width * m_context->height * fps;
-                        static const qint64 kThreshold = 1920*2 * 1080*2 * 20; //< 4k, 20fps
-                        if (megapixels >= kThreshold)
-                            setMultiThreadDecoding(true); // high fps and high resolution
-                    }
+                    const double fps = 1'000'000.0 / frameDistance;
+                    int64_t megapixels = m_context->width * m_context->height * fps;
+                    static const int64_t kThreshold = 1920*2 * 1080*2 * 20; //< 4k, 20fps
+                    if (megapixels >= kThreshold)
+                        setMultiThreadDecoding(true); // high fps and high resolution
                 }
             }
-            if (m_prevTimestamp != AV_NOPTS_VALUE)
-                m_prevFrameDuration = data->timestamp - m_prevTimestamp;
-            m_prevTimestamp = data->timestamp;
-
         }
+        if (m_prevTimestamp != AV_NOPTS_VALUE)
+            m_prevFrameDuration = data->timestamp - m_prevTimestamp;
+
+        m_prevTimestamp = data->timestamp;
     }
     else
     {
-        decodeVideo(m_context, outFrame, &got_picture, nullptr); // flush
-
-        // In case of b-frames stream ffmpeg gives last flushed frames with AV_NOPTS_VALUE, so use
-        // m_prevFrameDuration to get frame pts
-        if (outFrame->pkt_dts == AV_NOPTS_VALUE)
-        {
-            outFrame->pkt_dts = m_prevTimestamp + m_prevFrameDuration;
-            m_prevTimestamp = outFrame->pkt_dts;
-        }
+        decodeVideo(nullptr); // flush
     }
 
-    if (m_config.forceRgbaFormat && got_picture && outFrame->format != AV_PIX_FMT_RGBA)
-    {
-        CLVideoDecoderOutput tmpFrame;
-        tmpFrame.reallocate(outFrame->width, outFrame->height, AV_PIX_FMT_RGBA);
-        if (data)
-            tmpFrame.pkt_dts = data->timestamp;
-        if (outFrame->convertTo(&tmpFrame))
-        {
-            outFrame->copyFrom(&tmpFrame);
-            outFrame->sample_aspect_ratio = getSampleAspectRatio();
-            outFrame->flags = m_lastFlags;
-            outFrame->channel = m_lastChannelNumber;
-            return m_context->pix_fmt != AV_PIX_FMT_NONE;
-        }
-    }
+    // Hand out the oldest ready frame first, so a burst of reordered output is only delayed
+    // across calls, never dropped.
+    if (m_outputFrames.empty())
+        return false;
 
-    if (got_picture)
-    {
-        outFrame->format = CLVideoDecoderOutput::fixDeprecatedPixelFormat(m_context->pix_fmt);
-        outFrame->sample_aspect_ratio = getSampleAspectRatio();
-        outFrame->flags = m_lastFlags;
-        outFrame->channel = m_lastChannelNumber;
-        return m_context->pix_fmt != AV_PIX_FMT_NONE;
-    }
-    return false; // no picture decoded at current step
+    *outFramePtr = m_outputFrames.front();
+    m_outputFrames.pop_front();
+    return true;
 }
 
 double QnFfmpegVideoDecoder::getSampleAspectRatio() const

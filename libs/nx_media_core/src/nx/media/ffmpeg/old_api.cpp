@@ -6,38 +6,6 @@
 
 namespace nx::media::ffmpeg::old_api {
 
-// Simplify the old api implementation by not checking when multiple frames can be received in a
-// sent packet.
-int decode(AVCodecContext* avctx, AVFrame* frame, int* got_frame, const AVPacket* pkt)
-{
-    *got_frame = 0;
-    int result = 0;
-    result = avcodec_send_packet(avctx, pkt);
-    if (result == AVERROR_EOF)
-        result = 0;
-    else if (result == AVERROR(EAGAIN)) {
-        /* we fully drain all the output in each decode call, so this should not
-            * ever happen */
-        result = AVERROR_BUG;
-        goto finish;
-    } else if (result < 0)
-        goto finish;
-
-    result = avcodec_receive_frame(avctx, frame);
-    if (result < 0) {
-        if (result == AVERROR(EAGAIN) || result == AVERROR_EOF)
-            result = 0;
-        goto finish;
-    }
-    *got_frame = 1;
-
-finish:
-    if (result == 0 && pkt)
-        result = pkt->size;
-
-    return result;
-}
-
 int encode(AVCodecContext* avctx, AVPacket* avpkt, const AVFrame* frame, int* got_packet)
 {
     *got_packet = 0;

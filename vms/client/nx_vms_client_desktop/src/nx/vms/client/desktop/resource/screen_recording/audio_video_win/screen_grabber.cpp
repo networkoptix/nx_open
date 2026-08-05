@@ -580,7 +580,7 @@ bool ScreenGrabber::direct3DDataToFrame(void* opaque, AVFrame* pFrame)
         quint8* videoBuf = (quint8*) av_malloc(videoBufSize);
         av_image_fill_arrays(
             pFrame->data, pFrame->linesize, videoBuf, format(), width(), height(), /*align*/ 1);
-        pFrame->key_frame = 1;
+        pFrame->flags |= AV_FRAME_FLAG_KEY;
         // pFrame->pict_type = AV_PICTURE_TYPE_I;
         pFrame->width = width();
         pFrame->height = height();

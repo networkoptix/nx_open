@@ -172,12 +172,12 @@ copyLibs()
     local -r THIRD_PARTY_LIBS=(
         libatomic.so.1
 
-        libavcodec.so.61
-        libavfilter.so.10
-        libavformat.so.61
-        libavutil.so.59
-        libswscale.so.8
-        libswresample.so.5
+        libavcodec.so.62
+        libavfilter.so.11
+        libavformat.so.62
+        libavutil.so.60
+        libswscale.so.9
+        libswresample.so.6
 
         libcrypto.so.1.1
         libssl.so.1.1

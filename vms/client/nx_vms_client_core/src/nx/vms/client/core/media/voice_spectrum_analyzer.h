@@ -8,7 +8,7 @@
 #include <QtCore/QVector>
 
 extern "C" {
-#include <libavcodec/avfft.h> //< private
+#include <libavutil/tx.h>
 } // extern "C"
 
 #include <nx/media/audio/format.h>
@@ -53,13 +53,13 @@ protected: //< Made protected for unit tests.
     template<class T>
     bool processDataInternal(const T* sampleData, int sampleCount);
     int windowSize() const { return m_windowSize; }
-    FFTComplex* fftData() const { return m_fftData; }
+    AVComplexFloat* fftData() const { return m_fftData; }
     void performFft();
-    static SpectrumData fillSpectrumData(const FFTComplex data[], int size, int srcSampleRate);
+    static SpectrumData fillSpectrumData(const AVComplexFloat data[], int size, int srcSampleRate);
 
 protected: //< Intended for experimenting and debugging, e.g. when changing the algorithm.
     static std::string asString(const double data[], int size);
-    static std::string asString(const FFTComplex data[], int size);
+    static std::string asString(const AVComplexFloat data[], int size);
     static std::string asString(const int16_t data[], int size);
     std::string dump() const;
 
@@ -68,8 +68,9 @@ private:
     int m_channels = 0;
     int m_windowSize = 0; /**< Number of complex values for FFT. */
     int m_bitCount = 0; /**< log2(m_windowSize) */
-    FFTComplex* m_fftData = nullptr;
-    FFTContext* m_fftContext = nullptr;
+    AVComplexFloat* m_fftData = nullptr;
+    AVTXContext* m_fftContext = nullptr;
+    av_tx_fn m_fftFn = nullptr;
     int m_fftDataSize = 0; /**< Number of currently filled values in m_fftData. */
     SpectrumData m_spectrumData;
     mutable nx::Mutex m_mutex;

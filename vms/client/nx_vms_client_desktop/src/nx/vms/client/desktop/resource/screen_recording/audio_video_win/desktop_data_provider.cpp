@@ -46,6 +46,10 @@ static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
 static const int MAX_VIDEO_JITTER = 2;
 
+// Was AV_INPUT_BUFFER_MIN_SIZE, removed from libavcodec; kept as a plain constant since it was
+// only ever used here as an initial buffer capacity hint, not an FFmpeg API requirement.
+static const int kMinAudioBufferSize = 16384;
+
 } // namespace
 
 class EncodedAudioInfo
@@ -83,7 +87,7 @@ private:
 };
 
 EncodedAudioInfo::EncodedAudioInfo(DesktopDataProvider* owner):
-    m_tmpAudioBuffer(AV_INPUT_BUFFER_MIN_SIZE),
+    m_tmpAudioBuffer(kMinAudioBufferSize),
     m_owner(owner)
 {
 }

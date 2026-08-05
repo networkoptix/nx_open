@@ -53,8 +53,7 @@ static int intLog2(int value)
 
 void VoiceSpectrumAnalyzer::performFft()
 {
-    av_fft_permute(m_fftContext, m_fftData);
-    av_fft_calc(m_fftContext, m_fftData);
+    m_fftFn(m_fftContext, m_fftData, m_fftData, sizeof(AVComplexFloat));
 }
 
 VoiceSpectrumAnalyzer::VoiceSpectrumAnalyzer()
@@ -64,7 +63,7 @@ VoiceSpectrumAnalyzer::VoiceSpectrumAnalyzer()
 VoiceSpectrumAnalyzer::~VoiceSpectrumAnalyzer()
 {
     nx::kit::utils::freeAligned(m_fftData);
-    av_fft_end(m_fftContext);
+    av_tx_uninit(&m_fftContext);
 }
 
 void VoiceSpectrumAnalyzer::initialize(int srcSampleRate, int channels)
@@ -79,12 +78,20 @@ void VoiceSpectrumAnalyzer::initialize(int srcSampleRate, int channels)
     m_bitCount = intLog2(m_windowSize);
 
     nx::kit::utils::freeAligned(m_fftData);
-    m_fftData = static_cast<FFTComplex*>(nx::kit::utils::mallocAligned(
-        sizeof(FFTComplex) * m_windowSize, nx::media::kMediaAlignment));
+    m_fftData = static_cast<AVComplexFloat*>(nx::kit::utils::mallocAligned(
+        sizeof(AVComplexFloat) * m_windowSize, nx::media::kMediaAlignment));
     memset(m_fftData, 0, m_windowSize * sizeof(m_fftData[0]));
 
-    av_fft_end(m_fftContext);
-    m_fftContext = av_fft_init(m_bitCount, /*inverse*/ 0);
+    av_tx_uninit(&m_fftContext);
+    const int result = av_tx_init(
+        &m_fftContext,
+        &m_fftFn,
+        AV_TX_FLOAT_FFT,
+        /*inv*/ 0,
+        m_windowSize,
+        /*scale*/ nullptr,
+        AV_TX_INPLACE);
+    NX_ASSERT(result == 0, "av_tx_init failed: %1", result);
 }
 
 bool VoiceSpectrumAnalyzer::processData(const qint16* sampleData, int sampleCount)
@@ -163,7 +170,7 @@ bool VoiceSpectrumAnalyzer::processDataInternal(const T* sampleData, int sampleC
 }
 
 /*static*/ SpectrumData VoiceSpectrumAnalyzer::fillSpectrumData(
-    const FFTComplex data[], int windowSize, int srcSampleRate)
+    const AVComplexFloat data[], int windowSize, int srcSampleRate)
 {
     SpectrumData spectrumData;
 
@@ -183,7 +190,7 @@ bool VoiceSpectrumAnalyzer::processDataInternal(const T* sampleData, int sampleC
         static const double epsilon = 1e-10;
         while (currentStep + epsilon < stepsPerBand)
         {
-            const FFTComplex& complexNum = data[currentIndex];
+            const AVComplexFloat& complexNum = data[currentIndex];
             double fftMagnitude = sqrt(
                 complexNum.re * complexNum.re + complexNum.im * complexNum.im);
             value += fftMagnitude;
@@ -244,7 +251,7 @@ int VoiceSpectrumAnalyzer::bandsCount()
     return s;
 }
 
-/*static*/ std::string VoiceSpectrumAnalyzer::asString(const FFTComplex data[], int size)
+/*static*/ std::string VoiceSpectrumAnalyzer::asString(const AVComplexFloat data[], int size)
 {
     std::string s;
     for (int i = 0; i < size; ++i)

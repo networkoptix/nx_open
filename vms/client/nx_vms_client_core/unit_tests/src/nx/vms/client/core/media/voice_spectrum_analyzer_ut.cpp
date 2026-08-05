@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <libavcodec/avfft.h> //< for struct FFTComplex
+#include <libavutil/tx.h> //< for struct AVComplexFloat
 } // extern "C"
 
 #include <nx/kit/debug.h>
@@ -39,12 +39,12 @@ static const double kExpectedSpectrum[] = {
 };
 static_assert(kBandCount == ARRAY_LEN(kExpectedSpectrum));
 
-static const FFTComplex kFftInput[] = {
+static const AVComplexFloat kFftInput[] = {
 #include "fft_input.inc"
 };
 static_assert(kWindowSize == ARRAY_LEN(kFftInput));
 
-static const FFTComplex kExpectedFftOutput[] = {
+static const AVComplexFloat kExpectedFftOutput[] = {
 #include "expected_fft_output.inc"
 };
 static_assert(kWindowSize == ARRAY_LEN(kExpectedFftOutput));
@@ -64,7 +64,7 @@ static void assertDoubleArraysEqual(
 }
 
 static void assertComplexArraysEqual(
-    const char tag[], const FFTComplex expected[], const FFTComplex actual[], int size)
+    const char tag[], const AVComplexFloat expected[], const AVComplexFloat actual[], int size)
 {
     static const double kEpsilon = 0.0001;
 
@@ -86,13 +86,13 @@ static void assertComplexArraysEqual(
 class TestVoiceSpectrumAnalyzer: public VoiceSpectrumAnalyzer
 {
 public:
-    FFTComplex* access_fftData() { return fftData(); }
+    AVComplexFloat* access_fftData() { return fftData(); }
     int access_windowSize() { return windowSize(); }
     void access_performFft() { return performFft(); }
     std::string access_dump() { return dump(); }
 
     static SpectrumData access_fillSpectrumData(
-        const FFTComplex data[], int size, int srcSampleRate)
+        const AVComplexFloat data[], int size, int srcSampleRate)
     {
         return fillSpectrumData(data, size, srcSampleRate);
     }
@@ -127,7 +127,7 @@ TEST(SpectrumAnalyzerTest, Spectrum)
     TestVoiceSpectrumAnalyzer analyzer;
     analyzer.initialize(kSampleRate, kChannelCount);
 
-    std::vector<FFTComplex> fftData{kFftInput, kFftInput + ARRAY_LEN(kFftInput)};
+    std::vector<AVComplexFloat> fftData{kFftInput, kFftInput + ARRAY_LEN(kFftInput)};
 
     const SpectrumData spectrumData =
         analyzer.access_fillSpectrumData(kExpectedFftOutput, kWindowSize, kSampleRate);

@@ -529,13 +529,13 @@ distrib_copyFfmpegLibs() # source_directory [distribution_libs_ffmpeg_subdirecto
     local -r ffmpeg_subdirectory="${2-}" #< The default value for this argument is an empty string.
 
     local -r ffmpeg_libs=(
-        libavcodec.so.61
-        libavfilter.so.10
-        libavformat.so.61
-        libavutil.so.59
-        libswscale.so.8
-        libswresample.so.5
-        libavdevice.so.61
+        libavcodec.so.62
+        libavfilter.so.11
+        libavformat.so.62
+        libavutil.so.60
+        libswscale.so.9
+        libswresample.so.6
+        libavdevice.so.62
     )
 
     echo ""

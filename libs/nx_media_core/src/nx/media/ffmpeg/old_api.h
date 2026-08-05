@@ -10,8 +10,7 @@ extern "C" {
 
 namespace nx::media::ffmpeg::old_api {
 
-// This implementation of encode/decode does not support the receiving multiple frames!
-int NX_MEDIA_CORE_API decode(AVCodecContext* avctx, AVFrame* frame, int* got_frame, const AVPacket* pkt);
+// This implementation of encode does not support the receiving multiple frames!
 int NX_MEDIA_CORE_API encode(AVCodecContext* avctx, AVPacket* avpkt, const AVFrame* frame, int* got_packet);
 
 } // nx::media::ffmpeg::old_api

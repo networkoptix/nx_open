@@ -80,7 +80,7 @@ class NxOpenConan(ConanFile):
         "mobile_user_manual/*:format": "pdf",
     }
 
-    ffmpeg_version_and_revision = "7.0.1#67a29b60d290a9da6f3b044517beffe1"
+    ffmpeg_version_and_revision = "8.1.2#785fd838bf24adb9bc5dc00a45703d29"
 
     python_requires = (
         "os_deps_from_deb_based_distro/0.5" "#c83f3455d0891b9d63f29ac19e54c238",
@@ -234,7 +234,7 @@ class NxOpenConan(ConanFile):
         self.requires("boost/1.89.0" "#130a884f1529433238f4f2dc98d94ac8")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
-        self.requires("qt/6.11.1" "#9f66d37f9dff57be97c629cf70fd182a")
+        self.requires("qt/6.11.1" "#20f116afebe9f7a3da371681a5f92000")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
         self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
 

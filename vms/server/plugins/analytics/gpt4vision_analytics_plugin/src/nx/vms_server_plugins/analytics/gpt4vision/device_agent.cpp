@@ -174,7 +174,6 @@ open_ai::QueryPayload::Message::Content::ImageUrl DeviceAgent::encodeImage(
         ).toStdString());
         return {};
     }
-    auto codecGuard = nx::utils::makeScopeGuard([context]() {avcodec_close(context); });
 
     AVPacket* packet = av_packet_alloc();
     if (!packet)

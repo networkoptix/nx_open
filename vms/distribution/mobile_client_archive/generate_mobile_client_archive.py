@@ -106,15 +106,15 @@ if tools.is_linux():
 
 if tools.is_linux():
     sys_libs = [
-        'libavcodec.so.61',
-        'libavfilter.so.10',
-        'libavformat.so.61',
-        'libavutil.so.59',
+        'libavcodec.so.62',
+        'libavfilter.so.11',
+        'libavformat.so.62',
+        'libavutil.so.60',
         'libcrypto.so.1.1',
         'libqtkeychain.so.0.9.0',
         'libssl.so.1.1',
-        'libswresample.so.5',
-        'libswscale.so.8',
+        'libswresample.so.6',
+        'libswscale.so.9',
         'libva-drm.so.2',
         'libva-x11.so.2',
         'libva.so.2',
