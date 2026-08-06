@@ -432,114 +432,114 @@
     </message>
     <message>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Αυτή η κάμερα υποστηρίζει οριζόντια και κάθετη κίνηση</translation>
     </message>
     <message>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Αυτή η κάμερα υποστηρίζει ζουμ</translation>
     </message>
     <message>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Ανίχνευση κίνησης κατά την εισαγωγή του αρχείου καταγραφών</translation>
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Ρυθμίσεις Ροής</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Χρήση του Media2 για ανάκτηση των προφίλ</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Χρήση διαφορετικών τιμών για οριζόντια και κάθετη κίνηση</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Κάθετη κίνηση</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Θύρα Πολυμέσων</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>Ταχύτητα PTZ</translation>
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Μεταφορά RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Χρήση εγγενών προεπιλογών κάμερας</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Ρυθμίσεις Ώρας</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Διατήρηση ρυθμίσεων ώρας κάμερας</translation>
     </message>
     <message>
       <source>ONVIF Settings</source>
-      <translation type="unfinished">ONVIF Settings</translation>
+      <translation>Ρυθμίσεις ONVIF</translation>
     </message>
     <message>
       <source>Do not record primary stream</source>
-      <translation type="unfinished">Do not record primary stream</translation>
+      <translation>Να μην καταγράφεται η κύρια ροή</translation>
     </message>
     <message>
       <source>Do not record secondary stream</source>
-      <translation type="unfinished">Do not record secondary stream</translation>
+      <translation>Να μην καταγράφεται δευτερεύουσας ροής</translation>
     </message>
     <message>
       <source>Secondary Stream Profile</source>
-      <translation type="unfinished">Secondary Stream Profile</translation>
+      <translation>Προφίλ Δευτερεύουσας Ροής</translation>
     </message>
     <message>
       <source>Primary Stream Profile</source>
-      <translation type="unfinished">Primary Stream Profile</translation>
+      <translation>Προφίλ Κύριας Ροής</translation>
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation type="unfinished">Web Page Port</translation>
+      <translation>Θύρα Ιστοσελίδας</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
-      <translation type="unfinished">Do not send Stop PTZ command</translation>
+      <translation>Να μην αποστέλλεται η εντολή διακοπής PTZ</translation>
     </message>
     <message>
       <source>Do not record audio</source>
-      <translation type="unfinished">Do not record audio</translation>
+      <translation>Να μην γίνεται εγγραφή ήχου</translation>
     </message>
     <message>
       <source>Import from Device</source>
-      <translation type="unfinished">Import from Device</translation>
+      <translation>Εισαγωγή από συσκευή</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation type="unfinished">Import video automatically</translation>
+      <translation>Αυτόματη εισαγωγή βίντεο</translation>
     </message>
     <message>
       <source>Use site presets</source>
-      <translation type="unfinished">Use site presets</translation>
+      <translation>Χρήση προεπιλογών τοποθεσίας</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
-      <translation type="unfinished">Native camera presets will not be available.</translation>
+      <translation>Οι εγγενείς προεπιλογές κάμερας δεν θα είναι διαθέσιμες.</translation>
     </message>
   </context>
   <context>
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Add</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Προμηθευτής</translation>
     </message>
     <message>
       <source>IP Address</source>
@@ -562,11 +562,11 @@
     </message>
     <message>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Λογισμικό</translation>
     </message>
     <message>
       <source>Camera ID</source>
@@ -574,53 +574,53 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Κύρια Ροή</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Δευτερεύουσα Ροή</translation>
     </message>
     <message>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>Διεύθυνση MAC</translation>
     </message>
     <message>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Εμφάνιση στη διάταξη</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Αρχείο Καταγραφής Συμβάντων</translation>
     </message>
     <message>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Κανόνες κάμερας</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Λογικό αναγνωριστικό</translation>
     </message>
     <message>
       <source>Restreaming Link</source>
-      <translation type="unfinished">Restreaming Link</translation>
+      <translation>Σύνδεσμος αναμετάδοσης</translation>
     </message>
   </context>
   <context>
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Ενεργοποίηση Άδειας...</translation>
     </message>
   </context>
   <context>
     <name>CameraListDialog</name>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Προσθήκη Συσκευής...</translation>
     </message>
   </context>
   <context>
@@ -631,7 +631,7 @@
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Ευαισθησία</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -640,14 +640,14 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>σε</translation>
     </message>
   </context>
   <context>
     <name>CameraReplacementDialog</name>
     <message>
       <source>Camera Replacement</source>
-      <translation type="unfinished">Camera Replacement</translation>
+      <translation>Αντικατάσταση Κάμερας</translation>
     </message>
     <message>
       <source>Name</source>
@@ -667,30 +667,30 @@
     </message>
     <message>
       <source>New Device</source>
-      <translation type="unfinished">New Device</translation>
+      <translation>Νέα Συσκευή</translation>
     </message>
   </context>
   <context>
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Εγγραφή</translation>
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Ενεργοποίηση Άδειας...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Αντιγραφή Χρονοδιαγράμματος</translation>
     </message>
     <message>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Αντιγραφή Χρονοδιαγράμματος σε...</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Εγγραφή Κίνησης &amp;&amp; Αντικειμένων</translation>
     </message>
   </context>
   <context>
@@ -1017,7 +1017,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Ορισμός προτεραιότητας:</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1033,26 +1033,26 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Επιλέξτε ορισμένες συσκευές για να ρυθμίσετε την προτεραιότητα failover</translation>
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Χωρίς Failover</translation>
     </message>
   </context>
   <context>
     <name>FailoverWidget</name>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <source>Server Location ID:</source>
-      <translation type="unfinished">Server Location ID:</translation>
+      <translation>Αναγνωριστικό Τοποθεσίας Διακομιστή:</translation>
     </message>
     <message>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Προτεραιότητα Failover...</translation>
     </message>
   </context>
   <context>
@@ -1073,23 +1073,23 @@
     <name>GeneralPreferencesWidget</name>
     <message>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Διάφορα</translation>
     </message>
     <message>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Αυτόματη Παύση Βίντεο</translation>
     </message>
     <message>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>μετά</translation>
     </message>
     <message>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Λεπτά αδράνειας</translation>
     </message>
     <message>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Προσθήκη...</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1097,69 +1097,69 @@
     </message>
     <message>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Φάκελοι Τοπικών Μέσων</translation>
     </message>
     <message>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Είσοδος ήχου</translation>
     </message>
     <message>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Κύρια Πηγή</translation>
     </message>
     <message>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Δευτερεύουσα Πηγή</translation>
     </message>
     <message>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Εκτέλεση εφαρμογής κατά την εκκίνηση του υπολογιστή</translation>
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Εκκίνηση</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Αυτόματη επαναφορά αποθηκευμένης διαμόρφωσης παραθύρων</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Αναπαραγωγή ήχου από όλες τις κάμερες στη διάταξη</translation>
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Σίγαση ήχου όταν το μικρόφωνο είναι ενεργό</translation>
     </message>
     <message>
       <source>Allow the computer to enter sleep mode on idle</source>
-      <translation type="unfinished">Allow the computer to enter sleep mode on idle</translation>
+      <translation>Επιτρέπεται η αναστολή λειτουργίας του υπολογιστή όταν είναι σε αδράνεια</translation>
     </message>
     <message>
       <source>Connect to the previous site on startup</source>
-      <translation type="unfinished">Connect to the previous site on startup</translation>
+      <translation>Σύνδεση με την προηγούμενη τοποθεσία κατά την εκκίνηση</translation>
     </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>Ρυθμίσεις Τοποθεσίας</translation>
     </message>
   </context>
   <context>
     <name>ImageControlWidget</name>
     <message>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Έλεγχος Εικόνας</translation>
     </message>
     <message>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Αναλογία διαστάσεων</translation>
     </message>
     <message>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Προεπιλεγμένη περιστροφή</translation>
     </message>
   </context>
   <context>
@@ -1193,15 +1193,15 @@
     <name>ImagePreviewDialog</name>
     <message>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Προβολή Εικόνας</translation>
     </message>
     <message>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>Φόρτωση Εικόνας... Παρακαλώ Περιμένετε.</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Καμία εικόνα</translation>
     </message>
   </context>
   <context>
@@ -1212,15 +1212,15 @@
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Όνομα κάμερας</translation>
     </message>
     <message>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Ημερομηνία εξαγωγής</translation>
     </message>
     <message>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Μέγεθος Γραμματοσειράς</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1231,18 +1231,18 @@
     <name>IoModuleSettingsWidget</name>
     <message>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Μορφή</translation>
     </message>
     <message>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Ενεργοποίηση διάταξης πλακιδίων</translation>
     </message>
   </context>
   <context>
     <name>LayoutBackgroundSettingsWidget</name>
     <message>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>Επεξεργασία Εικόνας... Παρακαλώ Περιμένετε.</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1254,15 +1254,15 @@
     </message>
     <message>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Προβολή...</translation>
     </message>
     <message>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Πλάτος:</translation>
     </message>
     <message>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Διατήρηση Αναλογίας Διαστάσεων</translation>
     </message>
     <message>
       <source>Opacity:</source>
@@ -1270,7 +1270,7 @@
     </message>
     <message>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Ύψος:</translation>
     </message>
     <message>
       <source>Crop to monitor aspect ratio</source>
@@ -1281,19 +1281,19 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Κλειδωμένο</translation>
     </message>
     <message>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Πλάτος</translation>
     </message>
     <message>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Ύψος</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Λογικό αναγνωριστικό</translation>
     </message>
     <message>
       <source>Generate</source>
@@ -1316,26 +1316,26 @@
     </message>
     <message>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Κοινόχρηστες διατάξεις</translation>
     </message>
     <message>
       <source>User&apos;s local layouts</source>
-      <translation type="unfinished">User&apos;s local layouts</translation>
+      <translation>Τοπικές διατάξεις χρήστη</translation>
     </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
     <message>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Λεπτομέρειες Άδειας</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Γενικό</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Χαρακτηριστικά</translation>
     </message>
   </context>
   <context>
@@ -1346,14 +1346,14 @@
     </message>
     <message>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Προβλήματα Άδειας:</translation>
     </message>
   </context>
   <context>
     <name>LicenseWidget</name>
     <message>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Χειροκίνητη Ενεργοποίηση</translation>
     </message>
     <message>
       <source>Select License File...</source>
@@ -1735,19 +1735,19 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>Υπογραφή Υποστήριξης</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Όνομα Χρήστη</translation>
     </message>
     <message>
       <source>Mail from</source>
-      <translation type="unfinished">Mail from</translation>
+      <translation>Αλληλογραφία από</translation>
     </message>
     <message>
       <source>Signature</source>
-      <translation type="unfinished">Signature</translation>
+      <translation>Υπογραφή</translation>
     </message>
   </context>
   <context>
@@ -1758,45 +1758,45 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Όνομα Χρήστη</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
-      <translation type="unfinished">Sign in to web page</translation>
+      <translation>Συνδεθείτε στην ιστοσελίδα</translation>
     </message>
   </context>
   <context>
     <name>PopupSettingsWidget</name>
     <message>
       <source>Show all notifications</source>
-      <translation type="unfinished">Show all notifications</translation>
+      <translation>Εμφάνιση όλων των ειδοποιήσεων</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Συμβάντα</translation>
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Ειδοποιήσεις Ιστοσελίδας</translation>
     </message>
   </context>
   <context>
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Αποθήκευση Τρέχουσας Θέσης</translation>
     </message>
     <message>
       <source>Go To Position</source>
-      <translation type="unfinished">Go To Position</translation>
+      <translation>Μετάβαση Στη Θέση</translation>
     </message>
     <message>
       <source>Create Tour</source>
-      <translation type="unfinished">Create Tour</translation>
+      <translation>Δημιουργία Περιήγησης</translation>
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Έναρξη Περιήγησης</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1808,7 +1808,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>No Tour Selected</source>
-      <translation type="unfinished">No Tour Selected</translation>
+      <translation>Δεν Επιλέχθηκε Περιήγηση</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1816,18 +1816,18 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>No preview available</source>
-      <translation type="unfinished">No preview available</translation>
+      <translation>Δεν υπάρχει διαθέσιμη προεπισκόπηση</translation>
     </message>
     <message>
       <source>Get Preview</source>
-      <translation type="unfinished">Get Preview</translation>
+      <translation>Λήψη Προεπισκόπησης</translation>
     </message>
   </context>
   <context>
     <name>PtzPresetDialog</name>
     <message>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Αποθήκευση Θέσης</translation>
     </message>
     <message>
       <source>Name:</source>
@@ -1835,14 +1835,14 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Πλήκτρο Συντόμευσης:</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Επισύναψη στο σύστημα πολλαπλών οθονών προβολής...</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1860,25 +1860,25 @@ and click on the &quot;Search&quot; button</source>
     <name>QnCompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Εγκατάσταση Έκδοσης Συμβατότητας...</translation>
     </message>
     <message>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Επανεκκίνηση στην ενημερωμένη έκδοση όταν είναι έτοιμη</translation>
     </message>
   </context>
   <context>
     <name>QnMessageBox</name>
     <message>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Να μην εμφανιστεί ξανά αυτό το μήνυμα</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Notification Sounds</source>
-      <translation type="unfinished">Notification Sounds</translation>
+      <translation>Ήχοι Ειδοποιήσεων</translation>
     </message>
     <message>
       <source>Play</source>
@@ -1886,7 +1886,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Προσθήκη...</translation>
     </message>
     <message>
       <source>Rename...</source>
@@ -1894,14 +1894,14 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Διαγραφή...</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Προσθήκη URL</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1913,82 +1913,82 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Removing this connection option could lead to Site malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to Site malfunction.</translation>
+      <translation>Η κατάργηση αυτής της επιλογής σύνδεσης θα μπορούσε να οδηγήσει σε δυσλειτουργία της Τοποθεσίας.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Διαχείριση Τοποθεσίας</translation>
     </message>
   </context>
   <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Ρυθμίσεις συστήματος πολλαπλών οθονών προβολής</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
-      <translation type="unfinished">Launch video wall when Windows starts.</translation>
+      <translation>Εκκίνηση συστήματος πολλαπλών οθονών προβολής όταν ξεκινούν τα Windows.</translation>
     </message>
     <message>
       <source>Place shortcut on desktop.</source>
-      <translation type="unfinished">Place shortcut on desktop.</translation>
+      <translation>Τοποθέτηση συντόμευσης στην επιφάνεια εργασίας.</translation>
     </message>
     <message>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Ενεργοποίηση χρονοδιαγράμματος στο συστήματος πολλαπλών οθονών προβολής</translation>
     </message>
   </context>
   <context>
     <name>RapidReviewSettingsWidget</name>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Γρήγορη Ανασκόπηση</translation>
     </message>
     <message>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Αρχική διάρκεια βίντεο</translation>
     </message>
     <message>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Διάρκεια εξαγόμενου βίντεο</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Ταχύτητα</translation>
     </message>
     <message>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Διάστημα Καρέ</translation>
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Επαναφορά Ταχύτητας</translation>
     </message>
   </context>
   <context>
     <name>ReconnectInfoDialog</name>
     <message>
       <source>Reconnecting...</source>
-      <translation type="unfinished">Reconnecting...</translation>
+      <translation>Επανασύνδεση...</translation>
     </message>
     <message>
       <source>Please wait while the connection is being restored...</source>
-      <translation type="unfinished">Please wait while the connection is being restored...</translation>
+      <translation>Παρακαλώ περιμένετε για την επαναφορά της σύνδεσης...</translation>
     </message>
     <message>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Όνομα διακομιστή</translation>
     </message>
   </context>
   <context>
     <name>RecordingSettingsWidget</name>
     <message>
       <source>Temporary Folder</source>
-      <translation type="unfinished">Temporary Folder</translation>
+      <translation>Προσωρινός Φάκελος</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -2000,27 +2000,27 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Ανάλυση</translation>
     </message>
     <message>
       <source>Recording Quality</source>
-      <translation type="unfinished">Recording Quality</translation>
+      <translation>Ποιότητα Εγγραφής</translation>
     </message>
     <message>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Συνιστάται ένας ισχυρός υπολογιστής για &quot;καλύτερη&quot; ποιότητα και ανάλυση.</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Οθόνη</translation>
     </message>
     <message>
       <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
+      <translation>Πρόσθετες Επιλογές</translation>
     </message>
     <message>
       <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
+      <translation>Καταγραφή δρομέα</translation>
     </message>
   </context>
   <context>
@@ -2068,42 +2068,42 @@ and click on the &quot;Search&quot; button</source>
     <name>SaasInfoWidget</name>
     <message>
       <source>No services found</source>
-      <translation type="unfinished">No services found</translation>
+      <translation>Δεν βρέθηκαν υπηρεσίες</translation>
     </message>
     <message>
       <source>Contact your Channel Partner to add services</source>
-      <translation type="unfinished">Contact your Channel Partner to add services</translation>
+      <translation>Επικοινωνήστε με τον Εμπορικό σας Συνεργάτη για να προσθέσετε υπηρεσίες</translation>
     </message>
     <message>
       <source>Channel Partner Contact</source>
-      <translation type="unfinished">Channel Partner Contact</translation>
+      <translation>Επαφή Εμπορικού Συνεργάτη</translation>
     </message>
     <message>
       <source>Services state</source>
-      <translation type="unfinished">Services state</translation>
+      <translation>Κατάσταση Υπηρεσιών</translation>
     </message>
     <message>
       <source>Organization&apos;s limits violation</source>
-      <translation type="unfinished">Organization&apos;s limits violation</translation>
+      <translation>Παραβίαση ορίων Οργανισμού</translation>
     </message>
     <message>
       <source>Service Allocation</source>
-      <translation type="unfinished">Service Allocation</translation>
+      <translation>Κατανομή Υπηρεσιών</translation>
     </message>
   </context>
   <context>
     <name>ScheduleSettingsWidget</name>
     <message>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Ρυθμίσεις Χρονοδιαγράμματος</translation>
     </message>
     <message>
       <source>Record Always</source>
-      <translation type="unfinished">Record Always</translation>
+      <translation>Να γίνεται συνεχής Εγγραφή</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Μόνο Κίνηση</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -2111,11 +2111,11 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Do Not Record</source>
-      <translation type="unfinished">Do Not Record</translation>
+      <translation>Να Μη Γίνει Εγγραφή</translation>
     </message>
     <message>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Ρυθμός Bit</translation>
     </message>
     <message>
       <source>FPS</source>
@@ -2135,7 +2135,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Κίνηση &amp;&amp; Αντικείμενα</translation>
     </message>
   </context>
   <context>
@@ -2146,11 +2146,11 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Εμφάνιση υδατογραφήματος με όνομα χρήστη πάνω από το βίντεο</translation>
     </message>
     <message>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Προεπισκόπηση Υδατογραφήματος</translation>
     </message>
     <message>
       <source>to</source>
@@ -2158,23 +2158,23 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Περιορισμός διάρκειας συνεδρίας</translation>
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Προστασία δεδομένων</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Χρήση μόνο HTTPS για σύνδεση με κάμερες</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Δραστηριότητα Χρήστη</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Κρυπτογράφηση αρχείου</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2190,35 +2190,35 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Διαχείριση Χρηστών</translation>
     </message>
     <message>
       <source>Display servers in tree for non-power users</source>
-      <translation type="unfinished">Display servers in tree for non-power users</translation>
+      <translation>Εμφάνιση διακομιστών σε δέντρο για non-power χρήστες</translation>
     </message>
     <message>
       <source>Video Redaction</source>
-      <translation type="unfinished">Video Redaction</translation>
+      <translation>Επεξεργασία απόκρυψης βίντεο</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Διαμόρφωση...</translation>
     </message>
     <message>
       <source>Blur</source>
-      <translation type="unfinished">Blur</translation>
+      <translation>Θόλωμα</translation>
     </message>
     <message>
       <source>Exclude Cameras</source>
-      <translation type="unfinished">Exclude Cameras</translation>
+      <translation>Εξαίρεση Καμερών</translation>
     </message>
     <message>
       <source>Apply session duration to Cloud users</source>
-      <translation type="unfinished">Apply session duration to Cloud users</translation>
+      <translation>Εφαρμογή διάρκειας συνεδρίας στους χρήστες Cloud</translation>
     </message>
     <message>
       <source>Remote Access Tool</source>
-      <translation type="unfinished">Remote Access Tool</translation>
+      <translation>Εργαλείο Απομακρυσμένης Πρόσβασης</translation>
     </message>
     <message>
       <source>Administrators</source>
@@ -2226,18 +2226,18 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Διαθέσιμο σε</translation>
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Power Users</translation>
     </message>
   </context>
   <context>
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Πιστοποιητικό διακομιστή</translation>
     </message>
     <message>
       <source>General</source>
@@ -2249,7 +2249,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Αυτο-υπογραφόμενο πιστοποιητικό ρίζας</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2257,7 +2257,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Το πιστοποιητικό έχει λήξει</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -2272,14 +2272,14 @@ and click on the &quot;Search&quot; button</source>
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation type="unfinished">Select Servers</translation>
+      <translation>Επιλέξτε Διακομιστές</translation>
     </message>
   </context>
   <context>
     <name>ServerSettingsWidget</name>
     <message>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2295,53 +2295,53 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Αυτόματη ανίχνευση ενσωματωμένων και USB webcams</translation>
     </message>
     <message>
       <source>Remote Access</source>
-      <translation type="unfinished">Remote Access</translation>
+      <translation>Απομακρυσμένη Πρόσβαση</translation>
     </message>
     <message>
       <source>Enable hardware decoding</source>
-      <translation type="unfinished">Enable hardware decoding</translation>
+      <translation>Ενεργοποίηση αποκωδικοποίησης υλικού</translation>
     </message>
   </context>
   <context>
     <name>SignDialog</name>
     <message>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Έλεγχος Υδατογραφήματος</translation>
     </message>
     <message>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Ελεγμένο αρχείο:</translation>
     </message>
     <message>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Αποτελέσματα Ελέγχου:</translation>
     </message>
   </context>
   <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Τρέχοντα Στατιστικά</translation>
     </message>
     <message>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Πρόβλεψη για πλήρη χρήση αποθηκευτικού χώρου</translation>
     </message>
     <message>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Ο διακομιστής είναι εκτός σύνδεσης. Τα στατιστικά δεν είναι διαθέσιμα.</translation>
     </message>
     <message>
       <source>Additional storage</source>
-      <translation type="unfinished">Additional storage</translation>
+      <translation>Πρόσθετος αποθηκευτικός χώρος</translation>
     </message>
     <message>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Βασική πρόγνωση για τα δεδομένα που καταγράφηκαν κατά τη διάρκεια</translation>
     </message>
   </context>
   <context>
@@ -2360,7 +2360,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Επαναδημιουργία ευρετηρίου αντιγράφου ασφαλείας</translation>
     </message>
   </context>
   <context>
@@ -2378,7 +2378,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Protocol:</source>
-      <translation type="unfinished">Protocol:</translation>
+      <translation>Πρωτόκολλο:</translation>
     </message>
     <message>
       <source>URL:</source>
@@ -2397,19 +2397,19 @@ and click on the &quot;Search&quot; button</source>
     <name>SubjectSelectionDialog</name>
     <message>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Εμανιση όλων των χρηστών</translation>
     </message>
     <message>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Επιλέξτε Χρήστες</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Τίποτα δεν ταιριάζει στην αναζήτησή σας.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
   </context>
   <context>
@@ -2420,7 +2420,7 @@ and click on the &quot;Search&quot; button</source>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
+      <translation>Αποστολή ανώνυμων στατιστικών χρήσης και σφαλμάτων σε προγραμματιστές λογισμικού</translation>
     </message>
     <message>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
