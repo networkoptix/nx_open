@@ -448,6 +448,12 @@ BaseSettingsPage
             text: "Reset completed tutorials"
             onClicked: appContext.settings.completedTutorials = []
         }
+
+        Button
+        {
+            text: "Reset SaaS promo banner"
+            onClicked: appContext.settings.showSaasPromo = true
+        }
     }
 
     ItemSelectionDialog
