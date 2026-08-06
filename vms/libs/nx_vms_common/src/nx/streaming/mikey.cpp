@@ -176,7 +176,7 @@ bool isClientManagedMikeyMedia(const nx::rtp::Sdp::Media& media)
         return false;
     }
 
-    return !std::any_of(
+    return std::any_of(
         media.sdpAttributes.cbegin(),
         media.sdpAttributes.cend(),
         [](const QString& attribute)
