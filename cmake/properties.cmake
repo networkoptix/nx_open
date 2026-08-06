@@ -95,6 +95,7 @@ set(translations
     cs_CZ
     da_DK
     de_DE
+    el_GR
     fi_FI
     ru_RU
     es_ES
