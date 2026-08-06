@@ -939,7 +939,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
