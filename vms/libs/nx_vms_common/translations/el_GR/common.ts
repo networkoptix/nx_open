@@ -187,7 +187,7 @@
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation>Χρήστες προβολής Υγείας Τοποθεσίας</translation>
+      <translation>Προβολές Υγείας Τοποθεσίας</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
