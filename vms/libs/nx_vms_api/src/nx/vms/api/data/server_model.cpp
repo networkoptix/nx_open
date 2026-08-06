@@ -338,6 +338,9 @@ std::vector<Model> fromDbTypes(typename Model::DbListTypes all)
                 std::make_move_iterator(std::move(end)),
                 std::back_inserter(s.storages),
                 [](StorageData d) { return StorageModel::fromDb(std::move(d)); });
+
+            // Storages come in an arbitrary order, sort them to keep the responses consistent.
+            std::ranges::sort(s.storages, lessById);
         }
         extractParametersToFields(&s);
     }
