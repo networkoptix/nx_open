@@ -9,6 +9,7 @@ import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
 import Nx.Mobile.Tutorials
+import Nx.Mobile.Ui
 import Nx.Screens
 import Nx.Ui
 
@@ -135,6 +136,11 @@ Controls.ApplicationWindow
     WindowBanner
     {
         id: windowBanner
+    }
+
+    SaasPromoBanner
+    {
+        shown: available && !windowBanner.currentItem
     }
 
     onActiveFocusItemChanged:

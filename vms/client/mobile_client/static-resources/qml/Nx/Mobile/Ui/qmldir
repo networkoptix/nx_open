@@ -1,4 +1,5 @@
 module Nx.Mobile.Ui
 
 ResourceTreeDelegate 1.0 ResourceTreeDelegate.qml
+SaasPromoBanner 1.0 SaasPromoBanner.qml
 TitleLabel 1.0 TitleLabel.qml

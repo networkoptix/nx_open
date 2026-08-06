@@ -42,6 +42,7 @@
 #include <nx/vms/client/mobile/timeline/objects_loader.h>
 #include <nx/vms/client/mobile/ui/interactive_item_registry.h>
 #include <nx/vms/client/mobile/ui/interactive_item_watcher.h>
+#include <nx/vms/client/mobile/ui/saas_promo_backend.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <resources/camera_access_rights_helper.h>
@@ -125,6 +126,7 @@ void registerQmlTypes()
     CameraButtonController::registerQmlType();
     CameraButtonsModel::registerQmlType();
     MediaDownloadBackend::registerQmlType();
+    SaasPromoBackend::registerQmlType();
     UiController::registerQmlType();
     ShareBookmarkBackend::registerQmlType();
     PushNotificationModel::registerQmlType();

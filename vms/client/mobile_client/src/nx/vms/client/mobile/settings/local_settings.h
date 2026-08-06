@@ -55,6 +55,8 @@ public:
         int position);
 
     Property<QStringList> completedTutorials{this, "completedTutorials"};
+
+    Property<bool> showSaasPromo{this, "showSaasPromo", true};
 };
 
 } // namespace nx::vms::client::mobile
