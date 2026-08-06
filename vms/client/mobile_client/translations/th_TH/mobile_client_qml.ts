@@ -938,8 +938,8 @@
       <translation>ตั้งไว้ล่วงหน้า PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

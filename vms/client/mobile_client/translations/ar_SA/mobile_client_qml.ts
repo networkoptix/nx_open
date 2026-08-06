@@ -943,8 +943,8 @@
       <translation>اعدادات ال PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Cancel</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

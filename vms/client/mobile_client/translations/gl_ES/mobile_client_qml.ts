@@ -939,8 +939,8 @@
       <translation>Preaxustes PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

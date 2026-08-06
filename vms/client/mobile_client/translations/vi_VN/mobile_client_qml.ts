@@ -938,8 +938,8 @@
       <translation>Cài đặt trước PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

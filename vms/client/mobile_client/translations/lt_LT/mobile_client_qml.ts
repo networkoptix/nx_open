@@ -941,8 +941,8 @@
       <translation type="unfinished">PTZ Presets</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Atšaukti</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

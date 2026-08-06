@@ -941,8 +941,8 @@
       <translation>PTZ позиции</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Отменить</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

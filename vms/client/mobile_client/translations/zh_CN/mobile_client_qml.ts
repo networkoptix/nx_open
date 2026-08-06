@@ -938,8 +938,8 @@
       <translation>PTZ预置点</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>撤消</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

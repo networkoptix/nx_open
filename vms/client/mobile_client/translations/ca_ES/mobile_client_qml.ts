@@ -939,8 +939,8 @@
       <translation>Valors predefinits PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Cancel·la</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

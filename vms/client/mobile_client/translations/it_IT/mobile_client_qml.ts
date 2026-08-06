@@ -939,8 +939,8 @@
       <translation>Preset PTZ</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Annulla</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

@@ -939,8 +939,8 @@
       <translation>PTZ-esiasetukset</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Peruuta</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

@@ -939,8 +939,8 @@
       <translation>PTZ-posisjoner</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

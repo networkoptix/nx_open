@@ -939,8 +939,8 @@
       <translation>PTZ presets</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Annuleren</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

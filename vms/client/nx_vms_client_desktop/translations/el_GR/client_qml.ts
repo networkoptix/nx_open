@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Προσθήκη καταχώρισης</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP - Ρυθμίσεις Για Προχωρημένους</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,31 +24,31 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Χαρακτηριστικό Σύνδεσης</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Ιδιότητα Μέλους</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Χρονικό Όριο Αναζήτησης</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Για να ενεργοποιήσετε τον έλεγχο ταυτότητας digest για χρήστες LDAP που έχουν ήδη προστεθεί στη βάση δεδομένων VMS, πρέπει να τον ενεργοποιήσετε απευθείας στις ρυθμίσεις αυτών των χρηστών.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Για να απενεργοποιήσετε τον έλεγχο ταυτότητας digest για χρήστες LDAP που έχουν ήδη προστεθεί στη βάση δεδομένων VMS, πρέπει να τον απενεργοποιήσετε απευθείας στις ρυθμίσεις&apos; αυτών των χρηστών.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Να επιτρέπεται μη ασφαλής έλεγχος ταυτότητας (digest) για εισαγόμενους χρήστες</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,38 +56,38 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Συγχρονισμός Χρηστών</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Διάστημα Συγχρονισμού</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Χαρακτηριστικό Μελών Ομάδας</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>Διαμεσολάβηση αιτημάτων LDAP μέσω διακομιστή</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Γλώσσα Ειδοποιήσεων</translation>
     </message>
     <message>
       <source>User ID Attribute</source>
-      <translation type="unfinished">User ID Attribute</translation>
+      <translation>Χαρακτηριστικό Αναγνωριστικού Χρήστη</translation>
     </message>
     <message>
       <source>Group ID Attribute</source>
-      <translation type="unfinished">Group ID Attribute</translation>
+      <translation>Χαρακτηριστικό Αναγνωριστικού Ομάδας</translation>
     </message>
   </context>
   <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Ρυθμίσεις ενημέρωσης για προχωρημένους</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -95,59 +95,59 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Ειδοποίηση για διαθέσιμες ενημερώσεις</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Αυτόματες ενημερώσεις client</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Ενεργοποιήστε αυτή την επιλογή για την αυτόματη ενημέρωση των συνδεδεμένων clients στην τελευταία συμβατή έκδοση.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Οι συνδεδεμένοι clients θα ενημερώνονται αυτόματα στη νέα έκδοση όταν αυτή είναι διαθέσιμη.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Όλοι οι συνδεδεμένοι clients ενημερώνονται στην έκδοση %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Οι συνδεδεμένοι clients θα ενημερωθούν στην έκδοση %1 στις %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Έλεγχος για ενημερώσεις</translation>
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Επιταχύνετε αυτήν την ενημέρωση</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Χρησιμοποιείτε έναν προσαρμοσμένο client. Επικοινωνήστε με το %1 για να λάβετε τις οδηγίες ενημέρωσης.</translation>
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Ενημερώσεις client εκτός σύνδεσης</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Οι ενημερώσεις χωρίς σύνδεση είναι ενεργοποιημένες και τα αρχεία αποθηκεύονται στους διακομιστές.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Η ενεργοποίηση αυτής της επιλογής θα επιτρέψει τη λήψη πρόσθετων αρχείων σε διακομιστές, τα οποία μπορούν να χρησιμοποιηθούν για την ενημέρωση των συνδεδεμένων πελατών ακόμη και χωρίς πρόσβαση στο διαδίκτυο.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Αυτό θα διαγράψει όλα τα αρχεία ενημέρωσης στους διακομιστές.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Συνέχεια παρ’ όλα αυτά;</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -158,7 +158,7 @@
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>Τύπος Συμβάντος</translation>
     </message>
     <message>
       <source>All</source>
@@ -169,29 +169,29 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Τύπος Αντικειμένου</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Επιλογή / Αναίρεση επιλογής Όλων</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Επιλογή περιοχής</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Επιλέξτε κάποια περιοχή στο βίντεο...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -206,19 +206,19 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Προχωρημένη Αναζήτηση Αντικειμένων</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Επιλογή περιοχής</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Επιλέξτε κάποια περιοχή στο βίντεο...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -230,7 +230,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Οποιοδήποτε πρόσθετο</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -238,53 +238,53 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Ρυθμίσεις Πλακιδίων</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Ρυθμίσεις Πίνακα</translation>
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Εναλλαγή σε προβολή πίνακα</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Εναλλαγή σε προβολή κάρτας</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Οι αναλύσες της κάμερας θα λειτουργούν μόνο όταν προβάλλεται η κάμερα. Ενεργοποιήστε την εγγραφή για να λειτουργεί συνεχώς.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Ελέγξτε τις Ρυθμίσεις Κάμερας για να διαμορφώσετε αυτό το πρόσθετο.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Αυτό το πρόσθετο δεν έχει ρυθμίσεις για αυτήν την κάμερα.</translation>
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Ελέγξτε τις ρυθμίσεις διαχείρισης Τοποθεσίας για να ρυθμίσετε αυτό το πρόσθετο.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Αυτό το πρόσθετο δεν έχει ρυθμίσεις σε επίπεδο Tοποθεσίας.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Πρόσθετα</translation>
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Ενσωματώσεις API</translation>
     </message>
   </context>
   <context>
@@ -292,31 +292,31 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Οι ενσωματώσεις επιτρέπουν την απρόσκοπτη αξιοποίηση των αναλυτικών στοιχείων βίντεο σε διάφορες συσκευές από το VMS.
+Επιλέξτε μια ενσωμάτωση για να ξεκινήσετε τη διαμόρφωση των παραμέτρων της.</translation>
     </message>
   </context>
   <context>
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Ενσωματώσεις API</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>Οι ενσωματώσεις API αλληλεπιδρούν με τον διακομιστή %1 μέσω του REST API και ανταλλάσσουν μεταδεδομένα</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Νέα αιτήματα</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>Η ενσωμάτωση API μπορεί να ενεργοποιηθεί μετά την επαλήθευση του κωδικού που ελήφθη από τον πάροχο ενσωμάτωσης. Τα νέα αιτήματα μπορούν να απενεργοποιηθούν για την αποφυγή ανεπιθύμητης αλληλεπίδρασης.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Ενεργοποίηση %1;</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -324,23 +324,23 @@ Select an Integration to begin configuring its parameters.</translation>
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Αυτή η ενσωμάτωση θα μπορεί να κάνει τα εξής:
+ • να αλλάξει τις ρυθμίσεις στις κάμερες
+ • να αποκτήσει πρόσβαση στο αρχείο
+ • να επεξεργαστεί ροές βίντεο
+ • να ανταλλάξει μεταδεδομένα μέσω του δικτύου</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Ενεργοποίηση ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Κατάργηση %1;</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Αυτό θα καταργήσει το αίτημα ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -348,14 +348,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Κατάργηση αιτήματος</translation>
     </message>
   </context>
   <context>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Λάθος κωδικός σύζευξης</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -366,7 +366,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Αυτό το πεδίο δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -377,26 +377,26 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Μαζική επεξεργασία - %n Χρήστη</numerusform>
+        <numerusform>Μαζική επεξεργασία - %n Χρήστες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n Χρήστες</numerusform>
+        <numerusform>%n Χρήστες</numerusform>
       </translation>
     </message>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Κατάσταση χρήστη</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Ενεργοποιημένο</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -404,11 +404,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Μη ασφαλής ταυτοποίηση (digest)</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>διατήρηση τρέχουσας τιμής</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Επιλέξτε ένα χρονικό διάστημα στο χρονοδιάγραμμα και κάντε δεξί κλικ στην επιλεγμένη ενότητα για να δημιουργήσετε έναν σελιδοδείκτη</translation>
     </message>
   </context>
   <context>
@@ -437,49 +437,49 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Πλήκτρο συντόμευσης %1</translation>
     </message>
   </context>
   <context>
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Πατήστε κάθε κουμπί αρκετές φορές και γράψτε τα ονόματά τους στον παρακάτω πίνακα.</translation>
     </message>
   </context>
   <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Οποιαδήποτε συσκευή</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Οποιαδήποτε κάμερα</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Συσκευές στη διάταξη</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Κάμερες στη διάταξη</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Επιλεγμένη συσκευή</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Επιλεγμένη κάμερα</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Επιλέξτε συσκευές...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Επιλέξτε κάμερες...</translation>
     </message>
     <message>
       <source>none</source>
@@ -487,25 +487,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n επιλεγμένη συσκευή</numerusform>
+        <numerusform>%n επιλεγμένες συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n επιλεγμένη κάμερα</numerusform>
+        <numerusform>%n επιλεγμένες κάμερες</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Επιλεγμένη συσκευή</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Επιλεγμένη κάμερα</translation>
     </message>
   </context>
   <context>
@@ -516,15 +516,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Μη προσβάσιμο</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Μη συμβατό</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Σε εκκρεμότητα</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -532,18 +532,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Τερματισμός λειτουργίας</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Νέο</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Συνδεθείτε στο</translation>
     </message>
   </context>
   <context>
@@ -564,15 +564,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP - Ρυθμίσεις Σύνδεσης</translation>
     </message>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Host</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Σύνδεση DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -580,11 +580,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Παράβλεψη σφαλμάτων πιστοποιητικού διακομιστή LDAP</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Δοκιμή</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -592,63 +592,63 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Χρήση StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>Το πεδίο Host δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Το πεδίο DN σύνδεσης δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Ο κωδικός πρόσβασης δεν μπορεί να είναι κενός</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Για να επιτρέψετε στους χρήστες LDAP να συνδεθούν στο %1, είναι απαραίτητο να δημιουργηθεί μια σύνδεση μεταξύ του %1 και ενός εταιρικού διακομιστή LDAP.</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Κάντε κλικ στο εικονίδιο για να διαβάσετε περισσότερα</translation>
     </message>
   </context>
   <context>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>αντιγράφηκε</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Απόκρυψη πληροφοριών</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Εμφάνιση πληροφοριών</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Απόκρυψη thumbnails</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Εμφάνιση thumbnails</translation>
     </message>
   </context>
   <context>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Προσαρμοσμένες κεφαλίδες HTTP</translation>
     </message>
     <message>
       <source>Add</source>
@@ -671,7 +671,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Fisheye</source>
@@ -679,7 +679,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° Ισοορθογώνια προβολή</translation>
     </message>
   </context>
   <context>
@@ -705,11 +705,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Ρυθμίσεις λίστας</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Νέα λίστα</translation>
     </message>
     <message>
       <source>Name</source>
@@ -717,7 +717,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Όνομα Στήλης</translation>
     </message>
     <message>
       <source>OK</source>
@@ -733,7 +733,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Γενικό</translation>
     </message>
     <message>
       <source>Type</source>
@@ -745,25 +745,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Επιλογή τύπου</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Η κατάργηση χαρακτηριστικών θα διαγράψει όλα τα σχετικά δεδομένα</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Η διαγραφή της λίστας θα διαγράψει όλα τα δεδομένα που περιέχει.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Διαγραφή λίστας;</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Αυτή η λίστα σχετίζεται με τον Κανόνα Συμβάντος %n. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
+        <numerusform>Αυτή η λίστα σχετίζεται με τους Κανόνες Συμβάντος %n. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
       </translation>
     </message>
     <message>
@@ -775,11 +775,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Δοκιμή συμβάντος</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Δοκιμή</translation>
     </message>
   </context>
   <context>
@@ -793,26 +793,26 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventsPanel</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Δεν υπάρχουν συμβάντα</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να δημιουργήσετε έναν Κανόνα Συμβάντος</translation>
     </message>
   </context>
   <context>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Εξαγωγή λιστών</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Εξαγωγή</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Άνοιγμα Φακέλου Αρχείων...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -827,15 +827,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Σχήμα</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Κάντε κλικ για προσθήκη</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Εμφάνιση στο βίντεο</translation>
     </message>
   </context>
   <context>
@@ -857,7 +857,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>ΔΕΝ ΥΠΑΡΧΕΙ ΠΡΟΕΠΙΣΚΟΠΗΣΗ</translation>
     </message>
   </context>
   <context>
@@ -868,27 +868,27 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Βασικό DN</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Το βασικό DN δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Φίλτρο</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Το βασικό DN ορίζει το σημείο εκκίνησης για αναζητήσεις και συγχρονισμό LDAP.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Επεξεργασία βάσης αναζήτησης</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Τα φίλτρα βοηθούν στον έλεγχο της πρόσβασης στη τοποθεσία και του συγχρονισμού, καθορίζοντας ποιοι χρήστες ή/και ομάδες από το βασικό DN επιτρέπονται.</translation>
     </message>
   </context>
   <context>
@@ -902,39 +902,39 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>Η εικόνα δεν είναι κυκλική</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>Η εικόνα ενδέχεται να είναι πολύ σκοτεινή</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>Μη έγκυρη εικόνα εισαγωγής</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Προβολή πλέγματος</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Αυτόματη Βαθμονόμηση</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Προσάρτηση</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Οροφή</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Τοίχος</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Δάπεδο/τραπέζι</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -942,23 +942,23 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Διόρθωση περιστροφής κάμερας</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Προβολή φακού</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Στερεογραφικό</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Size</source>
@@ -966,26 +966,26 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>Μετατόπιση X</translation>
     </message>
     <message>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Μετατόπιση Y</translation>
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Ελλειπτικότητα</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Η αυτόματη βαθμονόμηση απέτυχε</translation>
     </message>
   </context>
   <context>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Δεν ήταν δυνατή η αυτόματη αντιστοίχιση ορισμένων τιμών. Παρακαλούμε αντιστοιχίστε τες χειροκίνητα.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -993,7 +993,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Ολοκλήρωση</translation>
     </message>
   </context>
   <context>
@@ -1007,11 +1007,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Στο επίπεδο της τοποθεσίας, τα μέλη της ομάδας έχουν δικαιώματα για:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Στο επίπεδο της τοποθεσίας, ο χρήστης έχει δικαιώματα για:</translation>
     </message>
   </context>
   <context>
@@ -1026,7 +1026,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1034,15 +1034,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Καθολικά Δικαιώματα</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Μέλη</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Προσθήκη Ομάδας</translation>
     </message>
   </context>
   <context>
@@ -1061,14 +1061,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Ομάδες Δικαιωμάτων</translation>
     </message>
   </context>
   <context>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Ομάδα - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -1076,7 +1076,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1084,11 +1084,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Καθολικά Δικαιώματα</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Μέλη</translation>
     </message>
   </context>
   <context>
@@ -1107,11 +1107,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Μέλη</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1119,23 +1119,23 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Ομάδες Δικαιωμάτων</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Η ομάδα έχει μια άλλη ομάδα ως γονική και ως θυγατρικό μέλος ή αποτελεί μέρος μιας τέτοιας κυκλικής αλυσίδας αναφοράς. Επιλύστε αυτήν την αλυσίδα για να αποτρέψετε τον εσφαλμένο υπολογισμό των δικαιωμάτων.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Όταν ο συνεχής συγχρονισμός με τον διακομιστή LDAP είναι απενεργοποιημένος, οι ομάδες δεν συγχρονίζονται αυτόματα. Για να ενημερώσετε αυτήν την ομάδα, ξεκινήστε έναν χειροκίνητο συγχρονισμό.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Αυτή η ομάδα δεν βρέθηκε στη βάση δεδομένων LDAP.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Υπάρχει μια άλλη ομάδα με το ίδιο όνομα. Συνιστάται να εκχωρείτε μοναδικά ονόματα στις ομάδες.</translation>
     </message>
   </context>
   <context>
@@ -1146,49 +1146,49 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Δεν υπάρχουν μέλη</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Χρησιμοποιήστε τα στοιχεία ελέγχου στα αριστερά για να προσθέσετε μέλη</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Σύνοψη Μελών</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Κληρονομεί την ιδιότητα μέλους στην τρέχουσα ομάδα</translation>
     </message>
   </context>
   <context>
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Επιλογή</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Δεν υπάρχουν ομάδες</translation>
     </message>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>ΕΝΣΩΜΑΤΩΜΕΝΟ</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>ΠΡΟΣΑΡΜΟΣΜΕΝΟ</translation>
     </message>
   </context>
   <context>
@@ -1196,62 +1196,62 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Κρατήστε πατημένο το %1 για να ενεργοποιήσετε ενέργειες</translation>
     </message>
   </context>
   <context>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Εισαγωγή από Συσκευές</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Εντοπίστηκε από</translation>
     </message>
   </context>
   <context>
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Επιλέξτε το χειριστήριο.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Δεν υπάρχουν συνδεδεμένες συσκευές.</translation>
     </message>
   </context>
   <context>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Ο έλεγχος ταυτότητας Digest έχει καταργηθεί και θα απενεργοποιηθεί στην επόμενη έκδοση και θα πρέπει να χρησιμοποιείται μόνο όταν δεν είναι δυνατή η χρήση του προεπιλεγμένου ελέγχου ταυτότητας φορέα.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Ο έλεγχος ταυτότητας Digest έχει καταργηθεί και θα απενεργοποιηθεί στην επόμενη έκδοση και θα πρέπει να χρησιμοποιείται μόνο όταν δεν είναι δυνατή η χρήση του προεπιλεγμένου ελέγχου ταυτότητας φορέα. Τα στοιχεία σύνδεσης των χρηστών πρέπει να αποτελούνται μόνο από πεζά γράμματα.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Ανεπαρκείς υπηρεσίες</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n απαιτείται κατάλληλη υπηρεσία ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
+        <numerusform>%n απαιτούνται κατάλληλες υπηρεσίες ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>Δεν υπάρχουν διαθέσιμες κατάλληλες υπηρεσίες</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1263,16 +1263,16 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Απαιτούμενες Υπηρεσίες</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Ανανέωση...</translation>
     </message>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Υπάρχουν περισσότερες κάμερες που χρησιμοποιούν αυτήν την ενσωμάτωση από ό, τι οι διαθέσιμες υπηρεσίες. Απενεργοποιήστε την ενσωμάτωση για ορισμένες κάμερες ή προσθέστε πιο κατάλληλες υπηρεσίες. Διαφορετικά, θα γίνει αυτόματα στο %1</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1287,26 +1287,26 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Προμηθευτής</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Ροή κάμερας</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Επιλέξτε ροή βίντεο από την κάμερα για ανάλυση</translation>
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Χρήση</translation>
     </message>
   </context>
   <context>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Διαχείριση Ενσωματώσεων</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1321,11 +1321,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Αυτό το πρόσθετο δεν έχει ρυθμίσεις σε επίπεδο Tοποθεσίας.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Ελέγξτε τις Ρυθμίσεις Κάμερας για να διαμορφώσετε αυτό το πρόσθετο.</translation>
     </message>
   </context>
   <context>
@@ -1336,7 +1336,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Προηγούμενο Αντικείμενο</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -1348,11 +1348,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Επόμενο Αντικείμενο</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Εναλλαγή επανάληψης</translation>
     </message>
   </context>
   <context>
@@ -1371,67 +1371,67 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Διερεύνηση Χειριστηρίου</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Ρυθμίσεις Χειριστηρίου</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>χειριστήριο</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Βασικές Ενέργειες</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Με Τροποποιητή</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Αυτό το μοντέλο δεν υποστηρίζεται</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Επαναφορά προεπιλογών</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Μετατόπιση και κλίση</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Μεγέθυνση / Σμίκρυνση</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Επιλογή κάμερας στη διάταξη</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Συνδεθείτε στη τοποθεσία για να διαμορφώσετε τον τρόπο ανοίγματος των διατάξεων</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Προεπιλεγμένη τιμή:</translation>
     </message>
   </context>
   <context>
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>ΣΕ ΣΥΝΔΕΣΗ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1443,11 +1443,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Τελευταίος συγχρονισμός</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1455,7 +1455,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Προηγμένες ρυθμίσεις</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1467,75 +1467,75 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Δεν έχει ρυθμιστεί ακόμα</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Διαμόρφωση</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Βάσεις αναζήτησης</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Προσθήκη Βάσης Αναζήτησης</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Καθορίστε τουλάχιστον μία βάση αναζήτησης για τον συγχρονισμό χρηστών και ομάδων</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Συνδέστε τη Τοποθεσία σας σε έναν διακομιστή LDAP για ευκολότερη διαχείριση χρηστών</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Η συνεχής εισαγωγή από τον διακομιστή LDAP είναι απενεργοποιημένη για αυτή τη τοποθεσία. Οι ενημερώσεις ομάδων και η συμμετοχή χρηστών και ομάδων θα πραγματοποιούνται αποκλειστικά μέσω χειροκίνητου συγχρονισμού.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Δεν υπάρχουν χρήστες ή ομάδες που να αντιστοιχούν στις ρυθμίσεις συγχρονισμού και προστίθενται στη βάση δεδομένων της τοποθεσίας. Βεβαιωθείτε ότι οι παράμετροι και τα φίλτρα του διακομιστή LDAP έχουν ρυθμιστεί σωστά.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Παρακαλούμε να είστε προσεκτικοί κατά την τροποποίηση των ρυθμίσεων LDAP. Η εσφαλμένη διαμόρφωση μπορεί να διακόψει τη διαθεσιμότητα της Τοποθεσίας για μεγάλο αριθμό χρηστών ταυτόχρονα.</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Η γραμμή δεν είναι έγκυρη. Αφαιρέστε τις αυτοτομές για να συνεχίσετε.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Αυτή η γραμμή απαιτεί τουλάχιστον %n σημείο.</numerusform>
+        <numerusform>Αυτή η γραμμή απαιτεί τουλάχιστον %n σημεία.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Κάντε κλικ στο τελευταίο σημείο για να ολοκληρώσετε τη σχεδίαση της γραμμής.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Έχει επιτευχθεί ο μέγιστος αριθμός σημείων (%n σημείο).</numerusform>
+        <numerusform>Έχει επιτευχθεί ο μέγιστος αριθμός σημείων (%n σημεία).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Κάντε κλικ σε κάθε βέλος για να αλλάξετε την επιθυμητή κατεύθυνση.</translation>
     </message>
   </context>
   <context>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Οποιοδήποτε %1</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -1562,11 +1562,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Λίστα Εισαγωγής</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Επιλογές Εισαγωγής</translation>
     </message>
     <message>
       <source>File:</source>
@@ -1578,11 +1578,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Διαχωριστής:</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Τα δεδομένα περιέχουν κεφαλίδα</translation>
     </message>
     <message>
       <source>Preview</source>
@@ -1590,7 +1590,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Εισαγωγή</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1598,38 +1598,38 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Εισαγωγή</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Αδυναμία ανοίγματος αρχείου</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Βεβαιωθείτε ότι το αρχείο υπάρχει και ότι έχετε πρόσβαση στο επιλεγμένο αρχείο</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Διόρθωση εισαγόμενων καταχωρίσεων</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Αδυναμία εισαγωγής του επιλεγμένου αρχείου</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Το αρχείο φαίνεται να είναι κενό.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Παρακαλώ βεβαιωθείτε ότι το επιλεγμένο αρχείο υπάρχει και έχετε πρόσβαση σε αυτό.</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Λίστες Αναζήτησης</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1637,7 +1637,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Εισαγωγή</translation>
     </message>
     <message>
       <source>Export</source>
@@ -1649,7 +1649,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 επιλέχθηκε:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1657,64 +1657,64 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Δεν Υπάρχουν Καταχωρήσεις</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Νέα λίστα...</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Δεν μπόρεσε να γίνει αποθήκευση του αρχείου</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Βεβαιωθείτε ότι έχετε πρόσβαση στον επιλεγμένο φάκελο και επαρκή χώρο στο δίσκο</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Η εξαγωγή απέτυχε</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Εξαγωγή Επιλεγμένων</translation>
     </message>
   </context>
   <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Επιλέξτε μια περιοχή στο βίντεο για να φιλτράρετε τα αποτελέσματα</translation>
     </message>
   </context>
   <context>
     <name>MotionPanel</name>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Επιλέξτε μια κάμερα για να δείτε τα συμβάντα κίνησής της</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Δεν ανιχνεύθηκε κίνηση</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να ενεργοποιήσετε την εγγραφή κίνησης</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Επιλογή Κάμερας...</translation>
     </message>
   </context>
   <context>
     <name>MultiSelectionComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Επιλογή</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1723,9 +1723,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n περισσότερο</numerusform>
+        <numerusform>%n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -1733,11 +1733,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Νέος Σύνδεσμος - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Ο προηγούμενος σύνδεσμος θα ακυρωθεί μόλις εκδοθεί ένας νέος</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1748,26 +1748,26 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Δεν υπάρχουν Λίστες</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Δεν έχετε δημιουργήσει ακόμη Λίστες. Με τις λίστες μπορείτε να αποθηκεύσετε πολλές τιμές για να τις χρησιμοποιήσετε στους Κανόνες Συμβάντων. Δημιουργήστε μια νέα λίστα για να ξεκινήσετε να προσθέτετε καταχωρίσεις.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Δημιουργία Νέου...</translation>
     </message>
   </context>
   <context>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Δεν υπάρχουν νέες ειδοποιήσεις</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Ρυθμίσεις Ειδοποιήσεων</translation>
     </message>
   </context>
   <context>
@@ -1785,18 +1785,18 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Περιορισμοί Μεγέθους</translation>
     </message>
   </context>
   <context>
     <name>ObjectTypeSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Επιλογή Αντικειμένων</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Όλα Τα Αντικείμενα</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1807,14 +1807,14 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>με χαρακτηριστικό %n</numerusform>
+        <numerusform>με χαρακτηριστικά %n</numerusform>
       </translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Οποιοσδήποτε τύπος</translation>
     </message>
   </context>
   <context>
@@ -1825,7 +1825,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL ή Host:Θύρα</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1841,14 +1841,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Απομνημόνευση των στοιχείων μου</translation>
     </message>
   </context>
   <context>
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Έγκριση</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1856,14 +1856,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Κωδικός σύζευξης ενσωμάτωσης</translation>
     </message>
   </context>
   <context>
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Προσθήκη Ομάδας</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1871,38 +1871,38 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Δεν υπάρχουν ακόμη προσαρμοσμένες ομάδες</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Δεν βρέθηκαν ομάδες</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Αλλαγή κριτηρίων αναζήτησης ή δημιουργία νέας ομάδας</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Δεν υπάρχουν ομάδες</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Χρησιμοποιήστε τα στοιχεία ελέγχου στα αριστερά για να προσθέσετε σε μια ομάδα</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Μέλος του</translation>
     </message>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Ενσωματωμένο</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1914,7 +1914,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Αλλαγή κωδικού πρόσβασης - %1</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1922,7 +1922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Τρέχων κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1941,83 +1941,83 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Δεν υπάρχουν προσαρμοσμένα δικαιώματα</translation>
     </message>
   </context>
   <context>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Απαιτούμενη ομάδα δικαιωμάτων</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Προβολή Δικαιωμάτων</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Απόκρυψη Δικαιωμάτων</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Δεν βρέθηκαν πόροι</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Αυτόματη προσθήκη εξαρτώμενων δικαιωμάτων</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Χρήση %1 ή %2 για επιλογή πολλαπλών πόρων, ή %3 για να καθαρίσετε την επιλογή</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Ο πίνακας πόρων σάς παρέχει μια επισκόπηση των δικαιωμάτων χρηστών ή ομάδων και σας επιτρέπει να εκχωρείτε δικαιώματα για συγκεκριμένους πόρους.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Εάν επιλέξετε μια άδεια που εξαρτάται από μια άλλη άδεια, και τα δύο δικαιώματα θα εκχωρηθούν αυτόματα.</translation>
     </message>
   </context>
   <context>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Ένταση</translation>
     </message>
   </context>
   <context>
     <name>PluginSelector</name>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Οποιοδήποτε πρόσθετο</translation>
     </message>
   </context>
   <context>
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Πρόσθετα</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Τα πρόσθετα είναι προγράμματα που εκτελούνται στον διακομιστή %1 για την ενεργοποίηση απρόσκοπτων ενσωματώσεων αναλυτικών στοιχείων βίντεο.</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Δεν υπάρχουν εγκατεστημένα πρόσθετα</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Ο Διακομιστής είναι εκτός σύνδεσης</translation>
     </message>
   </context>
   <context>
@@ -2031,24 +2031,24 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Το πολύγωνο δεν είναι έγκυρο. Αφαιρέστε τις αυτοτομές για να συνεχίσετε.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Αυτό το πολύγωνο απαιτεί τουλάχιστον %n σημείο.</numerusform>
+        <numerusform>Αυτό το πολύγωνο απαιτεί τουλάχιστον %n σημεία.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Κάντε κλικ στο τελευταίο σημείο για να ολοκληρώσετε τη σχεδίαση του πολυγώνου.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Έχει επιτευχθεί ο μέγιστος αριθμός σημείων (%n σημείο).</numerusform>
+        <numerusform>Έχει επιτευχθεί ο μέγιστος αριθμός σημείων (%n σημεία).</numerusform>
       </translation>
     </message>
   </context>
@@ -2056,19 +2056,19 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Δεν υπάρχει προεπισκόπηση</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Επιλέξτε το αντικείμενο για να εμφανιστεί η προεπισκόπηση</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Εμφάνιση στη διάταξη</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Η προεπισκόπηση δεν είναι διαθέσιμη για το επιλεγμένο αντικείμενο</translation>
     </message>
     <message>
       <source>Copy</source>
@@ -2076,18 +2076,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Φιλτράρισμα κατά</translation>
     </message>
     <message>
       <source>Find similar</source>
-      <translation type="unfinished">Find similar</translation>
+      <translation>Εύρεση παρόμοιων</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Επιλέξτε χαρακτηριστικό</translation>
     </message>
   </context>
   <context>
@@ -2102,7 +2102,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
   </context>
   <context>
@@ -2121,73 +2121,71 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Σύρετε πάνω από οποιοδήποτε μέρος του βίντεο
+για να ενεργοποιήσετε το PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Μεταβείτε στις Τοπικές ρυθμίσεις για να ενεργοποιήσετε έναν δείκτη μετακίνησης στο κέντρο του βίντεο</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Πατήστε τα πλήκτρα βέλους για να μετακινηθείτε. Χρησιμοποιήστε τα πλήκτρα συν και πλην για ζουμ.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Χρησιμοποιήστε τη ροδέλα του ποντικιού για μεγέθυνση</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Μπορείτε να ενεργοποιήσετε ξανά αυτόν τον οδηγό μεταβαίνοντας στις Τοπικές ρυθμίσεις &gt; Για προχωρημένους &gt; Επαναφορά όλων των προειδοποιήσεων</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Παρουσιάζουμε
+Νέα χειριστήρια PTZ</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Κάντε κλικ, διπλό κλικ ή σύρετε τον δείκτη του ποντικιού κρατώντας πατημένο το Shift για να χρησιμοποιήσετε τον προηγμένο έλεγχο PTZ</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Εδώ είναι ένας γρήγορος οδηγός
+για το τι έχει αλλάξει.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Για να χρησιμοποιήσετε την παρακολούθηση κλειδώματος στόχου,
+Πατήστε Alt + Κάντε κλικ για να ακολουθήσετε το αντικείμενο</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>σήμερα</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 ώρα</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 ώρες</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-7 ημέρες</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>- 30 ημέρες</translation>
     </message>
   </context>
   <context>
@@ -2205,7 +2203,7 @@ Press Alt + Click to follow object</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Τύπος Αντικειμένου</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -2220,11 +2218,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Ο διακομιστής δεν έχει ρυθμιστεί για τη λειτουργία απομακρυσμένης πρόσβασης</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Το εργαλείο απομακρυσμένης πρόσβασης είναι αυτήν τη στιγμή απενεργοποιημένο. Ενεργοποιήστε το ή επικοινωνήστε με τον διαχειριστή σας για να το ενεργοποιήσετε.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -2236,19 +2234,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Συνδέστε την εφαρμογή client %1 στον localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Τοπική θύρα</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Παρουσιάστηκε σφάλμα</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Όνομα Χρήστη</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2256,7 +2254,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Η απομακρυσμένη πρόσβαση δεν είναι διαθέσιμη</translation>
     </message>
   </context>
   <context>
@@ -2275,56 +2273,56 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Έχει δικαίωμα %1</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Προσθήκη %1 και εξαρτώμενων δικαιωμάτων</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Προσθήκη δικαιώματος %1</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Αφαίρεση %1 και εξαρτώμενων δικαιωμάτων</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Αφαίρεση δικαιώματος %1</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Το κληρονομεί επίσης από</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Κληρονομεί δικαιώματα %1 από</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Ήδη κληρονομημένο από</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Θα παραμείνει κληρονομημένο από</translation>
     </message>
   </context>
   <context>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Δεν υπάρχουν τοπικά αρχεία</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Σύρετε αρχεία βίντεο ή εικόνες στο παράθυρο του προγράμματος client ή προσθέστε τοπικό φάκελο πολυμέσων μέσω του παραθύρου διαλόγου Τοπικών Ρυθμίσεων</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2332,14 +2330,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Δοκιμάστε να αναζητήσετε κάτι άλλο</translation>
     </message>
   </context>
   <context>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Διαθέσιμο από τα Δικαιώματα</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2351,19 +2349,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Ιστοσελίδες &amp; Ενσωματώσεις</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Ιστοσελίδες</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Παρακολούθηση υγείας συστήματος</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Συστήματα προβολής πολλαπλών οθονών</translation>
     </message>
   </context>
   <context>
@@ -2371,9 +2369,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...και %n περισσότερο</numerusform>
+        <numerusform>...και %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -2385,7 +2383,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>ΜΗ ΕΝΗΜΕΡΩΜΕΝΟ</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
@@ -2396,7 +2394,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceSearchPane</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Διακομιστές</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2408,19 +2406,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Συστήματα προβολής πολλαπλών οθονών</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Ιστοσελίδες</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Τοπικά αρχεία</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -2435,7 +2433,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Η προεπισκόπηση είναι μη ενημερωμένη</translation>
     </message>
   </context>
   <context>
@@ -2454,7 +2452,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Συμβάντα</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2465,34 +2463,34 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Η τοποθεσία έχει ανασταλεί. Για να ενεργοποιήσετε/απενεργοποιήσετε τη χρήση ενσωμάτωσης για την τρέχουσα συσκευή, η Τοποθεσία πρέπει να είναι σε ενεργή κατάσταση. Επικοινωνήστε με τον εμπορικό σας συνεργάτη για λεπτομέρειες</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Η τοποθσία έχει ανασταλεί. Για να ενεργοποιήσετε/απενεργοποιήσετε τη χρήση ενσωμάτωσης για κάποια συσκευή η τοποθεσία πρέπει να είναι σε ενεργή κατάσταση. Επικοινωνήστε με τον εμπορικό σας συνεργάτη για λεπτομέρειες</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Η τοποθεσία έχει τερματίσει. Για να ενεργοποιήσετε/απενεργοποιήσετε τη χρήση ενσωμάτωσης για την τρέχουσα συσκευή, η Τοποθεσία πρέπει να είναι σε ενεργή κατάσταση. Επικοινωνήστε με τον εμπορικό σας συνεργάτη για λεπτομέρειες</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Η τοποθεσία έχει τερματίσει. Για να ενεργοποιήσετε/απενεργοποιήσετε τη χρήση ενσωμάτωσης για κάποια συσκευή η τοποθεσία πρέπει να είναι σε ενεργή κατάσταση. Επικοινωνήστε με τον εμπορικό σας συνεργάτη για λεπτομέρειες</translation>
     </message>
   </context>
   <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Επιλέξτε αρχείο για αποθήκευση</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>Αρχεία JSON (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Αρχείο για αποθήκευση των αποτελεσμάτων:</translation>
     </message>
   </context>
   <context>
@@ -2506,7 +2504,7 @@ Press Alt + Click to follow object</translation>
     <name>SecurityOverlay</name>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Χωρίς πρόσβαση</translation>
     </message>
   </context>
   <context>
@@ -2520,11 +2518,11 @@ Press Alt + Click to follow object</translation>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Αναγνωριστικό χρονοδιαγράμματος, το οποίο δημιουργείται όταν ο χρόνος αλλάζει προς τα πίσω σε ένα απομακρυσμένο NVR. Το νέο χρονοδιάγραμμα μπορεί να επικαλύψει την υπάρχουσα.</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Επιλογή</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2535,55 +2533,55 @@ Press Alt + Click to follow object</translation>
     <name>SensitivityItem</name>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Ευαισθησία</translation>
     </message>
   </context>
   <context>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Εισάγετε παραμέτρους</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Αυτή η ενέργεια απαιτεί την συμπλήρωση ορισμένων παραμέτρων.</translation>
     </message>
   </context>
   <context>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Αποδοχή αιτημάτων εγγραφής για ενσωματώσεις API</translation>
     </message>
     <message>
       <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <translation>Η ενεργοποίηση των αιτημάτων εγγραφής για Ενσωματώσεις API επιτρέπει σε τρίτους να υποβάλλουν αιτήματα έγκρισης μέσω της ενσωμάτωσης. Παρόλο που υπάρχουν μέτρα ασφαλείας, δεν συνιστάται η παρατεταμένη χρήση. Παρακολουθήστε στενά τη χρήση και απενεργοποιήστε αυτήν την επιλογή αφού εγκατασταθούν όλες οι απαραίτητες Ενσωματώσεις.</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>ΜΕΓΙΣΤΟ</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>ΕΛΑΧΙΣΤΟ</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Ορίστε το ελάχιστο και το μέγιστο μέγεθος αντικειμένου.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Το ελάχιστο μέγεθος αντικειμένου δεν μπορεί να είναι μεγαλύτερο από το μέγιστο.</translation>
     </message>
   </context>
   <context>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Διόρθωση ορίζοντα</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -2594,7 +2592,7 @@ Press Alt + Click to follow object</translation>
     <name>StatusOverlay</name>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Διαγνωστικά</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -2602,7 +2600,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Ενεργοποίηση Άδειας</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2610,21 +2608,21 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Ρυθμίσεις μονάδας εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Ρυθμίσεις Συσκευής</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Ορισμός για αυτήν την κάμερα</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Ορισμός για %n κάμερα</numerusform>
+        <numerusform>Ορισμός για όλες τις %n κάμερες</numerusform>
       </translation>
     </message>
     <message>
@@ -2637,11 +2635,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Παρακαλώ ελέγξτε τις πληροφορίες ελέγχου ταυτότητας</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Δεν υπάρχει σήμα</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -2649,15 +2647,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Ο διακομιστής δεν είναι διαθέσιμος</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Χωρίς πρόσβαση</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Η Συσκευή απενεργοποιήθηκε</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -2665,7 +2663,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Αδυναμία αποκρυπτογράφησης πολυμέσων</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -2684,29 +2682,29 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Τουλάχιστον 3 χαρακτήρες</translation>
     </message>
   </context>
   <context>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Λογικό αναγνωριστικό</translation>
     </message>
   </context>
   <context>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Ποτέ</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Πάντα</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Κατά Τη Σύνδεση</translation>
     </message>
   </context>
   <context>
@@ -2714,36 +2712,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Έγκυρο από %1 σε %2 (από ώρα διακομιστή)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Έγκυρο από %1 σε %2 (από ώρα διακομιστή) ή για %3 μετά τη σύνδεση</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Έγκυρος Σύνδεσμος Μέχρι</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Ο σύνδεσμος θα παραμείνει προσβάσιμος μέχρι την καθορισμένη ημερομηνία (συμπεριλαμβανομένης, βάσει της ώρας του διακομιστή)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Ανάκληση πρόσβασης μετά τη σύνδεση</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Η πρόσβαση μπορεί να ανακληθεί νωρίτερα εάν λήξει η περίοδος ισχύος του συνδέσμου</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Σε</translation>
     </message>
   </context>
   <context>
@@ -2754,19 +2752,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Δεν Υπάρχουν Αγαπημένες Τοποθεσίες</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Δεν Υπάρχουν Κρυφές Τοποθεσίες</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Μπορείτε να προσθέσετε τη τοποθεσία στα αγαπημένα από το μενού περιβάλλοντος</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Μπορείτε να αποκρύψετε τοποθεσίες από την κύρια λίστα από το μενού περιβάλλοντος</translation>
     </message>
   </context>
   <context>
@@ -2789,11 +2787,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Προσθήκη στα Aγαπημένα</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Αφαίρεση από τα Αγαπημένα</translation>
     </message>
   </context>
   <context>
@@ -2816,11 +2814,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Επιλέχθηκε στο Χρονοδιάγραμμα</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Η ώρα δεν είναι διαθέσιμη λόγω αλλαγών στη θερινή ώρα</translation>
     </message>
   </context>
   <context>
@@ -2828,9 +2826,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... και %n περισσότερο</numerusform>
+        <numerusform>... και %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -2838,7 +2836,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Νέος Χρήστης</translation>
     </message>
     <message>
       <source>General</source>
@@ -2846,7 +2844,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2854,7 +2852,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Καθολικά Δικαιώματα</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2865,7 +2863,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Νέος Χρήστης</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2885,7 +2883,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Ονοματεπώνυμο</translation>
     </message>
     <message>
       <source>Email</source>
@@ -2897,31 +2895,31 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Επιβεβαίωση Κωδικού Πρόσβασης</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Να επιτρέπεται η μη ασφαλής (digest) επαλήθευση ταυτότητας</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Πρέπει να καθορίσετε μόνο τη διεύθυνση ηλεκτρονικού email του χρήστη.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Ομάδες Δικαιωμάτων</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Πρόσβαση</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Κανονικός χρήστης με διαπιστευτήρια</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Προσωρινό με σύνδεσμο</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2929,18 +2927,18 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Η τοποθεσία που προστέθηκε θα γίνει γρήγορα ορατή στους χρήστες με υπάρχοντα λογαριασμό cloud, ενώ οι χρήστες χωρίς υπάρχοντα λογαριασμό cloud θα λαμβάνουν οδηγίες μέσω email.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Γλώσσα Ειδοποιήσεων</translation>
     </message>
   </context>
   <context>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Χρήστης - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2948,7 +2946,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2956,30 +2954,30 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Καθολικά Δικαιώματα</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Αυτός ο χρήστης δεν έχει εγγραφεί ακόμη στο %1</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Ενεργοποιημένος χρήστης</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Απενεργοποιημένος χρήστης</translation>
     </message>
   </context>
   <context>
     <name>UserGeneralTab</name>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Διαδρομή Ελέγχου</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2991,7 +2989,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Ονοματεπώνυμο</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -3007,88 +3005,88 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Ορισμός κωδικού πρόσβασης για ενεργοποίηση μη ασφαλούς ελέγχου ταυτότητας</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Να επιτρέπεται η μη ασφαλής (digest) επαλήθευση ταυτότητας</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Αυτός ο χρήστης δεν βρέθηκε στη βάση δεδομένων LDAP και δεν είναι δυνατό να συνδεθεί.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Ομάδες Δικαιωμάτων</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Η πρόσβαση λήγει</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Σύνδεσμος Πρόσβασης</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Αντιγραφή Συνδέσμου</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Τερματισμός</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Νέος σύνδεσμος...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Δεν υπάρχει έγκυρος σύνδεσμος για αυτόν το χρήστη</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Αντιγράφηκε</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Λήψη συνδέσμου...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Βεβαιωθείτε ότι αυτός ο υπολογιστής μπορεί να συνδεθεί στο %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>Ο διακομιστής LDAP είναι εκτός σύνδεσης. Ο χρήστης δεν μπορεί να συνδεθεί.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Όταν ο συνεχής συγχρονισμός με τον διακομιστή LDAP είναι απενεργοποιημένος, η συμμετοχή των χρηστών σε ομάδες δεν συγχρονίζεται αυτόματα. Για να ενημερώσετε αυτές τις πληροφορίες, ξεκινήστε έναν μη αυτόματο συγχρονισμό.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Τα στοιχεία σύνδεσης αυτού του χρήστη αντιγράφουν τα στοιχεία σύνδεσης ενός άλλου χρήστη. Κανένας από αυτούς δεν μπορεί να συνδεθεί. Για να επιλύσετε αυτό το πρόβλημα, μπορείτε να αλλάξετε τα στοιχεία σύνδεσης του χρήστη ή να απενεργοποιήσετε ή να διαγράψετε χρήστες με διπλότυπες συνδέσεις.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Γλώσσα Ειδοποιήσεων</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Γλώσσα Διεπαφής</translation>
     </message>
   </context>
   <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Κρυφό</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Αγαπημένα</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -3099,7 +3097,7 @@ Press Alt + Click to follow object</translation>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Προσθήκη Κανόνα</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -3111,15 +3109,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Καμία Καταχώρηση</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Αρχείο Καταγραφής Συμβάντων...</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Επαναφορά Προεπιλογών...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3127,11 +3125,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 επιλέχθηκε:</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Χρονοδιάγραμμα</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -3143,18 +3141,18 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
+      <translation>Δοκιμή συμβάντων...</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Επίσημη Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Βοήθεια &amp; Εγχειρίδιο χρήστη</translation>
     </message>
     <message>
       <source>Support</source>
@@ -3162,28 +3160,28 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Δεν έχετε πρόσβαση στο %1. Ελέγξτε τη σύνδεσή σας στο διαδίκτυο.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Μετακινήστε το χειριστήριο αριστερά και δεξιά αρκετές φορές.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Μετακινήστε το χειριστήριο πάνω και κάτω αρκετές φορές.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Περιστρέψτε το χειριστήριο δεξιόστροφα και αριστερόστροφα αρκετές φορές.</translation>
     </message>
   </context>
 </TS>

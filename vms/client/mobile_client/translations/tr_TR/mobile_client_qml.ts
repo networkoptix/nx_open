@@ -939,8 +939,8 @@
       <translation>PTZ ön tanımlı pozisyon</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>

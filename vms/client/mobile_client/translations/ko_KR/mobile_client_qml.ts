@@ -938,8 +938,8 @@
       <translation>PTZ 프리셋</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>취소</translation>
+      <source>Close</source>
+      <translation type="unfinished">Close</translation>
     </message>
   </context>
   <context>
