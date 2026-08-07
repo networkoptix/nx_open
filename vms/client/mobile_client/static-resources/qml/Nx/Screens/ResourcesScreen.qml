@@ -20,6 +20,7 @@ import nx.vms.client.core
 import nx.vms.client.mobile
 import nx.vms.client.mobile.timeline as Timeline
 
+import "private"
 import "private/ResourcesScreen"
 
 AdaptiveScreen
@@ -52,6 +53,8 @@ AdaptiveScreen
         else if (panel === rightPanel)
             appContext.settings.timelinePanelVisible = false
     }
+
+    titleUnderlineVisible: siteToolTip.available
 
     toolBar.controls:
         [
@@ -430,6 +433,18 @@ AdaptiveScreen
                 }
             }
         }
+    }
+
+    SiteToolTip
+    {
+        id: siteToolTip
+
+        readonly property var controller: resourcesScreen.contentItem === videoScreenLoader.item
+            ? videoScreenLoader.item.controller
+            : null
+
+        toolBar: resourcesScreen.toolBar
+        text: controller?.resourceHelper.crossSystemName ?? ""
     }
 
     customBackHandler: (isEscKeyPressed) =>

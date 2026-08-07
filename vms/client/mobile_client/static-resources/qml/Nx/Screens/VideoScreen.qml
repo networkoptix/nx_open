@@ -21,6 +21,7 @@ import nx.vms.client.mobile
 import nx.vms.client.mobile.timeline as Timeline
 import nx.vms.common
 
+import "private"
 import "private/VideoScreen"
 import "private/VideoScreen/Fullscreen"
 import "private/VideoScreen/Ptz"
@@ -375,6 +376,7 @@ Page
 
     title: cameraSwitcher.resourceName
     titleLabelOpacity: Math.abs(cameraSwitcher.transitionFraction * 2 - 1)
+    titleUnderlineVisible: siteToolTip.available
     titleControls:
         [
             LayoutItemProxy
@@ -425,6 +427,14 @@ Page
         y: portraitOrientation ? parent.height : 8
         x: (parent.width - width) / 2
         maxWidth: portraitOrientation ? parent.width - 2 * 16 : 360
+    }
+
+    SiteToolTip
+    {
+        id: siteToolTip
+
+        toolBar: modernVideoScreen.toolBar
+        text: controller.resourceHelper.crossSystemName
     }
 
     Menu
