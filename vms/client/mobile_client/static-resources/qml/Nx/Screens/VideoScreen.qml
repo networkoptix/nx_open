@@ -951,6 +951,7 @@ Page
 
             objectsType: objectActionsMenu.objectsType
             tileHeight: timeline.tileHeight
+            preferredEdge: StyleHints.preferredSheetEdge
         }
 
         Timeline.ObjectActionsMenu
@@ -1152,6 +1153,8 @@ Page
     {
         id: objectsTypeSheet
 
+        preferredEdge: StyleHints.preferredSheetEdge
+
         onObjectsTypeClicked:
         {
             if (!modernVideoScreen.auxiliary)
@@ -1164,6 +1167,7 @@ Page
         id: actionSheet
 
         resource: controller.resource
+        preferredEdge: StyleHints.preferredSheetEdge
         overlayStyle: modernVideoScreen.state === "fullscreen"
         externalVisualizerContainer: actionVisualizerContainer
         externalButtonContainer: modernVideoScreen.state === "fullscreen"
@@ -1201,6 +1205,9 @@ Page
     DownloadMediaDurationSheet
     {
         id: downloadMediaSheet
+
+        preferredEdge: StyleHints.preferredSheetEdge
+
         onDurationPicked: function(duration)
         {
             mediaDownloadBackend.downloadVideo(timeline.positionMs, duration)

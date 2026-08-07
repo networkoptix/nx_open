@@ -21,7 +21,10 @@ Drawer
 
     property bool closeAutomatically: true
     property bool closeButtonVisible: !control.bottomEdge
+    property int preferredEdge: Qt.RightEdge
     readonly property alias contentDragging: flickable.dragging
+    readonly property bool leftEdge: edge === Qt.LeftEdge
+    readonly property bool rightEdge: edge === Qt.RightEdge
     readonly property bool bottomEdge: edge === Qt.BottomEdge
 
     readonly property real availableSheetHeight:
@@ -38,7 +41,7 @@ Drawer
         - topPadding - bottomPadding - flickable.anchors.topMargin - flickable.anchors.bottomMargin
 
     x: (parent.width - width) / 2
-    edge: LayoutController.isPortrait ? Qt.BottomEdge : Qt.RightEdge
+    edge: LayoutController.isPortrait ? Qt.BottomEdge : preferredEdge
     width: bottomEdge ? Math.min(parent.width, 640) : StyleHints.sheetWidth
 
     height: bottomEdge
@@ -91,7 +94,7 @@ Drawer
 
         Rectangle
         {
-            anchors.left: parent.left
+            x: control.leftEdge ? parent.width - width : 0
             width: 2 * radius
             height: parent.height
             radius: parent.kCornerRadius
@@ -103,7 +106,7 @@ Drawer
         {
             id: mainAreaBackground
 
-            x: control.bottomEdge ? 0 : parent.kCornerRadius
+            x: control.rightEdge ? parent.kCornerRadius : 0
             y: control.bottomEdge ? parent.kCornerRadius : 0
             width: parent.width - (control.bottomEdge ? 0 : parent.kCornerRadius)
             height: parent.height - (control.bottomEdge ? parent.kCornerRadius : 0)

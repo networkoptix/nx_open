@@ -20,6 +20,7 @@ Action
     property real durationMs: 0
     property alias menuOpened: downloadMediaSheet.opened
     property alias isDownloadAvailable: mediaDownloadBackend.isDownloadAvailable
+    property int preferredSheetEdge: Qt.RightEdge
 
     enabled: isDownloadAvailable
     text: qsTr("Download")
@@ -43,6 +44,8 @@ Action
 
             DownloadMediaDurationSheet
             {
+                preferredEdge: control.preferredSheetEdge
+
                 onDurationPicked: (duration) =>
                 {
                     mediaDownloadBackend.downloadVideo(control.positionMs, duration)

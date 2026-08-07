@@ -17,6 +17,7 @@ Action
     property bool analyticsMode: false
     property alias objectData: backend.objectData
     readonly property alias backend: backend
+    property int preferredSheetEdge: Qt.RightEdge
 
     text: shared ? qsTr("Shared") : qsTr("Share")
 
@@ -57,6 +58,7 @@ Action
             {
                 backend: action.backend
                 isAnalyticsItemMode: action.analyticsMode
+                preferredEdge: action.preferredSheetEdge
 
                 onShowHowItWorks: howItWorksSheet.open()
             }
@@ -72,6 +74,7 @@ Action
                     + " link after setting the sharing options")
 
                 doNotShowAgain: !appContext.settings.showHowShareWorksNotification
+                preferredEdge: action.preferredSheetEdge
 
                 onContinued:
                 {

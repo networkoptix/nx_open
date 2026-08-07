@@ -98,6 +98,7 @@ Menu
 
             analyticsMode: menu.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
             objectData: d.singleObjectData ?? null
+            preferredSheetEdge: StyleHints.preferredSheetEdge
         }
 
         DownloadMediaAction
@@ -108,6 +109,8 @@ Menu
 
             durationMs: Math.max(d.singleObjectData?.durationMs ?? 0,
                 menu.minimumDownloadDurationMs)
+
+            preferredSheetEdge: StyleHints.preferredSheetEdge
         }
 
         Connections

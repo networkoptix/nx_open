@@ -74,7 +74,7 @@ Item
 
         edge: control.overlayStyle || LayoutController.isPortrait
             ? Qt.BottomEdge
-            : Qt.RightEdge
+            : StyleHints.preferredSheetEdge
 
         width: bottomEdge
             ? Math.min(parent.width, control.overlayStyle ? 360 : 640)
