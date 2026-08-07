@@ -22,12 +22,16 @@ public:
     void appendAuthHeader(AuthHeader value);
     std::vector<nx::Buffer> receivedRequests();
 
+    /** When set, the challenge is sent as 407 Proxy Authentication Required instead of 401. */
+    void setUseProxyAuthentication(bool value);
+
 private:
     enum class NextResponse {unauthorized, success};
 
     std::vector<nx::Buffer> m_receivedRequests;
     std::vector<AuthHeader> m_authHeaders;
     NextResponse m_nextRepsonse = NextResponse::unauthorized;
+    bool m_useProxyAuthentication = false;
 
     virtual void processConnection(AbstractStreamSocket* connection) override;
     nx::Buffer nextResponse();
@@ -53,7 +57,10 @@ public:
 
     void givenHttpServerWithAuthorization(
         std::vector<AuthHttpServer::AuthHeader> authData);
+    void givenHttpServerWithProxyAuthentication(
+        std::vector<AuthHttpServer::AuthHeader> authData);
     void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth, const char* username = nullptr);
+    void whenClientSendsRequestThroughAuthenticatingProxy();
     void thenClientRequestContainsAuthAttrs(const char* exptectedHeaderResponse);
     void thenClientGotResponseWithCode(int expectedHttpCode);
     void thenLastRequestAuthorizedOnServerAsUser(const std::string& username);

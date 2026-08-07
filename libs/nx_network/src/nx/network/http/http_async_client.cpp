@@ -1070,6 +1070,7 @@ void AsyncClient::resetDataBeforeNewRequest()
 {
     ++m_requestSequence;
     m_authorizationTried = false;
+    m_proxyAuthorizationTried = false;
     m_ha1RecalcTried = false;
     m_numberOfRedirectsTried = 0;
     m_request = nx::network::http::Request();

@@ -20,6 +20,12 @@ static constexpr char kResponseForDefaultBasicHeader[] = "Basic em9yel91c2VyOnpv
 static constexpr char kDefaultDigestHeader[] =
     "WWW-Authenticate: Digest algorithm=\"MD5\", nonce=\"cUySLvm\", realm=\"VMS\"\r\n";
 
+static constexpr char kDefaultProxyDigestHeader[] =
+    "Proxy-Authenticate: Digest algorithm=\"MD5\", nonce=\"cUySLvm\", realm=\"VMS\"\r\n";
+
+static constexpr char kProxyUsername[] = "proxy_user";
+static constexpr char kProxyPassword[] = "proxy_pass";
+
 static constexpr char kResponseForDefaultDigestHeader[] =
     "Digest username=\"zorz_user\", realm=\"VMS\", nonce=\"cUySLvm\", "
     "uri=\"/HttpAsyncClient_auth\", response=\"4a5ec2fdc1d7dd43dd6fb345944583c5\", "
@@ -64,6 +70,11 @@ void AuthHttpServer::appendAuthHeader(AuthHeader value)
     m_authHeaders.push_back(std::move(value));
 }
 
+void AuthHttpServer::setUseProxyAuthentication(bool value)
+{
+    m_useProxyAuthentication = value;
+}
+
 nx::Buffer AuthHttpServer::nextResponse()
 {
     nx::Buffer response;
@@ -72,9 +83,11 @@ nx::Buffer AuthHttpServer::nextResponse()
         case NextResponse::unauthorized:
             m_nextRepsonse = NextResponse::success;
 
-            response =
-                "HTTP/1.1 401 Unauthorized\r\n"
-                "Content-Length: 0\r\n";
+            response = m_useProxyAuthentication
+                ? "HTTP/1.1 407 Proxy Authentication Required\r\n"
+                  "Content-Length: 0\r\n"
+                : "HTTP/1.1 401 Unauthorized\r\n"
+                  "Content-Length: 0\r\n";
            for(const auto& authData: m_authHeaders)
                response.append(authData.header);
             response.append("\r\n");
@@ -136,6 +149,43 @@ void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(
     for (auto &headerAndResponse: authData)
         m_httpServer->appendAuthHeader(std::move(headerAndResponse));
     m_httpServer->start();
+}
+
+void HttpClientAsyncAuthorization::givenHttpServerWithProxyAuthentication(
+    std::vector<AuthHttpServer::AuthHeader> authData)
+{
+    m_httpServer = std::make_unique<AuthHttpServer>();
+    ASSERT_TRUE(m_httpServer->bindAndListen(SocketAddress::anyPrivateAddress));
+    m_httpServer->setUseProxyAuthentication(true);
+
+    for (auto &headerAndResponse: authData)
+        m_httpServer->appendAuthHeader(std::move(headerAndResponse));
+    m_httpServer->start();
+}
+
+void HttpClientAsyncAuthorization::whenClientSendsRequestThroughAuthenticatingProxy()
+{
+    m_httpClient->setAuthType(AuthType::authDigest);
+    m_httpClient->setProxyCredentials(PasswordCredentials(kProxyUsername, kProxyPassword));
+
+    const auto url = url::Builder()
+        .setScheme(http::kUrlSchemeName)
+        .setEndpoint(m_httpServer->endpoint())
+        .setPath(kTestPath)
+        .toUrl();
+
+    std::promise<void> done;
+    m_httpClient->post(
+        [this, url, &done]()
+        {
+            m_httpClient->doGet(
+                url,
+                [&done]()
+                {
+                    done.set_value();
+                });
+        });
+    done.get_future().wait();
 }
 
 void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(
@@ -249,6 +299,18 @@ TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
 
     thenClientGotResponseWithCode(200);
     thenClientRequestContainsAuthAttrs(kResponseForLowercaseMd5DigestHeaderCommonAttrs);
+}
+
+TEST_F(HttpClientAsyncAuthorization, ReusedClientProxyAuthentication)
+{
+    givenHttpServerWithProxyAuthentication(
+        {{AuthType::authDigest, kDefaultProxyDigestHeader}});
+
+    whenClientSendsRequestThroughAuthenticatingProxy();
+    thenClientGotResponseWithCode(200);
+
+    whenClientSendsRequestThroughAuthenticatingProxy();
+    thenClientGotResponseWithCode(200);
 }
 
 TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)
