@@ -924,6 +924,7 @@ Page
                 && !ptz.active
                 && !actionSheet.opened
                 && !downloadMediaSheet.opened
+                && !mainWindow.banner.modalActive
 
             timeZone: video.resourceHelper.timeZone
 

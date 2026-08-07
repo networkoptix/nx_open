@@ -10,6 +10,7 @@ Item
     id: control
 
     property BannerSource currentItem: null
+    readonly property bool modalActive: currentItem?.modal ?? false
     readonly property var activeItems: Array.from(children).filter(
         item => (item instanceof BannerSource) && item.active)
 
@@ -42,7 +43,7 @@ Item
     {
         anchors.fill: parent
 
-        active: currentItem?.modal ?? false
+        active: control.modalActive
     }
 
     Banner
