@@ -1005,8 +1005,6 @@ private:
     nx::utils::CachedValue<QnLiveStreamParams> m_primaryStreamConfiguration;
     nx::utils::CachedValue<QnLiveStreamParams> m_secondaryStreamConfiguration;
     nx::streaming::rtp::TimeOffsetPtr m_timeOffset;
-
-    mutable nx::Mutex m_cachedValueMutex;
 };
 
 constexpr QSize EMPTY_RESOLUTION_PAIR(0, 0);

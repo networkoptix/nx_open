@@ -122,6 +122,30 @@ AnalyticsEntitiesByEngine calculateSupportedEntities(ManifestItemIdsFetcher fetc
     return result;
 }
 
+QnVirtualCameraResource::DeviceAgentManifestMap deserializeDeviceAgentManifests(
+    const std::string& data)
+{
+    if (data.empty())
+        return {};
+
+    auto [manifests, result] =
+        nx::reflect::json::deserialize<QnVirtualCameraResource::DeviceAgentManifestMap>(data);
+
+    if (!result.success)
+    {
+        // Trying to deserialize with another method to support client connections to
+        // the old systems.
+        bool deserialized = false;
+        manifests = QJson::deserialized<QnVirtualCameraResource::DeviceAgentManifestMap>(
+            data, {}, &deserialized);
+
+        if (!deserialized)
+            NX_WARNING(NX_SCOPE_TAG, "Failed to deserialize manifest: %1", result.toString());
+    }
+
+    return manifests;
+}
+
 QPointF storedPtzPanTiltSensitivity(const QnVirtualCameraResource& camera)
 {
     return QJson::deserialized<QPointF>(
@@ -2997,26 +3021,8 @@ AnalyticsEntitiesByEngine QnVirtualCameraResource::supportedObjectTypes(
 QnVirtualCameraResource::DeviceAgentManifestMap
     QnVirtualCameraResource::deviceAgentManifests() const
 {
-    const auto data = getProperty(api::device_properties::kDeviceAgentManifestsKey).toStdString();
-    if (data.empty())
-        return {};
-
-    auto [deserializedManifestMap, result] =
-        nx::reflect::json::deserialize<DeviceAgentManifestMap>(data);
-
-    if (!result.success)
-    {
-        // Trying to deserialize with another method to support client connections to
-        // the old systems.
-        bool deserialized = false;
-        deserializedManifestMap = QJson::deserialized<DeviceAgentManifestMap>(
-            data, {}, &deserialized);
-
-        if (!deserialized)
-            NX_WARNING(this, "Failed to deserialize manifest: %1", result.toString());
-    }
-
-    return deserializedManifestMap;
+    return deserializeDeviceAgentManifests(
+        getProperty(api::device_properties::kDeviceAgentManifestsKey).toStdString());
 }
 
 std::optional<nx::vms::api::analytics::DeviceAgentManifest>
@@ -3034,13 +3040,17 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
     const nx::Uuid& engineId,
     const nx::vms::api::analytics::DeviceAgentManifest& manifest)
 {
-    NX_MUTEX_LOCKER lock(&m_cachedValueMutex);
-    auto manifests = m_cachedDeviceAgentManifests.get();
-    manifests[engineId] = manifest;
-    setProperty(
+    const bool changed = updateProperty(
         api::device_properties::kDeviceAgentManifestsKey,
-        QString::fromUtf8(nx::reflect::json::serialize(manifests)));
-    saveProperties();
+        [&engineId, &manifest](const QString& prevValue)
+        {
+            auto manifests = deserializeDeviceAgentManifests(prevValue.toStdString());
+            manifests[engineId] = manifest;
+            return QString::fromUtf8(nx::reflect::json::serialize(manifests));
+        });
+
+    if (changed)
+        saveProperties();
 }
 
 nx::vms::api::StreamIndex QnVirtualCameraResource::analyzedStreamIndex(nx::Uuid engineId) const
