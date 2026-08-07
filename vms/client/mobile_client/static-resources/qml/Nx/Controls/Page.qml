@@ -57,6 +57,7 @@ QuickControls.Page
                 titleUnderlineVisible: control.titleUnderlineVisible
                 leftButtonIcon.source: stackView.depth > 1 ? d.kBackButtonIconSource : ""
                 anchors.left: column.left
+                implicitHeight: StyleHints.headerHeight
 
                 onLeftButtonClicked: control.leftButtonClicked()
                 onClicked: control.headerClicked()

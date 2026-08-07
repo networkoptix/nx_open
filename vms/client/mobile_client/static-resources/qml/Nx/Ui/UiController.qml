@@ -101,7 +101,7 @@ NxObject
                     return Controller.CameraSettingsScreen
                 case "eventSearchScreen":
                     return Controller.EventSearchScreen
-                case "eventDetailsScreen":
+                case "detailsScreen":
                     return Controller.DetailsScreen
                 case "eventSearchMenuScreen":
                     return Controller.EventSearchMenuScreen

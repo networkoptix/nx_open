@@ -647,7 +647,7 @@ AdaptiveScreen
                 const objectData = ObjectDataAdapter.create(modelIndex)
 
                 detailsLoader.setSource(
-                    Qt.resolvedUrl("../private/DetailsScreen.qml"),
+                    Qt.resolvedUrl("../private/DetailsScreen/DetailsItem.qml"),
                     {
                         "uuid": NxGlobals.modelData(modelIndex, "uuid"),
                         "objectsType": screenController.analyticsSearchMode
@@ -656,7 +656,11 @@ AdaptiveScreen
                         "objectData": objectData,
                         "hasNext": Qt.binding(() => view.currentIndex > 0),
                         "hasPrevious": Qt.binding(() => view.currentIndex < view.count - 1),
-                        "resource": resource
+                        "resource": resource,
+                        "showPreviewImage": Qt.binding(() => LayoutController.isMobile),
+                        "gestureExclusionEnabled": Qt.binding(() => LayoutController.isPortrait
+                            && screen.isActive
+                            && screen.contentItem === detailsLoader.item)
                     })
 
                 if (!LayoutController.isTabletLayout)

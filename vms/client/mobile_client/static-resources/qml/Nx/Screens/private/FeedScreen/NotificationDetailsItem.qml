@@ -20,6 +20,7 @@ Item
     readonly property string title: resourceHelper.resourceName || qsTr("Details")
     readonly property bool hasPreview: d.currentCamera !== null
     property alias notification: d.notification
+    property alias gestureExclusionEnabled: preview.gestureExclusionEnabled
 
     signal backClicked()
 

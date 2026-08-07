@@ -80,7 +80,13 @@ Menu
         {
             id: detailsAction
 
-            // TODO: #vkutin #mmalofeev [MOBILE-3376] Invoke Details Screen.
+            onTriggered:
+            {
+                if (d.objectsData.length < 1)
+                    return
+
+                Workflow.openDetailsScreen(menu.objectsType, d.objectsData)
+            }
         }
 
         // Currently, actions enabled state does not depend on `d.selectedIndex`, because it

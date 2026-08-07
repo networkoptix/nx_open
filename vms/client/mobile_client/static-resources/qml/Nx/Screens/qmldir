@@ -3,6 +3,7 @@ module Nx.Screens
 CameraSettingsScreen 1.0 CameraSettingsScreen.qml
 CustomConnectionScreen 1.0 CustomConnectionScreen.qml
 DeprecatedVideoScreen 1.0 DeprecatedVideoScreen.qml
+DetailsScreen 1.0 DetailsScreen.qml
 FeedScreen 1.0 FeedScreen.qml
 ResourcesScreen 1.0 ResourcesScreen.qml
 SessionsScreen 1.0 SessionsScreen.qml

@@ -23,7 +23,10 @@ Rectangle
 
     property alias interval: preview
 
-    property bool activePage: false
+    // Whether the position slider must reserve its area from the Android system edge gestures.
+    // Set it while the preview is on the foreground screen, otherwise the exclusion area would
+    // keep blocking the gestures for whatever screen is shown on top.
+    property bool gestureExclusionEnabled: false
     property bool withNavigationControls: true
     property bool withShowOnCamera: true
 
@@ -285,6 +288,7 @@ Rectangle
                 Layout.fillWidth: true
 
                 target: showOnCameraButton
+                visible: root.withShowOnCamera
             }
         }
 
@@ -305,6 +309,7 @@ Rectangle
             LayoutItemProxy
             {
                 target: showOnCameraButton
+                visible: root.withShowOnCamera
             }
 
             LayoutItemProxy
@@ -445,7 +450,7 @@ Rectangle
     {
         id: showOnCameraButton
 
-        opacity: root.withShowOnCamera ? d.controlsOpacity : 0.0
+        opacity: d.controlsOpacity
         enabled: opacity > 0
         icon.source: "image://skin/24x24/Outline/show_on_layout.svg"
 
@@ -522,14 +527,15 @@ Rectangle
                 ? preview.videoAspectRatio < 1
                 : preview.videoAspectRatio > 1)
 
-        property int exclusionAreaY: root.activePage
+        property int exclusionAreaY: root.gestureExclusionEnabled
             ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
             : 0
 
         function updateGestureExclusionArea()
         {
             windowContext.ui.windowHelpers.setGestureExclusionArea(
-                d.exclusionAreaY, slider.height * Screen.devicePixelRatio)
+                d.exclusionAreaY,
+                root.gestureExclusionEnabled ? slider.height * Screen.devicePixelRatio : 0)
         }
 
         onExclusionAreaYChanged: updateGestureExclusionArea()

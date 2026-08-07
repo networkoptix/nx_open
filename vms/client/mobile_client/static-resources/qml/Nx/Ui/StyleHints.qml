@@ -32,17 +32,6 @@ QtObject
     // hides one of the panels.
     readonly property int contentAreaMinimumWidth: appContext.settings.contentAreaMinWidth
 
-    // Preferred preview height depending on the current device layout.
-    readonly property int previewHeight:
-    {
-        if (LayoutController.fullscreen)
-            return -1 //< Must fill all the available space.
-
-        if (LayoutController.isTablet && LayoutController.isPortrait)
-            return 536
-
-        // Preview has the same height on a mobile device in portrait orientation and on the right
-        // panel in tablet layout.
-        return 270
-    }
+    // Preferred preview height.
+    readonly property int previewHeight: 270
 }

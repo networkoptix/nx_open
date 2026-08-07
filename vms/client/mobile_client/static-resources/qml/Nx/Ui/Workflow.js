@@ -218,6 +218,16 @@ function openFeedScreen(push, feedState)
         stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
 }
 
+function openDetailsScreen(objectsType, objectList)
+{
+    stackView.push(
+        Qt.resolvedUrl("../Screens/DetailsScreen.qml"),
+        {
+            "objectList": objectList,
+            "objectsType": objectsType
+        })
+}
+
 function openMenuScreen()
 {
     stackView.replace(null, Qt.resolvedUrl("../Screens/MenuScreen.qml"))

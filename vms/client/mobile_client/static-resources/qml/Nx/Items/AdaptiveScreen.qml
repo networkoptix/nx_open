@@ -128,6 +128,7 @@ FocusScope
             id: defaultLeftControl
 
             visible: state !== ""
+            anchors.centerIn: parent
 
             states:
             [
