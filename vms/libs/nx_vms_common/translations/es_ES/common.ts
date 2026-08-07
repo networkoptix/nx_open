@@ -1808,15 +1808,15 @@
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
-      <translation type="unfinished">Max session token count per user on single Server.</translation>
+      <translation>Límite de tokens de sesión en un solo servidor.</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Intervalo de actualización de la caché de tokens de sesión remota (otros servidores y la nube).</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>Tiempo de espera agotado para la caché de tokens de sesión remota (otros servidores y la nube).</translation>
     </message>
     <message>
       <source>Default video codec.</source>
