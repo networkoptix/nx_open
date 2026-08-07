@@ -18,6 +18,10 @@ set(use_clang ${useClang})
 nx_to_python_compatible_bool(use_clang)
 list(APPEND _additional_conan_parameters "-o useClang=${use_clang}")
 
+set(with_clang_format ${withClangFormat})
+nx_to_python_compatible_bool(with_clang_format)
+list(APPEND _additional_conan_parameters "-o withClangFormat=${with_clang_format}")
+
 list(APPEND _additional_conan_parameters "-o targetDevice=${targetDevice}")
 
 if(NOT developerBuild)

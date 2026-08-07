@@ -24,6 +24,10 @@ nx_option(developerBuild
     "Disable this option for production builds"
     ON)
 
+option(withClangFormat
+    "Pull in clang-format via Conan (for the pre-commit formatting hook) without switching \
+the compiler to clang." ${developerBuild})
+
 if(developerBuild)
     set(default_cmake_build_type "Debug")
 else()
