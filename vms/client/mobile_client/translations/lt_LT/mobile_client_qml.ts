@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Uždaryti</translation>
     </message>
   </context>
   <context>

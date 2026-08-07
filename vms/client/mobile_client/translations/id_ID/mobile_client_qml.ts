@@ -704,7 +704,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Putuskan koneksi %1 dari %2?</translation>
     </message>
   </context>
   <context>
@@ -782,7 +782,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Pilih apa yang ingin dibagikan</translation>
     </message>
     <message>
       <source>Download</source>
@@ -790,7 +790,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Pilih apa yang ingin didownload</translation>
     </message>
   </context>
   <context>
@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tutup</translation>
     </message>
   </context>
   <context>

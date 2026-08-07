@@ -939,7 +939,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>關閉​​​</translation>
     </message>
   </context>
   <context>

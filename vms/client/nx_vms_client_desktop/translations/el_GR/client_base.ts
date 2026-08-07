@@ -36,23 +36,23 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Οποιοσδήποτε τύπος</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Επιλογή περιοχής</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Επιλέξτε κάποια περιοχή στο βίντεο...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Οποιοδήποτε πρόσθετο</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
@@ -123,7 +123,7 @@
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Αντιγράφηκε</translation>
     </message>
   </context>
   <context>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>Ιστοσελίδα...</translation>
     </message>
     <message>
       <source>New Layout...</source>
@@ -403,7 +403,7 @@
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Επισύναψη στο σύστημα πολλαπλών οθονών προβολής...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -451,7 +451,7 @@
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Αποθήκευση Τρέχουσας Θέσης...</translation>
     </message>
     <message>
       <source>Manage...</source>
@@ -559,7 +559,7 @@
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Ρυθμίσεις Συσκευής...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
@@ -575,7 +575,7 @@
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>Ρυθμίσεις μονάδας εισόδου/εξόδου...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
@@ -591,7 +591,7 @@
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation type="unfinished">Video Wall Settings...</translation>
+      <translation>Ρυθμίσεις συστήματος πολλαπλών οθονών προβολής...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -859,7 +859,7 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Νέο</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
@@ -927,7 +927,7 @@
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Ρυθμίσεις Χειριστηρίου...</translation>
     </message>
     <message>
       <source>Advanced...</source>
@@ -1023,7 +1023,7 @@
     </message>
     <message>
       <source>Import From Devices...</source>
-      <translation type="unfinished">Import From Devices...</translation>
+      <translation>Εισαγωγή από Συσκευές...</translation>
     </message>
     <message>
       <source>User Manual...</source>
@@ -1039,7 +1039,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Διαχείριση Τοποθεσίας...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -1079,7 +1079,7 @@
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Ανάλυση</translation>
     </message>
     <message>
       <source>JavaScript API...</source>
@@ -1402,7 +1402,7 @@
     </message>
     <message>
       <source>Copied</source>
-      <translation type="unfinished">Copied</translation>
+      <translation>Αντιγράφηκε</translation>
     </message>
     <message>
       <source>Hardware ID: %1
@@ -1651,7 +1651,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Ο κωδικός πρόσβασης δεν μπορεί να είναι κενός</translation>
     </message>
     <message>
       <source>Users are receiving emails</source>
@@ -2449,7 +2449,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>Το όνομα δεν μπορεί να είναι κενό.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
@@ -2620,7 +2620,7 @@ License Key: %2</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Εγγραφή</translation>
     </message>
     <message>
       <source>Name</source>
@@ -2628,7 +2628,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Προμηθευτής</translation>
     </message>
     <message>
       <source>Model</source>
@@ -2636,7 +2636,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Λογισμικό</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2690,7 +2690,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Επιβεβαίωση Κωδικού Πρόσβασης</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -3277,11 +3277,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Γενικό</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Χαρακτηριστικά</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3320,7 +3320,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Ποτέ</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -3489,7 +3489,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Καμία εικόνα</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
@@ -3516,7 +3516,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -3556,7 +3556,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Mute</source>
@@ -3613,7 +3613,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>Το όνομα δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
@@ -3704,7 +3704,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation type="unfinished">Hotkey</translation>
+      <translation>Πλήκτρο Συντόμευσης</translation>
     </message>
     <message>
       <source>Home</source>
@@ -3838,7 +3838,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Ταχύτητα</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -4102,7 +4102,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation type="unfinished">Select Servers...</translation>
+      <translation>Επιλέξτε Διακομιστές...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -4124,7 +4124,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation type="unfinished">Select Users...</translation>
+      <translation>Επιλέξτε Χρήστες...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -4192,7 +4192,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Πρόσθετα</translation>
     </message>
     <message>
       <source>PoE</source>
@@ -4204,7 +4204,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
   </context>
   <context>
@@ -4268,7 +4268,7 @@ License Key: %2</translation>
     <name>QnStatusOverlayController</name>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Ρυθμίσεις Συσκευής</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -4276,11 +4276,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Ρυθμίσεις μονάδας εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Διαγνωστικά</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -4573,7 +4573,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Ανεπαρκείς υπηρεσίες</translation>
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
@@ -4837,7 +4837,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Πρόσθετα</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -5135,9 +5135,9 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
-        <numerusform>+ %n more</numerusform>
+      <translation>
+        <numerusform>+ %n περισσότερα</numerusform>
+        <numerusform>+ %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -5225,7 +5225,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Ο κωδικός πρόσβασης δεν μπορεί να είναι κενός</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces</source>
@@ -5236,7 +5236,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnVideowallManageWidget</name>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Οθόνη</translation>
     </message>
     <message>
       <source>Screen %1</source>
@@ -5417,7 +5417,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Όνομα κάμερας:</translation>
     </message>
   </context>
   <context>
@@ -5848,7 +5848,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
   </context>
   <context>
@@ -5995,7 +5995,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Επιλογή</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6011,7 +6011,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In</source>
-      <translation type="unfinished">In</translation>
+      <translation>Σε</translation>
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
@@ -6121,7 +6121,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -6161,11 +6161,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Δεν βρέθηκαν ομάδες</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Αλλαγή κριτηρίων αναζήτησης ή δημιουργία νέας ομάδας</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -6385,19 +6385,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AbstractSearchWidgetPrivate</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Απόκρυψη πληροφοριών</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Εμφάνιση πληροφοριών</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Απόκρυψη thumbnails</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Εμφάνιση thumbnails</translation>
     </message>
     <message>
       <source>Last day</source>
@@ -6413,7 +6413,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Επιλέχθηκε στο Χρονοδιάγραμμα</translation>
     </message>
     <message>
       <source>Any time</source>
@@ -6421,35 +6421,35 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Συσκευές στη διάταξη</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Κάμερες στη διάταξη</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Επιλεγμένη συσκευή</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Επιλεγμένη κάμερα</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Επιλέξτε συσκευές...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Επιλέξτε κάμερες...</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Οποιαδήποτε συσκευή</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Οποιαδήποτε κάμερα</translation>
     </message>
     <message>
       <source>Selected media</source>
@@ -6462,25 +6462,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n επιλεγμένες συσκευές</numerusform>
+        <numerusform>%n επιλεγμένες συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n επιλεγμένες κάμερες</numerusform>
+        <numerusform>%n επιλεγμένες κάμερες</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Επιλεγμένη συσκευή</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Επιλεγμένη κάμερα</translation>
     </message>
   </context>
   <context>
@@ -6761,7 +6761,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Ανεπαρκείς υπηρεσίες</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
@@ -6794,7 +6794,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Ανάλυση</translation>
     </message>
     <message>
       <source>Setting was changed</source>
@@ -6903,7 +6903,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Ο Διακομιστής είναι εκτός σύνδεσης</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
@@ -6987,7 +6987,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Επιλέξτε ένα χρονικό διάστημα στο χρονοδιάγραμμα και κάντε δεξί κλικ στην επιλεγμένη ενότητα για να δημιουργήσετε έναν σελιδοδείκτη</translation>
     </message>
   </context>
   <context>
@@ -7132,7 +7132,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Ποτέ</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7342,11 +7342,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Κύρια Ροή</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Δευτερεύουσα Ροή</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7385,7 +7385,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Ολοκλήρωση</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7480,7 +7480,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Επιλογή Κάμερας</translation>
     </message>
     <message>
       <source>No cameras available</source>
@@ -7499,7 +7499,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Εγγραφή</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7515,7 +7515,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Expert</source>
@@ -7548,7 +7548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Ρυθμίσεις Συσκευής</translation>
     </message>
     <message>
       <source>Devices Settings</source>
@@ -7564,7 +7564,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Ρυθμίσεις μονάδας εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
@@ -7572,7 +7572,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Dewarping</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7584,7 +7584,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Μόνο Κίνηση</translation>
     </message>
     <message>
       <source>Objects Only</source>
@@ -7608,11 +7608,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Πρόσθετα</translation>
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -7672,11 +7672,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Κύρια Ροή</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Δευτερεύουσα Ροή</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -7700,7 +7700,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Επιλογή</translation>
     </message>
   </context>
   <context>
@@ -7804,7 +7804,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copied</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Αντιγράφηκε</translation>
     </message>
     <message>
       <source>Pasted</source>
@@ -8126,7 +8126,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -8172,7 +8172,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Διαχείριση Τοποθεσίας</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8225,7 +8225,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Δεν υπάρχουν συμβάντα</translation>
     </message>
     <message>
       <source>Any Action</source>
@@ -8327,7 +8327,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Events</source>
       <comment>Events tab title</comment>
-      <translation type="unfinished">Events</translation>
+      <translation>Συμβάντα</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -8411,7 +8411,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Γρήγορη Ανασκόπηση</translation>
     </message>
     <message>
       <source>Export Settings</source>
@@ -8455,7 +8455,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Επαναφορά Ταχύτητας</translation>
     </message>
     <message>
       <source>Add Bookmark Info</source>
@@ -8558,7 +8558,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No Failover</source>
-      <translation type="unfinished">No Failover</translation>
+      <translation>Χωρίς Failover</translation>
     </message>
   </context>
   <context>
@@ -8569,7 +8569,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
@@ -8612,7 +8612,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>Το όνομα δεν μπορεί να είναι κενό.</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -8631,7 +8631,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Να μην εμφανιστεί ξανά αυτό το μήνυμα</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -8686,7 +8686,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Κληρονομεί δικαιώματα %1 από</translation>
     </message>
     <message>
       <source>View video without redaction</source>
@@ -8772,7 +8772,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Κάντε κλικ στο εικονίδιο για να διαβάσετε περισσότερα</translation>
     </message>
   </context>
   <context>
@@ -9012,7 +9012,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -9290,9 +9290,9 @@ Site performance is degraded.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>Numerus: %n is a number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n επιλέχθηκε:</numerusform>
+        <numerusform>%n επιλέχθηκε:</numerusform>
       </translation>
     </message>
     <message>
@@ -9347,7 +9347,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Οποιοδήποτε %1</translation>
     </message>
   </context>
   <context>
@@ -9895,7 +9895,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Χρησιμοποιείτε έναν προσαρμοσμένο client. Επικοινωνήστε με το %1 για να λάβετε τις οδηγίες ενημέρωσης.</translation>
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
@@ -9977,7 +9977,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Aborted</source>
@@ -10081,7 +10081,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Δεν υπάρχουν νέες ειδοποιήσεις</translation>
     </message>
     <message>
       <source>Current Site</source>
@@ -10112,7 +10112,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site Notifications</source>
-      <translation type="unfinished">Site Notifications</translation>
+      <translation>Ειδοποιήσεις Ιστοσελίδας</translation>
     </message>
   </context>
   <context>
@@ -10341,7 +10341,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
@@ -10669,7 +10669,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Μόνο Κίνηση</translation>
     </message>
     <message>
       <source>Motion
@@ -11051,7 +11051,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Προμηθευτής</translation>
     </message>
     <message>
       <source>no error</source>
@@ -11168,7 +11168,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Σύνδεσμος Πρόσβασης</translation>
     </message>
     <message>
       <source>Invalid Link</source>
@@ -11245,7 +11245,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Δεν ανιχνεύθηκε κίνηση</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
@@ -11256,7 +11256,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να ενεργοποιήσετε την εγγραφή κίνησης</translation>
     </message>
   </context>
   <context>
@@ -11449,9 +11449,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... και %n περισσότερα</numerusform>
+        <numerusform>... και %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -11602,7 +11602,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11697,7 +11697,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11717,7 +11717,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Ονοματεπώνυμο</translation>
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
@@ -11740,11 +11740,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Ομάδες</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -11812,7 +11812,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Τερματισμός</translation>
     </message>
     <message>
       <source>Terminate access link</source>
@@ -11828,7 +11828,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Νέος Σύνδεσμος - %1</translation>
     </message>
     <message>
       <source>Access link has been successfully created!</source>
@@ -11849,7 +11849,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Νέος Χρήστης</translation>
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
@@ -11857,12 +11857,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Λήψη συνδέσμου...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Βεβαιωθείτε ότι αυτός ο υπολογιστής μπορεί να συνδεθεί στο %1</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -12131,11 +12131,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VmsEventSearchWidget</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Δεν υπάρχουν συμβάντα</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Δοκιμάστε να αλλάξετε τα φίλτρα ή να δημιουργήσετε έναν Κανόνα Συμβάντος</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
@@ -12161,7 +12161,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Ιστοσελίδα</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12247,7 +12247,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Η εξαγωγή απέτυχε</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
@@ -12332,7 +12332,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Τύπος Αντικειμένου</translation>
     </message>
   </context>
   <context>
@@ -12384,7 +12384,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Διακομιστές</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -12396,11 +12396,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Ιστοσελίδες</translation>
     </message>
     <message>
       <source>Users</source>
@@ -12408,15 +12408,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Τοπικά αρχεία</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Παρακολούθηση υγείας συστήματος</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Συστήματα προβολής πολλαπλών οθονών</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -12424,7 +12424,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Ιστοσελίδες &amp; Ενσωματώσεις</translation>
     </message>
     <message>
       <source>Other Sites</source>
@@ -12463,7 +12463,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Ενεργοποιημένο</translation>
     </message>
     <message>
       <source>In progress...</source>
@@ -12659,7 +12659,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Hotspots</translation>
     </message>
     <message>
       <source>Toolbar</source>
@@ -12689,7 +12689,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Έναρξη Περιήγησης</translation>
     </message>
     <message>
       <source>Start Showreel</source>
@@ -12757,7 +12757,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Ενεργοποιημένο</translation>
     </message>
     <message>
       <source>Add Title or Comment</source>

@@ -783,7 +783,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Vælg hvad der skal deles</translation>
     </message>
     <message>
       <source>Download</source>
@@ -791,7 +791,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Vælg hvad der skal downloades</translation>
     </message>
   </context>
   <context>
@@ -940,7 +940,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
   </context>
   <context>

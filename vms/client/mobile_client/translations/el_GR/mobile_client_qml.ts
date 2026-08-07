@@ -940,7 +940,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Κλείσιμο</translation>
     </message>
   </context>
   <context>
