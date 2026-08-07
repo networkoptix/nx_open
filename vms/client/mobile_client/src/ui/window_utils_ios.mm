@@ -3,12 +3,38 @@
 #include "window_utils.h"
 
 #include <UIKit/UIKit.h>
+#include <AudioToolbox/AudioToolbox.h>
+#include <WebKit/WKWebView.h>
+
+#include <QtCore/QThread>
+#include <QtGui/QColor>
 #include <QtGui/QWindow>
 #include <QtGui/QScreen>
 #include <QtGui/QGuiApplication>
 
-#include <AudioToolbox/AudioToolbox.h>
-#include <WebKit/WKWebView.h>
+#include <nx/utils/log/assert.h>
+
+namespace {
+
+void applyWebViewBackgroundColor(UIView* view, UIColor* color)
+{
+    if (![view isKindOfClass:[WKWebView class]])
+    {
+        for (UIView* subview in view.subviews)
+            applyWebViewBackgroundColor(subview, color);
+        return;
+    }
+
+    WKWebView* webView = (WKWebView*) view;
+    webView.opaque = NO;
+    webView.backgroundColor = color;
+    webView.scrollView.backgroundColor = color;
+
+    if (@available(iOS 15.0, *))
+        webView.underPageBackgroundColor = color;
+}
+
+} // namespace
 
 void prepareWindow()
 {
@@ -84,6 +110,27 @@ void makeShortVibration()
 {
     static constexpr int kShortVibrationId = 1519;
     AudioServicesPlaySystemSound(kShortVibrationId);
+}
+
+void setWebViewBackgroundColor(const QColor& color)
+{
+    if (!NX_ASSERT(QThread::currentThread() == qApp->thread(), "Must run on the GUI thread"))
+        return;
+
+    UIColor* uiColor = [UIColor
+        colorWithRed:color.redF()
+        green:color.greenF()
+        blue:color.blueF()
+        alpha:color.alphaF()];
+
+    for (QWindow* window: qApp->topLevelWindows())
+    {
+        if (!window->handle())
+            continue;
+
+        if (UIView* rootView = reinterpret_cast<UIView*>(window->winId()))
+            applyWebViewBackgroundColor(rootView, uiColor);
+    }
 }
 
 @interface QIOSViewController : UIViewController

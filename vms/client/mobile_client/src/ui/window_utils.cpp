@@ -54,6 +54,10 @@ QWindow *getMainWindow()
         window->reportContentOrientationChange(orientation);
     }
 
+    void setWebViewBackgroundColor(const QColor& /*color*/)
+    {
+    }
+
 #endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 #if !defined(Q_OS_ANDROID)

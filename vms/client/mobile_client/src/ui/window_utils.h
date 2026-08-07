@@ -5,6 +5,7 @@
 #include <QtCore/QMargins>
 #include <QtCore/Qt>
 
+class QColor;
 class QWindow;
 
 QWindow *getMainWindow();
@@ -37,3 +38,11 @@ void requestRecordAudioPermissionIfNeeded();
 
 /** Set exclusion area for the back gesture. */
 void setAndroidGestureExclusionArea(int startY, int height);
+
+/**
+ * Paints the background of the native web views. QtWebView creates them opaque and white, gives no
+ * API to restyle them, and layers them above the Qt scene, where no QML item can cover them.
+ *
+ * Must be called from the GUI thread. Paints nothing while no native view is attached.
+ */
+void setWebViewBackgroundColor(const QColor& color);

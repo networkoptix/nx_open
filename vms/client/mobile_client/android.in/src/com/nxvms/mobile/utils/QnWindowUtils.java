@@ -17,11 +17,13 @@ import android.os.Vibrator;
 import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.Display;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+import android.webkit.WebView;
 import android.util.DisplayMetrics;
 import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
@@ -405,5 +407,40 @@ public class QnWindowUtils
         final int kRequestCode = 1; // Any code greater than 0.
         ActivityCompat.requestPermissions(activity(), new String[]{permission}, kRequestCode);
         Logger.infoToSystemOnly(kLogTag, "finished, requested audio record permission.");
+    }
+
+    public static void setWebViewBackgroundColor(final int color)
+    {
+        final Activity activity = activity();
+        if (activity == null)
+            return;
+
+        activity.runOnUiThread(
+            new Runnable()
+            {
+                final int mColor = color;
+                final Activity mActivity = activity;
+
+                @Override public void run()
+                {
+                    applyWebViewBackgroundColor(mActivity.getWindow().getDecorView(), mColor);
+                }
+            });
+    }
+
+    private static void applyWebViewBackgroundColor(View view, int color)
+    {
+        if (view instanceof WebView)
+        {
+            view.setBackgroundColor(color);
+            return;
+        }
+
+        if (!(view instanceof ViewGroup))
+            return;
+
+        final ViewGroup group = (ViewGroup) view;
+        for (int i = 0; i < group.getChildCount(); ++i)
+            applyWebViewBackgroundColor(group.getChildAt(i), color);
     }
 }

@@ -83,4 +83,9 @@ void WindowHelpers::requestRecordAudioPermissionIfNeeded() const
     ::requestRecordAudioPermissionIfNeeded();
 }
 
+void WindowHelpers::setWebViewBackgroundColor(const QColor& color) const
+{
+    ::setWebViewBackgroundColor(color);
+}
+
 } // namespace nx::vms::client::mobile::detail

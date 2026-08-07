@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtGui/QColor>
 
 #include <nx/vms/client/mobile/window_context_aware.h>
 
@@ -43,6 +44,8 @@ public:
     Q_INVOKABLE void makeShortVibration() const;
 
     Q_INVOKABLE void requestRecordAudioPermissionIfNeeded() const;
+
+    Q_INVOKABLE void setWebViewBackgroundColor(const QColor& color) const;
 };
 
 } // namespace detail

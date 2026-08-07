@@ -36,10 +36,15 @@ Page
         {
             switch (loadRequest.status)
             {
+                case WebView.LoadStartedStatus:
+                    d.paintWebViewBackground()
+                    break
                 case WebView.LoadFailedStatus:
                     d.cancelLogInProcess()
                     break
                 case WebView.LoadSucceededStatus:
+                    d.paintWebViewBackground()
+
                     // Workaround for the size bugs in WebView.
                     webView.width = Qt.binding(()=>screen.width)
                     webView.height = Qt.binding(()=>
@@ -61,6 +66,14 @@ Page
         id: d
 
         property OauthClient oauthClient
+
+        // The native web view is opaque and white and is layered above the Qt scene, so nothing
+        // drawn in QML can hide it while a page loads. Called repeatedly because the view is
+        // attached to the platform hierarchy asynchronously.
+        function paintWebViewBackground()
+        {
+            windowContext.ui.windowHelpers.setWebViewBackgroundColor(screen.backgroundColor)
+        }
 
         function cancelLogInProcess()
         {
@@ -95,7 +108,11 @@ Page
             d.oauthClient.setCode(code)
         }
 
-        // Actual page url is not updated via onUrlChanged on some platforms.
+        // Actual page url is not updated via onUrlChanged on some platforms, Android among them,
+        // so the redirect carrying the authorization code has to be polled for. The url is read
+        // off the web view instead of being fetched with runJavaScript(): since Qt 6.11 that
+        // callback is invoked from the platform thread rather than through a queued signal, which
+        // enters the QML engine from a thread that does not own it and crashes the application.
         Timer
         {
             id: redirectUrlWorkaround
@@ -103,12 +120,7 @@ Page
             running: true
             repeat: true
             interval: 1000
-            onTriggered:
-            {
-                webView.runJavaScript(
-                    "window.location.href",
-                    (result) => d.handleUrlChanged(result))
-            }
+            onTriggered: d.handleUrlChanged(webView.url)
         }
     }
 
@@ -122,5 +134,6 @@ Page
 
         d.oauthClient = helper
         webView.url = d.oauthClient.url
+        d.paintWebViewBackground()
     }
 }

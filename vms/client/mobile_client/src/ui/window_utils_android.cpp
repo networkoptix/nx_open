@@ -5,6 +5,7 @@
 #ifdef Q_OS_ANDROID
 
 #include <QtCore/QJniObject>
+#include <QtGui/QColor>
 #include <QtGui/QGuiApplication>
 
 namespace {
@@ -106,6 +107,15 @@ int androidKeyboardHeight()
 void requestRecordAudioPermissionIfNeeded()
 {
     QJniObject::callStaticMethod<void>(kUtilsClass, "requestRecordAudioPermissionIfNeeded");
+}
+
+void setWebViewBackgroundColor(const QColor& color)
+{
+    QJniObject::callStaticMethod<void>(
+        kUtilsClass,
+        "setWebViewBackgroundColor",
+        "(I)V",
+        static_cast<jint>(color.rgba()));
 }
 
 #endif
