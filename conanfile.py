@@ -66,6 +66,7 @@ class NxOpenConan(ConanFile):
     options = {
         "targetDevice": ["ANY"],
         "useClang": [True, False],
+        "withClangFormat": [True, False],
         "customization": ["ANY"],
         "installRuntimeDependencies": [True, False],
         "withAnalyticsServer": [True, False],
@@ -73,6 +74,7 @@ class NxOpenConan(ConanFile):
     default_options = {
         "targetDevice": None,
         "useClang": False,
+        "withClangFormat": False,
         "customization": "metavms",
         "installRuntimeDependencies": True,
         "withAnalyticsServer": True,
@@ -194,8 +196,10 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
-            if self.options.useClang:
+            if self.options.useClang or self.options.withClangFormat:
+                # clang-format (used by the pre-commit hook) ships as part of this package.
                 self.tool_requires("clang/20.1.2" "#493f55bfbb20874208a25ee845a83c3c")
+            if self.options.useClang:
                 self.tool_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
             if self.isLinux:
                 self.tool_requires("sdk-gcc/9.5" "#54cc3c576f5d9f324caaf23152b4074e")
