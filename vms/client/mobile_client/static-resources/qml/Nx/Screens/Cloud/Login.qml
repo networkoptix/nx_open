@@ -49,7 +49,6 @@ Page
                             : 0
                         return screen.height - minimalOffset
                     })
-                    webView.forceActiveFocus()
                     break
                 default:
                     break
