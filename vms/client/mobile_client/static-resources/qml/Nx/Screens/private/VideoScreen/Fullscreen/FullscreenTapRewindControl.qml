@@ -12,6 +12,7 @@ Item
 
     property int alignment: Qt.AlignLeft
     property alias hintText: indicatorHint.text
+    property bool rewindAnimationEnabled: true
 
     implicitWidth: height * 2 / 3
 
@@ -66,7 +67,7 @@ Item
                     id: rewindIcon
 
                     primaryColor: ColorTheme.colors.light4
-                    opacity: 0
+                    opacity: rewindAnimationEnabled ? 0 : 0.3
 
                     sourcePath: "image://skin/24x24/Outline/play_small.svg"
                     sourceSize: Qt.size(24, 24)
@@ -101,7 +102,8 @@ Item
                         target: control
                         function onActivated()
                         {
-                            rewindAnimation.restart()
+                            if (rewindAnimationEnabled)
+                                rewindAnimation.restart()
                         }
                     }
                 }

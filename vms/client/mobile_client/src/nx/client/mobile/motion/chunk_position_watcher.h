@@ -30,6 +30,11 @@ class ChunkPositionWatcher: public QObject
         WRITE setPosition
         NOTIFY positionChanged)
 
+    Q_PROPERTY(bool playingLive
+        READ playingLive
+        WRITE setPlayingLive
+        NOTIFY playingLiveChanged)
+
     Q_PROPERTY(nx::vms::client::core::ChunkProvider* chunkProvider
         READ chunkProvider
         WRITE setChunkProvider
@@ -51,6 +56,9 @@ public:
     qint64 position() const;
     void setPosition(qint64 value);
 
+    bool playingLive() const;
+    void setPlayingLive(bool value);
+
     nx::vms::client::core::ChunkProvider* chunkProvider() const;
     void setChunkProvider(nx::vms::client::core::ChunkProvider* value);
 
@@ -58,9 +66,17 @@ public:
     Q_INVOKABLE qint64 prevChunkStartTimeMs() const;
     Q_INVOKABLE qint64 firstChunkStartTimeMs() const;
 
+    /**
+     * @return The position shifted from the current position by the given offset in milliseconds,
+     *     considering recorded content only, skipping gaps between chunks, -1 if the shifted
+     *     position reaches live, DATETIME_INVALID if it goes before the first chunk.
+     */
+    Q_INVOKABLE qint64 positionShiftedBy(qint64 offsetMs) const;
+
 signals:
     void contentTypeChanged();
     void positionChanged();
+    void playingLiveChanged();
     void chunkProviderChanged();
     void chunksChanged();
 

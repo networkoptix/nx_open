@@ -11,6 +11,7 @@ import nx.client.mobile
 import nx.vms.api
 import nx.vms.client.core
 import nx.vms.client.mobile
+import nx.vms.common
 
 NxObject
 {
@@ -124,6 +125,17 @@ NxObject
 
         contentType: controller.chunkContentType
         position: mediaPlayer.position
+        playingLive: mediaPlayer.liveMode
+        chunkProvider: controller.chunkProvider
+    }
+
+    ChunkPositionWatcher
+    {
+        id: recordingChunkPositionWatcher
+
+        contentType: CommonGlobals.RecordingContent
+        position: mediaPlayer.position
+        playingLive: mediaPlayer.liveMode
         chunkProvider: controller.chunkProvider
     }
 
@@ -380,12 +392,30 @@ NxObject
 
     function jumpDistance(distance)
     {
-        if (mediaPlayer.liveMode)
-            return
+        if (mediaPlayer.liveMode && distance >= 0)
+            return 0
 
-        const position = mediaPlayer.position + distance
-        if (NxGlobals.isValidTime(position))
-            forcePosition(position)
+        const oldPosition = mediaPlayer.position === -1
+            ? NxGlobals.syncNowMs()
+            : mediaPlayer.position
+
+        if (!NxGlobals.isValidTime(oldPosition))
+            return 0
+
+        const newPosition = recordingChunkPositionWatcher.positionShiftedBy(distance)
+        if (!NxGlobals.isValidTime(newPosition))
+            return 0
+
+        if (newPosition === -1)
+        {
+            playLive()
+            return NxGlobals.syncNowMs() - oldPosition
+        }
+        else
+        {
+            forcePosition(newPosition)
+            return newPosition - oldPosition
+        }
     }
 
     function jumpToPreviousChunk()

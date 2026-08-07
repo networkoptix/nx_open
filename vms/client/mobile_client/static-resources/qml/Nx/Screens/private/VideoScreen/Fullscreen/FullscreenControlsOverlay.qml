@@ -7,6 +7,8 @@ import Nx.Core.Controls
 import Nx.Items
 import Nx.Mobile.Controls
 
+import nx.vms.client.core
+
 import ".."
 
 Item
@@ -29,12 +31,27 @@ Item
 
     property alias scrubbingActive: speedControl.pressed
 
+    readonly property int tapRewindDistanceMs: 5000
+
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 
     function toggle()
     {
         opacityController.setOverlayVisible(!opacityController.overlayVisible)
+    }
+
+    function showDurationHint(durationMs)
+    {
+        opacityController.setOverlayVisible(true)
+
+        const sign = durationMs > 0 ? "+" : "-"
+        const durationString = Duration.toString(Math.abs(durationMs),
+            Duration.DaysAndTime, Duration.Long, " ")
+
+        hintBanner.showBanner("%1 %2"
+            .arg(sign)
+            .arg(durationString))
     }
 
     onVisibleChanged:
@@ -108,12 +125,17 @@ Item
         anchors.bottom: parent.bottom
         anchors.top: parent.top
         alignment: Qt.AlignLeft
-        hintText: qsTr("-5 sec")
+        hintText: "-%1".arg(Duration.toString(tapRewindDistanceMs, Duration.Seconds, Duration.Long))
 
-        visible: showPlaybackControls && !controller.playingLive
+        visible: showPlaybackControls
 
         onTapped: control.toggle()
-        onActivated: controller.jumpDistance(-5000)
+        onActivated:
+        {
+            const skippedMs = controller.jumpDistance(-tapRewindDistanceMs)
+            if (Math.abs(skippedMs) > tapRewindDistanceMs)
+                showDurationHint(skippedMs)
+        }
     }
 
     FullscreenTapRewindControl
@@ -124,12 +146,23 @@ Item
         anchors.bottom: parent.bottom
         anchors.top: parent.top
         alignment: Qt.AlignRight
-        hintText: qsTr("+5 sec")
+        hintText: controller.playingLive
+            ? qsTr("You are in Live Mode")
+            : "+%1".arg(Duration.toString(tapRewindDistanceMs, Duration.Seconds, Duration.Long))
+        rewindAnimationEnabled: !controller.playingLive
 
-        visible: showPlaybackControls && !controller.playingLive
+        visible: showPlaybackControls
 
         onTapped: control.toggle()
-        onActivated: controller.jumpDistance(5000)
+        onActivated:
+        {
+            if (controller.playingLive)
+                return
+
+            const skippedMs = controller.jumpDistance(tapRewindDistanceMs)
+            if (Math.abs(skippedMs) > tapRewindDistanceMs)
+                showDurationHint(skippedMs)
+        }
     }
 
     Item
@@ -210,6 +243,59 @@ Item
                         anchors.horizontalCenter: parent.horizontalCenter
                         font { pixelSize: 16; weight: Font.Normal }
                         color: ColorTheme.colors.light4
+                    }
+                }
+
+                Rectangle
+                {
+                    id: hintBanner
+
+                    anchors.horizontalCenter: titleLabels.horizontalCenter
+                    anchors.top: titleLabels.bottom
+                    anchors.topMargin: 8
+
+                    width: hintText.implicitWidth + 20
+                    height: hintText.implicitHeight + 12
+
+                    radius: 4
+                    color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+
+                    opacity: 0
+                    visible: opacity > 0
+
+                    Behavior on opacity
+                    {
+                        NumberAnimation
+                        {
+                            duration: 200
+                            easing.type: Easing.InOutQuad
+                        }
+                    }
+
+                    Text
+                    {
+                        id: hintText
+
+                        anchors.centerIn: parent
+
+                        font { pixelSize: 16; weight: Font.Normal }
+                        color: ColorTheme.colors.light4
+                    }
+
+                    Timer
+                    {
+                        id: hideTimer
+
+                        interval: 2000
+                        repeat: false
+                        onTriggered: hintBanner.opacity = 0
+                    }
+
+                    function showBanner(text)
+                    {
+                        hintText.text = text
+                        opacity = 1
+                        hideTimer.restart()
                     }
                 }
 

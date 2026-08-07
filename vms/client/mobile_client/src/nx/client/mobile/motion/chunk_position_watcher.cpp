@@ -10,6 +10,8 @@
 
 namespace {
 
+static constexpr qint64 kLivePosition = -1;
+
 qint64 chooseNearestTimeMs(
     qint64 currentTimeMs,
     qint64 targetTimeMs,
@@ -93,6 +95,7 @@ struct ChunkPositionWatcher::Private: public QObject
     ChunkPositionWatcher* const q;
 
     qint64 position = DATETIME_NOW;
+    bool playingLive = false;
     qint64 prevChunkStartTimeMs = DATETIME_INVALID;
     qint64 nextChunkStartTimeMs = DATETIME_INVALID;
 
@@ -175,10 +178,24 @@ void ChunkPositionWatcher::setPosition(qint64 value)
     if (d->position == value)
         return;
 
-    d->position = value == -1 ? DATETIME_NOW : value;
+    d->position = value == kLivePosition ? DATETIME_NOW : value;
     emit positionChanged();
 
     d->updateChunksInformation();
+}
+
+bool ChunkPositionWatcher::playingLive() const
+{
+    return d->playingLive;
+}
+
+void ChunkPositionWatcher::setPlayingLive(bool value)
+{
+    if (d->playingLive == value)
+        return;
+
+    d->playingLive = value;
+    emit playingLiveChanged();
 }
 
 nx::vms::client::core::ChunkProvider* ChunkPositionWatcher::chunkProvider() const
@@ -201,7 +218,7 @@ void ChunkPositionWatcher::setChunkProvider(nx::vms::client::core::ChunkProvider
 
 qint64 ChunkPositionWatcher::nextChunkStartTimeMs() const
 {
-    return d->nextChunkStartTimeMs == DATETIME_NOW ? -1 : d->nextChunkStartTimeMs;
+    return d->nextChunkStartTimeMs == DATETIME_NOW ? kLivePosition : d->nextChunkStartTimeMs;
 }
 
 qint64 ChunkPositionWatcher::prevChunkStartTimeMs() const
@@ -212,7 +229,92 @@ qint64 ChunkPositionWatcher::prevChunkStartTimeMs() const
 qint64 ChunkPositionWatcher::firstChunkStartTimeMs() const
 {
     const auto result = getChunkTime(0, d->periods(), true);
-    return result == DATETIME_NOW ? -1 : result;
+    return result == DATETIME_NOW ? kLivePosition : result;
+}
+
+qint64 ChunkPositionWatcher::positionShiftedBy(qint64 offsetMs) const
+{
+    const bool searchForward = offsetMs > 0;
+    const auto& periods = d->periods();
+
+    if (d->position == DATETIME_INVALID)
+        return DATETIME_INVALID;
+
+    if (playingLive() && searchForward)
+        return kLivePosition;
+
+    if (offsetMs == 0)
+        return d->position;
+
+    if (periods.isEmpty())
+        return searchForward ? kLivePosition : DATETIME_INVALID;
+
+    const auto currentPosition = d->position == DATETIME_NOW
+        ? qnSyncTime->currentMSecsSinceEpoch()
+        : d->position;
+
+    qint64 remainingOffset = std::abs(offsetMs);
+
+    if (searchForward)
+    {
+        auto it = periods.findNearestPeriod(currentPosition, searchForward);
+        if (it == periods.cend())
+            return kLivePosition;
+
+        qint64 shiftedPosition = it->contains(currentPosition)
+            ? currentPosition
+            : it->startTimeMs;
+
+        for (;;)
+        {
+            if (it->isInfinite())
+            {
+                const auto result = shiftedPosition + remainingOffset;
+                return result < qnSyncTime->currentMSecsSinceEpoch()
+                    ? result
+                    : kLivePosition;
+            }
+
+            const qint64 availableDuration = it->endTimeMs() - shiftedPosition;
+
+            if (availableDuration >= remainingOffset)
+                return shiftedPosition + remainingOffset;
+
+            remainingOffset -= availableDuration;
+            ++it;
+
+            if (it == periods.cend())
+                return kLivePosition;
+
+            shiftedPosition = it->startTimeMs;
+        }
+    }
+    else
+    {
+        auto it = periods.findNearestPeriod(currentPosition, searchForward);
+        if (it == periods.cend() || it->startTimeMs > currentPosition)
+            return DATETIME_INVALID;
+
+        qint64 shiftedPosition = it->contains(currentPosition)
+            ? currentPosition
+            : it->endTimeMs();
+
+        for (;;)
+        {
+            const qint64 availableDuration = shiftedPosition - it->startTimeMs;
+
+            if (availableDuration >= remainingOffset)
+                return shiftedPosition - remainingOffset;
+
+            if (it == periods.cbegin())
+                return DATETIME_INVALID;
+
+            remainingOffset -= availableDuration;
+            --it;
+
+            shiftedPosition = it->endTimeMs();
+        }
+    }
 }
 
 void ChunkPositionWatcher::registerQmlType()
