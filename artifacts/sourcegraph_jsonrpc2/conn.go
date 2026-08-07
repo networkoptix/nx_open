@@ -97,9 +97,13 @@ func (c *Conn) DisconnectNotify() <-chan struct{} {
 // member set to null.
 func (c *Conn) DispatchCall(ctx context.Context, method string, params interface{}, opts ...CallOption) (Waiter, error) {
 	req := &Request{Method: method}
+	var cb ResponseCallback
 	for _, opt := range opts {
 		if opt == nil {
 			continue
+		}
+		if onResponse, ok := opt.(onResponseOption); ok {
+			cb = onResponse.cb
 		}
 		if err := opt.apply(req); err != nil {
 			return Waiter{}, err
@@ -110,7 +114,7 @@ func (c *Conn) DispatchCall(ctx context.Context, method string, params interface
 			return Waiter{}, err
 		}
 	}
-	call, err := c.send(ctx, &anyMessage{request: req}, true)
+	call, err := c.send(ctx, &anyMessage{request: req}, true, cb)
 	if err != nil {
 		return Waiter{}, err
 	}
@@ -139,7 +143,7 @@ func (c *Conn) Notify(ctx context.Context, method string, params interface{}, op
 			return err
 		}
 	}
-	_, err := c.send(ctx, &anyMessage{request: req}, false)
+	_, err := c.send(ctx, &anyMessage{request: req}, false, nil)
 	return err
 }
 
@@ -158,7 +162,7 @@ func (c *Conn) SendCall(ctx context.Context, method string, params interface{}, 
 			return err
 		}
 	}
-	_, err := c.send(ctx, &anyMessage{request: req}, false)
+	_, err := c.send(ctx, &anyMessage{request: req}, false, nil)
 	return err
 }
 
@@ -168,19 +172,19 @@ func (c *Conn) Reply(ctx context.Context, id ID, result interface{}) error {
 	if err := resp.SetResult(result); err != nil {
 		return err
 	}
-	_, err := c.send(ctx, &anyMessage{response: resp}, false)
+	_, err := c.send(ctx, &anyMessage{response: resp}, false, nil)
 	return err
 }
 
 // ReplyWithError sends a response with an error.
 func (c *Conn) ReplyWithError(ctx context.Context, id ID, respErr *Error) error {
-	_, err := c.send(ctx, &anyMessage{response: &Response{ID: id, Error: respErr}}, false)
+	_, err := c.send(ctx, &anyMessage{response: &Response{ID: id, Error: respErr}}, false, nil)
 	return err
 }
 
 // SendResponse sends resp to the peer. It is lower level than (*Conn).Reply.
 func (c *Conn) SendResponse(ctx context.Context, resp *Response) error {
-	_, err := c.send(ctx, &anyMessage{response: resp}, false)
+	_, err := c.send(ctx, &anyMessage{response: resp}, false, nil)
 	return err
 }
 
@@ -253,13 +257,19 @@ func (c *Conn) readMessages(ctx context.Context) {
 				err = resp.Error
 			}
 
+			// Before the waiter is released, so a caller that uses both sees the callback's
+			// work finished when Wait returns.
+			if call.callback != nil {
+				call.callback(resp, err)
+			}
+
 			call.done <- err
 			close(call.done)
 		}
 	}
 }
 
-func (c *Conn) send(_ context.Context, m *anyMessage, wait bool) (cc *call, err error) {
+func (c *Conn) send(_ context.Context, m *anyMessage, wait bool, cb ResponseCallback) (cc *call, err error) {
 	c.sending.Lock()
 	defer c.sending.Unlock()
 
@@ -286,7 +296,7 @@ func (c *Conn) send(_ context.Context, m *anyMessage, wait bool) (cc *call, err 
 
 	// Assign a default id if not set
 	if m.request != nil && wait {
-		cc = &call{request: m.request, seq: c.seq, done: make(chan error, 1)}
+		cc = &call{request: m.request, seq: c.seq, done: make(chan error, 1), callback: cb}
 
 		isIDUnset := len(m.request.ID.Str) == 0 && m.request.ID.Num == 0
 		if isIDUnset {
@@ -378,6 +388,7 @@ type call struct {
 	response *Response
 	seq      uint64 // the seq of the request
 	done     chan error
+	callback ResponseCallback
 }
 
 // anyMessage represents either a JSON Request or Response.
