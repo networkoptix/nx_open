@@ -548,12 +548,8 @@
   <context>
     <name>FullscreenControlsOverlay</name>
     <message>
-      <source>-5 sec</source>
-      <translation>-5秒</translation>
-    </message>
-    <message>
-      <source>+5 sec</source>
-      <translation>+5秒</translation>
+      <source>You are in Live Mode</source>
+      <translation type="unfinished">You are in Live Mode</translation>
     </message>
   </context>
   <context>

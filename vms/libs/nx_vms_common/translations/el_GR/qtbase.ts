@@ -985,7 +985,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Page left</source>
-      <translation>Αριστερή σελίδα</translation>
+      <translation>Σελίδα αριστερά</translation>
     </message>
     <message>
       <source>Page up</source>
