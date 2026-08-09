@@ -550,7 +550,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>Du er i Live tilstand</translation>
     </message>
   </context>
   <context>
