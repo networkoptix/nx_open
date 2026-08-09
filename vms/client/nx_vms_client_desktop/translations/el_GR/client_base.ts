@@ -899,7 +899,7 @@
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Διαγραφή Σελιδοδείκτη...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
@@ -1070,7 +1070,7 @@
     <message>
       <source>New Window</source>
       <comment>The &quot;Open in&quot; submenu item</comment>
-      <translation type="unfinished">New Window</translation>
+      <translation>Νέο Παράθυρο</translation>
     </message>
     <message>
       <source>Dedicated Window</source>
@@ -1802,7 +1802,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Εστίαση...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
@@ -2516,11 +2516,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Λίστα Συσκευών</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Λίστα καμερών</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2664,7 +2664,7 @@ License Key: %2</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Άνοιγμα Πύλης %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2818,7 +2818,7 @@ License Key: %2</translation>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Συνδεθείτε στο %1</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
@@ -3551,7 +3551,7 @@ License Key: %2</translation>
     <name>QnNewVirtualCameraDialog</name>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Εικονική Κάμερα</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -3903,7 +3903,7 @@ License Key: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Εισάγετε URL</translation>
     </message>
     <message>
       <source>URL</source>
@@ -3980,7 +3980,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Δημιουργήθηκε</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -4126,7 +4126,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Ρυθμίσεις Διακομιστή</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -4775,7 +4775,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User Management</source>
-      <translation type="unfinished">User Management</translation>
+      <translation>Διαχείριση Χρήστη</translation>
     </message>
     <message>
       <source>Time Sync</source>
@@ -4874,7 +4874,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Ορισμένες κάμερες απαιτούν κωδικούς πρόσβασης για να οριστούν</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -5290,7 +5290,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Εστίαση...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -6259,7 +6259,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Ελαχιστοποίηση</translation>
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
@@ -8687,7 +8687,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Μετάβαση σε ζωντανή προβολή</translation>
     </message>
   </context>
   <context>
@@ -10329,7 +10329,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 layout</source>
       <comment>%1 will be substituted with a layout name</comment>
-      <translation type="unfinished">%1 layout</translation>
+      <translation>διάταξη %1</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more layouts</source>
@@ -10671,7 +10671,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Δεν επηρεάζει τις συνδέσεις που έχουν δημιουργηθεί από το διακομιστή.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -10704,7 +10704,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>Η κρυπτογράφηση της κυκλοφορίας βίντεο μπορεί να αυξήσει σημαντικά τη χρήση της CPU</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -10782,7 +10782,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Pin</source>
-      <translation type="unfinished">Pin</translation>
+      <translation>Καρφίτσωμα</translation>
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
@@ -10962,7 +10962,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Εγκατάσταση...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -11262,7 +11262,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Δημιουργήθηκε</translation>
     </message>
     <message>
       <source>Creator</source>
@@ -12212,7 +12212,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>πολλαπλές τιμές</translation>
     </message>
   </context>
   <context>
@@ -13312,7 +13312,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Προηγούμενο καρέ</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -13328,7 +13328,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Προς την αρχή</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -13336,7 +13336,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Προς την τέλος</translation>
     </message>
     <message>
       <source>Rewind is not available for VMAX</source>
