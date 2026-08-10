@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>خطأ داخلي.</translation>
     </message>
     <message>
       <source>Unsupported media type.</source>
