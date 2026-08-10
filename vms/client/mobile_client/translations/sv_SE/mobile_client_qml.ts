@@ -550,7 +550,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>Du är i liveläge</translation>
     </message>
   </context>
   <context>
@@ -701,7 +701,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Koppla bort %1 från %2?</translation>
     </message>
   </context>
   <context>
@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Välj vad som ska delas</translation>
     </message>
     <message>
       <source>Download</source>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Välj vad som ska laddas ner</translation>
     </message>
   </context>
   <context>
