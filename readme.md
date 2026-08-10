@@ -1,5 +1,9 @@
 # Nx Meta Platform open-source components
 
+<!-- hy-mt2-i18n:start -->
+**English** · [中文](./README_zh-CN.md) · [日本語](./README_ja.md) · [Español](./README_es.md)
+<!-- hy-mt2-i18n:end -->
+
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
@@ -101,7 +105,7 @@ for Windows.
     ```
     The built distribution packages and unit test archive will be placed in
     `nx_open-build/distrib/`. To run the unit tests, unpack the unit test archive and run all the
-    executables in it either one-by-one, or in parallel.
+executables in it either one-by-one, or in parallel.
 
 - To use the obtained Customization Package rather than the default one coming from Conan
     (Nx-Meta-branded with placeholders), add the following arguments to the `<build>` script:
