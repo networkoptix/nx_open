@@ -681,7 +681,7 @@ Page
         showPlaybackControls: d.hasArchive
         hasChunkNavigation: d.hasChunkNavigation
 
-        actionButtonContainer.visible: actionSheet.hasActions
+        hasActionButton: actionSheet.hasActions
 
         onBackButtonClicked:
         {

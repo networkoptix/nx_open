@@ -1,11 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
+import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Items
 import Nx.Mobile.Controls
+import Nx.Ui
 
 import nx.vms.client.core
 
@@ -18,6 +20,12 @@ Item
     property VideoScreenController controller
     property bool showPlaybackControls: true
     property bool hasChunkNavigation: true
+
+    // Whether the action button container should take place in the layouts. Cannot be replaced
+    // with the `actionButtonContainer.visible` binding, since the container visibility is
+    // controlled by LayoutItemProxy.
+    property bool hasActionButton: false
+
     property alias cameraTitle: cameraTitleLabel.text
     property alias cameraTimestampText: cameraTimestampLabel.text
 
@@ -312,25 +320,6 @@ Item
             }
         }
 
-        // Left controls.
-        Column
-        {
-            id: leftControls
-
-            anchors.left: parent.left
-            anchors.leftMargin: 16
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 8
-
-            Item
-            {
-                id: overlayActionButtonContainer
-
-                width: 48
-                height: 48
-            }
-        }
-
         // Center controls.
         Row
         {
@@ -397,87 +386,196 @@ Item
                 onClicked: controller.jumpToNextChunk()
             }
         }
+    }
 
-        // Bottom controls.
+    Item
+    {
+        anchors.fill: parent
+        visible: opacityController.defaultControlsOpacity > 0
+            || opacityController.speedControlOpacity > 0
+
+        // Left controls.
+        Column
+        {
+            id: leftControls
+
+            anchors.left: parent.left
+            anchors.leftMargin: 16
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+            visible: !LayoutController.isPortrait
+
+            LayoutItemProxy
+            {
+                target: overlayActionButtonContainer
+                visible: control.hasActionButton
+            }
+        }
+
         GradientShadow
         {
-            id: bottomControls
-
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
 
-            height: 100
+            height: LayoutController.isPortrait ? 164 : 100
             from: "transparent"
             to: ColorTheme.transparent(ColorTheme.colors.dark3, 0.8)
+            opacity: opacityController.defaultControlsOpacity
+        }
+
+        // Bottom controls landscape layout.
+        RowLayout
+        {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 16
+
+            visible: !LayoutController.isPortrait
+
+            LayoutItemProxy
+            {
+                target: overlayLiveButton
+            }
 
             Item
             {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.margins: 16
-                height: 48
+                Layout.fillWidth: true
+            }
 
-                LEDButton
+            LayoutItemProxy
+            {
+                Layout.preferredWidth: speedControl.expandedWidth
+
+                target: speedControl
+                visible: control.showPlaybackControls && opacityController.speedControlOpacity > 0
+            }
+
+            Item
+            {
+                Layout.fillWidth: true
+            }
+
+            LayoutItemProxy
+            {
+                target: exitFullscreenButton
+            }
+        }
+
+        // Bottom controls portrait layout.
+        ColumnLayout
+        {
+            id: portraitBottomControlsLayout
+
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 16
+
+            visible: LayoutController.isPortrait
+
+            spacing: 16
+
+            LayoutItemProxy
+            {
+                Layout.fillWidth: true
+
+                target: speedControl
+                visible: control.showPlaybackControls && opacityController.speedControlOpacity > 0
+            }
+
+            RowLayout
+            {
+                Layout.fillWidth: true
+
+                spacing: 8
+
+                LayoutItemProxy
                 {
-                    id: overlayLiveButton
-
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    height: 48
-
-                    leftPadding: 12
-                    rightPadding: 12
-
-                    backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
-
-                    text: "LIVE" //< Intentionally not translatable.
-                    font.pixelSize: 14
-
-                    checked: controller.playingLive
-
-                    onClicked:
-                    {
-                        if (controller.playingLive)
-                            controller.pause()
-                        else
-                            controller.playLive()
-                    }
+                    target: overlayLiveButton
                 }
 
-                OverlayControlButton
+                LayoutItemProxy
                 {
-                    id: exitFullscreenButton
+                    target: overlayActionButtonContainer
+                    visible: control.hasActionButton
+                }
 
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    icon.source: "image://skin/24x24/Outline/compress.svg"
+                Item
+                {
+                    Layout.fillWidth: true
+                }
 
-                    onClicked: control.exitFullscreenButtonClicked()
+                LayoutItemProxy
+                {
+                    target: exitFullscreenButton
                 }
             }
         }
     }
 
-    // Speed control
+    Item
+    {
+        id: overlayActionButtonContainer
+
+        implicitWidth: 48
+        implicitHeight: 48
+
+        opacity: opacityController.defaultControlsOpacity
+        enabled: opacity > 0
+    }
+
+    LEDButton
+    {
+        id: overlayLiveButton
+
+        implicitHeight: 48
+
+        opacity: opacityController.defaultControlsOpacity
+        enabled: opacity > 0
+
+        leftPadding: 12
+        rightPadding: 12
+
+        backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+
+        text: "LIVE" //< Intentionally not translatable.
+        font.pixelSize: 14
+
+        checked: controller.playingLive
+
+        onClicked:
+        {
+            if (controller.playingLive)
+                controller.pause()
+            else
+                controller.playLive()
+        }
+    }
+
+    OverlayControlButton
+    {
+        id: exitFullscreenButton
+
+        icon.source: "image://skin/24x24/Outline/compress.svg"
+
+        opacity: opacityController.defaultControlsOpacity
+        enabled: opacity > 0
+
+        onClicked: control.exitFullscreenButtonClicked()
+    }
+
     SpeedControl
     {
         id: speedControl
 
-        visible: control.showPlaybackControls && opacityController.speedControlOpacity > 0
+        implicitHeight: 48
         opacity: opacityController.speedControlOpacity
-
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.margins: 16
-
-        height: 48
-
         color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
         radius: 6
         expanded: true
-        expandedWidth: 400
+        expandedWidth: LayoutController.isPortrait ? portraitBottomControlsLayout.width : 400
         displayCollapseButton: false
 
         forced1x: controller.playingLive
@@ -510,8 +608,8 @@ Item
     // Components.
     component OverlayControlButton: ControlButton
     {
-        width: 48
-        height: 48
+        implicitWidth: 48
+        implicitHeight: 48
         foregroundColor: ColorTheme.colors.light4
         backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
     }
