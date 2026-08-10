@@ -6,7 +6,7 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation type="unfinished">
-        <numerusform>%n %2 are used out of %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
         <numerusform>%n %2 are used out of %1.</numerusform>
         <numerusform>%n %2 are used out of %1.</numerusform>
         <numerusform>%n %2 are used out of %1.</numerusform>
@@ -18,9 +18,9 @@
       <source>%n %2 will be used out of %1.</source>
       <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation type="unfinished">
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
-        <numerusform>%n %2 will be used out of %1.</numerusform>
+        <numerusform>سيتم استخدام %2 %n من %1.</numerusform>
+        <numerusform>سيتم استخدام %2 %n من %1.</numerusform>
+        <numerusform>.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
@@ -30,7 +30,7 @@
       <source>Activate %n more %1.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation type="unfinished">
-        <numerusform>Activate %n more %1.</numerusform>
+        <numerusform>تفعيل %n اكثر من %1.</numerusform>
         <numerusform>Activate %n more %1.</numerusform>
         <numerusform>Activate %n more %1.</numerusform>
         <numerusform>Activate %n more %1.</numerusform>
@@ -42,7 +42,7 @@
       <source>%n more %1 will be used.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation type="unfinished">
-        <numerusform>%n more %1 will be used.</numerusform>
+        <numerusform>%n أكثر من%1 سيتم استخدامهم.</numerusform>
         <numerusform>%n more %1 will be used.</numerusform>
         <numerusform>%n more %1 will be used.</numerusform>
         <numerusform>%n more %1 will be used.</numerusform>
@@ -55,60 +55,60 @@
     <name>nx::vms::license::Validator</name>
     <message>
       <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
+      <translation>توقيع غير صالح</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
-      <translation type="unfinished">Server with matching Hardware ID not found</translation>
+      <translation>لم يتم العثور على خادم بمعرف الجهاز المطابق</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation type="unfinished">Invalid customization</translation>
+      <translation>التخصيص غير صالح</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>License is expired</translation>
+      <translation>انتهت صلاحية الترخيص</translation>
     </message>
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>لم يتم التحقق من صحة الترخيص بواسطة %1</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
+      <translation>نوع غير صالح</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>لديك بالفعل رخصة بدأ واحدة نشطة.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>لديك بالفعل ترخيص NVR نشط واحد.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>لديك بالفعل ترخيص نشط واحد من نفس النوع.</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
+      <translation>يتطلب هذا النوع من التراخيص إصدارًا أحدث من البرنامج</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>Unknown error</translation>
+      <translation>خطأ غير معروف</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site.</translation>
+      <translation>يُسمح برخصة بدء تشغيل واحدة فقط لكل موقع.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site.</translation>
+      <translation>لا يسمح إلا برخصة NVR واحدة في كل موقع.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per Site.</source>
-      <translation type="unfinished">Only one license of this type is allowed per Site.</translation>
+      <translation>يسمح برخصة واحدة فقط من هذا النوع لكل موقع.</translation>
     </message>
   </context>
 </TS>
