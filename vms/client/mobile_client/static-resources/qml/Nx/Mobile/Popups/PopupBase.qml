@@ -163,10 +163,9 @@ Popup
             anchors.right: parent.right
             anchors.margins: 24
 
-            icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
+            compact: true
 
-            width: 24
-            height: 24
+            icon.source: "image://skin/24x24/Outline/close.svg?primary=light10"
             icon.width: 24
             icon.height: 24
 
