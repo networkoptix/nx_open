@@ -48,6 +48,11 @@ Page
 
             TitleLabel
             {
+                id: titleLabel
+
+                Layout.fillWidth: true
+                Layout.maximumWidth: Math.ceil(titleLabel.implicitWidth)
+
                 text: root.title
             }
 
