@@ -1,16 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-import QtQuick 2.15
+import QtQuick
+import QtQuick.Layouts
 
-import Nx.Core 1.0
-import Nx.Controls 1.0
-import Nx.Settings 1.0
-import Nx.Ui 1.0
+import Nx.Core
+import Nx.Controls
+import Nx.Items
+import Nx.Settings
+import Nx.Ui
 
-import Nx.Mobile 1.0
-import nx.vms.client.core 1.0
+import Nx.Mobile
+import nx.vms.client.core
 
-Page
+AdaptiveScreen
 {
     id: cameraSettingsScreen
 
@@ -21,95 +23,99 @@ Page
     property AudioController audioController: null
 
     title: qsTr("Camera Settings")
-    onLeftButtonClicked: Workflow.popCurrentScreen()
-    topPadding: 4
-    bottomPadding: 16
 
-    Column
+    contentItem: Item
     {
-        id: content
-
-        width: parent.width
-        spacing: 4
-
-        LabeledSwitch
+        ColumnLayout
         {
-            id: audioSwitch
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: 20
 
-            visible: audioController && audioController.audioEnabled
-            text: qsTr("Audio")
-            width: parent.width
+            spacing: 4
 
-            checkState: audioController && audioController.audioEnabled
-                ? Qt.Checked
-                : Qt.Unchecked
-
-            onCheckStateChanged:
+            LabeledSwitch
             {
-                if (audioController)
-                    audioController.audioEnabled = checkState !== Qt.Unchecked
-            }
-        }
+                id: audioSwitch
 
-        LabeledSwitch
-        {
-            id: changeQualitySwitch
+                Layout.fillWidth: true
 
-            text: qsTr("Change Quality")
-            width: parent.width
-            showIndicator: false
-            showCustomArea: true
+                visible: audioController && audioController.audioEnabled
+                text: qsTr("Audio")
 
-            customArea: Text
-            {
-                text:
+                checkState: audioController && audioController.audioEnabled
+                    ? Qt.Checked
+                    : Qt.Unchecked
+
+                onCheckStateChanged:
                 {
-                    const resolution = player.currentResolution
-                    if (resolution.width > 0 && resolution.height > 0)
-                        return ("%1x%2").arg(resolution.width).arg(resolution.height);
-
-                    if (player.videoQuality !== MediaPlayer.LowVideoQuality
-                        && player.videoQuality !== MediaPlayer.HighVideoQuality)
-                    {
-                        return ("%1p").arg(player.videoQuality);
-                    }
-                    return qsTr("Unknown", "Unknown video quality");
+                    if (audioController)
+                        audioController.audioEnabled = checkState !== Qt.Unchecked
                 }
-                font.pixelSize: 16
-                color: ColorTheme.colors.light16
-                anchors.verticalCenter: parent.verticalCenter
             }
 
-            customAreaClickHandler: function()
+            LabeledSwitch
             {
-                var customQualities = [ 1080, 720, 480, 360 ]
-                var allVideoQualities =
-                    [ MediaPlayer.LowVideoQuality, MediaPlayer.HighVideoQuality ]
-                        .concat(customQualities)
+                id: changeQualitySwitch
 
-                var actualQuality = player.actualVideoQuality()
-                if (actualQuality === MediaPlayer.CustomVideoQuality)
-                    actualQuality = player.currentResolution.height
+                Layout.fillWidth: true
 
-                var dialog = Workflow.openDialog(
-                    "../Screens/private/VideoScreen/QualityDialog.qml",
+                text: qsTr("Change Quality")
+                showIndicator: false
+                showCustomArea: true
+
+                customArea: Text
+                {
+                    text:
                     {
-                        "actualQuality": player.currentResolution,
-                        "activeQuality": actualQuality,
-                        "customQualities": customQualities,
-                        "availableVideoQualities":
-                            player.availableVideoQualities(allVideoQualities),
-                        "transcodingSupportStatus":
-                            player.transcodingStatus()
-                    }
-                )
+                        const resolution = player.currentResolution
+                        if (resolution.width > 0 && resolution.height > 0)
+                            return ("%1x%2").arg(resolution.width).arg(resolution.height);
 
-                dialog.onActiveQualityChanged.connect(
-                    function()
-                    {
-                        appContext.settings.lastUsedQuality = dialog.activeQuality
+                        if (player.videoQuality !== MediaPlayer.LowVideoQuality
+                            && player.videoQuality !== MediaPlayer.HighVideoQuality)
+                        {
+                            return ("%1p").arg(player.videoQuality);
+                        }
+                        return qsTr("Unknown", "Unknown video quality");
                     }
-                )
+                    font.pixelSize: 16
+                    color: ColorTheme.colors.light16
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                customAreaClickHandler: function()
+                {
+                    var customQualities = [ 1080, 720, 480, 360 ]
+                    var allVideoQualities =
+                        [ MediaPlayer.LowVideoQuality, MediaPlayer.HighVideoQuality ]
+                            .concat(customQualities)
+
+                    var actualQuality = player.actualVideoQuality()
+                    if (actualQuality === MediaPlayer.CustomVideoQuality)
+                        actualQuality = player.currentResolution.height
+
+                    var dialog = Workflow.openDialog(
+                        "../Screens/private/VideoScreen/QualityDialog.qml",
+                        {
+                            "actualQuality": player.currentResolution,
+                            "activeQuality": actualQuality,
+                            "customQualities": customQualities,
+                            "availableVideoQualities":
+                                player.availableVideoQualities(allVideoQualities),
+                            "transcodingSupportStatus":
+                                player.transcodingStatus()
+                        }
+                    )
+
+                    dialog.onActiveQualityChanged.connect(
+                        function()
+                        {
+                            appContext.settings.lastUsedQuality = dialog.activeQuality
+                        }
+                    )
+                }
             }
         }
     }
