@@ -547,7 +547,7 @@
     </message>
     <message>
       <source>Invalid data was received from the I/O module. Details: &quot;%1&quot;.</source>
-      <translation type="unfinished">Invalid data was received from the I/O module. Details: &quot;%1&quot;.</translation>
+      <translation>تم تلقي بيانات غير صالحة من وحدة I/O. التفاصيل: &quot;%1&quot;.</translation>
     </message>
   </context>
   <context>
@@ -606,13 +606,13 @@
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
+        <numerusform>%n من %1 المستخدمين المحددين ليسوا %2 مستخدمين ولن يتلقوا إشعارات على الهاتف المحمول.</numerusform>
       </translation>
     </message>
   </context>
@@ -642,41 +642,41 @@
     </message>
     <message>
       <source>This camera is not currently on the selected layout</source>
-      <translation type="unfinished">This camera is not currently on the selected layout</translation>
+      <translation>هذه الكاميرا غير موجودة حاليا في التخطيط المحدد</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts</translation>
+      <translation>هذه الكاميرا غير متوفرة حاليا في بعض التخطيطات المختارة</translation>
     </message>
   </context>
   <context>
     <name>QnLayoutAccessValidationPolicy</name>
     <message>
       <source>Users do not have access to the selected layout</source>
-      <translation type="unfinished">Users do not have access to the selected layout</translation>
+      <translation>المستخدمين ليس لديهم حق الوصول إلى التخطيط المحدد</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>بعض المستخدمين لا يستطيعون الوصول إلى التخطيط المحدد</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>تناظري</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>احترافي</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>حافّة</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -692,39 +692,39 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>مشفر تناظري</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation type="unfinished">Analog Licenses</translation>
+      <translation>التراخيص التناظرية</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation type="unfinished">Professional Licenses</translation>
+      <translation>ترخيص احترافي</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation type="unfinished">Edge Licenses</translation>
+      <translation>رخص طرفيه</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation type="unfinished">Vmax Licenses</translation>
+      <translation>تراخيص Vmax</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation type="unfinished">Analog Encoder Licenses</translation>
+      <translation>تراخيص أجهزة التشفير التناظرية</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation type="unfinished">Video Wall Licenses</translation>
+      <translation>تراخيص حائط الفيديو</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation type="unfinished">I/O Module Licenses</translation>
+      <translation>تراخيص وحدات الإدخال/الإخراج</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation type="unfinished">Start Licenses</translation>
+      <translation>تراخيص البدء</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -732,11 +732,11 @@
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation type="unfinished">Invalid Licenses</translation>
+      <translation>ترخيص غير صالح</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation type="unfinished">Free</translation>
+      <translation>مجاني</translation>
     </message>
     <message>
       <source>Time</source>
@@ -744,150 +744,150 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation type="unfinished">Time Licenses</translation>
+      <translation>تراخيص زمنية</translation>
     </message>
     <message>
       <source>Bridge</source>
-      <translation type="unfinished">Bridge</translation>
+      <translation>جسر</translation>
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation type="unfinished">Bridge Licenses</translation>
+      <translation>تراخيص الجسر</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص زمنية</numerusform>
+        <numerusform>%n تراخيص زمنية</numerusform>
+        <numerusform>%n تراخيص زمنية</numerusform>
+        <numerusform>%n تراخيص زمنية</numerusform>
+        <numerusform>%n تراخيص زمنية</numerusform>
+        <numerusform>%n تراخيص زمنية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص تناظرية</numerusform>
+        <numerusform>%n تراخيص تناظرية</numerusform>
+        <numerusform>%n تراخيص تناظرية</numerusform>
+        <numerusform>%n تراخيص تناظرية</numerusform>
+        <numerusform>%n تراخيص تناظرية</numerusform>
+        <numerusform>%n تراخيص تناظرية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص احترافية</numerusform>
+        <numerusform>%n تراخيص احترافية</numerusform>
+        <numerusform>%n تراخيص احترافية</numerusform>
+        <numerusform>%n تراخيص احترافية</numerusform>
+        <numerusform>%n تراخيص احترافية</numerusform>
+        <numerusform>%n تراخيص احترافية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform> %n تراخيص طرفية</numerusform>
+        <numerusform> %n تراخيص طرفية</numerusform>
+        <numerusform> %n تراخيص طرفية</numerusform>
+        <numerusform> %n تراخيص طرفية</numerusform>
+        <numerusform> %n تراخيص طرفية</numerusform>
+        <numerusform> %n تراخيص طرفية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص Vmax </numerusform>
+        <numerusform>%n تراخيص Vmax </numerusform>
+        <numerusform>%n تراخيص Vmax </numerusform>
+        <numerusform>%n تراخيص Vmax </numerusform>
+        <numerusform>%n تراخيص Vmax </numerusform>
+        <numerusform>%n تراخيص Vmax </numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
+        <numerusform>%n تراخيص أجهزة التشفير التناظرية </numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
+        <numerusform>%n رخص جدار الفيديو</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n تراخيص وحدات الإدخال/الإخراج</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص البدء</numerusform>
+        <numerusform>%n تراخيص البدء</numerusform>
+        <numerusform>%n تراخيص البدء</numerusform>
+        <numerusform>%n تراخيص البدء</numerusform>
+        <numerusform>%n تراخيص البدء</numerusform>
+        <numerusform>%n تراخيص البدء</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص الجسر</numerusform>
+        <numerusform>%n تراخيص الجسر</numerusform>
+        <numerusform>%n تراخيص الجسر</numerusform>
+        <numerusform>%n تراخيص الجسر</numerusform>
+        <numerusform>%n تراخيص الجسر</numerusform>
+        <numerusform>%n تراخيص الجسر</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
+        <numerusform>%n تراخيص غير صالحة</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>تراخيص مجانية</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n تراخيص مجانية</numerusform>
+        <numerusform>%n تراخيص مجانية</numerusform>
+        <numerusform>%n تراخيص مجانية</numerusform>
+        <numerusform>%n تراخيص مجانية</numerusform>
+        <numerusform>%n تراخيص مجانية</numerusform>
+        <numerusform>%n تراخيص مجانية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1067,7 +1067,7 @@
     </message>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>تسجيل محلي</translation>
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
@@ -1257,18 +1257,18 @@
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>معرّف الجهاز: %1</translation>
     </message>
   </context>
   <context>
     <name>QnSubjectValidationPolicy</name>
     <message>
       <source>None of selected user roles contain users</source>
-      <translation type="unfinished">None of selected user roles contain users</translation>
+      <translation>لا يحتوي أي من أدوار المستخدم المحددة على مستخدمين</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>حدد مستخدم واحد على الأقل</translation>
     </message>
   </context>
   <context>
@@ -1452,65 +1452,65 @@
     <message>
       <source>Msec</source>
       <comment>Numerus: Capitalized long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">Msec</translation>
+      <translation>مللي ثانية</translation>
     </message>
     <message>
       <source>Sec</source>
       <comment>Numerus: Capitalized long suffix for displaying seconds</comment>
-      <translation type="unfinished">Sec</translation>
+      <translation>ثانية</translation>
     </message>
     <message>
       <source>Min</source>
       <comment>Numerus: Capitalized long suffix for displaying minutes</comment>
-      <translation type="unfinished">Min</translation>
+      <translation>دقيقة</translation>
     </message>
     <message>
       <source>Hrs</source>
       <comment>Numerus: Capitalized long suffix for displaying hours</comment>
-      <translation type="unfinished">Hrs</translation>
+      <translation>ساعات</translation>
     </message>
     <message>
       <source>Days</source>
       <comment>Numerus: Capitalized long suffix for displaying days</comment>
-      <translation type="unfinished">Days</translation>
+      <translation>أيام</translation>
     </message>
     <message>
       <source>Wks</source>
       <comment>Numerus: Capitalized long suffix for displaying weeks</comment>
-      <translation type="unfinished">Wks</translation>
+      <translation>أسابيع</translation>
     </message>
     <message>
       <source>Mos</source>
       <comment>Numerus: Capitalized long suffix for displaying months</comment>
-      <translation type="unfinished">Mos</translation>
+      <translation>شهور</translation>
     </message>
     <message>
       <source>Yrs</source>
       <comment>Numerus: Capitalized long suffix for displaying years</comment>
-      <translation type="unfinished">Yrs</translation>
+      <translation>سنوات</translation>
     </message>
     <message numerus="yes">
       <source>Milliseconds</source>
       <comment>Numerus: Capitalized full suffix for displaying milliseconds</comment>
-      <translation type="unfinished">
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
+      <translation>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
+        <numerusform>مللي ثانية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
-      <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
-        <numerusform>Seconds</numerusform>
+      <translation>
+        <numerusform>ثواني</numerusform>
+        <numerusform>ثواني</numerusform>
+        <numerusform>ثواني</numerusform>
+        <numerusform>ثواني</numerusform>
+        <numerusform>ثواني</numerusform>
+        <numerusform>ثواني</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1528,61 +1528,61 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>الساعات </numerusform>
+        <numerusform>الساعات </numerusform>
+        <numerusform>الساعات </numerusform>
+        <numerusform>الساعات </numerusform>
+        <numerusform>الساعات </numerusform>
+        <numerusform>الساعات </numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
-      <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
-        <numerusform>Weeks</numerusform>
+      <translation>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
+        <numerusform>أسابيع</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Months</source>
       <comment>Numerus: Capitalized full suffix for displaying months</comment>
-      <translation type="unfinished">
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
+      <translation>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
+        <numerusform>أشهر</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
-      <translation type="unfinished">
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
-        <numerusform>Years</numerusform>
+      <translation>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
+        <numerusform>سنوات</numerusform>
       </translation>
     </message>
   </context>
@@ -1594,25 +1594,25 @@
     </message>
     <message>
       <source>Multiple groups</source>
-      <translation type="unfinished">Multiple groups</translation>
+      <translation>مجموعات متعددة</translation>
     </message>
   </context>
   <context>
     <name>QnUsersWithEmailValidationPolicy</name>
     <message>
       <source>Email address is not set for all the selected users.</source>
-      <translation type="unfinished">Email address is not set for all the selected users.</translation>
+      <translation>لم يتم تعيين عنوان البريد الإلكتروني لجميع المستخدمين المحددين.</translation>
     </message>
     <message>
       <source>Email address is not set for some selected users.</source>
-      <translation type="unfinished">Email address is not set for some selected users.</translation>
+      <translation>لم يتم تعيين عنوان البريد الإلكتروني لبعض المستخدمين المختارين.</translation>
     </message>
   </context>
   <context>
     <name>ServiceTypeDisplayStringHelper</name>
     <message>
       <source>Local recording</source>
-      <translation type="unfinished">Local recording</translation>
+      <translation>تسجيل محلي</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -1620,76 +1620,76 @@
     </message>
     <message>
       <source>Cloud storage</source>
-      <translation type="unfinished">Cloud storage</translation>
+      <translation>تخزين سحابي</translation>
     </message>
     <message>
       <source>Live view</source>
-      <translation type="unfinished">Live view</translation>
+      <translation>عرض مباشر</translation>
     </message>
   </context>
   <context>
     <name>StringsHelper</name>
     <message>
       <source>Check internet connection between VMS and license server.</source>
-      <translation type="unfinished">Check internet connection between VMS and license server.</translation>
+      <translation>تحقق من اتصال الإنترنت بين VMS وخادم الترخيص.</translation>
     </message>
     <message>
       <source>Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Contact your channel partner for assistance.</translation>
+      <translation>اتصل بشريك القناة للحصول على المساعدة.</translation>
     </message>
   </context>
   <context>
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>موقع جديد</translation>
     </message>
   </context>
   <context>
     <name>TimeFormat</name>
     <message>
       <source>just now</source>
-      <translation type="unfinished">just now</translation>
+      <translation>الآن فقط</translation>
     </message>
     <message>
       <source>yesterday</source>
-      <translation type="unfinished">yesterday</translation>
+      <translation>أمس</translation>
     </message>
     <message>
       <source>a week ago</source>
-      <translation type="unfinished">a week ago</translation>
+      <translation>منذ أسبوع</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes ago</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
+      <translation>
+        <numerusform>منذ %n دقائق</numerusform>
+        <numerusform>منذ %n دقائق</numerusform>
+        <numerusform>منذ %n دقائق</numerusform>
+        <numerusform>منذ %n دقائق</numerusform>
+        <numerusform>منذ %n دقائق</numerusform>
+        <numerusform>منذ %n دقائق</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
+      <translation>
+        <numerusform>منذ %n  ساعات</numerusform>
+        <numerusform>منذ %n  ساعات</numerusform>
+        <numerusform>منذ %n  ساعات</numerusform>
+        <numerusform>منذ %n  ساعات</numerusform>
+        <numerusform>منذ %n  ساعات</numerusform>
+        <numerusform>منذ %n  ساعات</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
-        <numerusform>%n days ago</numerusform>
+      <translation>
+        <numerusform>منذ %n  أيام</numerusform>
+        <numerusform>منذ %n  أيام</numerusform>
+        <numerusform>منذ %n  أيام</numerusform>
+        <numerusform>منذ %n  أيام</numerusform>
+        <numerusform>منذ %n  أيام</numerusform>
+        <numerusform>منذ %n  أيام</numerusform>
       </translation>
     </message>
   </context>
@@ -1697,74 +1697,74 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>خطأ داخلي</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>لم يتم العثور على حاوية مناظرة في مكتبة FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>تعذر إنشاء ملف الإخراج لتسجيل الفيديو.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation type="unfinished">Could not allocate output stream for recording.</translation>
+      <translation>تعذر تخصيص تيار الإخراج للتسجيل.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>تعذر تخصيص إخراج البث الصوتي.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>تعذر تخصيص دفق بيانات الإخراج الوصفية.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>معلومات ترميز الصوت غير صالحة.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>برنامج ترميز الفيديو أو الصوت غير متوافق مع التنسيق المحدد.</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>يلزم تحويل ترميز الفيديو.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>نوع مصدر غير صالح لتصدير البيانات.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>لم يتم تصدير أي بيانات.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>فتح هذا الجزء من الأرشيف لتصدير محتوياته.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>الأرشيف غير متوفر الآن. الرجاء المحاولة مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>خطأ في كتابة الملف.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>يلزم تحويل ترميز الصوت.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::common::SystemSettings</name>
     <message>
       <source>Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</source>
-      <translation type="unfinished">Maximum event log records to keep in the database. Real amount of undeleted records may be up to 20% higher than the specified value.</translation>
+      <translation>الحد الأقصى لسجلات سجل الأحداث للاحتفاظ في قاعدة البيانات. قد يصل العدد الحقيقي للسجلات غير المحذوفة إلى 20% أعلى من القيمة المحددة.</translation>
     </message>
     <message>
       <source>Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</source>
-      <translation type="unfinished">Whether or not to cache some frames for the primary stream. Values: &apos;yes&apos; - always enabled (may use a lot of RAM), &apos;no&apos; - always disabled except when required by the playback (e.g. HLS), &apos;auto&apos; - similar to &apos;no&apos;, but turned on when improving the user experience (e.g. when some Analytics plugin is working on the Camera).</translation>
+      <translation>إما أن تخزن بعض أطر البث الأولي أو لا. القيم: &apos;نعم&apos; - مفعل دائمًا (قد تستخدم الكثير من ذاكرة الوصول العشوائي RAM)، &apos;لا&apos; - معطل دائمًا إلا إذا كان مطلوباً من قبل اعادة التشغيل (مثل. HLS)، &apos;تلقائيًا&apos; - مماثل ل &apos;no&apos;، ولكن تم تشغيله عند تحسين تجربة المستخدم (مثل. عندما تعمل بعض الملحقات التحليلية على الكاميرا).</translation>
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
