@@ -1547,13 +1547,13 @@
     <message numerus="yes">
       <source>Days</source>
       <comment>Numerus: Capitalized full suffix for displaying days</comment>
-      <translation type="unfinished">
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
+      <translation>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
+        <numerusform>أيام</numerusform>
       </translation>
     </message>
     <message numerus="yes">

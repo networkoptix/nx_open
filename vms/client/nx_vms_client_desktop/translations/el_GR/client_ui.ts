@@ -866,7 +866,7 @@
     </message>
     <message>
       <source>End IP</source>
-      <translation>Τέλος IP</translation>
+      <translation>Τελική διεύθυνση IP</translation>
     </message>
     <message>
       <source>Start IP</source>

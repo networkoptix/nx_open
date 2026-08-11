@@ -8173,7 +8173,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Internal error.</source>
-      <translation type="unfinished">Internal error.</translation>
+      <translation>خطأ داخلي.</translation>
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
@@ -8410,7 +8410,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>موقع جديد</translation>
     </message>
   </context>
   <context>
@@ -8823,31 +8823,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File write error.</source>
-      <translation type="unfinished">File write error.</translation>
+      <translation>خطأ في كتابة الملف.</translation>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation type="unfinished">No data exported.</translation>
+      <translation>لم يتم تصدير أي بيانات.</translation>
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>خطأ داخلي</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
-      <translation type="unfinished">Video transcoding required.</translation>
+      <translation>يلزم تحويل ترميز الفيديو.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>الأرشيف غير متوفر الآن. الرجاء المحاولة مرة أخرى لاحقاً.</translation>
     </message>
     <message>
       <source>Unlock this portion of the archive to export its contents.</source>
-      <translation type="unfinished">Unlock this portion of the archive to export its contents.</translation>
+      <translation>فتح هذا الجزء من الأرشيف لتصدير محتوياته.</translation>
     </message>
     <message>
       <source>Audio transcoding required.</source>
-      <translation type="unfinished">Audio transcoding required.</translation>
+      <translation>يلزم تحويل ترميز الصوت.</translation>
     </message>
   </context>
   <context>
@@ -10028,7 +10028,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>موقع جديد</translation>
     </message>
     <message>
       <source>Site was not found.</source>
@@ -11666,7 +11666,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>internal error</source>
-      <translation type="unfinished">internal error</translation>
+      <translation>خطأ داخلي</translation>
     </message>
     <message>
       <source>unknown status</source>
@@ -12200,7 +12200,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Internal error</source>
-      <translation type="unfinished">Internal error</translation>
+      <translation>خطأ داخلي</translation>
     </message>
     <message>
       <source>Connection failure</source>
@@ -12992,7 +12992,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>موقع جديد</translation>
     </message>
   </context>
   <context>
