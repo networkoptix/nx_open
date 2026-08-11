@@ -1133,7 +1133,7 @@
       <source>Mute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation>
-        <numerusform>Σίγαση στοιχείου</numerusform>
+        <numerusform>Σίγαση Στοιχείου</numerusform>
         <numerusform>Σίγαση Στοιχείων</numerusform>
       </translation>
     </message>

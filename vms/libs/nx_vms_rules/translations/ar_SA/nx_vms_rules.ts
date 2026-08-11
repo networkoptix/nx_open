@@ -105,7 +105,7 @@
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
+      <translation>حدد مستخدم واحد على الأقل</translation>
     </message>
     <message>
       <source>Select exactly one camera</source>
@@ -206,7 +206,7 @@
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
-      <translation type="unfinished">Some users do not have access to the selected layout</translation>
+      <translation>بعض المستخدمين لا يستطيعون الوصول إلى التخطيط المحدد</translation>
     </message>
     <message>
       <source>For</source>

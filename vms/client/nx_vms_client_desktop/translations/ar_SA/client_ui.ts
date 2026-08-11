@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>دقيقة</translation>
     </message>
   </context>
   <context>
