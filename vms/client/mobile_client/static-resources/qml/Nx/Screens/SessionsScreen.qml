@@ -112,7 +112,8 @@ AdaptiveScreen
 
         menuButton
         {
-            icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
+            icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=%1"
+                .arg(StyleHints.foregroundColorName)
             visible: feedStateProvider.count !== 0
             indicator.visible: feed.filtered
 
@@ -170,7 +171,8 @@ AdaptiveScreen
     {
         id: rightButton
 
-        icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+        icon.source: "image://skin/24x24/Outline/settings.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         icon.width: 24
         icon.height: 24
     }
@@ -232,7 +234,8 @@ AdaptiveScreen
 
                 leftButton
                 {
-                    icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
+                    icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     icon.width: 24
                     icon.height: 24
                     onClicked: sessionsScreen.contentItem = sessionsScreenContent
@@ -240,7 +243,8 @@ AdaptiveScreen
 
                 rightButton
                 {
-                    icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
+                    icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     visible: feedStateProvider.count !== 0
 
                     indicator.width: 6
@@ -272,7 +276,8 @@ AdaptiveScreen
                 }
                 rightButton
                 {
-                    icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+                    icon.source: "image://skin/24x24/Outline/settings.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
                 systemTabs.visible: !loadingIndicator.visible
@@ -292,7 +297,8 @@ AdaptiveScreen
             {
                 leftButton
                 {
-                    icon.source: "image://skin/24x24/Outline/account_box.svg?primary=light10"
+                    icon.source: "image://skin/24x24/Outline/account_box.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     icon.width: 24
                     icon.height: 24
                     width: 36
@@ -307,7 +313,8 @@ AdaptiveScreen
                 }
                 rightButton
                 {
-                    icon.source: "image://skin/24x24/Outline/settings.svg?primary=light10"
+                    icon.source: "image://skin/24x24/Outline/settings.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     onClicked: Workflow.openSettingsScreen(/*push*/ true)
                 }
                 systemTabs.visible: false
@@ -324,7 +331,8 @@ AdaptiveScreen
             {
                 leftButton
                 {
-                    icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light10"
+                    icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     icon.width: 24
                     icon.height: 24
                     onClicked: goBack()
@@ -422,7 +430,7 @@ AdaptiveScreen
         {
             id: feedStateProvider
 
-            iconColor: LayoutController.isTabletLayout ? "dark1" : "light4"
+            iconColor: LayoutController.isTabletLayout ? "dark1" : StyleHints.foregroundColorName
             cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
         }
 

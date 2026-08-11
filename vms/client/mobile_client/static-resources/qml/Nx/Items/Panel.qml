@@ -68,7 +68,8 @@ Page
             {
                 id: menuButton
 
-                icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+                icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
+                    .arg(StyleHints.foregroundColorName)
                 icon.width: 24
                 icon.height: 24
 
@@ -78,7 +79,8 @@ Page
 
             NxControls.IconButton
             {
-                icon.source: "image://skin/24x24/Outline/close.svg?primary=light4"
+                icon.source: "image://skin/24x24/Outline/close.svg?primary=%1"
+                    .arg(StyleHints.foregroundColorName)
                 icon.width: 24
                 icon.height: 24
 

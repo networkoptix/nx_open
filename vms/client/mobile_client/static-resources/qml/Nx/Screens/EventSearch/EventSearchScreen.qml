@@ -66,7 +66,8 @@ AdaptiveScreen
 
         anchors.centerIn: parent
         visible: state !== ""
-        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
 
         onClicked:
         {
@@ -140,7 +141,8 @@ AdaptiveScreen
 
     customRightControl: ToolBarButton
     {
-        icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         visible: !LayoutController.isTabletLayout && screen.contentItem === searchContent
         indicator.visible: filtersItem.hasActiveFilters
         onClicked:

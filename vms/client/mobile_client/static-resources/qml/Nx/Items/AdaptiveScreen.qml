@@ -116,7 +116,8 @@ FocusScope
         {
             id: menuButton
 
-            icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+            icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
+                .arg(StyleHints.foregroundColorName)
             visible: false
         }
 
@@ -138,7 +139,8 @@ FocusScope
                     PropertyChanges
                     {
                         defaultLeftControl.icon.source: root.leftControlIconSource
-                            || "image://skin/20x20/Solid/arrow_open.svg?primary=light10"
+                            || "image://skin/20x20/Solid/arrow_open.svg?primary=%1"
+                                .arg(StyleHints.foregroundColorName)
                         defaultLeftControl.onClicked: splash.open()
                     }
                 },

@@ -2,13 +2,13 @@
 
 import QtQuick
 
-import Nx.Core
+import Nx.Ui
 
 Text
 {
     font.pixelSize: 18
     font.weight: 500
-    color: ColorTheme.colors.light4
+    color: StyleHints.foregroundColor
     elide: Text.ElideRight
     horizontalAlignment: Text.AlignHCenter
     verticalAlignment: Text.AlignVCenter

@@ -3,13 +3,23 @@
 pragma Singleton
 
 import QtQml
+import QtQuick
+
+import Nx.Core
 
 import nx.vms.client.mobile
 
 QtObject
 {
+    id: styleHints
+
     // Common height for the toolbar and panel header.
     readonly property int headerHeight: 64
+
+    // Name of the color of the texts and icons of the main controls: toolbar title and buttons,
+    // navigation bar buttons, panel header title and buttons.
+    readonly property string foregroundColorName: "light4"
+    readonly property color foregroundColor: ColorTheme.colors[styleHints.foregroundColorName]
 
     // Width of the side panels on tablet layout.
     readonly property int panelWidth: appContext.settings.sidePanelWidth

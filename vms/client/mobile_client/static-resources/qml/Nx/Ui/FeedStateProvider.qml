@@ -3,6 +3,7 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Ui
 
 import nx.vms.client.mobile
 
@@ -20,7 +21,7 @@ NxObject
     property alias user: notifications.user
     property int updateIntervalMs: 4000
 
-    property string iconColor: "light4"
+    property string iconColor: StyleHints.foregroundColorName
     readonly property string buttonIconSource: "image://skin/24x24/Outline/%1.svg?primary=%2"
        .arg(active ? "notification" : "notification_off")
        .arg(iconColor)

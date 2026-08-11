@@ -112,7 +112,8 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+                    leftControl.icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+                        .arg(StyleHints.foregroundColorName)
                     leftControl.onClicked: resourcesScreen.closeVideoScreen()
                 }
             },
@@ -123,7 +124,9 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    leftControl.icon.source: "image://skin/24x24/Outline/resource_tree.svg?primary=light4"
+                    leftControl.icon.source:
+                        "image://skin/24x24/Outline/resource_tree.svg?primary=%1"
+                            .arg(StyleHints.foregroundColorName)
                     leftControl.onClicked: resourcesScreen.splash.open()
                     leftControl.enabled: camerasGrid.enabled
                 }
@@ -135,7 +138,8 @@ AdaptiveScreen
     {
         id: kebabMenuButton
 
-        icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         visible: resourcesScreen.contentItem === videoScreenLoader.item
         onClicked:
         {

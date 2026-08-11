@@ -356,7 +356,8 @@ Page
     {
         id: menuButton
 
-        icon.source: "image://skin/24x24/Outline/more.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         onClicked: menu.open()
     }
 

@@ -94,7 +94,7 @@ Rectangle
 
             anchors.centerIn: parent
             sourceSize: Qt.size(24, 24)
-            primaryColor: isSelected ? ColorTheme.colors.brand_core : ColorTheme.colors.light1
+            primaryColor: isSelected ? ColorTheme.colors.brand_core : StyleHints.foregroundColor
 
             Indicator
             {

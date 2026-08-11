@@ -74,7 +74,8 @@ AdaptiveScreen
 
         anchors.centerIn: parent
         visible: feedScreen.contentItem === notificationDetailsItem
-        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
 
         onClicked: d.closeDetails()
     }
@@ -83,7 +84,8 @@ AdaptiveScreen
     {
         id: filterButton
 
-        icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         icon.width: 24
         icon.height: 24
 

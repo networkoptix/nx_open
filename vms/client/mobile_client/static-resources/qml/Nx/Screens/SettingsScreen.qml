@@ -81,7 +81,8 @@ AdaptiveScreen
         id: backButton
 
         anchors.centerIn: parent
-        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=light4"
+        icon.source: "image://skin/24x24/Outline/arrow_back.svg?primary=%1"
+            .arg(StyleHints.foregroundColorName)
         visible: state !== ""
 
         states:
