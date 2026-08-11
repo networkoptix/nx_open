@@ -162,6 +162,15 @@ Rectangle
 
         NavigationButton
         {
+            objectName: "qrButton"
+            iconSource: "image://skin/24x24/Outline/qr.svg"
+            screenId: Controller.UnknownScreen
+            visible: windowContext.mainSystemContext.featureAccess.canUseDeployByQrFeature
+            onClicked: windowContext.mainSystemContext.deploymentManager.deployNewServer()
+        }
+
+        NavigationButton
+        {
             id: settingsButton
 
             objectName: "settingsButton"
