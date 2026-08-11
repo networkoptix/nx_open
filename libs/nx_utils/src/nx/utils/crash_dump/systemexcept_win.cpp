@@ -93,9 +93,43 @@ static bool GetCrashPrefix( char* sCrashPrefix )
     return sprintf( sCrashPrefix, "%s_%s", sProgramName, fullVersionId.c_str());
 }
 
-static
-void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
+// Customer-defined exception codes (bit 29 set), used for CRT failures that are reported to us
+// through a callback rather than as an SEH exception, and thus have no exception code of their
+// own. Giving the dump a synthetic-but-real exception record is what makes it self-triaging:
+// without one the dump has no exception stream at all, debuggers report a placeholder breakpoint
+// at address 0, and !analyze blames thread 0 instead of the thread that actually failed.
+static const DWORD kPureVirtualCallExceptionCode = 0xE0000001;
+static const DWORD kInvalidCrtParameterExceptionCode = 0xE0000002;
 
+// NOTE: x86-64 only, as is the whole build. On any other architecture CONTEXT has no Rip member
+// (32-bit x86 has Eip, ARM64 has Pc), so this fails to compile rather than silently misreporting.
+static EXCEPTION_RECORD MakeCrtExceptionRecord(DWORD exceptionCode, const CONTEXT& context)
+{
+    return {
+        .ExceptionCode = exceptionCode,
+        .ExceptionFlags = EXCEPTION_NONCONTINUABLE,
+        .ExceptionAddress = reinterpret_cast<PVOID>(context.Rip),
+    };
+}
+
+struct DumpThreadParams
+{
+    HANDLE targetThreadHandle = nullptr;
+    DWORD targetThreadId = 0;
+    DWORD exceptionCode = 0;
+
+    // Captured on the failing thread at CRT handler entry, so it names the fault site and not
+    // wherever that thread has moved to by the time the dump is written.
+    CONTEXT context{.ContextFlags = CONTEXT_FULL};
+};
+
+// Static rather than a stack local of the failing thread: dumpStackProc() outlives its caller's
+// frame whenever SuspendThread() fails, and writing a full-memory dump can take far longer than
+// the caller's sleep. Only one crash is ever dumped, so a single instance is enough.
+static DumpThreadParams globalDumpThreadParams;
+
+static void WriteDump(HANDLE hThread, PEXCEPTION_POINTERS ex, DWORD faultingThreadId)
+{
     static const pfMiniDumpWriteDump MiniDumpWriteDumpAddress =
         Win32FuncResolver::instance()->resolveFunction<pfMiniDumpWriteDump> (
         L"DbgHelp.dll",
@@ -140,9 +174,11 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
 
     MINIDUMP_EXCEPTION_INFORMATION sMDumpExcept;
 
-    sMDumpExcept.ThreadId           = ::GetCurrentThreadId();
-    sMDumpExcept.ExceptionPointers  = ex;
-    sMDumpExcept.ClientPointers     = FALSE;
+    // NOTE: Must be the thread that actually failed, which is not necessarily the caller - the
+    // CRT-failure path writes the dump from a helper thread.
+    sMDumpExcept.ThreadId = faultingThreadId;
+    sMDumpExcept.ExceptionPointers = ex;
+    sMDumpExcept.ClientPointers = FALSE;
 
     // This will generate the full minidump. I don't know the specific
     // requirements of our dump file. If it is used for online report
@@ -173,7 +209,7 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
 
 static void translate( unsigned int code , _EXCEPTION_POINTERS* ExceptionInfo ) {
     Q_UNUSED(code);
-    WriteDump( GetCurrentThread() , ExceptionInfo );
+    WriteDump(GetCurrentThread(), ExceptionInfo, ::GetCurrentThreadId());
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -183,44 +219,78 @@ static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* Exceptio
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-static DWORD WINAPI dumpStackProc( LPVOID lpParam )
+static DWORD WINAPI dumpStackProc(LPVOID /*lpParam*/)
 {
-    //TODO/IMPL
-    HANDLE targetThreadHandle = (HANDLE)lpParam;
+    DumpThreadParams& params = globalDumpThreadParams;
 
-    //suspending thread
-    if( SuspendThread( targetThreadHandle ) == (DWORD)-1 )
-    {
-        //TODO/IMPL
-    }
+    // Suspend the failing thread purely to freeze its memory/registers while the dump is being
+    // written. Its CONTEXT was already captured on that thread itself, at CRT handler entry -
+    // there is no need (and, since the thread has since moved on into this file's own Sleep()
+    // call, no correctness) to fetch it again here via GetThreadContext().
+    SuspendThread(params.targetThreadHandle);
 
-    //getting thread context
-    CONTEXT threadContext;
-    memset( &threadContext, 0, sizeof(threadContext) );
-    threadContext.ContextFlags = (CONTEXT_FULL);
-    if( !GetThreadContext( targetThreadHandle, &threadContext ) )
-    {
-        //TODO/IMPL
-    }
+    EXCEPTION_RECORD exceptionRecord =
+        MakeCrtExceptionRecord(params.exceptionCode, params.context);
+    EXCEPTION_POINTERS exceptionPointers{
+        .ExceptionRecord = &exceptionRecord,
+        .ContextRecord = &params.context};
 
-    WriteDump(targetThreadHandle,NULL);
+    WriteDump(params.targetThreadHandle, &exceptionPointers, params.targetThreadId);
+
     //terminating process
     return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
 }
 
-static void dumpCrtError()
+static void dumpCrtError(DWORD exceptionCode, const CONTEXT& context)
 {
-    //creating thread to dump call stack of current thread
+    globalDumpThreadParams.exceptionCode = exceptionCode;
+    globalDumpThreadParams.context = context;
+
+    // Dump the call stack of this thread from a helper thread, so that this one can be suspended
+    // and its registers/memory frozen while the dump is written.
     HANDLE currentThreadExtHandle = INVALID_HANDLE_VALUE;
-    if( DuplicateHandle( GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &currentThreadExtHandle, 0, FALSE, DUPLICATE_SAME_ACCESS ) &&
-        CreateThread( NULL, 0, dumpStackProc, currentThreadExtHandle, 0, NULL ) != NULL )
+    if (DuplicateHandle(
+        GetCurrentProcess(),
+        GetCurrentThread(),
+        GetCurrentProcess(),
+        &currentThreadExtHandle,
+        0,
+        FALSE,
+        DUPLICATE_SAME_ACCESS))
     {
-        ::Sleep( 10'000 );
-        return;
+        globalDumpThreadParams.targetThreadHandle = currentThreadExtHandle;
+        globalDumpThreadParams.targetThreadId = ::GetCurrentThreadId();
+
+        if (CreateThread(nullptr, 0, dumpStackProc, nullptr, 0, nullptr))
+        {
+            // dumpStackProc() suspends this thread and then terminates the process, so this sleep
+            // normally never elapses. It only matters if SuspendThread() failed, and it has to
+            // outlast writing a full-memory dump, which can take tens of seconds.
+            ::Sleep(120'000);
+            return;
+        }
+
+        ::CloseHandle(currentThreadExtHandle);
     }
-    WriteDump(currentThreadExtHandle,NULL);
-    TerminateProcess( GetCurrentProcess(), 1 );
+
+    // Fallback: the helper thread could not be started, so dump from this thread directly, using
+    // the context already captured by the caller.
+    EXCEPTION_RECORD exceptionRecord = MakeCrtExceptionRecord(exceptionCode, context);
+    EXCEPTION_POINTERS exceptionPointers{
+        .ExceptionRecord = &exceptionRecord,
+        .ContextRecord = const_cast<CONTEXT*>(&context)};
+
+    WriteDump(GetCurrentThread(), &exceptionPointers, ::GetCurrentThreadId());
+    TerminateProcess(GetCurrentProcess(), 1);
 }
+
+// A macro, not a helper: RtlCaptureContext() records the frame of *its* caller, and that PC
+// becomes the dump's ExceptionAddress and hence !analyze's FAILURE_BUCKET_ID. Expanding at the
+// handler keeps that symbol stable; capturing in a helper - or in dumpCrtError(), static with two
+// call sites - would leave it to the inliner.
+#define NX_CAPTURE_CRASH_CONTEXT(name) \
+    CONTEXT name{.ContextFlags = CONTEXT_FULL}; \
+    ::RtlCaptureContext(&name)
 
 static void invalidCrtCallParameterHandler(
    const wchar_t* /*expression*/,
@@ -229,36 +299,39 @@ static void invalidCrtCallParameterHandler(
    unsigned int /*line*/,
    uintptr_t /*pReserved*/ )
 {
-    dumpCrtError();
+    NX_CAPTURE_CRASH_CONTEXT(context);
+    dumpCrtError(kInvalidCrtParameterExceptionCode, context);
 }
 
-static void myPurecallHandler()
+static void pureVirtualCallHandler()
 {
-    dumpCrtError();
+    NX_CAPTURE_CRASH_CONTEXT(context);
+    dumpCrtError(kPureVirtualCallExceptionCode, context);
 }
 
 static void abortHandler(int signal)
 {
     if (signal == SIGABRT)
     {
-        // Cause access violation so abort is handled the same way.
-        // if we call dumpCrtError() here instead minidump will not contain any exception code.
+        // Cause access violation so abort is handled the same way, via the SEH path.
+        // NOTE: dumpCrtError() would now also produce a dump with a usable exception record, but
+        // routing through a genuine SEH exception keeps the real fault context, so it is kept.
         *static_cast<volatile int*>(0) = 7;
     }
 }
 
 void win32_exception::installGlobalUnhandledExceptionHandler()
 {
-     //_set_se_translator( &win32_exception::translate );
-    SetUnhandledExceptionFilter( &unhandledSEHandler );
+    //_set_se_translator(&win32_exception::translate);
+    SetUnhandledExceptionFilter(&unhandledSEHandler);
 
-    // installing CRT handlers (invalid parameter, purecall, etc.)
-    _set_invalid_parameter_handler( invalidCrtCallParameterHandler );
-    _set_purecall_handler( myPurecallHandler );
+    // Install CRT handlers (invalid parameter, pure virtual call, etc.).
+    _set_invalid_parameter_handler(invalidCrtCallParameterHandler);
+    _set_purecall_handler(pureVirtualCallHandler);
 
-    // unhandled c++ exceptions, abort(), etc.
-    signal( SIGABRT, abortHandler );
-    _set_abort_behavior( 0, _WRITE_ABORT_MSG );
+    // Unhandled C++ exceptions, abort(), etc.
+    signal(SIGABRT, abortHandler);
+    _set_abort_behavior(0, _WRITE_ABORT_MSG);
 }
 
 void win32_exception::setCreateFullCrashDump( bool isFull )
@@ -338,7 +411,7 @@ void FWriteFile( HANDLE hFile , const char* fmt , ... ) {
 
 static
 void LegacyDump( HANDLE hThread ) {
-    STACKFRAME64 StackFrame;
+    STACKFRAME64 StackFrame{};
     BOOL bRet;
     PIMAGEHLP_SYMBOL64 pImgSymbol;
     IMAGEHLP_MODULE64 ModuleName;
@@ -363,12 +436,9 @@ void LegacyDump( HANDLE hThread ) {
 
 
     if( pContextRecord ) {
-#ifdef _WIN64
-#else
-        StackFrame.AddrPC.Offset = pContextRecord->Eip;
-        StackFrame.AddrStack.Offset = pContextRecord->Esp;
-        StackFrame.AddrFrame.Offset = pContextRecord->Ebp;
-#endif
+        StackFrame.AddrPC.Offset = pContextRecord->Rip;
+        StackFrame.AddrStack.Offset = pContextRecord->Rsp;
+        StackFrame.AddrFrame.Offset = pContextRecord->Rbp;
     }
 
     StackFrame.AddrPC.Mode = AddrModeFlat;
@@ -387,11 +457,7 @@ void LegacyDump( HANDLE hThread ) {
 
     while( true ) {
         bRet = StackWalk64(
-#ifndef _WIN64
-            IMAGE_FILE_MACHINE_I386,
-#else
             IMAGE_FILE_MACHINE_AMD64,
-#endif
             GetCurrentProcess(),
             hThread,
             &StackFrame,
@@ -406,7 +472,7 @@ void LegacyDump( HANDLE hThread ) {
             return;
         }
 
-        FWriteFile(hFile.get(),"%08x:",StackFrame.AddrPC.Offset);
+        FWriteFile(hFile.get(), "%016llx:", StackFrame.AddrPC.Offset);
         if( SymGetModuleInfo64(GetCurrentProcess(), StackFrame.AddrPC.Offset, &ModuleName) ) {
             FWriteFile(hFile.get()," %s",ModuleName.ModuleName);
         }
@@ -417,7 +483,7 @@ void LegacyDump( HANDLE hThread ) {
             StackFrame.AddrPC.Offset,
             &dwDisp,
             pImgSymbol )) {
-                FWriteFile(hFile.get()," %s() + 0x%x\n",pImgSymbol->Name, dwDisp);
+                FWriteFile(hFile.get(), " %s() + 0x%llx\n", pImgSymbol->Name, dwDisp);
         } else {
             FWriteFile(hFile.get(),"%s","\n");
         }
