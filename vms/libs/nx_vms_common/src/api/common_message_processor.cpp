@@ -1210,7 +1210,7 @@ void QnCommonMessageProcessor::updateResource(
 void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
-            QnResourceParams(camera.id, camera.url, camera.vendor))
+            QnResourceParams(camera.id, camera.url, camera.vendor, camera.model))
         .dynamicCast<QnVirtualCameraResource>();
 
     if (NX_ASSERT(qnCamera, "Unknown resource type: %1", camera.typeId))
