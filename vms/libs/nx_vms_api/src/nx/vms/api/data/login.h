@@ -130,7 +130,6 @@ struct NX_VMS_API LoginSession
 {
     static constexpr std::string_view kTokenPrefix = "vms-";
     static constexpr std::string_view kTicketPrefix = "vmsTicket-";
-    static constexpr int kGeneratedLocalTokenSize = 30;
 
     nx::Uuid id;
     QString username;
