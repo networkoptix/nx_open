@@ -13,10 +13,11 @@ namespace nx::vms::common { class SystemContext; }
 struct QnResourceParams
 {
     QnResourceParams() = default;
-    QnResourceParams(nx::Uuid resID, QString url, QString vendor) noexcept:
+    QnResourceParams(nx::Uuid resID, QString url, QString vendor, QString model = QString()) noexcept:
         resID(std::move(resID)),
         url(std::move(url)),
-        vendor(std::move(vendor))
+        vendor(std::move(vendor)),
+        model(std::move(model))
     {
         NX_ASSERT(!resID.isNull());
     }
@@ -24,6 +25,7 @@ struct QnResourceParams
     nx::Uuid resID;
     QString url;
     QString vendor;
+    QString model;
 };
 
 class NX_VMS_COMMON_API QnResourceFactory
