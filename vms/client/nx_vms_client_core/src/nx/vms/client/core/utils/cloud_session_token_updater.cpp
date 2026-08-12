@@ -3,7 +3,6 @@
 #include "cloud_session_token_updater.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QGuiApplication>
 
 #include <nx/cloud/db/api/connection.h>
 #include <nx/vms/client/core/application_context.h>
@@ -12,6 +11,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/client/core/utils/application_wake_notifier.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
@@ -33,27 +33,11 @@ CloudSessionTokenUpdater::CloudSessionTokenUpdater(QObject* parent):
 {
     m_timer->callOnTimeout([this]() { updateTokenIfNeeded(); });
 
-    connect(qApp, &QGuiApplication::applicationStateChanged, this,
-        [this](Qt::ApplicationState state)
+    connect(appContext()->applicationWakeNotifier(), &ApplicationWakeNotifier::wokeUp, this,
+        [this]()
         {
-            switch (state)
-            {
-                case Qt::ApplicationSuspended:
-                    NX_DEBUG(this, "Application is suspended. "
-                        "Will try to refresh token on awakeness");
-                    m_wasSuspended = true;
-                    break;
-                case Qt::ApplicationActive:
-                    if (m_wasSuspended)
-                    {
-                        NX_DEBUG(this, "Application is active, forcing token update try");
-                        updateTokenIfNeeded();
-                        m_wasSuspended = false;
-                    }
-                    break;
-                default:
-                    break;
-            }
+            NX_DEBUG(this, "Application is active, trying to update the token");
+            updateTokenIfNeeded();
         });
 }
 

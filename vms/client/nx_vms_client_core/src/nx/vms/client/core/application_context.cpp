@@ -46,6 +46,7 @@
 #include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/thumbnails/remote_async_image_provider.h>
 #include <nx/vms/client/core/thumbnails/thumbnail_image_provider.h>
+#include <nx/vms/client/core/utils/application_wake_notifier.h>
 #include <nx/vms/client/core/watchers/cloud_features_watcher.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
@@ -200,6 +201,9 @@ struct ApplicationContext::Private
     const Features features;
 
     std::unique_ptr<ThreadPool::Manager> threadPoolManager{new ThreadPool::Manager()};
+    // Declared before its consumers so that it outlives them.
+    std::unique_ptr<ApplicationWakeNotifier> applicationWakeNotifier{
+        new ApplicationWakeNotifier()};
     std::unique_ptr<QQmlEngine> qmlEngine;
     std::unique_ptr<Settings> settings;
     std::unique_ptr<CloudStatusWatcher> cloudStatusWatcher;
@@ -428,6 +432,11 @@ QQmlEngine* ApplicationContext::qmlEngine() const
 CloudStatusWatcher* ApplicationContext::cloudStatusWatcher() const
 {
     return d->cloudStatusWatcher.get();
+}
+
+ApplicationWakeNotifier* ApplicationContext::applicationWakeNotifier() const
+{
+    return d->applicationWakeNotifier.get();
 }
 
 nx::vms::discovery::Manager* ApplicationContext::moduleDiscoveryManager() const

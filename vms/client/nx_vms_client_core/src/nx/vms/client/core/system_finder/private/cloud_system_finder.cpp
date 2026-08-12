@@ -21,6 +21,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
 #include <nx/vms/client/core/network/abstract_cloud_status_watcher.h>
+#include <nx/vms/client/core/utils/application_wake_notifier.h>
 
 using namespace std::chrono;
 using nx::network::http::ClientPool;
@@ -100,6 +101,10 @@ struct CloudSystemFinder::Private
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
     using SystemsHash = QHash<QString, QnCloudSystemDescriptionPtr>;
     SystemsHash systems;
+    // Ping generation, never reused. A response older than the last applied one is dropped, so a
+    // ping that fails long after a newer one succeeded cannot remove the server it found.
+    uint64_t lastPingId = 0;
+    QHash<QString, uint64_t> lastPingIds;
 
     void pingAllSystems()
     {
@@ -116,6 +121,8 @@ struct CloudSystemFinder::Private
         static const nx::Uuid kAdapterFuncId = nx::Uuid::createUuid();
         NX_VERBOSE(this, "Cloud system <%1>: send moduleInformation request", cloudSystemId);
 
+        const auto pingId = ++lastPingId;
+
         ClientPool::Request request;
         request.method = nx::network::http::Method::get;
         request.url = makeCloudModuleInformationUrl(cloudSystemId);
@@ -124,7 +131,7 @@ struct CloudSystemFinder::Private
             kAdapterFuncId, nx::network::ssl::kAcceptAnyCertificate);
         context->request = request;
         context->completionFunc = nx::utils::AsyncHandlerExecutor(q).bind(
-            [this, cloudSystemId](ClientPool::ContextPtr context)
+            [this, cloudSystemId, pingId](ClientPool::ContextPtr context)
             {
                 const bool success = context->hasSuccessfulResponse();
 
@@ -145,7 +152,7 @@ struct CloudSystemFinder::Private
                 }
 
                 const QByteArray messageBody = context->response.messageBody.toRawByteArray();
-                onRequestCompleteImpl(cloudSystemId, success, messageBody);
+                onRequestCompleteImpl(cloudSystemId, pingId, success, messageBody);
             });
 
         clientPool->sendRequest(context);
@@ -181,10 +188,22 @@ struct CloudSystemFinder::Private
 
     void onRequestCompleteImpl(
         const QString& cloudSystemId,
+        uint64_t pingId,
         bool success,
         const QByteArray& messageBody)
     {
         const NX_MUTEX_LOCKER lock(&mutex);
+        if (pingId <= lastPingIds.value(cloudSystemId))
+        {
+            NX_VERBOSE(this,
+                "Cloud system <%1>: ignoring ping response %2, already applied %3",
+                cloudSystemId,
+                pingId,
+                lastPingIds.value(cloudSystemId));
+            return;
+        }
+        lastPingIds[cloudSystemId] = pingId;
+
         const auto it = systems.find(cloudSystemId);
         if (it == systems.end())
             return;
@@ -197,6 +216,18 @@ struct CloudSystemFinder::Private
                 messageBody, &moduleInformation)
             || cloudSystemId != moduleInformation.cloudSystemId)
         {
+            // A system reachable just before and just after a sleep still fails here, and the
+            // user returns to a tile that went unreachable while nobody could see it. Wait for a
+            // verdict from a ping answered in foreground. Mobile only: elsewhere a non-active
+            // state just means the window lost focus, which says nothing about connectivity.
+            if (appContext()->mode() == ApplicationContext::Mode::mobileClient
+                && appContext()->applicationWakeNotifier()->isInBackground())
+            {
+                NX_VERBOSE(this, "Cloud system <%1>: ping failed in background, keeping the "
+                    "current server", cloudSystemId);
+                return;
+            }
+
             clearServersUnderLock(systemDescription);
             return;
         }
@@ -312,6 +343,9 @@ struct CloudSystemFinder::Private
 
             const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
             NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
+            // Supersede the pings already sent: if a system comes back, it gets a fresh
+            // description, and an answer about the old one must not be applied to it.
+            const auto barrier = ++lastPingId; //< Belongs to no ping, so it discards them all.
             for (const auto& removedCloudId: removedCloudIds)
             {
                 NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
@@ -321,6 +355,7 @@ struct CloudSystemFinder::Private
 
                 removedTargetIds.insert(system->id(), system->localId());
                 systems.remove(removedCloudId);
+                lastPingIds[removedCloudId] = barrier;
             }
 
             updateStateUnderLock(value);
@@ -357,6 +392,18 @@ CloudSystemFinder::CloudSystemFinder(AbstractCloudStatusWatcher* watcher, QObjec
         [this] { d->pingAllSystems(); });
     updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod);
     updateSystemsTimer->start();
+
+    connect(appContext()->applicationWakeNotifier(), &ApplicationWakeNotifier::wokeUp, this,
+        [this]()
+        {
+            // Answers to pings sent before the wake-up are stale: a failure among them would
+            // drop the server and mark the tile unreachable, so discard them. No re-ping here -
+            // the periodic round is usually already in flight and a second one only competes.
+            const NX_MUTEX_LOCKER lock(&d->mutex);
+            const auto barrier = ++d->lastPingId; //< Belongs to no ping, so it discards them all.
+            for (const auto& cloudSystemId: d->systems.keys())
+                d->lastPingIds[cloudSystemId] = barrier;
+        });
 
     d->onCloudStatusChanged(watcher->status());
 }
@@ -395,12 +442,15 @@ SystemDescriptionPtr CloudSystemFinder::getSystem(const QString &id) const
         : (*it).dynamicCast<SystemDescription>());
 }
 
+// Test-only entry point: injects a response as if a ping had just come back. No real request
+// stands behind it, so a fresh id is minted here - it is newer than any applied one, so the
+// staleness check in onRequestCompleteImpl always lets the injected response through.
 void CloudSystemFinder::onRequestComplete(
     const QString& cloudSystemId,
     bool success,
     const QByteArray& messageBody)
 {
-    d->onRequestCompleteImpl(cloudSystemId, success, messageBody);
+    d->onRequestCompleteImpl(cloudSystemId, ++d->lastPingId, success, messageBody);
 }
 
 } // namespace nx::vms::client::core

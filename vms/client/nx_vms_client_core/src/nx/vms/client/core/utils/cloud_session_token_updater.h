@@ -51,7 +51,6 @@ private:
     QTimer* m_timer = nullptr;
     nx::utils::DeadlineTimer m_expirationTimer; //< Countdown timer to the token update request.
     nx::utils::DeadlineTimer m_requestInProgressTimer; //< Means "update request in progress" until expired.
-    bool m_wasSuspended = false;
 };
 
 } // namespace nx::vms::client::core

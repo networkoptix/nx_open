@@ -22,6 +22,7 @@ namespace nx::vms::discovery { class Manager; }
 
 namespace nx::vms::client::core {
 
+class ApplicationWakeNotifier;
 class ColorTheme;
 class CloudFeaturesWatcher;
 class CloudCrossSystemManager;
@@ -122,6 +123,8 @@ public:
     QQmlEngine* qmlEngine() const;
 
     CloudStatusWatcher* cloudStatusWatcher() const;
+
+    ApplicationWakeNotifier* applicationWakeNotifier() const;
 
     nx::vms::discovery::Manager* moduleDiscoveryManager() const;
 
