@@ -85,7 +85,6 @@ Control
                 width: parent.width
                 color: ColorTheme.colors.light16
                 font.pixelSize: 14
-                wrapMode: Text.Wrap
                 elide: Text.ElideRight
             }
 
@@ -98,7 +97,6 @@ Control
                 width: parent.width
                 color: ColorTheme.colors.light10
                 font.pixelSize: 18
-                wrapMode: Text.Wrap
                 elide: Text.ElideRight
             }
         }

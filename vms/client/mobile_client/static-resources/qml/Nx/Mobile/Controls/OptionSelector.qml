@@ -77,11 +77,9 @@ BaseOption
     {
         id: selectorImage
 
-        anchors.verticalCenter: parent.verticalCenter
-        source: lp("/images/open_selector.svg")
-        width: 24
-        height: 24
-        visible: !LayoutController.isTabletLayout
+        source: "image://skin/24x24/Outline/arrow_right_2px.svg?primary=light16"
+        sourceSize.width: 24
+        sourceSize.height: 24
     }
 
     NxObject
