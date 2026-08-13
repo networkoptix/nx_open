@@ -385,7 +385,7 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n Χρήστες</numerusform>
+        <numerusform>%n Χρήστης</numerusform>
         <numerusform>%n Χρήστες</numerusform>
       </translation>
     </message>
@@ -769,8 +769,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
       <translation>
-        <numerusform>Αυτή η λίστα σχετίζεται με τον Κανόνα Συμβάντος %n. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
-        <numerusform>Αυτή η λίστα σχετίζεται με τους Κανόνες Συμβάντος %n. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
+        <numerusform>Αυτή η λίστα σχετίζεται με %n Κανόνα Συμβάντος. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
+        <numerusform>Αυτή η λίστα σχετίζεται με %n Κανόνες Συμβάντος. Είστε βέβαιοι ότι θέλετε να τη διαγράψετε;</numerusform>
       </translation>
     </message>
     <message>
@@ -1252,8 +1252,8 @@ Select an Integration to begin configuring its parameters.</source>
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
       <translation>
-        <numerusform>%n απαιτείται κατάλληλη υπηρεσία ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
-        <numerusform>%n απαιτούνται κατάλληλες υπηρεσίες ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
+        <numerusform>Απαιτείται %n κατάλληλη υπηρεσία ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
+        <numerusform>Απαιτούνται %n κατάλληλες υπηρεσίες ενσωμάτωσης για την ενεργοποίηση της ενσωμάτωσης</numerusform>
       </translation>
     </message>
     <message>
@@ -1800,8 +1800,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>with %n attributes</source>
       <translation>
-        <numerusform>με χαρακτηριστικό %n</numerusform>
-        <numerusform>με χαρακτηριστικά %n</numerusform>
+        <numerusform>με %n χαρακτηριστικό</numerusform>
+        <numerusform>με %n χαρακτηριστικά</numerusform>
       </translation>
     </message>
     <message>
