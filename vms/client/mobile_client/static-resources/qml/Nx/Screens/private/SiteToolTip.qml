@@ -3,6 +3,8 @@
 import QtQuick
 
 import Nx.Controls
+import Nx.Core
+import Nx.Mobile.Controls
 
 ToolTip
 {
@@ -11,10 +13,30 @@ ToolTip
     required property ToolBar toolBar
     readonly property bool available: !!text
 
-    parent: toolBar
-    width: parent.width - 40
-    x: (parent.width - width) / 2
-    y: parent.height - 10
+    target: toolBar
+    width: toolBar.width - 40
+    targetSpacing: -10
+
+    padding: 12
+
+    timeout: 2000
+    closePolicy: ToolTip.CloseOnEscape
+        | ToolTip.CloseOnPressOutsideParent
+        | ToolTip.CloseOnReleaseOutsideParent
+
+    contentItem: Text
+    {
+        text: control.text
+        color: ColorTheme.colors.dark4
+        font.pixelSize: 14
+        lineHeightMode: Text.FixedHeight
+        lineHeight: 21
+        elide: Text.ElideRight
+        horizontalAlignment: Qt.AlignHCenter
+        verticalAlignment: Qt.AlignVCenter
+    }
+
+    onAvailableChanged: close()
 
     Connections
     {

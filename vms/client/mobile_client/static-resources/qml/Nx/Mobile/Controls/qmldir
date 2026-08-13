@@ -26,4 +26,5 @@ TextButton 1.0 TextButton.qml
 TextField 1.0 TextField.qml
 TextInput 1.0 TextInput.qml
 ToolBarButton 1.0 ToolBarButton.qml
+ToolTip 1.0 ToolTip.qml
 WindowBanner 1.0 WindowBanner.qml
