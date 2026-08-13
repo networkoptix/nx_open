@@ -67,7 +67,7 @@
     <name>CustomerSupport</name>
     <message>
       <source>your Regional / License support</source>
-      <translation>την περιφερειακή υποστήριξη / υποστήριξη αδειών χρήσης</translation>
+      <translation>την τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης</translation>
     </message>
   </context>
   <context>
@@ -916,8 +916,8 @@
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation>
-        <numerusform>%n Τοπική υπηρεσία ηχογράφησης</numerusform>
-        <numerusform>%n Τοπικές υπηρεσίες ηχογράφησης</numerusform>
+        <numerusform>%n Τοπική υπηρεσία καταγραφής</numerusform>
+        <numerusform>%n Τοπικές υπηρεσίες καταγραφής</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -965,8 +965,8 @@
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation>
-        <numerusform>%n η ομάδα δεν έχει δικαιώματα %1 για κάποιες από τις επιλεγμένες κάμερες</numerusform>
-        <numerusform>%n οι ομάδες δεν έχουν δικαιώματα %1 για κάποιες από τις επιλεγμένες κάμερες</numerusform>
+        <numerusform>%n ομάδα δεν έχει δικαιώματα %1 για κάποιες από τις επιλεγμένες κάμερες</numerusform>
+        <numerusform>%n ομάδες δεν έχουν δικαιώματα %1 για κάποιες από τις επιλεγμένες κάμερες</numerusform>
       </translation>
     </message>
     <message>
@@ -978,8 +978,8 @@
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation>
-        <numerusform>Ο χρήστης %n δεν έχουν άδεια %1 για ορισμένες από τις επιλεγμένες κάμερες</numerusform>
-        <numerusform>Οι χρήστες %n δεν έχουν άδεια %1 για ορισμένες από τις επιλεγμένες κάμερες</numerusform>
+        <numerusform>%n χρήστης δεν έχει άδεια %1 για ορισμένες από τις επιλεγμένες κάμερες</numerusform>
+        <numerusform>%n χρήστες δεν έχουν άδεια %1 για ορισμένες από τις επιλεγμένες κάμερες</numerusform>
       </translation>
     </message>
     <message>
@@ -993,14 +993,14 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n Κάμερες</numerusform>
+        <numerusform>%n Κάμερα</numerusform>
         <numerusform>%n Κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n κάμερες</numerusform>
+        <numerusform>%n κάμερα</numerusform>
         <numerusform>%n κάμερες</numerusform>
       </translation>
     </message>

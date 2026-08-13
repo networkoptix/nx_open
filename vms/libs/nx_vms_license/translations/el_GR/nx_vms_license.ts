@@ -27,8 +27,8 @@
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>Θα χρησιμοποιηθούν %n εποπλέον %1.</numerusform>
-        <numerusform>Θα χρησιμοποιηθούν %n εποπλέον %1.</numerusform>
+        <numerusform>Θα χρησιμοποιηθούν %n επιπλέον %1.</numerusform>
+        <numerusform>Θα χρησιμοποιηθούν %n επιπλέον %1.</numerusform>
       </translation>
     </message>
   </context>
