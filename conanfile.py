@@ -236,7 +236,7 @@ class NxOpenConan(ConanFile):
         self.requires("boost/1.83.0" "#8a17c6958cbd11aeab9ce0397ae17f33")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#1f59f84a0b451eb017127dd866850b30")
-        self.requires("qt/6.9.1" "#81d64dc5f2297c09fbcb176e964162b4")
+        self.requires("qt/6.9.1" "#7c428335062a3639fb10afdb46a7248e")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
         self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
 
