@@ -219,7 +219,7 @@
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
-      <translation>プレビュー</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>Show on Camera</source>
