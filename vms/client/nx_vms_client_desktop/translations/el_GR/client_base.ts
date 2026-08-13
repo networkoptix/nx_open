@@ -57,8 +57,8 @@
     <message numerus="yes">
       <source>%1 with %n attributes</source>
       <translation>
-        <numerusform>%1 με ιδιότητα %n</numerusform>
-        <numerusform>%1 με ιδιότητες %n</numerusform>
+        <numerusform>%1 με %n ιδιότητα</numerusform>
+        <numerusform>%1 με %n ιδιότητες</numerusform>
       </translation>
     </message>
   </context>
@@ -1386,7 +1386,7 @@
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>Για να ενεργοποιήσετε το Κλειδί Άδειας Χρήσης χειροκίνητα, επικοινωνήστε με την Περιφερειακή Υποστήριξη / Υποστήριξη Άδειας Χρήσης:</translation>
+      <translation>Για να ενεργοποιήσετε το Κλειδί Άδειας Χρήσης χειροκίνητα, επικοινωνήστε με την τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης:</translation>
     </message>
     <message>
       <source>Hardware ID</source>
@@ -1424,7 +1424,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>If your Site does not have access to the Internet, please send the provided License Key and Hardware ID to your Regional / License support team to receive the activation file:</source>
-      <translation>Εάν η Τοποθεσία σας δεν έχει πρόσβαση στο Διαδίκτυο, παρακαλώ στείλτε το παρεχόμενο κλειδί και το αναγνωριστικό υλικού αδειών στην Περιφερειακή Ομάδα Υποστήριξης / Υποστήριξης Αδειών Χρήσης, για να λάβετε το αρχείο ενεργοποίησης:</translation>
+      <translation>Εάν η Τοποθεσία σας δεν έχει πρόσβαση στο Διαδίκτυο, παρακαλώ στείλτε το παρεχόμενο κλειδί και το αναγνωριστικό υλικού αδειών στην τεχνική υποστήριξη της περιοχής σας ή στην υποστήριξη αδειών χρήσης, για να λάβετε το αρχείο ενεργοποίησης:</translation>
     </message>
   </context>
   <context>
@@ -1432,8 +1432,8 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation>
-        <numerusform>Αποτυχία απενεργοποίησης άδειας χρήσης %n</numerusform>
-        <numerusform>Αποτυχία απενεργοποίησης αδειών χρήσης %n</numerusform>
+        <numerusform>Αποτυχία απενεργοποίησης %n άδειας χρήσης</numerusform>
+        <numerusform>Αποτυχία απενεργοποίησης %n αδειών χρήσης</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1481,9 +1481,9 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <comment>Numerus: %n is the count of licenses which can be deactivated</comment>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Απενεργοποίηση %n Άλλου</numerusform>
+        <numerusform>Απενεργοποίηση %n Άλλων</numerusform>
       </translation>
     </message>
   </context>
@@ -1510,45 +1510,45 @@ License Key: %2</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Για να λάβετε ένα έγκυρο Κλειδί Άδειας Χρήσης, επικοινωνήστε με την τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Εάν το πρόβλημα επιμένει, παρακαλούμε επικοινωνήστε με την τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Επικοινωνήστε με την τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης:</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>Η διαδρομή &quot;%1&quot; δεν είναι έγκυρη. Παρακαλώ δοκιμάστε μια άλλη διαδρομή.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>Το αρχείο &quot;%1&quot; υπάρχει ήδη. Δοκιμάστε ένα άλλο όνομα.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Το αρχείο &quot;%1&quot; χρησιμοποιείται από μια άλλη διεργασία.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>Δεν είναι δυνατή η εγγραφή του αρχείου &quot;%1&quot;. Δοκιμάστε ένα άλλο όνομα.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>Το όνομα αρχείου &quot;%1&quot; είναι δεσμευμένο από το λειτουργικό σύστημα. Δοκιμάστε ένα άλλο όνομα.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>Το όνομα αρχείου δεν πρέπει να περιέχει τον ακόλουθο δεσμευμένο χαρακτήρα:</numerusform>
+        <numerusform>Το όνομα αρχείου δεν πρέπει να περιέχει τους ακόλουθους δεσμευμένους χαρακτήρες:</numerusform>
       </translation>
     </message>
   </context>
@@ -1563,11 +1563,11 @@ License Key: %2</source>
     <name>OutgoingMailSettingsWidget::Private</name>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1575,7 +1575,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>URL is not valid.</source>
-      <translation type="unfinished">URL is not valid.</translation>
+      <translation>Η διεύθυνση URL δεν είναι έγκυρη.</translation>
     </message>
     <message>
       <source>Active</source>
@@ -1583,7 +1583,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Not configured</source>
-      <translation type="unfinished">Not configured</translation>
+      <translation>Δεν έχει ρυθμιστεί</translation>
     </message>
     <message>
       <source>Error</source>
@@ -1591,17 +1591,17 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set your email address or SMTP server</source>
-      <translation type="unfinished">Set your email address or SMTP server</translation>
+      <translation>Ορίστε τη διεύθυνση email ή τον διακομιστή SMTP σας</translation>
     </message>
     <message>
       <source>%1 users are receiving emails</source>
       <extracomment>%1 will be substituted with short, non-branded cloud service name e.g. &quot;Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 users are receiving emails</translation>
+      <translation>%1 χρήστες λαμβάνουν emails</translation>
     </message>
     <message>
       <source>%1 is not available</source>
       <extracomment>%1 will be substituted with branded cloud service name e.g. &quot;Nx Cloud&quot;.</extracomment>
-      <translation type="unfinished">%1 is not available</translation>
+      <translation>Το %1 δεν είναι διαθέσιμο</translation>
     </message>
     <message>
       <source>Route via %1</source>
@@ -1691,7 +1691,7 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
-        <numerusform>Ο κωδικός πρόσβασης θα πρέπει να περιέχει %n διαφορετικούς συνδυασμούς χαρακτήρων, συμβόλων ή ψηφίων</numerusform>
+        <numerusform>Ο κωδικός πρόσβασης θα πρέπει να περιέχει %n διαφορετικό συνδυασμό χαρακτήρων, συμβόλων ή ψηφίων</numerusform>
         <numerusform>Οι κωδικοί πρόσβασης θα πρέπει να περιέχουν %n διαφορετικούς συνδυασμούς χαρακτήρων, συμβόλων ή ψηφίων</numerusform>
       </translation>
     </message>
@@ -1718,15 +1718,15 @@ License Key: %2</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long</source>
       <translation>
+        <numerusform>Ο κωδικός πρόσβασης πρέπει να έχει μήκος τουλάχιστον %n χαρακτήρα</numerusform>
         <numerusform>Ο κωδικός πρόσβασης πρέπει να έχει μήκος τουλάχιστον %n χαρακτήρες</numerusform>
-        <numerusform>Οι κωδικοί πρόσβασης πρέπει να έχουν μήκος τουλάχιστον %n χαρακτήρες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
       <translation>
+        <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να έχει περισσότερο από %n χαρακτήρα</numerusform>
         <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να έχει περισσότερους από %n χαρακτήρες</numerusform>
-        <numerusform>Οι κωδικοί πρόσβασης δεν πρέπει να έχουν περισσότερους από %n χαρακτήρες</numerusform>
       </translation>
     </message>
     <message>
@@ -1746,15 +1746,15 @@ License Key: %2</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
       <translation>
         <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να περιέχει %n ή περισσότερους συνεχόμενους χαρακτήρες μαζί</numerusform>
-        <numerusform>Οι κωδικοί πρόσβασης δεν πρέπει να περιέχουν %n ή περισσότερους συνεχόμενους χαρακτήρες μαζί</numerusform>
+        <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να περιέχει %n ή περισσότερους συνεχόμενους χαρακτήρες μαζί</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters</numerusform>
+      <translation>
+        <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να περιέχει %n επαναλαμβανόμενο χαρακτήρα</numerusform>
+        <numerusform>Ο κωδικός πρόσβασης δεν πρέπει να περιέχει %n ή περισσότερους επαναλαμβανόμενους χαρακτήρες</numerusform>
       </translation>
     </message>
   </context>
@@ -1762,42 +1762,42 @@ License Key: %2</source>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>Δεν είναι δυνατή η λήψη της τρέχουσας θέσης από την κάμερα &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Παρακαλώ περιμένετε να συνδεθεί η κάμερα.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>Αποτυχία λήψης της τρέχουσας θέσης</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>Δεν μπορεί να οριστεί η τρέχουσα θέση για την κάμερα &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
+      <translation>Αποτυχία ορισμού τρέχουσας θέσης</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+      <translation>Η προεπιλογή χρησιμοποιείται από ορισμένες περιηγήσεις. Διαγραφή της ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
+      <translation>Αυτές οι περιηγήσεις δεν θα είναι πλέον έγκυρες.</translation>
     </message>
   </context>
   <context>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Η διάταξη είναι κλειδωμένη</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Αυτή η κάμερα δεν υποστηρίζει προηγμένο PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
@@ -1817,34 +1817,34 @@ License Key: %2</source>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>Το PTZ μπορεί να χρησιμοποιηθεί μόνο σε λειτουργία ζωντανής μετάδοσης</translation>
     </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Μεγέθυνση</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Σμίκρυνση</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation type="unfinished">Focus Far</translation>
+      <translation>Εστίαση Μακριά</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation type="unfinished">Focus Near</translation>
+      <translation>Εστίαση Κοντά</translation>
     </message>
     <message>
       <source>Auto Focus</source>
-      <translation type="unfinished">Auto Focus</translation>
+      <translation>Αυτόματη Εστίαση</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation type="unfinished">Change Dewarping Mode</translation>
+      <translation>Αλλαγή λειτουργίας Dewarping</translation>
     </message>
   </context>
   <context>
@@ -1858,35 +1858,35 @@ License Key: %2</source>
     <name>QnAboutDialog</name>
     <message>
       <source>OpenGL version</source>
-      <translation type="unfinished">OpenGL version</translation>
+      <translation>Έκδοση OpenGL</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation type="unfinished">OpenGL renderer</translation>
+      <translation>Μηχανή απόδοσης OpenGL</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation type="unfinished">OpenGL vendor</translation>
+      <translation>Προμηθευτής OpenGL</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
-      <translation type="unfinished">OpenGL max texture size</translation>
+      <translation>Μέγιστο μέγεθος υφής OpenGL</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation type="unfinished">%1 version %2 (%3).</translation>
+      <translation>%1 έκδοση %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation type="unfinished">Built for %1-%2 with %3.</translation>
+      <translation>Κατασκευασμένο για %1-%2 με %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation type="unfinished">Regional / License support</translation>
+      <translation>Τεχνική υποστήριξη της περιοχής σας ή με την υποστήριξη αδειών χρήσης</translation>
     </message>
     <message>
       <source>Partner information</source>
-      <translation type="unfinished">Partner information</translation>
+      <translation>Πληροφορίες συνεργάτη</translation>
     </message>
     <message>
       <source>Phones</source>
@@ -1898,35 +1898,35 @@ License Key: %2</source>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>RHI backend</translation>
     </message>
     <message>
       <source>RHI device</source>
-      <translation type="unfinished">RHI device</translation>
+      <translation>Συσκευή RHI</translation>
     </message>
     <message>
       <source>RHI device ID</source>
-      <translation type="unfinished">RHI device ID</translation>
+      <translation>Αναγνωριστικό συσκευής RHI</translation>
     </message>
     <message>
       <source>RHI vendor ID</source>
-      <translation type="unfinished">RHI vendor ID</translation>
+      <translation>Αναγνωριστικό προμηθευτή RHI</translation>
     </message>
     <message>
       <source>RHI max texture size</source>
-      <translation type="unfinished">RHI max texture size</translation>
+      <translation>Μέγιστο μέγεθος υφής RHI</translation>
     </message>
     <message>
       <source>Graphics API</source>
-      <translation type="unfinished">Graphics API</translation>
+      <translation>API Γραφικών</translation>
     </message>
     <message>
       <source>Unable to get GPU information for %1</source>
-      <translation type="unfinished">Unable to get GPU information for %1</translation>
+      <translation>Δεν είναι δυνατή η λήψη πληροφοριών GPU για %1</translation>
     </message>
     <message>
       <source>Platform</source>
-      <translation type="unfinished">Platform</translation>
+      <translation>Πλατφόρμα</translation>
     </message>
     <message>
       <source>Developer Build</source>
@@ -2142,16 +2142,16 @@ License Key: %2</source>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Λεπτομέρειες για τη συνεδρία %n του %1</numerusform>
-        <numerusform>Λεπτομέρειες για τις συνεδρίες %n του %1</numerusform>
+        <numerusform>Λεπτομέρειες για %n συνεδρία από %1</numerusform>
+        <numerusform>Λεπτομέρειες για %n συνεδρίες από %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Λεπτομέρειες για %n κάμερα του %1</numerusform>
-        <numerusform>Λεπτομέρειες για %n κάμερες του %1</numerusform>
+        <numerusform>Λεπτομέρειες για %n κάμερα από %1</numerusform>
+        <numerusform>Λεπτομέρειες για %n κάμερες από %1</numerusform>
       </translation>
     </message>
     <message>
@@ -2231,19 +2231,19 @@ License Key: %2</source>
     </message>
     <message>
       <source>User removed</source>
-      <translation type="unfinished">User removed</translation>
+      <translation>Ο χρήστης αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Database restored</source>
-      <translation type="unfinished">Database restored</translation>
+      <translation>Η βάση δεδομένων αποκαταστάθηκε</translation>
     </message>
     <message>
       <source>Session begins</source>
-      <translation type="unfinished">Session begins</translation>
+      <translation>Έναρξη συνεδρίας</translation>
     </message>
     <message>
       <source>Session ends</source>
-      <translation type="unfinished">Session ends</translation>
+      <translation>Λήξη συνεδρίας</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -2271,128 +2271,128 @@ License Key: %2</source>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation type="unfinished">Click to expand</translation>
+      <translation>Κάντε κλικ για επέκταση</translation>
     </message>
     <message>
       <source>Device updated</source>
-      <translation type="unfinished">Device updated</translation>
+      <translation>Η συσκευή ενημερώθηκε</translation>
     </message>
     <message>
       <source>Camera updated</source>
-      <translation type="unfinished">Camera updated</translation>
+      <translation>Η κάμερα ενημερώθηκε</translation>
     </message>
     <message>
       <source>Device added</source>
-      <translation type="unfinished">Device added</translation>
+      <translation>Η συσκευή προστέθηκε</translation>
     </message>
     <message>
       <source>Camera added</source>
-      <translation type="unfinished">Camera added</translation>
+      <translation>Η κάμερα προστέθηκε</translation>
     </message>
     <message>
       <source>Device removed</source>
-      <translation type="unfinished">Device removed</translation>
+      <translation>Η συσκευή αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Camera removed</source>
-      <translation type="unfinished">Camera removed</translation>
+      <translation>Η κάμερα αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation type="unfinished">Email settings changed</translation>
+      <translation>Οι ρυθμίσεις του Email άλλαξαν</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation type="unfinished">Filled circle mark means the archive is still available</translation>
+      <translation>Η γεμάτη κυκλική ένδειξη σημαίνει ότι το αρχείο είναι ακόμα διαθέσιμο</translation>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Η ενημέρωση εγκαταστάθηκε</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n ενέργεια</numerusform>
+        <numerusform>%n ενέργειες</numerusform>
       </translation>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Ο κανόνας συμβάντος άλλαξε</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Ο κανόνας συμβάντος αφαιρέθηκε</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Ο αποθηκευτικός χώρος προστέθηκε</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Ο αποθηκευτικός χώρος ενημερώθηκε</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Ο αποθηκευτικός χώρος αφαιρέθηκε</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>Επίθεση MitM</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>Επίθεση MitM από το διακομιστή %1</translation>
     </message>
     <message>
       <source>Connected to %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connected to %1</translation>
+      <translation>Συνδεδεμένο με %1</translation>
     </message>
     <message>
       <source>Disconnected from %1</source>
       <comment>%1 is the Cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnected from %1</translation>
+      <translation>Αποσυνδέθηκε από %1</translation>
     </message>
     <message>
       <source>Connected to %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Connected to %1 via %2</translation>
+      <translation>Συνδέθηκε με %1 μέσω %2</translation>
     </message>
     <message>
       <source>Disconnected from %1 via %2</source>
       <comment>%1 is the Cloud name (like Nx Cloud), %2 is a description of the agent used for establishing the connection (like Nx Witness Desktop Client 6.0.0.0)</comment>
-      <translation type="unfinished">Disconnected from %1 via %2</translation>
+      <translation>Αποσυνδέθηκε από %1 μέσω %2</translation>
     </message>
     <message>
       <source>Site name changed</source>
-      <translation type="unfinished">Site name changed</translation>
+      <translation>Το όνομα της τοποθεσίας άλλαξε</translation>
     </message>
     <message>
       <source>Site merge</source>
-      <translation type="unfinished">Site merge</translation>
+      <translation>Συγχώνευση τοποθεσίας</translation>
     </message>
     <message>
       <source>Server proxy connection</source>
-      <translation type="unfinished">Server proxy connection</translation>
+      <translation>Σύνδεση διακομιστή μεσολάβησης</translation>
     </message>
     <message>
       <source>Site has been updated to version %1</source>
-      <translation type="unfinished">Site has been updated to version %1</translation>
+      <translation>Η τοποθεσία έχει ενημερωθεί στην έκδοση %1</translation>
     </message>
     <message>
       <source>%1 - %2, Duration: %3, Target: %4</source>
       <comment>%1 is start time of proxy connection, %2 is end time of proxy connection, %3 is proxy connection duration, %4 is proxy connection target address</comment>
-      <translation type="unfinished">%1 - %2, Duration: %3, Target: %4</translation>
+      <translation>%1 - %2, Διάρκεια: %3, Στόχος: %4</translation>
     </message>
     <message>
       <source>Start time: %1, Target: %2</source>
       <comment>%1 is start time of proxy connection, %2 is proxy connection target address</comment>
-      <translation type="unfinished">Start time: %1, Target: %2</translation>
+      <translation>Ώρα έναρξης: %1, Στόχος: %2</translation>
     </message>
     <message>
       <source>User IP</source>
-      <translation type="unfinished">User IP</translation>
+      <translation>IP Χρήστη</translation>
     </message>
     <message>
       <source>Device</source>
@@ -2404,11 +2404,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Device IP</source>
-      <translation type="unfinished">Device IP</translation>
+      <translation>Ip Συσκευής</translation>
     </message>
     <message>
       <source>Camera IP</source>
-      <translation type="unfinished">Camera IP</translation>
+      <translation>IP Κάμερας</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2416,16 +2416,16 @@ License Key: %2</source>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
-      <translation type="unfinished">This action was performed by a plugin.</translation>
+      <translation>Αυτή η ενέργεια εκτελέστηκε από ένα πρόσθετο (plugin).</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Έχετε %n ειδοποιήση</numerusform>
+        <numerusform>Έχετε %n ειδοποιήσεις</numerusform>
       </translation>
     </message>
   </context>
@@ -2433,19 +2433,19 @@ License Key: %2</source>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>Να μην κλειδωθεί το αρχείο</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 μήνας</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 μήνες</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 μήνες</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -2453,11 +2453,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>Η περιγραφή δεν μπορεί να είναι κενή</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Έτος</translation>
     </message>
   </context>
   <context>
@@ -2465,7 +2465,7 @@ License Key: %2</source>
     <message>
       <source>%1 Running</source>
       <comment>%1 will be substituted with desktop client display name, e.g &apos;NX Witness Client&apos;</comment>
-      <translation type="unfinished">%1 Running</translation>
+      <translation>%1 Εκτελείται</translation>
     </message>
   </context>
   <context>
@@ -2476,7 +2476,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Δημιουργία και κοινοποίηση...</translation>
     </message>
   </context>
   <context>
@@ -2487,78 +2487,78 @@ License Key: %2</source>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation type="unfinished">FAILED: %1</translation>
+      <translation>ΑΠΟΤΥΧΙΑ: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation type="unfinished">Confirming server availability.</translation>
+      <translation>Επιβεβαίωση διαθεσιμότητας διακομιστή.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation type="unfinished">Evaluating media stream for errors.</translation>
+      <translation>Έλεγχος της ροής πολυμέσων για σφάλματα.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation type="unfinished">Diagnostics for device %1</translation>
+      <translation>Διαγνωστικά για τη συσκευή %1</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation type="unfinished">Diagnostics for camera %1</translation>
+      <translation>Διαγνωστικά για την κάμερα %1</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation type="unfinished">Device Diagnostics</translation>
+      <translation>Διαγνωστικά Συσκευής</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation type="unfinished">Camera Diagnostics</translation>
+      <translation>Διαγνωστικά Κάμερας</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation type="unfinished">Confirming device is accessible.</translation>
+      <translation>Επιβεβαίωση προσβασιμότητας της συσκευής.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation type="unfinished">Confirming camera is accessible.</translation>
+      <translation>Επιβεβαίωση προσβασιμότητας της κάμερας.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation type="unfinished">Confirming target device provides media stream.</translation>
+      <translation>Επιβεβαίωση ότι η συσκευή-στόχος παρέχει ροή πολυμέσων.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation type="unfinished">Confirming target camera provides media stream.</translation>
+      <translation>Η επιβεβαίωση ότι η κάμερα-στόχος παρέχει ροή πολυμέσων.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation type="unfinished">Diagnostics for I/O module %1</translation>
+      <translation>Διαγνωστικά για μονάδα εισόδου/εξόδου %1</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation type="unfinished">I/O Module Diagnostics</translation>
+      <translation>Διαγνωστικά μονάδας εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation type="unfinished">Confirming I/O module is accessible.</translation>
+      <translation>Επιβεβαίωση ότι η μονάδα εισόδου/εξόδου είναι προσβάσιμη.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
+      <translation>Επιβεβαίωση ότι η μονάδα εισόδου/εξόδου προορισμού παρέχει ροή πολυμέσων.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation type="unfinished">Diagnostics complete</translation>
+      <translation>Τα διαγνωστικά ολοκληρώθηκαν</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Αντιγραφή επιλογής στο πρόχειρο</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Εξαγωγή επιλογής σε αρχείο...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2574,46 +2574,46 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>Βρέθηκε %n συσκευή</numerusform>
+        <numerusform>Βρέθηκαν %n συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>Βρέθηκε %n κάμερα</numerusform>
+        <numerusform>Βρέθηκαν %n κάμερες</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation type="unfinished">Export selected devices to a file.</translation>
+      <translation>Εξαγωγή επιλεγμένων συσκευών σε ένα αρχείο.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation type="unfinished">Export selected cameras to a file.</translation>
+      <translation>Εξαγωγή επιλεγμένων καμερών σε αρχείο.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>Βρέθηκε %n μονάδα εισόδου/εξόδου</numerusform>
+        <numerusform>Βρέθηκαν %n μονάδες εισόδου/εξόδου</numerusform>
       </translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Δεν υπάρχουν κάμερες</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Devices List for %1</translation>
+      <translation>Λίστα συσκευών για %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Cameras List for %1</translation>
+      <translation>Λίστα καμερών για %1</translation>
     </message>
   </context>
   <context>
@@ -2640,11 +2640,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation type="unfinished">IP/Name</translation>
+      <translation>IP/Όνομα</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation type="unfinished">MAC address</translation>
+      <translation>Διεύθυνση MAC</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2652,7 +2652,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>Αναγνωριστικό (ID)</translation>
     </message>
     <message>
       <source>Logical ID</source>
@@ -2671,11 +2671,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>Ο κωδικός πρόσβασης πρέπει να έχει μήκος τουλάχιστον 8 χαρακτήρων και να περιέχει διαφορετικούς τύπους χαρακτήρων.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>Ο κωδικός πρόσβασης δεν πρέπει να είναι ίδιος με το όνομα χρήστη της κάμερας</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2702,11 +2702,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
-      <translation type="unfinished">To modify your password please enter the existing one</translation>
+      <translation>Για να τροποποιήσετε τον κωδικό πρόσβασής σας, παρακαλούμε εισάγετε τον υπάρχοντα</translation>
     </message>
     <message>
       <source>Invalid current password</source>
-      <translation type="unfinished">Invalid current password</translation>
+      <translation>Μη έγκυρος κωδικός πρόσβασης</translation>
     </message>
   </context>
   <context>
@@ -2723,37 +2723,37 @@ License Key: %2</source>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect Site from %1</translation>
+      <translation>Αποσύνδεση τοποθεσίας από το %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1...</translation>
+      <translation>Σύνδεση τοποθεσίας με %1...</translation>
     </message>
     <message>
       <source>There is currently no connection between your site and %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">There is currently no connection between your site and %1.</translation>
+      <translation>Δεν υπάρχει αυτήν τη στιγμή σύνδεση μεταξύ της τοποθεσίας σας και του %1.</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect Site from %1</translation>
+      <translation>Εισαγάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να αποσυνδέσετε την τοποθεσία σας από το %1</translation>
     </message>
     <message>
       <source>Cannot disconnect the Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the Site from %1</translation>
+      <translation>Δεν είναι δυνατή η αποσύνδεση της τοποθεσίας από το %1</translation>
     </message>
     <message>
       <source>Site disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site disconnected from %1</translation>
+      <translation>Η τοποθεσία αποσυνδέθηκε από το %1</translation>
     </message>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">Disconnect site from %1?</translation>
+      <translation>Αποσύνδεση τοποθεσίας από το %1;</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
@@ -2762,7 +2762,7 @@ License Key: %2</source>
     <message>
       <source>All %1 users will be removed from the site</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be removed from the site</translation>
+      <translation>Όλοι οι χρήστες %1 θα αφαιρεθούν από την τοποθεσία</translation>
     </message>
     <message>
       <source>You will be logged out of the site. The site will be accessible only via local network</source>
@@ -2778,14 +2778,14 @@ License Key: %2</source>
     </message>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>Αυτή η ενέργεια δεν μπορεί να ανεραιθεί</translation>
     </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Επιτυχία.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
@@ -2793,11 +2793,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Η ζητούμενη λειτουργία δεν επιτρέπεται με τα παρεχόμενα διαπιστευτήρια.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Αυτός ο λογαριασμός δεν έχει ενεργοποιηθεί. Παρακαλώ ελέγξτε το email σας.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2805,25 +2805,25 @@ License Key: %2</source>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Network error. Please check your Internet connection and try again.</translation>
+      <translation>Σφάλμα δικτύου. Ελέγξτε τη σύνδεσή σας στο Διαδίκτυο και προσπαθήστε ξανά.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Μη έγκυρη σύνδεση.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 is temporary unavailable. Please try again later.</translation>
+      <translation>Το %1 δεν είναι προσωρινά διαθέσιμο. Παρακαλώ δοκιμάστε ξανά αργότερα.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Τα διαπιστευτήρια δεν είναι πλέον έγκυρα.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Εσωτερικό σφάλμα %1. Επικοινωνήστε με την ομάδα υποστήριξης.</translation>
     </message>
   </context>
   <context>
@@ -2834,16 +2834,16 @@ License Key: %2</source>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>Ο λογαριασμός δεν είναι ενεργοποιημένος.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Παρακαλούμε συνδεθείτε στο %1 και ακολουθήστε τις παρεχόμενες οδηγίες.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Μη έγκυρος κωδικός πρόσβασης</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2887,7 +2887,7 @@ License Key: %2</source>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Παρακαλώ κλείστε την εφαρμογή και ξεκινήστε την ξανά χρησιμοποιώντας τη συντόμευση στο μενού έναρξης.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
@@ -2895,21 +2895,21 @@ License Key: %2</source>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>Ο Client και ο Διακομιστής έχουν διαφορετικές εκδόσεις</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Client - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Διακομιστής - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Λήψη έκδοσης Client %1;</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2917,7 +2917,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>Αποτυχία λήψης και εκκίνησης της έκδοσης %1</translation>
     </message>
     <message>
       <source>Try Again</source>
@@ -2925,27 +2925,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>Αποτυχία επανεκκίνησης του %1 σε λειτουργία συμβατότητας</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Παρακαλώ κλείστε το %1 και ξεκινήστε το ξανά χρησιμοποιώντας τη συντόμευση στο μενού έναρξης.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>Πρέπει να κατεβάσετε μια άλλη έκδοση του %1 για να συνδεθείτε σε αυτόν τον διακομιστή.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>Πρέπει να επανεκκινήσετε τον %1 σε λειτουργία συμβατότητας για να συνδεθείτε σε αυτόν τον διακομιστή.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Επανεκκίνηση του %1 σε λειτουργία συμβατότητας;</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation type="unfinished">Failed to restart %1</translation>
+      <translation>Αποτυχία επανεκκίνησης %1</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -2953,11 +2953,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Αποτυχία εισόδου σε λειτουργία συμβατότητας για την έκδοση %1</translation>
     </message>
     <message>
       <source>Log In...</source>
-      <translation type="unfinished">Log In...</translation>
+      <translation>Σύνδεση...</translation>
     </message>
     <message>
       <source>Your session has expired</source>
@@ -2965,62 +2965,62 @@ License Key: %2</source>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
-      <translation type="unfinished">Please sign in again with your link to continue</translation>
+      <translation>Παρακαλώ συνδεθείτε ξανά με το σύνδεσμο για να συνεχίσετε</translation>
     </message>
     <message>
       <source>Site is not compatible with two-factor authentication</source>
-      <translation type="unfinished">Site is not compatible with two-factor authentication</translation>
+      <translation>Η τοποθεσία δεν είναι συμβατή με τον έλεγχο ταυτότητας δύο παραγόντων</translation>
     </message>
     <message>
       <source>Failed to log in to Site &quot;%1&quot;</source>
-      <translation type="unfinished">Failed to log in to Site &quot;%1&quot;</translation>
+      <translation>Αποτυχία σύνδεσης στην Τοποθεσία &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Αποθήκευση Αντιγράφου Ασφαλείας Βάσης Δεδομένων...</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
+      <translation>Γίνεται λήψη αντιγράφου ασφαλείας της βάσης δεδομένων από τον διακομιστή. Παρακαλώ περιμένετε.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation type="unfinished">Open Database Backup...</translation>
+      <translation>Άνοιγμα Αντιγράφου Ασφαλείας Βάσης Δεδομένων...</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
+      <translation>Γίνεται μεταφόρτωση αντιγράφου ασφαλείας της βάσης δεδομένων στον διακομιστή. Παρακαλώ περιμένετε.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation type="unfinished">Failed to back up database</translation>
+      <translation>Αποτυχία δημιουργίας αντιγράφου ασφαλείας της βάσης δεδομένων</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation type="unfinished">Database backed up to file</translation>
+      <translation>Δημιουργήθηκε αντίγραφο ασφαλείας της βάσης δεδομένων σε αρχείο</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Αποτυχία ανοίγματος αρχείου</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation type="unfinished">Failed to restore database</translation>
+      <translation>Η επαναφορά της βάσης δεδομένων απέτυχε</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Αρχεία Αντιγράφων Ασφαλείας Βάσης Δεδομένων</translation>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Αποθήκευση Αντιγράφου Ασφαλείας Βάσης Δεδομένων</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Εισάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να δημιουργήσετε αντίγραφο ασφαλείας</translation>
     </message>
     <message>
       <source>Create</source>
@@ -3028,7 +3028,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Επαναφορά από αντίγραφο ασφαλείας βάσης δεδομένων</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -3036,48 +3036,48 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation type="unfinished">Restore database?</translation>
+      <translation>Επαναφορά βάσης δεδομένων;</translation>
     </message>
     <message>
       <source>Database successfully restored. Server application will restart shortly.</source>
-      <translation type="unfinished">Database successfully restored. Server application will restart shortly.</translation>
+      <translation>Η βάση δεδομένων επαναφέρθηκε με επιτυχία. Η εφαρμογή διακομιστή θα επανεκκινηθεί σύντομα.</translation>
     </message>
     <message>
       <source>Site configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">Site configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>Θα γίνει επαναφορά της ρύθμισης παραμέτρων τοποθεσίας από την δημιουργία αντιγράφων ασφαλείας, θα γίνει επανεκκίνηση του διακομιστή.</translation>
     </message>
     <message>
       <source>Enter your account password to restore Site from backup</source>
-      <translation type="unfinished">Enter your account password to restore Site from backup</translation>
+      <translation>Εισαγάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να επαναφέρετε την τοποθεσία από αντίγραφο ασφαλείας</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Αντικατάσταση υπάρχοντος αρχείου;</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>Η αντικατάσταση του αρχείου απέτυχε</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>Τα προγράμματα οδήγησης της κάρτας βίντεο (Video card drivers) δεν είναι ενημερωμένα ή δεν έχουν εγκατασταθεί</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>Το %1 ενδέχεται να μην λειτουργεί σωστά.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>Ο φάκελος έχει ήδη προστεθεί</translation>
     </message>
     <message>
       <source>None</source>
@@ -3085,26 +3085,26 @@ License Key: %2</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Αυτόματο (%1)</translation>
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Επιλογή Φακέλου...</translation>
     </message>
     <message>
       <source>Notifications filters are moved to the right panel</source>
-      <translation type="unfinished">Notifications filters are moved to the right panel</translation>
+      <translation>Τα φίλτρα ειδοποιήσεων μετακινούνται στον δεξιό πίνακα</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Άνοιγμα αρχείου καταγραφής συμβάντων</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Άνοιγμα Λίστας Σελιδοδεικτών</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3124,27 +3124,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Λίστα Συσκευών</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Λίστα Καμερών</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Ανοίξτε Διαχείριση Κανόνων Γεγονότων</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Άνοιγμα Αρχείου Καταγραφής Διαδρομής Ελέγχου</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Άνοιγμα Λίστας Συσκευών</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Άνοιγμα Λίστας Καμερών</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -3152,14 +3152,14 @@ License Key: %2</source>
     </message>
     <message>
       <source>Open Integrations</source>
-      <translation type="unfinished">Open Integrations</translation>
+      <translation>Άνοιγμα Ενσωματώσεων</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gamma %1</translation>
     </message>
   </context>
   <context>
@@ -3170,7 +3170,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Προεπιλεγμένη κατάσταση</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3189,12 +3189,12 @@ License Key: %2</source>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Είσοδος</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Έξοδος</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -3204,16 +3204,16 @@ License Key: %2</source>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Γειωμένο κύκλωμα</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Μη έγκυρη κατάσταση</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>Με κλικ</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -3222,50 +3222,50 @@ License Key: %2</source>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Ανοιχτό κύκλωμα</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Εναλλαγή κατάστασης</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Ώθηση</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>Αναγνωριστικό (ID)</translation>
     </message>
   </context>
   <context>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Παρακαλώ εισάγετε μια τιμή.</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Παρακαλώ εισάγετε έναν κωδικό πρόσβασης.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>Αποτυχία απενεργοποίησης της θύρας εισόδου/εξόδου %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>Αποτυχία ενεργοποίησης της θύρας εισόδου/εξόδου %1</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Τύπος Άδειας</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3273,7 +3273,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
+      <translation>Κλειδωμένο στο αναγνωριστικό υλικού</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -3285,19 +3285,19 @@ License Key: %2</source>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Επιτρέπονται οθόνες</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Επιτρέπονται Συνεδρίες Ελέγχου</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Επιτρέπονται Ροές Αρχείου</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Απενεργοποιήσεις που απομένουν</translation>
     </message>
   </context>
   <context>
@@ -3344,7 +3344,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>Η άδεια είναι ενεργή</translation>
     </message>
     <message>
       <source>License is expired</source>
@@ -3352,21 +3352,21 @@ License Key: %2</source>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Λήγει σύντομα</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>Η άδεια λήγει σήμερα</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>Η άδεια λήγει αύριο</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>Η άδεια λήγει σε %n ημέρα</numerusform>
+        <numerusform>Η άδεια λήγει σε %n ημέρες</numerusform>
       </translation>
     </message>
     <message>
@@ -3375,39 +3375,39 @@ License Key: %2</source>
     </message>
     <message>
       <source>Not verified</source>
-      <translation type="unfinished">Not verified</translation>
+      <translation>Δεν έχει επαληθευτεί</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Ενεργοποίηση Δοκιμαστικής Άδειας</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation type="unfinished">Open License File</translation>
+      <translation>Άνοιγμα Αρχείου Άδειας</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>Αποτυχία ανοίγματος αρχείου</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Για να λάβετε ένα αρχείο Κλειδιού ενεργοποίησης, στείλτε το παρεχόμενο Κλειδί άδειας χρήσης και το Αναγνωριστικό υλικού στη διεύθυνση %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Παρακαλώ στείλτε το παρεχόμενο κλειδί άδειας και το αναγνωριστικό υλικού στην τεχνική υποστήριξη της περιοχής σας ή στην υποστήριξη αδειών χρήσης για να αποκτήσετε ένα βασικό αρχείο ενεργοποίησης.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Παρακαλούμε στείλτε το παρεχόμενο κλειδί και το αναγνωριστικό υλικού άδειας χρήσης στην τεχνική υποστήριξη της περιοχής σας ή στην υποστήριξη αδειών χρήσης (%1) για να αποκτήσετε ένα αρχείο Κλειδιού ενεργοποίησης.</translation>
     </message>
     <message>
       <source>Text Files</source>
-      <translation type="unfinished">Text Files</translation>
+      <translation>Αρχεία Κειμένου</translation>
     </message>
   </context>
   <context>
@@ -3422,7 +3422,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation type="unfinished">Screen Recording</translation>
+      <translation>Καταγραφή Οθόνης</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -3430,34 +3430,34 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restart required</source>
-      <translation type="unfinished">Restart required</translation>
+      <translation>Απαιτείται επανεκκίνηση</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation type="unfinished">Restart Now</translation>
+      <translation>Επανεκκίνηση Τώρα</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation type="unfinished">Restart Later</translation>
+      <translation>Επανεκκίνηση Αργότερα</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
+      <translation>Ορισμένες αλλαγές θα τεθούν σε ισχύ μόνο μετά την επανεκκίνηση %1</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Οι ρυθμίσεις είναι μόνο για ανάγνωση. Επικοινωνήστε με τον διαχειριστή της τοποθεσίας σας. Όλες οι αλλαγές θα χαθούν μετά τον τερματισμό του προγράμματος.</translation>
     </message>
   </context>
   <context>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation type="unfinished">Preparing Image...</translation>
+      <translation>Προετοιμασία Εικόνας...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
-      <translation type="unfinished">Please wait while image is being prepared...</translation>
+      <translation>Παρακαλώ περιμένετε όσο προετοιμάζεται η εικόνα...</translation>
     </message>
     <message>
       <source>Server Time</source>
@@ -3465,27 +3465,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>Client Time</source>
-      <translation type="unfinished">Client Time</translation>
+      <translation>Ώρα του Client</translation>
     </message>
     <message>
       <source>Stretch</source>
-      <translation type="unfinished">Stretch</translation>
+      <translation>Τέντωμα</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation type="unfinished">Fit</translation>
+      <translation>Προσαρμογή</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation type="unfinished">Crop</translation>
+      <translation>Περικοπή</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation>Αυτή η επιλογή δεν θα επηρεάσει το Πρόγραμμα Εγγραφής. Το Πρόγραμμα Εγγραφής βασίζεται πάντα στην ώρα του διακομιστή.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Επιλογή Αρχείου...</translation>
     </message>
     <message>
       <source>No image</source>
@@ -3493,15 +3493,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation type="unfinished">Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</translation>
+      <translation>Ορίζει την ώρα που θα χρησιμοποιείται στον client (χρονοδιάγραμμα, χρονικές σημάνσεις κ.λπ.) όταν οι client και οι διακομιστές βρίσκονται σε διαφορετικές ζώνες ώρας.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation type="unfinished">Length of time each camera on layout will be displayed if you start a Tour.</translation>
+      <translation>Χρονική διάρκεια εμφάνισης κάθε κάμερας στη διάταξη, εάν ξεκινήσετε μια περιήγηση.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
-      <translation type="unfinished">Displays IP addresses for cameras and servers.</translation>
+      <translation>Εμφανίζει διευθύνσεις IP για κάμερες και διακομιστές.</translation>
     </message>
   </context>
   <context>
@@ -3520,7 +3520,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation type="unfinished">Create Zoom Window</translation>
+      <translation>Δημιουργία Παραθύρου Εστίασης</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -3532,7 +3532,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation type="unfinished">%1 (Tour &quot;%2&quot; is active)</translation>
+      <translation>%1 (Η περιήγηση &quot;%2&quot; είναι ενεργή)</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -3544,15 +3544,15 @@ License Key: %2</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Μεγέθυνση Περιοχής</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Αναζήτηση Κίνησης</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Αναζήτηση Αντικειμένου</translation>
     </message>
     <message>
       <source>Hotspots</source>
@@ -3560,13 +3560,13 @@ License Key: %2</source>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Σίγαση</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
+      <translation>
+        <numerusform>Ορισμός για %n συσκευή</numerusform>
+        <numerusform>Ορισμός για %n συσκευές</numerusform>
       </translation>
     </message>
   </context>
@@ -3586,7 +3586,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Παράλειψη</translation>
     </message>
     <message>
       <source>Close</source>
@@ -3605,7 +3605,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Εικονική Κάμερα %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -3617,83 +3617,83 @@ License Key: %2</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your Site and be accessed by any user.</translation>
+      <translation>Η &quot;Εικονική Κάμερα&quot; είναι ένας εικονικός χώρος αποθήκευσης αρχείων βίντεο, τα οποία μπορούν να μεταφορτωθούν σε οποιονδήποτε διακομιστή στην Τοποθεσία σας και να έχουν πρόσβαση σε αυτά οποιοσδήποτε χρήστης.</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation type="unfinished">Clip sound up to %1 seconds</translation>
+      <translation>Κλιπ ήχου έως %1 δευτερόλεπτα</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation type="unfinished">Rename sound</translation>
+      <translation>Μετονομασία ήχου</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation type="unfinished">Custom title:</translation>
+      <translation>Προσαρμοσμένος τίτλος:</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation type="unfinished">Sound Files</translation>
+      <translation>Αρχεία Ήχου</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Επιλογή Αρχείου...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation type="unfinished">Enter New Title:</translation>
+      <translation>Εισάγετε Νέο Τίτλο:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation type="unfinished">Failed to add file</translation>
+      <translation>Αποτυχία προσθήκης αρχείου</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation type="unfinished">Failed to set new title</translation>
+      <translation>Αποτυχία ορισμού νέου τίτλου</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation type="unfinished">Delete sound?</translation>
+      <translation>Διαγραφή ήχου;</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation type="unfinished">Downloading sound list...</translation>
+      <translation>Λήψη λίστας ήχων...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation type="unfinished">No Sound</translation>
+      <translation>Χωρίς Ήχο</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation type="unfinished">Downloading sound...</translation>
+      <translation>Λήψη ήχου...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation type="unfinished">Uploading sound...</translation>
+      <translation>Μεταφόρτωση ήχου...</translation>
     </message>
   </context>
   <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Περιστροφή</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation type="unfinished">Manage PTZ for %1...</translation>
+      <translation>Διαχείριση PTZ για %1...</translation>
     </message>
     <message>
       <source>Apply changes before exiting?</source>
-      <translation type="unfinished">Apply changes before exiting?</translation>
+      <translation>Εφαρμογή αλλαγών πριν από την έξοδο;</translation>
     </message>
   </context>
   <context>
@@ -3716,11 +3716,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Tours</source>
-      <translation type="unfinished">Tours</translation>
+      <translation>Περιηγήσεις</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation type="unfinished">Positions</translation>
+      <translation>Θέσεις</translation>
     </message>
     <message>
       <source>None</source>
@@ -3728,47 +3728,47 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
-      <translation type="unfinished">
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
-        <numerusform>This preset will be activated after %n minutes of inactivity</numerusform>
+      <translation>
+        <numerusform>Αυτή η προεπιλογή θα ενεργοποιηθεί μετά από %n λεπτό αδράνειας</numerusform>
+        <numerusform>Αυτή η προεπιλογή θα ενεργοποιηθεί μετά από %n λεπτά αδράνειας</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
-      <translation type="unfinished">
-        <numerusform>Tour has %n identical positions</numerusform>
-        <numerusform>Tour has %n identical positions</numerusform>
+      <translation>
+        <numerusform>Η περιήγηση έχει %n πανομοιότυπη θέση</numerusform>
+        <numerusform>Η περιήγηση έχει %n πανομοιότυπες θέσεις</numerusform>
       </translation>
     </message>
     <message>
       <source>less than a minute</source>
-      <translation type="unfinished">less than a minute</translation>
+      <translation>λιγότερο από ένα λεπτό</translation>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation type="unfinished">Invalid tour</translation>
+      <translation>Μη έγκυρη περιήγηση</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation type="unfinished">New Tour %1</translation>
+      <translation>Νέα Περιήγηση %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Αποθηκευμένη Θέση %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation type="unfinished">Tour should contain at least 2 positions.</translation>
+      <translation>Η περιήγηση πρέπει να περιέχει τουλάχιστον 2 θέσεις.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation type="unfinished">Tour Time: %1.</translation>
+      <translation>Χρόνος Περιήγησης: %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>περίπου %n λεπτό</numerusform>
+        <numerusform>περίπου %n λεπτά</numerusform>
       </translation>
     </message>
   </context>
@@ -3776,7 +3776,7 @@ License Key: %2</source>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation type="unfinished">Saved Position %1</translation>
+      <translation>Αποθηκευμένη Θέση %1</translation>
     </message>
     <message>
       <source>None</source>
@@ -3791,22 +3791,22 @@ License Key: %2</source>
     </message>
     <message>
       <source>Reassign</source>
-      <translation type="unfinished">Reassign</translation>
+      <translation>Επανεκχώρηση</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by preset &quot;%1&quot;</translation>
+      <translation>Πλήκτρο συντόμευσης που χρησιμοποιείται από προεπιλογή &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
+      <translation>Πλήκτρο συντόμευσης που χρησιμοποιείται από την περιήγηση &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>QnPtzTourSpotsModel</name>
     <message>
       <source>Lowest</source>
-      <translation type="unfinished">Lowest</translation>
+      <translation>Χαμηλότερο</translation>
     </message>
     <message>
       <source>Low</source>
@@ -3814,7 +3814,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Normal</source>
-      <translation type="unfinished">Normal</translation>
+      <translation>Κανονικό</translation>
     </message>
     <message>
       <source>High</source>
@@ -3822,19 +3822,19 @@ License Key: %2</source>
     </message>
     <message>
       <source>Highest</source>
-      <translation type="unfinished">Highest</translation>
+      <translation>Υψηλότερο</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Στιγμιαίο</translation>
     </message>
     <message>
       <source>Position</source>
-      <translation type="unfinished">Position</translation>
+      <translation>Θέση</translation>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation type="unfinished">Stay Time</translation>
+      <translation>Χρόνος Παραμονής</translation>
     </message>
     <message>
       <source>Speed</source>
@@ -3849,30 +3849,30 @@ License Key: %2</source>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation type="unfinished">Cameras from other servers and removed cameras</translation>
+      <translation>Κάμερες από άλλους διακομιστές και αφαιρεμένες κάμερες</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n devices</numerusform>
-        <numerusform>Total %1 %n devices</numerusform>
+      <translation>
+        <numerusform>Σύνολο %1 %n συσκευή</numerusform>
+        <numerusform>Σύνολο %1 %n συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n cameras</numerusform>
-        <numerusform>Total %1 %n cameras</numerusform>
+      <translation>
+        <numerusform>Σύνολο %1 %n κάμερα</numerusform>
+        <numerusform>Σύνολο %1 %n κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
-      <translation type="unfinished">
-        <numerusform>Total %1 %n I/O modules</numerusform>
-        <numerusform>Total %1 %n I/O modules</numerusform>
+      <translation>
+        <numerusform>Σύνολο %1 %n μονάδα εισόδου/εξόδου</numerusform>
+        <numerusform>Σύνολο %1 %n μονάδες εισόδου/εξόδου</numerusform>
       </translation>
     </message>
   </context>
@@ -3884,7 +3884,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation type="unfinished">Calendar Days</translation>
+      <translation>Ημερολογιακές ημέρες</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -3908,7 +3908,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Τρέχων ρυθμός μετάδοσης Bit (Bitrate)</translation>
     </message>
   </context>
   <context>
@@ -3938,7 +3938,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Είσοδος σε πλήρη οθόνη</translation>
     </message>
     <message>
       <source>Zoom Window</source>
@@ -3946,7 +3946,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Move to a dedicated window</source>
-      <translation type="unfinished">Move to a dedicated window</translation>
+      <translation>Μετακίνηση σε ένα ειδικό παράθυρο</translation>
     </message>
   </context>
   <context>
@@ -3969,26 +3969,26 @@ License Key: %2</source>
     </message>
     <message>
       <source>URL already added</source>
-      <translation type="unfinished">URL already added</translation>
+      <translation>Η διεύθυνση URL έχει ήδη προστεθεί</translation>
     </message>
   </context>
   <context>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>Επάνω αριστερή γωνία</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>Επάνω δεξιά γωνία</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>Κάτω αριστερή γωνία</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>Κάτω δεξιά γωνία</translation>
     </message>
   </context>
   <context>
@@ -4014,11 +4014,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Ώρα έναρξης</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Μήκος</translation>
     </message>
     <message>
       <source>Tags</source>
@@ -4034,7 +4034,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Δημιουργός</translation>
     </message>
     <message>
       <source>Description</source>
@@ -4061,22 +4061,22 @@ License Key: %2</source>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation type="unfinished">Select devices...</translation>
+      <translation>Επιλογή συσκευών...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation type="unfinished">Select cameras...</translation>
+      <translation>Επιλογή καμερών...</translation>
     </message>
   </context>
   <context>
     <name>QnSelectLayoutsButton</name>
     <message>
       <source>Any Layout</source>
-      <translation type="unfinished">Any Layout</translation>
+      <translation>Οποιαδήποτε Διάταξη</translation>
     </message>
     <message>
       <source>All Layouts</source>
-      <translation type="unfinished">All Layouts</translation>
+      <translation>Όλες Οι Διατάξεις</translation>
     </message>
     <message>
       <source>Select Layouts...</source>
@@ -4084,9 +4084,9 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>%n Layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
+      <translation>
+        <numerusform>%n Διάταξη</numerusform>
+        <numerusform>%n Διατάξεις</numerusform>
       </translation>
     </message>
   </context>
@@ -4094,7 +4094,7 @@ License Key: %2</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Οποιοσδήποτε Διακομιστής</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -4106,9 +4106,9 @@ License Key: %2</source>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Διακομιστής</numerusform>
+        <numerusform>%n Διακομιστές</numerusform>
       </translation>
     </message>
   </context>
@@ -4116,11 +4116,11 @@ License Key: %2</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation type="unfinished">Any User</translation>
+      <translation>Οποιοσδήποτε Χρήστης</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Όλοι Οι Χρήστες</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -4145,15 +4145,15 @@ License Key: %2</source>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation type="unfinished">Show Log</translation>
+      <translation>Εμφάνιση Αρχείου Καταγραφής</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation type="unfinished">Check Issues</translation>
+      <translation>Έλεγχος Ζητημάτων</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation type="unfinished">%1 (up %2)</translation>
+      <translation>%1 (πάνω %2)</translation>
     </message>
   </context>
   <context>
@@ -4168,11 +4168,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation type="unfinished">Server Settings - %1 (readonly)</translation>
+      <translation>Ρυθμίσεις Διακομιστή - %1 (μόνο ανάγνωση)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation type="unfinished">Server Settings - %1</translation>
+      <translation>Ρυθμίσεις Διακομιστή - %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
@@ -4180,11 +4180,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <translation>Διαχείριση Αποθήκευσης</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation type="unfinished">Apply changes before switching to another server?</translation>
+      <translation>Εφαρμογή αλλαγών πριν από τη μετάβαση σε άλλον διακομιστή;</translation>
     </message>
     <message>
       <source>Server Web Page</source>
@@ -4196,7 +4196,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>PoE</source>
-      <translation type="unfinished">PoE</translation>
+      <translation>PoE</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -4211,9 +4211,9 @@ License Key: %2</source>
     <name>QnServerSettingsWidget</name>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Ο διακομιστής χρησιμοποιεί αυτό το %n πιστοποιητικό SSL για την επαλήθευση της ταυτότητάς του</numerusform>
+        <numerusform>Ο διακομιστής χρησιμοποιεί αυτά τα %n πιστοποιητικά SSL για την επαλήθευση της ταυτότητάς του</numerusform>
       </translation>
     </message>
     <message>
@@ -4222,26 +4222,26 @@ License Key: %2</source>
     </message>
     <message>
       <source>The certificate received from the Server does not match the pinned certificate.</source>
-      <translation type="unfinished">The certificate received from the Server does not match the pinned certificate.</translation>
+      <translation>Το πιστοποιητικό που ελήφθη από τον διακομιστή δεν ταιριάζει με το καρφιτσωμένο πιστοποιητικό.</translation>
     </message>
     <message>
       <source>Certificate details are not available</source>
-      <translation type="unfinished">Certificate details are not available</translation>
+      <translation>Οι λεπτομέρειες του πιστοποιητικού δεν είναι διαθέσιμες</translation>
     </message>
     <message>
       <source>To access certificate details, enable the Audit Trail feature.</source>
-      <translation type="unfinished">To access certificate details, enable the Audit Trail feature.</translation>
+      <translation>Για να αποκτήσετε πρόσβαση σε λεπτομέρειες πιστοποιητικού, ενεργοποιήστε τη δυνατότητα Διαδρομής Ελέγχου.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication must be disabled for your account before remote access will be available.</source>
-      <translation type="unfinished">Insecure (digest) authentication must be disabled for your account before remote access will be available.</translation>
+      <translation>Η μη ασφαλής (digest) πιστοποίηση ταυτότητας πρέπει να απενεργοποιηθεί για τον λογαριασμό σας, προτού καταστεί διαθέσιμη η απομακρυσμένη πρόσβαση.</translation>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Πιστοποιητικό</numerusform>
+        <numerusform>Πιστοποιητικά</numerusform>
       </translation>
     </message>
   </context>
@@ -4249,19 +4249,19 @@ License Key: %2</source>
     <name>QnSignInfo</name>
     <message>
       <source>Analyzing: %1%</source>
-      <translation type="unfinished">Analyzing: %1%</translation>
+      <translation>Ανάλυση: %1%</translation>
     </message>
     <message>
       <source>Invalid watermark</source>
-      <translation type="unfinished">Invalid watermark</translation>
+      <translation>Μη έγκυρο υδατογράφημα</translation>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation type="unfinished">Watermark Not Found</translation>
+      <translation>Δεν Βρέθηκε Υδατογράφημα</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation type="unfinished">Watermark Matched</translation>
+      <translation>Το υδατογράφημα αντιστοιχίστηκε</translation>
     </message>
   </context>
   <context>
@@ -4288,11 +4288,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Ξεκλείδωμα</translation>
     </message>
     <message>
       <source>Authorize</source>
-      <translation type="unfinished">Authorize</translation>
+      <translation>Εξουσιοδότηση</translation>
     </message>
     <message>
       <source>Set</source>
@@ -4304,14 +4304,14 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Ρύθμιση 2FA</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayWidget</name>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>ΔΕΝ ΥΠΑΡΧΟΥΝ ΑΡΚΕΤΕΣ ΑΔΕΙΕΣ ΧΡΗΣΗΣ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -4319,11 +4319,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>ΜΗ ΕΞΟΥΣΙΟΔΟΤΗΜΕΝΟ</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
-      <translation type="unfinished">UNSUPPORTED</translation>
+      <translation>ΜΗ ΥΠΟΣΤΗΡΙΖΟΜΕΝΟ</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -4331,11 +4331,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
-      <translation type="unfinished">SITE SHUT DOWN</translation>
+      <translation>ΚΛΕΙΣΙΜΟ ΤΟΠΟΘΕΣΙΑΣ</translation>
     </message>
     <message>
       <source>INFORMATION REQUIRED</source>
-      <translation type="unfinished">INFORMATION REQUIRED</translation>
+      <translation>ΑΠΑΙΤΟΥΝΤΑΙ ΠΛΗΡΟΦΟΡΙΕΣ</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -4347,11 +4347,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
-      <translation type="unfinished">NO EXPORT PERMISSION</translation>
+      <translation>ΔΕΝ ΥΠΑΡΧΕΙ ΑΔΕΙΑ ΕΞΑΓΩΓΗΣ</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>ΠΑΡΑ ΠΟΛΛΕΣ ΣΥΝΔΕΣΕΙΣ</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
@@ -4359,27 +4359,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ΚΡΥΠΤΟΓΡΑΦΗΜΕΝΟ ΑΡΧΕΙΟ</translation>
     </message>
     <message>
       <source>CERTIFICATE ERROR</source>
-      <translation type="unfinished">CERTIFICATE ERROR</translation>
+      <translation>ΣΦΑΛΜΑ ΠΙΣΤΟΠΟΙΗΤΙΚΟΥ</translation>
     </message>
     <message>
       <source>This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</source>
-      <translation type="unfinished">This camera is not accessible. Run camera diagnostics in the Desktop Client for more information.</translation>
+      <translation>Αυτή η κάμερα δεν είναι προσβάσιμη. Εκτελέστε διαγνωστικά κάμερας στο Desktop Client για περισσότερες πληροφορίες.</translation>
     </message>
     <message>
       <source>Access to this camera requires authorization credentials.</source>
-      <translation type="unfinished">Access to this camera requires authorization credentials.</translation>
+      <translation>Η πρόσβαση σε αυτήν την κάμερα απαιτεί διαπιστευτήρια εξουσιοδότησης.</translation>
     </message>
     <message>
       <source>CONNECTION LOST</source>
-      <translation type="unfinished">CONNECTION LOST</translation>
+      <translation>ΧΑΘΗΚΕ Η ΣΥΝΔΕΣΗ</translation>
     </message>
     <message>
       <source>NOT ACTIVATED</source>
-      <translation type="unfinished">NOT ACTIVATED</translation>
+      <translation>ΔΕΝ ΕΙΝΑΙ ΕΝΕΡΓΟΠΟΙΗΜΕΝΟ</translation>
     </message>
     <message>
       <source>2FA DISABLED</source>
@@ -4394,11 +4394,11 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Εξαγωγή επιλογής σε αρχείο...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Αντιγραφή επιλογής στο πρόχειρο</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -4406,27 +4406,27 @@ License Key: %2</source>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Εξαγωγή επιλεγμένων συμβάντων σε αρχείο</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Τελευταία 5 λεπτά</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Τελευταία 60 λεπτά</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Τελευταίες 24 ώρες</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Η μεγαλύτερη διαθέσιμη περίοδος</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Η πρόβλεψη είναι διαθέσιμη μόνο για κάμερες με ενεργοποιημένη την εγγραφή.</translation>
     </message>
     <message>
       <source>TB</source>
@@ -4454,39 +4454,39 @@ License Key: %2</source>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation>Ανάλογα με το συνολικό μέγεθος του αρχείου, η επαναδημιουργία ευρετηρίου μπορεί να διαρκέσει έως και αρκετές ώρες.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation>Η επαναδημιουργία ευρετηρίου είναι απαραίτητη μόνο εάν οι φάκελοι αρχειοθέτησής σας έχουν μετακινηθεί, μετονομαστεί ή διαγραφεί.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+      <translation>Μπορείτε να ακυρώσετε αυτήν τη λειτουργία ανά πάσα στιγμή χωρίς απώλεια δεδομένων.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>Συνέχεια ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation type="unfinished">Hard disk load will increase significantly</translation>
+      <translation>Το φορτίο του σκληρού δίσκου θα αυξηθεί σημαντικά</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation type="unfinished">Archive reindexing completed</translation>
+      <translation>Η επαναδημιουργία ευρετηρίου αρχειοθέτησης ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation type="unfinished">Backup reindexing completed</translation>
+      <translation>Η επαναδημιουργία αντιγράφων ασφαλείας ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation type="unfinished">Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</translation>
+      <translation>Η επαναδημιουργία ευρετηρίου μπορεί να διορθώσει προβλήματα με την αρχειοθέτηση ή τα αντίγραφα ασφαλείας, εάν έχουν χαθεί ή καταστραφεί ή εάν έχει αντικατασταθεί κάποιο υλικό.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Τι να κάνετε με τα τρέχοντα δεδομένα ανάλυσης;</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4503,32 +4503,32 @@ License Key: %2</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Τα τρέχοντα δεδομένα αναλυτικών στοιχείων δεν θα μετακινηθούν αυτόματα σε άλλη τοποθεσία και θα καταστούν μη προσβάσιμα. Μπορείτε να τα διατηρήσετε και να τα μετακινήσετε χειροκίνητα αργότερα ή να τα διαγράψετε οριστικά.
+Εάν σκοπεύατε να μετακινήσετε δεδομένα αναλυτικών στοιχείων σε άλλη τοποθεσία αποθήκευσης, επικοινωνήστε με την υποστήριξη πριν προχωρήσετε.</translation>
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Ανεπαρκή δικαιώματα για την αποθήκευση δεδομένων ανάλυσης.</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Τα δεδομένα ανάλυσης μπορούν να καταλαμβάνουν μεγάλο χώρο. Συνιστούμε να επιλέξετε άλλη τοποθεσία για αυτά αντί για το διαμέρισμα του συστήματος.</translation>
     </message>
     <message>
       <source>Analytics and motion data will continue to be stored on the disabled storage</source>
-      <translation type="unfinished">Analytics and motion data will continue to be stored on the disabled storage</translation>
+      <translation>Τα δεδομένα ανάλυσης και κίνησης θα συνεχίσουν να αποθηκεύονται στον απενεργοποιημένο χώρο αποθήκευσης</translation>
     </message>
     <message>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Η εγγραφή σε απενεργοποιημένη θέση αποθήκευσης θα σταματήσει. Ωστόσο, η διαγραφή παλιού υλικού από αυτήν θα συνεχιστεί.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>Η εγγραφή ενεργοποιήθηκε στον αποθηκευτικό χώρο USB</translation>
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Επιλέξτε μια πολιτική ανάγνωσης-εγγραφής για να ορίσετε τον τρόπο αλληλεπίδρασης με τους καταλόγους αποθήκευσης.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -4544,32 +4544,32 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
-      <translation type="unfinished">The Site Servers have different read-write policies for the storage</translation>
+      <translation>Οι Διακομιστές Τοποθεσίας έχουν διαφορετικές πολιτικές ανάγνωσης-εγγραφής για τον αποθηκευτικό χώρο</translation>
     </message>
     <message>
       <source>URL: %1</source>
       <comment>%1 will be substituted with storage URL, e.g &apos;192.168.1.10/media&apos;</comment>
-      <translation type="unfinished">URL: %1</translation>
+      <translation>URL: %1</translation>
     </message>
     <message>
       <source>Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</source>
-      <translation type="unfinished">Exclusive - server reads from all folders but writes only to its own folder. It deletes old data from all folders.</translation>
+      <translation>Αποκλειστικά - ο διακομιστής διαβάζει από όλους τους φακέλους αλλά γράφει μόνο στον δικό του φάκελο. Διαγράφει παλιά δεδομένα από όλους τους φακέλους.</translation>
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Ο κοινόχρηστος - διακομιστής διαβάζει από όλους τους φακέλους αλλά γράφει μόνο στον δικό του φάκελο. Διαγράφει παλιά δεδομένα μόνο από τον δικό του φάκελο.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Ο απομονωμένος - διακομιστής διαβάζει και γράφει αποκλειστικά στον δικό του φάκελο. Διαγράφει παλιά δεδομένα μόνο από τον δικό του φάκελο.</translation>
     </message>
     <message>
       <source>Cloud storage cannot be enabled.</source>
-      <translation type="unfinished">Cloud storage cannot be enabled.</translation>
+      <translation>Δεν είναι δυνατή η ενεργοποίηση της αποθήκευσης στο cloud.</translation>
     </message>
     <message>
       <source>To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</source>
-      <translation type="unfinished">To activate it add %1 more suitable services or reduce the number of cameras with backup enabled.</translation>
+      <translation>Για να το ενεργοποιήσετε, προσθέστε %1 πιο κατάλληλες υπηρεσίες ή μειώστε τον αριθμό των καμερών με ενεργοποιημένη τη δημιουργία αντιγράφων ασφαλείας.</translation>
     </message>
     <message>
       <source>Insufficient services</source>
@@ -4577,38 +4577,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</source>
-      <translation type="unfinished">All non-cloud backup storages will be disabled when cloud backup is enabled. Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot;</translation>
+      <translation>Όλες οι αποθηκευτικές δυνατότητες δημιουργίας αντιγράφων ασφαλείας εκτός cloud θα απενεργοποιηθούν όταν ενεργοποιηθεί η δημιουργία αντιγράφων ασφαλείας cloud. Οι συσκευές που έχουν ρυθμιστεί με τη ρύθμιση &quot;Όλα τα αρχεία&quot; θα αλλάξουν σε &quot;Κίνηση, Αντικείμενο και Σελιδοδείκτες&quot;</translation>
     </message>
     <message>
       <source>Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</source>
-      <translation type="unfinished">Devices configured with &quot;All archive&quot; setting will be changed to &quot;Motion, Object, and Bookmarks&quot; when cloud backup is enabled</translation>
+      <translation>Οι συσκευές που έχουν ρυθμιστεί με τη ρύθμιση &quot;Όλα τα αρχεία&quot; θα αλλάξουν σε &quot;Κίνηση, Αντικείμενο και Σελιδοδείκτες&quot; όταν ενεργοποιηθεί η δημιουργία αντιγράφων ασφαλείας στο cloud</translation>
     </message>
     <message>
       <source>Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup has been stopped because the Site has been shut down. It must be active to perform a backup to cloud storage. Contact your channel partner for assistance.</translation>
+      <translation>Η δημιουργία αντιγράφου ασφαλείας στο cloud διακόπηκε επειδή η τοποθεσία έχει απενεργοποιηθεί. Η τοποθεσία πρέπει να είναι ενεργή για να πραγματοποιηθεί δημιουργία αντιγράφου ασφαλείας στο cloud. Επικοινωνήστε με τον εμπορικό συνεργάτη σας για βοήθεια.</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Cloud backup continues, but the Site is currently suspended. It must be active to modify the backup configuration or to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Η δημιουργία αντιγράφου ασφαλείας στο cloud συνεχίζεται, αλλά η τοποθεσία είναι προς το παρόν σε αναστολή. Η τοποθεσία πρέπει να είναι ενεργή για να τροποποιήσετε τις ρυθμίσεις αντιγράφου ασφαλείας ή να ενεργοποιήσετε την τοποθεσία αποθήκευσης στο cloud. Επικοινωνήστε με τον εμπορικό συνεργάτη σας για βοήθεια.</translation>
     </message>
     <message>
       <source>The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">The Site must be active to enable cloud storage location. Contact your channel partner for assistance.</translation>
+      <translation>Η τοποθεσία πρέπει να είναι ενεργή για να ενεργοποιήσετε την τοποθεσία αποθήκευσης στο cloud. Επικοινωνήστε με τον εμπορικό συνεργάτη σας για βοήθεια.</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Τοποθεσία σε αναστολή</translation>
     </message>
     <message>
       <source>Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</source>
-      <translation type="unfinished">Disabling cloud storage on one server will disable it on all servers. Local backup must be configured manually.</translation>
+      <translation>Η απενεργοποίηση του χώρου αποθήκευσης στο cloud σε έναν διακομιστή θα τον απενεργοποιήσει σε όλους τους διακομιστές. Η τοπική δημιουργία αντιγράφων ασφαλείας πρέπει να ρυθμιστεί χειροκίνητα.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
     <message>
       <source>Invalid storage</source>
-      <translation type="unfinished">Invalid storage</translation>
+      <translation>Μη έγκυρος αποθηκευτικός χώρος</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -4620,15 +4620,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation type="unfinished">%1 (Checking...)</translation>
+      <translation>%1 (Έλεγχος...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation type="unfinished">%1 (Scanning... %2%)</translation>
+      <translation>%1 (Σάρωση... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
-      <translation type="unfinished">%1 (Rebuilding... %2%)</translation>
+      <translation>%1 (Ανακατασκευή... %2%)</translation>
     </message>
     <message>
       <source>Loading...</source>
@@ -4644,7 +4644,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
-      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+      <translation>Πολύ μικρά και τα διαμερίσματα συστήματος είναι δεσμευμένα και δεν χρησιμοποιούνται για εγγραφή εάν υπάρχει αρκετός άλλος διαθέσιμος χώρος αποθήκευσης.</translation>
     </message>
     <message>
       <source>Reserved</source>
@@ -4656,15 +4656,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>ram</source>
-      <translation type="unfinished">ram</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
-      <translation type="unfinished">optical</translation>
+      <translation>οπτικό</translation>
     </message>
     <message>
       <source>swap</source>
-      <translation type="unfinished">swap</translation>
+      <translation>εναλλαγή</translation>
     </message>
     <message>
       <source>network</source>
@@ -4672,15 +4672,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>smb</source>
-      <translation type="unfinished">smb</translation>
+      <translation>smb</translation>
     </message>
     <message>
       <source>Use to store analytics and motion data</source>
-      <translation type="unfinished">Use to store analytics and motion data</translation>
+      <translation>Χρήση για την αποθήκευση αναλυτικών στοιχείων και δεδομένων κίνησης</translation>
     </message>
     <message>
       <source>Stores analytics and motion data</source>
-      <translation type="unfinished">Stores analytics and motion data</translation>
+      <translation>Αποθηκεύει αναλυτικά δεδομένα και δεδομένα κίνησης</translation>
     </message>
     <message>
       <source>cloud</source>
@@ -4696,7 +4696,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Purpose</source>
-      <translation type="unfinished">Purpose</translation>
+      <translation>Σκοπός</translation>
     </message>
     <message>
       <source>Size</source>
@@ -4716,7 +4716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Undefined</source>
-      <translation type="unfinished">Undefined</translation>
+      <translation>Απροσδιόριστο</translation>
     </message>
     <message>
       <source>removable</source>
@@ -4724,15 +4724,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown size</source>
-      <translation type="unfinished">Unknown size</translation>
+      <translation>Άγνωστο μέγεθος</translation>
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Ο χώρος αποθήκευσης έχει διαφορετικές πολιτικές ανάγνωσης-εγγραφής σε διάφορους διακομιστές στην τοποθεσία</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
-      <translation type="unfinished">Click on the icon to see Servers list</translation>
+      <translation>Κάντε κλικ στο εικονίδιο για να δείτε τη λίστα με τους διακομιστές</translation>
     </message>
     <message>
       <source>Read-Write Policy</source>
@@ -4747,34 +4747,34 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation type="unfinished">Fast Backup Scan...</translation>
+      <translation>Γρήγορη Σάρωση Αντιγράφων Ασφαλείας...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation type="unfinished">Fast Archive Scan...</translation>
+      <translation>Γρήγορη Σάρωση Αρχείου...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation type="unfinished">Reindexing Backup...</translation>
+      <translation>Επαναδημιουργία Αντιγράφων Ασφαλείας...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation type="unfinished">Reindexing Archive...</translation>
+      <translation>Επαναδημιουργία Ευρετηρίου Αρχείου...</translation>
     </message>
   </context>
   <context>
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation type="unfinished">\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+      <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation type="unfinished">Network Shared Resource</translation>
+      <translation>Κοινόχρηστος Πόρος Δικτύου</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation type="unfinished">Invalid credentials for external storage</translation>
+      <translation>Μη έγκυρα διαπιστευτήρια για εξωτερικό χώρο αποθήκευσης</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
@@ -4786,7 +4786,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation type="unfinished">Storage path used by another server</translation>
+      <translation>Διαδρομή αποθήκευσης που χρησιμοποιείται από άλλο διακομιστή</translation>
     </message>
     <message>
       <source>Add Storage</source>
@@ -4794,11 +4794,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+      <translation>Δεν συνιστάται η χρήση μιας θέσης εγγραφής για διαφορετικούς διακομιστές.</translation>
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Ο αποθηκευτικός χώρος είναι διαθέσιμος αλλά δεν θα είναι εγγράψιμος επειδή είναι πολύ μικρός σε σύγκριση με τους ήδη υπάρχοντες αποθηκευτικούς χώρους</translation>
     </message>
   </context>
   <context>
@@ -4817,7 +4817,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Ενημερώσεις</translation>
     </message>
     <message>
       <source>Security</source>
@@ -4829,11 +4829,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Sync</source>
-      <translation type="unfinished">Time Sync</translation>
+      <translation>Συγχρονισμός ώρας</translation>
     </message>
     <message>
       <source>Routing</source>
-      <translation type="unfinished">Routing</translation>
+      <translation>Δρομολόγηση</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -4853,50 +4853,50 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to save site settings</source>
-      <translation type="unfinished">Failed to save site settings</translation>
+      <translation>Αποτυχία αποθήκευσης ρυθμίσεων τοποθεσίας</translation>
     </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation type="unfinished">Email address is not set</translation>
+      <translation>Η διεύθυνση Email δεν έχει οριστεί</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation type="unfinished">No licenses</translation>
+      <translation>Δεν υπάρχουν άδειες</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation type="unfinished">Email server is not set</translation>
+      <translation>Δεν έχει οριστεί διακομιστής Email</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation type="unfinished">Storage is not configured</translation>
+      <translation>Ο αποθηκευτικός χώρος δεν έχει ρυθμιστεί</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation type="unfinished">Rebuilding archive index is completed</translation>
+      <translation>Η ανακατασκευή του ευρετηρίου αρχειοθέτησης ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
+      <translation>Η ανακατασκευή του ευρετηρίου αρχειοθέτησης ακυρώθηκε από τον χρήστη</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation type="unfinished">Email address is not set.</translation>
+      <translation>Η διεύθυνση Email δεν έχει οριστεί.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation type="unfinished">Email server is not set.</translation>
+      <translation>Δεν έχει οριστεί διακομιστής Email.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation type="unfinished">You have no licenses.</translation>
+      <translation>Δεν έχετε άδειες.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation type="unfinished">You cannot record video from cameras.</translation>
+      <translation>Δεν μπορείτε να εγγράψετε βίντεο από κάμερες.</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -4908,19 +4908,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>Ορισμένοι χρήστες δεν έχουν ορίσει τις διευθύνσεις email τους</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>Ορισμένοι χρήστες δεν έχουν ορίσει τις διευθύνσεις email τους.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>Σφάλμα κατά την αποστολή email</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>Εντοπίστηκε πρόβλημα ακεραιότητας αρχείου</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -4928,23 +4928,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Κανένας διακομιστής δεν έχει πρόσβαση στο διαδίκτυο για συγχρονισμό ώρας</translation>
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Δεν έχει ρυθμιστεί ο χώρος αποθήκευσης αντιγράφων ασφαλείας</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Το πρόγραμμα εγγραφής της κάμερας δεν είναι έγκυρο</translation>
     </message>
     <message>
       <source>Storage for analytics data is not set</source>
-      <translation type="unfinished">Storage for analytics data is not set</translation>
+      <translation>Δεν έχει οριστεί χώρος αποθήκευσης για δεδομένα ανάλυσης</translation>
     </message>
     <message>
       <source>System storage is used for analytics data</source>
-      <translation type="unfinished">System storage is used for analytics data</translation>
+      <translation>Ο χώρος αποθήκευσης του συστήματος χρησιμοποιείται για δεδομένα ανάλυσης</translation>
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
@@ -4952,191 +4952,191 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
-      <translation type="unfinished">We recommend choosing another location for it instead of the system partition.</translation>
+      <translation>Σας συνιστούμε να επιλέξετε μια άλλη τοποθεσία για αυτό αντί του διαμερίσματος συστήματος.</translation>
     </message>
     <message>
       <source>Local recording services overused</source>
-      <translation type="unfinished">Local recording services overused</translation>
+      <translation>Υπερχρησιμοποιούμενες τοπικές υπηρεσίες καταγραφής</translation>
     </message>
     <message>
       <source>Cloud storage services overused</source>
-      <translation type="unfinished">Cloud storage services overused</translation>
+      <translation>Υπερβολική χρήση υπηρεσιών αποθήκευσης στο cloud</translation>
     </message>
     <message>
       <source>Paid integrations services overused</source>
-      <translation type="unfinished">Paid integrations services overused</translation>
+      <translation>Υπερβολική χρήση υπηρεσιών ενσωμάτωσης επί πληρωμή</translation>
     </message>
     <message>
       <source>Intercom call</source>
-      <translation type="unfinished">Intercom call</translation>
+      <translation>Κλήση ενδοεπικοινωνίας</translation>
     </message>
     <message>
       <source>Intercom missed call</source>
-      <translation type="unfinished">Intercom missed call</translation>
+      <translation>Αναπάντητη κλήση ενδοεπικοινωνίας</translation>
     </message>
     <message>
       <source>The Site has no internet access for time synchronization</source>
-      <translation type="unfinished">The Site has no internet access for time synchronization</translation>
+      <translation>Η τοποθεσία δεν έχει πρόσβαση στο διαδίκτυο για συγχρονισμό ώρας</translation>
     </message>
     <message>
       <source>System partition is used for analytics data</source>
-      <translation type="unfinished">System partition is used for analytics data</translation>
+      <translation>Το διαμέρισμα συστήματος χρησιμοποιείται για δεδομένα ανάλυσης</translation>
     </message>
     <message>
       <source>Site suspended</source>
-      <translation type="unfinished">Site suspended</translation>
+      <translation>Τοποθεσία σε αναστολή</translation>
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Τερματισμός τοποθεσίας</translation>
     </message>
     <message>
       <source>Email address is not set for your account</source>
-      <translation type="unfinished">Email address is not set for your account</translation>
+      <translation>Δεν έχει οριστεί διεύθυνση email για τον λογαριασμό σας</translation>
     </message>
     <message>
       <source>Calling...</source>
-      <translation type="unfinished">Calling...</translation>
+      <translation>Κλήση...</translation>
     </message>
     <message>
       <source>Missed call</source>
-      <translation type="unfinished">Missed call</translation>
+      <translation>Αναπάντητη κλήση</translation>
     </message>
     <message numerus="yes">
       <source>Storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Ο χώρος αποθήκευσης δεν έχει ρυθμιστεί σε %n διακομιστή</numerusform>
+        <numerusform>Ο χώρος αποθήκευσης δεν έχει ρυθμιστεί σε %n διακομιστές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
+      <translation>
+        <numerusform>Ο χώρος αποθήκευσης αντιγράφων ασφαλείας δεν έχει ρυθμιστεί σε %n διακομιστή</numerusform>
+        <numerusform>Ο χώρος αποθήκευσης αντιγράφων ασφαλείας δεν έχει ρυθμιστεί σε %n διακομιστές</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule is invalid</source>
-      <translation type="unfinished">Recording schedule is invalid</translation>
+      <translation>Το πρόγραμμα εγγραφής δεν είναι έγκυρο</translation>
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid on %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
+      <translation>
+        <numerusform>Το πρόγραμμα εγγραφής δεν είναι έγκυρο σε %n κάμερα</numerusform>
+        <numerusform>Το πρόγραμμα εγγραφής δεν είναι έγκυρο σε %n κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Δεν έχει οριστεί διεύθυνση email για %n χρήστη</numerusform>
+        <numerusform>Δεν έχει οριστεί διεύθυνση email για %n χρήστες</numerusform>
       </translation>
     </message>
     <message>
       <source>Check out %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1</translation>
+      <translation>Ελέγξτε το %1</translation>
     </message>
     <message>
       <source>Remote archive synchronization failed</source>
-      <translation type="unfinished">Remote archive synchronization failed</translation>
+      <translation>Ο απομακρυσμένος συγχρονισμός του αρχείου απέτυχε</translation>
     </message>
     <message numerus="yes">
       <source>Storage for analytics data is not set on %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
+      <translation>
+        <numerusform>Ο αποθηκευτικός χώρος για δεδομένα ανάλυσης δεν έχει οριστεί σε %n Διακομιστή</numerusform>
+        <numerusform>Ο αποθηκευτικός χώρος για δεδομένα ανάλυσης δεν έχει οριστεί σε %n Διακομιστές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
-      <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
+      <translation>
+        <numerusform>Ο αποθηκευτικός χώρος συστήματος χρησιμοποιείται για δεδομένα ανάλυσης σε %n διακομιστή</numerusform>
+        <numerusform>Ο αποθηκευτικός χώρος συστήματος χρησιμοποιείται για δεδομένα ανάλυσης σε %n διακομιστές</numerusform>
       </translation>
     </message>
     <message>
       <source>Connect to your Site from anywhere!</source>
-      <translation type="unfinished">Connect to your Site from anywhere!</translation>
+      <translation>Συνδεθείτε στην τοποθεσία σας από οπουδήποτε!</translation>
     </message>
     <message>
       <source>No online server in the site has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the site has internet access for time synchronization.</translation>
+      <translation>Κανένας συνδεδεμένος διακομιστής στην τοποθεσία δεν έχει πρόσβαση στο διαδίκτυο για τον συγχρονισμό της ώρας.</translation>
     </message>
     <message>
       <source>You cannot receive Site notifications by email.</source>
-      <translation type="unfinished">You cannot receive Site notifications by email.</translation>
+      <translation>Δεν μπορείτε να λαμβάνετε ειδοποιήσεις της τοποθεσίας μέσω email.</translation>
     </message>
     <message>
       <source>They cannot receive Site notifications by email.</source>
-      <translation type="unfinished">They cannot receive Site notifications by email.</translation>
+      <translation>Δεν μπορούν να λαμβάνουν ειδοποιήσεις της τοποθεσίας μέσω email.</translation>
     </message>
     <message>
       <source>Some cameras are set to record in a mode they do not support.</source>
-      <translation type="unfinished">Some cameras are set to record in a mode they do not support.</translation>
+      <translation>Ορισμένες κάμερες έχουν ρυθμιστεί για εγγραφή σε μία λειτουργία που δεν υποστηρίζουν.</translation>
     </message>
     <message>
       <source>Site will stop functioning soon</source>
-      <translation type="unfinished">Site will stop functioning soon</translation>
+      <translation>Η τοποθεσία σύντομα θα σταματήσει να λειτουργεί</translation>
     </message>
     <message>
       <source>Site has stopped functioning</source>
-      <translation type="unfinished">Site has stopped functioning</translation>
+      <translation>Η τοποθεσία έχει σταματήσει να λειτουργεί</translation>
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Η τοποθεσία θα σταματήσει να λειτουργεί σήμερα</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
-      <translation type="unfinished">Site will stop functioning tomorrow</translation>
+      <translation>Η τοποθεσία θα σταματήσει να λειτουργεί αύριο</translation>
     </message>
     <message numerus="yes">
       <source>Site will stop functioning in %n days</source>
-      <translation type="unfinished">
-        <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
+      <translation>
+        <numerusform>Η τοποθεσία θα σταματήσει να λειτουργεί σε %n ημέρα</numerusform>
+        <numerusform>Η τοποθεσία θα σταματήσει να λειτουργεί σε %n ημέρες</numerusform>
       </translation>
     </message>
     <message>
       <source>Notification and interface languages differ</source>
-      <translation type="unfinished">Notification and interface languages differ</translation>
+      <translation>Οι γλώσσες ειδοποιήσεων και διεπαφής διαφέρουν</translation>
     </message>
     <message>
       <source>Notifications language differs from the interface language</source>
-      <translation type="unfinished">Notifications language differs from the interface language</translation>
+      <translation>Η γλώσσα των ειδοποιήσεων διαφέρει από τη γλώσσα διεπαφής</translation>
     </message>
     <message>
       <source>Recording disabled</source>
-      <translation type="unfinished">Recording disabled</translation>
+      <translation>Η εγγραφή απενεργοποιήθηκε</translation>
     </message>
     <message>
       <source>Cloud storage backup disabled</source>
-      <translation type="unfinished">Cloud storage backup disabled</translation>
+      <translation>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud είναι απενεργοποιημένη</translation>
     </message>
     <message>
       <source>Paid integration services disabled</source>
-      <translation type="unfinished">Paid integration services disabled</translation>
+      <translation>Οι υπηρεσίες ενσωμάτωσης επί πληρωμή απενεργοποιήθηκαν</translation>
     </message>
     <message>
       <source>Cloud storage is available</source>
-      <translation type="unfinished">Cloud storage is available</translation>
+      <translation>Ο χώρος αποθήκευσης στο cloud είναι διαθέσιμος</translation>
     </message>
     <message>
       <source>Cloud storage is enabled</source>
-      <translation type="unfinished">Cloud storage is enabled</translation>
+      <translation>Ο χώρος αποθήκευσης στο cloud είναιενεργοποιημένος</translation>
     </message>
     <message>
       <source>Cloud Storage is enabled</source>
-      <translation type="unfinished">Cloud Storage is enabled</translation>
+      <translation>Ο Χώρος Αποθήκευσης στο cloud είναιενεργοποιημένος</translation>
     </message>
     <message numerus="yes">
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>+ %n περισσότερα</numerusform>
+        <numerusform>+ %n περισσότερο</numerusform>
         <numerusform>+ %n περισσότερα</numerusform>
       </translation>
     </message>
@@ -5145,61 +5145,61 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
+      <translation>Δεν περιλαμβάνει προσωπικά στοιχεία και είναι εντελώς ανώνυμο.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Ενεργοποίηση αυτόματου εντοπισμού συσκευών και διακομιστών και αυτόματου ελέγχου της κατάστασης των συσκευών</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Ενεργοποίηση αυτόματου εντοπισμού καμερών και διακομιστών και αυτόματου ελέγχου της κατάστασης των καμερών</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Εάν η λειτουργία Failover είναι ενεργοποιημένη, ο διακομιστής ενδέχεται να εξακολουθεί να ζητά ενημερώσεις κατάστασης κάμερας ανεξάρτητα από αυτήν τη ρύθμιση.</translation>
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
-      <translation type="unfinished">When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</translation>
+      <translation>Όταν είναι ενεργοποιημένη, εντοπίζονται συνεχώς νέες κάμερες και διακομιστές και αποστέλλονται αιτήματα εντοπισμού στις κάμερες για ενημέρωση της κατάστασής τους.</translation>
     </message>
     <message>
       <source>Includes information about site, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation type="unfinished">Includes information about site, such as cameras models and firmware versions, number of servers, etc.</translation>
+      <translation>Περιλαμβάνει πληροφορίες σχετικά με την τοποθεσία, όπως μοντέλα καμερών και εκδόσεις υλικολογισμικού, αριθμό διακομιστών κ.λπ.</translation>
     </message>
     <message>
       <source>Allow optimize device settings</source>
-      <translation type="unfinished">Allow optimize device settings</translation>
+      <translation>Επιτρέψτε τη βελτιστοποίηση των ρυθμίσεων της συσκευής</translation>
     </message>
     <message>
       <source>Allow optimize camera settings</source>
-      <translation type="unfinished">Allow optimize camera settings</translation>
+      <translation>Επιτρέψτε τη βελτιστοποίηση των ρυθμίσεων της κάμερας</translation>
     </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation type="unfinished">Close all programs which may use this file and try again</translation>
+      <translation>Κλείστε όλα τα προγράμματα που μπορούν να χρησιμοποιήσουν αυτό το αρχείο και προσπαθήστε ξανά</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation type="unfinished">File used by another process</translation>
+      <translation>Το αρχείο χρησιμοποιείται από μια άλλη διεργασία</translation>
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>Αρχείο HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>Αρχείο υπολογιστικού φύλλου (CSV)</translation>
     </message>
   </context>
   <context>
     <name>QnTimeSlider</name>
     <message>
       <source>No thumbnails available</source>
-      <translation type="unfinished">No thumbnails available</translation>
+      <translation>Δεν υπάρχουν διαθέσιμα thumbnails</translation>
     </message>
   </context>
   <context>
@@ -5210,7 +5210,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom access rights</source>
-      <translation type="unfinished">Custom access rights</translation>
+      <translation>Προσαρμοσμένα δικαιώματα πρόσβασης</translation>
     </message>
   </context>
   <context>
@@ -5262,7 +5262,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation type="unfinished">PC %1</translation>
+      <translation>PC %1</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
@@ -5312,9 +5312,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n σελιδοδείκτη;</numerusform>
+        <numerusform>Διαγραφή %n σελιδοδεικτών;</numerusform>
       </translation>
     </message>
     <message>
@@ -5349,16 +5349,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Η κάμερα %1 δεν υποστηρίζει PTZ</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
-      <translation type="unfinished">
-        <numerusform>The following %n items are not saved:</numerusform>
-        <numerusform>The following %n items are not saved:</numerusform>
+      <translation>
+        <numerusform>Το ακόλουθο %n στοιχείο δεν αποθηκεύεται:</numerusform>
+        <numerusform>Τα ακόλουθα %n στοιχεία δεν αποθηκεύονται:</numerusform>
       </translation>
     </message>
     <message>
@@ -5367,9 +5367,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n items:</numerusform>
-        <numerusform>Failed to delete %n items:</numerusform>
+      <translation>
+        <numerusform>Αποτυχία διαγραφής %n στοιχείου:</numerusform>
+        <numerusform>Αποτυχία διαγραφής %n στοιχείων:</numerusform>
       </translation>
     </message>
   </context>
@@ -5448,7 +5448,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Διακοπή Συστήματος Πολλαπλής Προβολής?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -5484,16 +5484,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to open %n devices on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
+      <translation>
+        <numerusform>Αποτυχία ανοίγματος %n συσκευής στο σύστημα προβολής πολλαπλών οθονών:</numerusform>
+        <numerusform>Αποτυχία ανοίγματος %n συσκευών στο σύστημα προβολής πολλαπλών οθονών:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
-      <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
+      <translation>
+        <numerusform>Αποτυχία ανοίγματος %n κάμερας στο σύστημα προβολής πολλαπλών οθονών:</numerusform>
+        <numerusform>Αποτυχία ανοίγματος %n καμερών στο σύστημα προβολής πολλαπλών οθονών:</numerusform>
       </translation>
     </message>
     <message>
@@ -5502,11 +5502,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Τερματισμός τοποθεσίας</translation>
     </message>
     <message>
       <source>To add a Video Wall, the Site should be in active state. %1</source>
-      <translation type="unfinished">To add a Video Wall, the Site should be in active state. %1</translation>
+      <translation>Για να προσθέσετε Σύστημα Πολλαπλής Οθόνης, η τοποθεσία θα πρέπει να είναι σε ενεργή κατάσταση. %1</translation>
     </message>
     <message>
       <source>Cannot find compatible client version: %1</source>
@@ -5557,9 +5557,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Remove %n items from layout?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from layout?</numerusform>
-        <numerusform>Remove %n items from layout?</numerusform>
+      <translation>
+        <numerusform>Αφαίρεση %n στοιχείου από τη διάταξη;</numerusform>
+        <numerusform>Κατάργηση %n στοιχείων από τη διάταξη;</numerusform>
       </translation>
     </message>
     <message>
@@ -5576,51 +5576,51 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n devices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n devices?</numerusform>
-        <numerusform>Delete %n devices?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n συσκευής;</numerusform>
+        <numerusform>Διαγραφή %n συσκευών;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n cameras?</numerusform>
-        <numerusform>Delete %n cameras?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n κάμερας;</numerusform>
+        <numerusform>Διαγραφή %n καμερών;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n I/O Modules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n I/O Modules?</numerusform>
-        <numerusform>Delete %n I/O Modules?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n μονάδας εισόδου/εξόδου;</numerusform>
+        <numerusform>Διαγραφή %n μονάδων εισόδου/εξόδου;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n items?</numerusform>
-        <numerusform>Delete %n items?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n στοιχείου;</numerusform>
+        <numerusform>Διαγραφή %n στοιχείων;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of them are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n of them are auto-discovered.</numerusform>
-        <numerusform>%n of them are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n από αυτά εντοπίζεται αυτόματα.</numerusform>
+        <numerusform>%n από αυτά εντοπίζονται αυτόματα.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras are auto-discovered.</numerusform>
-        <numerusform>%n cameras are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n κάμερα εντοπίζεται αυτόματα.</numerusform>
+        <numerusform>%n κάμερες εντοπίζονται αυτόματα.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
-        <numerusform>%n I/O modules are auto-discovered.</numerusform>
+      <translation>
+        <numerusform>%n μονάδα εισόδου/εξόδου εντοπίζεται αυτόματα.</numerusform>
+        <numerusform>%n μονάδα εισόδου/εξόδου εντοπίζονται αυτόματα.</numerusform>
       </translation>
     </message>
     <message>
@@ -5637,9 +5637,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
-      <translation type="unfinished">
-        <numerusform>Remove %n items from showreel?</numerusform>
-        <numerusform>Remove %n items from showreel?</numerusform>
+      <translation>
+        <numerusform>Αφαίρεση %n στοιχείου από το showreel;</numerusform>
+        <numerusform>Αφαίρεση %n στοιχείων από το showreel;</numerusform>
       </translation>
     </message>
     <message>
@@ -5652,9 +5652,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Ορισμένα αρχεία βίντεο εξακολουθούν να μεταφορτώνονται σε %n εικονική κάμερα:</numerusform>
+        <numerusform>Ορισμένα αρχεία βίντεο εξακολουθούν να μεταφορτώνονται σε %n εικονικές κάμερες:</numerusform>
       </translation>
     </message>
     <message>
@@ -5719,16 +5719,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n διάταξης;</numerusform>
+        <numerusform>Διαγραφή %n διατάξεων;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
-      <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
-        <numerusform>%n items were not deleted.</numerusform>
+      <translation>
+        <numerusform>%n στοιχείο δεν διαγράφηκε.</numerusform>
+        <numerusform>%n στοιχεία δεν διαγράφηκαν.</numerusform>
       </translation>
     </message>
     <message>
@@ -5741,9 +5741,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n matrices?</numerusform>
-        <numerusform>Delete %n matrices?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n πίνακα;</numerusform>
+        <numerusform>Διαγραφή %n πινάκων;</numerusform>
       </translation>
     </message>
     <message>
@@ -5765,9 +5765,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users?</numerusform>
-        <numerusform>Delete %n users?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n χρήστη;</numerusform>
+        <numerusform>Διαγραφή %n χρηστών;</numerusform>
       </translation>
     </message>
     <message>
@@ -5814,15 +5814,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>ServerStatusItemDelegate::ServerStatusWidget</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Παραλήφθηκε</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Αναμονή για απόκριση του διακομιστή...</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Εγκατεστημένο</translation>
     </message>
     <message>
       <source>Installing...</source>
@@ -5830,7 +5830,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Λήφθηκε</translation>
     </message>
   </context>
   <context>
@@ -5916,9 +5916,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>Strings</name>
     <message numerus="yes">
       <source>%n Layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n Layouts</numerusform>
-        <numerusform>%n Layouts</numerusform>
+      <translation>
+        <numerusform>%n Διάταξη</numerusform>
+        <numerusform>%n Διατάξεις</numerusform>
       </translation>
     </message>
     <message>
@@ -5927,9 +5927,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
-      <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
-        <numerusform>Source Server and %n Servers</numerusform>
+      <translation>
+        <numerusform>Διακομιστής πηγής και %n διακομιστής</numerusform>
+        <numerusform>Διακομιστής πηγής και %n διακομιστές</numerusform>
       </translation>
     </message>
     <message>
@@ -5974,9 +5974,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n Διακομιστής</numerusform>
+        <numerusform>%n Διακομιστές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6015,89 +6015,89 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n removed devices</source>
-      <translation type="unfinished">
-        <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
+      <translation>
+        <numerusform>%n αφαιρεμένη συσκευή</numerusform>
+        <numerusform>%n αφαιρεμένες συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
-        <numerusform>%n removed cameras</numerusform>
+      <translation>
+        <numerusform>%n αφαιρεμένη κάμερα</numerusform>
+        <numerusform>%n αφαιρεμένες κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed servers</source>
-      <translation type="unfinished">
-        <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
+      <translation>
+        <numerusform>%n αφαιρεμένος διακομιστής</numerusform>
+        <numerusform>%n αφαιρεμένοι διακομιστές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
-        <numerusform>%n removed layouts</numerusform>
+      <translation>
+        <numerusform>%n αφαιρεμένη διάταξη</numerusform>
+        <numerusform>%n αφαιρεμένες διατάξεις</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n subjects more</source>
-      <translation type="unfinished">
-        <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
+      <translation>
+        <numerusform>%n ακόμη θέμα</numerusform>
+        <numerusform>%n ακόμη θέματα</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
-      <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
-        <numerusform>%n devices more</numerusform>
+      <translation>
+        <numerusform>%n ακόμη συσκευή</numerusform>
+        <numerusform>%n ακόμη συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras more</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
+      <translation>
+        <numerusform>%n ακόμη κάμερα</numerusform>
+        <numerusform>%n ακόμη κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers more</source>
-      <translation type="unfinished">
-        <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
+      <translation>
+        <numerusform>%n ακόμη διακομιστής</numerusform>
+        <numerusform>%n ακόμη διακομιστές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
-        <numerusform>%n layouts more</numerusform>
+      <translation>
+        <numerusform>%n ακόμη διάταξη</numerusform>
+        <numerusform>%n ακόμη διατάξεις</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed subjects</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">
-        <numerusform>%n removed subjects</numerusform>
-        <numerusform>%n removed subjects</numerusform>
+      <translation>
+        <numerusform>%n αφαιρεμένο θέμα</numerusform>
+        <numerusform>%n αφαιρεμένα θέματα</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Πηγή και %n περισσότερη κάμερα</numerusform>
+        <numerusform>Πηγή και %n περισσότερες κάμερες</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
-      <translation type="unfinished">
-        <numerusform>%n additional</numerusform>
-        <numerusform>%n additional</numerusform>
+      <translation>
+        <numerusform>%n επιπλέον</numerusform>
+        <numerusform>%n επιπλέον</numerusform>
       </translation>
     </message>
   </context>
@@ -6105,7 +6105,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>TierUsageStrings</name>
     <message>
       <source>Number of servers per Site</source>
-      <translation type="unfinished">Number of servers per Site</translation>
+      <translation>Αριθμός διακομιστών ανά τοποθεσία</translation>
     </message>
     <message>
       <source>Number of devices per server</source>
@@ -6129,7 +6129,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cross-Site features</source>
-      <translation type="unfinished">Cross-Site features</translation>
+      <translation>Λειτουργίες μεταξύ τοποθεσιών</translation>
     </message>
   </context>
   <context>
@@ -6173,16 +6173,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n existing LDAP groups are not found in the LDAP database.</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
+      <translation>
+        <numerusform>%n υπάρχουσα ομάδα LDAP δεν βρίσκεται στη βάση δεδομένων LDAP.</numerusform>
+        <numerusform>%n υπάρχουσες ομάδες LDAP δεν βρίσκονται στη βάση δεδομένων LDAP.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n ομάδας</numerusform>
+        <numerusform>Διαγραφή %n ομάδων</numerusform>
       </translation>
     </message>
     <message>
@@ -6195,9 +6195,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
-        <numerusform>Failed to delete %n groups.</numerusform>
+      <translation>
+        <numerusform>Αποτυχία διαγραφής %n ομάδας.</numerusform>
+        <numerusform>Αποτυχία διαγραφής %n ομάδων.</numerusform>
       </translation>
     </message>
     <message>
@@ -6237,16 +6237,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n users</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n users</numerusform>
-        <numerusform>Delete %n users</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n χρήστη</numerusform>
+        <numerusform>Διαγραφή %n χρηστών</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
-      <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
+      <translation>
+        <numerusform>Ο διακομιστής LDAP είναι εκτός σύνδεσης. %n χρήστης δεν μπορούν να συνδεθούν.</numerusform>
+        <numerusform>Ο διακομιστής LDAP είναι εκτός σύνδεσης. %n χρήστες δεν μπορούν να συνδεθούν.</numerusform>
       </translation>
     </message>
     <message>
@@ -6255,16 +6255,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Failed to delete %n users.</source>
-      <translation type="unfinished">
-        <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
+      <translation>
+        <numerusform>Αποτυχία διαγραφής %n χρήστη.</numerusform>
+        <numerusform>Αποτυχία διαγραφής %n χρηστών.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
-      <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
+      <translation>
+        <numerusform>%n υπάρχον χρήστης LDAP δεν βρίσκεται στη βάση δεδομένων LDAP</numerusform>
+        <numerusform>%n υπάρχοντες χρήστες LDAP δεν βρίσκονται στη βάση δεδομένων LDAP</numerusform>
       </translation>
     </message>
     <message>
@@ -6303,7 +6303,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>VmsRulesDialogHelper</name>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>Αυτή η ενέργεια δεν μπορεί να ανεραιθεί</translation>
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
@@ -6311,9 +6311,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Delete %n rules?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
-        <numerusform>Delete %n rules?</numerusform>
+      <translation>
+        <numerusform>Διαγραφή %n κανόνα;</numerusform>
+        <numerusform>Διαγραφή %n κανόνων;</numerusform>
       </translation>
     </message>
   </context>
@@ -6582,9 +6582,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n αντικείμενο</numerusform>
+        <numerusform>%n αντικείμενα</numerusform>
       </translation>
     </message>
     <message>
@@ -6765,15 +6765,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
+      <translation>
+        <numerusform>Απαιτούνται %n κατάλληλη υπηρεσία αποθήκευσης στο cloud</numerusform>
+        <numerusform>Απαιτούνται %n κατάλληλες υπηρεσίες αποθήκευσης στο cloud</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
-      <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
+      <translation>
+        <numerusform>%n Megapixel</numerusform>
         <numerusform>%n Megapixels</numerusform>
       </translation>
     </message>
@@ -6787,9 +6787,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
-      <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
-        <numerusform>%n suitable cloud storage services available</numerusform>
+      <translation>
+        <numerusform>%n διαθέσιμη κατάλληλη υπηρεσία αποθήκευσης στο cloud</numerusform>
+        <numerusform>%n διαθέσιμες κατάλληλες υπηρεσίες αποθήκευσης στο cloud</numerusform>
       </translation>
     </message>
     <message>
@@ -6806,12 +6806,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site is currently suspended</source>
-      <translation type="unfinished">Site is currently suspended</translation>
+      <translation>Η τοποθεσία βρίσκεται σε αναστολή</translation>
     </message>
     <message numerus="yes">
       <source>%n MP</source>
       <comment>Numerus: MP for Megapixels</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
       </translation>
@@ -6833,9 +6833,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Ορισμός για %n επιλεγμένη συσκευή</numerusform>
+        <numerusform>Ορισμός για %n επιλεγμένες συσκευές</numerusform>
       </translation>
     </message>
   </context>
@@ -6856,7 +6856,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Backup will be turned off for newly added cameras on all servers at the site</source>
-      <translation type="unfinished">Backup will be turned off for newly added cameras on all servers at the site</translation>
+      <translation>Το αντίγραφο ασφαλείας θα απενεργοποιηθεί για τις νέες κάμερες σε όλους τους διακομιστές της τοποθεσίας</translation>
     </message>
     <message numerus="yes">
       <source>Backup will not be activated for %n devices:</source>
@@ -6915,19 +6915,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site shut down</source>
-      <translation type="unfinished">Site shut down</translation>
+      <translation>Τερματισμός τοποθεσίας</translation>
     </message>
     <message>
       <source>To perform backup to a cloud storage, the site should be in active state. %1</source>
-      <translation type="unfinished">To perform backup to a cloud storage, the site should be in active state. %1</translation>
+      <translation>Για να εκτελέσετε αντίγραφο ασφαλείας σε ένα χώρο αποθήκευσης στο cloud, η τοποθεσία θα πρέπει να βρίσκεται σε ενεργή κατάσταση. %1</translation>
     </message>
     <message>
       <source>Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</source>
-      <translation type="unfinished">Cloud backup continues, but the site is currently suspended. It must be active to modify the &quot;What to backup&quot; and &quot;Quality&quot; settings for a device, or to enable cloud backup. You can also disable it. %1</translation>
+      <translation>Η δημιουργία αντιγράφου ασφαλείας στο cloud συνεχίζεται, αλλά η τοποθεσία βρίσκεται σε αναστολή. Η τοποθεσία πρέπει να είναι ενεργή για να τροποποιήσετε τις ρυθμίσεις &quot; Τι να δημιουργείται αντίγραφο ασφαλείας&quot; και &quot; Ποιότητα&quot; για μια συσκευή ή για να ενεργοποιήσετε τη δημιουργία αντιγράφου ασφαλείας στο cloud. Μπορείτε επίσης να την απενεργοποιήσετε. %1</translation>
     </message>
     <message>
       <source>The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</source>
-      <translation type="unfinished">The number of devices selected for backup exceeds available services. Add additional services or reduce the number of devices configured for backup. On %1 the site will automatically limit the number of backed-up devices to match the available services</translation>
+      <translation>Ο αριθμός των συσκευών που έχουν επιλεγεί για δημιουργία αντιγράφου ασφαλείας υπερβαίνει τον αριθμό των διαθέσιμων υπηρεσιών. Προσθέστε επιπλέον υπηρεσίες ή μειώστε τον αριθμό των συσκευών που έχουν ρυθμιστεί για δημιουργία αντιγράφου ασφαλείας. Στις %1, η τοποθεσία θα περιορίσει αυτόματα τον αριθμό των συσκευών για τις οποίες δημιουργείται αντίγραφο ασφαλείας, ώστε να μην υπερβαίνει τον αριθμό των διαθέσιμων υπηρεσιών</translation>
     </message>
   </context>
   <context>
@@ -6942,7 +6942,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Αυτή η ενέργεια δεν μπορεί να ανεραιθεί.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -6950,16 +6950,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας είναι ενεργοποιημένη για %n συσκευή</numerusform>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας είναι ενεργοποιημένη για %n συσκευές</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας είναι ενεργοποιημένη για %n κάμερα</numerusform>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας είναι ενεργοποιημένη για %n κάμερες</numerusform>
       </translation>
     </message>
     <message>
@@ -6969,7 +6969,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Footage from these cameras is backed up through to %1 %2</source>
       <comment>%1 and %2 will be replaced respectively by the date and time in the site format.</comment>
-      <translation type="unfinished">Footage from these cameras is backed up through to %1 %2</translation>
+      <translation>Το υλικό από αυτές τις κάμερες αποθηκεύεται ως αντίγραφο ασφαλείας έως και τις %1 %2</translation>
     </message>
   </context>
   <context>
@@ -6980,9 +6980,9 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n σελιδοδείκτης</numerusform>
+        <numerusform>%n σελιδοδείκτες</numerusform>
       </translation>
     </message>
     <message>
@@ -7242,19 +7242,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Pointed</source>
-      <translation type="unfinished">Pointed</translation>
+      <translation>Διορθώθηκε</translation>
     </message>
     <message>
       <source>Target resource does not exist</source>
-      <translation type="unfinished">Target resource does not exist</translation>
+      <translation>Ο πόρος-στόχος δεν υπάρχει</translation>
     </message>
     <message>
       <source>Select Camera or Layout...</source>
-      <translation type="unfinished">Select Camera or Layout...</translation>
+      <translation>Επιλογή κάμερας ή διάταξη...</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Προορισμός</translation>
     </message>
   </context>
   <context>
@@ -7272,15 +7272,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation type="unfinished">Device Rules</translation>
+      <translation>Κανόνες Συσκευής</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation type="unfinished">Camera Rules</translation>
+      <translation>Κανόνες Κάμερας</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation type="unfinished">I/O Module Rules</translation>
+      <translation>Κανόνες Μονάδας Εισόδου/Εξόδου</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -7292,7 +7292,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use this link to add the camera to another site</source>
-      <translation type="unfinished">Use this link to add the camera to another site</translation>
+      <translation>Χρησιμοποιήστε αυτόν τον σύνδεσμο για να προσθέσετε την κάμερα σε άλλην τοποθεσία</translation>
     </message>
   </context>
   <context>
@@ -7338,7 +7338,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Αυτή η ενέργεια δεν μπορεί να ανεραιθεί.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -7406,7 +7406,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 will be removed from the site and replaced by the selected camera</source>
       <extracomment>%1 will be substituted with the camera&apos;s name.</extracomment>
-      <translation type="unfinished">%1 will be removed from the site and replaced by the selected camera</translation>
+      <translation>Το %1 θα αφαιρεθεί από την τοποθεσία και θα αντικατασταθεί από την επιλεγμένη κάμερα</translation>
     </message>
     <message>
       <source>Checking if the data from the camera can be transferred to the new one.</source>
@@ -7449,11 +7449,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording continues, but the site is currently suspended. It must be active to change the recording settings for a device or to enable recording. Contact your channel partner for assistance.</translation>
+      <translation>Η εγγραφή συνεχίζεται, αλλά η τοποθεσία βρίσκεται σε αναστολή. Η τοποθεσία πρέπει να είναι ενεργή για να αλλάξετε τις ρυθμίσεις εγγραφής μιας συσκευής ή για να ενεργοποιήσετε την εγγραφή. Επικοινωνήστε με τον εμπορικό συνεργάτη σας για βοήθεια.</translation>
     </message>
     <message>
       <source>Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</source>
-      <translation type="unfinished">Recording has been stopped because the site has been shut down. It must be active to enable recording for a device. Contact your channel partner for assistance.</translation>
+      <translation>Η εγγραφή διακόπηκε επειδή η τοποθεσία έχει απενεργοποιηθεί. Η τοποθεσία πρέπει να είναι ενεργή για να ενεργοποιήσετε την εγγραφή για μια συσκευή. Επικοινωνήστε με τον εμπορικό συνεργάτη σας για βοήθεια.</translation>
     </message>
   </context>
   <context>
@@ -7552,7 +7552,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices Settings</source>
-      <translation type="unfinished">Devices Settings</translation>
+      <translation>Ρυθμίσεις Συσκευών</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -7560,7 +7560,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cameras Settings</source>
-      <translation type="unfinished">Cameras Settings</translation>
+      <translation>Ρυθμίσεις Καμερών</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
@@ -7568,7 +7568,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation type="unfinished">I/O Modules Settings</translation>
+      <translation>Ρυθμίσεις Μονάδων Εισόδου/Εξόδου</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -7707,7 +7707,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ChannelPartnerUserNotificationManager</name>
     <message>
       <source>Channel Partner users have access to this site</source>
-      <translation type="unfinished">Channel Partner users have access to this site</translation>
+      <translation>Οι χρήστες του εμπορικού συνεργάτη έχουν πρόσβαση σε αυτήν την τοποθεσία</translation>
     </message>
     <message>
       <source>Channel Partner users&apos; access is managed at the Organization level, and they are not visible in site user management.</source>
@@ -7901,32 +7901,32 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
-      <translation type="unfinished">Local Site owner is absent or disabled.</translation>
+      <translation>Ο κάτοχος της τοπικής τοποθεσίας απουσιάζει ή είναι απενεργοποιημένος.</translation>
     </message>
     <message>
       <source>Site connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Site connected to %1</translation>
+      <translation>Η τοποθεσία συνδέθηκε με το %1</translation>
     </message>
     <message>
       <source>Failed to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect Site to %1</translation>
+      <translation>Αποτυχία σύνδεσης της τοποθεσίας στο %1</translation>
     </message>
     <message>
       <source>Connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1</translation>
+      <translation>Σύνδεση Τοποθεσίας με %1</translation>
     </message>
     <message>
       <source>Connect Site to %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect Site to %1?</translation>
+      <translation>Σύνδεση Τοποθεσίας με %1;</translation>
     </message>
     <message>
       <source>Enter your account password to connect Site to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect Site to %1</translation>
+      <translation>Εισαγάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να συνδέσετε την τοποθεσία με το %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7955,16 +7955,16 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Merge Server to the Site</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the Site</translation>
+      <translation>Συγχώνευση διακομιστή με την Τοποθεσία</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the Site</source>
-      <translation type="unfinished">Enter your account password to merge Server to the Site</translation>
+      <translation>Εισαγάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να συγχωνεύσετε τον διακομιστή με την Τοποθεσία</translation>
     </message>
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current Site (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Συγχώνευση</translation>
     </message>
   </context>
   <context>
@@ -8033,11 +8033,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">This camera requires password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Αυτή η κάμερα απαιτεί κωδικό πρόσβασης για να ρυθμιστεί. Ζητήστε από τον διαχειριστή της τοποθεσίας σας να το κάνει.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up. Ask your site administrator to do it.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up. Ask your site administrator to do it.</translation>
+      <translation>Ορισμένες από τις επιλεγμένες κάμερες απαιτούν κωδικό πρόσβασης για να ρυθμιστούν. Ζητήστε από τον διαχειριστή της τοποθεσίας σας να το κάνει.</translation>
     </message>
   </context>
   <context>
@@ -8176,7 +8176,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
-      <translation type="unfinished">Maximum number of Devices for the Site is reached</translation>
+      <translation>Έχει επιτευχθεί ο μέγιστος αριθμός συσκευών για την τοποθεσία</translation>
     </message>
   </context>
   <context>
@@ -8209,11 +8209,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Αντιγραφή επιλογής στο πρόχειρο</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Εξαγωγή επιλογής σε αρχείο...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -8616,7 +8616,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Επιλογή Φακέλου...</translation>
     </message>
   </context>
   <context>
@@ -8809,23 +8809,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Οι τοποθεσίες θα συγχωνευθούν σύντομα</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree.</translation>
+      <translation>Οι διακομιστές από την άλλη τοποθεσία θα εμφανιστούν στο δέντρο πόρων.</translation>
     </message>
     <message>
       <source>Connecting to the current Site...</source>
-      <translation type="unfinished">Connecting to the current Site...</translation>
+      <translation>Σύνδεση στην τρέχουσα τοποθεσία...</translation>
     </message>
     <message>
       <source>Server will be connected to Site shortly</source>
-      <translation type="unfinished">Server will be connected to Site shortly</translation>
+      <translation>Ο διακομιστής θα συνδεθεί στην τοποθεσία σύντομα</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Αποτυχία συγχώνευσης %1 στην τοποθεσία μας.</translation>
     </message>
   </context>
   <context>
@@ -8861,7 +8861,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutActionHandler</name>
     <message>
       <source>Save Layout As</source>
-      <translation type="unfinished">Save Layout As</translation>
+      <translation>Αποθήκευση Διάταξης Ως</translation>
     </message>
     <message>
       <source>Enter Layout Name:</source>
@@ -8869,7 +8869,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save Layout As Cloud</source>
-      <translation type="unfinished">Save Layout As Cloud</translation>
+      <translation>Αποθήκευση διάταξης ως cloud</translation>
     </message>
     <message>
       <source>New Layout</source>
@@ -9027,9 +9027,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LicenseManagerWidget</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n κανάλια.</numerusform>
+        <numerusform>%n κανάλια.</numerusform>
       </translation>
     </message>
     <message>
@@ -9245,8 +9245,8 @@ Client performance is degraded.</translation>
     <message>
       <source>Debug logging is enabled.
 Site performance is degraded.</source>
-      <translation type="unfinished">Debug logging is enabled.
-Site performance is degraded.</translation>
+      <translation>Η καταγραφή εντοπισμού σφαλμάτων είναι ενεργοποιημένη.
+Η απόδοση της τοποθεσία έχει υποβαθμιστεί.</translation>
     </message>
     <message>
       <source>Logs download canceled</source>
@@ -9265,7 +9265,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::LogsManagementWidget</name>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Επιλογή Φακέλου...</translation>
     </message>
     <message>
       <source>Downloading...</source>
@@ -9411,7 +9411,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MediaFileSettingsDialog</name>
     <message>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Ρυθμίσεις Αρχείου</translation>
     </message>
   </context>
   <context>
@@ -9429,7 +9429,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>Η διεύθυνση URL δεν είναι έγκυρη.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
@@ -9465,12 +9465,12 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
-      <translation type="unfinished">Enter your account password to merge Sites</translation>
+      <translation>Εισάγετε τον κωδικό πρόσβασης του λογαριασμού σας για να συγχωνεύσετε τοποθεσίες</translation>
     </message>
     <message>
       <source>Merge</source>
       <comment>Merge two Sites together (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Συγχώνευση</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
@@ -9478,19 +9478,19 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
-      <translation type="unfinished">This is the current Site URL.</translation>
+      <translation>Αυτή είναι η τρέχουσα διεύθυνση URL της τοποθεσίας.</translation>
     </message>
     <message>
       <source>Servers from the other Site will appear in the resource tree when the database synchronization is finished.</source>
-      <translation type="unfinished">Servers from the other Site will appear in the resource tree when the database synchronization is finished.</translation>
+      <translation>Οι διακομιστές από την άλλη Τοποθεσία θα εμφανίζονται στο δέντρο πόρων όταν ολοκληρωθεί ο συγχρονισμός της βάσης δεδομένων.</translation>
     </message>
     <message>
       <source>Sites will be merged shortly</source>
-      <translation type="unfinished">Sites will be merged shortly</translation>
+      <translation>Οι τοποθεσίες θα συγχωνευθούν σύντομα</translation>
     </message>
     <message>
       <source>Failed to merge Sites</source>
-      <translation type="unfinished">Failed to merge Sites</translation>
+      <translation>Αποτυχία συγχώνευσης Τοποθεσιών</translation>
     </message>
     <message>
       <source>Remote</source>
@@ -9545,64 +9545,64 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Site was not found.</source>
-      <translation type="unfinished">Site was not found.</translation>
+      <translation>Η τοποθεσία δεν βρέθηκε.</translation>
     </message>
     <message>
       <source>The discovered Site %1 has an incompatible version %2.</source>
       <comment>%1 is name of Site, %2 is version information</comment>
-      <translation type="unfinished">The discovered Site %1 has an incompatible version %2.</translation>
+      <translation>Η τοποθεσία που ανακαλύφθηκε %1 έχει μια μη συμβατή έκδοση %2.</translation>
     </message>
     <message>
       <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</translation>
+      <translation>Η επιλεγμένη τοποθεσία έχει μια παλαιότερη έκδοση λογισμικού που δεν είναι συμβατή με την τρέχουσα τοποθεσία. Ενημερώστε την επιλεγμένη τοποθεσία στην πιο πρόσφατη έκδοση για να την συγχωνεύσετε με την τρέχουσα.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with Starter licenses.</translation>
+      <translation>Πρόκειται να συγχωνεύσετε Τοποθεσίες με άδειες Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one Starter license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Επιτρέπεται μόνο μία άδεια χρήσης Starter ανά Τοποθεσία, επομένως η δεύτερη άδεια χρήσης θα απενεργοποιηθεί.</translation>
     </message>
     <message>
       <source>You are about to merge Sites with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Sites with NVR licenses.</translation>
+      <translation>Πρόκειται να συγχωνεύσετε Τοποθεσίες με άδειες NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per Site, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per Site, so the second license will be deactivated.</translation>
+      <translation>Επιτρέπεται μόνο μία άδεια NVR ανά Τοποθεσία, επομένως η δεύτερη άδεια θα απενεργοποιηθεί.</translation>
     </message>
     <message>
       <source>Could not configure the remote Site %1.</source>
       <comment>%1 is name of the Site</comment>
-      <translation type="unfinished">Could not configure the remote Site %1.</translation>
+      <translation>Δεν ήταν δυνατή η ρύθμιση της απομακρυσμένης Τοποθεσίας %1.</translation>
     </message>
     <message>
       <source>%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 Site can only be merged with non-%1. Site name and password are taken from %1 Site.</translation>
+      <translation>Η τοποθεσία %1 μπορεί να συγχωνευθεί μόνο με τοποθεσίες που δεν είναι%1. Το όνομα και ο κωδικός πρόσβασης της τοποθεσίας λαμβάνονται από την τοποθεσία %1.</translation>
     </message>
     <message>
       <source>Both Sites are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Both Sites are connected to %1. Merge is not allowed.</translation>
+      <translation>Και οι δύο τοποθεσίες είναι συνδεδεμένες με %1. Δεν επιτρέπεται η συγχώνευση.</translation>
     </message>
     <message>
       <source>%1 sites have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 sites have different owners. Merge is not allowed.</translation>
+      <translation>Οι τοποθεσίες %1 έχουν διαφορετικούς κατόχους. Δεν επιτρέπεται η συγχώνευση.</translation>
     </message>
     <message>
       <source>Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Sites because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Δεν είναι δυνατή η συγχώνευση τοποθεσιών επειδή έχουν τουλάχιστον έναν διακομιστή με το ίδιο αναγνωριστικό. Καταργήστε αυτόν τον διακομιστή και δοκιμάστε ξανά.</translation>
     </message>
     <message>
       <source>Site name is not configured yet.</source>
-      <translation type="unfinished">Site name is not configured yet.</translation>
+      <translation>Το όνομα της τοποθεσίας δεν έχει διαμορφωθεί ακόμη.</translation>
     </message>
     <message>
       <source>Maximum number of Servers for the Site is reached.</source>
-      <translation type="unfinished">Maximum number of Servers for the Site is reached.</translation>
+      <translation>Επιτεύχθηκε ο μέγιστος αριθμός διακομιστών για την Τοποθεσία.</translation>
     </message>
   </context>
   <context>
@@ -9907,12 +9907,12 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</translation>
+      <translation>Οι εκδόσεις λειτουργικού συστήματος ορισμένων στοιχείων δεν υποστηρίζονται πλέον. Παρακαλούμε αφαιρέστε τα από την Τοποθεσία ή ενημερώστε το λειτουργικό τους σύστημα σε μια υποστηριζόμενη έκδοση.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect Site from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect Site from %1 first.</translation>
+      <translation>Μη συμβατή παρουσία %1. Για να γίνει ενημέρωση, αποσυνδέστε πρώτα την τοποθεσία από το %1.</translation>
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
@@ -9920,11 +9920,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Site updated to</source>
-      <translation type="unfinished">Site updated to</translation>
+      <translation>Η τοποθεσία ενημερώθηκε σε</translation>
     </message>
     <message>
       <source>Site update in process</source>
-      <translation type="unfinished">Site update in process</translation>
+      <translation>Ενημέρωση τοποθεσίας σε εξέλιξη</translation>
     </message>
   </context>
   <context>
@@ -10045,11 +10045,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
-      <translation type="unfinished">LDAP Default group cannot be deleted as long as the site is connected to LDAP server</translation>
+      <translation>Η προεπιλεγμένη ομάδα LDAP δεν μπορεί να διαγραφεί όσο η τοποθεσία είναι συνδεδεμένη με τον διακομιστή LDAP</translation>
     </message>
     <message>
       <source>User management for organization users is available only at the organization level, not the site level</source>
-      <translation type="unfinished">User management for organization users is available only at the organization level, not the site level</translation>
+      <translation>Η διαχείριση χρηστών για χρήστες οργανισμού είναι διαθέσιμη μόνο σε επίπεδο οργανισμού και όχι σε επίπεδο τοποθεσίας</translation>
     </message>
   </context>
   <context>
@@ -10085,7 +10085,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Current Site</source>
-      <translation type="unfinished">Current Site</translation>
+      <translation>Τρέχουσα Τοποθεσία</translation>
     </message>
     <message>
       <source>Any Notification</source>
@@ -10377,7 +10377,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Web Page</source>
-      <translation type="unfinished">New Web Page</translation>
+      <translation>Νέα Ιστοσελίδα</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -10393,7 +10393,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>New Integration</source>
-      <translation type="unfinished">New Integration</translation>
+      <translation>Νέα Ενσωμάτωση</translation>
     </message>
     <message>
       <source>Edit Integration</source>
@@ -10473,7 +10473,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Επιλογή Φακέλου...</translation>
     </message>
   </context>
   <context>
@@ -10760,8 +10760,8 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Οι ρυθμίσεις ποιότητας και FPS είναι απενεργοποιημένες λόγω της επιλογής &quot;Να επιτρέπεται η βελτιστοποίηση των ρυθμίσεων κάμερας&quot; στο παράθυρο διαλόγου &quot;Διαχείριση τοποθεσίας&quot;.
+Μπορείτε ακόμα να αλλάξετε την ποιότητα και τα FPS απευθείας στην κάμερα.</translation>
     </message>
     <message>
       <source>Mbps</source>
@@ -10878,11 +10878,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</translation>
+      <translation>Κρυπτογραφεί τα δεδομένα αρχείου για να αποτρέψει την προβολή τους εκτός της τοποθεσίας. Δεν θα χρειαστεί να εισαγάγετε τον κωδικό πρόσβασης κρυπτογράφησης για να δείτε το αρχείο βίντεο εντός αυτής της τοποθεσίας.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall Site security and may lead to performance degradation</translation>
+      <translation>Η απεριόριστη διάρκεια ζωής της συνεδρίας χρήστη απειλεί τη συνολική ασφάλεια της τοποθεσίας και ενδέχεται να οδηγήσει σε υποβάθμιση της απόδοσης</translation>
     </message>
   </context>
   <context>
@@ -11323,7 +11323,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
-      <translation type="unfinished">The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</translation>
+      <translation>Η Τοποθεσία υπερβαίνει τα όρια του Οργανισμού της και ενδέχεται σύντομα να καταστεί μη λειτουργική. Παρακαλούμε προσαρμόστε τη χρήση σας για να αποφύγετε διακοπές στην υπηρεσία.</translation>
     </message>
     <message>
       <source>Open Settings</source>
@@ -11376,12 +11376,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Η πρόσβασή σας στην Τοποθεσία λήγει %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">Your access to the Site expires in %1</translation>
+      <translation>Η πρόσβασή σας στην τοποθεσία λήγει %1</translation>
     </message>
   </context>
   <context>
@@ -11436,7 +11436,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
-      <translation type="unfinished">This action is not supported for notifications from other Sites</translation>
+      <translation>Αυτή η ενέργεια δεν υποστηρίζεται για ειδοποιήσεις από άλλες τοποθεσίες</translation>
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
@@ -11513,11 +11513,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Μεγάλο</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Σύντομο</translation>
     </message>
   </context>
   <context>
@@ -11669,7 +11669,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Site Error</source>
-      <translation type="unfinished">Site Error</translation>
+      <translation>Σφάλμα Τοποθεσίας</translation>
     </message>
   </context>
   <context>
@@ -11875,11 +11875,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
-      <translation type="unfinished">This will instantly remove an access to the site for this user</translation>
+      <translation>Αυτό θα καταργήσει αμέσως την πρόσβαση στην τοποθεσία για αυτόν τον χρήστη</translation>
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Ο χρήστης με το καθορισμένο email έχει ήδη πρόσβαση διαχειριστή μέσω του Εμπορικού Συνεργάτη</translation>
     </message>
   </context>
   <context>
@@ -12236,7 +12236,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unable to connect to the site because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the site because it has become offline</translation>
+      <translation>Δεν είναι δυνατή η σύνδεση με την τοποθεσία επειδή έχει τεθεί εκτός σύνδεσης</translation>
     </message>
   </context>
   <context>
@@ -13036,7 +13036,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Σύνολο</translation>
     </message>
     <message>
       <source>Used</source>
@@ -13318,7 +13318,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Folder...</source>
-      <translation type="unfinished">Select Folder...</translation>
+      <translation>Επιλογή Φακέλου...</translation>
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
@@ -13371,7 +13371,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Άνοιγμα του φακέλου που περιέχει το αρχείο</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

@@ -286,18 +286,18 @@
     </message>
   </context>
   <context>
-    <name>DetailsScreen</name>
+    <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation>Προεπισκόπηση</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Ακύρωση</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation>Αναζήτηση με %1</translation>
+      <translation type="unfinished">Search by %1</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>

@@ -227,8 +227,8 @@
     <message numerus="yes">
       <source>Cannot verify the identity of %n servers</source>
       <translation>
-        <numerusform>Δεν είναι δυνατή η επαλήθευση της ταυτότητας του διακομιστή %n</numerusform>
-        <numerusform>Δεν είναι δυνατή η επαλήθευση της ταυτότητας των διακομιστών %n</numerusform>
+        <numerusform>Δεν είναι δυνατή η επαλήθευση της ταυτότητας του %n διακομιστή</numerusform>
+        <numerusform>Δεν είναι δυνατή η επαλήθευση της ταυτότητας των %n διακομιστών</numerusform>
       </translation>
     </message>
     <message>

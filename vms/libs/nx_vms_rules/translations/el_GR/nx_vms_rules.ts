@@ -359,8 +359,8 @@
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
       <translation>
-        <numerusform>Η επιπλέον διεύθυνση email %n από τις %1 είναι μη έγκυρη</numerusform>
-        <numerusform>Οι %n από τις %1 επιπλέον διευθύνσεις ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρες</numerusform>
+        <numerusform>%n επιπλέον διεύθυνση email από τις %1 είναι μη έγκυρη</numerusform>
+        <numerusform>%n από τις %1 επιπλέον διευθύνσεις ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρες</numerusform>
       </translation>
     </message>
   </context>
@@ -1014,22 +1014,22 @@
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
       <translation>
-        <numerusform>Η εγγραφή στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
-        <numerusform>Η εγγραφή σε κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η εγγραφή σε %n κανάλι διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η εγγραφή σε %n κανάλια διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
       <translation>
-        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
-        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud στα κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud σε %n κανάλι διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η δημιουργία αντιγράφων ασφαλείας του χώρου αποθήκευσης στο cloud σε %n κανάλια διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation>
-        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή στο κανάλι %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
-        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή στα κανάλια %n διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή σε %n κανάλι διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
+        <numerusform>Η χρήση της υπηρεσίας ενσωμάτωσης επί πληρωμή σε %n κανάλια διακόπηκε λόγω υπερβολικής χρήσης της υπηρεσίας.</numerusform>
       </translation>
     </message>
     <message>

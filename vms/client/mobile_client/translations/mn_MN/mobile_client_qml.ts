@@ -286,18 +286,18 @@
     </message>
   </context>
   <context>
-    <name>DetailsScreen</name>
+    <name>DetailsItem</name>
     <message>
       <source>Preview</source>
       <translation type="unfinished">Preview</translation>
     </message>
     <message>
-      <source>Cancel</source>
-      <translation>Цуцлах</translation>
-    </message>
-    <message>
       <source>Search by %1</source>
       <translation type="unfinished">Search by %1</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>

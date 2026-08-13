@@ -286,18 +286,18 @@
     </message>
   </context>
   <context>
-    <name>DetailsScreen</name>
+    <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation>預覽</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>取消</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation>以 %1 搜尋</translation>
+      <translation type="unfinished">Search by %1</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
