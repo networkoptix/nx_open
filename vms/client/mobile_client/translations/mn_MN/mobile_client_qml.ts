@@ -297,7 +297,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Цуцлах</translation>
     </message>
   </context>
   <context>

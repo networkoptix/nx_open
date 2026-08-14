@@ -289,7 +289,7 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Náhled</translation>
     </message>
     <message>
       <source>Search by %1</source>
@@ -297,7 +297,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Zrušit</translation>
     </message>
   </context>
   <context>

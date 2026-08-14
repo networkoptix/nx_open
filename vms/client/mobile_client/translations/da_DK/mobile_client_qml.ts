@@ -289,15 +289,15 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Forhåndsvisning</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Søg efter %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>

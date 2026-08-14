@@ -289,15 +289,15 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>プレビュー</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>%1 で検索</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>

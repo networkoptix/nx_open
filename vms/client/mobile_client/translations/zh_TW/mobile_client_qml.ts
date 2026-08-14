@@ -289,15 +289,15 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>預覽</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>以 %1 搜尋</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>取消</translation>
     </message>
   </context>
   <context>

@@ -289,15 +289,15 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Προεπισκόπηση</translation>
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Αναζήτηση με %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Ακύρωση</translation>
     </message>
   </context>
   <context>
