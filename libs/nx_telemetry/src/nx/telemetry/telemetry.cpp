@@ -56,7 +56,7 @@ void init(const InitAttributes& attributes, const Settings& settings)
         sdk::resource::Resource::Create({
             {"service.name", attributes.serviceName},
             {"service.version", attributes.serviceVersion},
-            {"deployment.environment", settings.environment},
+            {"deployment.environment.name", settings.environment},
         }));
 
     auto provider = shared_ptr<trace::TracerProvider>(

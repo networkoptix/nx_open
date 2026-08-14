@@ -98,16 +98,17 @@ private:
 /**
  * Collects Prometheus metrics of one application and serializes them into the text exposition
  * format for a /metrics scrape handler. serviceName and environment are attached as constant
- * labels to every series, following the conventions of the Go nxtelemetry package.
+ * labels to every series, following the conventions of the Go nxidentity package.
  *
  * All methods are thread-safe (delegated to prometheus-cpp internal locking).
  */
 class NX_PROMETHEUS_API Registry
 {
 public:
-    // Resource label names, must match the Go side (libs/go/tools/utils/nxtelemetry/telemetry.go).
+    // Resource label names, must match the Go side
+    // (libs/go/tools/utils/nxidentity/identity.go).
     inline static const std::string kLabelServiceName = "service_name";
-    inline static const std::string kLabelEnvironment = "deployment_environment";
+    inline static const std::string kLabelEnvironment = "deployment_environment_name";
 
     Registry(std::string serviceName, std::string environment);
     ~Registry();
