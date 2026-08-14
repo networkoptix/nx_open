@@ -31,6 +31,7 @@ Control
     property real highlightIntensity: type === VideoPlaceholder.Error ? 0.10 : 0.25
 
     property real preferredVerticalPadding: 44
+    property real minimumVerticalPadding: 44
 
     property bool interactive: true
 
@@ -103,6 +104,7 @@ Control
         Item
         {
             Layout.fillHeight: true
+            Layout.minimumHeight: minimumVerticalPadding
             Layout.preferredHeight: preferredVerticalPadding
         }
 
@@ -111,7 +113,7 @@ Control
             id: image
 
             readonly property int requiredHeight:
-                Layout.preferredHeight + Layout.topMargin + preferredVerticalPadding * 2
+                Layout.preferredHeight + Layout.topMargin + minimumVerticalPadding * 2
 
             readonly property bool hasEnoughSpace: control.height >= requiredHeight
 
@@ -132,6 +134,12 @@ Control
             readonly property bool hasEnoughSpace:
                 control.height >= (requiredHeight + image.requiredHeight + button.requiredHeight)
 
+            readonly property real preferredWidth: Math.min(300, control.availableWidth)
+
+            // Layout does not resize hidden items, binding on preferredWidth is required
+            // for the proper `hasEnoughSpace` update.
+            width: preferredWidth
+
             visible: !!text && hasEnoughSpace
             color: control.foregroundColor
             font.pixelSize: 40
@@ -141,8 +149,7 @@ Control
             maximumLineCount: 3
 
             Layout.topMargin: 16
-            Layout.fillWidth: true
-            Layout.maximumWidth: 300
+            Layout.preferredWidth: preferredWidth
             Layout.alignment: Qt.AlignCenter
         }
 
@@ -163,6 +170,7 @@ Control
         Item
         {
             Layout.fillHeight: true
+            Layout.minimumHeight: minimumVerticalPadding
             Layout.preferredHeight: preferredVerticalPadding
         }
     }

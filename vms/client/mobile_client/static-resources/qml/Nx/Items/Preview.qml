@@ -107,6 +107,7 @@ Rectangle
             anchors.fill: preview
             visible: preview.cannotDecryptMedia || root.dataState === Preview.DataState.NoData
             state: root.dataState === Preview.DataState.NoData ? "noData" : "cannotDecryptMedia"
+            minimumVerticalPadding: 19
         }
 
         GradientShadow
