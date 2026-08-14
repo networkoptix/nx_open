@@ -2,6 +2,7 @@
 
 #include "webrtc_demuxer.h"
 
+#include <array>
 #include <chrono>
 
 #include <core/resource/camera_resource.h>
@@ -9,12 +10,70 @@
 #include <nx/rtp/parsers/hevc_rtp_parser.h>
 #include <nx/rtp/parsers/i_rtp_parser_factory.h>
 #include <nx/rtp/parsers/mjpeg_rtp_parser.h>
+#include <nx/rtp/parsers/opus_rtp_parser.h>
 #include <nx/rtp/parsers/simpleaudio_rtp_parser.h>
 #include <nx/rtp/rtp.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 
 namespace nx::webrtc {
+
+namespace {
+
+// Codec names are case-insensitive per RFC 4566; e.g. browsers spell this one "opus" while others
+// spell it "OPUS".
+bool sameCodec(const QString& sdpCodecName, const char* codecName)
+{
+    return sdpCodecName.compare(codecName, Qt::CaseInsensitive) == 0;
+}
+
+// G726 carries its bitrate in the codec name: g726-16, g726-24, g726-32, g726-40. Returns null if
+// the name has no bitrate suffix, which leaves the track without a parser and so skipped.
+std::unique_ptr<nx::rtp::AudioStreamParser> makeG726Parser(const QString& codecName)
+{
+    const int bitRatePos = codecName.indexOf(QLatin1Char('-'));
+    if (bitRatePos == -1)
+    {
+        NX_VERBOSE(NX_SCOPE_TAG, "For G726 codec bitrate is not specified: %1", codecName);
+        return nullptr;
+    }
+
+    auto parser = std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_ADPCM_G726);
+    parser->setBitsPerSample(codecName.mid(bitRatePos + 1).toInt() / 8);
+    return parser;
+}
+
+// Kept split by media type: setSdp() needs the audio parser typed to read its codec parameters,
+// and so an audio m-line must never yield a VideoStreamParser.
+nx::rtp::StreamParserPtr makeVideoParser(const QString& codec)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "SDP video codec: %1", codec);
+    if (sameCodec(codec, "H264"))
+        return std::make_unique<nx::rtp::H264Parser>();
+    if (sameCodec(codec, "H265"))
+        return std::make_unique<nx::rtp::HevcParser>();
+    if (sameCodec(codec, "JPEG"))
+        return std::make_unique<nx::rtp::MjpegParser>();
+    return nullptr;
+}
+
+std::unique_ptr<nx::rtp::AudioStreamParser> makeAudioParser(const QString& codec)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "SDP audio codec: %1", codec);
+    if (sameCodec(codec, "opus"))
+        return std::make_unique<nx::rtp::OpusParser>();
+    if (sameCodec(codec, "PCMU"))
+        return std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_MULAW);
+    if (sameCodec(codec, "PCMA"))
+        return std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_ALAW);
+    if (codec.startsWith("G726", Qt::CaseInsensitive))
+        return makeG726Parser(codec); //< g726-24, g726-32 etc.
+    if (sameCodec(codec, "L16"))
+        return std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_S16BE);
+    return nullptr;
+}
+
+} // namespace
 
 Demuxer::Demuxer(const Tracks* tracks): m_tracks(tracks)
 {
@@ -37,108 +96,100 @@ void Demuxer::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 void Demuxer::setSdp(const std::string& value)
 {
     // TODO: extract deviceId from SDP
+    // Currently irrelevant: a Demuxer only ever serves one device's recv session, so the
+    // videoTrack()/audioTrack() lookups below match on trackType alone regardless.
     nx::Uuid deviceId;
 
     nx::rtp::Sdp sdp;
     sdp.parse(QString::fromStdString(value));
-    for (const auto& i: sdp.media)
-    {
-        nx::rtp::StreamParserPtr parser;
-        // TODO should check mediaType too. SDP parser parse `codecName` of `m=application` track as PCMU.
-        if (i.mediaType == nx::rtp::Sdp::MediaType::Video)
-        {
-            NX_VERBOSE(this, "Check video codec: %1", i.rtpmap.codecName.toStdString());
-            if (i.rtpmap.codecName == "H264")
-            {
-                parser = std::make_unique<nx::rtp::H264Parser>();
-            }
-            else if (i.rtpmap.codecName == "H265")
-            {
-                parser = std::make_unique<nx::rtp::HevcParser>();
-            }
-            else if (i.rtpmap.codecName == "JPEG")
-            {
-                parser = std::make_unique<nx::rtp::MjpegParser>();
-            }
-        }
-        else if (i.mediaType == nx::rtp::Sdp::MediaType::Audio)
-        {
-            NX_VERBOSE(this, "Check audio codec: %1", i.rtpmap.codecName.toStdString());
-            if (i.rtpmap.codecName == "PCMU")
-            {
-                parser = std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_MULAW);
-            }
-            else if (i.rtpmap.codecName == "PCMA")
-            {
-                parser = std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_ALAW);
-            }
-            else if (i.rtpmap.codecName.startsWith("G726")) //< g726-24, g726-32 etc.
-            {
-                int bitRatePos = i.rtpmap.codecName.indexOf(QLatin1Char('-'));
-                if (bitRatePos == -1)
-                {
-                    NX_VERBOSE(this, "For G726 codec bitrate is not specified: %1", i.rtpmap.codecName.toStdString());
-                    continue;
-                }
-                QString bitsPerSample = i.rtpmap.codecName.mid(bitRatePos + 1);
-                auto audioParser = std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_ADPCM_G726);
-                audioParser->setBitsPerSample(bitsPerSample.toInt() / 8);
-                parser = std::move(audioParser);
-            }
-            else if (i.rtpmap.codecName == "L16")
-            {
-                parser = std::make_unique<nx::rtp::SimpleAudioParser>(AV_CODEC_ID_PCM_S16BE);
-            }
-        }
-        else
-        {
-            NX_VERBOSE(this, "Skipping non-media track: %1", i.toString());
-            continue;
-        }
-        if (!parser)
-        {
-            NX_VERBOSE(this, "Can't create parser for codec: %1", i.rtpmap.codecName.toStdString());
-            continue;
-        }
 
-        uint32_t senderSsrc = 0;
-        parser->setSdpInfo(i);
-        if (dynamic_cast<nx::rtp::VideoStreamParser*>(parser.get()) != nullptr)
+    // Outer loop over media types, not over sdp.media: the recorder allocates all video streams
+    // before the audio ones, and trackIdx has to end up matching that layout.
+    constexpr std::array kTrackTypes = {
+        nx::rtp::Sdp::MediaType::Video, nx::rtp::Sdp::MediaType::Audio};
+    int trackIdx = 0;
+    for (const auto trackType: kTrackTypes)
+    {
+        const bool video = trackType == nx::rtp::Sdp::MediaType::Video;
+        for (const auto& media: sdp.media)
         {
-            m_hasVideo = true;
-            m_rtcpFir.sourceSsrc = i.ssrc;
-            m_videoMediaSsrc = i.ssrc;
-            if (const Track* track = m_tracks->videoTrack(deviceId))
+            if (trackType != media.mediaType)
+                continue;
+
+            nx::rtp::StreamParserPtr parser;
+            if (video)
             {
-                senderSsrc = track->ssrc;
-                m_twcc.setSsrcs(i.ssrc, track->ssrc);
+                parser = makeVideoParser(media.rtpmap.codecName);
+                if (parser)
+                    parser->setSdpInfo(media);
             }
+            else if (auto audio = makeAudioParser(media.rtpmap.codecName))
+            {
+                // getCodecParameters() is only valid once setSdpInfo() has run.
+                audio->setSdpInfo(media);
+                m_audioCodecParameters = audio->getCodecParameters();
+                parser = std::move(audio);
+            }
+            if (!parser)
+            {
+                NX_VERBOSE(this, "Can't create parser for codec: %1", media.rtpmap.codecName);
+                continue;
+            }
+
+            uint32_t senderSsrc = 0;
+            if (video)
+            {
+                NX_ASSERT(trackIdx == 0, "Only one video track is supported");
+                m_hasVideo = true;
+                m_rtcpFir.sourceSsrc = media.ssrc;
+                m_videoMediaSsrc = media.ssrc;
+                if (const Track* track = m_tracks->videoTrack(deviceId))
+                {
+                    senderSsrc = track->ssrc;
+                    m_twcc.setSsrcs(media.ssrc, track->ssrc);
+                }
+            }
+            else
+            {
+                m_hasAudio = true;
+                if (const Track* track = m_tracks->audioTrack(deviceId))
+                    senderSsrc = track->ssrc;
+            }
+
+            NX_ASSERT(m_resource);
+            auto timeHelper =
+                std::make_unique<nx::streaming::rtp::CameraTimeHelper>(media.mediaType,
+                    m_resource->getPhysicalId().toStdString(),
+                    m_resource->getTimeOffset());
+            auto result = m_parsers.emplace(media.ssrc,
+                ParserContext(nx::rtp::RtpParser(media.payloadType, std::move(parser)),
+                    senderSsrc,
+                    std::move(timeHelper),
+                    trackIdx,
+                    media.payloadType));
+            if (result.second)
+            {
+                // Only a stored track consumes an index, otherwise the rest would no longer line
+                // up with the recorder's streams. The publisher sends the payload type it listed
+                // first, so this is the only codec this track will carry.
+                ++trackIdx;
+                NX_DEBUG(this,
+                    "Track ssrc: %1 index: %2 codec: %3 ptype: %4",
+                    media.ssrc,
+                    result.first->second.trackIdx,
+                    media.rtpmap.codecName,
+                    media.payloadType);
+            }
+            else
+            {
+                NX_DEBUG(this,
+                    "Track with ssrc: %1 ptype: %2 codec: %3 is not inserted",
+                    media.ssrc,
+                    media.payloadType,
+                    media.rtpmap.codecName);
+            }
+            m_reorderers[media.ssrc];
         }
-        if (auto audioParser = dynamic_cast<nx::rtp::AudioStreamParser*>(parser.get());
-            audioParser != nullptr)
-        {
-            m_hasAudio = true;
-            m_audioCodecParameters = audioParser->getCodecParameters();
-            if (const Track* track = m_tracks->audioTrack(deviceId))
-                senderSsrc = track->ssrc;
-        }
-        NX_ASSERT(m_resource);
-        auto timeHelper = std::make_unique<nx::streaming::rtp::CameraTimeHelper>(
-            i.mediaType,
-            m_resource->getPhysicalId().toStdString(),
-            m_resource->getTimeOffset());
-        auto result = m_parsers.emplace(
-            i.ssrc,
-            ParserContext(
-                nx::rtp::RtpParser(i.payloadType, std::move(parser)),
-                senderSsrc,
-                std::move(timeHelper)));
-        if (!result.second)
-        {
-            NX_DEBUG(this, "Track with ssrc: %1 ptype: %2 codec: %3 is not inserted",
-                i.ssrc, i.payloadType, i.rtpmap.codecName);
-        }
-        m_reorderers[i.ssrc];
     }
 }
 
@@ -160,20 +211,17 @@ bool Demuxer::processData(const char* data, size_t size)
             return false;
         array.resize(newSize);
     }
-    const nx::rtp::RtpHeader* header = (nx::rtp::RtpHeader*) array.data();
+
+    auto header = reinterpret_cast<const nx::rtp::RtpHeader*>(array.data());
     if (header->isRtcp())
-    {
         return processRtcp(array);
-    }
-    else
-    {
-        return processRtp(array);
-    }
+
+    return processRtp(array);
 }
 
 bool Demuxer::processRtp(const nx::utils::ByteArray& array)
 {
-    const nx::rtp::RtpHeader* header = (nx::rtp::RtpHeader*) array.data();
+    auto header = reinterpret_cast<const nx::rtp::RtpHeader*>(array.data());
     uint32_t ssrc = ntohl(header->ssrc);
     if (m_parsers.find(ssrc) == m_parsers.end())
     {
@@ -301,13 +349,32 @@ bool Demuxer::processRtcp(const nx::utils::ByteArray& array)
 bool Demuxer::demux(const char* data, size_t size)
 {
     NX_ASSERT(size >= sizeof(nx::rtp::RtpHeader));
-    const nx::rtp::RtpHeader* header = (const nx::rtp::RtpHeader*) data;
+    auto header = reinterpret_cast<const nx::rtp::RtpHeader*>(data);
     NX_ASSERT(!header->isRtcp());
     uint32_t ssrc = ntohl(header->ssrc);
     auto parser = m_parsers.find(ssrc);
     NX_ASSERT(parser != m_parsers.end());
+    auto& context = parser->second;
 
-    auto& buffer = parser->second.buffer;
+    if (header->payloadType != context.payloadType)
+    {
+        // RtpParser would skip it anyway, but only after buffering, and `buffer` is cleared only
+        // when a frame comes out. Dropping here keeps it from growing for the whole session.
+        if (context.reportedUnexpectedPayloadType != header->payloadType)
+        {
+            context.reportedUnexpectedPayloadType = header->payloadType;
+            NX_WARNING(this,
+                "Dropping ssrc %1 packets with payload type %2: the track was negotiated as "
+                "payload type %3 and the codec cannot be changed mid-stream",
+                ssrc,
+                static_cast<int>(header->payloadType),
+                context.payloadType);
+        }
+        context.parser.resetSequenceCheck();
+        return true;
+    }
+
+    auto& buffer = context.buffer;
     auto oldSize = buffer.size();
     buffer.insert(
         buffer.end(),
@@ -316,17 +383,19 @@ bool Demuxer::demux(const char* data, size_t size)
 
     bool packetLoss = false, gotData = false;
 
-    parser->second.parser.processData(
+    context.parser.processData(
         buffer.data(), oldSize, buffer.size() - oldSize, packetLoss, gotData);
     if (gotData)
     {
         nx::rtp::RtcpSenderReport senderReport;
-        auto media = parser->second.parser.nextData(senderReport);
-        media->timestamp = parser->second.timeHelper->getTime(
-            qnSyncTime->currentTimePoint(),
-            std::chrono::microseconds(media->timestamp),
-            parser->second.parser.isUtcTime(),
-            true).count();
+        auto media = context.parser.nextData(senderReport);
+        media->channelNumber = static_cast<uint32_t>(context.trackIdx);
+        media->timestamp = context.timeHelper
+                               ->getTime(qnSyncTime->currentTimePoint(),
+                                   std::chrono::microseconds(media->timestamp),
+                                   context.parser.isUtcTime(),
+                                   true)
+                               .count();
         // TODO emit network issues like in server_rtsp_stream_provider.cpp.
         // TODO Separate timestamp-related code.
         m_frames.emplace_back(std::move(media));
