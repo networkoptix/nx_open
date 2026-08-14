@@ -29,19 +29,19 @@ struct RtpHeader
     static const int kVersion = 2;
     static const int kCsrcSize = 4;
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
-    unsigned short   version:2;     /* packet type                */
-    unsigned short   padding:1;     /* padding flag               */
-    unsigned short   extension:1;   /* header extension flag      */
-    unsigned short   CSRCCount:4;   /* CSRC count                 */
-    unsigned short   marker:1;      /* marker bit                 */
-    unsigned short   payloadType:7; /* payload type               */
+    uint16_t version : 2;
+    uint16_t padding : 1;
+    uint16_t extension : 1;
+    uint16_t CSRCCount : 4;
+    uint16_t marker : 1;
+    uint16_t payloadType : 7;
 #else
-    unsigned short   CSRCCount:4;   /* CSRC count                 */
-    unsigned short   extension:1;   /* header extension flag      */
-    unsigned short   padding:1;     /* padding flag               */
-    unsigned short   version:2;     /* packet type                */
-    unsigned short   payloadType:7; /* payload type               */
-    unsigned short   marker:1;      /* marker bit                 */
+    uint16_t CSRCCount : 4;
+    uint16_t extension : 1;
+    uint16_t padding : 1;
+    uint16_t version : 2;
+    uint16_t payloadType : 7;
+    uint16_t marker : 1;
 #endif
     uint16_t sequence;               // sequence number
     uint32_t timestamp;              // timestamp
@@ -76,6 +76,9 @@ struct RtpHeader
         return res;
     }
 };
+// Both kSize and sizeof() are used to bound reads of a header mapped onto wire bytes, so the two
+// have to agree.
+static_assert(sizeof(RtpHeader) == RtpHeader::kSize);
 
 struct RtpHeaderExtensionHeader
 {
@@ -86,6 +89,7 @@ struct RtpHeaderExtensionHeader
     int id() const { return ntohs(definedByProfile); }
     int lengthBytes() const { return ntohs(length) * /*size of word*/ 4; }
 };
+static_assert(sizeof(RtpHeaderExtensionHeader) == RtpHeaderExtensionHeader::kSize);
 #pragma pack(pop)
 
 struct RtpExtensionData

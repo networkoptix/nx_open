@@ -42,20 +42,32 @@ private:
 private:
     struct ParserContext
     {
-        ParserContext(
-            nx::rtp::RtpParser&& parser,
+        ParserContext(nx::rtp::RtpParser&& parser,
             uint32_t senderSsrc,
-            std::unique_ptr<nx::streaming::rtp::CameraTimeHelper>&& timeHelper)
-            :
+            std::unique_ptr<nx::streaming::rtp::CameraTimeHelper>&& timeHelper,
+            int trackIdx,
+            int payloadType):
             parser(std::move(parser)),
             senderSsrc(senderSsrc),
-            timeHelper(std::move(timeHelper))
+            timeHelper(std::move(timeHelper)),
+            trackIdx(trackIdx),
+            payloadType(payloadType)
         {}
         nx::rtp::RtpParser parser;
         std::vector<uint8_t> buffer;
         nx::rtp::RtcpSenderReport senderReport;
         uint32_t senderSsrc = 0;
         std::unique_ptr<nx::streaming::rtp::CameraTimeHelper> timeHelper;
+
+        // Index of this track among the stored ones, video first: the recorder stream to write to.
+        int trackIdx = 0;
+
+        // The only payload type this context can parse: an m-line may negotiate several, but the
+        // parser and the recorder's stream layout are fixed to the one the publisher listed first.
+        int payloadType = -1;
+
+        // Throttles the demux() warning to one per unexpected payload type.
+        int reportedUnexpectedPayloadType = -1;
     };
 
 private:

@@ -18,25 +18,48 @@ static const std::string kSendOnlyAttr = "a=sendonly";
 static const std::string kRecvOnlyAttr = "a=recvonly";
 static const std::string kSendRecvAttr = "a=sendrecv";
 
-// Builds the m-line, rtpmap, and optional fmtp lines for a media description.
+// PCMU's statically assigned RTP payload type, RFC 3551 table 4.
+constexpr int kPcmuPayloadType = 0;
+
+// One codec offered on an m-line. `channels` is omitted from the rtpmap when zero, and
+// `fmtpParams` produces no fmtp line when empty.
+struct OfferedCodec
+{
+    int payloadType = -1;
+    std::string name;
+    int clockRate = 0;
+    int channels = 0;
+    std::string fmtpParams;
+};
+
+// Builds the m-line plus the rtpmap and optional fmtp lines for every offered codec. The answerer
+// picks one of the payload types listed on the m-line (RFC 3264), and their order expresses our
+// preference, so pass the codecs most-preferred first.
 // Uses the DTLS-SRTP AVPF profile (RFC 4585) so rtcp-fb directives are honored
 // -- Safari/iOS enforce this strictly, Chrome is lenient -- and a bundled session
 // must not mix AVP and SAVPF across its m-lines.
 std::string makeMediaLines(
-    const std::string& mediaType,
-    uint16_t port,
-    int payloadType,
-    const std::string& codec,
-    int clockRate,
-    const std::string& fmtpParams = {})
+    const std::string& mediaType, uint16_t port, const std::vector<OfferedCodec>& codecs)
 {
-    auto mlines = "m=" + mediaType + " " + std::to_string(port) + " UDP/TLS/RTP/SAVPF " +
-        std::to_string(payloadType) + "\r\n";
-    mlines += "a=rtpmap:" + std::to_string(payloadType) + " " + codec + "/" +
-        std::to_string(clockRate) + "\r\n";
+    auto mlines = "m=" + mediaType + " " + std::to_string(port) + " UDP/TLS/RTP/SAVPF";
+    for (const auto& codec: codecs)
+        mlines += " " + std::to_string(codec.payloadType);
+    mlines += "\r\n";
 
-    if (!fmtpParams.empty())
-        mlines += "a=fmtp:" + std::to_string(payloadType) + " " + fmtpParams + "\r\n";
+    for (const auto& codec: codecs)
+    {
+        mlines += "a=rtpmap:" + std::to_string(codec.payloadType) + " " + codec.name + "/"
+            + std::to_string(codec.clockRate);
+        if (codec.channels > 0)
+            mlines += "/" + std::to_string(codec.channels);
+        mlines += "\r\n";
+
+        if (!codec.fmtpParams.empty())
+        {
+            mlines +=
+                "a=fmtp:" + std::to_string(codec.payloadType) + " " + codec.fmtpParams + "\r\n";
+        }
+    }
 
     return mlines;
 }
@@ -240,13 +263,14 @@ std::string TracksForRecv::getSdpForTrack(const Track* track, uint16_t port) con
     std::string sdp;
     if (track->trackType == TrackType::video)
     {
-        sdp = makeMediaLines(
-            "video",
+        sdp = makeMediaLines("video",
             port,
-            track->payloadType,
-            "H264",
-            90000,
-            "packetization-mode=1");
+            {{
+                .payloadType = track->payloadType,
+                .name = "H264",
+                .clockRate = 90000,
+                .fmtpParams = "packetization-mode=1",
+            }});
 
         // Full intra request: https://datatracker.ietf.org/doc/html/rfc5104#section-4.3.1
         // `ccm` means `Codec Control Message`.
@@ -261,7 +285,32 @@ std::string TracksForRecv::getSdpForTrack(const Track* track, uint16_t port) con
     }
     else if (track->trackType == TrackType::audio)
     {
-        sdp = makeMediaLines("audio", port, track->payloadType, "PCMU", 8000);
+        // Opus first: every WebRTC stack implements it, it is what browsers pick by default, and
+        // unlike PCMU it is not locked to 8 kHz narrowband. Per RFC 7587 section 7 the rtpmap
+        // always reads 48000/2 regardless of what the sender ends up encoding. `useinbandfec=1`
+        // lets the sender add in-band FEC, which matters because we archive this stream and cannot
+        // ask for a retransmit later. Stereo is left at its default of mono.
+        //
+        // PCMU stays on the m-line only as a fallback for a publisher that cannot do Opus.
+        // examineSdp() rejects the whole session when the publisher answers with no audio, so
+        // offering Opus alone would cost such a publisher its video too, not just its audio. Any
+        // browser prefers Opus over G.711, so this costs nothing in practice.
+        sdp = makeMediaLines("audio",
+            port,
+            {
+                {
+                    .payloadType = track->payloadType,
+                    .name = "opus",
+                    .clockRate = 48000,
+                    .channels = 2,
+                    .fmtpParams = "minptime=10;useinbandfec=1",
+                },
+                {
+                    .payloadType = kPcmuPayloadType,
+                    .name = "PCMU",
+                    .clockRate = 8000,
+                },
+            });
     }
     else
     {
