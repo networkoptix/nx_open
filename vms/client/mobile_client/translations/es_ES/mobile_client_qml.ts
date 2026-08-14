@@ -219,7 +219,7 @@
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
-      <translation>Previsualización</translation>
+      <translation>Prevista</translation>
     </message>
     <message>
       <source>Show on Camera</source>

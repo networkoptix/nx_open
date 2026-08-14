@@ -219,7 +219,7 @@
     <name>DetailsScreen</name>
     <message>
       <source>Preview</source>
-      <translation>Ön izleme</translation>
+      <translation>Önizleme</translation>
     </message>
     <message>
       <source>Show on Camera</source>
