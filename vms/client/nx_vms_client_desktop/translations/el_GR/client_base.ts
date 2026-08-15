@@ -7537,15 +7537,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No secondary stream</source>
-      <translation type="unfinished">No secondary stream</translation>
+      <translation>Δεν υπάρχει δευτερεύουσα ροή</translation>
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Μη έγκυρη διεύθυνση ροής</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Ασυμβατότητα πρωτοκόλλου ροής</translation>
     </message>
   </context>
   <context>
@@ -7553,7 +7553,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Επιλέξτε ένα πιστοποιητικό για να επαληθεύσετε τον εαυτό σας στο %1:</translation>
     </message>
     <message>
       <source>Select</source>
@@ -7580,34 +7580,34 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Your confirmation is required to provide a token to</source>
       <comment>... a web page (below there is a web page name with an icon)</comment>
-      <translation type="unfinished">Your confirmation is required to provide a token to</translation>
+      <translation>Απαιτείται η επιβεβαίωσή σας για την παροχή ενός διακριτικού για</translation>
     </message>
     <message>
       <source>Allow</source>
-      <translation type="unfinished">Allow</translation>
+      <translation>Επιτρέπω</translation>
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>Αυτή η ιστοσελίδα ζητά πρόσβαση στον λογαριασμό σας για εξουσιοδότηση</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Αυτή η ενημέρωση είναι ήδη εγκατεστημένη.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Αυτή η έκδοση δεν είναι εγκατεστημένη.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Μη έγκυρη μορφή έκδοσης.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Κατεστραμμένο πακέτο ενημέρωσης.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7615,27 +7615,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος στο δίσκο για να εγκαταστήσετε την ενημέρωση του client.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Το πακέτο εγκατάστασης χάθηκε.</translation>
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>Το αρχείο %1 δεν υπάρχει</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>Δεν υπάρχει έγκυρο πακέτο του client για λήψη</translation>
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Δεν είναι δυνατή η λήψη του αρχείου ενημέρωσης</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος για λήψη του αρχείου ενημέρωσης</translation>
     </message>
   </context>
   <context>
@@ -7656,7 +7656,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Paste from Clipboard</source>
-      <translation type="unfinished">Paste from Clipboard</translation>
+      <translation>Επικόλληση από το πρόχειρο</translation>
     </message>
     <message>
       <source>Copied</source>
@@ -7666,7 +7666,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Pasted</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Pasted</translation>
+      <translation>Έγινε Επικόλληση</translation>
     </message>
   </context>
   <context>
@@ -7674,7 +7674,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Συνδεθείτε στο %1</translation>
     </message>
   </context>
   <context>
@@ -7688,31 +7688,31 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation type="unfinished">Video Wall is removed on the server and will be closed.</translation>
+      <translation>Το σύστημα προβολής πολλαπλών οθονών καταργήθηκε από τον διακομιστή και θα κλείσει.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
+      <translation>Δεν ήταν δυνατή η σύνδεση με τον διακομιστή. Το σύστημα προβολής πολλαπλών οθονών θα κλείσει.</translation>
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Δεν ήταν δυνατή η σύνδεση με τον διακομιστή. Η εφαρμογή θα κλείσει.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation type="unfinished">Failed to connect to the selected server</translation>
+      <translation>Αποτυχία σύνδεσης με τον επιλεγμένο διακομιστή</translation>
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Απαιτείται εκ νέου έλεγχος ταυτότητας</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Εισαγάγετε τον κωδικό πρόσβασης για να συνεχίσετε την συνεδρία σας</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Η συνεδρία σας έχει λήξει. Παρακαλώ συνδεθείτε ξανά για να συνεχίσετε.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7721,24 +7721,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter access link to continue your session</source>
-      <translation type="unfinished">Enter access link to continue your session</translation>
+      <translation>Εισαγάγετε τον σύνδεσμο πρόσβασης για να συνεχίσετε την συνεδρία σας</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again with your link to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again with your link to continue.</translation>
+      <translation>Η συνεδρία σας έχει λήξει. Παρακαλώ συνδεθείτε ξανά με το σύνδεσμο για να συνεχίσετε.</translation>
     </message>
     <message>
       <source>Authentication details are incorrect</source>
-      <translation type="unfinished">Authentication details are incorrect</translation>
+      <translation>Τα στοιχεία ελέγχου ταυτότητας είναι λανθασμένα</translation>
     </message>
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Συνδεθείτε στο %1</translation>
     </message>
     <message>
       <source>Are you sure you want to disconnect?</source>
-      <translation type="unfinished">Are you sure you want to disconnect?</translation>
+      <translation>Είστε βέβαιοι οτι θέλετε να αποσυνδεθείτε;</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -7754,7 +7754,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>None of your Servers has connection to %1.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">None of your Servers has connection to %1.</translation>
+      <translation>Κανένας από τους διακομιστές σας δεν έχει σύνδεση με το %1.</translation>
     </message>
     <message>
       <source>Local Site owner is absent or disabled.</source>
@@ -7795,11 +7795,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ConnectToCurrentSystemTool</name>
     <message>
       <source>Configuring Server</source>
-      <translation type="unfinished">Configuring Server</translation>
+      <translation>Ρύθμιση Διακομιστή</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation type="unfinished">Total amount of licenses will decrease</translation>
+      <translation>Ο συνολικός αριθμός αδειών θα μειωθεί</translation>
     </message>
     <message>
       <source>Enter password...</source>
@@ -7807,7 +7807,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Administrator password</source>
-      <translation type="unfinished">Administrator password</translation>
+      <translation>Κωδικός πρόσβασης διαχειριστή</translation>
     </message>
     <message>
       <source>Merge Server to the Site</source>
@@ -7840,11 +7840,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Test Failed</source>
-      <translation type="unfinished">Test Failed</translation>
+      <translation>Η δοκιμή απέτυχε</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation type="unfinished">Request timeout</translation>
+      <translation>Λήξη χρονικού ορίου αιτήματος</translation>
     </message>
     <message>
       <source>New Site</source>
@@ -7855,23 +7855,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
+      <translation>Η εγγραφή δεν μπορεί να ενεργοποιηθεί για ορισμένες κάμερες.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
+      <translation>Οι ρυθμίσεις χρονοδιαγράμματος δεν είναι συμβατές με ορισμένες συσκευές.</translation>
     </message>
     <message>
       <source>Copy archive length settings</source>
-      <translation type="unfinished">Copy archive length settings</translation>
+      <translation>Αντιγραφή ρυθμίσεων μήκους αρχείου</translation>
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Το Πρόγραμμα εγγραφής περιέχει λειτουργίες εγγραφής που δεν υποστηρίζονται από τις επιλεγμένες κάμερες. Οι μη υποστηριζόμενες λειτουργίες εγγραφής θα αλλάξουν σε &quot;Πάντα εγγραφή&quot;.</translation>
     </message>
     <message>
       <source>Recording will not be enabled on some cameras.</source>
-      <translation type="unfinished">Recording will not be enabled on some cameras.</translation>
+      <translation>Η εγγραφή δεν θα είναι ενεργοποιημένη σε ορισμένες κάμερες.</translation>
     </message>
   </context>
   <context>
@@ -7882,11 +7882,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This camera requires password to be set up</source>
-      <translation type="unfinished">This camera requires password to be set up</translation>
+      <translation>Αυτή η κάμερα απαιτεί κωδικό πρόσβασης για να ρυθμιστεί</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up</translation>
+      <translation>Ορισμένες από τις επιλεγμένες κάμερες απαιτούν τη ρύθμιση κωδικού πρόσβασης</translation>
     </message>
     <message>
       <source>This camera requires password to be set up. Ask your site administrator to do it.</source>
@@ -7901,23 +7901,23 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DesktopDataProvider</name>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>Αδυναμία εντοπισμού ανάλυσης καταγραφής</translation>
     </message>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation type="unfinished">Could not find video encoder %1.</translation>
+      <translation>Δεν ήταν δυνατή η εύρεση του κωδικοποιητή βίντεο %1.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
+      <translation>Το πλάτος της οθόνης πρέπει να είναι πολλαπλάσιο του 8.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>Δεν ήταν δυνατή η αρχικοποίηση του κωδικοποιητή βίντεο.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>Δεν ήταν δυνατή η αρχικοποίηση του κωδικοποιητή ήχου.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
@@ -9156,15 +9156,15 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Ένα αντικείμενο δεν έχει χαρακτηριστικά που να ταιριάζουν με την επιλεγμένη λίστα</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Το αντικείμενο προστέθηκε στη λίστα</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
-      <translation type="unfinished">An object has been added to the &quot;%1&quot; successfully</translation>
+      <translation>Ένα αντικείμενο προστέθηκε με επιτυχία στο &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9194,7 +9194,7 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::LookupListExportProcessor</name>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Αρχεία κειμένου</translation>
     </message>
     <message>
       <source>All</source>
@@ -9202,7 +9202,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Export List</source>
-      <translation type="unfinished">Export List</translation>
+      <translation>Λίστα Εξαγωγής</translation>
     </message>
   </context>
   <context>
@@ -9217,22 +9217,22 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::LookupListPreviewHelper</name>
     <message>
       <source>Import Lookup List</source>
-      <translation type="unfinished">Import Lookup List</translation>
+      <translation>Εισαγωγή Λίστας Αναζήτησης</translation>
     </message>
     <message>
       <source>Text files</source>
-      <translation type="unfinished">Text files</translation>
+      <translation>Αρχεία κειμένου</translation>
     </message>
     <message>
       <source>All other text files</source>
-      <translation type="unfinished">All other text files</translation>
+      <translation>Όλα τα άλλα αρχεία κειμένου</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation type="unfinished">Server is not specified</translation>
+      <translation>Ο διακομιστής δεν έχει καθοριστεί</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -9240,19 +9240,19 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
-      <translation type="unfinished">Device address field must contain a valid URL, IP address, or RTSP link.</translation>
+      <translation>Το πεδίο διεύθυνσης συσκευής πρέπει να περιέχει μια έγκυρη διεύθυνση URL, διεύθυνση IP ή σύνδεσμο RTSP.</translation>
     </message>
     <message>
       <source>First address in range is greater than the last one.</source>
-      <translation type="unfinished">First address in range is greater than the last one.</translation>
+      <translation>Η πρώτη διεύθυνση στο εύρος είναι μεγαλύτερη από την τελευταία.</translation>
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation type="unfinished">The specified IP address range has more than 255 addresses.</translation>
+      <translation>Το καθορισμένο εύρος διευθύνσεων IP έχει περισσότερες από 255 διευθύνσεις.</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Δεν είναι δυνατή η έναρξη της διαδικασίας αναζήτησης</translation>
     </message>
   </context>
   <context>
@@ -9266,11 +9266,11 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Αυτή η ομάδα έχει ανατεθεί σε επίπεδο οργανισμού και μπορεί να διαχειριστεί μόνο σε επίπεδο οργανισμού</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
-      <translation type="unfinished">The user has been assigned to this group at organization level and can be unassigned only at organization level</translation>
+      <translation>Ο χρήστης έχει εκχωρηθεί σε αυτήν την ομάδα σε επίπεδο οργανισμού και μπορεί να αφαιρεθεί από αυτήν μόνο σε επίπεδο οργανισμού</translation>
     </message>
   </context>
   <context>
@@ -9281,23 +9281,23 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation type="unfinished">The login cannot be empty.</translation>
+      <translation>Το όνομα χρήστη δεν μπορεί να είναι κενό.</translation>
     </message>
     <message>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Δοκιμή...</translation>
     </message>
     <message>
       <source>Use a specific hostname or IP address rather than %1.</source>
-      <translation type="unfinished">Use a specific hostname or IP address rather than %1.</translation>
+      <translation>Χρησιμοποιήστε ένα συγκεκριμένο όνομα κεντρικού υπολογιστή ή διεύθυνση IP αντί για %1.</translation>
     </message>
     <message>
       <source>Merge with %1</source>
-      <translation type="unfinished">Merge with %1</translation>
+      <translation>Συγχώνευση με %1</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
-      <translation type="unfinished">You will be reconnected.</translation>
+      <translation>Θα επανασυνδεθείτε.</translation>
     </message>
     <message>
       <source>support</source>
@@ -9305,7 +9305,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
-      <translation type="unfinished">It is recommended to contact %1 before proceeding.</translation>
+      <translation>Συνιστάται να επικοινωνήσετε με τον/την %1 πριν προχωρήσετε.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
@@ -9342,15 +9342,15 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>Remote</source>
-      <translation type="unfinished">Remote</translation>
+      <translation>Απομακρυσμένα</translation>
     </message>
     <message>
       <source>Current (%1)</source>
-      <translation type="unfinished">Current (%1)</translation>
+      <translation>Τρέχον (%1)</translation>
     </message>
     <message>
       <source>Remote (%1)</source>
-      <translation type="unfinished">Remote (%1)</translation>
+      <translation>Απομακρυσμένα (%1)</translation>
     </message>
     <message>
       <source>Success</source>
@@ -9361,27 +9361,27 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MergeSystemsTool</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>Ο κωδικός πρόσβασης ή το όνομα χρήστη δεν είναι έγκυρο.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation type="unfinished">This user does not have permissions for the requested operation.</translation>
+      <translation>Αυτός ο χρήστης δεν έχει δικαιώματα για την ζητούμενη λειτουργία.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>Δεν είναι δυνατή η δημιουργία αντιγράφου ασφαλείας της βάσης δεδομένων.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Συγχώνευση ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Δεν ήταν δυνατή η δημιουργία σύνδεσης με τον διακομιστή. Το πιστοποιητικό του διακομιστή δεν είναι έγκυρο.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Δεν ήταν δυνατή η δημιουργία σύνδεσης με τον διακομιστή. Το πιστοποιητικό του διακομιστή απορρίφθηκε.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9457,31 +9457,31 @@ Site performance is degraded.</source>
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>Η τρέχουσα ροή έχει υψηλή ανάλυση. Η ανάλυση για κίνηση αυξάνει το φορτίο της CPU.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Η ανίχνευση κίνησης για ορισμένες κάμερες δεν θα λειτουργεί επειδή η υπόλοιπη ροή έχει πολύ υψηλή ανάλυση.
+Μπορείτε να την επιβάλετε, αλλά μπορεί να αυξήσει σημαντικά το φορτίο της CPU.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Η ανίχνευση κίνησης για αυτήν την κάμερα δεν θα λειτουργεί επειδή η υπόλοιπη ροή έχει πολύ υψηλή ανάλυση.
+Μπορείτε να την επιβάλετε, αλλά μπορεί να αυξήσει σημαντικά το φορτίο της CPU.</translation>
     </message>
     <message>
       <source>Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
 You can force motion detection, but it may lead to a substantial increase in CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection is currently disabled for this camera because the video stream exceed the %1 * %2 resolution.
-You can force motion detection, but it may lead to a substantial increase in CPU load.</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη αυτήν τη στιγμή για αυτήν την κάμερα, επειδή η ροή βίντεο υπερβαίνει την ανάλυση %1 * %2.
+Μπορείτε να επιβάλετε την ανίχνευση κίνησης, αλλά αυτό μπορεί να οδηγήσει σε σημαντική αύξηση του φορτίου της CPU.</translation>
     </message>
   </context>
   <context>
@@ -9492,59 +9492,59 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Download in External Browser</source>
-      <translation type="unfinished">Download in External Browser</translation>
+      <translation>Λήψη σε εξωτερικό πρόγραμμα περιήγησης</translation>
     </message>
     <message>
       <source>Copy Link to Clipboard</source>
-      <translation type="unfinished">Copy Link to Clipboard</translation>
+      <translation>Αντιγραφή συνδέσμου στο πρόχειρο</translation>
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Έχετε ήδη εγκαταστήσει αυτήν την έκδοση.</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Η έκδοση δεν βρέθηκε</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Αδυναμία ενημέρωσης από το επιλεγμένο αρχείο</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Μη έγκυρες πληροφορίες ενημέρωσης</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Η υποβάθμιση σε παλαιότερες εκδόσεις δεν είναι δυνατή</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Το αρχείο ενημέρωσης δεν βρέθηκε</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Το πακέτο αναβάθμισης είναι κατεστραμμένο</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Λείπει το πακέτο ενημέρωσης για ορισμένους διακομιστές</translation>
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Δεν υπάρχει διαθέσιμο πακέτο ενημέρωσης</translation>
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation type="unfinished">Select Update File...</translation>
+      <translation>Επιλέξτε Ενημέρωση Αρχείου...</translation>
     </message>
     <message>
       <source>Update Files</source>
-      <translation type="unfinished">Update Files</translation>
+      <translation>Ενημέρωση Αρχείων</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
+      <translation>Ορισμένοι διακομιστές είναι εκτός σύνδεσης και δεν θα ενημερωθούν. Θέλετε να τους παραλείψετε;</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
@@ -9555,43 +9555,43 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>Λείπει το πακέτο ενημέρωσης για τον client</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>Δεν υπάρχουν διαδικτυακοί διακομιστές για ενημέρωση.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>Ακύρωση ενημέρωσης και διαγραφή όλων των ληφθέντων δεδομένων;</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>Η έκδοση λειτουργικού συστήματος του client δεν υποστηρίζεται πλέον. Ενημερώστε το λειτουργικό του σύστημα σε μια υποστηριζόμενη έκδοση.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Αποτυχία έναρξης ενημέρωσης</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Η ακύρωση της ενημέρωσης απέτυχε</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Αποτυχία έναρξης της εγκατάστασης</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+      <translation>Ορισμένοι διακομιστές δεν έχουν ολοκληρώσει τη διαδικασία ενημέρωσης. Να ολοκληρωθεί ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Αποτυχία λήψης πακέτων ενημέρωσης σε ορισμένα στοιχεία</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
+      <translation>Εάν το πρόβλημα επιμένει, επικοινωνήστε με την Υποστήριξη Πελατών.</translation>
     </message>
     <message>
       <source>Try again</source>
@@ -9599,23 +9599,23 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Cancel Update</source>
-      <translation type="unfinished">Cancel Update</translation>
+      <translation>Ακύρωση Ενημέρωσης</translation>
     </message>
     <message>
       <source>Update completed</source>
-      <translation type="unfinished">Update completed</translation>
+      <translation>Η ενημέρωση ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Η ενημέρωση ολοκληρώθηκε, αλλά μερικά στοιχεία απέτυχαν σε μια ενημέρωση</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
-      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
+      <translation>Παρακαλώ ενημερώστε το %1 χειροκίνητα χρησιμοποιώντας ένα πακέτο εγκατάστασης.</translation>
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
-      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
+      <translation>Το %1 θα επανεκκινηθεί στην ενημερωμένη έκδοση.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9623,15 +9623,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>Παρουσιάστηκε σφάλμα κατά την εγκατάσταση ενημερώσεων:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
-      <translation type="unfinished">Downloading updates...</translation>
+      <translation>Λήψη ενημερώσεων...</translation>
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>Ολοκλήρωση Ενημέρωσης</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -9639,23 +9639,23 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>Η τελευταία έκδοση είναι ήδη εγκατεστημένη</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>Αυτή η έκδοση είναι ήδη εγκατεστημένη</translation>
     </message>
     <message>
       <source>Install update</source>
-      <translation type="unfinished">Install update</translation>
+      <translation>Εγκατάσταση ενημέρωσης</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Μεταφόρτωση</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Μεταφόρτωση &amp;&amp; Εγκατάσταση</translation>
     </message>
     <message>
       <source>Download</source>
@@ -9667,31 +9667,31 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Αναζήτηση για άλλο αρχείο...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Επιλέξτε μια άλλη έκδοση</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation type="unfinished">Update to Specific Build</translation>
+      <translation>Ενημέρωση σε συγκεκριμένη έκδοση</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Λήψη πακέτου του client...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
-      <translation type="unfinished">Installing updates...</translation>
+      <translation>Εγκατάσταση ενημερώσεων...</translation>
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Εγκατάσταση ενημερώσεων του client...</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Έναρξη ενημέρωσης σε...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -9699,47 +9699,47 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation type="unfinished">Ready to update to</translation>
+      <translation>Έτοιμο για ενημέρωση σε</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Ορισμένοι διακομιστές δεν έχουν διαθέσιμα πακέτα ενημέρωσης.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Ορισμένοι διακομιστές αντιμετώπισαν ένα εσωτερικό σφάλμα.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation type="unfinished">Please contact Customer Support.</translation>
+      <translation>Παρακαλούμε επικοινωνήστε με την Υποστήριξη Πελατών.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>Ορισμένοι διακομιστές έχουν αποσυνδεθεί. Παρακαλώ περιμένετε μέχρι να συνδεθούν για να συνεχίσετε.</translation>
     </message>
     <message>
       <source>Continue in Background</source>
-      <translation type="unfinished">Continue in Background</translation>
+      <translation>Συνέχεια στο παρασκήνιο</translation>
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation type="unfinished">Latest Available Update</translation>
+      <translation>Τελευταία Διαθέσιμη Ενημέρωση</translation>
     </message>
     <message>
       <source>Specific Build</source>
-      <translation type="unfinished">Specific Build</translation>
+      <translation>Συγκεκριμένη Έκδοση</translation>
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation type="unfinished">Browse for Update File</translation>
+      <translation>Αναζήτηση για αρχείο ενημέρωσης</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>Ενημέρωση από διακομιστές πολυμέσων</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
-      <translation type="unfinished">Unable to check updates on the Internet</translation>
+      <translation>Δεν είναι δυνατός ο έλεγχος ενημερώσεων στο Διαδίκτυο</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
@@ -9747,11 +9747,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</source>
-      <translation type="unfinished">There is not enough space on your computer to download the Client update. Please free up some space on your hard drive and try again.</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος στον υπολογιστή σας για να κατεβάσετε την ενημέρωση του client. Απελευθερώστε λίγο χώρο στον σκληρό σας δίσκο και δοκιμάστε ξανά.</translation>
     </message>
     <message>
       <source>Uploading offline update packages to Servers...</source>
-      <translation type="unfinished">Uploading offline update packages to Servers...</translation>
+      <translation>Μεταφόρτωση πακέτων ενημέρωσης εκτός σύνδεσης σε διακομιστές...</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the Site or update their OS to a supported version.</source>
@@ -9764,7 +9764,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Applying updates at the end of the week is not recommended</source>
-      <translation type="unfinished">Applying updates at the end of the week is not recommended</translation>
+      <translation>Δεν συνιστάται η εφαρμογή ενημερώσεων στο τέλος της εβδομάδας</translation>
     </message>
     <message>
       <source>Site updated to</source>
@@ -9779,14 +9779,14 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Δεν έχετε καμία διάταξη</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NewDeviceAdditionDialog</name>
     <message>
       <source>Possible formats:</source>
-      <translation type="unfinished">Possible formats:</translation>
+      <translation>Πιθανές μορφές:</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -9794,15 +9794,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Η αναζήτηση συσκευών στο δίκτυο περιορίζεται σε κάμερες που υποστηρίζουν συνδέσεις HTTPS. Αυτό μπορεί να αλλάξει στις ρυθμίσεις %1.</translation>
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Διαχείριση Συστήματος</translation>
     </message>
     <message>
       <source>Device search failed</source>
-      <translation type="unfinished">Device search failed</translation>
+      <translation>Η αναζήτηση συσκευής απέτυχε</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
@@ -9813,15 +9813,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation type="unfinished">Initializing scan...</translation>
+      <translation>Αρχικοποίηση σάρωσης...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation type="unfinished">Scanning online hosts...</translation>
+      <translation>Σάρωση διαδικτυακών κεντρικών υπολογιστών...</translation>
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>Έλεγχος κεντρικού υπολογιστή...</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -9829,19 +9829,19 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Aborted</source>
-      <translation type="unfinished">Aborted</translation>
+      <translation>Ματαιώθηκε</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation type="unfinished">Searching...</translation>
+      <translation>Αναζήτηση...</translation>
     </message>
     <message>
       <source>No devices found</source>
-      <translation type="unfinished">No devices found</translation>
+      <translation>Δεν βρέθηκαν συσκευές</translation>
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Όλες οι συσκευές έχουν ήδη προστεθεί</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
@@ -9866,30 +9866,30 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NoPermissionsOverlayWidget</name>
     <message>
       <source>You do not have permission to edit settings of this camera</source>
-      <translation type="unfinished">You do not have permission to edit settings of this camera</translation>
+      <translation>Δεν έχετε άδεια επεξεργασίας των ρυθμίσεων αυτής της κάμερας</translation>
     </message>
     <message>
       <source>You do not have permission to edit settings of some cameras</source>
-      <translation type="unfinished">You do not have permission to edit settings of some cameras</translation>
+      <translation>Δεν έχετε άδεια επεξεργασίας των ρυθμίσεων ορισμένων καμερών</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::NonEditableUsersAndGroups</name>
     <message>
       <source>You do not have permissions to modify this user</source>
-      <translation type="unfinished">You do not have permissions to modify this user</translation>
+      <translation>Δεν έχετε δικαιώματα τροποποίησης αυτού του χρήστη</translation>
     </message>
     <message>
       <source>You cannot modify a user with a non-unique login</source>
-      <translation type="unfinished">You cannot modify a user with a non-unique login</translation>
+      <translation>Δεν μπορείτε να τροποποιήσετε έναν χρήστη με μη μοναδικά στοιχεία σύνδεσης</translation>
     </message>
     <message>
       <source>You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</source>
-      <translation type="unfinished">You may not have permissions to modify certain members of this group, or it includes users with duplicate logins</translation>
+      <translation>Ενδέχεται να μην έχετε δικαιώματα τροποποίησης ορισμένων μελών αυτής της ομάδας ή η ομάδα περιλαμβάνει χρήστες με διπλότυπα στοιχεία σύνδεσης</translation>
     </message>
     <message>
       <source>You do not have permissions to modify this group</source>
-      <translation type="unfinished">You do not have permissions to modify this group</translation>
+      <translation>Δεν έχετε δικαιώματα για να τροποποιήσετε αυτήν την ομάδα</translation>
     </message>
     <message>
       <source>LDAP Default group cannot be deleted as long as the site is connected to LDAP server</source>
@@ -9904,11 +9904,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationActionExecutor</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+      <translation>Δεν είναι δυνατή η επιβεβαίωση του συμβάντος στην κάμερα που αφαιρέθηκε.</translation>
     </message>
     <message>
       <source>Unable to acknowledge event on inaccessible camera.</source>
-      <translation type="unfinished">Unable to acknowledge event on inaccessible camera.</translation>
+      <translation>Δεν είναι δυνατή η αναγνώριση συμβάντος σε μη προσβάσιμη κάμερα.</translation>
     </message>
   </context>
   <context>
@@ -9937,19 +9937,19 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Any Notification</source>
-      <translation type="unfinished">Any Notification</translation>
+      <translation>Οποιαδήποτε Ειδοποίηση</translation>
     </message>
     <message>
       <source>Event Notifications</source>
-      <translation type="unfinished">Event Notifications</translation>
+      <translation>Ειδοποιήσεις συμβάντων</translation>
     </message>
     <message>
       <source>Choose Types...</source>
-      <translation type="unfinished">Choose Types...</translation>
+      <translation>Επιλογή Τύπων...</translation>
     </message>
     <message>
       <source>Any notification</source>
-      <translation type="unfinished">Any notification</translation>
+      <translation>Οποιαδήποτε ειδοποίηση</translation>
     </message>
     <message numerus="yes">
       <source>%n notification types</source>
@@ -9967,7 +9967,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::NotificationSettingsDialog</name>
     <message>
       <source>Select Notification Types</source>
-      <translation type="unfinished">Select Notification Types</translation>
+      <translation>Επιλογή τύπων ειδοποιήσεων</translation>
     </message>
   </context>
   <context>
@@ -9982,7 +9982,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ObjectTrackingButton</name>
     <message>
       <source>Object tracking is ON</source>
-      <translation type="unfinished">Object tracking is ON</translation>
+      <translation>Η παρακολούθηση αντικειμένων είναι ΕΝΕΡΓΟΠΟΙΗΜΕΝΗ</translation>
     </message>
   </context>
   <context>
@@ -10003,27 +10003,27 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Ο διακομιστής αργεί πολύ να απαντήσει</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Δεν υπάρχει εργασία ενημέρωσης</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Έτοιμο για λήψη ενημέρωσης</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Λήψη ενημέρωσης</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Έτοιμο για επανεκκίνηση στη νέα έκδοση</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Εγκατάσταση ενημέρωσης</translation>
     </message>
     <message>
       <source>Installed</source>
@@ -10031,35 +10031,35 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Αναμονή για δεδομένα ομότιμων χρηστών (peer data)</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος για την λήψη αρχείων ενημέρωσης.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος για την εξαγωγή αρχείων ενημέρωσης.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Αποτυχία λήψης πακέτων ενημέρωσης.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Τα περιεχόμενα ενημέρωσης δεν είναι έγκυρα.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Το αρχείο ενημερώσεων είναι κατεστραμμένο.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Δεν είναι δυνατή η εξαγωγή των αρχείων ενημέρωσης.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Εσωτερικό σφάλμα προγράμματος λήψης.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -10067,19 +10067,19 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Μη αναμενόμενος κωδικός σφάλματος.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Έτοιμο για εγκατάσταση ενημέρωσης</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Το πακέτο ενημέρωσης δεν βρέθηκε.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος για την εγκατάσταση της ενημέρωσης.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
@@ -10087,33 +10087,33 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Αυτή η έκδοση λειτουργικού συστήματος δεν υποστηρίζεται πλέον.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
-      <translation type="unfinished">Update installation failed.</translation>
+      <translation>Η εγκατάσταση της ενημέρωσης απέτυχε.</translation>
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>Η επαλήθευση του αρχείου ενημέρωσης απέτυχε.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>Επαλήθευση ενημέρωσης</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PlaybackPositionItem</name>
     <message>
       <source>video is paused</source>
-      <translation type="unfinished">video is paused</translation>
+      <translation>το βίντεο βρίσκεται σε παύση</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsTableView</name>
     <message>
       <source>Disconnected</source>
-      <translation type="unfinished">Disconnected</translation>
+      <translation>Αποσυνδεδεμένο</translation>
     </message>
     <message>
       <source>Connected</source>
@@ -10121,11 +10121,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Powered</source>
-      <translation type="unfinished">Powered</translation>
+      <translation>Τροφοδοτημένο</translation>
     </message>
     <message>
       <source>Unexpected</source>
-      <translation type="unfinished">Unexpected</translation>
+      <translation>Απροσδόκητο</translation>
     </message>
     <message>
       <source>Empty</source>
@@ -10150,23 +10150,23 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Power</source>
-      <translation type="unfinished">Power</translation>
+      <translation>Ενέργεια</translation>
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Άγνωστη συσκευή</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Άγνωστη συσκευή %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PoeSettingsWidget</name>
     <message>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Προσοχή! Υπέρβαση ορίου ισχύος</translation>
     </message>
   </context>
   <context>
@@ -10181,11 +10181,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation type="unfinished">URL cannot be empty.</translation>
+      <translation>Η διεύθυνση URL δεν μπορεί να είναι κενή.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
-      <translation type="unfinished">Wrong URL format.</translation>
+      <translation>Λάθος μορφή URL.</translation>
     </message>
     <message>
       <source>Web Page</source>
@@ -10193,35 +10193,35 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>Ενεργοποιήστε τον διακομιστή μεσολάβησης ιστοσελίδας στην καρτέλα &lt;b&gt;Γενικά&lt;/b&gt;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Η χρήση μεσολάβησης όλου του περιεχομένου εκθέτει οποιαδήποτε υπηρεσία ή συσκευή στο δίκτυο του διακομιστή στους χρήστες αυτής της ιστοσελίδας</translation>
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>Η ιστοσελίδα μπορεί να αλληλεπιδράσει με το Desktop Client και να ζητήσει πρόσβαση στην συνεδρία χρήστη</translation>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">An integration may interact with the Desktop Client and request access to the user session</translation>
+      <translation>Μια ενσωμάτωση μπορεί να αλληλεπιδράσει με το Desktop Client και να ζητήσει πρόσβαση στην περίοδο λειτουργίας χρήστη</translation>
     </message>
     <message>
       <source>Proxy this integration through the server</source>
-      <translation type="unfinished">Proxy this integration through the server</translation>
+      <translation>Διαμεσολάβηση αυτής της ενσωμάτωσης μέσω του διακομιστή</translation>
     </message>
     <message>
       <source>Proxy this web page through the server</source>
-      <translation type="unfinished">Proxy this web page through the server</translation>
+      <translation>Διαμεσολάβηση αυτής της ιστοσελίδας μέσω του διακομιστή</translation>
     </message>
     <message>
       <source>Allow opening this integration without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this integration without SSL certificate checking</translation>
+      <translation>Να επιτρέπεται το άνοιγμα αυτής της ενσωμάτωσης χωρίς έλεγχο πιστοποιητικού SSL</translation>
     </message>
     <message>
       <source>Allow opening this web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening this web page without SSL certificate checking</translation>
+      <translation>Να επιτρέπεται το άνοιγμα αυτής της ιστοσελίδας χωρίς έλεγχο πιστοποιητικού SSL</translation>
     </message>
     <message>
       <source>New Web Page</source>
@@ -10229,15 +10229,15 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Edit Web Page</source>
-      <translation type="unfinished">Edit Web Page</translation>
+      <translation>Επεξεργασία Ιστοσελίδας</translation>
     </message>
     <message>
       <source>New Proxied Web Page</source>
-      <translation type="unfinished">New Proxied Web Page</translation>
+      <translation>Νέα διαμεσολαβούμενη ιστοσελίδα</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Επεξεργασία διαμεσολαβούμενης ιστοσελίδας</translation>
     </message>
     <message>
       <source>New Integration</source>
@@ -10245,19 +10245,19 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Edit Integration</source>
-      <translation type="unfinished">Edit Integration</translation>
+      <translation>Επεξεργασία ενσωμάτωσης</translation>
     </message>
     <message>
       <source>New Proxied Integration</source>
-      <translation type="unfinished">New Proxied Integration</translation>
+      <translation>Νέα διαμεσολαβούμενη ενσωμάτωση</translation>
     </message>
     <message>
       <source>Edit Proxied Integration</source>
-      <translation type="unfinished">Edit Proxied Integration</translation>
+      <translation>Επεξεργασία διαμεσολαβούμενης ενσωμάτωσης</translation>
     </message>
     <message>
       <source>To allow the use of a client API, create a web integration instead. %1</source>
-      <translation type="unfinished">To allow the use of a client API, create a web integration instead. %1</translation>
+      <translation>Για να επιτρέψετε τη χρήση ενός API client, δημιουργήστε μια ενσωμάτωση ιστού. %1</translation>
     </message>
     <message>
       <source>Learn more...</source>
@@ -10265,18 +10265,18 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Auto-refresh integration</source>
-      <translation type="unfinished">Auto-refresh integration</translation>
+      <translation>Αυτόματη ανανέωση ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Auto-refresh web page</source>
-      <translation type="unfinished">Auto-refresh web page</translation>
+      <translation>Αυτόματη ανανέωση της ιστοσελίδας</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation type="unfinished">Set layout resolution to &quot;Auto&quot; to increase performance.</translation>
+      <translation>Ορίστε την ανάλυση διάταξης σε &quot;Αυτόματη&quot; για να αυξήσετε την απόδοση.</translation>
     </message>
   </context>
   <context>
@@ -10293,11 +10293,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::RecordingSettingsWidget</name>
     <message>
       <source>Screen %1 - %2x%3</source>
-      <translation type="unfinished">Screen %1 - %2x%3</translation>
+      <translation>Οθόνη %1 - %2x%3</translation>
     </message>
     <message>
       <source>%1 (Primary)</source>
-      <translation type="unfinished">%1 (Primary)</translation>
+      <translation>%1 (Κύριο)</translation>
     </message>
     <message>
       <source>Best</source>
@@ -10305,7 +10305,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Average</source>
-      <translation type="unfinished">Average</translation>
+      <translation>Κανονικό</translation>
     </message>
     <message>
       <source>Performance</source>
@@ -10313,11 +10313,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Πρωτότυπο</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation type="unfinished">Quarter Native</translation>
+      <translation>1/4 Πρωτότυπο</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -10342,7 +10342,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 video wall</source>
       <comment>%1 will be substituted with a video wall name</comment>
-      <translation type="unfinished">%1 video wall</translation>
+      <translation>%1 σύστημα προβολής πολλαπλών οθονών</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more video walls</source>
@@ -10355,7 +10355,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message>
       <source>%1 group</source>
       <comment>%1 will be substituted with a user group name</comment>
-      <translation type="unfinished">%1 group</translation>
+      <translation>%1 ομάδα</translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
@@ -10370,22 +10370,22 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Επιτεύχθηκε το μέγιστο επίπεδο εμφώλευσης</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>προσθήκη στην τρέχουσα διάταξη</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>άνοιγμα όλων σε μια νέα διάταξη</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>άνοιγμα όλων</translation>
     </message>
     <message>
       <source>Health Monitor</source>
@@ -10396,7 +10396,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::RestApiHelper</name>
     <message>
       <source>Password confirmation is required to apply changes</source>
-      <translation type="unfinished">Password confirmation is required to apply changes</translation>
+      <translation>Απαιτείται επιβεβαίωση κωδικού πρόσβασης για την εφαρμογή των αλλαγών</translation>
     </message>
     <message>
       <source>Confirm</source>
@@ -10453,7 +10453,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Shut down</source>
-      <translation type="unfinished">Shut down</translation>
+      <translation>Τερματισμός λειτουργίας</translation>
     </message>
   </context>
   <context>
@@ -10467,33 +10467,33 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>Η ρύθμιση ποιότητας καθορίζει μόνο τον βαθμό συμπίεσης και δεν επηρεάζει την ανάλυση. Οι επιλογές Χαμηλή, Μέτρια, Υψηλή και Καλύτερη είναι προκαθορισμένες τιμές ρυθμού μετάδοσης bit.</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Λιγότερες Ρυθμίσεις</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Περισσότερες Ρυθμίσεις</translation>
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη ή δεν υποστηρίζεται</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Η διπλή ροή είναι απενεργοποιημένη ή δεν υποστηρίζεται</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Οι ρυθμίσεις ποιότητας και FPS είναι απενεργοποιημένες για ορισμένες από τις επιλεγμένες κάμερες.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Οι ρυθμίσεις ποιότητας και FPS είναι απενεργοποιημένες λόγω της επιλογής &quot;Διατήρηση ρυθμίσεων ροής κάμερας και προφίλ&quot; στην καρτέλα &quot;Διαχείριση Συστήματος&quot;.
+Μπορείτε ακόμα να αλλάξετε την ποιότητα και τα FPS απευθείας στην κάμερα.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -10502,18 +10502,18 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Κίνηση, Αντικείμενα
+ + Χαμηλή ανάλυση</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Μόνο Αντικείμενα</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Αντικείμενα
+ + Χαμηλή ανάλυση</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -10522,88 +10522,88 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Κίνηση
+ + Χαμηλή ανάλυση</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες συσκευές</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη για αυτήν την κάμερα</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες κάμερες</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Ορισμένες από τις επιλεγμένες συσκευές έχουν μόνο μία ροή. Οι εγγραφές με και χωρίς κίνηση θα έχουν την ίδια ανάλυση ή ποιότητα.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Αυτή η κάμερα έχει μόνο μία ροή. Οι εγγραφές με και χωρίς κίνηση θα έχουν την ίδια ανάλυση ή ποιότητα.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Ορισμένες από τις επιλεγμένες κάμερες έχουν μόνο μία ροή. Οι εγγραφές με και χωρίς κίνηση θα έχουν την ίδια ανάλυση ή ποιότητα.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Η ανίχνευση αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες συσκευές</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Η ανίχνευση αντικειμένων είναι απενεργοποιημένη για αυτήν την κάμερα</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Η ανίχνευση αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες κάμερες</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Η ανίχνευση κίνησης και αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες συσκευές</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Η ανίχνευση κίνησης και αντικειμένων είναι απενεργοποιημένη για αυτήν την κάμερα</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Η ανίχνευση κίνησης και αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες κάμερες</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη για αυτήν την μονάδα εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+      <translation>Η ανίχνευση κίνησης είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες μονάδες εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Αυτή η μονάδα εισόδου/εξόδου έχει μόνο μία ροή. Οι εγγραφές με και χωρίς κίνηση θα έχουν την ίδια ανάλυση ή ποιότητα.</translation>
     </message>
     <message>
       <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Ορισμένες από τις επιλεγμένες μονάδες εισόδου/εξόδου έχουν μόνο μία ροή. Οι εγγραφές με και χωρίς κίνηση θα έχουν την ίδια ανάλυση ή ποιότητα.</translation>
     </message>
     <message>
       <source>Object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+      <translation>Η ανίχνευση αντικειμένων είναι απενεργοποιημένη για αυτήν την μονάδα εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Η ανίχνευση αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες μονάδες εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this I/O module</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+      <translation>Η ανίχνευση κίνησης και αντικειμένων είναι απενεργοποιημένη για αυτήν την μονάδα εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+      <translation>Η ανίχνευση κίνησης και αντικειμένων είναι απενεργοποιημένη για ορισμένες από τις επιλεγμένες μονάδες εισόδου/εξόδου</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow optimize camera settings&quot; option in the &quot;Site Administration&quot; dialog.
@@ -10621,31 +10621,31 @@ You can still change quality and FPS directly on the camera.</source>
     <name>nx::vms::client::desktop::ScreenRecordingActionHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
+      <translation>Το υποσύστημα καταγραφής οθόνης δεν έχει αρχικοποιηθεί ακόμα. Παρακαλώ προσπαθήστε ξανά αργότερα.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation type="unfinished">Recording in %1...</translation>
+      <translation>Εγγραφή σε %1...</translation>
     </message>
     <message>
       <source>Could not open file &quot;%1&quot;. Please check if the folder is accessible.</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;. Please check if the folder is accessible.</translation>
+      <translation>Δεν ήταν δυνατό το άνοιγμα του αρχείου &quot;%1&quot;. Ελέγξτε αν ο φάκελος είναι προσβάσιμος.</translation>
     </message>
     <message>
       <source>Recorded Video</source>
-      <translation type="unfinished">Recorded Video</translation>
+      <translation>Εγγεγραμμένο βίντεο</translation>
     </message>
     <message>
       <source>Save Recording As...</source>
-      <translation type="unfinished">Save Recording As...</translation>
+      <translation>Αποθήκευση Εγγραφής Ως...</translation>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (Audio/Video Interleaved)</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation type="unfinished">Failed to start recording</translation>
+      <translation>Αποτυχία έναρξης της καταγραφής</translation>
     </message>
   </context>
   <context>
@@ -10663,11 +10663,11 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Κωδικός πρόσβασης κρυπτογράφησης αρχείου</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Αποτυχία ορισμού κωδικού πρόσβασης κρυπτογράφησης αρχείου</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
@@ -10679,7 +10679,7 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Οι τοπικοί και LDAP χρήστες θα αποσυνδεθούν αυτόματα εάν η συνεδρία τους υπερβαίνει την καθορισμένη διάρκεια.</translation>
     </message>
     <message>
       <source>Learn more.</source>
@@ -10696,11 +10696,11 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>The recommended maximum user session lifetime is %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">The recommended maximum user session lifetime is %1</translation>
+      <translation>Η συνιστώμενη μέγιστη διάρκεια ζωής της συνεδρίας χρήστη είναι %1</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-power users only. You and other power users will not see them.</translation>
+      <translation>Τα υδατογραφήματα θα εμφανίζονται πάνω από ζωντανά, αρχειοθετημένα και εξαγόμενα βίντεο μόνο για τους χρήστες που δεν είναι power users. Εσείς και οι άλλοι power users δεν θα τα βλέπετε.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
@@ -10708,21 +10708,21 @@ You can still change quality and FPS directly on the camera.</source>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost</translation>
+      <translation>Η σύνδεση με κάμερες που δεν υποστηρίζουν HTTPS θα χαθεί</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Η κρυπτογράφηση αρχείων αυξάνει τη χρήση της CPU</translation>
     </message>
     <message>
       <source>Additional configuration might be required on the server machine.</source>
-      <translation type="unfinished">Additional configuration might be required on the server machine.</translation>
+      <translation>Ενδέχεται να απαιτείται πρόσθετη παραμετροποίηση στον διακομιστή.</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Ο κωδικός πρόσβασης κρυπτογράφησης θα απαιτηθεί για την επαναφορά του αρχείου.
+Προσοχή: Δεν είναι δυνατή η επαναφορά αυτού του κωδικού πρόσβασης. Εάν τον χάσετε, το αρχείο δεν θα είναι ανακτήσιμο.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the site. You will not be required to enter the encryption password to view the video archive within this site.</source>
@@ -10748,37 +10748,37 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>All objects</source>
-      <translation type="unfinished">All objects</translation>
+      <translation>Όλα τα αντικείμενα</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Αποτυχία σύνδεσης με τον διακομιστή</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Προβολή πιστοποιητικού</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Το πιστοποιητικό παρουσιάστηκε από τον/την %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Αυτό το πιστοποιητικό δεν ταιριάζει με το πιστοποιητικό %1 στο οποίο είναι καρφιτσωμένο.</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Αυτό είναι ένα προσαρμοσμένο πιστοποιητικό εγκατεστημένο στο %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Καρφίτσωμα αυτού του πιστοποιητικού στο %1;</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10786,29 +10786,29 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>The certificate is auto-generated and pinned to %1</source>
-      <translation type="unfinished">The certificate is auto-generated and pinned to %1</translation>
+      <translation>Το πιστοποιητικό δημιουργείται αυτόματα και καρφιτσώνεται στο %1</translation>
     </message>
     <message>
       <source>Server ID: %1</source>
-      <translation type="unfinished">Server ID: %1</translation>
+      <translation>Αναγνωριστικό διακομιστή: %1</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.
 Do not pin this certificate if you did not modify %2 Server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.
-Do not pin this certificate if you did not modify %2 Server SSL certificate.</translation>
+      <translation>Κάποιος ενδέχεται να υποδύεται τον %1 για να κλέψει τα προσωπικά σας στοιχεία.
+Μην καρφιτσώσετε αυτό το πιστοποιητικό εάν δεν τροποποιήσατε το %2 πιστοποιητικό SSL διακομιστή.</translation>
     </message>
     <message>
       <source>Custom Certificate</source>
-      <translation type="unfinished">Custom Certificate</translation>
+      <translation>Προσαρμοσμένο Πιστοποιητικό</translation>
     </message>
     <message>
       <source>Auto-generated Certificate</source>
-      <translation type="unfinished">Auto-generated Certificate</translation>
+      <translation>Αυτόματα δημιουργημένο πιστοποιητικό</translation>
     </message>
     <message>
       <source>Unknown Certificate</source>
-      <translation type="unfinished">Unknown Certificate</translation>
+      <translation>Άγνωστο Πιστοποιητικό</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10816,19 +10816,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
-      <translation type="unfinished">Contact a user with Administrators permissions to resolve this issue.</translation>
+      <translation>Επικοινωνήστε με έναν χρήστη με δικαιώματα διαχειριστή για να επιλύσετε αυτό το πρόβλημα.</translation>
     </message>
     <message>
       <source>Not Part Of Certificate</source>
-      <translation type="unfinished">Not Part Of Certificate</translation>
+      <translation>Δεν αποτελεί μέρος του πιστοποιητικού</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Προβολή καρφιτσωμένου πιστοποιητικού</translation>
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Καρφίτσωμα σε αυτό το πιστοποιητικό</translation>
     </message>
   </context>
   <context>
@@ -10843,18 +10843,18 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Εμπιστεύομαι αυτόν τον διακομιστή</translation>
     </message>
     <message>
       <source>Certificate details</source>
-      <translation type="unfinished">Certificate details</translation>
+      <translation>Λεπτομέρειες πιστοποιητικού</translation>
     </message>
     <message numerus="yes">
       <source>I trust these servers</source>
       <comment>Numerus form depends on the number of certificates</comment>
-      <translation type="unfinished">
-        <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
+      <translation>
+        <numerusform>Εμπιστεύομαι αυτόν τον διακομιστή</numerusform>
+        <numerusform>Εμπιστεύομαι αυτούς τους διακομιστές</numerusform>
       </translation>
     </message>
   </context>
@@ -10883,7 +10883,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Βιβλιοθήκη</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10895,27 +10895,27 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>κανένα σφάλμα</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>το αρχείο βιβλιοθήκης δεν μπορεί να φορτωθεί</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>μη έγκυρη ή μη συμβατή βιβλιοθήκη πρόσθετων</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>η βιβλιοθήκη πρόσθετων απέτυχε να αρχικοποιηθεί</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>το πρόσθετο επέστρεψε εσφαλμένο μανιφέστο</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>η έκδοση του API του πρόσθετου δεν υποστηρίζεται πλέον</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -10923,15 +10923,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Δεν φορτώθηκε</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Φορτώθηκε</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>το πρόσθετο βρίσκεται στη μαύρη λίστα</translation>
     </message>
     <message>
       <source>Status</source>
@@ -10939,7 +10939,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>το πρόσθετο είναι προαιρετικό και δεν βρίσκεται στη λίστα επιτρεπόμενων</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -10947,7 +10947,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>άγνωστη κατάσταση</translation>
     </message>
   </context>
   <context>
@@ -10977,7 +10977,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Δεν υπάρχει σύνδεση με τον διακομιστή.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -10985,7 +10985,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Σφάλμα διακομιστή.</translation>
     </message>
   </context>
   <context>
@@ -11000,19 +11000,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Αποθήκευση αρχείων ενημέρωσης</translation>
     </message>
     <message>
       <source>Client</source>
-      <translation type="unfinished">Client</translation>
+      <translation>Client</translation>
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Στοιχείο</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Εγκατεστημένη Έκδοση</translation>
     </message>
   </context>
   <context>
@@ -11035,44 +11035,44 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Invalid Link</source>
-      <translation type="unfinished">Invalid Link</translation>
+      <translation>Μη Έγκυρος Σύνδεσμος</translation>
     </message>
     <message>
       <source>The provided link is not valid</source>
-      <translation type="unfinished">The provided link is not valid</translation>
+      <translation>Ο παρεχόμενος σύνδεσμος δεν είναι έγκυρος</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelActionsHandler</name>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation type="unfinished">Showreel %1</translation>
+      <translation>Showreel %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation type="unfinished">Delete Showreel %1?</translation>
+      <translation>Διαγραφή Showreel %1;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation type="unfinished">Drag layout or camera here to add it to the showreel</translation>
+      <translation>Σύρετε εδώ τη διάταξη ή την κάμερα για να την προσθέσετε στο showreel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ShowreelExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
+      <translation>Χρησιμοποιήστε τα βέλη του πληκτρολογίου για να αλλάξετε διάταξη. Για να κλείσετε το showreel, πατήστε Esc.</translation>
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Πατήστε Esc για να διακόψετε την περιήγηση.</translation>
     </message>
   </context>
   <context>
@@ -11080,17 +11080,17 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>Εναλλαγή σε</translation>
     </message>
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation type="unfinished">Display for</translation>
+      <translation>Εμφάνιση για</translation>
     </message>
     <message>
       <source>Display selected for</source>
       <comment>Time will follow</comment>
-      <translation type="unfinished">Display selected for</translation>
+      <translation>Εμφάνιση επιλεγμένων για</translation>
     </message>
   </context>
   <context>
@@ -11101,7 +11101,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Δημιουργία σελιδοδείκτη...</translation>
     </message>
   </context>
   <context>
@@ -11127,42 +11127,42 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Συνδεθείτε στο %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message>
       <source>Set Passwords</source>
-      <translation type="unfinished">Set Passwords</translation>
+      <translation>Ορισμός κωδικών πρόσβασης</translation>
     </message>
     <message>
       <source>Replaced camera discovered</source>
-      <translation type="unfinished">Replaced camera discovered</translation>
+      <translation>Εντοπίστηκε αντικατεστημένη κάμερα</translation>
     </message>
     <message>
       <source>Camera %1 has been replaced by %2.</source>
-      <translation type="unfinished">Camera %1 has been replaced by %2.</translation>
+      <translation>Η κάμερα %1 έχει αντικατασταθεί από την %2.</translation>
     </message>
     <message>
       <source>Click on the &quot;Undo Replace&quot; button to continue using two devices.</source>
-      <translation type="unfinished">Click on the &quot;Undo Replace&quot; button to continue using two devices.</translation>
+      <translation>Κάντε κλικ στο κουμπί &quot;Αναίρεση Αντικατάστασης&quot; για να συνεχίσετε να χρησιμοποιείτε δύο συσκευές.</translation>
     </message>
     <message>
       <source>Undo Replace</source>
-      <translation type="unfinished">Undo Replace</translation>
+      <translation>Αναίρεση Αντικατάστασης</translation>
     </message>
     <message>
       <source>Add more services or fix overuse by stopping using services for some devices.</source>
-      <translation type="unfinished">Add more services or fix overuse by stopping using services for some devices.</translation>
+      <translation>Προσθέστε περισσότερες υπηρεσίες ή διορθώστε την υπερβολική χρήση διακόπτοντας τη χρήση υπηρεσιών για ορισμένες συσκευές.</translation>
     </message>
     <message>
       <source>If no action is taken, required number of services will be released automatically on %1.</source>
-      <translation type="unfinished">If no action is taken, required number of services will be released automatically on %1.</translation>
+      <translation>Εάν δεν ληφθεί καμία ενέργεια, ο απαιτούμενος αριθμός υπηρεσιών θα αποδεσμευτεί αυτόματα στις %1.</translation>
     </message>
     <message>
       <source>Some features may not be available.</source>
-      <translation type="unfinished">Some features may not be available.</translation>
+      <translation>Ορισμένες λειτουργίες ενδέχεται να μην είναι διαθέσιμες.</translation>
     </message>
     <message>
       <source>The Site exceeds its Organization&apos;s limits and may become non-functional soon. Please adjust your usage to avoid service disruption.</source>
@@ -11170,11 +11170,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open Settings</source>
-      <translation type="unfinished">Open Settings</translation>
+      <translation>Άνοιγμα Ρυθμίσεων</translation>
     </message>
     <message>
       <source>Open Services</source>
-      <translation type="unfinished">Open Services</translation>
+      <translation>Άνοιγμα Υπηρεσιών</translation>
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
@@ -11238,11 +11238,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Δεν υπάρχει διαθέσιμο αρχείο</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>Αποτυχία εκτέλεσης της ενέργειας του πρόσθετου</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11291,9 +11291,9 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <comment>Numerus form depends on the number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Κάντε διπλό κλικ για να προσθέσετε μία κάμερα στην τρέχουσα διάταξη ή ctrl+κλικ για να ανοίξετε σε νέα καρτέλα</numerusform>
+        <numerusform>Κάντε διπλό κλικ για να προσθέσετε κάμερες στην τρέχουσα διάταξη ή ctrl+κλικ για να ανοίξετε σε νέα καρτέλα</numerusform>
       </translation>
     </message>
   </context>
@@ -11305,7 +11305,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Ζώνη Ώρας</translation>
     </message>
     <message>
       <source>Date</source>
@@ -11313,7 +11313,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Ώρα Λειτουργικού Συστήματος Διακομιστή</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -11324,31 +11324,31 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Ώρα, κοινή και συγχρονισμένη μεταξύ όλων των διακομιστών. Μπορεί να διαφέρει ανάλογα με την ώρα του λειτουργικού συστήματος σε οποιονδήποτε συγκεκριμένο διακομιστή.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Συγχρονισμένο με το Διαδίκτυο</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Συγχρονισμένο με την τοπική ώρα στον επιλεγμένο διακομιστή</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Δεν είναι συγχρονισμένο. Κάθε διακομιστής χρησιμοποιεί τη δική του τοπική ώρα.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Ίδια με την τοπική ώρα του διακομιστή</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Δεν υπάρχει σύνδεση στο Διαδίκτυο. Η ώρα δεν συγχρονίζεται.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Ο διακομιστής ώρας είναι εκτός σύνδεσης. Η ώρα δεν συγχρονίζεται.</translation>
     </message>
   </context>
   <context>
@@ -11366,11 +11366,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TwoWayAudioButton</name>
     <message>
       <source>Hold to Speak</source>
-      <translation type="unfinished">Hold to Speak</translation>
+      <translation>Κρατήστε πατημένο για να μιλήσετε</translation>
     </message>
     <message>
       <source>Input device is not selected</source>
-      <translation type="unfinished">Input device is not selected</translation>
+      <translation>Η συσκευή εισόδου δεν έχει επιλεγεί</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -11381,50 +11381,50 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UploadWorker</name>
     <message>
       <source>Could not open file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not open file &quot;%1&quot;</translation>
+      <translation>Δεν ήταν δυνατό το άνοιγμα του αρχείου &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not calculate md5 for file &quot;%1&quot;</source>
-      <translation type="unfinished">Could not calculate md5 for file &quot;%1&quot;</translation>
+      <translation>Δεν ήταν δυνατός ο υπολογισμός του md5 για το αρχείο &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Δεν ήταν δυνατή η δημιουργία μεταφόρτωσης από την πλευρά του διακομιστή: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation type="unfinished">Could not upload file chunk to the server</translation>
+      <translation>Δεν ήταν δυνατή η μεταφόρτωση τμήματος αρχείου στον διακομιστή</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation type="unfinished">Could not check uploaded file on the server</translation>
+      <translation>Δεν ήταν δυνατός ο έλεγχος του μεταφορτωμένου αρχείου στον διακομιστή</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
-      <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+      <translation>Το αρχείο καταστράφηκε κατά την μεταφόρτωση στον διακομιστή</translation>
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Το απομακρυσμένο αρχείο &quot;%1&quot; είναι κατεστραμμένο</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Ο διακομιστής έχει ήδη αυτό το αρχείο &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupListModel</name>
     <message>
       <source>LDAP group</source>
-      <translation type="unfinished">LDAP group</translation>
+      <translation>Ομάδα LDAP</translation>
     </message>
     <message>
       <source>Built-in group</source>
-      <translation type="unfinished">Built-in group</translation>
+      <translation>Ενσωματωμένη ομάδα</translation>
     </message>
     <message>
       <source>Custom group</source>
-      <translation type="unfinished">Custom group</translation>
+      <translation>Προσαρμοσμένη ομάδα</translation>
     </message>
     <message>
       <source>Name</source>
@@ -11436,11 +11436,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
-      <translation type="unfinished">Group is not found in the LDAP database.</translation>
+      <translation>Η ομάδα δεν βρέθηκε στη βάση δεδομένων LDAP.</translation>
     </message>
     <message>
       <source>Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</source>
-      <translation type="unfinished">Group has another group as both its parent, and as a child member, or is a part of such circular reference chain. This can lead to an incorrect calculation of permissions.</translation>
+      <translation>Η ομάδα έχει μια άλλη ομάδα ως γονική και ως θυγατρικό μέλος ή αποτελεί μέρος μιας τέτοιας κυκλικής αλυσίδας αναφοράς. Αυτό μπορεί να οδηγήσει σε εσφαλμένο υπολογισμό των δικαιωμάτων.</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11452,26 +11452,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
-      <translation type="unfinished">There are multiple groups with this name. To maintain a clear and organized structure, we suggest providing unique names for each group.</translation>
+      <translation>Υπάρχουν πολλές ομάδες με αυτό το όνομα. Για να διατηρήσετε μια σαφή και οργανωμένη δομή, προτείνουμε να παρέχετε μοναδικά ονόματα για κάθε ομάδα.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::UserGroupRequestChain</name>
     <message>
       <source>Invalid JSON</source>
-      <translation type="unfinished">Invalid JSON</translation>
+      <translation>Μη έγκυρο JSON</translation>
     </message>
     <message>
       <source>Invalid request</source>
-      <translation type="unfinished">Invalid request</translation>
+      <translation>Μη έγκυρο αίτημα</translation>
     </message>
     <message>
       <source>Method not found</source>
-      <translation type="unfinished">Method not found</translation>
+      <translation>Η μέθοδος δεν βρέθηκε</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
+      <translation>Μη έγκυρες παράμετροι</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -11479,35 +11479,35 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Connection failure</source>
-      <translation type="unfinished">Connection failure</translation>
+      <translation>Αποτυχία σύνδεσης</translation>
     </message>
     <message>
       <source>Invalid encoding</source>
-      <translation type="unfinished">Invalid encoding</translation>
+      <translation>Μη έγκυρη κωδικοποίηση</translation>
     </message>
     <message>
       <source>Invalid encoding charset</source>
-      <translation type="unfinished">Invalid encoding charset</translation>
+      <translation>Μη έγκυρη κωδικοποίηση χαρακτήρων</translation>
     </message>
     <message>
       <source>Application Error</source>
-      <translation type="unfinished">Application Error</translation>
+      <translation>Σφάλμα Εφαρμογής</translation>
     </message>
     <message>
       <source>Transport Error</source>
-      <translation type="unfinished">Transport Error</translation>
+      <translation>Σφάλμα μεταφοράς</translation>
     </message>
     <message>
       <source>Server error code %1</source>
-      <translation type="unfinished">Server error code %1</translation>
+      <translation>Κωδικός σφάλματος διακομιστή %1</translation>
     </message>
     <message>
       <source>Reserved error code %1</source>
-      <translation type="unfinished">Reserved error code %1</translation>
+      <translation>Δεσμευμένος Κωδικός σφάλματος %1</translation>
     </message>
     <message>
       <source>Unknown error code %1</source>
-      <translation type="unfinished">Unknown error code %1</translation>
+      <translation>Άγνωστος κωδικός σφάλματος %1</translation>
     </message>
     <message>
       <source>Site Error</source>
@@ -11518,16 +11518,16 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserListModel</name>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>Τοπικός χρήστης</translation>
     </message>
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user</translation>
+      <translation>%1 χρήστης</translation>
     </message>
     <message>
       <source>LDAP user</source>
-      <translation type="unfinished">LDAP user</translation>
+      <translation>Χρήστης LDAP</translation>
     </message>
     <message>
       <source>Login</source>
@@ -11547,15 +11547,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>LDAP server is offline. Users are not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. Users are not able to log in.</translation>
+      <translation>Ο διακομιστής LDAP είναι εκτός σύνδεσης. Οι χρήστες δεν μπορούν να συνδεθούν.</translation>
     </message>
     <message>
       <source>User is not found in the LDAP database.</source>
-      <translation type="unfinished">User is not found in the LDAP database.</translation>
+      <translation>Ο χρήστης δεν βρέθηκε στη βάση δεδομένων LDAP.</translation>
     </message>
     <message>
       <source>Temporary user</source>
-      <translation type="unfinished">Temporary user</translation>
+      <translation>Προσωρινός χρήστης</translation>
     </message>
     <message>
       <source>Full Name</source>
@@ -11563,15 +11563,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
-      <translation type="unfinished">There is another user with this login. To avoid issues it is required for all users to have a unique login.</translation>
+      <translation>Υπάρχει ένας άλλος χρήστης με αυτά τα στοιχεία σύνδεσης. Για την αποφυγή προβλημάτων, απαιτείται όλοι οι χρήστες να έχουν μοναδικά στοιχεία σύνδεσης.</translation>
     </message>
     <message>
       <source>Organization user</source>
-      <translation type="unfinished">Organization user</translation>
+      <translation>Χρήστης οργανισμού</translation>
     </message>
     <message>
       <source>Channel Partner user</source>
-      <translation type="unfinished">Channel Partner user</translation>
+      <translation>Χρήστης εμπορικού συνεργάτη</translation>
     </message>
   </context>
   <context>
@@ -11598,15 +11598,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">%1 user with specified email already exists.</translation>
+      <translation>Ο χρήστης %1 με το καθορισμένο email υπάρχει ήδη.</translation>
     </message>
     <message>
       <source>Save user</source>
-      <translation type="unfinished">Save user</translation>
+      <translation>Αποθήκευση χρήστη</translation>
     </message>
     <message>
       <source>Enter your account password</source>
-      <translation type="unfinished">Enter your account password</translation>
+      <translation>Εισάγετε τον κωδικό πρόσβασης του λογαριασμού σας</translation>
     </message>
     <message>
       <source>Save</source>
@@ -11618,7 +11618,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Εφαρμογή αλλαγών;</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -11626,7 +11626,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Copy Access Link</source>
-      <translation type="unfinished">Copy Access Link</translation>
+      <translation>Αντιγραφή Συνδέσμου Πρόσβασης</translation>
     </message>
     <message>
       <source>Invalid current password</source>
@@ -11634,7 +11634,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>Το email δεν μπορεί να είναι κενό</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -11642,15 +11642,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed</translation>
+      <translation>Επιτρέπονται μόνο γράμματα, αριθμοί και σύμβολα %1</translation>
     </message>
     <message>
       <source>User with specified login already exists</source>
-      <translation type="unfinished">User with specified login already exists</translation>
+      <translation>Ο χρήστης με τα καθορισμένα στοιχεία σύνδεσης υπάρχει ήδη</translation>
     </message>
     <message>
       <source>Are you sure you want to terminate access link?</source>
-      <translation type="unfinished">Are you sure you want to terminate access link?</translation>
+      <translation>Είστε βέβαιοι ότι θέλετε να τερματίσετε τον σύνδεσμο πρόσβασης;</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -11658,11 +11658,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Terminate access link</source>
-      <translation type="unfinished">Terminate access link</translation>
+      <translation>Τερματισμός συνδέσμου πρόσβασης</translation>
     </message>
     <message>
       <source>Create access link</source>
-      <translation type="unfinished">Create access link</translation>
+      <translation>Δημιουργία συνδέσμου πρόσβασης</translation>
     </message>
     <message>
       <source>Create</source>
@@ -11674,15 +11674,15 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Access link has been successfully created!</source>
-      <translation type="unfinished">Access link has been successfully created!</translation>
+      <translation>Ο σύνδεσμος πρόσβασης δημιουργήθηκε με επιτυχία!</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended. Some actions may not work.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended. Some actions may not work.</translation>
+      <translation>Δεν συνιστάται η παραχώρηση ευρέων δικαιωμάτων στον προσωρινό χρήστη. Ορισμένες ενέργειες ενδέχεται να μην λειτουργήσουν.</translation>
     </message>
     <message>
       <source>Granting broad permissions to the temporary user is not recommended.</source>
-      <translation type="unfinished">Granting broad permissions to the temporary user is not recommended.</translation>
+      <translation>Δεν συνιστάται η χορήγηση ευρέων δικαιωμάτων στον προσωρινό χρήστη.</translation>
     </message>
     <message>
       <source>and</source>
@@ -11695,7 +11695,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>User %1 has been successfully created!</source>
-      <translation type="unfinished">User %1 has been successfully created!</translation>
+      <translation>Ο χρήστης %1 δημιουργήθηκε με επιτυχία!</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
@@ -11709,11 +11709,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>in %1</source>
       <comment>%1 is a duration</comment>
-      <translation type="unfinished">in %1</translation>
+      <translation>στο %1</translation>
     </message>
     <message>
       <source>Copy the Access Link and share it with intended user</source>
-      <translation type="unfinished">Copy the Access Link and share it with intended user</translation>
+      <translation>Αντιγράψτε τον σύνδεσμο πρόσβασης και κοινοποιήστε τον στον προβλεπόμενο χρήστη</translation>
     </message>
     <message>
       <source>This will instantly remove an access to the site for this user</source>
@@ -11728,7 +11728,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Επιλογή Έκδοσης</translation>
     </message>
     <message>
       <source>Version</source>
@@ -11736,7 +11736,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Μη έγκυρη έκδοση.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -11744,38 +11744,38 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>Ο κωδικός πρόσβασης είναι λανθασμένος.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraActionHandler</name>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Αποτυχία προσθήκης εικονικής κάμερας</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Άνοιγμα Εγγραφών Εικονικής Κάμερας...</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation type="unfinished">No video files found in selected folder</translation>
+      <translation>Δεν βρέθηκαν αρχεία βίντεο στον επιλεγμένο φάκελο</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation type="unfinished">Stop uploading?</translation>
+      <translation>Διακοπή μεταφόρτωσης;</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation type="unfinished">Already uploaded files will be kept.</translation>
+      <translation>Τα αρχεία που έχουν ήδη μεταφορτωθεί θα διατηρηθούν.</translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation type="unfinished">Use .MKV, .AVI, .MP4 or other video files.</translation>
+      <translation>Χρησιμοποιήστε .MKV, .AVI, .MP4 ή άλλα αρχεία βίντεο.</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation type="unfinished">Only video files with correct timestamp are supported.</translation>
+      <translation>Υποστηρίζονται μόνο αρχεία βίντεο με σωστή χρονική σήμανση.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
@@ -11793,135 +11793,135 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation type="unfinished">Not enough space on server storage</translation>
+      <translation>Δεν υπάρχει αρκετός χώρος στον αποθηκευτικό χώρο του διακομιστή</translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation type="unfinished">Selected files will not be uploaded</translation>
+      <translation>Τα επιλεγμένα αρχεία δεν θα μεταφορτωθούν</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation type="unfinished">Some files will not be uploaded</translation>
+      <translation>Ορισμένα αρχεία δεν θα μεταφορτωθούν</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation type="unfinished">No new files to upload in selected folder</translation>
+      <translation>Δεν υπάρχουν νέα αρχεία για μεταφόρτωση στον επιλεγμένο φάκελο</translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation type="unfinished">To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</translation>
+      <translation>Για να το αποτρέψετε αυτό, μπορείτε να προσθέσετε επιπλέον αποθηκευτικό χώρο. Μπορείτε επίσης να ελέγξετε ποια πλάνα θα διαγραφούν πρώτα αλλάζοντας την ώρα διατήρησης αρχειοθέτησης στις ρυθμίσεις της κάμερας.</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation type="unfinished">Upload anyway?</translation>
+      <translation>Να μεταφορτωθεί ούτως ή άλλως;</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation>Δεν ήταν δυνατή η έναρξη της μεταφόρτωσης, καθώς ο χρήστης &quot;%1&quot; μεταφορτώνει αυτήν τη στιγμή υλικό σε αυτήν την κάμερα.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Could not start upload as another user is currently uploading footage to this camera.</translation>
+      <translation>Δεν ήταν δυνατή η έναρξη της μεταφόρτωσης, καθώς κάποιος άλλος χρήστης ανεβάζει αυτήν τη στιγμή υλικό σε αυτήν την κάμερα.</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation type="unfinished">Could not finish upload to %1</translation>
+      <translation>Δεν ήταν δυνατή η ολοκλήρωση της μεταφόρτωσης στο %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation type="unfinished">Make sure there is enough space on server storage.</translation>
+      <translation>Βεβαιωθείτε ότι υπάρχει αρκετός χώρος στον αποθηκευτικό χώρο του διακομιστή.</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation type="unfinished">Uploading footage</translation>
+      <translation>Μεταφόρτωση υλικού</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 has unsupported format.</translation>
+      <translation>Η μορφή %1 δεν υποστηρίζεται.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 does not have timestamp.</translation>
+      <translation>Το %1 δεν έχει χρονική σήμανση.</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 is older than allowed in camera archive settings.</translation>
+      <translation>Το %1 είναι παλαιότερο από το επιτρεπόμενο στις ρυθμίσεις αρχειοθέτησης της κάμερας.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video has already been uploaded.</translation>
+      <translation>Το %1 καλύπτει την περίοδο για την οποία έχει ήδη μεταφορτωθεί βίντεο.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">%1 covers period for which video is being uploaded.</translation>
+      <translation>Το %1 καλύπτει την περίοδο για την οποία μεταφορτώνεται το βίντεο.</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected file formats are not supported</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+      <translation>
+        <numerusform>Η επιλεγμένη μορφή αρχείου δεν υποστηρίζεται</numerusform>
+        <numerusform>Οι επιλεγμένες μορφές αρχείων δεν υποστηρίζονται</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files do not have timestamps</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+      <translation>
+        <numerusform>Το επιλεγμένο αρχείο δεν έχει χρονικές σημάνσεις</numerusform>
+        <numerusform>Τα επιλεγμένα αρχεία δεν έχουν χρονικές σημάνσεις</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files are too old</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+      <translation>
+        <numerusform>Το επιλεγμένο αρχείο είναι πολύ παλιό</numerusform>
+        <numerusform>Τα επιλεγμένα αρχεία είναι πολύ παλιά</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+      <translation>
+        <numerusform>Το επιλεγμένο αρχείο καλύπτει την περίοδο για την οποία έχει ήδη μεταφορτωθεί βίντεο</numerusform>
+        <numerusform>Τα επιλεγμένα αρχεία καλύπτουν τις περιόδους για τις οποίες έχουν ήδη μεταφορτωθεί βίντεο</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Μπορείτε να μεταφορτώσετε αυτό το αρχείο σε διαφορετική παρουσία μιας εικονικής κάμερας.</numerusform>
+        <numerusform>Μπορείτε να μεταφορτώσετε αυτά τα αρχεία σε διαφορετική παρουσία μιας εικονικής κάμερας.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
-      <translation type="unfinished">
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+      <translation>
+        <numerusform>Το επιλεγμένο αρχείο καλύπτει την περίοδο για την οποία έχει ήδη μεταφορτωθεί βίντεο</numerusform>
+        <numerusform>Τα επιλεγμένα αρχεία καλύπτουν τις περιόδους για τις οποίες έχουν ήδη μεταφορτωθεί βίντεο</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+      <translation>
+        <numerusform>Κάποιο υλικό ενδέχεται να διαγραφεί μετά τη μεταφόρτωση αυτού του αρχείου</numerusform>
+        <numerusform>Κάποιο υλικό ενδέχεται να διαγραφεί μετά τη μεταφόρτωση αυτών των αρχείων</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
-      <translation type="unfinished">
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+      <translation>
+        <numerusform>Δεν υπάρχει πολύς ελεύθερος χώρος στον χώρο αποθήκευσης του διακομιστή. Κάποιο παλιό υλικό ενδέχεται να διαγραφεί για να ελευθερωθεί χώρος. Σημειώστε ότι εάν το επιλεγμένο αρχείο είναι το παλαιότερο στον διακομιστή, θα διαγραφεί αμέσως μετά τη μεταφόρτωσή του.</numerusform>
+        <numerusform>Δεν υπάρχει πολύς ελεύθερος χώρος στον χώρο αποθήκευσης του διακομιστή. Κάποιο παλιό υλικό ενδέχεται να διαγραφεί για να ελευθερωθεί χώρος. Σημειώστε ότι εάν τα επιλεγμένα αρχεία είναι τα παλαιότερα στον διακομιστή, θα διαγραφούν αμέσως μετά τη μεταφόρτωσή τους.</numerusform>
       </translation>
     </message>
   </context>
@@ -11929,22 +11929,22 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::VirtualCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Η κίνηση ανιχνεύεται μόνο κατά τη μεταφόρτωση βίντεο.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Η ενεργοποίηση ή η απενεργοποίηση αυτής της ρύθμισης δεν αλλάζει τίποτα στο υπάρχον αρχείο.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation type="unfinished">Another user is currently uploading footage to this camera.</translation>
+      <translation>Ένας άλλος χρήστης μεταφορτώνει αυτήν τη στιγμή υλικό σε αυτήν την κάμερα.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation type="unfinished">User %1 is currently uploading footage to this camera.</translation>
+      <translation>Ο χρήστης %1 μεταφορτώνει αυτήν τη στιγμή υλικό σε αυτήν την κάμερα.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -11954,19 +11954,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Finalizing %1...</translation>
+      <translation>Ολοκλήρωση %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Μεταφόρτωση %1...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::VirtualCameraWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>Αποτυχία αποστολής αιτήματος στον διακομιστή.</translation>
     </message>
   </context>
   <context>
@@ -11991,11 +11991,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::WebPageCertificateDialog</name>
     <message>
       <source>Open this integration?</source>
-      <translation type="unfinished">Open this integration?</translation>
+      <translation>Άνοιγμα αυτής της ενσωμάτωσης;</translation>
     </message>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Άνοιγμα αυτής της ιστοσελίδας;</translation>
     </message>
     <message>
       <source>Integration</source>
@@ -12011,10 +12011,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
 but this integration presented an untrusted certificate auth.
 We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</translation>
+      <translation>Προσπαθείτε να ανοίξετε το %1, αλλά αυτή η ενσωμάτωση παρουσίασε μη αξιόπιστο πιστοποιητικό εξουσιοδότησης. Σας συνιστούμε να μην ανοίξετε αυτήν την ενσωμάτωση. Εάν κατανοείτε τους κινδύνους, μπορείτε να ανοίξετε την ενσωμάτωση.</translation>
     </message>
     <message>
       <source>You try to open the
@@ -12022,21 +12019,21 @@ We recommend you not to open this integration. If you understand the risks, you 
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Προσπαθείτε να ανοίξετε το
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+αλλά αυτή η ιστοσελίδα παρουσίασε ένα μη αξιόπιστο πιστοποιητικό εξουσιοδότησης.
+Σας συνιστούμε να μην ανοίξετε αυτήν την ιστοσελίδα. Εάν κατανοείτε τους κινδύνους, μπορείτε να ανοίξετε την ιστοσελίδα.</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Σύνδεση παρ' όλα αυτά</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WebViewController</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation type="unfinished">The proxy %1 requires a username and password.</translation>
+      <translation>Ο διακομιστής μεσολάβησης %1 απαιτεί όνομα χρήστη και κωδικό πρόσβασης.</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -12048,29 +12045,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
-      <translation type="unfinished">Unavailable in dedicated window mode</translation>
+      <translation>Μη διαθέσιμο σε λειτουργία αποκλειστικού παραθύρου</translation>
     </message>
     <message>
       <source>Move this window to the Layout to use this functionality</source>
-      <translation type="unfinished">Move this window to the Layout to use this functionality</translation>
+      <translation>Μετακινήστε αυτό το παράθυρο στη Διάταξη για να χρησιμοποιήσετε αυτή τη λειτουργία</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WeekTimeScheduleDialog</name>
     <message>
       <source>Empty schedule is not allowed</source>
-      <translation type="unfinished">Empty schedule is not allowed</translation>
+      <translation>Το κενό χρονοδιάγραμμα δεν επιτρέπεται</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Είστε σίγουροι ότι θέλετε να αποκρύψετε αυτό το πλακίδιο;</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>Θα έχετε πρόσβαση στο μενού σύνδεσης %1 ανά πάσα στιγμή κάνοντας κλικ στο εικονίδιο cloud στον πίνακα πλοήγησης.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -12085,7 +12082,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WorkbenchExportHandler</name>
     <message>
       <source>Export completed</source>
-      <translation type="unfinished">Export completed</translation>
+      <translation>H Εξαγωγή ολοκληρώθηκε</translation>
     </message>
     <message>
       <source>Export failed</source>
@@ -12093,35 +12090,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation type="unfinished">Selected period cannot be exported for the current camera.</translation>
+      <translation>Δεν είναι δυνατή η εξαγωγή της επιλεγμένης περιόδου για την τρέχουσα κάμερα.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Αρκετοί σελιδοδείκτες μπορούν να εξαχθούν μόνο ως διάταξη.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
-      <translation type="unfinished">Local files not allowed for Multi-Video export</translation>
+      <translation>Δεν επιτρέπονται τοπικά αρχεία για εξαγωγή πολλαπλών βίντεο</translation>
     </message>
     <message>
       <source>Please remove all local files from the layout and try again.</source>
-      <translation type="unfinished">Please remove all local files from the layout and try again.</translation>
+      <translation>Αφαιρέστε όλα τα τοπικά αρχεία από τη διάταξη και προσπαθήστε ξανά.</translation>
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Έναρξη εξαγωγής...</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Η αποθήκευση απέτυχε</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Έναρξη αποθήκευσης...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Προετοιμάζουμε αρχεία για τη διαδικασία εξαγωγής. Παρακαλώ περιμένετε μερικά δευτερόλεπτα.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -12135,11 +12132,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::WorkbenchUpdateWatcher</name>
     <message>
       <source>%1 version available</source>
-      <translation type="unfinished">%1 version available</translation>
+      <translation>Διαθέσιμη έκδοση %1</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation>Σημαντικά προβλήματα έχουν διορθωθεί. Συνιστάται ανεπιφύλακτα η ενημέρωση.</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -12151,18 +12148,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>%1 Version is available</source>
-      <translation type="unfinished">%1 Version is available</translation>
+      <translation>Η Έκδοση %1 είναι διαθέσιμη</translation>
     </message>
     <message>
       <source>Skip Version</source>
-      <translation type="unfinished">Skip Version</translation>
+      <translation>Παράλειψη Έκδοσης</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::analytics::taxonomy::AttributeDisplayManager</name>
     <message>
       <source>Date/Time</source>
-      <translation type="unfinished">Date/Time</translation>
+      <translation>Ημερομηνία/Ώρα</translation>
     </message>
     <message>
       <source>Title</source>
@@ -12181,7 +12178,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Όλη η αρχειοθήκη</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -12197,15 +12194,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Υψηλή ανάλυση</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Χαμηλή ανάλυση</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Όλες οι ροές</translation>
     </message>
   </context>
   <context>
@@ -12308,7 +12305,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress... (%1 left)</source>
-      <translation type="unfinished">In progress... (%1 left)</translation>
+      <translation>Σε εξέλιξη... (%1 απέμειναν)</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -12324,7 +12321,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Imported up to</source>
-      <translation type="unfinished">Imported up to</translation>
+      <translation>Έγινε εισαγωγή έως</translation>
     </message>
     <message>
       <source>Status</source>
@@ -12336,28 +12333,28 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>In progress...</source>
-      <translation type="unfinished">In progress...</translation>
+      <translation>Σε εξέλιξη...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
     <message>
       <source>Latest</source>
-      <translation type="unfinished">Latest</translation>
+      <translation>Πιο πρόσφατο</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>Επικαλυπτόμενο αναγνωριστικό...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Καμία Ενέργεια</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -12369,11 +12366,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Αυτόματη εστίαση</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Μετάβαση στη θέση PTZ</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
@@ -12381,11 +12378,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Επόμενη κάμερα στη διάταξη</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Προηγούμενη κάμερα στη διάταξη</translation>
     </message>
     <message>
       <source>Open Layout</source>
@@ -12393,7 +12390,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Τροποποιητής</translation>
     </message>
     <message>
       <source>Multiple</source>
@@ -12404,11 +12401,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Επιλογή Διάταξης...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Κουμπί</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -12419,57 +12416,57 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>Ο πόρος δεν είναι διαθέσιμος για χρήση με το JS API</translation>
     </message>
     <message>
       <source>Resource not found</source>
-      <translation type="unfinished">Resource not found</translation>
+      <translation>Δεν βρέθηκε πόρος</translation>
     </message>
     <message>
       <source>Parameter not found</source>
-      <translation type="unfinished">Parameter not found</translation>
+      <translation>Η παράμετρος δεν βρέθηκε</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Δεν είναι δυνατός ο καθορισμός παραμέτρων πολυμέσων για τον πόρο χωρίς ροή πολυμέσων.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Δεν είναι δυνατή η προσθήκη του πόρου στη διάταξη</translation>
     </message>
     <message>
       <source>Cannot find an item with the specified ID</source>
-      <translation type="unfinished">Cannot find an item with the specified ID</translation>
+      <translation>Δεν είναι δυνατή η εύρεση ενός στοιχείου με το καθορισμένο αναγνωριστικό</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified ID.</source>
-      <translation type="unfinished">Cannot find a resource with the specified ID.</translation>
+      <translation>Δεν είναι δυνατή η εύρεση πόρου με το καθορισμένο αναγνωριστικό.</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item</translation>
+      <translation>Δεν είναι δυνατή η εύρεση ενός γραφικού στοιχείου που να αντιστοιχεί στο καθορισμένο αντικείμενο</translation>
     </message>
     <message>
       <source>Cannot maximize the item</source>
-      <translation type="unfinished">Cannot maximize the item</translation>
+      <translation>Δεν είναι δυνατή η μεγιστοποίηση του αντικειμένου</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>
     <message>
       <source>No filter</source>
-      <translation type="unfinished">No filter</translation>
+      <translation>Χωρίς φίλτρο</translation>
     </message>
     <message>
       <source>Main storage only</source>
-      <translation type="unfinished">Main storage only</translation>
+      <translation>Μόνο στην κύρια αποθήκευση</translation>
     </message>
     <message>
       <source>Backup storage only</source>
-      <translation type="unfinished">Backup storage only</translation>
+      <translation>Μόνο στον αποθηκευτικό χώρο αντιγράφων ασφαλείας</translation>
     </message>
   </context>
   <context>
@@ -12477,12 +12474,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ preset</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (ενεργό)</translation>
     </message>
     <message>
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
-      <translation type="unfinished">%1 (active)</translation>
+      <translation>%1 (ενεργό)</translation>
     </message>
   </context>
   <context>
@@ -12516,7 +12513,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Περιοχές Ενδιαφέροντος</translation>
     </message>
     <message>
       <source>Hotspots</source>
@@ -12524,29 +12521,29 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Toolbar</source>
-      <translation type="unfinished">Toolbar</translation>
+      <translation>Γραμμή Εργαλείων</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ShowreelSettingsFactory</name>
     <message>
       <source>Switch with Hotkeys</source>
-      <translation type="unfinished">Switch with Hotkeys</translation>
+      <translation>Εναλλαγή με πλήκτρα συντόμευσης</translation>
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation type="unfinished">Switch on Timer</translation>
+      <translation>Ενεργοποίηση χρονοδιακόπτη</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ShowreelTextFactory</name>
     <message>
       <source>Stop Tour</source>
-      <translation type="unfinished">Stop Tour</translation>
+      <translation>Διακοπή Περιήγησης</translation>
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation type="unfinished">Stop Showreel</translation>
+      <translation>Διακοπή Showreel</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -12554,40 +12551,40 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Έναρξη Showreel</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::AnalyticsEventTypePicker</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics events can be set up on a certain cameras.</translation>
+      <translation>Τα συμβάντα ανάλυσης μπορούν να ρυθμιστούν σε συγκεκριμένες κάμερες.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Επιλέξτε κάμερες χρησιμοποιώντας το κουμπί παραπάνω για να δείτε τη λίστα με τα υποστηριζόμενα συμβάντα.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::AnalyticsObjectAttributesPicker</name>
     <message>
       <source>Event will trigger only if there are matches any of attributes.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes.</translation>
+      <translation>Το συμβάν θα ενεργοποιηθεί μόνο εάν υπάρχουν αντιστοιχίες σε οποιοδήποτε από τα χαρακτηριστικά.</translation>
     </message>
     <message>
       <source>You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Μπορείτε να δείτε τα ονόματα των χαρακτηριστικών και τις τιμές τους στην καρτέλα Αντικείμενα.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::AnalyticsObjectTypePicker</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>Η ανίχνευση αντικειμένων ανάλυσης μπορεί να ρυθμιστεί σε συγκεκριμένες κάμερες.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation type="unfinished">Choose cameras using the button above to see the list of supported events.</translation>
+      <translation>Επιλέξτε κάμερες χρησιμοποιώντας το κουμπί παραπάνω για να δείτε τη λίστα με τα υποστηριζόμενα συμβάντα.</translation>
     </message>
   </context>
   <context>
@@ -12602,19 +12599,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>WHEN</source>
-      <translation type="unfinished">WHEN</translation>
+      <translation>ΟΤΑΝ</translation>
     </message>
     <message>
       <source>EVENT</source>
-      <translation type="unfinished">EVENT</translation>
+      <translation>ΣΥΜΒΑΝ</translation>
     </message>
     <message>
       <source>DO</source>
-      <translation type="unfinished">DO</translation>
+      <translation>ΕΚΤΕΛΕΣΗ</translation>
     </message>
     <message>
       <source>ACTION</source>
-      <translation type="unfinished">ACTION</translation>
+      <translation>ΕΝΕΡΓΕΙΑ</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12622,11 +12619,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation type="unfinished">Add Title or Comment</translation>
+      <translation>Προσθήκη τίτλου ή σχολίου</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
-      <translation type="unfinished">The rule is not valid and may not work</translation>
+      <translation>Ο κανόνας δεν είναι έγκυρος και ενδέχεται να μην λειτουργεί</translation>
     </message>
   </context>
   <context>
@@ -12645,14 +12642,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Token</source>
-      <translation type="unfinished">Token</translation>
+      <translation>Διακριτικό</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::HttpHeadersPickerWidget</name>
     <message>
       <source>No custom headers</source>
-      <translation type="unfinished">No custom headers</translation>
+      <translation>Δεν υπάρχουν προσαρμοσμένες κεφαλίδες</translation>
     </message>
     <message numerus="yes">
       <source>%n custom headers</source>
@@ -12704,7 +12701,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::OptionalDurationPicker</name>
     <message>
       <source>Once in</source>
-      <translation type="unfinished">Once in</translation>
+      <translation>Μία φορά κάθε</translation>
     </message>
     <message>
       <source>For</source>
@@ -12719,11 +12716,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::RulesTableModel</name>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Συμβάν</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Ενέργεια</translation>
     </message>
     <message>
       <source>Target</source>
@@ -12731,11 +12728,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Comment</source>
-      <translation type="unfinished">Comment</translation>
+      <translation>Σχόλιο</translation>
     </message>
     <message>
       <source>No source</source>
-      <translation type="unfinished">No source</translation>
+      <translation>Δεν υπάρχει πηγή</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -12761,7 +12758,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No target</source>
-      <translation type="unfinished">No target</translation>
+      <translation>Δεν υπάρχει προορισμός</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -12776,7 +12773,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Source Server and %1</source>
-      <translation type="unfinished">Source Server and %1</translation>
+      <translation>Διακομιστής πηγής και %1</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -12796,7 +12793,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select at least one User</source>
-      <translation type="unfinished">Select at least one User</translation>
+      <translation>Επιλέξτε τουλάχιστον έναν χρήστη</translation>
     </message>
     <message>
       <source>Site</source>
@@ -12807,7 +12804,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::SingleTargetLayoutPicker</name>
     <message>
       <source>Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</source>
-      <translation type="unfinished">Looking for a local layout? Select only one user from the &quot;Show to&quot; list to display their local layouts as an option here.</translation>
+      <translation>Ψάχνετε για μια τοπική διάταξη; Επιλέξτε μόνο έναν χρήστη από τη λίστα &quot;Εμφάνιση σε&quot; για να εμφανίσετε τις τοπικές διατάξεις του ως επιλογή εδώ.</translation>
     </message>
   </context>
   <context>
@@ -12821,30 +12818,30 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::StatePicker</name>
     <message>
       <source>When event occurs</source>
-      <translation type="unfinished">When event occurs</translation>
+      <translation>Όταν συμβαίνει το συμβάν</translation>
     </message>
     <message>
       <source>When event starts</source>
-      <translation type="unfinished">When event starts</translation>
+      <translation>Όταν ξεκινά το συμβάν</translation>
     </message>
     <message>
       <source>When event stops</source>
-      <translation type="unfinished">When event stops</translation>
+      <translation>Όταν το συμβάν σταματήσει</translation>
     </message>
     <message>
       <source>Select state</source>
-      <translation type="unfinished">Select state</translation>
+      <translation>Επιλέξτε κατάσταση</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::TextLookupPicker</name>
     <message>
       <source>Contains keywords</source>
-      <translation type="unfinished">Contains keywords</translation>
+      <translation>Περιέχει λέξεις-κλειδιά</translation>
     </message>
     <message>
       <source>Contains list entries</source>
-      <translation type="unfinished">Contains list entries</translation>
+      <translation>Περιέχει καταχωρήσεις λίστας</translation>
     </message>
     <message>
       <source>Keywords separated by space</source>
@@ -12856,48 +12853,48 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not contains keywords</source>
-      <translation type="unfinished">Not contains keywords</translation>
+      <translation>Δεν περιέχει λέξεις-κλειδιά</translation>
     </message>
     <message>
       <source>Not contains list entries</source>
-      <translation type="unfinished">Not contains list entries</translation>
+      <translation>Δεν περιέχει καταχωρήσεις λίστας</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesActionHandler</name>
     <message>
       <source>Lookup lists network request failed</source>
-      <translation type="unfinished">Lookup lists network request failed</translation>
+      <translation>Το αίτημα δικτύου για λίστες αναζήτησης απέτυχε</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::rules::VmsRulesDialog</name>
     <message>
       <source>Delete rule error: %1</source>
-      <translation type="unfinished">Delete rule error: %1</translation>
+      <translation>Σφάλμα διαγραφής κανόνα: %1</translation>
     </message>
     <message>
       <source>Save rule error: %1</source>
-      <translation type="unfinished">Save rule error: %1</translation>
+      <translation>Σφάλμα αποθήκευσης κανόνα: %1</translation>
     </message>
     <message>
       <source>Reset rules error: %1</source>
-      <translation type="unfinished">Reset rules error: %1</translation>
+      <translation>Σφάλμα επαναφοράς κανόνων: %1</translation>
     </message>
     <message numerus="yes">
       <source>Some of the rules were not enabled</source>
       <comment>Numerus form depends on the invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
+      <translation>
+        <numerusform>Ένας κανόνας δεν ενεργοποιήθηκε</numerusform>
+        <numerusform>Μερικοί από τους κανόνες δεν ενεργοποιήθηκαν</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Numerus form depends on the invalid rule count</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
+      <translation>
+        <numerusform>Ο επιλεγμένος κανόνας δεν μπορεί να ενεργοποιηθεί, καθώς έχει λανθασμένες παραμέτρους. Διορθώστε τις και ενεργοποιήστε ξανά τον κανόνα.</numerusform>
+        <numerusform>Ορισμένοι από τους επιλεγμένους κανόνες δεν μπορούν να ενεργοποιηθούν, καθώς έχουν λανθασμένες παραμέτρους. Διορθώστε τις και ενεργοποιήστε ξανά τους κανόνες.</numerusform>
       </translation>
     </message>
   </context>
@@ -12924,38 +12921,38 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Used</source>
-      <translation type="unfinished">Used</translation>
+      <translation>Χρησιμοποιήθηκαν</translation>
     </message>
     <message>
       <source>The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</source>
-      <translation type="unfinished">The number of devices using this service exceeds the available capacity. Add more services or disable the services on some devices.</translation>
+      <translation>Ο αριθμός των συσκευών που χρησιμοποιούν αυτήν την υπηρεσία υπερβαίνει τη διαθέσιμη χωρητικότητα. Προσθέστε περισσότερες υπηρεσίες ή απενεργοποιήστε τις υπηρεσίες σε ορισμένες συσκευές.</translation>
     </message>
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>Στο %1, το σύστημα θα απενεργοποιήσει αυτόματα την υπηρεσία σε ορισμένες συσκευές.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::saas::TierUsageModel</name>
     <message>
       <source>Limitation</source>
-      <translation type="unfinished">Limitation</translation>
+      <translation>Περιορισμός</translation>
     </message>
     <message>
       <source>Allowed</source>
-      <translation type="unfinished">Allowed</translation>
+      <translation>Επιτρέπεται</translation>
     </message>
     <message>
       <source>Current</source>
-      <translation type="unfinished">Current</translation>
+      <translation>Τρέχον</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Οποιοδήποτε Πρόσθετο</translation>
     </message>
   </context>
   <context>
@@ -12970,7 +12967,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Custom Users</source>
-      <translation type="unfinished">Custom Users</translation>
+      <translation>Προσαρμοσμένοι Χρήστες</translation>
     </message>
     <message>
       <source>%1 users</source>
@@ -12986,11 +12983,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name is necessary</source>
-      <translation type="unfinished">Name is necessary</translation>
+      <translation>Το όνομα είναι απαραίτητο</translation>
     </message>
     <message>
       <source>Reason is necessary</source>
-      <translation type="unfinished">Reason is necessary</translation>
+      <translation>Ο λόγος είναι απαραίτητος</translation>
     </message>
     <message>
       <source>Name</source>
@@ -13002,27 +12999,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>Λόγος απενεργοποίησης</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- Επιλέξτε ένα -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>Αναβαθμίζω το μηχάνημά μου</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Κατά λάθος εκχώρησα την άδεια χρήσης σε λάθος μηχάνημα</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Άλλος λόγος</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Παρακαλώ συμπληρώστε τα παρακάτω για απενεργοποίηση της άδειας χρήσης</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
@@ -13046,11 +13043,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Η διάταξη είναι πλήρης</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>Αποτυχία αλλαγής κωδικού πρόσβασης</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
@@ -13075,7 +13072,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>Ο διακομιστής &quot;%1&quot; δεν αποκρίνεται.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
@@ -13104,31 +13101,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>Η διάταξη είναι κλειδωμένη και δεν μπορεί να αλλάξει</translation>
     </message>
     <message>
       <source>Open File</source>
-      <translation type="unfinished">Open File</translation>
+      <translation>Άνοιγμα αρχείου</translation>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Όλα τα υποστηριζόμενα</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>Επιλέχθηκε πολύ σύντομη περίοδος</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation>Δεν είναι δυνατή η εκτέλεση Προεπισκόπηση Αναζήτησης. Παρακαλώ επιλέξτε μια περίοδο 15 δευτερολέπτων ή μεγαλύτερη.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation type="unfinished">Preview Search for %1</translation>
+      <translation>Προεπισκόπηση αναζήτησης για %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
+      <translation>Επιβεβαίωση διαγραφής αρχείων</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
@@ -13139,31 +13136,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
+      <translation>Υπάρχει ένας άλλος χρήστης με το ίδιο όνομα</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation type="unfinished">Updating Background...</translation>
+      <translation>Ενημέρωση Φόντου...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
+      <translation>Η επεξεργασία εικόνας μπορεί να διαρκέσει μερικά λεπτά. Παρακαλώ περιμένετε.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
+      <translation>Αποτυχία μεταφόρτωσης εικόνας</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation type="unfinished">Beta version %1</translation>
+      <translation>Έκδοση Beta %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Παρακαλούμε αναβαθμίστε στην επόμενη διαθέσιμη ενημέρωση κώδικα ή έκδοση μόλις αυτή είναι διαθέσιμη.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
+      <translation>Αποτυχία ανοίγματος της ιστοσελίδας του διακομιστή</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
@@ -13175,11 +13172,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Αυτή η έκδοση προορίζεται μόνο για δοκιμαστικούς σκοπούς.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Άνοιγμα Ρυθμίσεων Διακομιστή</translation>
     </message>
     <message>
       <source>OK</source>
@@ -13187,45 +13184,45 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Επιβεβαίωση θέσης αποθήκευσης για τα δεδομένα ανάλυσης στο &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>το μεγαλύτερο διαθέσιμο διαμέρισμα</translation>
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Η διαμόρφωση του παραθύρου αποθηκεύτηκε</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Αυτή η έκδοση προορίζεται μόνο για σκοπούς επίδειξης.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Δεν μπορεί να αναβαθμιστεί σε επόμενες εκδόσεις μόλις αυτές γίνουν διαθέσιμες.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Για αναβάθμιση, απεγκαταστήστε το %1 πριν εγκαταστήσετε μια ενημερωμένη έκδοση (όλα τα δεδομένα θα χαθούν).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
     <message>
       <source>Undo replacement completed successfully!</source>
-      <translation type="unfinished">Undo replacement completed successfully!</translation>
+      <translation>Η αναίρεση αντικατάστασης ολοκληρώθηκε με επιτυχία!</translation>
     </message>
     <message>
       <source>Some settings may not be transferred from the replaced camera due to compatibility issues.</source>
-      <translation type="unfinished">Some settings may not be transferred from the replaced camera due to compatibility issues.</translation>
+      <translation>Ορισμένες ρυθμίσεις ενδέχεται να μην μεταφερθούν από την αντικατεστημένη κάμερα λόγω προβλημάτων συμβατότητας.</translation>
     </message>
     <message>
       <source>Confirm undo replacement?</source>
-      <translation type="unfinished">Confirm undo replacement?</translation>
+      <translation>Επιβεβαίωση αναίρεσης αντικατάστασης;</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -13233,19 +13230,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>There are no suitable cameras for replacement on the Server &quot;%1&quot;</source>
-      <translation type="unfinished">There are no suitable cameras for replacement on the Server &quot;%1&quot;</translation>
+      <translation>Δεν υπάρχουν κατάλληλες κάμερες για αντικατάσταση στον διακομιστή &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Not enough access rights</source>
-      <translation type="unfinished">Not enough access rights</translation>
+      <translation>Δεν υπάρχουν αρκετά δικαιώματα πρόσβασης</translation>
     </message>
     <message>
       <source>You do not have permissions to open this camera on the layout</source>
-      <translation type="unfinished">You do not have permissions to open this camera on the layout</translation>
+      <translation>Δεν έχετε δικαιώματα για να ανοίξετε αυτήν την κάμερα στη διάταξη</translation>
     </message>
     <message>
       <source>You do not have permissions to open some of selected cameras on the layout</source>
-      <translation type="unfinished">You do not have permissions to open some of selected cameras on the layout</translation>
+      <translation>Δεν έχετε δικαιώματα για να ανοίξετε ορισμένες από τις επιλεγμένες κάμερες στη διάταξη</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
