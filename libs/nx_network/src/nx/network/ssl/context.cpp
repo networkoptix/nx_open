@@ -138,9 +138,11 @@ bool Context::setDefaultCertificate(Pem pem, std::string* errorMessage)
         NX_MUTEX_LOCKER locker(&m_mutex);
         m_defaultServerPem = std::move(pem);
         m_defaultServerContext = std::move(newDefaultContext);
-    }
 
-    NX_INFO(this, "Default certificate set to %1", m_defaultServerPem);
+        // Under the lock: a concurrent call replaces m_defaultServerPem's X509 in place, so
+        // formatting it outside the lock can read freed memory.
+        NX_INFO(this, "Default certificate set to %1", m_defaultServerPem);
+    }
 
     return true;
 }
