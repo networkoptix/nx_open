@@ -91,11 +91,12 @@ void MediaQueue::putData(const QnConstAbstractMediaDataPtr& media)
     if (const auto& video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media))
     {
         const bool isKeyFrame = video->isKeyFrame();
-        if (m_keyDataFound.size() <= video->channelNumber)
-            m_keyDataFound.resize(video->channelNumber + 1);
+        auto& keyDataFound = m_keyDataFound[video->deviceId];
+        if (keyDataFound.size() <= video->channelNumber)
+            keyDataFound.resize(video->channelNumber + 1);
         if (isKeyFrame)
-            m_keyDataFound[video->channelNumber] = true;
-        if (!m_keyDataFound[video->channelNumber] && !isKeyFrame)
+            keyDataFound[video->channelNumber] = true;
+        if (!keyDataFound[video->channelNumber] && !isKeyFrame)
         {
             NX_VERBOSE(this, "Skip data, waiting for keyframe: %1", media);
             return;
@@ -135,6 +136,15 @@ void MediaQueue::clearUnprocessedData()
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_mediaQueue.clear();
     m_keyDataFound.clear();
+}
+
+void MediaQueue::clearDataForDevice(nx::Uuid deviceId)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    std::erase_if(
+        m_mediaQueue, [deviceId](const auto& value) { return value->deviceId == deviceId; });
+    // The device restarts from scratch, so require a keyframe again, like clearUnprocessedData().
+    m_keyDataFound.erase(deviceId);
 }
 
 } // namespace nx::vms::server

@@ -58,6 +58,11 @@ static const AVCodecID kFallbackMseAudioCodec = AV_CODEC_ID_AAC;
 constexpr int kH264PayloadType = 96;
 constexpr int kOpusPayloadType = 111;
 
+AVCodecParameters* avCodecParameters(const CodecParametersConstPtr& parameters)
+{
+    return parameters ? parameters->getAvCodecParameters() : nullptr;
+}
+
 }
 
 namespace nx::webrtc {
@@ -267,6 +272,102 @@ bool Session::removeProvider(nx::Uuid deviceId)
     return true;
 }
 
+RenegotiationResult Session::renegotiateProvider(
+    nx::Uuid deviceId, QnAbstractMediaData::DataType dataType, int64_t resumePositionUs)
+{
+    auto provider = this->provider(deviceId);
+    if (!provider)
+    {
+        NX_DEBUG(this, "Can't renegotiate unknown provider %1", deviceId);
+        return RenegotiationResult::failed;
+    }
+
+    // MSE reports EOF permanently and can only be re-created with the session, see
+    // Transcoder::checkForMseEof().
+    if (!NX_ASSERT(m_method == nx::vms::api::WebRtcMethod::srtp,
+            "Renegotiation is not applicable to MSE"))
+    {
+        return RenegotiationResult::failed;
+    }
+
+    Track* track = nullptr;
+    if (dataType == QnAbstractMediaData::VIDEO)
+        track = m_tracks->videoTrack(deviceId);
+    else if (dataType == QnAbstractMediaData::AUDIO)
+        track = m_tracks->audioTrack(deviceId);
+
+    if (!track)
+    {
+        NX_DEBUG(this, "No %1 track of device %2 to renegotiate", dataType, deviceId);
+        return RenegotiationResult::failed;
+    }
+
+    // Without this, every packet that hits the still-EOF encoder would start another round.
+    if (track->pendingAnswer)
+        return RenegotiationResult::pending;
+
+    // Nothing sent before the client applies the new SDP would be decodable anyway.
+    provider->suspend();
+    if (m_consumer)
+        m_consumer->clearQueueForDevice(deviceId);
+
+    // The recreated RTP encoder restarts its sequence numbers and timestamps, so on the old SSRC
+    // it would look to the receiver like a stale continuation of the same stream rather than a
+    // new one. useTranscoding is deliberately kept: a transcoded track never reports EOF (its
+    // output codec doesn't change), so getting here means the track is passed through, and
+    // dropping the flag would discard the knowledge that the client rejected the native codec.
+    const auto oldSsrc = track->ssrc;
+    const auto* oldEncoder = encoderForTrack(track);
+    if (!m_tracks->updateSsrc(track))
+    {
+        NX_DEBUG(this, "Can't assign a new ssrc to track %1 of device %2", track->mid, deviceId);
+        return RenegotiationResult::failed;
+    }
+
+    track->pendingAnswer = true;
+    track->resumePositionUs = resumePositionUs;
+
+    provider->setInitialized(false);
+
+    // createRtpEncoders() reports success if either track got an encoder, so check this one:
+    // otherwise the offer would advertise an SSRC that the (still EOF) old encoder never emits,
+    // and the next packet would trigger another renegotiation.
+    if (!initializeMuxersInternal(dataType) || encoderForTrack(track) == oldEncoder)
+    {
+        NX_DEBUG(
+            this, "No encoder for the new codec of track %1, device %2", track->mid, deviceId);
+        track->pendingAnswer = false;
+        NX_ASSERT(m_tracks->updateSsrc(track, oldSsrc), "Can't roll the ssrc back");
+        return RenegotiationResult::failed;
+    }
+
+    if (m_tracker && m_tracker->isStarted())
+        m_tracker->sendOffer();
+
+    return RenegotiationResult::offerSent;
+}
+
+const QnUniversalRtpEncoder* Session::encoderForTrack(const Track* track) const
+{
+    if (!m_muxer)
+        return nullptr;
+
+    if (track->trackType == TrackType::audio)
+        return m_muxer->audioEncoder(track->deviceId);
+
+    return m_muxer->videoEncoder(track->deviceId);
+}
+
+bool Session::isRenegotiationPending(nx::Uuid deviceId) const
+{
+    for (const auto* track: {m_tracks->videoTrack(deviceId), m_tracks->audioTrack(deviceId)})
+    {
+        if (track && track->pendingAnswer)
+            return true;
+    }
+    return false;
+}
+
 void Session::addProvider(std::shared_ptr<AbstractCameraDataProvider> provider)
 {
     const auto deviceId = provider->resource()->getId();
@@ -312,11 +413,16 @@ void Session::setTranscodingParams(
     m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
 }
 
-bool Session::initializeMuxersInternal()
+bool Session::initializeMuxersInternal(QnAbstractMediaData::DataType videoOrAudio)
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
         m_transcodingSettings.aspectRatio = QnAspectRatio();
+
+    // A single track is (re)initialized on renegotiation, so that the other one keeps the encoder
+    // it already streams with, RTP sequence numbers included. See renegotiateProvider().
+    const bool doVideo = videoOrAudio != QnAbstractMediaData::AUDIO;
+    const bool doAudio = videoOrAudio != QnAbstractMediaData::VIDEO;
 
     for (const auto& [_, provider]: m_providers)
     {
@@ -329,13 +435,12 @@ bool Session::initializeMuxersInternal()
         const bool useFallbackVideo = videoTrack && videoTrack->useTranscoding;
         const bool useFallbackAudio = audioTrack && audioTrack->useTranscoding;
 
-        auto videoCodecParamaters = provider->getVideoCodecParameters();
+        auto videoCodecParamaters = doVideo ? provider->getVideoCodecParameters() : nullptr;
         if (videoCodecParamaters)
         {
             bool videoTranscodingRequired = m_transcodingSettings.isTranscodingRequired()
-                || m_resolution
-                || useFallbackVideo
-                || !m_muxer->isVideoCodecSupported(videoCodecParamaters->codec_id);
+                || m_resolution || useFallbackVideo
+                || !m_muxer->isVideoCodecSupported(videoCodecParamaters->getCodecId());
 
             const auto transcodePolicy = m_sessionPool->transcodePolicy();
             if (transcodePolicy.disableTranscoding && videoTranscodingRequired)
@@ -343,7 +448,7 @@ bool Session::initializeMuxersInternal()
                 NX_DEBUG(this,
                     "Video transcoding is disabled(source codec: %1) in the server settings. "
                     "Feature unavailable",
-                    videoCodecParamaters->codec_id);
+                    videoCodecParamaters->getCodecId());
                 return false;
             }
 
@@ -375,16 +480,19 @@ bool Session::initializeMuxersInternal()
                 if (!provider->addVideoTranscoder(config, m_transcodingSettings))
                     return false;
 
+                // The encoder is created for the transcoder output, not for the source.
+                videoCodecParamaters = provider->getVideoCodecParameters();
+
                 NX_DEBUG(this, "Video transcoding started, target codec: %1",
                     config.targetCodecId);
             }
         }
 
-        auto audioCodecParamaters = provider->getAudioCodecParameters();
+        auto audioCodecParamaters = doAudio ? provider->getAudioCodecParameters() : nullptr;
         if (audioCodecParamaters)
         {
             bool audioTranscodingRequired = useFallbackAudio
-                || !m_muxer->isAudioCodecSupported(audioCodecParamaters->codec_id);
+                || !m_muxer->isAudioCodecSupported(audioCodecParamaters->getCodecId());
             if (audioTranscodingRequired)
             {
                 auto audioCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
@@ -392,14 +500,15 @@ bool Session::initializeMuxersInternal()
                 if (!provider->addAudioTranscoder(audioCodecId))
                     return false;
 
+                audioCodecParamaters = provider->getAudioCodecParameters();
+
                 NX_DEBUG(this, "Audio transcoding started, target codec: %1", audioCodecId);
             }
         }
 
-        if (!m_muxer->createEncoders(
-            provider->resource()->getId(),
-            provider->getVideoCodecParameters(),
-            provider->getAudioCodecParameters()))
+        if (!m_muxer->createEncoders(provider->resource()->getId(),
+                avCodecParameters(videoCodecParamaters),
+                avCodecParameters(audioCodecParamaters)))
         {
             return false;
         }
@@ -567,6 +676,32 @@ AnswerResult Session::processSdpAnswer(const std::string& sdp)
 
     if (!initializeMuxersInternal())
         return AnswerResult::failed;
+
+    if (!doOfferAgain)
+    {
+        // This answer is final for the current offer round: any track renegotiated mid-session
+        // (see renegotiateProvider()) now has a client that knows its new SSRC/payload type, so
+        // its provider (suspended and purged of stale data since the offer was sent) can restart.
+        std::map<nx::Uuid, int64_t> resumePositionsUs;
+        for (auto& [_, track]: m_tracks->tracks())
+        {
+            if (!track->pendingAnswer)
+                continue;
+            track->pendingAnswer = false;
+            resumePositionsUs[track->deviceId] = track->resumePositionUs;
+        }
+
+        // Restart each renegotiated provider now that the client knows about its new SSRC/payload
+        // type, the same way an explicit seek would -- for a clean, keyframe-aligned resume.
+        if (m_consumer)
+        {
+            for (const auto& [deviceId, resumePositionUs]: resumePositionsUs)
+            {
+                m_consumer->seek(
+                    deviceId, resumePositionUs, [](nx::Uuid, Consumer::StreamStatus) {});
+            }
+        }
+    }
 
     return doOfferAgain ? AnswerResult::again : AnswerResult::success;
 }

@@ -24,12 +24,11 @@ using namespace nx::network;
 class NX_WEBRTC_API Consumer
 {
 public:
-
-    enum StreamStatus: int
+    enum StreamStatus : int
     {
         wait = http::StatusCode::_continue, //< Don't know result at this moment.
         success = http::StatusCode::ok, //< Success.
-        reconnect = http::StatusCode::movedPermanently, //< Stream is possible only after reconnect.
+        reconnect = http::StatusCode::movedPermanently, //< Only a reconnect can resume the stream.
         nodata = http::StatusCode::notFound, //< No provider for this timestamp, can't seek.
     };
     using StatusHandler = std::function<void(nx::Uuid deviceId, StreamStatus)>;
@@ -53,6 +52,7 @@ public:
     void resume(nx::Uuid deviceId, StatusHandler handler);
     void nextFrame(nx::Uuid deviceId, StatusHandler handler);
     void onDataSent(bool success);
+    void clearQueueForDevice(nx::Uuid deviceId);
     int64_t lastReportedTimestampUs() { return m_lastReportedTimestampUs; }
     void setSendTimestampInterval(std::chrono::milliseconds interval);
 
@@ -69,11 +69,15 @@ private:
     void runInMuxingThread(std::function<void()>&& func);
     void stopUnsafe();
     void sendMediaBuffer();
+    void startRenegotiationTimeout();
+
 private:
     // Main.
     nx::vms::server::MediaQueue m_mediaQueue;
     bool m_needStop = false;
     nx::network::aio::BasicPollable m_pollable;
+    // Fires if the client doesn't answer a renegotiation offer, see startRenegotiationTimeout().
+    nx::network::aio::Timer m_renegotiationTimer;
     Session* m_session = nullptr;
     Streamer* m_streamer = nullptr;
     int64_t m_lastReportedTimestampUs = AV_NOPTS_VALUE;

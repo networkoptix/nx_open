@@ -44,8 +44,8 @@ public: // Initialize.
     virtual bool addAudioTranscoder(AVCodecID codec) = 0;
     virtual bool isTranscodingEnabled(QnAbstractMediaData::DataType dataType) const = 0;
 
-    virtual AVCodecParameters* getVideoCodecParameters() const = 0;
-    virtual AVCodecParameters* getAudioCodecParameters() const = 0;
+    virtual CodecParametersConstPtr getVideoCodecParameters() const = 0;
+    virtual CodecParametersConstPtr getAudioCodecParameters() const = 0;
 
     virtual void setStreamDataFilter(nx::vms::api::StreamDataFilters /*filter*/) = 0;
 
@@ -60,6 +60,13 @@ public: // Playback.
     virtual bool resume() = 0;
     virtual bool nextFrame() = 0;
     virtual void stop() = 0;
+
+    /**
+     * Stops data production until the next play(), keeping no state of its own: unlike pause(),
+     * this leaves paused() and nextFrame() alone. Called while a codec-change renegotiation is
+     * in flight, when the client can't decode what is produced anyway.
+     */
+    virtual void suspend() = 0;
 
 protected:
     int64_t m_positionUs = DATETIME_NOW;

@@ -121,6 +121,33 @@ Track* Tracks::track(uint32_t ssrc) const
     return it != m_tracks.end() ? it->second.get() : nullptr;
 }
 
+uint32_t Tracks::updateSsrc(Track* track, std::optional<uint32_t> newSsrc)
+{
+    if (!track)
+        return 0;
+
+    if (!newSsrc)
+    {
+        do
+            newSsrc = nx::utils::random::number<uint32_t>();
+        while (m_tracks.contains(*newSsrc));
+    }
+    else if (m_tracks.contains(*newSsrc))
+    {
+        return 0;
+    }
+
+    auto it = m_tracks.find(track->ssrc);
+    if (!NX_ASSERT(it != m_tracks.end() && it->second.get() == track, "Foreign track"))
+        return 0;
+
+    auto ownedTrack = std::move(it->second);
+    m_tracks.erase(it);
+    ownedTrack->ssrc = *newSsrc;
+    m_tracks.emplace(*newSsrc, std::move(ownedTrack));
+    return *newSsrc;
+}
+
 Tracks::Tracks(Session* session)
     : m_session(session)
 {
