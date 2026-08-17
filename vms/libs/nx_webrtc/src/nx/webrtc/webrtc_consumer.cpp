@@ -16,11 +16,18 @@ namespace nx::webrtc {
 
 const int kMediaQueueSize = 512;
 
+// A renegotiation answer is one signaling round trip away, so this is only a safety net against a
+// client that ignores mid-session offers.
+constexpr std::chrono::seconds kRenegotiationTimeout(10);
+
 Consumer::Consumer(Session* session):
     m_mediaQueue(kMediaQueueSize),
     m_session(session),
     m_sessionId(session->id())
-{}
+{
+    // Keep the timer in the same aio thread as the pollable, startStream() rebinds them together.
+    m_renegotiationTimer.bindToAioThread(m_pollable.getAioThread());
+}
 
 Consumer::~Consumer()
 {
@@ -39,10 +46,16 @@ bool Consumer::canAcceptData() const
     return m_mediaQueue.size() < kMediaQueueSize;
 }
 
+void Consumer::clearQueueForDevice(nx::Uuid deviceId)
+{
+    m_mediaQueue.clearDataForDevice(deviceId);
+}
+
 bool Consumer::startStream(Streamer* streamer)
 {
     m_streamer = streamer;
     m_pollable.bindToAioThread(streamer->ice()->getAioThread());
+    m_renegotiationTimer.bindToAioThread(streamer->ice()->getAioThread());
     return true;
 }
 
@@ -51,6 +64,7 @@ void Consumer::stopUnsafe()
     NX_ASSERT(m_pollable.isInSelfAioThread());
 
     m_needStop = true;
+    m_renegotiationTimer.pleaseStopSync();
     m_pollable.pleaseStopSync();
 }
 
@@ -332,6 +346,15 @@ void Consumer::processNextData()
         }
 
         const auto deviceId = media->deviceId;
+
+        // Data dispatched here before clearQueueForDevice() ran would be sent under the new SSRC
+        // while the client is still using the old SDP. The answer restarts the provider anyway.
+        if (m_session->isRenegotiationPending(deviceId))
+        {
+            NX_VERBOSE(this, "Skip data while renegotiating: %1", media);
+            continue;
+        }
+
         auto rtpEncoder = m_session->muxer()->setDataPacket(deviceId, media);
         if (!rtpEncoder)
         {
@@ -352,12 +375,31 @@ void Consumer::processNextData()
         // can be unsupported by browser.
         if (m_session->muxer()->isEof(deviceId, rtpEncoder))
         {
-            m_pollable.dispatch(
-                [this, deviceId]()
-                {
+            // A codec change is handled by renegotiating the SDP for this track on the same peer
+            // connection over the existing signaling WebSocket -- the client's generic offer
+            // handling picks up the new SDP on its own, no data channel signal needed. This
+            // packet is simply dropped: renegotiateProvider() suspends the provider and purges
+            // anything already queued for it. Once the answer is applied, the provider is
+            // restarted (same as an explicit seek) either at live, or at this packet's timestamp
+            // if it was archive. If renegotiation is impossible, fall back to a reconnect.
+            auto provider = m_session->provider(deviceId);
+            const int64_t resumePositionUs =
+                (provider && provider->isLiveMode()) ? DATETIME_NOW : media->timestamp;
+            switch (m_session->renegotiateProvider(deviceId, media->dataType, resumePositionUs))
+            {
+                case RenegotiationResult::offerSent:
+                    startRenegotiationTimeout();
+                    continue;
+                case RenegotiationResult::pending:
+                    continue;
+                case RenegotiationResult::failed:
+                    NX_WARNING(this,
+                        "Failed to renegotiate provider %1 after codec change, "
+                        "ask the client to reconnect",
+                        deviceId);
                     m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
-                });
-            return;
+                    return;
+            }
         }
 
         if (media->dataType == QnAbstractMediaData::VIDEO ||
@@ -388,6 +430,30 @@ void Consumer::processNextData()
             break;
         }
     }
+}
+
+// A single timer is enough: on expiration every device that is still waiting for an answer is
+// reported, so re-arming it for a second device doesn't lose the first one.
+void Consumer::startRenegotiationTimeout()
+{
+    m_renegotiationTimer.start(
+        std::chrono::duration_cast<std::chrono::milliseconds>(kRenegotiationTimeout),
+        [this]()
+        {
+            for (const auto& provider: m_session->allProviders())
+            {
+                const auto deviceId = provider->resource()->getId();
+                if (!m_session->isRenegotiationPending(deviceId))
+                    continue;
+
+                NX_WARNING(this,
+                    "No answer for the renegotiation offer of device %1 in %2, "
+                    "ask the client to reconnect",
+                    deviceId,
+                    kRenegotiationTimeout);
+                m_streamer->handleStreamStatus(deviceId, StreamStatus::reconnect);
+            }
+        });
 }
 
 void Consumer::runInMuxingThread(std::function<void()>&& func)

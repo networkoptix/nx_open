@@ -25,6 +25,13 @@ enum AnswerResult
     failed
 };
 
+enum class RenegotiationResult
+{
+    offerSent, //< A new offer is sent, the provider restarts once it is answered.
+    pending, //< An offer for this track is already in flight, nothing to do.
+    failed, //< Renegotiation is impossible, the caller should fall back to a reconnect.
+};
+
 class SessionPool;
 class Tracker;
 class AbstractIceDelegate;
@@ -108,12 +115,33 @@ public:
 
     bool removeProvider(nx::Uuid deviceId);
 
+    /**
+     * Rebuilds the encoder of the `dataType` track of an already streaming provider (e.g. after
+     * its underlying media switched codec, such as a live-to-archive seek) and pushes a new SDP
+     * offer over the existing tracker connection. Unlike createProvider()/removeProvider(), this
+     * keeps the peer connection, ICE and data channel intact -- only the SDP is renegotiated.
+     * Once the answer for this offer is applied (see processSdpAnswer()), the provider is
+     * restarted at `resumePositionUs` (DATETIME_NOW for live), the same way an explicit seek
+     * would -- guaranteeing a clean, keyframe-aligned resume instead of waiting for whatever
+     * keyframe the already-running stream happens to produce next. SRTP only.
+     * @return failed if the track is unknown, the method is MSE, or no encoder could be created
+     *     for the new codec; the caller should then fall back to a reconnect.
+     */
+    RenegotiationResult renegotiateProvider(
+        nx::Uuid deviceId, QnAbstractMediaData::DataType dataType, int64_t resumePositionUs);
+
+    // True while an offer sent by renegotiateProvider() for this device is not answered yet.
+    bool isRenegotiationPending(nx::Uuid deviceId) const;
+
     std::string idForToStringFromPtr() const;
 
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
-    bool initializeMuxersInternal();
+    // Restricts (re)initialization to a single track, unless UNKNOWN is passed.
+    bool initializeMuxersInternal(
+        QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
+    const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
     SessionDescription describeUnsafe() const;
 

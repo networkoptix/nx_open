@@ -3,6 +3,7 @@
 #pragma once
 
 #include <deque>
+#include <map>
 #include <vector>
 
 #include <nx/media/media_data_packet.h>
@@ -19,6 +20,8 @@ public:
     void stop();
     void setMaxSize(int maxSize);
     void clearUnprocessedData();
+    // Drops data queued for `deviceId` and makes its video wait for a keyframe again.
+    void clearDataForDevice(nx::Uuid deviceId);
 
     int size() const;
 
@@ -29,7 +32,8 @@ private:
 private:
     int m_maxSize;
     std::deque<QnConstAbstractMediaDataPtr> m_mediaQueue;
-    std::vector<bool> m_keyDataFound;
+    // Per device, per channel: the queue skips video until the first keyframe of that channel.
+    std::map<nx::Uuid, std::vector<bool>> m_keyDataFound;
 
     nx::WaitCondition m_waitForFrame;
     mutable nx::Mutex m_mutex;

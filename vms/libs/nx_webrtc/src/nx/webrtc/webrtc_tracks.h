@@ -4,6 +4,8 @@
 
 #include "webrtc_utils.h"
 
+#include <optional>
+
 #include <nx/utils/uuid.h>
 
 namespace nx::webrtc {
@@ -29,6 +31,11 @@ struct NX_WEBRTC_API Track
     TrackState offerState{};
     TrackState answerState{};
     bool useTranscoding = false;
+    // A renegotiation offer was sent (Session::renegotiateProvider()) but not answered yet, so the
+    // client doesn't know the new SSRC/payload type.
+    bool pendingAnswer = false;
+    // Valid only while pendingAnswer: where to resume the provider (DATETIME_NOW for live).
+    int64_t resumePositionUs = 0;
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
@@ -41,6 +48,11 @@ class NX_WEBRTC_API Tracks
 public:
 
     void addTrack(std::unique_ptr<Track> track);
+
+    // Without `newSsrc` assigns a fresh random one, telling the receiver that the RTP stream
+    // restarted, e.g. on a mid-session codec change. `newSsrc` can be set to roll back to the old
+    // ssrc when the codec change fails. Returns the ssrc in use, or 0 if `newSsrc` is taken.
+    uint32_t updateSsrc(Track* track, std::optional<uint32_t> newSsrc = std::nullopt);
 
     Tracks(Session* session);
     virtual ~Tracks() = default;
