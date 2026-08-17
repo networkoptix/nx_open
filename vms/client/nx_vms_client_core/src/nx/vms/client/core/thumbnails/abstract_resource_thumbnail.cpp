@@ -160,12 +160,24 @@ QnResourcePtr AbstractResourceThumbnail::resource() const
 
 void AbstractResourceThumbnail::setResource(const QnResourcePtr& value)
 {
-    if (d->resource == value)
+    // A Resource which is already removed from the Resource Pool must not be accepted. Its
+    // flagsChanged signal will never be emitted again, because QnResource::addFlags does not emit
+    // anything when the flag is already set, and Qn::removed is never cleared. So the removal
+    // watch installed below would be dead, and such a Resource would be kept alive by the shared
+    // pointer and requested forever.
+    QnResourcePtr newValue = value;
+    if (newValue && newValue->hasFlags(Qn::removed))
+    {
+        NX_DEBUG(this, "Refusing the removed Resource %1", newValue);
+        newValue.reset();
+    }
+
+    if (d->resource == newValue)
         return;
 
     d->receiver.reset();
     d->updateOperation.cancel();
-    d->resource = value;
+    d->resource = newValue;
     reset();
 
     d->updateRotation();
@@ -289,6 +301,16 @@ void AbstractResourceThumbnail::update(bool forceRefresh)
 {
     if (!d->resource || !d->active)
         return;
+
+    // The Resource can be removed from the Resource Pool while it is set here. When the Pool is
+    // modified from a non-GUI thread, the removal watch is delivered as a queued metacall, so it
+    // can be handled later than this call.
+    if (d->resource->hasFlags(Qn::removed))
+    {
+        NX_DEBUG(this, "Not updating the removed Resource %1", d->resource);
+        d->updateOperation.cancel();
+        return;
+    }
 
     d->forceRefresh |= forceRefresh;
     d->updateOperation.requestOperation();
@@ -531,8 +553,18 @@ void AbstractResourceThumbnail::Private::doUpdate()
     const bool forceRefreshRequested = forceRefresh;
     forceRefresh = false;
 
-    if (!resource || !active || !NX_ASSERT(!resource->hasFlags(Qn::removed)))
+    if (!resource || !active)
         return;
+
+    // The Resource can be removed from the Resource Pool after the update has been requested. The
+    // removal watch installed in setResource() is delivered as a queued metacall when the Pool is
+    // modified from a non-GUI thread, so it can be handled after this timer expires. It is not an
+    // error, just skip the update.
+    if (resource->hasFlags(Qn::removed))
+    {
+        NX_DEBUG(q, "Skipping the update for the removed Resource %1", resource);
+        return;
+    }
 
     NX_VERBOSE(q, "Update for %1 (%2), forceRefresh=%3", resource->getName(),
         resource->getId(), forceRefreshRequested);
