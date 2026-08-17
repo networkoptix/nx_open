@@ -33,7 +33,7 @@ void AbstractAsyncSqlQueryExecutor::executeUpdateWithoutTran(
 //-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
-static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod{1};
 
 const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
 

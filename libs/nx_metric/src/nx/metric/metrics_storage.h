@@ -40,6 +40,19 @@ struct Storage: ParameterSet
     NX_METRICS_ADD(std::atomic<qint64>, apiCalls, "Amount of requested API calls");
     NX_METRICS_ADD(std::atomic<qint64>, primaryStreams, "Amount of primary streams");
     NX_METRICS_ADD(std::atomic<qint64>, secondaryStreams, "Amount of secondary streams");
+    NX_METRICS_ADD(std::atomic<qint64>,
+        motionDataWriteRequests,
+        "Total number of motion data write requests");
+    NX_METRICS_ADD(std::atomic<qint64>,
+        motionDataWriteRequestsSucceeded,
+        "Total number of successful motion data write requests");
+    NX_METRICS_ADD(std::atomic<qint64>,
+        motionDataWriteRequestsFailed,
+        "Total number of failed motion data write requests");
+    // Motion data writes are synchronous and currently have no cancellation path.
+    NX_METRICS_ADD(std::atomic<qint64>,
+        motionDataWriteRequestsCancelled,
+        "Total number of cancelled motion data write requests");
 
     struct Transactions: ParameterSet
     {

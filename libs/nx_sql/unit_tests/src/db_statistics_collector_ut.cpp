@@ -44,14 +44,17 @@ protected:
         m_statisticsCollector.recordQuery(std::move(query), val);
     }
 
-    void addRandomRecord()
+    void addRandomRecord(
+        QueryType queryType = QueryType::lookup, std::optional<DBResult> result = DBResultCode::ok)
     {
         using namespace std::chrono;
 
-        QueryExecutionTaskRecord queryInfo;
-        queryInfo.executionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
-        queryInfo.waitForExecutionDuration = milliseconds(nx::utils::random::number<int>(0, 100));
-        queryInfo.result = DBResultCode::ok;
+        const QueryExecutionTaskRecord queryInfo{
+            .queryType = queryType,
+            .result = result,
+            .waitForExecutionDuration = milliseconds(nx::utils::random::number<int>(0, 100)),
+            .executionDuration = milliseconds(nx::utils::random::number<int>(0, 100)),
+        };
         m_statisticsCollector.recordQueryExecutionTask(queryInfo);
         m_records.push_back(queryInfo);
     }
@@ -70,7 +73,7 @@ protected:
         m_timeShift.applyRelativeShift(timeShift);
     }
 
-    void assertStatisticsIsCalculatedByLastRecords(int /*count*/)
+    void assertStatisticsIsCalculatedByLastRecords()
     {
         Statistics queryStatistics;
         std::chrono::milliseconds requestExecutionTimeTotal(0);
@@ -79,14 +82,24 @@ protected:
         {
             if (record.result)
             {
-                if (*record.result == DBResultCode::ok)
+                if (DBResultCode::ok == record.result->code)
+                {
                     ++queryStatistics.requestsSucceeded;
+                    if (QueryType::modification == record.queryType)
+                        ++queryStatistics.modificationRequestsSucceeded;
+                }
                 else
+                {
                     ++queryStatistics.requestsFailed;
+                    if (QueryType::modification == record.queryType)
+                        ++queryStatistics.modificationRequestsFailed;
+                }
             }
             else
             {
                 ++queryStatistics.requestsCancelled;
+                if (QueryType::modification == record.queryType)
+                    ++queryStatistics.modificationRequestsCancelled;
             }
 
             if (record.executionDuration)
@@ -105,6 +118,11 @@ protected:
         }
 
         assertEqual(queryStatistics, m_statisticsCollector.getStatistics());
+    }
+
+    int totalModificationRequests() const
+    {
+        return m_statisticsCollector.getStatistics().totalModificationRequests;
     }
 
     void assertWaitForExecutionTimeMinMaxAverageEqualTo(
@@ -184,6 +202,9 @@ private:
         ASSERT_EQ(expected.requestsCancelled, actual.requestsCancelled);
         ASSERT_EQ(expected.requestsFailed, actual.requestsFailed);
         ASSERT_EQ(expected.requestsSucceeded, actual.requestsSucceeded);
+        ASSERT_EQ(expected.modificationRequestsSucceeded, actual.modificationRequestsSucceeded);
+        ASSERT_EQ(expected.modificationRequestsFailed, actual.modificationRequestsFailed);
+        ASSERT_EQ(expected.modificationRequestsCancelled, actual.modificationRequestsCancelled);
         assertEqual(expected.requestExecutionTimes, actual.requestExecutionTimes);
         assertEqual(expected.waitingForExecutionTimes, actual.waitingForExecutionTimes);
     }
@@ -229,11 +250,22 @@ TEST_F(DbStatisticsCollector, execution_time_min_max_average)
 
 TEST_F(DbStatisticsCollector, expired_elements_are_removed)
 {
-    addRandomRecord();
+    addRandomRecord(QueryType::modification);
     waitForStatisticsToExpire();
     addRandomRecord();
     addRandomRecord();
-    assertStatisticsIsCalculatedByLastRecords(2);
+    assertStatisticsIsCalculatedByLastRecords();
+    ASSERT_EQ(1, totalModificationRequests());
+}
+
+TEST_F(DbStatisticsCollector, modification_requests_are_counted)
+{
+    addRandomRecord(QueryType::lookup);
+    addRandomRecord(QueryType::modification);
+    addRandomRecord(QueryType::modification, DBResultCode::statementError);
+    addRandomRecord(QueryType::modification, std::nullopt);
+    assertStatisticsIsCalculatedByLastRecords();
+    ASSERT_EQ(3, totalModificationRequests());
 }
 
 TEST_F(DbStatisticsCollector, queries_statistics)
