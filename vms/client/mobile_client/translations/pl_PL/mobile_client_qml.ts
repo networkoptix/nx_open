@@ -289,7 +289,7 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation>Przegląd</translation>
+      <translation>Pogdląd</translation>
     </message>
     <message>
       <source>Search by %1</source>
