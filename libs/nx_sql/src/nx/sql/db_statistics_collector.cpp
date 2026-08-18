@@ -8,9 +8,12 @@
 
 namespace nx::sql {
 
-StatisticsCollector::QueryExecutionTaskContext::QueryExecutionTaskContext(std::chrono::milliseconds period)
-    :
+StatisticsCollector::QueryExecutionTaskContext::QueryExecutionTaskContext(
+    std::chrono::milliseconds period):
     successfulRequestsCounter(period),
+    successfulModificationRequestsCounter(period),
+    failedModificationRequestsCounter(period),
+    cancelledModificationRequestsCounter(period),
     failedRequestsCounter(period),
     cancelledRequestsCounter(period),
     taskExecutionTimeCounter(period),
@@ -20,6 +23,9 @@ StatisticsCollector::QueryExecutionTaskContext::QueryExecutionTaskContext(std::c
 void StatisticsCollector::QueryExecutionTaskContext::reset()
 {
     successfulRequestsCounter.reset();
+    successfulModificationRequestsCounter.reset();
+    failedModificationRequestsCounter.reset();
+    cancelledModificationRequestsCounter.reset();
     failedRequestsCounter.reset();
     cancelledRequestsCounter.reset();
     taskExecutionTimeCounter.reset();
@@ -61,13 +67,28 @@ void StatisticsCollector::recordQueryExecutionTask(QueryExecutionTaskRecord reco
 
     m_queryExecutionTaskStatistics.tasksWaitingForExecutionCounter.add(record.waitForExecutionDuration);
 
+    const bool modification = QueryType::modification == record.queryType;
+    if (modification)
+        ++m_totalModificationRequests;
+
     if (!record.result)
     {
         m_queryExecutionTaskStatistics.cancelledRequestsCounter.add(1);
+        if (modification)
+            m_queryExecutionTaskStatistics.cancelledModificationRequestsCounter.add(1);
         return;
     }
 
-    if (record.result == DBResultCode::ok)
+    const bool succeeded = DBResultCode::ok == record.result->code;
+    if (modification)
+    {
+        if (succeeded)
+            m_queryExecutionTaskStatistics.successfulModificationRequestsCounter.add(1);
+        else
+            m_queryExecutionTaskStatistics.failedModificationRequestsCounter.add(1);
+    }
+
+    if (succeeded)
         m_queryExecutionTaskStatistics.successfulRequestsCounter.add(1);
     else
         m_queryExecutionTaskStatistics.failedRequestsCounter.add(1);
@@ -89,20 +110,26 @@ Statistics StatisticsCollector::getStatistics() const
 
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    return Statistics
-    {
+    return Statistics{
         .statisticalPeriod = m_period,
         .requestsSucceeded =
             self->m_queryExecutionTaskStatistics.successfulRequestsCounter.getSumPerLastPeriod(),
+        .modificationRequestsSucceeded = self->m_queryExecutionTaskStatistics
+            .successfulModificationRequestsCounter.getSumPerLastPeriod(),
+        .modificationRequestsFailed = self->m_queryExecutionTaskStatistics
+            .failedModificationRequestsCounter.getSumPerLastPeriod(),
+        .modificationRequestsCancelled = self->m_queryExecutionTaskStatistics
+            .cancelledModificationRequestsCounter.getSumPerLastPeriod(),
+        .totalModificationRequests = m_totalModificationRequests,
         .requestsFailed =
             self->m_queryExecutionTaskStatistics.failedRequestsCounter.getSumPerLastPeriod(),
         .requestsCancelled =
             self->m_queryExecutionTaskStatistics.cancelledRequestsCounter.getSumPerLastPeriod(),
         .dbThreadPoolSize = m_dbThreadPoolSize->load(),
-        .requestExecutionTimes =
-            self->getDurationStatistics(&self->m_queryExecutionTaskStatistics.taskExecutionTimeCounter),
-        .waitingForExecutionTimes =
-            self->getDurationStatistics(&self->m_queryExecutionTaskStatistics.tasksWaitingForExecutionCounter),
+        .requestExecutionTimes = self->getDurationStatistics(
+            &self->m_queryExecutionTaskStatistics.taskExecutionTimeCounter),
+        .waitingForExecutionTimes = self->getDurationStatistics(
+            &self->m_queryExecutionTaskStatistics.tasksWaitingForExecutionCounter),
         .queryQueue = m_queryQueue.stats(),
         .queries = getQueryStatistics(lock),
     };
@@ -118,6 +145,7 @@ void StatisticsCollector::clearStatistics()
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     m_queryExecutionTaskStatistics.reset();
+    m_totalModificationRequests = 0;
 
     for (auto& query : m_queryStatistics)
         query.second.reset();

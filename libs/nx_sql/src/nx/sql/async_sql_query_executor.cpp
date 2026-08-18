@@ -7,8 +7,8 @@
 #include <nx/utils/log/log.h>
 
 #include "detail/query_execution_thread.h"
-#include "sql_query_execution_helper.h"
 #include "query.h"
+#include "sql_query_execution_helper.h"
 
 namespace nx::sql {
 
@@ -33,7 +33,7 @@ void AbstractAsyncSqlQueryExecutor::executeUpdateWithoutTran(
 //-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
-static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod{1};
 
 const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
 

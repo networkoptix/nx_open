@@ -28,6 +28,7 @@ namespace detail { class QueryQueue; }
  */
 struct QueryExecutionTaskRecord
 {
+    QueryType queryType = QueryType::lookup;
     std::optional<DBResult> result;
     std::chrono::milliseconds waitForExecutionDuration = std::chrono::milliseconds::zero();
     std::optional<std::chrono::milliseconds> executionDuration;
@@ -61,6 +62,9 @@ private:
     struct QueryExecutionTaskContext
     {
         nx::utils::math::SumPerPeriod<int> successfulRequestsCounter;
+        nx::utils::math::SumPerPeriod<int> successfulModificationRequestsCounter;
+        nx::utils::math::SumPerPeriod<int> failedModificationRequestsCounter;
+        nx::utils::math::SumPerPeriod<int> cancelledModificationRequestsCounter;
         nx::utils::math::SumPerPeriod<int> failedRequestsCounter;
         nx::utils::math::SumPerPeriod<int> cancelledRequestsCounter;
 
@@ -92,6 +96,7 @@ private:
     std::atomic<std::size_t>* m_dbThreadPoolSize = nullptr;
     mutable nx::Mutex m_mutex;
     QueryExecutionTaskContext m_queryExecutionTaskStatistics;
+    int m_totalModificationRequests = 0;
     std::unordered_map<std::string /*query */, SingleQueryStatisticsContext> m_queryStatistics;
 
     DurationStatistics getDurationStatistics(

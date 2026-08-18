@@ -185,6 +185,10 @@ struct Statistics
 {
     std::chrono::milliseconds statisticalPeriod;
     int requestsSucceeded = 0;
+    int modificationRequestsSucceeded = 0;
+    int modificationRequestsFailed = 0;
+    int modificationRequestsCancelled = 0;
+    int totalModificationRequests = 0;
     int requestsFailed = 0;
     int requestsCancelled = 0;
     std::size_t dbThreadPoolSize = 0;
@@ -195,7 +199,10 @@ struct Statistics
 };
 
 NX_REFLECTION_INSTRUMENT(Statistics,
-    (statisticalPeriod)(requestsSucceeded)(requestsFailed)(requestsCancelled) \
+    (statisticalPeriod)(requestsSucceeded)(modificationRequestsSucceeded) \
+    (modificationRequestsFailed)(modificationRequestsCancelled) \
+    (totalModificationRequests) \
+    (requestsFailed)(requestsCancelled) \
     (dbThreadPoolSize)(requestExecutionTimes)(waitingForExecutionTimes)(queryQueue) \
     (queries))
 
