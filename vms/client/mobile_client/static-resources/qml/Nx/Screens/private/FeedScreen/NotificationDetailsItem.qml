@@ -158,12 +158,25 @@ Item
 
         function startPlayback()
         {
-            const durationTimeMs = 10000
-            const paddingTimeMs = durationTimeMs / 2
-            preview.interval.startTimeMs = timestamp - paddingTimeMs
-            preview.interval.durationMs = durationTimeMs + paddingTimeMs * 2
-            preview.interval.setPosition(preview.interval.startTimeMs)
-            preview.interval.play(preview.interval.startTimeMs) //< Loads the stream.
+            const paddingTimeMs = 5000
+            let startTimeMs = timestamp - paddingTimeMs
+            let endTimeMs = timestamp + paddingTimeMs
+
+            const bottomBoundMs = archiveProvider.bottomBound
+            if (bottomBoundMs >= 0)
+                startTimeMs = Math.max(startTimeMs, bottomBoundMs)
+
+            const topBoundMs = archiveProvider.topBound
+            if (topBoundMs >= 0)
+                endTimeMs = Math.min(endTimeMs, topBoundMs)
+
+            // During an ongoing recording the top bound is the client sync time, which may lag
+            // behind the event time. Never let the window end before the event moment itself.
+            endTimeMs = Math.max(endTimeMs, timestamp + 1)
+
+            preview.interval.startTimeMs = startTimeMs
+            preview.interval.durationMs = endTimeMs - startTimeMs
+            preview.interval.play(startTimeMs) //< Loads the stream.
         }
 
         function evaluateArchive()

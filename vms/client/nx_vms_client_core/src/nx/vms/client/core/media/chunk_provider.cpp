@@ -328,6 +328,7 @@ void ChunkProvider::ChunkProviderInternal::notifyAboutTimePeriodsChange()
 {
     emit q->periodsUpdated(m_contentType);
     emit q->bottomBoundChanged();
+    emit q->topBoundChanged();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -388,6 +389,14 @@ qint64 ChunkProvider::bottomBound() const
 {
     const auto boundingPeriod = periods(Qn::RecordingContent).boundingPeriod();
     return boundingPeriod.startTimeMs > 0 ? boundingPeriod.startTimeMs : -1;
+}
+
+qint64 ChunkProvider::topBound() const
+{
+    // An in-progress chunk is an infinite period, so truncate it to the current time.
+    const auto boundingPeriod = periods(Qn::RecordingContent)
+        .boundingPeriod(qnSyncTime->currentMSecsSinceEpoch());
+    return boundingPeriod.isValid() ? boundingPeriod.endTimeMs() : -1;
 }
 
 const QnTimePeriodList& ChunkProvider::periods(Qn::TimePeriodContent type) const

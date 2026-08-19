@@ -24,6 +24,7 @@ class NX_VMS_CLIENT_CORE_API ChunkProvider:
 
     Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
+    Q_PROPERTY(qint64 topBound READ topBound NOTIFY topBoundChanged)
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
     Q_PROPERTY(bool loadingAnalytics READ isLoadingAnalytics NOTIFY loadingAnalyticsChanged)
@@ -38,6 +39,7 @@ public:
 
     virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override;
     qint64 bottomBound() const;
+    qint64 topBound() const;
 
     QnResourcePtr resource() const;
 
@@ -63,6 +65,7 @@ public:
 signals:
     void resourceChanged();
     void bottomBoundChanged();
+    void topBoundChanged();
     void loadingChanged();
     void loadingMotionChanged();
     void loadingAnalyticsChanged();
