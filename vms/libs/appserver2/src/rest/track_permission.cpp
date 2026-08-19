@@ -174,6 +174,7 @@ struct TrackPermission::Private
             else
             {
                 notificationsInOut->push_back(makeNotification(user, *newIt, NotifyType::update));
+                ++newIt;
             }
         }
         for (; oldIt != accessibleInOut->ids.end(); ++oldIt)
