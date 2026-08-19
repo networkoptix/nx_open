@@ -564,6 +564,11 @@ private:
         using namespace details;
         using nx::utils::model::getId;
 
+        // Let Derived notify the items which depend on a resource of another type, e.g. Devices
+        // depend on their parent Server status. isValidType ignores such transactions below.
+        if constexpr (requires { static_cast<Derived*>(this)->notifyDependent(transaction); })
+            static_cast<Derived*>(this)->notifyDependent(transaction);
+
         if (DeleteCommand == transaction.command)
         {
             auto d = static_cast<Derived*>(this);

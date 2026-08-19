@@ -67,7 +67,6 @@ struct TrackPermission::Private
         if (notifications.empty())
             return;
 
-        auto last = std::prev(notifications.end());
         for (auto it = notifications.begin(); it != notifications.end(); ++it)
             (*it)();
     }
@@ -175,6 +174,7 @@ struct TrackPermission::Private
             else
             {
                 notificationsInOut->push_back(makeNotification(user, *newIt, NotifyType::update));
+                ++newIt;
             }
         }
         for (; oldIt != accessibleInOut->ids.end(); ++oldIt)
