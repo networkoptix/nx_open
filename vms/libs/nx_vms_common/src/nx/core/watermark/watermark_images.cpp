@@ -2,9 +2,9 @@
 
 #include "watermark_images.h"
 
-#include <cmath>
-#include <array>
 #include <algorithm>
+#include <array>
+#include <cmath>
 
 #include <QtCore/QMap>
 #include <QtCore/QSize>
@@ -15,6 +15,7 @@
 #include <nx/core/watermark/watermark.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/text_renderer.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/graphics/drop_shadow_filter.h>
 
 using nx::core::Watermark;
@@ -37,6 +38,9 @@ const std::array<std::pair<double, QSize>, 5> predefinedSizes = {{
     {3.0 / 4.0,  QSize(1200, 1600)},
     {9.0 / 16.0, QSize(1080, 1920)}}};
 
+// Guards cachedWatermark and watermarkImages, which can be accessed concurrently from
+// several Qt Quick image loader threads via WatermarkImageProvider::requestImage().
+nx::Mutex watermarkCacheMutex = nx::Mutex(nx::Mutex::Recursive);
 Watermark cachedWatermark;
 QMap<double, QImage> watermarkImages;
 
@@ -44,6 +48,7 @@ void checkWatermarkChange(const Watermark& watermark)
 {
     if (watermark != cachedWatermark)
     {
+        NX_MUTEX_LOCKER lock(&watermarkCacheMutex);
         cachedWatermark = watermark;
         watermarkImages.clear(); //< Drop obsolete images.
     }
@@ -53,6 +58,7 @@ QImage getCachedimageByAspectRatio(double aspectRatio)
 {
     // Try to find any value in the interval
     // (aspectRatio / fuzzyEqualRatio, aspectRatio * fuzzyEqualRatio).
+    NX_MUTEX_LOCKER lock(&watermarkCacheMutex);
     const auto item = watermarkImages.lowerBound(aspectRatio / kFuzzyEqualRatio);
     if (item == watermarkImages.end())
         return QImage();
@@ -104,6 +110,7 @@ QImage createAndCacheWatermarkImage(const Watermark& watermark, QSize size)
     // Create new watermark image.
     auto image = nx::core::createWatermarkImage(watermark, size);
 
+    NX_MUTEX_LOCKER lock(&watermarkCacheMutex);
     // And push it into cache.
     watermarkImages[aspectRatio] = image;
 
@@ -209,6 +216,8 @@ QImage nx::core::retrieveWatermarkImage(const Watermark& watermark, const QSize&
     // Check to avoid future possible division by zero.
     if (size.isEmpty())
         return QImage();
+
+    NX_MUTEX_LOCKER lock(&watermarkCacheMutex);
 
     checkWatermarkChange(watermark);
 
