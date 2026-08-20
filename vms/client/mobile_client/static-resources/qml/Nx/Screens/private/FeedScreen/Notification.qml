@@ -26,20 +26,21 @@ Control
     property bool expanded: false
     property bool selected: false
 
-    readonly property bool isTabletLayout:
+    // Whether the notification is rendered as a compact card for a side panel rather than as a
+    // full-width one for the content area.
+    readonly property bool panelLayout:
     {
         if (windowContext.deprecatedUiController.currentScreen === Controller.SessionsScreen)
-            return false //< On the SessionsScreen it is always mobile layout for the feed.
+            return false //< On the SessionsScreen the feed always uses the content area layout.
 
-        // Use tablet layout in portrait and landscape device orientation.
-        return LayoutController.isTablet
+        return LayoutController.hasSidePanels
     }
 
     signal clicked()
 
-    onIsTabletLayoutChanged:
+    onPanelLayoutChanged:
     {
-        if (isTabletLayout)
+        if (panelLayout)
             expanded = false
     }
 
@@ -103,16 +104,16 @@ Control
         Item
         {
             Layout.fillWidth: true
-            Layout.preferredHeight: control.isTabletLayout
-                ? landscapeContentLayout.implicitHeight
-                : mobileContentLayout.implicitHeight
+            Layout.preferredHeight: control.panelLayout
+                ? panelContentLayout.implicitHeight
+                : contentAreaLayout.implicitHeight
 
             ColumnLayout
             {
-                id: mobileContentLayout
+                id: contentAreaLayout
 
                 anchors.fill: parent
-                visible: !control.isTabletLayout
+                visible: !control.panelLayout
                 spacing: 16
 
                 LayoutItemProxy
@@ -148,10 +149,10 @@ Control
 
             RowLayout
             {
-                id: landscapeContentLayout
+                id: panelContentLayout
 
                 anchors.fill: parent
-                visible: control.isTabletLayout
+                visible: control.panelLayout
                 spacing: 24
 
                 ColumnLayout
@@ -228,7 +229,7 @@ Control
                 {
                     anchors.centerIn: parent
 
-                    visible: !control.isTabletLayout && !!url
+                    visible: !control.panelLayout && !!url
                     sourcePath: "image://skin/48x48/Solid/play.svg"
                     sourceSize: Qt.size(48, 48)
                     primaryColor: ColorTheme.colors.light1
@@ -286,7 +287,7 @@ Control
 
                 Text
                 {
-                    visible: !control.isTabletLayout && description.truncated
+                    visible: !control.panelLayout && description.truncated
 
                     text: qsTr("Show more")
                     font.pixelSize: 16
@@ -305,7 +306,7 @@ Control
 
                 ColoredImage
                 {
-                    visible: !control.isTabletLayout && description.truncated
+                    visible: !control.panelLayout && description.truncated
 
                     sourceSize: Qt.size(24, 24)
                     sourcePath: "image://skin/24x24/Outline/arrow_down_2px.svg"

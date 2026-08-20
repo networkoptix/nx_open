@@ -88,7 +88,7 @@ AdaptiveScreen
                     {
                         screen.contentItem = searchContent
 
-                        if (!LayoutController.isTabletLayout)
+                        if (!LayoutController.hasSidePanels)
                             detailsLoader.setSource("")
 
                         LayoutController.exitFullscreen()
@@ -113,9 +113,8 @@ AdaptiveScreen
             State
             {
                 name: "returnToPreviousScreen"
-                when: stackView.depth > 1 &&
-                    (LayoutController.isTablet
-                        || (!LayoutController.isTabletLayout && screen.contentItem === searchContent))
+                when: stackView.depth > 1
+                    && (LayoutController.hasSidePanels || screen.contentItem === searchContent)
 
                 PropertyChanges
                 {
@@ -143,7 +142,7 @@ AdaptiveScreen
     {
         icon.source: "image://skin/24x24/Outline/filter_list.svg?primary=%1"
             .arg(StyleHints.foregroundColorName)
-        visible: !LayoutController.isTabletLayout && screen.contentItem === searchContent
+        visible: !LayoutController.hasSidePanels && screen.contentItem === searchContent
         indicator.visible: filtersItem.hasActiveFilters
         onClicked:
         {
@@ -161,13 +160,13 @@ AdaptiveScreen
     {
         id: resetAllButton
 
-        parent: LayoutController.isTabletLayout ? leftPanel.availableHeaderArea : screen.toolBar
+        parent: LayoutController.hasSidePanels ? leftPanel.availableHeaderArea : screen.toolBar
         anchors.right: parent.right
-        anchors.topMargin: LayoutController.isTabletLayout ? 20 : 0
-        anchors.rightMargin: LayoutController.isTabletLayout ? 0 : 20
+        anchors.topMargin: LayoutController.hasSidePanels ? 20 : 0
+        anchors.rightMargin: LayoutController.hasSidePanels ? 0 : 20
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr("Reset All")
-        visible: (LayoutController.isTabletLayout || screen.contentItem === filtersItem)
+        visible: (LayoutController.hasSidePanels || screen.contentItem === filtersItem)
             && filtersItem.hasActiveFilters
         onClicked: screenController.clearFilters()
     }
@@ -182,7 +181,7 @@ AdaptiveScreen
         anchors.verticalCenter: parent.verticalCenter
 
         text: qsTr("Reset")
-        visible: !LayoutController.isTabletLayout
+        visible: !LayoutController.hasSidePanels
             && screen.contentItem === optionSelectorItem
             && !!optionSelectorItem.selector
             && !optionSelectorItem.selector.isDefaultValue
@@ -393,12 +392,12 @@ AdaptiveScreen
             anchors.fill: parent
             anchors.leftMargin: 20
             anchors.rightMargin: 20
-            anchors.topMargin: LayoutController.isTabletLayout ? 20 : 68
+            anchors.topMargin: LayoutController.hasSidePanels ? 20 : 68
 
             ColumnLayout
             {
                 anchors.fill: parent
-                spacing: LayoutController.isTablet ? 12 : 8
+                spacing: LayoutController.isExpanded ? 12 : 8
 
                 Repeater
                 {
@@ -407,7 +406,8 @@ AdaptiveScreen
                     Rectangle
                     {
                         Layout.fillWidth: true
-                        Layout.preferredHeight: LayoutController.isTablet ? 209 : 92 //< Keep in sync with EventSearchItem height.
+                        // Keep in sync with EventSearchItem height.
+                        Layout.preferredHeight: LayoutController.isExpanded ? 209 : 92
 
                         radius: 8
                         color: "white"
@@ -432,7 +432,7 @@ AdaptiveScreen
         onSelectorClicked: (selector) =>
         {
             optionSelectorItem.selector = selector
-            if (LayoutController.isTabletLayout)
+            if (LayoutController.hasSidePanels)
             {
                 leftPanelPopupContent.item = optionSelectorItem
                 leftPanelPopup.open()
@@ -453,7 +453,7 @@ AdaptiveScreen
             apply()
             screenController.updateIfRequired()
 
-            if (LayoutController.isTabletLayout)
+            if (LayoutController.hasSidePanels)
                 leftPanelPopup.close()
             else
                 screen.contentItem = filtersItem
@@ -479,19 +479,19 @@ AdaptiveScreen
 
         LayoutItemProxy
         {
-            id: landscapeSearchProxy
+            id: panelSearchProxy
 
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: 20
             anchors.rightMargin: 20
-            target: LayoutController.isTabletLayout ? searchField : null
+            target: LayoutController.hasSidePanels ? searchField : null
         }
 
         LayoutItemProxy
         {
-            anchors.top: landscapeSearchProxy.bottom
+            anchors.top: panelSearchProxy.bottom
             anchors.topMargin: 4
             anchors.left: parent.left
             anchors.right: parent.right
@@ -580,7 +580,7 @@ AdaptiveScreen
 
         LayoutItemProxy
         {
-            id: portraitSearchProxy
+            id: contentSearchProxy
 
             anchors.top: parent.top
             anchors.topMargin: 16
@@ -589,23 +589,21 @@ AdaptiveScreen
             anchors.right: parent.right
             anchors.rightMargin: 20
             target: searchField
-            visible: !LayoutController.isTabletLayout
+            visible: !LayoutController.hasSidePanels
         }
 
         ListView
         {
             id: view
 
-            readonly property bool portraitMode: height > width
-
-            y: portraitSearchProxy.visible ? searchField.height + 32 : 20
+            y: contentSearchProxy.visible ? searchField.height + 32 : 20
             height: parent.height - y
             width: parent.width
             leftMargin: 20
             rightMargin: 20
 
             clip: true
-            spacing: LayoutController.isTablet ? 12 : 8
+            spacing: LayoutController.isExpanded ? 12 : 8
 
             boundsBehavior: Flickable.DragAndOvershootBounds
 
@@ -627,7 +625,7 @@ AdaptiveScreen
                 extraText: model.description
                 timestampMs: model.timestampMs
                 shared: !!model.isSharedBookmark
-                selected: LayoutController.isTabletLayout && detailsLoader.item?.uuid === uuid
+                selected: LayoutController.hasSidePanels && detailsLoader.item?.uuid === uuid
 
                 onVisibleChanged: model.visible = visible
 
@@ -657,13 +655,13 @@ AdaptiveScreen
                         "hasNext": Qt.binding(() => view.currentIndex > 0),
                         "hasPrevious": Qt.binding(() => view.currentIndex < view.count - 1),
                         "resource": resource,
-                        "showPreviewImage": Qt.binding(() => LayoutController.isMobile),
+                        "showPreviewImage": Qt.binding(() => !LayoutController.hasSidePanels),
                         "gestureExclusionEnabled": Qt.binding(() => LayoutController.isPortrait
                             && screen.isActive
                             && screen.contentItem === detailsLoader.item)
                     })
 
-                if (!LayoutController.isTabletLayout)
+                if (!LayoutController.hasSidePanels)
                     screen.contentItem = detailsLoader.item
             }
 
@@ -802,7 +800,7 @@ AdaptiveScreen
 
             // On the mobile layout the details are the content item already; only the tablet
             // layout swaps the content between the search results and the details.
-            if (!LayoutController.isTabletLayout)
+            if (!LayoutController.hasSidePanels)
                 return
 
             if (LayoutController.fullscreen)
@@ -817,7 +815,9 @@ AdaptiveScreen
             }
         }
 
-        function onIsPortraitChanged()
+        // Keyed on the shell kind rather than on `mode`: moving between two layouts that both
+        // have side panels must leave the panels alone.
+        function onHasSidePanelsChanged()
         {
             if (!screen.isActive)
                 return
@@ -825,14 +825,13 @@ AdaptiveScreen
             if (screen.contentItem === eventSearchMenu)
                 return
 
-            if (LayoutController.isMobile)
-                return
-
-            if (LayoutController.isPortrait)
+            if (!LayoutController.hasSidePanels)
             {
-                if (screen.contentItem !== detailsLoader.item)
-                    screen.closeDetailsPanel()
-
+                // The details were living in the right panel, which is gone now. Releasing them
+                // resets `view.currentIndex` through the binding below, so the row that was
+                // selected before the resize can be tapped open again - re-selecting the current
+                // index emits no change and would leave the row dead.
+                screen.closeDetailsPanel()
                 return
             }
 

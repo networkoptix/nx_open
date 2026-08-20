@@ -82,7 +82,7 @@ AdaptiveScreen
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
         item:
         {
-            if (LayoutController.isTabletLayout
+            if (LayoutController.hasSidePanels
                 && sessionsScreen.selectedOrganizationIndex != null
                 && sessionsScreen.selectedOrgHasFolders)
             {
@@ -181,9 +181,9 @@ AdaptiveScreen
     {
         target: LayoutController
 
-        function onIsTabletLayoutChanged()
+        function onHasSidePanelsChanged()
         {
-            if (LayoutController.isTabletLayout && sessionsScreen.contentItem === feed)
+            if (LayoutController.hasSidePanels && sessionsScreen.contentItem === feed)
                 sessionsScreen.contentItem = sessionsScreenContent
         }
     }
@@ -347,7 +347,7 @@ AdaptiveScreen
 
                 rightButton
                 {
-                    visible: !emptyListPlaceholder.visible && !LayoutController.isTabletLayout
+                    visible: !emptyListPlaceholder.visible && !LayoutController.hasSidePanels
                     icon.source: feedStateProvider.buttonIconSource
 
                     indicator.width: 12
@@ -430,7 +430,9 @@ AdaptiveScreen
         {
             id: feedStateProvider
 
-            iconColor: LayoutController.isTabletLayout ? "dark1" : StyleHints.foregroundColorName
+            iconColor: LayoutController.hasSidePanels
+                ? "dark1"
+                : StyleHints.foregroundColorName
             cloudSystemIds: organizationsModel.childSystemIds(sessionsScreen.rootIndex)
         }
 
@@ -482,14 +484,14 @@ AdaptiveScreen
         ColumnLayout
         {
             anchors.fill: parent
-            anchors.topMargin: breadcrumb.visible ? 0 : (LayoutController.isTablet ? 20 : 8)
-            spacing: LayoutController.isTablet ? 20 : 16
+            anchors.topMargin: breadcrumb.visible ? 0 : (LayoutController.isExpanded ? 20 : 8)
+            spacing: LayoutController.isExpanded ? 20 : 16
 
             Breadcrumb
             {
                 id: breadcrumb
 
-                readonly property bool canBeShown: !LayoutController.isTabletLayout
+                readonly property bool canBeShown: !LayoutController.hasSidePanels
                     && rootIndex.parent !== NxGlobals.invalidModelIndex()
 
                 Layout.fillWidth: true
@@ -906,6 +908,10 @@ AdaptiveScreen
 
             Flow
             {
+                id: siteListSkeleton
+
+                readonly property int kItemHeight: 116
+
                 anchors.fill: parent
                 topPadding: loadingIndicator.topTabsVisible ? 64 : 16
                 leftPadding: 20
@@ -913,12 +919,15 @@ AdaptiveScreen
 
                 Repeater
                 {
-                    model: LayoutController.isTablet && LayoutController.isPortrait ? 6 : 4
+                    // Fill the whole area with placeholders, whatever the layout is.
+                    model: siteList.cellsInRow * Math.ceil(
+                        (siteListSkeleton.height - siteListSkeleton.topPadding)
+                            / (siteListSkeleton.kItemHeight + siteListSkeleton.spacing))
 
                     delegate: MaskItem
                     {
                         width: siteList.cellWidth
-                        height: 116
+                        height: siteListSkeleton.kItemHeight
                     }
                 }
             }

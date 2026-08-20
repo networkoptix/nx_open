@@ -25,7 +25,7 @@ AdaptiveScreen
 
     function ensureContentNotEmpty()
     {
-        if (LayoutController.isTabletLayout)
+        if (LayoutController.hasSidePanels)
         {
             if (!contentItem || contentItem === settingsNavigation)
                 contentItem = interfaceSettingsPage
@@ -92,7 +92,7 @@ AdaptiveScreen
                 name: "returnToPreviousScreen"
                 when: stackView.depth > 1
                     && (settingsScreen.initialPage
-                        || LayoutController.isTabletLayout
+                        || LayoutController.hasSidePanels
                         || settingsScreen.contentItem === settingsNavigation)
 
                 PropertyChanges
@@ -115,7 +115,7 @@ AdaptiveScreen
             State
             {
                 name: "returnToSettingsNavigation"
-                when: !LayoutController.isTabletLayout
+                when: !LayoutController.hasSidePanels
                     && settingsScreen.contentItem !== settingsNavigation
 
                 PropertyChanges
@@ -126,7 +126,7 @@ AdaptiveScreen
             State
             {
                 name: "returnToMenuScreen"
-                when: stackView.depth === 1 && !LayoutController.isTabletLayout
+                when: stackView.depth === 1 && !LayoutController.hasSidePanels
 
                 PropertyChanges
                 {
@@ -146,12 +146,12 @@ AdaptiveScreen
         return contentItem?.title ?? ""
     }
 
-    contentItem: LayoutController.isTabletLayout ? null : settingsNavigation
+    contentItem: LayoutController.hasSidePanels ? null : settingsNavigation
 
     leftPanel
     {
         interactive: false
-        title: LayoutController.isTabletLayout ? "" : qsTr("Settings")
+        title: LayoutController.hasSidePanels ? "" : qsTr("Settings")
         item: settingsNavigation
         visible: true
     }
@@ -177,23 +177,23 @@ AdaptiveScreen
                 Layout.fillWidth: true
                 Layout.leftMargin: 20
                 Layout.rightMargin: 20
-                Layout.preferredHeight: LayoutController.isTabletLayout ? 40 : 56
+                Layout.preferredHeight: LayoutController.hasSidePanels ? 40 : 56
 
-                leftPadding: LayoutController.isTabletLayout ? 8 : 16
-                spacing: LayoutController.isTabletLayout ? 4 : 8
+                leftPadding: LayoutController.hasSidePanels ? 8 : 16
+                spacing: LayoutController.hasSidePanels ? 4 : 8
                 textHorizontalAlignment: Text.AlignLeft
 
                 text: page?.title ?? ""
                 font.weight: Font.Normal
-                font.pixelSize: LayoutController.isTabletLayout ? 14 : 18
+                font.pixelSize: LayoutController.hasSidePanels ? 14 : 18
 
                 checked: settingsScreen.contentItem === page
 
-                backgroundColor: LayoutController.isTabletLayout
+                backgroundColor: LayoutController.hasSidePanels
                     ? (checked ? ColorTheme.colors.dark8 : "transparent")
                     : ColorTheme.colors.dark6
 
-                foregroundColor: LayoutController.isTabletLayout
+                foregroundColor: LayoutController.hasSidePanels
                     ? (checked ? ColorTheme.colors.light4 : ColorTheme.colors.light10)
                     : ColorTheme.colors.light1
 
@@ -212,7 +212,7 @@ AdaptiveScreen
                     anchors.rightMargin: 16
                     anchors.verticalCenter: parent.verticalCenter
 
-                    visible: !LayoutController.isTabletLayout
+                    visible: !LayoutController.hasSidePanels
                     sourcePath: "image://skin/20x20/Outline/arrow_right.svg"
                     sourceSize: Qt.size(24, 24)
                     primaryColor: ColorTheme.colors.light16
@@ -301,7 +301,7 @@ AdaptiveScreen
 
         onSettingsSaved:
         {
-            if (LayoutController.isTabletLayout)
+            if (LayoutController.hasSidePanels)
                 return
 
             if (saveSettingsHandler.target === pushExpertModePage)
@@ -335,7 +335,7 @@ AdaptiveScreen
     {
         target: LayoutController
 
-        function onIsTabletLayoutChanged()
+        function onHasSidePanelsChanged()
         {
             settingsScreen.ensureContentNotEmpty()
         }

@@ -29,7 +29,7 @@ QtObject
 
     // Preferred sheet edge in landscape. Left-handed mode is not supported on tablet layout.
     readonly property int preferredSheetEdge:
-        (!LayoutController.isTabletLayout && appContext.settings.leftHandedMode)
+        (!LayoutController.hasSidePanels && appContext.settings.leftHandedMode)
             ? Qt.LeftEdge
             : Qt.RightEdge
 

@@ -49,6 +49,21 @@ FocusScope
     property alias rightPanel: rightPanel
     property alias rightPanelButtonIndicator: rightPanelButtonIndicator
 
+    property Item leftPanelButtonContainer
+    property Item rightPanelButtonContainer
+
+    readonly property bool leftPanelButtonWanted: LayoutController.hasSidePanels
+        && !LayoutController.fullscreen
+        && root.hasLeftPanel
+        && leftPanel.interactive
+        && leftPanel.isHidden
+
+    readonly property bool rightPanelButtonWanted: LayoutController.hasSidePanels
+        && !LayoutController.fullscreen
+        && root.hasRightPanel
+        && rightPanel.interactive
+        && rightPanel.isHidden
+
     property string leftControlIconSource
     property alias leftControlEnabled: defaultLeftControl.enabled
 
@@ -68,13 +83,15 @@ FocusScope
 
     readonly property int spacing: 1
 
-    // Opens `panel`, cross-closing the opposite one first if the landscape layout cannot fit both
+    // Opens `panel`, cross-closing the opposite one first if the layout cannot fit both
     // with the minimum content area. Use this from screens that drive `panel.visible` imperatively
     // (e.g. when the user selects an item and the matching panel should become visible).
     function showPanel(panel)
     {
         if (LayoutController.fullscreen)
             return
+
+        d.lastOpenedPanel = panel
 
         const opposite = panel === leftPanel ? rightPanel : leftPanel
         if (opposite.visible && !d.fitsBothPanels)
@@ -123,8 +140,8 @@ FocusScope
 
         ToolBarButton
         {
-            // On the portrait layout toggles splash if has one or pop current item from the stack
-            // if there is no splash and stack size > 1.
+            // On the single pane layout toggles splash if has one, or pops the current item from
+            // the stack if there is no splash and stack size > 1.
             id: defaultLeftControl
 
             visible: state !== ""
@@ -135,7 +152,7 @@ FocusScope
                 State
                 {
                     name: "openSplash"
-                    when: root.hasSplash && !LayoutController.isTabletLayout
+                    when: root.hasSplash && !LayoutController.hasSidePanels
 
                     PropertyChanges
                     {
@@ -171,11 +188,11 @@ FocusScope
 
     ColumnLayout
     {
-        id: portraitLayout
+        id: singlePaneLayout
 
         anchors.fill: parent
         spacing: root.spacing
-        visible: !LayoutController.isTabletLayout
+        visible: !LayoutController.hasSidePanels
 
         ProxyItem
         {
@@ -186,7 +203,7 @@ FocusScope
 
         ProxyItem
         {
-            objectName: "portraitContentProxyItem"
+            objectName: "singlePaneContentProxyItem"
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -198,11 +215,11 @@ FocusScope
 
     RowLayout
     {
-        id: landscapeLayout
+        id: panelsLayout
 
         anchors.fill: parent
         spacing: root.spacing
-        visible: LayoutController.isTabletLayout
+        visible: LayoutController.hasSidePanels
 
         Panel
         {
@@ -243,7 +260,7 @@ FocusScope
 
                 ProxyItem
                 {
-                    objectName: "landscapeContentProxyItem"
+                    objectName: "panelsContentProxyItem"
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -277,9 +294,17 @@ FocusScope
 
     NxControls.Button
     {
-        anchors.left: parent.left
-        anchors.bottom: parent.bottom
-        anchors.margins: 20
+        id: leftPanelButton
+
+        readonly property bool docked: !!root.leftPanelButtonContainer
+
+        parent: root.leftPanelButtonContainer ?? root
+
+        anchors.left: docked ? undefined : parent.left
+        anchors.bottom: docked ? undefined : parent.bottom
+        anchors.centerIn: docked ? parent : undefined
+        anchors.leftMargin: 20
+        anchors.bottomMargin: 12
         leftPadding: 0
         rightPadding: 0
         padding: 0
@@ -292,11 +317,7 @@ FocusScope
             || "image://skin/24x24/Solid/left_panel_open.svg?primary=dark1"
         icon.width: 24
         icon.height: 24
-        visible: LayoutController.isTabletLayout
-            && !LayoutController.fullscreen
-            && root.hasLeftPanel
-            && root.leftPanel.interactive
-            && leftPanel.isHidden
+        visible: root.leftPanelButtonWanted
 
         onClicked: root.showPanel(leftPanel)
 
@@ -313,9 +334,17 @@ FocusScope
 
     NxControls.Button
     {
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.margins: 20
+        id: rightPanelButton
+
+        readonly property bool docked: !!root.rightPanelButtonContainer
+
+        parent: root.rightPanelButtonContainer ?? root
+
+        anchors.right: docked ? undefined : parent.right
+        anchors.bottom: docked ? undefined : parent.bottom
+        anchors.centerIn: docked ? parent : undefined
+        anchors.rightMargin: 20
+        anchors.bottomMargin: 12
         leftPadding: 0
         rightPadding: 0
         padding: 0
@@ -328,11 +357,7 @@ FocusScope
             || "image://skin/24x24/Solid/right_panel_open.svg?primary=dark1"
         icon.width: 24
         icon.height: 24
-        visible: LayoutController.isTabletLayout
-            && !LayoutController.fullscreen
-            && root.hasRightPanel
-            && root.rightPanel.interactive
-            && rightPanel.isHidden
+        visible: root.rightPanelButtonWanted
 
         onClicked: root.showPanel(rightPanel)
 
@@ -385,7 +410,7 @@ FocusScope
     {
         target: LayoutController
 
-        function onIsTabletLayoutChanged()
+        function onHasSidePanelsChanged()
         {
             splash.close()
         }
@@ -408,46 +433,55 @@ FocusScope
     {
         id: d
 
-        // Landscape layout width required to fit both side panels and the minimum content area.
-        readonly property int requiredLandscapeWidth: StyleHints.contentAreaMinimumWidth
+        // The panel `showPanel()` was called for most recently. When the layout stops fitting
+        // both, this is the one that stays: the user has just asked for it. Tracked here rather
+        // than via `visible`, which also changes when the whole panels layout is shown or hidden.
+        property Item lastOpenedPanel: null
+
+        // Layout width required to fit both side panels and the minimum content area.
+        readonly property int requiredPanelsWidth: StyleHints.contentAreaMinimumWidth
             + leftPanel.implicitWidth
             + rightPanel.implicitWidth
             + 2 * root.spacing
 
-        // True if the landscape layout has enough room to host both side panels with at least
+        // True if the layout has enough room to host both side panels with at least
         // the minimum content area width visible between them. Independent of the panels
         // current visibility, so `showPanel()` can use it to decide whether opening one panel
         // must cross-close the opposite.
-        readonly property bool fitsBothPanels: landscapeLayout.width >= requiredLandscapeWidth
+        readonly property bool fitsBothPanels: panelsLayout.width >= requiredPanelsWidth
 
         // Hides `panel` and notifies consumers via `panelClosed` so they can release whatever
         // state was driving it (selection, persisted visibility, etc.).
         function closePanel(panel)
         {
+            if (lastOpenedPanel === panel)
+                lastOpenedPanel = null
+
             panel.visible = false
             root.panelClosed(panel)
         }
 
-        // Hides the right panel when both panels are visible but the content area would not fit
-        // the minimum width. Triggered imperatively from the Connections below rather than via a
-        // reactive `onSomethingChanged` handler — modifying `rightPanel.visible` from a binding-
-        // change handler causes QML to detect a binding loop (the handler writes a property that
-        // the binding reads).
+        // Hides one of the panels when both are visible but the content area would not fit the
+        // minimum width. Triggered imperatively from the Connections below rather than via a
+        // reactive `onSomethingChanged` handler — modifying `visible` from a binding-change
+        // handler causes QML to detect a binding loop (the handler writes a property that the
+        // binding reads).
         function autoCloseIfNarrow()
         {
-            if (!LayoutController.isTabletLayout)
+            if (!LayoutController.hasSidePanels)
                 return
 
             if (!leftPanel.visible || !rightPanel.visible)
                 return
 
-            if (landscapeLayout.width <= 0)
+            if (panelsLayout.width <= 0)
                 return
 
             if (fitsBothPanels)
                 return
 
-            closePanel(rightPanel)
+            // Without a history to go by the right panel gives way, as it always did.
+            closePanel(lastOpenedPanel === rightPanel ? leftPanel : rightPanel)
         }
     }
 
@@ -465,7 +499,7 @@ FocusScope
 
     Connections
     {
-        target: landscapeLayout
+        target: panelsLayout
         function onWidthChanged() { d.autoCloseIfNarrow() }
     }
 }

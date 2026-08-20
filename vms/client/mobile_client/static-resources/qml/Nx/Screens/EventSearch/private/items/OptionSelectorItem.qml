@@ -55,7 +55,7 @@ Item
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.leftMargin: 20
-            anchors.topMargin: LayoutController.isTabletLayout ? 0 : 20
+            anchors.topMargin: LayoutController.hasSidePanels ? 0 : 20
             anchors.rightMargin: 20
 
             height: 36
@@ -73,7 +73,7 @@ Item
                 right: parent.right
                 bottom: parent.bottom
 
-                topMargin: (searchEdit.visible || !LayoutController.isTabletLayout) ? 20 : 0
+                topMargin: (searchEdit.visible || !LayoutController.hasSidePanels) ? 20 : 0
                 leftMargin: 20
                 rightMargin: 20
             }

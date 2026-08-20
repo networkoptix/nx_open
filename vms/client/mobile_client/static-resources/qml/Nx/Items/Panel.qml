@@ -97,7 +97,7 @@ Page
             width: parent.width
             height: 1
             color: ColorTheme.colors.dark7
-            visible: !LayoutController.isTabletLayout
+            visible: !LayoutController.hasSidePanels
         }
     }
 

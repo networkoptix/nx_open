@@ -27,6 +27,16 @@ Controls.ApplicationWindow
     property alias banner: windowBanner
 
     visible: true
+
+    // The desktop build exists to try the layouts out, and its title bar is the only place that
+    // is always visible regardless of the screen. Mobile platforms never show the window title.
+    title: CoreUtils.isMobilePlatform()
+        ? ""
+        : appContext.appInfo.productName()
+            + " - " + LayoutController.modeName
+            + (appContext.settings.forcedLayoutMode >= 0 ? " (forced)" : "")
+            + " - " + mainWindow.width + "x" + mainWindow.height
+
     background: Rectangle
     {
         color: ColorTheme.colors.dark4
@@ -96,7 +106,7 @@ Controls.ApplicationWindow
         id: snackBar
 
         parent: Controls.Overlay.overlay
-        y: LayoutController.isTabletLayout
+        y: LayoutController.hasSidePanels
             ? uiContainer.navigationBar.y - height - 16
             : mainWindow.height - height - 16
     }

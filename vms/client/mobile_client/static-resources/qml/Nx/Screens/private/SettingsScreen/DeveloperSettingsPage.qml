@@ -363,16 +363,42 @@ BaseSettingsPage
                 appContext.settings.forceDeployByQrCodeFeature = (checkState !== Qt.Unchecked)
         }
 
-        LabeledSwitch
+        Row
         {
-            id: forceTabletMode
+            spacing: 8
 
-            width: parent.width
-            text: "Force tablet mode"
-            checkState: appContext.settings.forceTabletMode ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged:
-                appContext.settings.forceTabletMode = (checkState !== Qt.Unchecked)
-            onClicked: d.openRestartDialog()
+            Text
+            {
+                text: "Layout mode"
+                font.pixelSize: 16
+                color: ColorTheme.colors.light16
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            QuickControls.ComboBox
+            {
+                id: layoutModeComboBox
+
+                model: [
+                    { text: "Auto", value: -1 },
+                    { text: "Horizontal compact", value: LayoutMode.HorizontalCompact },
+                    { text: "Compact", value: LayoutMode.Compact },
+                    { text: "Medium", value: LayoutMode.Medium },
+                    { text: "Expanded", value: LayoutMode.Expanded }
+                ]
+                textRole: "text"
+                valueRole: "value"
+
+                onActivated: appContext.settings.forcedLayoutMode = currentValue
+
+                Binding
+                {
+                    target: layoutModeComboBox
+                    property: "currentIndex"
+                    value: layoutModeComboBox.indexOfValue(
+                        appContext.settings.forcedLayoutMode)
+                }
+            }
         }
 
         Row

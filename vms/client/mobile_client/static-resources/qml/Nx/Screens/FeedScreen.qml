@@ -47,7 +47,7 @@ AdaptiveScreen
         iconSource: "image://skin/24x24/Outline/filter_list.svg?primary=dark1"
         interactive: true
         visible: false
-        item: LayoutController.isTabletLayout && d.canFilter ? leftPanelItem : null
+        item: LayoutController.hasSidePanels && d.canFilter ? leftPanelItem : null
     }
 
     leftPanelButtonIndicator.visible: feed.filtered
@@ -57,7 +57,7 @@ AdaptiveScreen
         title: notificationDetailsItem.title
         color: ColorTheme.colors.dark5
         interactive: true
-        item: LayoutController.isTabletLayout && feed.selectedNotification
+        item: LayoutController.hasSidePanels && feed.selectedNotification
             ? notificationDetailsItem
             : null
 
@@ -91,7 +91,7 @@ AdaptiveScreen
 
         indicator.visible: feed.filtered
 
-        visible: !LayoutController.isTabletLayout && d.canFilter && feedScreen.contentItem === feed
+        visible: !LayoutController.hasSidePanels && d.canFilter && feedScreen.contentItem === feed
 
         onClicked: feed.openFilterMenu()
     }
@@ -104,7 +104,7 @@ AdaptiveScreen
 
         onSelectedNotificationChanged:
         {
-            if (!selectedNotification || LayoutController.isTabletLayout)
+            if (!selectedNotification || LayoutController.hasSidePanels)
                 return
 
             feedScreen.contentItem = notificationDetailsItem
@@ -175,7 +175,7 @@ AdaptiveScreen
             if (!feedScreen.isActive)
                 return
 
-            if (!LayoutController.isTabletLayout)
+            if (!LayoutController.hasSidePanels)
                 return
 
             if (LayoutController.fullscreen)
@@ -189,21 +189,18 @@ AdaptiveScreen
             }
         }
 
-        function onIsPortraitChanged()
+        function onHasSidePanelsChanged()
         {
             if (!feedScreen.isActive)
                 return
 
-            if (feedScreen.contentItem === feed) //< Feed list fits any orientation.
+            if (feedScreen.contentItem === feed) //< Feed list fits any layout.
             {
                 feed.selectedNotification = null
                 return
             }
 
-            if (LayoutController.isMobile)
-                return
-
-            if (LayoutController.isPortrait)
+            if (!LayoutController.hasSidePanels)
                 return
 
             if (LayoutController.fullscreen)
@@ -228,7 +225,7 @@ AdaptiveScreen
             if (LayoutController.fullscreen)
                 LayoutController.exitFullscreen()
 
-            if (LayoutController.isTabletLayout)
+            if (LayoutController.hasSidePanels)
                 return
 
             feedScreen.contentItem = feed

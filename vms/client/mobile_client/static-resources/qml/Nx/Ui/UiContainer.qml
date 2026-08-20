@@ -30,15 +30,15 @@ Item
 
     ColumnLayout
     {
-        id: mobileLayout
+        id: bottomBarLayout
 
         anchors.fill: parent
         spacing: 1
-        visible: !LayoutController.isTabletLayout
+        visible: !LayoutController.hasSidePanels
 
         ProxyItem
         {
-            id: mobileContentProxyItem
+            id: contentProxyItem
 
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -47,7 +47,7 @@ Item
         }
         ProxyItem
         {
-            id: mobileNavigationBarProxy
+            id: bottomNavigationBarProxy
 
             Layout.fillWidth: true
 
@@ -65,16 +65,16 @@ Item
 
     RowLayout
     {
-        id: tabletLayout
+        id: railLayout
 
         anchors.fill: parent
         spacing: 1
-        visible: LayoutController.isTabletLayout
+        visible: LayoutController.hasSidePanels
         clip: true
 
         ProxyItem
         {
-            id: tabletNavigationBarProxy
+            id: railNavigationBarProxy
 
             Layout.fillHeight: true
             target: screenNavigationBar
@@ -89,7 +89,7 @@ Item
 
         ProxyItem
         {
-            id: tabletContentProxy
+            id: railContentProxy
 
             Layout.fillWidth: true
             Layout.fillHeight: true

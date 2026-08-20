@@ -140,7 +140,7 @@ Control
 
             x: margin
             y: margin
-            height: LayoutController.isTabletLayout ? 32 : 22
+            height: LayoutController.isExpanded ? 32 : 22
 
             width:
             {
@@ -179,7 +179,7 @@ Control
 
                 text: (!!mediaResourceHelper.crossSystemName ? "../" : "") + cameraItem.resourceName
                 anchors.verticalCenter: parent.verticalCenter
-                font.pixelSize: LayoutController.isTabletLayout ? 16 : 12
+                font.pixelSize: LayoutController.isExpanded ? 16 : 12
                 font.weight: Font.Medium
                 elide: Text.ElideRight
                 color: ColorTheme.colors.light4

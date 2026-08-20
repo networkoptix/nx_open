@@ -72,7 +72,7 @@ Item
 
         contentSpacing: 0
 
-        edge: control.overlayStyle || LayoutController.isPortrait
+        edge: control.overlayStyle || LayoutController.isCompact
             ? Qt.BottomEdge
             : StyleHints.preferredSheetEdge
 

@@ -250,7 +250,7 @@ Item
 
                 filter: appContext.pushManager.lastUsedFilter
                 filterRegularExpression: search.regExp
-                filterExceptionId: LayoutController.isTabletLayout && feed.selectedNotification
+                filterExceptionId: LayoutController.hasSidePanels && feed.selectedNotification
                     ? feed.selectedNotification.id
                     : ""
 
@@ -291,7 +291,8 @@ Item
                     viewed: model.viewed ?? true
                     url: model.url
                     expanded: feed.searching
-                    selected: LayoutController.isTabletLayout && model.id === feed.selectedNotification?.id
+                    selected: LayoutController.hasSidePanels
+                        && model.id === feed.selectedNotification?.id
 
                     onClicked:
                     {

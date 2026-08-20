@@ -45,7 +45,7 @@ Rectangle
         required property int screenId
 
         Layout.alignment: Qt.AlignCenter
-        Layout.fillWidth: !LayoutController.isTabletLayout
+        Layout.fillWidth: !LayoutController.hasSidePanels
         Layout.preferredWidth: d.buttonSize.width
         Layout.preferredHeight: d.buttonSize.height
 
@@ -53,7 +53,7 @@ Rectangle
         {
             anchors.fill: parent
             visible: mouseArea.isSelected
-            rotation: LayoutController.isTabletLayout ? 90 : 0
+            rotation: LayoutController.hasSidePanels ? 90 : 0
             opacity: 0.1
 
             gradient: Gradient
@@ -65,8 +65,8 @@ Rectangle
 
         Rectangle
         {
-            width: LayoutController.isTabletLayout ? 2 : parent.width
-            height: LayoutController.isTabletLayout ? parent.height : 2
+            width: LayoutController.hasSidePanels ? 2 : parent.width
+            height: LayoutController.hasSidePanels ? parent.height : 2
             anchors.bottom: parent.bottom
             color: ColorTheme.colors.brand_core
             visible: mouseArea.isSelected
@@ -108,10 +108,10 @@ Rectangle
 
     RowLayout
     {
-        id: mobileLayout
+        id: bottomBarLayout
 
         anchors.fill: parent
-        visible: !LayoutController.isTabletLayout
+        visible: !LayoutController.hasSidePanels
         spacing: 24
 
         LayoutItemProxy
@@ -138,10 +138,10 @@ Rectangle
 
     ColumnLayout
     {
-        id: tabletLayout
+        id: railLayout
 
         anchors.fill: parent
-        visible: LayoutController.isTabletLayout
+        visible: LayoutController.hasSidePanels
         spacing: 0
 
         LayoutItemProxy
@@ -193,7 +193,7 @@ Rectangle
             screenId: Controller.UnknownScreen
             onClicked:
             {
-                if (LayoutController.isTabletLayout)
+                if (LayoutController.hasSidePanels)
                     Workflow.openDialog("../Mobile/Popups/LogoutConfirmationPopup.qml")
                 else
                     windowContext.sessionManager.stopSessionByUser()

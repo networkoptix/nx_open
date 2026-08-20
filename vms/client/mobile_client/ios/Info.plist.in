@@ -46,8 +46,6 @@
         <false/>
         <key>UIStatusBarStyle</key>
         <string>UIStatusBarStyleLightContent</string>
-        <key>UIRequiresFullScreen</key>
-        <string>YES</string>
         <key>CFBundleURLTypes</key>
         <array>
                 <dict>

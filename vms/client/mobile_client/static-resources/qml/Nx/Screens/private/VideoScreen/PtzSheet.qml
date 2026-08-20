@@ -37,7 +37,7 @@ AdaptiveSheet
         id: panel
 
         width: parent.width
-        height: LayoutController.isPortrait ? implicitHeight : sheet.availableContentHeight
+        height: sheet.bottomEdge ? implicitHeight : sheet.availableContentHeight
         visible: !sheet.moveOnTapMode
     }
 

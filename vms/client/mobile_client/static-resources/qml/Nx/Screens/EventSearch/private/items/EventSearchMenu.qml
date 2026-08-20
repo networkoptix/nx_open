@@ -22,7 +22,7 @@ Item
 
         anchors.fill: parent
         anchors.margins: 20
-        spacing: LayoutController.isTabletLayout ? 12 : 4
+        spacing: LayoutController.isExpanded ? 12 : 4
 
         Repeater
         {
@@ -55,9 +55,9 @@ Item
             {
                 objectName: modelData.objectName
 
-                alignment: LayoutController.isMobile ? Qt.AlignLeft : Qt.AlignCenter
-                width: LayoutController.isMobile ? flow.width : 261
-                height: LayoutController.isMobile ? 56 : 120
+                alignment: LayoutController.isExpanded ? Qt.AlignCenter : Qt.AlignLeft
+                width: LayoutController.isExpanded ? 261 : flow.width
+                height: LayoutController.isExpanded ? 120 : 56
                 padding: 0
                 leftPadding: 0
                 rightPadding: 0
@@ -67,9 +67,9 @@ Item
                 icon.width: 24
                 icon.height: 24
                 color: ColorTheme.colors.dark7
-                display: LayoutController.isMobile
-                    ? AbstractButton.TextBesideIcon
-                    : AbstractButton.TextUnderIcon
+                display: LayoutController.isExpanded
+                    ? AbstractButton.TextUnderIcon
+                    : AbstractButton.TextBesideIcon
                 visible: modelData.visible
 
                 onClicked: eventSearchMenu.menuItemClicked(modelData.analyticsSearchMode)

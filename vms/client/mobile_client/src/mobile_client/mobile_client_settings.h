@@ -65,7 +65,7 @@ public:
 
         CrashReportingEnabled,
 
-        ForceTabletMode,
+        ForcedLayoutMode,
 
         TimelinePanelVisible,
         ResourcesPanelVisible,
@@ -204,10 +204,12 @@ private:
             CrashReportingEnabled,
             (nx::build_info::publicationType() != nx::build_info::PublicationType::release))
 
+        // Overrides the layout mode which is chosen by the window size otherwise. Values match
+        // the LayoutMode.Value enumeration; -1 keeps the size-based mode.
         QN_DECLARE_RW_PROPERTY(
-            bool,
-            forceTabletMode, setForceTabletMode,
-            ForceTabletMode, false)
+            int,
+            forcedLayoutMode, setForcedLayoutMode,
+            ForcedLayoutMode, -1)
 
         QN_DECLARE_RW_PROPERTY(
             bool,
@@ -219,10 +221,7 @@ private:
             resourcesPanelVisible, setResourcesPanelVisible,
             ResourcesPanelVisible, true)
 
-        QN_DECLARE_RW_PROPERTY(
-            int,
-            sidePanelWidth, setSidePanelWidth,
-            SidePanelWidth, 320)
+        QN_DECLARE_RW_PROPERTY(int, sidePanelWidth, setSidePanelWidth, SidePanelWidth, 300)
 
         QN_DECLARE_RW_PROPERTY(
             int,

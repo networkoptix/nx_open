@@ -163,14 +163,18 @@ Menu
 
         function adjustPosition(invokerRect /*in parent coords*/, indentFromInvoker)
         {
-            const parent = menu.parent ?? menu.Overlay.overlay
+            // Not necessarily the window: the menu is parented to the content area of the video
+            // screen, which the side panels can make portrait-shaped inside a landscape window.
+            const container = menu.parent ?? menu.Overlay.overlay
 
-            if (LayoutController.isPortrait)
+            // The menu is offset along the longer dimension of the container, where the invoker
+            // is more likely to leave room for it on one of the sides.
+            if (container.height >= container.width)
             {
                 // Offset vertically.
                 menu.x = invokerRect.x
 
-                if (invokerRect.y < parent.height - invokerRect.y - invokerRect.height)
+                if (invokerRect.y < container.height - invokerRect.y - invokerRect.height)
                 {
                     // Bottom edge.
                     menu.y = invokerRect.y + invokerRect.height + indentFromInvoker
@@ -187,7 +191,7 @@ Menu
                 // Offset horizontally.
                 menu.y = invokerRect.y
 
-                if (invokerRect.x < parent.width - invokerRect.x - invokerRect.width)
+                if (invokerRect.x < container.width - invokerRect.x - invokerRect.width)
                 {
                     // Right edge.
                     menu.x = invokerRect.x + invokerRect.width + indentFromInvoker

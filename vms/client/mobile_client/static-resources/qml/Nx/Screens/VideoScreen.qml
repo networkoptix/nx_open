@@ -50,6 +50,16 @@ Page
     // Whether this is an auxiliary video screen or the primary video screen.
     property bool auxiliary: false
 
+    // Places for the side panel buttons of the hosting screen, at the edges of the playback
+    // controls row. They keep the buttons in line with the controls instead of floating over them.
+    property alias leftPanelButtonSlot: leftPanelButtonSlot
+    property alias rightPanelButtonSlot: rightPanelButtonSlot
+
+    // Whether that screen shows those buttons at the moment. The bar keeps the room only for the
+    // ones which ask for it.
+    property bool leftPanelButtonWanted: false
+    property bool rightPanelButtonWanted: false
+
     signal backClicked()
 
     backgroundColor: "black"
@@ -78,8 +88,10 @@ Page
 
             PropertyChanges
             {
-                // Must be over open panel float button.
-                cameraSwitcher.height: modernVideoScreen.height - 96
+                // Must not go under the navigation bar, which keeps the video controls and the
+                // side panel buttons of the parent screen.
+                cameraSwitcher.height:
+                    modernVideoScreen.contentItem.height - navigationBar.height
                 cameraSwitcher.y: 0
                 cameraSwitcher.backgroundColor: modernVideoScreen.backgroundColor
 
@@ -93,7 +105,7 @@ Page
             name: "navigatorOnTheRight"
 
             when: modernVideoScreen.ownsNavigator
-                && !LayoutController.isPortrait
+                && !LayoutController.isCompact
                 && !LayoutController.fullscreen
 
             AnchorChanges
@@ -119,15 +131,23 @@ Page
             {
                 navigatorProxyItem.width: 360
                 navigatorProxyItem.height: modernVideoScreen.height
-                navigatorProxyItem.y: -modernVideoScreen.toolBar.height
+
+                // The navigator takes the header area as well, which the narrowed tool bar leaves
+                // free. The tool bar keeps its height while hidden, so it cannot measure that
+                // area: the header, which the parent screen may collapse, is the actual offset.
+                navigatorProxyItem.y: -modernVideoScreen.header.height
 
                 modernVideoScreen.toolBar.width: modernVideoScreen.width - navigatorProxyItem.width
 
-                cameraSwitcher.height: Math.min(cameraSwitcher.width / (16.0 / 9.0),
-                    modernVideoScreen.height - modernVideoScreen.toolBar.height - bottomBar.height)
-
-                cameraSwitcher.y: (navigationBar.y - cameraSwitcher.height) / 2
+                // As in the state without the navigator: the video area takes the whole space left
+                // of the navigator and above the navigation bar, and fits the picture inside
+                // itself. Sizing the area to the picture instead would leave the space around it
+                // to the screen background, which reads as a taller navigation bar.
+                cameraSwitcher.height:
+                    modernVideoScreen.contentItem.height - navigationBar.height
+                cameraSwitcher.y: 0
                 cameraSwitcher.width: modernVideoScreen.width - navigatorProxyItem.width
+                cameraSwitcher.backgroundColor: modernVideoScreen.backgroundColor
 
                 bottomBar.color: ColorTheme.colors.dark6
                 fullscreenControlsOverlay.visible: false
@@ -139,7 +159,7 @@ Page
             name: "navigatorOnTheBottom"
 
             when: modernVideoScreen.ownsNavigator
-                && LayoutController.isPortrait
+                && LayoutController.isCompact
                 && !LayoutController.fullscreen
 
             AnchorChanges
@@ -384,7 +404,8 @@ Page
             {
                 anchors.verticalCenter: parent.verticalCenter
                 target: modernVideoScreen.motionAreaButton
-                visible: modernVideoScreen.activePage
+                visible: modernVideoScreen.toolBar.visible
+                    && modernVideoScreen.activePage
                     && (selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.motion
                         || selectedObjectsType == Timeline.ObjectsLoader.ObjectsType.analytics)
                     && video.roiController.customRoiExists
@@ -706,16 +727,118 @@ Page
     Rectangle
     {
         id: navigationBar
-
-        implicitHeight: navigationBarContent.height + navigationBarContent.contentMargin * 2
+        implicitHeight: leftPanelButtonSlot.docked || rightPanelButtonSlot.docked
+            ? 80
+            : navigationBarContent.height + navigationBarContent.contentMargin * 2
         color: modernVideoScreen.backgroundColor
+
+        // The playback controls are the primary content of the bar: once it gets too narrow to
+        // keep them between the panel buttons, the buttons give way.
+        readonly property bool fitsPanelButtons: width >= navigationBarContent.requiredWidth
+            + Math.max(navigationBarContent.contentMargin, leftPanelButtonSlot.reservedWidth)
+            + Math.max(navigationBarContent.contentMargin, rightPanelButtonSlot.reservedWidth)
+
+        // A place at the edge of the bar for a side panel button of the hosting screen. The button
+        // is reparented here by that screen; the slot goes away when the bar has no width to
+        // spare, leaving it to the playback controls.
+        component PanelButtonSlot: Item
+        {
+            property bool wanted: false
+            property bool fits: true
+
+            readonly property Item button: children.length ? children[0] : null
+            readonly property bool docked: !!button
+            readonly property bool active: docked && wanted && fits
+            readonly property real edgeMargin: 20
+            readonly property real contentGap: 20
+
+            readonly property real reservedWidth: docked && wanted
+                ? edgeMargin + implicitWidth + contentGap
+                : 0
+
+            readonly property real occupiedWidth: active ? reservedWidth : 0
+            LayoutMirroring.enabled: false
+
+            implicitWidth: 56
+            implicitHeight: 56
+
+            visible: active
+            width: active ? implicitWidth : 0
+            height: active ? implicitHeight : 0
+        }
+
+        PanelButtonSlot
+        {
+            id: leftPanelButtonSlot
+
+            wanted: modernVideoScreen.leftPanelButtonWanted
+            fits: navigationBar.fitsPanelButtons
+
+            anchors.left: navigationBar.left
+            anchors.leftMargin: edgeMargin
+            anchors.verticalCenter: navigationBar.verticalCenter
+        }
+
+        PanelButtonSlot
+        {
+            id: rightPanelButtonSlot
+
+            wanted: modernVideoScreen.rightPanelButtonWanted
+            fits: navigationBar.fitsPanelButtons
+
+            anchors.right: navigationBar.right
+            anchors.rightMargin: edgeMargin
+            anchors.verticalCenter: navigationBar.verticalCenter
+        }
 
         Item
         {
             id: navigationBarContent
 
             readonly property real contentMargin: 12
-            readonly property real availableWidth: navigationBar.width - contentMargin * 2
+
+            readonly property real leftInset:
+                Math.max(contentMargin, leftPanelButtonSlot.occupiedWidth)
+            readonly property real rightInset:
+                Math.max(contentMargin, rightPanelButtonSlot.occupiedWidth)
+
+            readonly property real availableWidth: navigationBar.width - leftInset - rightInset
+
+            readonly property real requiredWidth: playbackControlsWidth
+                + calendarButton.implicitWidth
+                + (actionSheet.hasActions ? actionButtonContainer.Layout.preferredWidth : 0)
+
+            // Whether the bar is too narrow even for the controls alone, with the panel buttons
+            // already given way. The secondary controls - the calendar and the camera actions -
+            // then move into the overflow menu, which takes the place of one of them. With no
+            // actions to hide there is nothing to win: the menu button is as wide as the calendar.
+            readonly property bool overflow: actionSheet.hasActions
+                && navigationBar.width - contentMargin * 2 < requiredWidth
+
+            // The space the controls occupy with the speed control collapsed - the expanded speed
+            // control takes exactly it - and the space of the playback controls alone.
+            property real collapsedControlsWidth: 0
+            property real playbackControlsWidth: 0
+            readonly property bool controlsSettled: !speedControl.expanded
+                && speedControl.width <= speedControl.collapsedWidth
+
+            Binding
+            {
+                target: navigationBarContent
+                property: "collapsedControlsWidth"
+                value: navigationBarLayout.implicitWidth
+                when: navigationBarContent.controlsSettled
+                restoreMode: Binding.RestoreNone
+            }
+
+            Binding
+            {
+                target: navigationBarContent
+                property: "playbackControlsWidth"
+                value: playbackControls.implicitWidth
+                when: navigationBarContent.controlsSettled
+                restoreMode: Binding.RestoreNone
+            }
 
             component ExpandCollapseAnimation: NumberAnimation
             {
@@ -731,7 +854,28 @@ Page
             {
                 id: navigationBarLayout
 
+                readonly property real leftControlsWidth:
+                    (calendarButton.visible ? calendarButton.width : 0)
+                        + playbackControls.leftPadding
+                        + prevChunkButton.width
+                        + playbackControls.spacing
+
+                readonly property real rightControlsWidth: playbackControls.spacing
+                    + nextChunkButton.width
+                    + playbackControls.rightPadding
+                    + (actionButtonContainer.visible ? actionButtonContainer.width : 0)
+                    + (overflowButton.visible ? overflowButton.width : 0)
+
+                property real centerOffset:
+                    (navigationBarContent.leftInset - navigationBarContent.rightInset) / 2
+                        + (speedControl.expanded
+                            ? (rightControlsWidth - leftControlsWidth) / 2
+                            : 0)
+
+                Behavior on centerOffset { ExpandCollapseAnimation {} }
+
                 anchors.horizontalCenter: navigationBarContent.horizontalCenter
+                anchors.horizontalCenterOffset: centerOffset
 
                 spacing: 0
 
@@ -740,6 +884,7 @@ Page
                     id: calendarButton
 
                     icon.source: "image://skin/24x24/Solid/calendar.svg"
+                    visible: !navigationBarContent.overflow
                     enabled: d.hasArchive && !speedControl.expanded
                     opacity: speedControl.expanded ? 0 : 1
 
@@ -751,6 +896,8 @@ Page
 
                 Row
                 {
+                    id: playbackControls
+
                     leftPadding: 8
                     rightPadding: 8
 
@@ -811,13 +958,13 @@ Page
                         {
                             id: speedControl
 
-                            readonly property int kPrefferedWidth: 277
-
+                            // Takes over the whole space the controls occupied before it expanded,
+                            // and never more than the bar can give away.
                             expandedWidth: Math.min(
-                                navigationBarContent.availableWidth
-                                    - playPauseButton.width
-                                    - playBar.spacing,
-                                kPrefferedWidth)
+                                    navigationBarContent.availableWidth,
+                                    navigationBarContent.collapsedControlsWidth)
+                                - playPauseButton.width
+                                - playBar.spacing
 
                             forced1x: controller.playingLive
                             paused: !controller.playing
@@ -865,11 +1012,62 @@ Page
                     Layout.preferredWidth: 44
                     Layout.preferredHeight: 44
 
-                    visible: actionSheet.hasActions
+                    visible: actionSheet.hasActions && !navigationBarContent.overflow
                     enabled: !speedControl.expanded
                     opacity: speedControl.expanded ? 0 : 1
 
                     Behavior on opacity { ExpandCollapseAnimation {} }
+                }
+
+                // Holds the controls which do not fit into the narrow bar as buttons of their own.
+                ControlButton
+                {
+                    id: overflowButton
+
+                    icon.source: "image://skin/24x24/Outline/menu.svg"
+                    visible: navigationBarContent.overflow
+                    enabled: !speedControl.expanded
+                    opacity: speedControl.expanded ? 0 : 1
+
+                    Behavior on opacity { ExpandCollapseAnimation {} }
+
+                    onClicked:
+                        overflowMenu.open()
+
+                    Menu
+                    {
+                        id: overflowMenu
+
+                        // Opens up from the button: the bar is at the bottom of the screen.
+                        x: overflowButton.width - width
+                        y: -height - 8
+
+                        MenuItem
+                        {
+                            text: qsTr("Calendar")
+                            enabled: d.hasArchive
+                            showDisabled: true
+
+                            onTriggered:
+                                calendarPanel.open()
+                        }
+
+                        MenuItem
+                        {
+                            text: qsTr("Actions")
+                            visible: actionSheet.hasActions
+                            height: visible ? implicitHeight : 0
+
+                            // Dimmed exactly as the action button in the bar is while the actions
+                            // cannot be triggered.
+                            enabled: actionSheet.available
+                            showDisabled: true
+                            disabledDescription: qsTr("Live mode only")
+
+                            onTriggered:
+                                actionSheet.open()
+                        }
+                    }
                 }
             }
         }
@@ -969,7 +1167,11 @@ Page
             id: bottomBar
 
             width: navigator.width
-            height: 68
+
+            // Wherever the navigator stands beside the video, the two bottom bars are next to
+            // each other and must read as one row, so this one follows the video controls.
+            height: navigationBar.height
+
             anchors.bottom: navigator.bottom
             visible: d.hasArchive
 
@@ -1178,9 +1380,13 @@ Page
         onUnavailableAction: actionBanner.trigger()
         onAvailableChanged: actionBanner.reset()
 
+        // A single action is shown as a button of its own, but there is no place for such a button
+        // in the fullscreen controls and in the narrow navigation bar, where the overflow menu
+        // opens this sheet instead: it has to list the action even when there is just one.
         Binding on externalMode
         {
             when: modernVideoScreen.state === "fullscreen"
+                || navigationBarContent.overflow
             value: false
         }
 

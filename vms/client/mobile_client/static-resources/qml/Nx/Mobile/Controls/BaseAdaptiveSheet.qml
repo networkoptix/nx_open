@@ -41,7 +41,7 @@ Drawer
         - topPadding - bottomPadding - flickable.anchors.topMargin - flickable.anchors.bottomMargin
 
     x: (parent.width - width) / 2
-    edge: LayoutController.isPortrait ? Qt.BottomEdge : preferredEdge
+    edge: LayoutController.isCompact ? Qt.BottomEdge : preferredEdge
     width: bottomEdge ? Math.min(parent.width, 640) : StyleHints.sheetWidth
 
     height: bottomEdge

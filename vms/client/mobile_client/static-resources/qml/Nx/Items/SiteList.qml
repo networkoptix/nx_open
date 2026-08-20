@@ -136,12 +136,16 @@ ListView
 
                 visible: headerItem.state == "showButton"
 
-                Layout.fillWidth: LayoutController.isMobile
+                Layout.fillWidth: !LayoutController.isExpanded
                 Layout.preferredWidth: siteList.cellWidth
-                Layout.preferredHeight: LayoutController.isMobile ? 44 : 116
+                Layout.preferredHeight: LayoutController.isExpanded ? 116 : 44
 
-                color: LayoutController.isMobile ? ColorTheme.colors.brand_core : ColorTheme.colors.dark8
-                textColor: LayoutController.isMobile ? ColorTheme.colors.dark1 : ColorTheme.colors.brand_core
+                color: LayoutController.isExpanded
+                    ? ColorTheme.colors.dark8
+                    : ColorTheme.colors.brand_core
+                textColor: LayoutController.isExpanded
+                    ? ColorTheme.colors.brand_core
+                    : ColorTheme.colors.dark1
                 leftPadding: 0
                 rightPadding: 0
                 padding: 0
@@ -150,11 +154,11 @@ ListView
                 icon.width: 32
                 icon.height: 32
 
-                display: LayoutController.isMobile
-                    ? AbstractButton.TextOnly
-                    : AbstractButton.TextUnderIcon
+                display: LayoutController.isExpanded
+                    ? AbstractButton.TextUnderIcon
+                    : AbstractButton.TextOnly
 
-                text: LayoutController.isMobile ? qsTr("Log In") : qsTr("Log In to Cloud")
+                text: LayoutController.isExpanded ? qsTr("Log In to Cloud") : qsTr("Log In")
 
                 onClicked: Workflow.openCloudLoginScreen()
             }
@@ -185,7 +189,7 @@ ListView
     footer: Item
     {
         width: parent.width
-        height: LayoutController.isTablet ? 20 : 16
+        height: LayoutController.isExpanded ? 20 : 16
     }
 
     property string searchText: ""

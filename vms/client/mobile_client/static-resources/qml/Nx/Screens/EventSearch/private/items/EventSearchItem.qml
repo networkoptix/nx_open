@@ -35,7 +35,7 @@ Control
     signal clicked()
 
     implicitWidth: (parent && parent.width) ?? 0
-    padding: LayoutController.isTablet ? 20 : 12
+    padding: LayoutController.isExpanded ? 20 : 12
     clip: true
 
     background: Rectangle
@@ -48,17 +48,17 @@ Control
 
     contentItem: RowLayout
     {
-        spacing: LayoutController.isTablet ? 20 : 12
+        spacing: LayoutController.isExpanded ? 20 : 12
 
         Preview
         {
             id: preview
 
-            minimumAspectRatio: LayoutController.isTablet
+            minimumAspectRatio: LayoutController.isExpanded
                 ? 16.0 / 9.0
                 : 1.0
 
-            Layout.preferredWidth: LayoutController.isTablet ? 300 : 120
+            Layout.preferredWidth: LayoutController.isExpanded ? 300 : 120
             Layout.alignment: Qt.AlignTop
 
             backgroundColor: ColorTheme.colors.dark6
@@ -69,7 +69,7 @@ Control
             {
                 anchors.left: parent.left
                 anchors.top: parent.top
-                anchors.margins: LayoutController.isTablet ? 4 : 2
+                anchors.margins: LayoutController.isExpanded ? 4 : 2
 
                 radius: 4
                 width: 48
@@ -89,7 +89,7 @@ Control
 
         Column
         {
-            spacing: LayoutController.isTablet ? 12 : 4
+            spacing: LayoutController.isExpanded ? 12 : 4
 
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
@@ -102,11 +102,11 @@ Control
                 visible: !!text
                 elide: Text.ElideRight
                 wrapMode: Text.Wrap
-                maximumLineCount: LayoutController.isTablet ? 3 : 2
+                maximumLineCount: LayoutController.isExpanded ? 3 : 2
                 verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light4
-                font.pixelSize: LayoutController.isTablet ? 18 : 16
+                font.pixelSize: LayoutController.isExpanded ? 18 : 16
                 font.weight: Font.Medium
                 lineHeight: 1.25
             }
@@ -124,7 +124,7 @@ Control
 
                 color: ColorTheme.colors.light10
                 linkColor: ColorTheme.colors.brand_core
-                font.pixelSize: LayoutController.isTablet ? 16 : 14
+                font.pixelSize: LayoutController.isExpanded ? 16 : 14
                 font.weight: Font.Normal
                 lineHeight: 1.25
             }
@@ -141,7 +141,7 @@ Control
                 verticalAlignment: Qt.AlignVCenter
 
                 color: ColorTheme.colors.light10
-                font.pixelSize: LayoutController.isTablet ? 16 : 14
+                font.pixelSize: LayoutController.isExpanded ? 16 : 14
                 font.weight: Font.Normal
                 lineHeight: 1.25
 
@@ -163,7 +163,7 @@ Control
 
                     color: ColorTheme.colors.light16
                     font.pixelSize: 14
-                    font.weight: LayoutController.isTablet ? Font.Medium : Font.Normal
+                    font.weight: LayoutController.isExpanded ? Font.Medium : Font.Normal
                     lineHeight: 1.25
                     elide: Text.ElideRight
                     verticalAlignment: Qt.AlignVCenter
@@ -181,7 +181,7 @@ Control
 
                     color: ColorTheme.colors.light16
                     font.pixelSize: 14
-                    font.weight: LayoutController.isTablet ? Font.Medium : Font.Normal
+                    font.weight: LayoutController.isExpanded ? Font.Medium : Font.Normal
                     lineHeight: 1.25
                     elide: Text.ElideRight
                     verticalAlignment: Qt.AlignVCenter

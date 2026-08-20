@@ -40,7 +40,7 @@ All paths relative to `static-resources/qml/Nx/`. Private subcomponents under `S
 
 ### App shell
 
-- Layout (phone vs tablet) -> `Ui/LayoutController.qml`
+- Layout mode (horizontal compact / compact / medium / expanded, by window size) -> `Ui/LayoutController.qml`, `Ui/LayoutMode.qml`
 - Screen container -> `Ui/UiContainer.qml`
 - Base screen with left/right panels, splash -> `Items/AdaptiveScreen.qml`
 - Side panel -> `Items/Panel.qml`

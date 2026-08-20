@@ -353,7 +353,7 @@
             "tertiaryText": "light15"
         },
         "header": {
-            "background": "mobileTimeline.background",
+            "background": "dark7",
             "text": "light10",
             "underline": "light14",
             "shadow": "dark13"

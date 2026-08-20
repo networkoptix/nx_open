@@ -12,28 +12,82 @@ NxObject
 {
     id: layoutController
 
+    // Window height below which the bottom navigation bar and the bottom sheets do not fit. Below
+    // this threshold, HorizontalCompact mode is used.
+    readonly property int shortWindowHeight: 480
+
+    // Window width starting from which the side panels fit next to the content. Below this
+    // threshold, Compact mode is used; above it, Medium mode is used.
+    readonly property int mediumWindowWidth: 670
+
+    // Window width starting from which the content pane is wide enough for the large metrics. Below
+    // this threshold, Medium mode is used; above it, Expanded mode is used.
+    readonly property int expandedWindowWidth: 840
+
+    // Whether the window is taller than wide. This is plain window geometry, NOT a layout mode:
+    // use it only where the shape of the window itself matters - the fullscreen video controls,
+    // the system gesture exclusion areas - and never to decide a layout.
+    readonly property bool isPortrait: mainWindow
+        ? mainWindow.width <= mainWindow.height
+        : false
+
     property ApplicationWindow mainWindow
     property StackView stackView: mainWindow?.uiContainer.stackView ?? null //< Makes proper context for the Workflow.
 
-    // Current display orientation.
-    readonly property bool isPortrait: mainWindow ? mainWindow.width <= mainWindow.height : false
-
-    // TODO: Now `isMobile` and `isTablet` properties uses for the controls customization.
-    // `isMobile` means a small screen, `isTablet` means a large screen. This properties must be
-    // moved to some ScreenSizeController.
-    readonly property bool isMobile: !isTablet
-    // Whether the given device is a tablet.
-    readonly property bool isTablet: appContext.settings.forceTabletMode //< TODO: introduce enum for a device type.
-
-    readonly property bool isTabletLayout: appContext.settings.forceTabletMode && !isPortrait
-    onIsTabletLayoutChanged:
+    readonly property int mode:
     {
-        if (!isTabletLayout)
+        const forcedMode = appContext.settings.forcedLayoutMode
+        if (forcedMode >= 0)
+            return forcedMode
+
+        if (!mainWindow)
+            return LayoutMode.Compact
+
+        if (mainWindow.height < layoutController.shortWindowHeight)
+            return LayoutMode.HorizontalCompact
+
+        if (mainWindow.width < layoutController.mediumWindowWidth)
+            return LayoutMode.Compact
+
+        return mainWindow.width < layoutController.expandedWindowWidth
+            ? LayoutMode.Medium
+            : LayoutMode.Expanded
+    }
+
+    readonly property string modeName:
+    {
+        switch (mode)
+        {
+            case LayoutMode.HorizontalCompact:
+                return "horizontal compact"
+            case LayoutMode.Compact:
+                return "compact"
+            case LayoutMode.Medium:
+                return "medium"
+            case LayoutMode.Expanded:
+                return "expanded"
+        }
+
+        return "unknown"
+    }
+
+    readonly property bool isCompact: mode === LayoutMode.Compact
+
+    // Whether the screen is split into a content area with the optional side panels around it.
+    // Such a layout also moves the navigation into a rail at the left edge, freeing the bottom.
+    readonly property bool hasSidePanels:
+        mode === LayoutMode.Medium || mode === LayoutMode.Expanded
+
+    readonly property bool isExpanded: mode === LayoutMode.Expanded
+
+    onHasSidePanelsChanged:
+    {
+        if (!hasSidePanels)
             return
 
         if (windowContext.deprecatedUiController.currentScreen === Controller.MenuScreen)
         {
-            // Menu screen in not enabled on the tablet layout, open default one.
+            // Menu screen is not reachable from the navigation rail, open the default one.
             Workflow.openDefaultScreen()
             return
         }
@@ -48,10 +102,10 @@ NxObject
 
         d.setFullscreen(true)
 
-        // Tablets are never rotated programmatically: the video simply fills the screen in
-        // the current orientation, as the native players do. Also, iPadOS 26+ ignores such
-        // requests altogether - it resizes the app window instead of rotating the device.
-        if (isTablet)
+        // Tablet-sized layouts are never rotated programmatically: the video simply fills the
+        // screen in the current orientation, as the native players do. Also, iPadOS 26+ ignores
+        // such requests altogether - it resizes the app window instead of rotating the device.
+        if (hasSidePanels)
             return
 
         if (isPortrait === (orientation === Qt.PortraitOrientation))

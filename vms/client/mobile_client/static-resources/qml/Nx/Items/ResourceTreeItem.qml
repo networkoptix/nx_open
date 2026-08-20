@@ -36,7 +36,7 @@ Item
     ColumnLayout
     {
         anchors.fill: parent
-        anchors.topMargin: LayoutController.isTabletLayout ? 0 : 20
+        anchors.topMargin: LayoutController.hasSidePanels ? 0 : 20
         anchors.leftMargin: 20
         anchors.rightMargin: 20
         spacing: 4

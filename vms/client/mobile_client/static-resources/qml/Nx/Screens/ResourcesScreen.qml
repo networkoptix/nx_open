@@ -35,12 +35,12 @@ AdaptiveScreen
     {
         LayoutController.exitFullscreen()
 
-        videoScreenLoader.item.controller.stop()
+        videoScreenLoader.item?.controller.stop()
 
         if (!resourceHelper.isLayout)
             windowContext.deprecatedUiController.resource = null
 
-        resourcesScreen.contentItem = camerasGrid
+        resourcesScreen.showsVideoScreen = false
     }
 
     // Persist `false` whenever AdaptiveScreen closes a panel (close button, auto-close, or
@@ -88,11 +88,32 @@ AdaptiveScreen
             : null
     }
 
-    contentItem: LayoutController.isTablet && resourceHelper.isCamera
+    // Whether the content area shows the embedded video screen instead of the cameras grid. The
+    // video screen is embedded in every layout, only the timeline placement differs: a side panel
+    // in the two-pane shell, stacked under the video otherwise.
+    property bool showsVideoScreen: false
+
+    // Kept a binding rather than assigned imperatively: an item assigned to `contentItem` would
+    // become null if the loader item ever went away, leaving an empty content area behind and
+    // making every `contentItem === videoScreenLoader.item` check below true.
+    contentItem: showsVideoScreen && videoScreenLoader.item
         ? videoScreenLoader.item
         : camerasGrid
     overlayItem: overlayItem
     longContent: contentItem === videoScreenLoader.item
+
+    // The video screen has its own controls at the bottom of the content area, so the panel
+    // buttons go in line with them there. Over the cameras grid they keep floating in the corners.
+    // Only the layouts which have the side panels dock the buttons: elsewhere the video screen
+    // must not reserve the room for them in its navigation bar.
+    leftPanelButtonContainer: LayoutController.hasSidePanels
+            && contentItem === videoScreenLoader.item
+        ? videoScreenLoader.item.leftPanelButtonSlot
+        : null
+    rightPanelButtonContainer: LayoutController.hasSidePanels
+            && contentItem === videoScreenLoader.item
+        ? videoScreenLoader.item.rightPanelButtonSlot
+        : null
 
     customLeftControl: ToolBarButton
     {
@@ -108,7 +129,7 @@ AdaptiveScreen
                 when: resourcesScreen.contentItem === videoScreenLoader.item
                     && (resourceHelper.isLayout
                         || resourceHelper.resource === null
-                        || (resourceHelper.isCamera && !LayoutController.isTabletLayout))
+                        || (resourceHelper.isCamera && !LayoutController.hasSidePanels))
 
                 PropertyChanges
                 {
@@ -120,7 +141,7 @@ AdaptiveScreen
             State
             {
                 name: "openResourceTreeSplash"
-                when: !LayoutController.isTabletLayout
+                when: !LayoutController.hasSidePanels
 
                 PropertyChanges
                 {
@@ -134,17 +155,14 @@ AdaptiveScreen
         ]
     }
 
-    customRightControl: ToolBarButton
+    // The embedded video screen keeps its own tool bar hidden, so its kebab is the one of this
+    // screen.
+    menuButton
     {
-        id: kebabMenuButton
-
-        icon.source: "image://skin/24x24/Outline/more.svg?primary=%1"
-            .arg(StyleHints.foregroundColorName)
         visible: resourcesScreen.contentItem === videoScreenLoader.item
+
         onClicked:
-        {
             videoScreenLoader.item.menu.open()
-        }
     }
 
     splashTitle: qsTr("Resources")
@@ -186,7 +204,11 @@ AdaptiveScreen
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
         interactive: true
-        item: resourcesScreen.contentItem === videoScreenLoader.item
+
+        // The timeline goes into this panel only where there is one. Complementary to
+        // `ownsNavigator` below, which lets the video screen keep the timeline under the video.
+        item: LayoutController.hasSidePanels
+                && resourcesScreen.contentItem === videoScreenLoader.item
             ? videoScreenLoader.item.navigatorItem
             : null
 
@@ -217,32 +239,28 @@ AdaptiveScreen
             resourcesScreen.filterIds = []
             videoScreenLoader.item?.controller.stop()
             windowContext.deprecatedUiController.resource = layoutResource
-            resourcesScreen.contentItem = camerasGrid
+            resourcesScreen.showsVideoScreen = false
 
-            if (!LayoutController.isTabletLayout)
+            if (!LayoutController.hasSidePanels)
                 splash.close()
         }
 
         onCameraSelected: (cameraResource) =>
         {
-            if (!LayoutController.isTabletLayout)
+            if (!LayoutController.hasSidePanels)
                 splash.close()
 
-            windowContext.deprecatedUiController.resource = cameraResource
-            if (LayoutController.isMobile)
-            {
-                Workflow.openVideoScreen(cameraResource)
-            }
-            else
-            {
-                // Filter out all the cameras except selected to prevent ability to swipe between
-                // cameras.
-                videoScreenLoader.item.defaultCamerasModel.filterIds = [cameraResource.id]
-                videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
-                videoScreenLoader.item.controller.start(cameraResource, -1)
+            camerasGrid.stopMediaPlayers()
 
-                resourcesScreen.contentItem = videoScreenLoader.item
-            }
+            windowContext.deprecatedUiController.resource = cameraResource
+
+            // Filter out all the cameras except selected to prevent ability to swipe between
+            // cameras.
+            videoScreenLoader.item.defaultCamerasModel.filterIds = [cameraResource.id]
+            videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
+            videoScreenLoader.item.controller.start(cameraResource, -1)
+
+            resourcesScreen.showsVideoScreen = true
         }
 
         onVisibleChanged:
@@ -260,27 +278,20 @@ AdaptiveScreen
         enabled: !windowContext.sessionManager.hasReconnectingSession && !loadingDummy.visible
         layout: resourceHelper.isLayout ? windowContext.deprecatedUiController.resource : null
         keepStatuses: !windowContext.sessionManager.hasReconnectingSession && !windowContext.sessionManager.hasConnectedSession
-        active: resourcesScreen.isActive
-        bottomMargin : LayoutController.isTabletLayout ? 20 : 0
-        leftMargin : LayoutController.isTabletLayout ? 20 : 0
-        rightMargin : LayoutController.isTabletLayout ? 20 : 0
-        topMargin : LayoutController.isTabletLayout ? 20 : 0
+        active: resourcesScreen.isActive && !resourcesScreen.showsVideoScreen
+        bottomMargin : LayoutController.hasSidePanels ? 20 : 0
+        leftMargin : LayoutController.hasSidePanels ? 20 : 0
+        rightMargin : LayoutController.hasSidePanels ? 20 : 0
+        topMargin : LayoutController.hasSidePanels ? 20 : 0
 
         onOpenVideoScreen: (resource, thumbnailUrl, camerasModel) =>
         {
             stopMediaPlayers()
 
-            if (LayoutController.isMobile)
-            {
-                Workflow.openVideoScreen(resource, thumbnailUrl, undefined, camerasModel)
-            }
-            else
-            {
-                videoScreenLoader.item.camerasModel = camerasModel
-                videoScreenLoader.item.controller.start(resource, -1)
+            videoScreenLoader.item.camerasModel = camerasModel
+            videoScreenLoader.item.controller.start(resource, -1)
 
-                resourcesScreen.contentItem = videoScreenLoader.item
-            }
+            resourcesScreen.showsVideoScreen = true
         }
 
         DummyMessage
@@ -308,20 +319,25 @@ AdaptiveScreen
     {
         id: videoScreenLoader
 
-        active: LayoutController.isTablet
         clip: true
 
         sourceComponent: Component
         {
             VideoScreen
             {
+                id: modernVideoScreen //< For the FT purposes.
+                activePage: resourcesScreen.isActive && resourcesScreen.showsVideoScreen
+
                 toolBar.visible: false
                 backgroundColor: ColorTheme.colors.dark4
-                ownsNavigator: !LayoutController.isTabletLayout
+                ownsNavigator: !LayoutController.hasSidePanels
+
+                leftPanelButtonWanted: resourcesScreen.leftPanelButtonWanted
+                rightPanelButtonWanted: resourcesScreen.rightPanelButtonWanted
 
                 // The visible kebab button lives in resourcesScreen's toolBar (above), so
                 // anchor the menu to it instead of VideoScreen's hidden internal kebab.
-                menuAnchor: kebabMenuButton
+                menuAnchor: resourcesScreen.menuButton
 
                 onBackClicked: resourcesScreen.closeVideoScreen()
 
@@ -453,6 +469,12 @@ AdaptiveScreen
 
     customBackHandler: (isEscKeyPressed) =>
     {
+        if (resourcesScreen.showsVideoScreen)
+        {
+            resourcesScreen.closeVideoScreen()
+            return
+        }
+
         if (loadingDummy.visible)
             windowContext.sessionManager.stopSessionByUser()
         else if (!isEscKeyPressed)
@@ -461,7 +483,10 @@ AdaptiveScreen
 
     Component.onCompleted:
     {
-        if (contentItem === videoScreenLoader.item)
-            videoScreenLoader.item.controller.start(resourceHelper.resource, -1)
+        if (!resourceHelper.isCamera)
+            return
+
+        showsVideoScreen = true
+        videoScreenLoader.item.controller.start(resourceHelper.resource, -1)
     }
 }
