@@ -88,21 +88,28 @@ bool ShareBookmarkBackend::Private::updateShareParams(
     if (!NX_ASSERT(manager))
         return false;
 
-    const auto handleResult =
-        [this, backupShareParams = bookmark.share](const bool result)
-        {
-            if (result)
-                return true;
+    const auto backupShareParams = bookmark.share;
 
-            bookmark.share = backupShareParams;
-            emit q->bookmarkChanged();
+    const auto handleResult = [this, backupShareParams](const bool result)
+    {
+        if (result)
+            return true;
 
-            executeLater([this]() { emit q->sharingFailed(); }, q);
+        bookmark.share = backupShareParams;
+        emit q->bookmarkChanged();
 
-            return false;
-        };
+        executeLater([this]() { emit q->sharingFailed(); }, q);
+
+        return false;
+    };
 
     bookmark.share = shareParams;
+
+    // Snapshot the exact request payload (nullopt digest = keep the current password), then
+    // restore the existing digest in the display copy so the sheet keeps showing the password.
+    const auto request = bookmark;
+    if (!bookmark.share.digest)
+        bookmark.share.digest = backupShareParams.digest;
 
     auto callback = nx::utils::guarded(q,
         [this, handleResult, showNativeShareSheet](
@@ -126,7 +133,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
             emit q->bookmarkChanged();
         });
 
-    return handleResult(manager->submitBookmarkOperation(operation, bookmark, std::move(callback)));
+    return handleResult(manager->submitBookmarkOperation(operation, request, std::move(callback)));
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -246,10 +253,7 @@ bool ShareBookmarkBackend::isShared() const
     constexpr api::BookmarkShareFilters kSharedBookmarkFilters =
         api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible;
 
-    const auto bookmark = d->objectData->convertToBookmark();
-
-    return bookmark.shareable()
-        && bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
+    return d->bookmark.shareable() && d->bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
         && d->systemContext()->featureAccess()->canUseShareBookmark();
 }
 
@@ -380,18 +384,23 @@ bool ShareBookmarkBackend::stopSharing()
 
 void ShareBookmarkBackend::resetBookmarkData()
 {
-    d->bookmark = {};
-
     d->setRawResource(d->objectData ? d->objectData->resource().get() : nullptr);
 
-    if (!d->objectData)
+    if (!d->objectData || !NX_ASSERT(d->systemContext()))
+    {
+        d->bookmark = {};
+        return;
+    }
+
+    const auto source = d->objectData->convertToBookmark();
+
+    // Keep the working copy for the same bookmark so a pending or just-applied share change is not
+    // overwritten by the timeline's possibly-stale cached copy. Reseed only for a different
+    // object.
+    if (!source.guid.isNull() && source.guid == d->bookmark.guid)
         return;
 
-    const auto context = d->systemContext();
-    if (!NX_ASSERT(context))
-        return;
-
-    d->bookmark = d->objectData->convertToBookmark();
+    d->bookmark = source;
     d->operation = d->bookmark.guid.isNull()
         ? QnCameraBookmarksManager::BookmarkOperation::create
         : QnCameraBookmarksManager::BookmarkOperation::update;
