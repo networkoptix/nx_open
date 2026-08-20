@@ -13,6 +13,7 @@ import Nx.Core.Items
 import Nx.Items
 import Nx.Mobile.Controls as MobileControls
 import Nx.Ui
+
 import nx.vms.client.core
 import nx.vms.client.mobile.timeline as Timeline
 
@@ -367,7 +368,9 @@ Item
         {
             id: downloadButton
 
-            enabled: action.enabled && !preview.interval.cannotDecryptMedia
+            enabled: detailsItem.objectsType !== Timeline.ObjectsLoader.ObjectsType.motion
+                && action.enabled
+                && !preview.interval.cannotDecryptMedia
 
             action: DownloadMediaAction
             {
@@ -386,8 +389,7 @@ Item
                 icon.width: 20
                 icon.height: 20
                 objectData: detailsItem.objectData
-                analyticsMode:
-                    detailsItem.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+                objectsType: detailsItem.objectsType
             }
         }
     }

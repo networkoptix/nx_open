@@ -8,20 +8,20 @@ import Nx.Mobile.Ui.Sheets
 import Nx.Ui
 
 import nx.vms.client.mobile
+import nx.vms.client.mobile.timeline as Timeline
 
 Action
 {
     id: action
 
-    readonly property bool shared: backend.isShared && !analyticsMode
-    property bool analyticsMode: false
+    required property int objectsType
     property alias objectData: backend.objectData
     readonly property alias backend: backend
     property int preferredSheetEdge: Qt.RightEdge
 
-    text: shared ? qsTr("Shared") : qsTr("Share")
+    text: d.shared ? qsTr("Shared") : qsTr("Share")
 
-    icon.source: shared
+    icon.source: d.shared
         ? `image://skin/20x20/Solid/shared.svg?primary=light10&secondary=green`
         : `image://skin/20x20/Solid/share.svg?primary=light10`
 
@@ -34,7 +34,7 @@ Action
         if (!backend.isAvailable)
             return
 
-        if (appContext.settings.showHowShareWorksNotification && analyticsMode)
+        if (d.needsHowItWork())
             howItWorksSheet.open()
         else
             shareBookmarkSheet.open()
@@ -42,6 +42,31 @@ Action
 
     readonly property NxObject d: NxObject
     {
+        readonly property bool createsNewBookmark:
+            action.objectsType !== Timeline.ObjectsLoader.ObjectsType.bookmarks
+
+        readonly property bool shared: backend.isShared && !createsNewBookmark
+
+        function needsHowItWork()
+        {
+            if (action.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics)
+                return appContext.settings.showHowShareWorksNotification
+
+            if (action.objectsType === Timeline.ObjectsLoader.ObjectsType.motion)
+                return appContext.settings.showHowDetectedMotionShareWorksNotification
+
+            return false
+        }
+
+        function storeDoNotShowAgain()
+        {
+            if (action.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics)
+                appContext.settings.showHowShareWorksNotification = false
+
+            if (action.objectsType === Timeline.ObjectsLoader.ObjectsType.motion)
+                appContext.settings.showHowDetectedMotionShareWorksNotification = false
+        }
+
         ShareBookmarkBackend
         {
             id: backend
@@ -57,7 +82,7 @@ Action
             ShareBookmarkSheet
             {
                 backend: action.backend
-                isAnalyticsItemMode: action.analyticsMode
+                newBookmarkMode: d.createsNewBookmark
                 preferredEdge: action.preferredSheetEdge
 
                 onShowHowItWorks: howItWorksSheet.open()
@@ -73,12 +98,14 @@ Action
                 description: qsTr("Sharing opens the new bookmark dialog to generate a playback"
                     + " link after setting the sharing options")
 
-                doNotShowAgain: !appContext.settings.showHowShareWorksNotification
+                doNotShowAgain: false
                 preferredEdge: action.preferredSheetEdge
 
                 onContinued:
                 {
-                    appContext.settings.showHowShareWorksNotification = !doNotShowAgain
+                    if (doNotShowAgain)
+                        d.storeDoNotShowAgain()
+
                     shareBookmarkSheet.open()
                 }
             }

@@ -61,6 +61,7 @@ Menu
 
         text: qsTr("Download")
         enabled: downloadAction.enabled && d.objectsData?.length > 0
+            && menu.objectsType !== Timeline.ObjectsLoader.ObjectsType.motion
 
         onTriggered:
             d.invokeAction(downloadAction, qsTr("Select what to download"))
@@ -96,7 +97,7 @@ Menu
         {
             id: shareAction
 
-            analyticsMode: menu.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+            objectsType: menu.objectsType
             objectData: d.singleObjectData ?? null
             preferredSheetEdge: StyleHints.preferredSheetEdge
         }

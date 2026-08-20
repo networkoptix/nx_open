@@ -58,6 +58,7 @@ public:
 
         EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
+        ShowHowDetectedMotionShareWorksNotification,
 
         NewTimelinePrototype,
 
@@ -108,6 +109,11 @@ private:
             showHowShareWorksNotification,
             setShowHowShareWorksNotification,
             ShowHowShareWorksNotification,
+            true)
+        QN_DECLARE_RW_PROPERTY(bool,
+            showHowDetectedMotionShareWorksNotification,
+            setShowHowDetectedMotionShareWorksNotification,
+            ShowHowDetectedMotionShareWorksNotification,
             true)
         QN_DECLARE_RW_PROPERTY(
             bool,

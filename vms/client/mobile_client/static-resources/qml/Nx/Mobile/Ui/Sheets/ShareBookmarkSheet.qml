@@ -13,14 +13,14 @@ AdaptiveSheet
 {
     id: sheet
 
-    property bool isAnalyticsItemMode: false
+    property bool newBookmarkMode: false
     property ShareBookmarkBackend backend
 
     signal showHowItWorks()
 
     contentSpacing: 24
 
-    title: isAnalyticsItemMode
+    title: newBookmarkMode
         ? qsTr("New Bookmark")
         : qsTr("Sharing")
 
@@ -75,7 +75,7 @@ AdaptiveSheet
     {
         id: infoButton
 
-        visible: sheet.isAnalyticsItemMode
+        visible: sheet.newBookmarkMode
         parent: sheet.titleCustomArea
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
@@ -99,7 +99,7 @@ AdaptiveSheet
         backgroundMode: FieldBackground.Mode.Light
 
         width: parent.width
-        visible: sheet.isAnalyticsItemMode
+        visible: sheet.newBookmarkMode
 
         labelText: qsTr("Name")
         text: backend.bookmarkName
@@ -114,7 +114,7 @@ AdaptiveSheet
         width: parent.width
         height: 156
 
-        visible: sheet.isAnalyticsItemMode
+        visible: sheet.newBookmarkMode
 
         labelText: qsTr("Description")
     }
@@ -125,7 +125,7 @@ AdaptiveSheet
 
         width: parent.width
 
-        visible: sheet.isAnalyticsItemMode
+        visible: sheet.newBookmarkMode
         preferredTagHeight: 36
 
         model: [BookmarkConstants.objectBasedTagName]
@@ -135,7 +135,7 @@ AdaptiveSheet
     {
         id: shareLinkOptionsText
 
-        visible: sheet.isAnalyticsItemMode && text
+        visible: sheet.newBookmarkMode && text
         width: parent.width
 
         color: ColorTheme.colors.light4
@@ -148,7 +148,7 @@ AdaptiveSheet
     {
         id: enableSharingToggle
 
-        visible: !isAnalyticsItemMode
+        visible: !newBookmarkMode
         parent: sheet.titleCustomArea
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
@@ -231,7 +231,7 @@ AdaptiveSheet
 
         model:
         {
-            if (sheet.isAnalyticsItemMode)
+            if (sheet.newBookmarkMode)
                 return kShareObjectButtonModel
 
             return d.hasChanges
@@ -259,7 +259,7 @@ AdaptiveSheet
 
         property bool hasChanges: false
         property bool updating: false
-        property bool enabled: isAnalyticsItemMode
+        property bool enabled: newBookmarkMode
             || !enableSharingToggle.visible
             || enableSharingToggle.checkState === Qt.Checked
 
