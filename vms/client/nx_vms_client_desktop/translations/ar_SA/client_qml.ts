@@ -1601,7 +1601,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>ملف:</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -2832,7 +2832,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>يعرض</translation>
     </message>
     <message>
       <source>Delete</source>
