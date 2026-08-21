@@ -1250,43 +1250,43 @@
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>Lỗi I/O bộ nhớ tại %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>Lưu trữ quá chậm tại %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>Ổ đĩa lưu trữ đầy tại %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>Ổ đĩa hệ thống gần đầy tại %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>Lưu trữ dữ liệu phân tích ngoại tuyến tại %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>Dung lượng lưu trữ phân tích gần đầy tại %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>Lỗi quyền truy cập bộ nhớ phân tích tại %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>Mã hóa bộ nhớ thất bại tại %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>Lỗi lưu trữ RAID tại %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>Sao lưu kho lưu trữ thất bại tại %1</translation>
     </message>
   </context>
   <context>
@@ -1311,7 +1311,7 @@
     <name>nx::vms::rules::TargetServerFieldValidator</name>
     <message>
       <source>Select online server</source>
-      <translation type="unfinished">Select online server</translation>
+      <translation>Chọn máy chủ trực tuyến</translation>
     </message>
   </context>
   <context>

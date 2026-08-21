@@ -82,19 +82,19 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Scroll Left</translation>
+      <translation>تمرير لليسار</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Scroll Right</translation>
+      <translation>تمرير لليمين</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Scroll Up</translation>
+      <translation>تمرير لأعلى</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Scroll Down</translation>
+      <translation>تمرير لأسفل</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -276,7 +276,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Pick Screen Color</source>
-      <translation type="unfinished">&amp;Pick Screen Color</translation>
+      <translation>&amp;اختيار لون الشاشة</translation>
     </message>
     <message>
       <source>Select Color</source>
@@ -284,15 +284,15 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation type="unfinished">&amp;Basic colors</translation>
+      <translation>&amp;الألوان الأساسية</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation type="unfinished">&amp;Custom colors</translation>
+      <translation>&amp;الألوان المخصصة</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation type="unfinished">&amp;Add to Custom Colors</translation>
+      <translation>&amp;إضافة إلى الألوان المخصصة</translation>
     </message>
   </context>
   <context>
@@ -307,33 +307,33 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation type="unfinished">Open the combo box selection popup</translation>
+      <translation>افتح نافذة الاختيار المنسدلة</translation>
     </message>
   </context>
   <context>
     <name>QDateTimeParser</name>
     <message>
       <source>AM</source>
-      <translation type="unfinished">AM</translation>
+      <translation>صباحا</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>ص</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>مساءً</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>م</translation>
     </message>
   </context>
   <context>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>ماذا&apos;s هذا؟</translation>
     </message>
   </context>
   <context>
@@ -372,7 +372,7 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation type="unfinished">Destination file is the same file.</translation>
+      <translation>الملف المشار إليه هو نفس الملف</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
@@ -392,7 +392,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation type="unfinished">Will not rename sequential file using block copy</translation>
+      <translation>لن يتم إعادة تسمية الملف التسلسلي باستخدام نسخ الكتلة</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
@@ -491,7 +491,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation type="unfinished">File &amp;name:</translation>
+      <translation>&amp;اسم الملف:</translation>
     </message>
     <message>
       <source>&amp;Open</source>
@@ -499,7 +499,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Choose</source>
-      <translation type="unfinished">&amp;Choose</translation>
+      <translation>&amp;اختر</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -507,11 +507,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation type="unfinished">All Files (*)</translation>
+      <translation>كل الملفات (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>يعرض </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
@@ -523,11 +523,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation type="unfinished">Show &amp;hidden files</translation>
+      <translation>عرض &amp;الملفات المخفية</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation type="unfinished">&amp;New Folder</translation>
+      <translation>&amp;مجلد جديد</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -535,33 +535,32 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Directories</source>
-      <translation type="unfinished">Directories</translation>
+      <translation>المجلدات</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-      <translation type="unfinished">%1
-Directory not found.
-Please verify the correct directory name was given.</translation>
+      <translation>%1
+لم يتم العثور على المجلد.
+يرجى التأكد من إدخال اسم المجلد الصحيح.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation type="unfinished">%1 already exists.
-Do you want to replace it?</translation>
+      <translation>%1موجود بالفعل، هل تريد استبداله؟</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-      <translation type="unfinished">%1
-File not found.
-Please verify the correct file name was given.</translation>
+      <translation>%1
+لم يتم العثور على الملف.
+يرجى التأكد من إدخال اسم الملف الصحيح.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation type="unfinished">New Folder</translation>
+      <translation>مجلد جديد</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -570,20 +569,20 @@ Please verify the correct file name was given.</translation>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation type="unfinished">&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</translation>
+      <translation> &apos;%1&apos; محمي ضد الكتابة. 
+هل تريد حذفه على أي حال؟</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
-      <translation type="unfinished">Are you sure you want to delete &apos;%1&apos;?</translation>
+      <translation>هل أنت متأكد من رغبتك في حذف &apos;%1&apos;؟</translation>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation type="unfinished">Could not delete directory.</translation>
+      <translation>تعذر حذف المجلد.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation type="unfinished">Recent Places</translation>
+      <translation>الأماكن الحديثة</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -591,20 +590,20 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>جهاز الكمبيوتر</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation type="unfinished">%1 File</translation>
+      <translation>%1 ملف</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation type="unfinished">Sidebar</translation>
+      <translation>الشريط الجانبي </translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation type="unfinished">List of places and bookmarks</translation>
+      <translation>قائمة الأماكن والإشارات المرجعية</translation>
     </message>
     <message>
       <source>Files</source>
@@ -612,15 +611,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation type="unfinished">Alt+Left</translation>
+      <translation>Alt+يسار</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation type="unfinished">Alt+Right</translation>
+      <translation>Alt+يمين</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation type="unfinished">Alt+Up</translation>
+      <translation>Alt+أعلى</translation>
     </message>
   </context>
   <context>
@@ -635,23 +634,23 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>%1 MB</source>
-      <translation type="unfinished">%1 MB</translation>
+      <translation>%1 م.ب.</translation>
     </message>
     <message>
       <source>%1 KB</source>
-      <translation type="unfinished">%1 KB</translation>
+      <translation>%1 كيلوبايت</translation>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation type="unfinished">%1 bytes</translation>
+      <translation>%1 بايت</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation type="unfinished">Invalid filename</translation>
+      <translation>اسم المِلف غير صالح</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation type="unfinished">&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</translation>
+      <translation>&lt;b&gt;الاسم &quot;%1&quot; لا يمكن استخدامه.&lt;/b&gt;&lt;p&gt;حاول استخدام اسم آخر، بحروف أقل أو علامات الترقيم.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -677,15 +676,15 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>My Computer</source>
-      <translation type="unfinished">My Computer</translation>
+      <translation>جهاز الكمبيوتر</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation type="unfinished">Computer</translation>
+      <translation>كمبيوتر</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation type="unfinished">%1 byte(s)</translation>
+      <translation>%1 بايت(ات)</translation>
     </message>
   </context>
   <context>
@@ -708,7 +707,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation type="unfinished">Close without Saving</translation>
+      <translation>إغلاق بدون حفظ</translation>
     </message>
   </context>
   <context>
@@ -716,18 +715,18 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>QT_LAYOUT_DIRECTION</source>
       <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-      <translation type="unfinished">QT_LAYOUT_DIRECTION</translation>
+      <translation>اتجاه تخطيط QT</translation>
     </message>
   </context>
   <context>
     <name>QIODevice</name>
     <message>
       <source>Permission denied</source>
-      <translation type="unfinished">Permission denied</translation>
+      <translation>تم رفض الإذن</translation>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation type="unfinished">Too many open files</translation>
+      <translation>عدد كبير جدًا من الملفات المفتوحة</translation>
     </message>
     <message>
       <source>No such file or directory</source>
@@ -804,22 +803,22 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;تراجع</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;إعادة</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>&amp;قص</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -881,7 +880,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation type="unfinished">Yes to &amp;All</translation>
+      <translation>نعم &amp;للجميع</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -889,7 +888,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation type="unfinished">N&amp;o to All</translation>
+      <translation>لا لل&amp;كل</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -1064,27 +1063,27 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Cache</source>
-      <translation type="unfinished">Cache</translation>
+      <translation>ذاكرة التخزين المؤقت</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation type="unfinished">Shared Data</translation>
+      <translation>البيانات المشتركة</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation type="unfinished">Runtime</translation>
+      <translation>وقت التشغيل</translation>
     </message>
     <message>
       <source>Configuration</source>
-      <translation type="unfinished">Configuration</translation>
+      <translation>الإعدادات</translation>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation type="unfinished">Shared Configuration</translation>
+      <translation>الإعدادات المشتركة</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation type="unfinished">Shared Cache</translation>
+      <translation>ذاكرة التخزين المؤقت المشتركة</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1106,22 +1105,22 @@ Do you want to delete it anyway?</translation>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation type="unfinished">What&apos;s This?</translation>
+      <translation>ماذا&apos;s هذا؟</translation>
     </message>
   </context>
   <context>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation type="unfinished">&amp;Undo</translation>
+      <translation>&amp;تراجع</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation type="unfinished">&amp;Redo</translation>
+      <translation>&amp;إعادة</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation type="unfinished">Cu&amp;t</translation>
+      <translation>&amp;قص</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
@@ -1129,7 +1128,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation type="unfinished">Copy &amp;Link Location</translation>
+      <translation>نسخ &amp;مكان الرابط</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
@@ -1148,16 +1147,16 @@ Do you want to delete it anyway?</translation>
     <name>QAbstractFileIconProvider</name>
     <message>
       <source>Drive</source>
-      <translation type="unfinished">Drive</translation>
+      <translation>محرك أقراص</translation>
     </message>
     <message>
       <source>File</source>
-      <translation type="unfinished">File</translation>
+      <translation>ملف</translation>
     </message>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation type="unfinished">File Folder</translation>
+      <translation>مجلد الملفات</translation>
     </message>
     <message>
       <source>Folder</source>
@@ -1167,12 +1166,12 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation type="unfinished">Alias</translation>
+      <translation>اسم مستعار</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Shortcut</translation>
+      <translation>إختصار</translation>
     </message>
     <message>
       <source>Unknown</source>

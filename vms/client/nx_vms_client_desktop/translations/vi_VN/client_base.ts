@@ -1145,7 +1145,7 @@
     </message>
     <message>
       <source>Share Bookmark...</source>
-      <translation type="unfinished">Share Bookmark...</translation>
+      <translation>Chia sẻ Dấu trang...</translation>
     </message>
   </context>
   <context>
@@ -2012,23 +2012,23 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Không thể xóa bộ nhớ cache của WebEngine</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Vui lòng đóng tất cả các trang và thử lại.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Các tệp có thể bị khóa bởi một tiến trình khác.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Bộ nhớ đệm của WebEngine đã được xóa một phần</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Một số tập tin có thể bị khóa bởi một tiến trình khác.</translation>
     </message>
   </context>
   <context>
@@ -2450,7 +2450,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Create and Share...</source>
-      <translation type="unfinished">Create and Share...</translation>
+      <translation>Tạo và chia sẻ...</translation>
     </message>
   </context>
   <context>
@@ -5266,7 +5266,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Bookmarks can only be shared on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be shared on an online Server.</translation>
+      <translation>Dấu trang chỉ có thể được chia sẻ trên máy chủ trực tuyến.</translation>
     </message>
   </context>
   <context>
@@ -5720,11 +5720,11 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>Không thể xóa bố cục đám mây</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>Đã mất kết nối với đám mây. Vui lòng thử lại sau.</translation>
     </message>
   </context>
   <context>
@@ -6169,7 +6169,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Người dùng LDAP</translation>
     </message>
   </context>
   <context>

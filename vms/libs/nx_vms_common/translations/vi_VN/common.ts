@@ -896,7 +896,7 @@
     <name>QnOnlineServerPolicy</name>
     <message>
       <source>Online servers</source>
-      <translation type="unfinished">Online servers</translation>
+      <translation>Máy chủ trực tuyến</translation>
     </message>
   </context>
   <context>
@@ -1958,7 +1958,7 @@
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
-      <translation type="unfinished">JSON RPC subscription update interval (milliseconds, 0 = disabled).</translation>
+      <translation>Khoảng thời gian cập nhật đăng ký JSON RPC (mili giây, 0 = bị vô hiệu hóa).</translation>
     </message>
   </context>
 </TS>
