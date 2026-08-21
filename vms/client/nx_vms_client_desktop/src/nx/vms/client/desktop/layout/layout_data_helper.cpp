@@ -2,12 +2,21 @@
 
 #include "layout_data_helper.h"
 
+#include <QtCore/QFileInfo>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/api/data/layout_data.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/core/file_cache/file_cache.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <utils/common/delayed.h>
 
 namespace nx::vms::client::desktop {
 
@@ -88,6 +97,112 @@ bool resourceBelongsToLayout(const QnResourcePtr& resource, const QnLayoutResour
             return true;
     }
     return false;
+}
+
+namespace {
+
+void ensureBackgroundImageInCloudCache(
+    const core::LayoutResourcePtr& layout,
+    const core::LayoutResourcePtr& cloudLayout,
+    std::function<void(bool success)> callback)
+{
+    const QString filename = layout->backgroundImageFilename();
+    if (filename.isEmpty())
+    {
+        executeLater([callback] { callback(true); }, cloudLayout.get());
+        return;
+    }
+
+    const auto sourceCache = file_cache::backgroundImageCache(layout);
+    const QString sourcePath = sourceCache ? sourceCache->absoluteFilePath(filename) : QString();
+    if (sourcePath.isEmpty())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Rejecting unsafe background image filename: %1", filename);
+        executeLater([callback] { callback(false); }, cloudLayout.get());
+        return;
+    }
+
+    // Layouts saved by the previous versions refer to the background image by a name derived from
+    // its source path, while the cloud cache is content-addressed: re-key the image by content.
+    file_cache::cachedImageFilenameAsync(sourcePath,
+        [cloudLayout, sourcePath, callback](const QString& targetFilename)
+        {
+            if (targetFilename.isEmpty())
+            {
+                // The layout was never displayed on this machine, so the image is not cached. The
+                // user can set the background anew via the layout settings dialog.
+                NX_WARNING(NX_SCOPE_TAG,
+                    "Background image is not available locally: %1", sourcePath);
+                callback(false);
+                return;
+            }
+
+            const auto targetCache = file_cache::backgroundImageCache(cloudLayout);
+            const QString targetPath = targetCache
+                ? targetCache->absoluteFilePath(targetFilename)
+                : QString();
+
+            if (!NX_ASSERT(!targetPath.isEmpty()))
+            {
+                callback(false);
+                return;
+            }
+
+            if (QFileInfo::exists(targetPath))
+            {
+                cloudLayout->setBackgroundImageFilename(targetFilename);
+                callback(true);
+                return;
+            }
+
+            file_cache::copyFileAsync(sourcePath, targetPath,
+                [cloudLayout, targetFilename, callback](bool success)
+                {
+                    if (!success)
+                    {
+                        NX_WARNING(NX_SCOPE_TAG,
+                            "Failed to copy background image to the cloud image cache: %1",
+                            targetFilename);
+                        callback(false);
+                        return;
+                    }
+
+                    cloudLayout->setBackgroundImageFilename(targetFilename);
+                    callback(true);
+                },
+                cloudLayout.get());
+        },
+        cloudLayout.get());
+}
+
+} // namespace
+
+core::LayoutResourcePtr convertLayoutToCloud(
+    const core::LayoutResourcePtr& layout,
+    core::LayoutResource::ItemsRemapHash* itemsRemapHash,
+    std::function<void(const core::LayoutResourcePtr& cloudLayout)> onCompleted)
+{
+    const auto cloudLayout =
+        appContext()->cloudLayoutsManager()->convertLocalLayout(layout, itemsRemapHash);
+    if (!cloudLayout)
+        return cloudLayout;
+
+    ensureBackgroundImageInCloudCache(layout, cloudLayout,
+        [cloudLayout, onCompleted = std::move(onCompleted)](bool success)
+        {
+            if (!success)
+            {
+                cloudLayout->setBackgroundImageFilename({});
+                cloudLayout->setBackgroundOpacity(
+                    nx::vms::api::LayoutData::kDefaultBackgroundOpacity);
+                cloudLayout->setBackgroundSize({});
+            }
+
+            if (onCompleted)
+                onCompleted(cloudLayout);
+        });
+
+    return cloudLayout;
 }
 
 } // namespace nx::vms::client::desktop

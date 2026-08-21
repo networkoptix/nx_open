@@ -12,6 +12,7 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/client/core/utils/filename_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
 #include <nx/vms/common/system_settings.h>
@@ -24,7 +25,7 @@ ServerFileCache::ServerFileCache(
     const QString& folderName,
     QObject* parent)
     :
-    QObject(parent),
+    core::FileCache(parent),
     SystemContextAware(systemContext),
     m_folderName(folderName)
 {
@@ -86,9 +87,18 @@ QString ServerFileCache::getFullPath(const QString &filename) const {
                                     );
 }
 
-void ServerFileCache::ensureCacheFolder() {
-    QString folderPath = getFullPath(QString());
-    QDir().mkpath(folderPath);
+QString ServerFileCache::absoluteFilePath(const QString& unsafeFilename) const
+{
+    const auto safeFilename = core::sanitizeFilename(unsafeFilename);
+    if (safeFilename.isEmpty())
+        return {};
+
+    return getFullPath(safeFilename);
+}
+
+QString ServerFileCache::cacheFolder() const
+{
+    return getFullPath(QString());
 }
 
 QString ServerFileCache::folderName() const {

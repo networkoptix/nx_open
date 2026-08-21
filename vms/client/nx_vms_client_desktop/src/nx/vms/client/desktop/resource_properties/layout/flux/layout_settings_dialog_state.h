@@ -100,9 +100,6 @@ struct LayoutSettingsDialogState: AbstractFluxState
 
     struct Background
     {
-        /** Background is not supported for cross-system layouts. */
-        bool supported = true;
-
         BackgroundImageStatus status = BackgroundImageStatus::empty;
         QString errorText;
 
@@ -129,9 +126,6 @@ struct LayoutSettingsDialogState: AbstractFluxState
         /** Image is present and image file is available locally. */
         bool imagePresent() const
         {
-            if (!supported)
-                return false;
-
             switch (status)
             {
                 case BackgroundImageStatus::loaded:
@@ -174,7 +168,7 @@ struct LayoutSettingsDialogState: AbstractFluxState
 
         bool canStartDownloading() const
         {
-            return supported && status == BackgroundImageStatus::empty && !filename.isEmpty();
+            return status == BackgroundImageStatus::empty && !filename.isEmpty();
         }
     };
 
@@ -192,7 +186,7 @@ QN_FUSION_DECLARE_FUNCTIONS(LayoutSettingsDialogState::Range,
     (debug),
     NX_VMS_CLIENT_DESKTOP_API)
 
-#define LayoutSettingsDialogState_Background_Fields (supported)(status)(errorText)(width)(height)\
+#define LayoutSettingsDialogState_Background_Fields (status)(errorText)(width)(height)\
     (keepImageAspectRatio)(opacityPercent)(cropToMonitorAspectRatio)(filename)(imageSourcePath)\
     (preview)(croppedPreview)
 

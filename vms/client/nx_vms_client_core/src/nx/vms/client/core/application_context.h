@@ -111,6 +111,8 @@ public:
         QObject* parent = nullptr);
     virtual ~ApplicationContext() override;
 
+    Mode mode() const;
+
     Qn::SerializationFormat serializationFormat() const;
 
     QQmlEngine* qmlEngine() const;

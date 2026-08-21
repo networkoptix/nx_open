@@ -31,6 +31,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/export/data/nov_metadata.h>
 #include <nx/vms/client/desktop/export/tools/nov_media_export.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <nx/vms/client/desktop/resource/layout_password_management.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/utils/local_file_cache.h>
@@ -426,12 +427,17 @@ bool ExportLayoutTool::exportMetadata(const NovMetadata& metadata)
         if (!NX_ASSERT(systemContext))
             systemContext = appContext()->currentSystemContext();
 
-        bool exportedLayout = d->layout->isFile();  // we have changed background to an exported layout
-        ServerImageCache* cache = exportedLayout
-            ? systemContext->localFileCache()
-            : systemContext->serverImageCache();
+        const auto cache = file_cache::backgroundImageCache(d->originalLayout);
+        if (!NX_ASSERT(cache, "No image cache available for layout background export"))
+            return false;
 
-        QImage background(cache->getFullPath(d->layout->backgroundImageFilename()));
+        const auto backgroundPath = cache->absoluteFilePath(d->layout->backgroundImageFilename());
+        if (backgroundPath.isEmpty())
+        {
+            NX_WARNING(this, "Rejecting unsafe background image filename: %1",
+                d->layout->backgroundImageFilename());
+        }
+        const auto background = backgroundPath.isEmpty() ? QImage() : QImage(backgroundPath);
         if (!background.isNull())
         {
 

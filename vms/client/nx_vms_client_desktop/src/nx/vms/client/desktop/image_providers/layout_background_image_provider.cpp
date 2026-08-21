@@ -2,11 +2,13 @@
 
 #include "layout_background_image_provider.h"
 
+#include <QtCore/QPointer>
+
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/core/file_cache/file_cache.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 
 #include "threaded_image_loader.h"
 
@@ -14,7 +16,7 @@ namespace nx::vms::client::desktop {
 
 struct LayoutBackgroundImageProvider::Private
 {
-    QPointer<ServerImageCache> cache;
+    QPointer<core::FileCache> cache;
     QSize maxImageSize;
     QScopedPointer<ThreadedImageLoader> loader;
     QImage image;
@@ -28,7 +30,7 @@ struct LayoutBackgroundImageProvider::Private
             return maxImageSize;
 
         if (cache)
-            return cache->getMaxImageSize();
+            return file_cache::maxBackgroundImageSize();
 
         return QSize();
     }
@@ -44,13 +46,22 @@ LayoutBackgroundImageProvider::LayoutBackgroundImageProvider(const QnLayoutResou
     if (layout->backgroundImageFilename().isEmpty())
         return;
 
-    const auto systemContext = SystemContext::fromResource(layout);
-    d->cache = layout->isFile()
-        ? systemContext->localFileCache()
-        : systemContext->serverImageCache();
+    d->cache = file_cache::backgroundImageCache(layout);
     d->maxImageSize = maxImageSize;
+
+    if (!d->cache)
+        return;
+
+    const auto path = d->cache->absoluteFilePath(layout->backgroundImageFilename());
+    if (path.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting unsafe background image filename: %1",
+            layout->backgroundImageFilename());
+        return;
+    }
+
     d->loader.reset(new ThreadedImageLoader());
-    d->loader->setInput(d->cache->getFullPath(layout->backgroundImageFilename()));
+    d->loader->setInput(path);
     d->loader->setSize(d->sizeHint());
 
     connect(d->loader.get(), &ThreadedImageLoader::imageLoaded, this,
@@ -79,7 +90,7 @@ QSize LayoutBackgroundImageProvider::sizeHint() const
 
 core::ThumbnailStatus LayoutBackgroundImageProvider::status() const
 {
-    if (d->cache.isNull())
+    if (d->cache.isNull() || !d->loader)
         return core::ThumbnailStatus::Invalid;
 
     return d->image.isNull()
@@ -89,7 +100,10 @@ core::ThumbnailStatus LayoutBackgroundImageProvider::status() const
 
 void LayoutBackgroundImageProvider::doLoadAsync()
 {
-    d->loader->start();
+    if (d->loader)
+        d->loader->start();
+    else
+        NX_WARNING(this, "Loader is not initialized");
 }
 
 } // namespace nx::vms::client::desktop

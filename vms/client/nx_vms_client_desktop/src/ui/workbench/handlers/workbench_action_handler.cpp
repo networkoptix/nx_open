@@ -79,6 +79,7 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -969,7 +970,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
         NX_ASSERT(parameters.widgets().empty());
 
         // Convert common layout to cloud one.
-        auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+        auto cloudLayout = convertLayoutToCloud(layout);
         // Replace opened layout with the cloud one.
         auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
         if (!targetLayout)
@@ -2960,7 +2961,9 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
         addParams);
 }
 
-void ActionHandler::at_setAsBackgroundAction_triggered() {
+void ActionHandler::at_setAsBackgroundAction_triggered()
+{
+    using nx::vms::client::core::FileCache;
 
     auto checkCondition =
         [this]()
@@ -2988,13 +2991,15 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    ServerImageCache *cache = new ServerImageCache(system(), this);
+    auto cache = new ServerImageCache(system(), this);
     cache->setProperty(uploadingImageARPropertyName, parameters.widget()->aspectRatio());
-    connect(cache, &ServerImageCache::fileUploaded, cache, &QObject::deleteLater);
-    connect(cache, &ServerImageCache::fileUploaded, this,
-        [this, checkCondition, progressDialog]
-            (const QString &filename, ServerFileCache::OperationResult status)
+
+    auto handleResult =
+        [this, cache, checkCondition, progressDialog]
+            (const QString& filename, FileCache::OperationResult status)
         {
+            cache->deleteLater();
+
             if (!progressDialog || progressDialog->wasCanceled())
                 return;
 
@@ -3003,16 +3008,29 @@ void ActionHandler::at_setAsBackgroundAction_triggered() {
             if (!checkCondition())
                 return;
 
-            if (status != ServerFileCache::OperationResult::ok)
+            if (status != FileCache::OperationResult::ok)
             {
                 QnMessageBox::critical(mainWindowWidget(), tr("Failed to upload image"));
                 return;
             }
 
             setCurrentLayoutBackground(filename);
+        };
+
+    connect(cache, &ServerFileCache::fileUploaded, this, handleResult);
+
+    auto importer = new ImageImporter(cache, cache);
+    connect(importer, &ImageImporter::imported, this,
+        [cache, handleResult]
+            (const QString& filename, FileCache::OperationResult status)
+        {
+            if (status == FileCache::OperationResult::ok)
+                cache->uploadFile(filename);
+            else
+                handleResult(filename, status);
         });
 
-    cache->storeImage(parameters.resource()->getUrl());
+    importer->importFromFile(parameters.resource()->getUrl());
     progressDialog->show();
 }
 

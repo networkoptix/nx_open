@@ -14,16 +14,19 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 
 using namespace nx::vms::client::desktop;
+using nx::vms::client::core::FileCache;
 using TranslationListModel = nx::vms::client::core::TranslationListModel;
 
 namespace {
@@ -214,45 +217,61 @@ void QnLookAndFeelPreferencesWidget::onBackgroundImageSelected(const QString& fi
 
     appContext()->localSettings()->backgroundsFolder = QFileInfo(fileName).absolutePath();
 
-    const QString previousCachedName = appContext()->localSettings()->backgroundImage().imagePath();
-    QString cachedName = ServerImageCache::cachedImageFilename(fileName);
-    if (previousCachedName == cachedName ||
-        QDir::toNativeSeparators(previousCachedName).toLower() ==
-        QDir::toNativeSeparators(fileName).toLower())
-        return;
-
     QPointer<ProgressDialog> progressDialog = createSelfDestructingDialog<ProgressDialog>(this);
     progressDialog->setWindowTitle(tr("Preparing Image..."));
     progressDialog->setText(tr("Please wait while image is being prepared..."));
     progressDialog->setInfiniteMode();
+    progressDialog->show();
 
-    auto imgCache = new LocalFileCache(appContext()->currentSystemContext(), this);
-    connect(
-        imgCache,
-        &ServerFileCache::fileUploaded,
-        this,
-        [this, imgCache, progressDialog, fileName](const QString& storedFileName)
+    auto importBackgroundImage =
+        [this, fileName, progressDialog](const QString& cachedImageFilename)
         {
-            if (progressDialog)
-            {
-                if (!progressDialog->wasCanceled())
-                {
-                    BackgroundImage background = appContext()->localSettings()->backgroundImage();
-                    background.name = storedFileName;
-                    background.originalName = fileName;
-                    appContext()->localSettings()->backgroundImage = background;
-                    ui->imageNameLineEdit->setText(QFileInfo(fileName).fileName());
-                    emit hasChangesChanged();
-                }
+            if (!progressDialog || progressDialog->wasCanceled())
+                return;
 
+            const QString previousCachedName =
+                appContext()->localSettings()->backgroundImage().imagePath();
+
+            if (cachedImageFilename.isEmpty() || previousCachedName == cachedImageFilename ||
+                QDir::toNativeSeparators(previousCachedName).toLower() ==
+                QDir::toNativeSeparators(fileName).toLower())
+            {
                 progressDialog->close();
+                return;
             }
 
-            imgCache->deleteLater();
-        });
+            auto imgCache = new LocalFileCache(appContext()->currentSystemContext(), this);
+            auto importer = new ImageImporter(imgCache, imgCache);
 
-    imgCache->storeImage(fileName);
-    progressDialog->show();
+            connect(importer, &ImageImporter::imported, this,
+                [this, imgCache, progressDialog, fileName](
+                    const QString& storedFileName,
+                    FileCache::OperationResult status)
+                {
+                    if (progressDialog)
+                    {
+                        if (!progressDialog->wasCanceled()
+                            && status == FileCache::OperationResult::ok)
+                        {
+                            BackgroundImage background =
+                                appContext()->localSettings()->backgroundImage();
+                            background.name = storedFileName;
+                            background.originalName = fileName;
+                            appContext()->localSettings()->backgroundImage = background;
+                            ui->imageNameLineEdit->setText(QFileInfo(fileName).fileName());
+                            emit hasChangesChanged();
+                        }
+
+                        progressDialog->close();
+                    }
+
+                    imgCache->deleteLater();
+                });
+
+            importer->importFromFile(fileName, /*aspectRatio*/ {}, cachedImageFilename);
+        };
+
+    file_cache::cachedImageFilenameAsync(fileName, std::move(importBackgroundImage), this);
 }
 
 bool QnLookAndFeelPreferencesWidget::backgroundAllowed() const

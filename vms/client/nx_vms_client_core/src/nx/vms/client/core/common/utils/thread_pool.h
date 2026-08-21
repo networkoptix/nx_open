@@ -15,7 +15,7 @@ namespace nx::vms::client::core {
  * It does not forcefully kill threads, so make sure your threads are short.
  * Use QnLongRunnablePool if your threads do not finish on their own.
  */
-class ThreadPool: public QThreadPool
+class NX_VMS_CLIENT_CORE_API ThreadPool: public QThreadPool
 {
     Q_OBJECT
     using base_type = QThreadPool;

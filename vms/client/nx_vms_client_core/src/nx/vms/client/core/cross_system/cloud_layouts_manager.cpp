@@ -6,6 +6,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
+#include <common/common_globals.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/avi/filetypesupport.h>
 #include <core/resource/user_resource.h>
@@ -14,6 +15,7 @@
 #include <nx/cloud/db/client/async_http_requests_executor.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/http/http_types.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/serialization/format.h>
@@ -31,6 +33,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/delayed.h>
 
+#include "cloud_image_cache.h"
 #include "cross_system_layout_resource.h"
 
 using namespace std::chrono;
@@ -86,9 +89,17 @@ struct CloudLayoutsManager::Private
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
     QnUserResourcePtr user;
 
+    // Only the desktop client displays layout backgrounds.
+    const bool backgroundImageDownloadsEnabled =
+        appContext()->mode() == ApplicationContext::Mode::desktopClient;
+
+    // Declared after the executor it shares; destroyed first, stopping pending file transfers.
+    std::unique_ptr<CloudImageCache> imageCache;
+
     Private(CloudLayoutsManager* owner):
         q(owner),
-        apiRequestExecutor(actualLayoutsEndpoint(), nx::network::ssl::kDefaultCertificateCheck)
+        apiRequestExecutor(actualLayoutsEndpoint(), nx::network::ssl::kDefaultCertificateCheck),
+        imageCache(std::make_unique<CloudImageCache>(&apiRequestExecutor))
     {
         systemContext->setObjectName("Cloud Layouts System Context");
         appContext()->addSystemContext(systemContext.get());
@@ -122,6 +133,9 @@ struct CloudLayoutsManager::Private
         {
             if (layoutData.id.isNull())
                 continue;
+
+            if (backgroundImageDownloadsEnabled && !layoutData.backgroundImageFilename.isEmpty())
+                imageCache->downloadFile(layoutData.backgroundImageFilename);
 
             if (auto existingLayout = resourcePool->getResourceById<CrossSystemLayoutResource>(
                 layoutData.id))
@@ -256,6 +270,19 @@ struct CloudLayoutsManager::Private
         resourcePool->removeResources(resourcePool->getResources());
         user.reset();
         systemContext->accessController()->setUser({});
+        imageCache->clear();
+    }
+
+    bool isBackgroundInUse(const QString& filename, const nx::Uuid& excludedLayoutId) const
+    {
+        // Best effort: another client can start referencing the same file concurrently.
+        // TODO: #vbreus Reference tracking or garbage collection is needed on the cloud side.
+        return systemContext->resourcePool()->contains<CrossSystemLayoutResource>(
+            [&](const CrossSystemLayoutResourcePtr& layout)
+            {
+                return layout->getId() != excludedLayoutId
+                    && layout->backgroundImageFilename() == filename;
+            });
     }
 
     void sendSaveLayoutRequest(
@@ -275,7 +302,7 @@ struct CloudLayoutsManager::Private
             nx::format(kParticularLayoutPathTemplate, layout.id.toSimpleString()).toStdString(),
             /*urlQuery*/ {},
             layout,
-            utils::guarded(q,
+            nx::utils::AsyncHandlerExecutor(q).bind(
                 [this, callback = std::move(callback)](cloud::db::api::ResultCode resultCode)
                 {
                     const bool success = resultCode == cloud::db::api::ResultCode::ok
@@ -288,18 +315,32 @@ struct CloudLayoutsManager::Private
                 }));
     }
 
-    void sendDeleteLayoutRequest(const nx::Uuid& id)
+    void sendDeleteLayoutRequest(const nx::Uuid& id, std::function<void()> onSuccess = {})
     {
         apiRequestExecutor.makeAsyncCall<void>(
             network::http::Method::delete_,
             nx::format(kParticularLayoutPathTemplate, id.toSimpleString()).toStdString(),
             /*urlQuery*/ {},
-            utils::guarded(q,
-                [this](cloud::db::api::ResultCode resultCode)
+            nx::utils::AsyncHandlerExecutor(q).bind(
+                [this, onSuccess = std::move(onSuccess)](cloud::db::api::ResultCode resultCode)
                 {
                     if (resultCode != cloud::db::api::ResultCode::ok)
+                    {
                         NX_WARNING(this, "Delete request failed with code %1", resultCode);
+                        return;
+                    }
+
+                    if (onSuccess)
+                        onSuccess();
                 }));
+    }
+
+    void deleteBackgroundIfUnused(const QString& filename, const nx::Uuid& excludedLayoutId)
+    {
+        if (filename.isEmpty() || isBackgroundInUse(filename, excludedLayoutId))
+            return;
+
+        imageCache->deleteFile(filename);
     }
 
     LayoutResourcePtr convertLocalLayout(
@@ -319,11 +360,6 @@ struct CloudLayoutsManager::Private
         cloudLayout->setIdUnsafe(nx::Uuid::createUuid());
         cloudLayout->setParentId(nx::Uuid());
         cloudLayout->addFlags(Qn::local);
-
-        // Reset background if it is set.
-        cloudLayout->setBackgroundImageFilename({});
-        cloudLayout->setBackgroundOpacity(nx::vms::api::LayoutData::kDefaultBackgroundOpacity);
-        cloudLayout->setBackgroundSize({});
 
         cloudLayout->setName(nx::utils::generateUniqueString(
             usedNames,
@@ -354,25 +390,64 @@ struct CloudLayoutsManager::Private
         if (!NX_ASSERT(cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online))
             return;
 
-        auto internalCallback =
-            [layout, callback = std::move(callback)](bool success)
+        const bool isNewLayout = layout->hasFlags(Qn::local);
+        const QString previousBackgroundFilename = isNewLayout
+            ? QString()
+            : layout->snapshot().backgroundImageFilename;
+
+        const bool backgroundChanged =
+            isNewLayout || previousBackgroundFilename != layout->backgroundImageFilename();
+
+        auto proceedWithSave =
+            [this, layout, isNewLayout, previousBackgroundFilename,
+                callback = std::move(callback)](bool uploadOk) mutable
             {
-                if (success)
+                if (!uploadOk)
                 {
-                    layout->removeFlags(Qn::local);
-                    layout->addFlags(Qn::remote);
+                    if (callback)
+                        callback(false);
+                    return;
                 }
-                if (callback)
-                    callback(success);
+
+                auto onSaved =
+                    [this, layout, previousBackgroundFilename, callback = std::move(callback)](
+                        bool success)
+                    {
+                        if (success)
+                        {
+                            layout->removeFlags(Qn::local);
+                            layout->addFlags(Qn::remote);
+
+                            if (previousBackgroundFilename != layout->backgroundImageFilename())
+                            {
+                                deleteBackgroundIfUnused(previousBackgroundFilename,
+                                    layout->getId());
+                            }
+                        }
+                        if (callback)
+                            callback(success);
+                    };
+
+                core::CrossSystemLayoutData layoutData;
+                core::fromResourceToData(layout, layoutData);
+                sendSaveLayoutRequest(layoutData, std::move(onSaved), isNewLayout);
             };
 
-        core::CrossSystemLayoutData layoutData;
-        core::fromResourceToData(layout, layoutData);
-
-        sendSaveLayoutRequest(
-            layoutData,
-            internalCallback,
-            /*isNewLayout*/ layout->hasFlags(Qn::local));
+        if (backgroundChanged && !layout->backgroundImageFilename().isEmpty())
+        {
+            imageCache->uploadFile(layout->backgroundImageFilename(),
+                [proceedWithSave = std::move(proceedWithSave)](
+                    FileCache::OperationResult result) mutable
+                {
+                    // An image missing from the local cache is not an error: it may already be
+                    // stored in the cloud. Only a transfer failure blocks saving the layout.
+                    proceedWithSave(result != FileCache::OperationResult::serverError);
+                });
+        }
+        else
+        {
+            proceedWithSave(true);
+        }
     }
 
     void deleteLayout(const QnLayoutResourcePtr& layout)
@@ -380,7 +455,16 @@ struct CloudLayoutsManager::Private
         if (!NX_ASSERT(cloudStatusWatcher->status() == core::CloudStatusWatcher::Status::Online))
             return;
 
-        sendDeleteLayoutRequest(layout->getId());
+        const auto backgroundFilename = layout->backgroundImageFilename();
+        const auto layoutId = layout->getId();
+
+        // Delete the background only after the layout itself is confirmed deleted.
+        sendDeleteLayoutRequest(layoutId,
+            [this, backgroundFilename, layoutId]()
+            {
+                deleteBackgroundIfUnused(backgroundFilename, layoutId);
+            });
+
         systemContext->resourcePool()->removeResource(layout);
     }
 
@@ -456,6 +540,11 @@ void CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
 void CloudLayoutsManager::updateLayouts()
 {
     d->updateLayouts();
+}
+
+CloudImageCache* CloudLayoutsManager::imageCache() const
+{
+    return d->imageCache.get();
 }
 
 SystemContext* CloudLayoutsManager::systemContext() const

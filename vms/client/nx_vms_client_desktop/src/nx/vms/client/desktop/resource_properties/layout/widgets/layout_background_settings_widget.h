@@ -7,11 +7,12 @@
 
 namespace Ui { class LayoutBackgroundSettingsWidget; }
 
+namespace nx::vms::client::core { class FileCache; }
+
 namespace nx::vms::client::desktop {
 
 struct LayoutSettingsDialogState;
 class LayoutSettingsDialogStore;
-class SystemContext;
 
 class LayoutBackgroundSettingsWidget: public QWidget
 {
@@ -26,7 +27,7 @@ public:
 
     void uploadImage();
 
-    void initCache(SystemContext* systemContext, bool isLocalFile);
+    void initCache(core::FileCache* cache);
 
 signals:
     void newImageUploadedSuccessfully();
@@ -40,7 +41,7 @@ private:
 
 private:
     void onImageUploaded(const QString& filename, bool ok);
-    void onImageDownloaded(const QString& filename, bool ok);
+    void onImageDownloaded(const QString& filename, const QString& path, bool ok);
 
     void setPreview(const QImage& image);
 

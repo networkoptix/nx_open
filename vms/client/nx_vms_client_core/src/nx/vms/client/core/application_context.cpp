@@ -288,6 +288,11 @@ ApplicationContext::~ApplicationContext()
     nx::setOnAssertHandler(nullptr);
 }
 
+ApplicationContext::Mode ApplicationContext::mode() const
+{
+    return d->mode;
+}
+
 Qn::SerializationFormat ApplicationContext::serializationFormat() const
 {
     return d->format;

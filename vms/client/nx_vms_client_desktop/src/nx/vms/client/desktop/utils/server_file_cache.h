@@ -5,12 +5,13 @@
 #include <QtCore/QHash>
 #include <QtCore/QObject>
 
+#include <nx/vms/client/core/file_cache/file_cache.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
 namespace nx::vms::client::desktop {
 
 class ServerFileCache:
-    public QObject,
+    public core::FileCache,
     public SystemContextAware
 {
     Q_OBJECT
@@ -23,6 +24,12 @@ public:
 
     /** Get full path to cached file with fixed filename */
     virtual QString getFullPath(const QString &filename) const;
+
+    /**
+     * Full path to the file with the name which is safe to use in the cache directory. Returns an
+     * empty string for the names rejected by sanitizeFilename().
+     */
+    virtual QString absoluteFilePath(const QString& unsafeFilename) const override;
 
     virtual void getFileList();
 
@@ -43,20 +50,12 @@ public:
     virtual void deleteFile(const QString &filename);
 
     /** Clear cache state. */
-    virtual void clear();
+    virtual void clear() override;
 
     static void clearLocalCache();
 
-    enum class OperationResult {
-        ok,
-        disconnected,
-        serverError,
-        fileSystemError,
-        invalidOperation,
-    };
-
 protected:
-    void ensureCacheFolder();
+    virtual QString cacheFolder() const override;
     QString folderName() const;
     QString relativeFilePath(const QString& filename) const;
     bool isConnectedToServer() const;
