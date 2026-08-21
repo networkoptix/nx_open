@@ -1356,6 +1356,8 @@ Page
         id: objectsTypeSheet
 
         preferredEdge: StyleHints.preferredSheetEdge
+        bookmarksAvailable: controller.systemContext?.hasViewBookmarksPermission ?? false
+        objectsAvailable: controller.systemContext?.hasSearchObjectsPermission ?? false
 
         onObjectsTypeClicked:
         {

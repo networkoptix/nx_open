@@ -13,6 +13,8 @@ AdaptiveSheet
     id: sheet
 
     property int selectedType: Timeline.ObjectsLoader.ObjectsType.motion
+    property bool bookmarksAvailable: true
+    property bool objectsAvailable: true
 
     signal objectsTypeClicked()
 
@@ -68,6 +70,7 @@ AdaptiveSheet
         icon.source: "image://skin/24x24/Outline/bookmark.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.bookmarks
         width: parent.width
+        visible: sheet.bookmarksAvailable
     }
 
     ObjectsTypeRadioButton
@@ -78,6 +81,7 @@ AdaptiveSheet
         icon.source: "image://skin/24x24/Outline/object.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
         width: parent.width
+        visible: sheet.objectsAvailable
     }
 
     footer: Button
