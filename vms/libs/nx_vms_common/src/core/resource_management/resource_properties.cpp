@@ -2,11 +2,11 @@
 
 #include "resource_properties.h"
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx/utils/log/log.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(
     nx::vms::common::SystemContext* context,
@@ -118,11 +118,12 @@ std::optional<QString> QnResourcePropertyDictionary::setValueUnsafe(
     {
         modifiedProperties[key] = value;
     }
-    else
+    else if (const auto modifiedIt = modifiedProperties.find(key);
+        modifiedIt != modifiedProperties.end() && modifiedIt->second == value)
     {
-        // If parameter marked as modified, removing mark,
-        // i.e. parameter value has been reset to already saved value.
-        modifiedProperties.erase(key);
+        // Removing the mark, i.e. the parameter value has been reset to the already saved one.
+        // A mark with a different value is a newer unsaved change; dropping it would lose it.
+        modifiedProperties.erase(modifiedIt);
     }
 
     return prevValue;
