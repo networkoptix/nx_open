@@ -8,6 +8,7 @@
 #include <QtCore/QThread>
 
 #include <nx/fusion/serialization/json.h>
+#include <nx/ranges.h>
 #include <nx/utils/i18n/scoped_locale.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qobject.h>
@@ -127,6 +128,7 @@ Engine::~Engine()
 {
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     m_rules.clear();
+    m_ruleCache.reset(m_rules);
 }
 
 Router* Engine::router() const
@@ -206,6 +208,7 @@ void Engine::updateRule(const api::Rule& ruleData)
     auto ruleId = rule->id();
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     auto result = m_rules.insert_or_assign(ruleId, std::move(rule));
+    m_ruleCache.update(result.first->second);
     lock.unlock();
 
     emit ruleAddedOrUpdated(ruleId, result.second);
@@ -215,6 +218,8 @@ void Engine::removeRule(nx::Uuid ruleId)
 {
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     const auto erasedCount = m_rules.erase(ruleId);
+    if (erasedCount > 0)
+        m_ruleCache.remove(ruleId);
     lock.unlock();
 
     if (erasedCount > 0)
@@ -232,9 +237,16 @@ void Engine::resetRules(const std::vector<api::Rule>& rulesData)
 
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     m_rules = std::move(ruleSet);
+    m_ruleCache.reset(m_rules);
     lock.unlock();
 
     emit rulesReset();
+}
+
+void Engine::onTaxonomyChanged()
+{
+    NX_MUTEX_LOCKER lock(&m_ruleMutex);
+    m_ruleCache.onTaxonomyChanged();
 }
 
 bool Engine::registerEvent(const ItemDescriptor& descriptor, const EventConstructor& constructor)
@@ -819,22 +831,22 @@ size_t Engine::processEvent(const EventPtr& event)
 
     std::vector<ConstRulePtr> triggeredRules;
     std::vector<nx::Uuid> runningRules;
+    const auto eventKey = event->cacheKey();
 
     {
         NX_MUTEX_LOCKER lock(&m_ruleMutex);
 
-        for (const auto& [id, rule]: m_rules)
+        // The cache contains enabled and compatible rules by event type.
+        for (const auto& entry: m_ruleCache.byEventType(event->type()))
         {
-            if (!rule->enabled() || !rule->isCompatible())
-                continue;
+            const auto& rule = entry.rule;
+            const auto id = rule->id();
+            const auto cacheKey =
+                eventKey.empty() ? std::string() : eventKey + id.toSimpleStdString();
 
-            auto cacheKey = event->cacheKey();
-            if (!cacheKey.isEmpty())
+            if (!cacheKey.empty())
             {
-                cacheKey += id.toSimpleString();
-
-                m_eventCache.rememberEvent(cacheKey);
-                if (m_eventCache.isReportedRecently(cacheKey))
+                if (m_eventCache.rememberEvent(cacheKey)->isReportedRecently())
                 {
                     NX_VERBOSE(this, "Skipping cached event with key: %1", cacheKey);
                     continue;
@@ -842,8 +854,9 @@ size_t Engine::processEvent(const EventPtr& event)
             }
 
             // Check if the event is matched by field filters except state.
-            auto matchedFilters = rule->eventFiltersByType(event->type());
-            matchedFilters.removeIf([&event](auto filter){ return !filter->matchFields(event); });
+            auto matchedFilters = entry.filters
+                | std::views::filter([&event](auto filter){ return filter->matchFields(event); })
+                | nx::ranges::to<std::vector>();
 
             if (matchedFilters.empty())
                 continue;
@@ -853,12 +866,13 @@ size_t Engine::processEvent(const EventPtr& event)
             if (!checkRunningEvent(id, event))
                 matchedFilters.clear();
 
-            matchedFilters.removeIf([&event](auto filter){ return !filter->matchState(event); });
+            const auto matchState = [&event](auto filter){ return !filter->matchState(event); };
+            std::erase_if(matchedFilters, matchState);
 
             if (!matchedFilters.empty())
             {
                 triggeredRules.push_back(rule);
-                if (!cacheKey.isEmpty())
+                if (!cacheKey.empty())
                     m_eventCache.reportEvent(cacheKey);
             }
         }
@@ -964,11 +978,18 @@ bool Engine::isActionFieldRegistered(const QString& fieldId) const
     return m_actionFields.contains(fieldId);
 }
 
-nx::vms::event::EventCache* Engine::eventCache()
+EventCache* Engine::eventCache()
 {
     checkOwnThread();
 
     return &m_eventCache;
+}
+
+RuleCache* Engine::ruleCache()
+{
+    checkOwnThread();
+
+    return &m_ruleCache;
 }
 
 RunningEventWatcher Engine::runningEventWatcher(nx::Uuid ruleId)

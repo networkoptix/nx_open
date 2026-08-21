@@ -316,16 +316,4 @@ constexpr auto nxReflectVisitAllEnumItems(EventLevel*, Visitor&& visitor)
 Q_DECLARE_FLAGS(EventLevels, EventLevel)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 
-/*
- * A single analytics event could contains not all necessary data to match it.
- * Some fields could be at the previous events only. So, we need to collect information
- * related to the analytics track and keep it at this context. Event could use context
- * to match its attributes (in the future) or its objectType (current version).
- */
-struct NX_VMS_API AnalyticsTrackContext
-{
-    /** All object types which were detected during the track. */
-    QString objectTypeId;
-};
-
 } // namespace nx::vms::api

@@ -35,7 +35,7 @@ public:
     virtual QString aggregationKey() const override { return m_deviceId.toSimpleString(); }
     virtual QString subtype() const override;
     virtual QString sequenceKey() const override;
-    virtual QString cacheKey() const override;
+    virtual std::string cacheKey() const override;
     virtual QVariantMap details(
         common::SystemContext* context,
         Qn::ResourceInfoLevel detailLevel) const override;
