@@ -52,18 +52,18 @@ public:
         return m_deviceId.toSimpleString();
     }
 
-    virtual QString cacheKey() const override
+    virtual std::string cacheKey() const override
     {
         return m_cacheKey;
     }
 
-    void setCacheKey(const QString& cacheKey)
+    void setCacheKey(const std::string& cacheKey)
     {
         m_cacheKey = cacheKey;
     }
 
     nx::Uuid m_deviceId;
-    QString m_cacheKey;
+    std::string m_cacheKey;
 };
 
 // Test event with permissions. No filter fields. May be used for field/details format tests.

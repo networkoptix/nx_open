@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/api/rules/rule.h>
-#include <nx/vms/event/event_cache.h>
 #include <nx/vms/rules/action_builder.h>
+#include <nx/vms/rules/event_cache.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/event_filter_fields/source_camera_field.h>
 #include <nx/vms/rules/rule.h>
@@ -24,7 +24,7 @@ class EventCacheTest: public EngineBasedTest, public TestPlugin
 public:
     EventCacheTest(): TestPlugin(engine.get()) {};
 
-    nx::vms::event::EventCache* cache() const { return engine->eventCache(); }
+    EventCache* cache() const { return engine->eventCache(); }
 };
 
 TEST_F(EventCacheTest, eventReporting)

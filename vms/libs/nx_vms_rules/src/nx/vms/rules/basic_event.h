@@ -65,10 +65,9 @@ public:
 
     /**
      * Used for caching and limiting repeat of instant events or repeating 'start' of prolonged
-     * events.
-     * Returns empty string by default.
+     * events. Returns empty string by default.
      */
-    virtual QString cacheKey() const;
+    virtual std::string cacheKey() const;
 
     /**
      * Event details (such as caption, description, timestamp, source etc.) in a human-readable

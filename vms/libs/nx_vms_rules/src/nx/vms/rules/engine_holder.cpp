@@ -3,7 +3,9 @@
 #include "engine_holder.h"
 
 #include <api/common_message_processor.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/utils/async_handler_executor.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
@@ -89,6 +91,16 @@ void EngineHolder::connectEngine(
         [engine](nx::Uuid id)
         {
             engine->removeRule(id);
+        },
+        connectionType);
+
+    using nx::analytics::taxonomy::AbstractStateWatcher;
+
+    const auto watcher = engine->systemContext()->analyticsTaxonomyStateWatcher();
+    connect(watcher, &AbstractStateWatcher::stateChanged, engine,
+        [engine]
+        {
+            engine->onTaxonomyChanged();
         },
         connectionType);
 

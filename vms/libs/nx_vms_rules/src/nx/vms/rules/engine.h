@@ -18,9 +18,10 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/rules/rules_fwd.h>
 #include <nx/vms/common/system_context_aware.h>
-#include <nx/vms/event/event_cache.h>
 
+#include "event_cache.h"
 #include "field_validator.h"
+#include "rule_cache.h"
 #include "rules_fwd.h"
 #include "running_event_watcher.h"
 
@@ -94,6 +95,12 @@ public:
 
     /** Removes existing rule from the engine, does nothing otherwise. Emits corresponding signal. */
     void removeRule(nx::Uuid ruleId);
+
+    /**
+     * Notifies the engine the analytics taxonomy state has been changed, so the cached rule
+     * properties which depend on it must be recalculated.
+     */
+    void onTaxonomyChanged();
 
 // Event management methods.
     /**
@@ -208,7 +215,8 @@ public: // Declare following methods public for testing purposes.
     std::unique_ptr<EventFilterField> buildEventField(const FieldDescriptor* descriptor) const;
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;
 
-    nx::vms::event::EventCache* eventCache();
+    EventCache* eventCache();
+    RuleCache* ruleCache();
 
 private:
     // Assuming cache access and event processing are in the same thread.
@@ -271,13 +279,14 @@ private:
     // Fields in the following section are guarded by mutex.
     mutable nx::Mutex m_ruleMutex;
     RuleSet m_rules;
+    RuleCache m_ruleCache;
     QSet<nx::utils::TimerEventHandler*> m_timerHandlers;
 
 private: // All the fields below should be used by Engine's thread only.
     QHash<nx::Uuid, RunningRuleInfo> m_runningRules;
 
     // TODO: VMS-55671: Unify analytics object caches.
-    nx::vms::event::EventCache m_eventCache;
+    EventCache m_eventCache;
 
     QTimer* m_aggregationTimer;
 };

@@ -2,13 +2,18 @@
 
 #include "event_cache.h"
 
-namespace nx::vms::event {
+namespace nx::vms::rules {
 
 namespace {
 
 static const std::chrono::seconds kObjectDetectedProcessingTimeout(1);
 
 } // namespace
+
+bool LastEventData::isReportedRecently() const
+{
+    return !lastReported.hasExpired(kObjectDetectedProcessingTimeout);
+}
 
 void EventCache::cleanupOldEventsFromCache(std::chrono::milliseconds timeout)
 {
@@ -21,20 +26,20 @@ void EventCache::cleanupOldEventsFromCache(std::chrono::milliseconds timeout)
         [timeout](const auto& pair) { return pair.second.lastEvent.hasExpired(timeout); });
 }
 
-bool EventCache::isReportedBefore(const QString& eventKey) const
+bool EventCache::isReportedBefore(const std::string& eventKey) const
 {
     auto it = m_previousEvents.find(eventKey);
     return it != m_previousEvents.end() && it->second.lastReported.isValid();
 }
 
-bool EventCache::isReportedRecently(const QString& eventKey) const
+bool EventCache::isReportedRecently(const std::string& eventKey) const
 {
     const auto it = m_previousEvents.find(eventKey);
-    return it != m_previousEvents.end()
-        && !it->second.lastReported.hasExpired(kObjectDetectedProcessingTimeout);
+
+    return it != m_previousEvents.end() && it->second.isReportedRecently();
 }
 
-nx::vms::api::AnalyticsTrackContext* EventCache::rememberEvent(const QString& eventKey)
+LastEventData* EventCache::rememberEvent(const std::string& eventKey)
 {
     cleanupOldEventsFromCache();
     auto& data = m_previousEvents[eventKey];
@@ -42,11 +47,10 @@ nx::vms::api::AnalyticsTrackContext* EventCache::rememberEvent(const QString& ev
     return &data;
 }
 
-void EventCache::reportEvent(const QString& eventKey)
+void EventCache::reportEvent(const std::string& eventKey)
 {
-    if (eventKey.isEmpty())
-        return;
-    m_previousEvents[eventKey].lastReported.restart();
+    if (!eventKey.empty())
+        m_previousEvents[eventKey].lastReported.restart();
 }
 
-} // namespace nx::vms::event
+} // namespace nx::vms::rules

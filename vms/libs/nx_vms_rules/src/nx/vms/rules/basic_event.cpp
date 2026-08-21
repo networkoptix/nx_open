@@ -58,7 +58,7 @@ void BasicEvent::setState(State state)
     m_state = state;
 }
 
-QString BasicEvent::cacheKey() const
+std::string BasicEvent::cacheKey() const
 {
     return {};
 }

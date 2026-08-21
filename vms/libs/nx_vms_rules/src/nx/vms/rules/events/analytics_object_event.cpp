@@ -46,9 +46,9 @@ QString AnalyticsObjectEvent::sequenceKey() const
     return utils::makeKey(m_deviceId.toSimpleString(), m_objectTrackId.toSimpleString());
 }
 
-QString AnalyticsObjectEvent::cacheKey() const
+std::string AnalyticsObjectEvent::cacheKey() const
 {
-    return state() == State::started ? m_objectTrackId.toSimpleString() : QString();
+    return state() == State::started ? m_objectTrackId.toSimpleStdString() : std::string();
 }
 
 nx::analytics::taxonomy::ObjectType* AnalyticsObjectEvent::objectTypeById(
