@@ -343,7 +343,7 @@ struct AccountChangedEvent
     std::string email;
 
     // Event type
-    AccountChangedEventType eventType;
+    AccountChangedEventType eventType = AccountChangedEventType::other;
 
     // If eventType == passwrodChanged contains the session which should remain active
     // If eventType == enabled2Fa contains session which should be marked as 2fa verified

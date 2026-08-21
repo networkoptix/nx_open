@@ -24,6 +24,13 @@ public:
     void setRequest(const RequestPath& requestPath, const std::string& request = "*");
     void setRequestPattern(const RequestPathRegex& requestPath, const Response& response);
 
+    // True if a test registered something for this path. In the dummy mode such a registration
+    // wins over the default empty response.
+    bool hasRegisteredResponse(const RequestPath& requestPath) const;
+
+    // Drops every registered request, response and call counter.
+    void clear();
+
     int getNumCalls(const RequestPath& requestPath);
 
 private:
@@ -183,8 +190,13 @@ void nx::cloud::oauth2::client::test::Oauth2ClientMock::processRequest(
     {
         if (!m_manager.m_requests.contains(requestPath))
         {
+            // Reporting an error rather than dropping the handler: a caller that bridges this
+            // call to a synchronous one would otherwise block its thread forever.
             NX_ASSERT(false, "Unexpected request path: %1", requestPath);
-            return;
+            return processRequest<Response>(
+                requestPath,
+                std::move(handler),
+                Oauth2MockResult{db::api::ResultCode::notFound, "{}"});
         }
         const std::string& registeredRequestStr = m_manager.m_requests[requestPath];
         if (registeredRequestStr != "*" && registeredRequestStr != requestStr)

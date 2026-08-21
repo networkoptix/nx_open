@@ -29,6 +29,9 @@ struct ResultCodeDescriptor
         if (systemErrorCode != SystemError::noError)
             return api::ResultCode::networkError;
 
+        if (!response)
+            return api::ResultCode::unknownError;
+
         const auto resultCodeStrIter =
             response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
         if (resultCodeStrIter != response->headers.end())

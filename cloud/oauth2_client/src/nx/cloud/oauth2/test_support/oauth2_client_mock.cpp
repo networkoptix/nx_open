@@ -2,6 +2,7 @@
 
 #include "oauth2_client_mock.h"
 
+#include <algorithm>
 #include <utility>
 
 #include <nx/network/http/rest/http_rest_client.h>
@@ -50,11 +51,14 @@ void Oauth2ClientMock::issuePasswordResetCode(
     nx::MoveOnlyFunc<void(db::api::ResultCode, db::api::IssueCodeResponse)>
         completionHandler)
 {
-    if (m_dummyMode)
-        return completionHandler(db::api::ResultCode::ok, IssueCodeResponse{});
-
     Oauth2ClientMockManager::RequestPath path = {
         api::kOauthPasswordResetCodePath, nx::network::http::Method::post};
+
+    // Unlike the other calls, a registered response wins over the dummy default: the invite and
+    // password reset flows need a real token, an empty one is not usable as an activation code.
+    if (m_dummyMode && !m_manager.hasRegisteredResponse(path))
+        return completionHandler(db::api::ResultCode::ok, IssueCodeResponse{});
+
     processRequest<IssuePasswordResetCodeRequest, IssueCodeResponse>(
         path, request, std::move(completionHandler));
 }
@@ -249,6 +253,30 @@ void Oauth2ClientMockManager::setRequestPattern(
     const Response& response)
 {
     m_requestPatterns.emplace_back(std::make_pair(requestPath, response));
+}
+
+bool Oauth2ClientMockManager::hasRegisteredResponse(const RequestPath& requestPath) const
+{
+    if (m_requests.contains(requestPath))
+        return true;
+
+    return std::any_of(
+        m_requestPatterns.cbegin(),
+        m_requestPatterns.cend(),
+        [&requestPath](const auto& patternAndResponse)
+        {
+            const auto& pattern = patternAndResponse.first;
+            return pattern.second == requestPath.second
+                && std::regex_match(requestPath.first, pattern.first);
+        });
+}
+
+void Oauth2ClientMockManager::clear()
+{
+    m_requestPatterns.clear();
+    m_responses.clear();
+    m_requests.clear();
+    m_requestsCounter.clear();
 }
 
 int Oauth2ClientMockManager::getNumCalls(const RequestPath& requestPath)
