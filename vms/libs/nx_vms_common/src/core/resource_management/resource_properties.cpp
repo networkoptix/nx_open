@@ -117,11 +117,12 @@ std::optional<QString> QnResourcePropertyDictionary::setValueUnsafe(
     {
         modifiedProperties[key] = value;
     }
-    else
+    else if (const auto modifiedIt = modifiedProperties.find(key);
+        modifiedIt != modifiedProperties.end() && modifiedIt->second == value)
     {
-        // If parameter marked as modified, removing mark,
-        // i.e. parameter value has been reset to already saved value.
-        modifiedProperties.erase(key);
+        // Removing the mark, i.e. the parameter value has been reset to the already saved one.
+        // A mark with a different value is a newer unsaved change; dropping it would lose it.
+        modifiedProperties.erase(modifiedIt);
     }
 
     return prevValue;
