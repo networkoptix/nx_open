@@ -2008,23 +2008,23 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Cannot clear WebEngine cache</source>
-      <translation type="unfinished">Cannot clear WebEngine cache</translation>
+      <translation>Không thể xóa bộ nhớ cache của WebEngine</translation>
     </message>
     <message>
       <source>Please close all web pages and try again.</source>
-      <translation type="unfinished">Please close all web pages and try again.</translation>
+      <translation>Vui lòng đóng tất cả các trang và thử lại.</translation>
     </message>
     <message>
       <source>The files may be locked by another process.</source>
-      <translation type="unfinished">The files may be locked by another process.</translation>
+      <translation>Các tệp có thể bị khóa bởi một tiến trình khác.</translation>
     </message>
     <message>
       <source>WebEngine cache partially cleared</source>
-      <translation type="unfinished">WebEngine cache partially cleared</translation>
+      <translation>Bộ nhớ đệm của WebEngine đã được xóa một phần</translation>
     </message>
     <message>
       <source>Some files may be locked by another process.</source>
-      <translation type="unfinished">Some files may be locked by another process.</translation>
+      <translation>Một số tập tin có thể bị khóa bởi một tiến trình khác.</translation>
     </message>
   </context>
   <context>
@@ -6142,7 +6142,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>LDAP Users</source>
-      <translation type="unfinished">LDAP Users</translation>
+      <translation>Người dùng LDAP</translation>
     </message>
   </context>
   <context>

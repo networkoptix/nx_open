@@ -19,7 +19,7 @@
       <comment>Numerus: %2 is substituted with the required license type</comment>
       <translation type="unfinished">
         <numerusform>سيتم استخدام %2 %n من %1.</numerusform>
-        <numerusform>سيتم استخدام %2 %n من %1.</numerusform>
+        <numerusform/>
         <numerusform>.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
         <numerusform>%n %2 will be used out of %1.</numerusform>
