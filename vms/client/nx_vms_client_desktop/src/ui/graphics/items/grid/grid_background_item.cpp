@@ -11,18 +11,20 @@
 #include <nx/media/yuvconvert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/math.h>
+#include <nx/vms/client/core/cross_system/cloud_image_cache.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
-#include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <nx/vms/client/desktop/file_cache/local_image_cache.h>
 #include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
+#include <nx/vms/client/desktop/settings/local_settings.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -31,6 +33,7 @@
 #include <utils/common/delayed.h>
 
 using namespace nx::vms::client::desktop;
+using nx::vms::client::core::FileCache;
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::LayoutResourcePtr;
 
@@ -38,9 +41,9 @@ namespace {
 
 enum class ImageStatus
 {
-    None,
-    Loading,
-    Loaded
+    NotRequested, //< No lookup was made for the current file name.
+    Requested, //< The cache lookup is in progress.
+    Finished, //< The attempt is over, with or without an image.
 };
 
 enum class BackgroundType
@@ -48,6 +51,13 @@ enum class BackgroundType
     Default,
     Image,
     Special
+};
+
+enum class BackgroundCacheType
+{
+    local,
+    server,
+    cloud,
 };
 
 BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
@@ -64,6 +74,17 @@ BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
     return BackgroundType::Image;
 }
 
+BackgroundCacheType backgroundCacheType(const LayoutResourcePtr& layout)
+{
+    if (layout->hasFlags(Qn::cross_system))
+        return BackgroundCacheType::cloud;
+
+    if (layout->isFile())
+        return BackgroundCacheType::local;
+
+    return BackgroundCacheType::server;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 static const QSize kDefaultImageSize = QSize(1, 1);
@@ -73,7 +94,7 @@ struct BackgroundImageData
     QSize size = kDefaultImageSize;
     qreal opacity = 1;
     Qn::ImageBehavior mode = Qn::ImageBehavior::Stretch;
-    bool isLocal = true;
+    BackgroundCacheType cacheType = BackgroundCacheType::local;
 
     BackgroundImageData() = default;
 
@@ -82,10 +103,10 @@ struct BackgroundImageData
         const QSize& size,
         qreal opacity,
         Qn::ImageBehavior mode,
-        bool isLocal);
+        BackgroundCacheType cacheType);
 
     static BackgroundImageData getForDefaultType();
-    static BackgroundImageData getForImageType(const QnLayoutResourcePtr& layout);
+    static BackgroundImageData getForImageType(const LayoutResourcePtr& layout);
 
     bool imageIsVisible(bool connected) const;
 
@@ -100,19 +121,20 @@ BackgroundImageData::BackgroundImageData(
     const QSize& size,
     qreal opacity,
     Qn::ImageBehavior mode,
-    bool isLocal)
+    BackgroundCacheType cacheType)
     :
     fileName(fileName),
     size(size),
     opacity(opacity),
     mode(mode),
-    isLocal(isLocal)
+    cacheType(cacheType)
 {
 }
 
 bool BackgroundImageData::imageIsVisible(bool connected) const
 {
-    return (isLocal || connected)
+    // Only server-stored images require a server connection to be displayed.
+    return (cacheType != BackgroundCacheType::server || connected)
         && !fileName.isEmpty()
         && !qFuzzyIsNull(opacity);
 }
@@ -125,10 +147,10 @@ BackgroundImageData BackgroundImageData::getForDefaultType()
         kDefaultImageSize,
         background.opacity,
         background.mode,
-        true); //< Image is always local for default background image.
+        BackgroundCacheType::local); //< Image is always local for default background image.
 }
 
-BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourcePtr& layout)
+BackgroundImageData BackgroundImageData::getForImageType(const LayoutResourcePtr& layout)
 {
     const BackgroundImage background = appContext()->localSettings()->backgroundImage();
     return BackgroundImageData(
@@ -136,7 +158,7 @@ BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourceP
         layout->backgroundSize(),
         qBound<qreal>(0, layout->backgroundOpacity(), 1),
         background.mode,
-        layout->isFile()); //< Image is local if layout is exported.
+        backgroundCacheType(layout));
 }
 
 bool BackgroundImageData::operator==(const BackgroundImageData& other) const
@@ -144,7 +166,7 @@ bool BackgroundImageData::operator==(const BackgroundImageData& other) const
     return (fileName == other.fileName)
         && (size == other.size)
         && (mode == other.mode)
-        && (isLocal == other.isLocal)
+        && (cacheType == other.cacheType)
         && qFuzzyEquals(opacity, other.opacity);
 }
 
@@ -163,8 +185,7 @@ public:
 
     qreal imageAspectRatio = 1.0;
     BackgroundImageData imageData;
-    ImageStatus imageStatus = ImageStatus::None;
-
+    ImageStatus imageStatus = ImageStatus::NotRequested;
 
     QRectF rect;
     QRect sceneBoundingRect;
@@ -204,6 +225,29 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsScene* scene, QnWorkbenchCon
             const QString& /*absolutePath*/)
         {
             at_imageLoaded(filename, status == FileCache::OperationResult::ok);
+        });
+
+    // Cross-system layout backgrounds are downloaded into the cloud image cache, a failed local
+    // lookup is retried when the download completes.
+    connect(appContext()->cloudLayoutsManager()->imageCache(),
+        &nx::vms::client::core::CloudImageCache::fileDownloaded,
+        this,
+        [this](
+            const QString& filename,
+            FileCache::OperationResult status,
+            const QString& /*absolutePath*/)
+        {
+            Q_D(QnGridBackgroundItem);
+            if (filename != d->imageData.fileName
+                || d->imageData.cacheType != BackgroundCacheType::cloud
+                || status != FileCache::OperationResult::ok)
+            {
+                return;
+            }
+
+            // Re-arm the lookup: updateDisplay() starts one only from the NotRequested status.
+            d->imageStatus = ImageStatus::NotRequested;
+            updateDisplay();
         });
 
     connect(context,
@@ -253,7 +297,7 @@ void QnGridBackgroundItem::updateDefaultBackground()
     if (d->imageData.fileName != backgroundImagePath)
     {
         d->imageData.fileName = backgroundImagePath;
-        d->imageStatus = ImageStatus::None;
+        d->imageStatus = ImageStatus::NotRequested;
         if (d->nativePaintBackground)
             m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
         else
@@ -303,10 +347,10 @@ void QnGridBackgroundItem::updateDisplay()
         updateGeometry();
     }
 
-    if (d->imageStatus != ImageStatus::None)
+    if (d->imageStatus != ImageStatus::NotRequested)
         return;
 
-    d->imageStatus = ImageStatus::Loading;
+    d->imageStatus = ImageStatus::Requested;
     requestImageLoad(d->imageData.fileName);
 }
 
@@ -396,7 +440,7 @@ void QnGridBackgroundItem::update(const LayoutResourcePtr& layout)
 
     d->backgroundType = type;
     d->imageData = data;
-    d->imageStatus = ImageStatus::None;
+    d->imageStatus = ImageStatus::NotRequested;
 
     if (d->nativePaintBackground)
         m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
@@ -444,10 +488,10 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
 {
     Q_D(QnGridBackgroundItem);
 
-    if (filename != d->imageData.fileName || d->imageStatus != ImageStatus::Loading)
+    if (filename != d->imageData.fileName || d->imageStatus != ImageStatus::Requested)
         return;
 
-    d->imageStatus = ImageStatus::Loaded;
+    d->imageStatus = ImageStatus::Finished;
     if (!ok)
         return;
 
@@ -476,7 +520,7 @@ void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
             {
                 Q_D(QnGridBackgroundItem);
                 if (filename == d->imageData.fileName)
-                    d->imageStatus = ImageStatus::None;
+                    d->imageStatus = ImageStatus::NotRequested;
                 return;
             }
             setImage(image, filename);
@@ -489,9 +533,17 @@ FileCache* QnGridBackgroundItem::cache()
 {
     Q_D(const QnGridBackgroundItem);
 
-    return d->imageData.isLocal
-        ? static_cast<FileCache*>(system()->localImageCache())
-        : static_cast<FileCache*>(system()->serverImageCache());
+    switch (d->imageData.cacheType)
+    {
+        case BackgroundCacheType::cloud:
+            return appContext()->cloudLayoutsManager()->imageCache();
+        case BackgroundCacheType::local:
+            return system()->localImageCache();
+        case BackgroundCacheType::server:
+            return system()->serverImageCache();
+    }
+
+    return nullptr;
 }
 
 void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename)
@@ -501,7 +553,7 @@ void QnGridBackgroundItem::setImage(const QImage& image, const QString& filename
     if (!filename.isEmpty() && filename != d->imageData.fileName)
         return; // race condition
 
-    if (d->imageStatus != ImageStatus::Loaded)    // image name was changed during load
+    if (d->imageStatus != ImageStatus::Finished) //< The image name was changed during the load.
         return;
 
     if (!d->imagesMemCache.contains(d->imageData.fileName))

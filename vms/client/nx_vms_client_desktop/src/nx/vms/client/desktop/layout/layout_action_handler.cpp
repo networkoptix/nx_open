@@ -35,6 +35,7 @@
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameter_types.h>
@@ -407,7 +408,7 @@ void LayoutActionHandler::saveLayout(const core::LayoutResourcePtr& layout)
     // cameras on a local layout using api.
     if (!layout->isCrossSystem() && hasCrossSystemItems(layout))
     {
-        appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+        convertLayoutToCloud(layout);
         return;
     }
 
@@ -626,15 +627,19 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
                 removeLayouts(existing);
             }
 
-            // Convert common layout to cloud one.
+            // Convert common layout to cloud one. The layout is saved when its background image
+            // is transferred into the cloud cache, so it can be uploaded along with the layout.
             core::LayoutResource::ItemsRemapHash itemsRemapHash;
-            auto cloudLayout =
-                appContext()->cloudLayoutsManager()->convertLocalLayout(layout, &itemsRemapHash);
+            auto cloudLayout = convertLayoutToCloud(layout, &itemsRemapHash,
+                nx::utils::guarded(this,
+                    [this](const core::LayoutResourcePtr& cloudLayout)
+                    {
+                        saveLayout(cloudLayout);
+                    }));
             cloudLayout->setName(name);
 
             cloneRadassModes(system()->radassResourceManager(), layout, cloudLayout, itemsRemapHash);
 
-            saveLayout(cloudLayout);
             workbench()->replaceLayout(layout, cloudLayout);
         });
 

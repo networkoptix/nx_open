@@ -7,15 +7,14 @@
 #include <QtCore/QHash>
 
 #include <api/server_rest_connection_fwd.h>
+#include <nx/vms/client/core/file_cache/file_cache.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <utils/common/delayed.h>
-
-#include "file_cache.h"
 
 namespace nx::vms::client::desktop {
 
 class ServerFileCache:
-    public FileCache,
+    public core::FileCache,
     public SystemContextAware
 {
     Q_OBJECT

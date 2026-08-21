@@ -3,12 +3,10 @@
 #include "local_image_cache.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QSaveFile>
 #include <QtCore/QStandardPaths>
 
 #include <common/common_globals.h>
-#include <nx/utils/log/log.h>
-#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/core/utils/filename_utils.h>
 
 namespace nx::vms::client::desktop {
 
@@ -44,7 +42,7 @@ QString LocalImageCache::absoluteFilePath(const QString& unsafeFilename) const
         return unsafeFilename;
     }
 
-    const QString safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const QString safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
         return {};
 
@@ -54,22 +52,6 @@ QString LocalImageCache::absoluteFilePath(const QString& unsafeFilename) const
 void LocalImageCache::clear()
 {
     // Nothing to reset.
-}
-
-FileCache::OperationResult LocalImageCache::storeImageData(
-    const QString& unsafeFilename, const QByteArray& imageData)
-{
-    if (imageData.isEmpty())
-    {
-        NX_WARNING(this, "Rejecting cache write with empty image data: %1", unsafeFilename);
-        return OperationResult::invalidOperation;
-    }
-
-    return writeImageFile(unsafeFilename,
-        [&imageData](QSaveFile& file)
-        {
-            return file.write(imageData) == imageData.size();
-        });
 }
 
 } // namespace nx::vms::client::desktop

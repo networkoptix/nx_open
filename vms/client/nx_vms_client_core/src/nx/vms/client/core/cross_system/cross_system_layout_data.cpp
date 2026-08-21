@@ -32,6 +32,9 @@ void fromDataToResource(
     }
 
     resource->setItems(dstItems);
+    resource->setBackgroundImageFilename(data.backgroundImageFilename);
+    resource->setBackgroundSize({data.backgroundWidth, data.backgroundHeight});
+    resource->setBackgroundOpacity(data.backgroundOpacity);
     resource->setProperty(api::resource_properties::kCustomGroupIdPropertyKey, data.customGroupId);
 }
 
@@ -67,6 +70,11 @@ void fromResourceToData(
         data.items.push_back(itemData);
     }
 
+    data.backgroundImageFilename = resource->backgroundImageFilename();
+    const auto backgroundSize = resource->backgroundSize();
+    data.backgroundWidth = backgroundSize.isEmpty() ? 0 : backgroundSize.width();
+    data.backgroundHeight = backgroundSize.isEmpty() ? 0 : backgroundSize.height();
+    data.backgroundOpacity = static_cast<float>(resource->backgroundOpacity());
     data.customGroupId =
         resource->getProperty(api::resource_properties::kCustomGroupIdPropertyKey);
 }

@@ -9,8 +9,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/utils/filename_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <transcoding/file_transcoder.h>
 #include <ui/models/notification_sound_model.h>
 #include <utils/media/audio_player.h>
@@ -118,7 +118,7 @@ bool ServerNotificationCache::updateTitle(const QString& unsafeFilename, const Q
     if (!isConnectedToServer())
         return false;
 
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", unsafeFilename);
@@ -165,7 +165,7 @@ void ServerNotificationCache::at_fileAddedEvent(const QString& storedFilePath)
         return;
 
     const auto unsafeLocalFilename = getUnsafeLocalFilename(storedFilePath);
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeLocalFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeLocalFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", storedFilePath);
@@ -189,7 +189,7 @@ void ServerNotificationCache::at_fileUpdatedEvent(const QString& storedFilePath)
         return;
 
     const auto unsafeLocalFilename = getUnsafeLocalFilename(storedFilePath);
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeLocalFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeLocalFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", storedFilePath);
@@ -224,7 +224,7 @@ void ServerNotificationCache::at_fileRemovedEvent(const QString& storedFilePath)
         return;
 
     const auto unsafeLocalFilename = getUnsafeLocalFilename(storedFilePath);
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeLocalFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeLocalFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", storedFilePath);

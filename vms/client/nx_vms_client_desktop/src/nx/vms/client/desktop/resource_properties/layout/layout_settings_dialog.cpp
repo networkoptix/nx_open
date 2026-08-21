@@ -7,8 +7,8 @@
 
 #include <core/resource/layout_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/system_context.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 
 #include "flux/layout_settings_dialog_state.h"
@@ -39,15 +39,12 @@ struct LayoutSettingsDialog::Private
         layout->setFixedSize(state.fixedSizeEnabled ? state.fixedSize : QSize());
 
         const auto& background = state.background;
-        if (background.supported)
+        layout->setBackgroundImageFilename(background.filename);
+        // Do not save size change if no image was set.
+        if (!background.filename.isEmpty())
         {
-            layout->setBackgroundImageFilename(background.filename);
-            // Do not save size change if no image was set.
-            if (!background.filename.isEmpty())
-            {
-                layout->setBackgroundSize({background.width.value, background.height.value});
-                layout->setBackgroundOpacity(0.01 * background.opacityPercent);
-            }
+            layout->setBackgroundSize({background.width.value, background.height.value});
+            layout->setBackgroundOpacity(0.01 * background.opacityPercent);
         }
     }
 };
@@ -94,7 +91,7 @@ void LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
             d->store.data(),
             layout,
             this);
-        d->backgroundTab->initCache(SystemContext::fromResource(layout), layout->isFile());
+        d->backgroundTab->initCache(file_cache::backgroundImageCache(layout));
 
         d->store->loadLayout(layout);
     }
@@ -103,12 +100,6 @@ void LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 void LayoutSettingsDialog::accept()
 {
     const auto& background = d->store->state().background;
-    if (!background.supported)
-    {
-        d->applyChanges();
-        base_type::accept();
-        return;
-    }
 
     switch (background.status)
     {
@@ -146,8 +137,7 @@ void LayoutSettingsDialog::accept()
 
 void LayoutSettingsDialog::loadState(const LayoutSettingsDialogState& state)
 {
-    setPageVisible((int) Tab::background, state.background.supported);
-    const bool isLoading = state.background.supported && state.background.loadingInProgress();
+    const bool isLoading = state.background.loadingInProgress();
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isLoading);
 }
 

@@ -15,14 +15,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/image_providers/threaded_image_loader.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
-#include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
-#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
-#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/image_preview_dialog.h>
 #include <ui/widgets/common/framed_label.h>
@@ -32,6 +30,8 @@
 #include "../flux/layout_settings_dialog_state.h"
 #include "../flux/layout_settings_dialog_state_reducer.h"
 #include "../flux/layout_settings_dialog_store.h"
+
+using nx::vms::client::core::FileCache;
 
 namespace nx::vms::client::desktop {
 
@@ -214,17 +214,15 @@ void LayoutBackgroundSettingsWidget::setupUi()
     ui->imageLabel->setAutoScale(true);
 }
 
-void LayoutBackgroundSettingsWidget::initCache(SystemContext* systemContext, bool isLocalFile)
+void LayoutBackgroundSettingsWidget::initCache(FileCache* cache)
 {
     if (d->cache)
         d->cache->disconnect(this);
     d->importer.reset();
 
-    d->cache = isLocalFile
-        ? static_cast<FileCache*>(systemContext->localImageCache())
-        : static_cast<FileCache*>(systemContext->serverImageCache());
+    d->cache = cache;
 
-    // Cross-site and CSL contexts have no file caches.
+    // Some contexts (e.g. cross-site) have no file caches.
     if (!d->cache)
         return;
 

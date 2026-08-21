@@ -81,6 +81,9 @@
 #include <nx/vms/client/desktop/common/dialogs/progress_dialog.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
+#include <nx/vms/client/desktop/file_cache/image_importer.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
 #include <nx/vms/client/desktop/help/help_handler.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -119,9 +122,6 @@
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>
 #include <nx/vms/client/desktop/ui/messages/videowall_messages.h>
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
-#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
-#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
-#include <nx/vms/client/desktop/file_cache/image_importer.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -971,7 +971,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
         }
 
         // Convert common layout to cloud one.
-        auto cloudLayout = appContext()->cloudLayoutsManager()->convertLocalLayout(layout);
+        auto cloudLayout = convertLayoutToCloud(layout);
         // Replace opened layout with the cloud one.
         auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
         if (!targetLayout)
@@ -2962,7 +2962,9 @@ void ActionHandler::at_createZoomWindowAction_triggered() {
         addParams);
 }
 
-void ActionHandler::at_setAsBackgroundAction_triggered() {
+void ActionHandler::at_setAsBackgroundAction_triggered()
+{
+    using nx::vms::client::core::FileCache;
 
     auto checkCondition =
         [this]()

@@ -11,6 +11,7 @@
 
 namespace nx::vms::client::core {
 
+class CloudImageCache;
 class SystemContext;
 
 /**
@@ -36,6 +37,9 @@ public:
 
     /** Update cloud layout resources by fetching the latest data. */
     void updateLayouts();
+
+    /** Cache for the cloud layout background images. */
+    CloudImageCache* imageCache() const;
 
     SystemContext* systemContext() const;
 

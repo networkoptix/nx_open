@@ -255,16 +255,12 @@ State LayoutSettingsDialogStateReducer::loadLayout(State state, const QnLayoutRe
     }
 
     resetBackgroundParameters(state);
-    state.background.supported = !state.isCrossSystem;
-    if (state.background.supported)
-    {
-        state.background.filename = layout->backgroundImageFilename();
-        state.background.width.setValue(layout->backgroundSize().width());
-        state.background.height.setValue(layout->backgroundSize().height());
-        state.background.opacityPercent = boundOpacityPercent(
-            int(layout->backgroundOpacity() * 100));
-        updateBackgroundLimits(state);
-    }
+    state.background.filename = layout->backgroundImageFilename();
+    state.background.width.setValue(layout->backgroundSize().width());
+    state.background.height.setValue(layout->backgroundSize().height());
+    state.background.opacityPercent = boundOpacityPercent(
+        int(layout->backgroundOpacity() * 100));
+    updateBackgroundLimits(state);
 
     return state;
 }
@@ -330,9 +326,6 @@ State LayoutSettingsDialogStateReducer::setFixedSizeHeight(State state, int valu
 State LayoutSettingsDialogStateReducer::setBackgroundImageError(State state,
     const QString& errorText)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setBackgroundImageError");
     state.background.status = BackgroundImageStatus::error;
     state.background.errorText = errorText;
@@ -341,9 +334,6 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageError(State state,
 
 State LayoutSettingsDialogStateReducer::clearBackgroundImage(State state)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "clearBackgroundImage");
     resetBackgroundParameters(state);
     return state;
@@ -351,9 +341,6 @@ State LayoutSettingsDialogStateReducer::clearBackgroundImage(State state)
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageOpacityPercent(State state, int value)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setBackgroundImageOpacityPercent");
     state.background.opacityPercent = boundOpacityPercent(value);
     return state;
@@ -361,9 +348,6 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageOpacityPercent(State s
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageWidth(State state, int value)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setBackgroundImageWidth");
     state.background.width.setValue(value);
     if (state.background.keepImageAspectRatio)
@@ -380,9 +364,6 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageWidth(State state, int
 
 State LayoutSettingsDialogStateReducer::setBackgroundImageHeight(State state, int value)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setBackgroundImageHeight");
     state.background.height.setValue(value);
     if (state.background.keepImageAspectRatio)
@@ -399,9 +380,6 @@ State LayoutSettingsDialogStateReducer::setBackgroundImageHeight(State state, in
 
 State LayoutSettingsDialogStateReducer::setCropToMonitorAspectRatio(State state, bool value)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setCropToMonitorAspectRatio");
     state.background.cropToMonitorAspectRatio = value;
     updateBackgroundLimits(state);
@@ -412,9 +390,6 @@ State LayoutSettingsDialogStateReducer::setCropToMonitorAspectRatio(State state,
 
 State LayoutSettingsDialogStateReducer::setKeepImageAspectRatio(State state, bool value)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setKeepImageAspectRatio");
     state.background.keepImageAspectRatio = value;
     updateBackgroundLimits(state);
@@ -425,9 +400,6 @@ State LayoutSettingsDialogStateReducer::setKeepImageAspectRatio(State state, boo
 
 State LayoutSettingsDialogStateReducer::startDownloading(State state, const QString& targetPath)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "startDownloading");
     NX_ASSERT(state.background.canStartDownloading());
     state.background.imageSourcePath = targetPath;
@@ -437,9 +409,6 @@ State LayoutSettingsDialogStateReducer::startDownloading(State state, const QStr
 
 State LayoutSettingsDialogStateReducer::imageDownloaded(State state)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "imageDownloaded");
     NX_ASSERT(state.background.status == BackgroundImageStatus::downloading);
     state.background.status = BackgroundImageStatus::loading;
@@ -448,9 +417,6 @@ State LayoutSettingsDialogStateReducer::imageDownloaded(State state)
 
 State LayoutSettingsDialogStateReducer::imageSelected(State state, const QString& filename)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "imageSelected");
     state.background.status = BackgroundImageStatus::newImageLoading;
     state.background.imageSourcePath = filename;
@@ -463,9 +429,6 @@ State LayoutSettingsDialogStateReducer::imageSelected(State state, const QString
 
 State LayoutSettingsDialogStateReducer::startUploading(State state)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "startUploading");
     // We can re-upload existing image if it was cropped.
     NX_ASSERT(state.background.status == BackgroundImageStatus::loaded
@@ -476,9 +439,6 @@ State LayoutSettingsDialogStateReducer::startUploading(State state)
 
 State LayoutSettingsDialogStateReducer::imageUploaded(State state, const QString& filename)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "imageUploaded");
     state.background.filename = filename;
     state.background.status = BackgroundImageStatus::newImageLoaded;
@@ -487,9 +447,6 @@ State LayoutSettingsDialogStateReducer::imageUploaded(State state, const QString
 
 State LayoutSettingsDialogStateReducer::setPreview(State state, const QImage& image)
 {
-    if (!NX_ASSERT(state.background.supported))
-        return state;
-
     trace(state, "setPreview");
     if (state.background.status == BackgroundImageStatus::loading)
         state.background.status = BackgroundImageStatus::loaded;

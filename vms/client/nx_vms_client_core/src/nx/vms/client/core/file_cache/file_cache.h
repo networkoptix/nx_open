@@ -4,21 +4,24 @@
 
 #include <functional>
 
+#include <QtCore/QByteArray>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
 class QImage;
 class QSaveFile;
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
+
+class ThreadPool;
 
 /**
  * Abstract interface for a keyed file cache: a directory of bytes-by-name. Provides a uniform
  * lookup surface so callers can resolve paths through a `FileCache*` pointer without knowing
- * the underlying storage. Local-write helpers (`storeImage`, `writeImageFile`) accept image
- * filenames only.
+ * the underlying storage. Local-write helpers (`storeImage`, `storeImageData`, `writeImageFile`)
+ * accept image filenames only.
  */
-class FileCache: public QObject
+class NX_VMS_CLIENT_CORE_API FileCache: public QObject
 {
     Q_OBJECT
 
@@ -35,6 +38,12 @@ public:
 
     explicit FileCache(QObject* parent = nullptr);
     virtual ~FileCache() override;
+
+    /** True if the filename's extension is allowed for image files. */
+    static bool hasAllowedImageExtension(const QString& filename);
+
+    /** Thread pool shared by the file operations of all the caches. */
+    static ThreadPool* ioThreadPool();
 
     /**
      * Absolute path to `unsafeFilename` inside the cache. Returns an empty string when
@@ -54,6 +63,11 @@ public:
      */
     OperationResult storeImage(const QString& unsafeFilename, const QImage& image);
 
+    /**
+     * Atomically write raw `imageData` into the cache under `unsafeFilename` after its validation.
+     */
+    OperationResult storeImageData(const QString& unsafeFilename, const QByteArray& imageData);
+
 protected:
     /** Absolute path to the directory where this cache stores its files. */
     virtual QString cacheFolder() const = 0;
@@ -68,4 +82,4 @@ protected:
         const std::function<bool(QSaveFile&)>& writer);
 };
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

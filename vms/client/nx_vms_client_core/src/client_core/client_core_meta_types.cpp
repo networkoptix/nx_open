@@ -49,6 +49,7 @@
 #include <nx/vms/client/core/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
+#include <nx/vms/client/core/file_cache/file_cache.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 #include <nx/vms/client/core/items/grid_viewport.h>
 #include <nx/vms/client/core/media/abstract_time_period_storage.h>
@@ -119,6 +120,7 @@ void initializeMetatypesInternal()
     qRegisterMetaType<nx::media::PlayerStatistics>();
     qRegisterMetaType<ActivationType>();
     qRegisterMetaType<MotionSelection>();
+    qRegisterMetaType<FileCache::OperationResult>();
 }
 
 void initializeMetaTypes()

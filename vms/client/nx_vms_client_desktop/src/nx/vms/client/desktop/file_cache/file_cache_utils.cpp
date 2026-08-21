@@ -2,63 +2,109 @@
 
 #include "file_cache_utils.h"
 
+#include <QtCore/QBuffer>
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtCore/QSet>
+#include <QtCore/QSaveFile>
 #include <QtCore/QStandardPaths>
+#include <QtGui/QImage>
 
+#include <common/common_globals.h>
+#include <core/resource/layout_resource.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/client/core/common/utils/thread_pool.h>
+#include <nx/vms/client/core/cross_system/cloud_image_cache.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
+#include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/file_cache/local_image_cache.h>
+#include <nx/vms/client/desktop/file_cache/server_file_cache.h>
+#include <nx/vms/client/desktop/system_context.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <utils/common/id.h>
+
+using nx::vms::client::core::FileCache;
 
 namespace nx::vms::client::desktop::file_cache {
 
 namespace {
 
-const QSet<QString> kAllowedImageExtensions{"png", "jpg", "jpeg"};
 const QString kDefaultImageExtension = "png";
+
+/** Cache file name identifying the image data, so edits to the image produce a new cache entry. */
+QString cachedImageFilename(const QByteArray& imageData, const QString& extension)
+{
+    return guidFromArbitraryData(imageData).toSimpleString() + '.' + extension;
+}
 
 } // namespace
 
-bool isFilenameSafe(const QString& unsafeFilename)
+void cachedImageFilenameAsync(
+    const QString& sourcePath,
+    std::function<void(const QString& filename)> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    return !sanitizeFilename(unsafeFilename).isEmpty();
+    FileCache::ioThreadPool()->start(
+        [sourcePath, handler = handlerExecutor.bind(std::move(handler))]() mutable
+        {
+            QString result;
+            QFile file(sourcePath);
+
+            if (file.open(QIODevice::ReadOnly))
+            {
+                result = cachedImageFilename(file.readAll(),
+                    FileCache::hasAllowedImageExtension(sourcePath)
+                        ? QFileInfo(sourcePath).suffix()
+                        : kDefaultImageExtension);
+            }
+
+            handler(result);
+        });
 }
 
-QString sanitizeFilename(const QString& unsafeFilename)
+void copyFileAsync(
+    const QString& sourcePath,
+    const QString& targetPath,
+    std::function<void(bool success)> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    // The last component of the path, which is expected to be the filename.
-    // It can be empty if the path ends with a separator or is empty itself.
-    QString filename = QFileInfo(unsafeFilename).fileName();
-
-    if (filename.isEmpty()
-        || filename == "."
-        || filename == ".."
-        || filename != unsafeFilename)
-    {
-        return {};
-    }
-
-    // Windows (NTFS) strips trailing whitespace and dots when resolving filenames, so `"foo "`
-    // and `"foo."` collide with `"foo"`. Reject such names to keep cache keys unique.
-    const QChar last = filename.back();
-    if (last == '.' || last.isSpace())
-        return {};
-
-    return filename;
+    FileCache::ioThreadPool()->start(
+        [sourcePath, targetPath, handler = handlerExecutor.bind(std::move(handler))]() mutable
+        {
+            QDir().mkpath(QFileInfo(targetPath).absolutePath());
+            handler(QFile::copy(sourcePath, targetPath));
+        });
 }
 
-QString cachedImageFilename(const QString& sourcePath)
+void storeImageAsync(
+    const QString& folder,
+    const QImage& image,
+    const QString& extension,
+    std::function<void(const QString& filename)> handler,
+    nx::utils::AsyncHandlerExecutor handlerExecutor)
 {
-    return guidFromArbitraryData(sourcePath.toUtf8()).toSimpleString() + '.'
-        + (hasAllowedImageExtension(sourcePath)
-            ? QFileInfo(sourcePath).suffix()
-            : kDefaultImageExtension);
-}
+    FileCache::ioThreadPool()->start(
+        [folder, image, extension, handler = handlerExecutor.bind(std::move(handler))]() mutable
+        {
+            QByteArray data;
+            QBuffer buffer(&data);
+            if (!buffer.open(QIODevice::WriteOnly) || !image.save(&buffer, extension.toUtf8()))
+            {
+                handler(QString());
+                return;
+            }
 
-bool hasAllowedImageExtension(const QString& filename)
-{
-    return kAllowedImageExtensions.contains(QFileInfo(filename).suffix());
+            const QString filename = cachedImageFilename(data, extension);
+
+            QDir().mkpath(folder);
+            QSaveFile file(folder + QDir::separator() + filename);
+            const bool success = file.open(QIODevice::WriteOnly)
+                && file.write(data) == data.size()
+                && file.commit();
+
+            handler(success ? filename : QString());
+        });
 }
 
 void clearLocalCache()
@@ -74,6 +120,20 @@ QSize maxBackgroundImageSize()
     // graphics backend.
     const int value = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
     return QSize(value, value);
+}
+
+FileCache* backgroundImageCache(const QnLayoutResourcePtr& layout)
+{
+    if (layout->hasFlags(Qn::cross_system))
+        return appContext()->cloudLayoutsManager()->imageCache();
+
+    auto systemContext = SystemContext::fromResource(layout);
+    if (!NX_ASSERT(systemContext))
+        systemContext = appContext()->currentSystemContext();
+
+    return layout->isFile()
+        ? static_cast<FileCache*>(systemContext->localImageCache())
+        : static_cast<FileCache*>(systemContext->serverImageCache());
 }
 
 } // namespace nx::vms::client::desktop::file_cache

@@ -14,9 +14,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/stored_file_data.h>
+#include <nx/vms/client/core/utils/filename_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_logon/logic/remote_session.h>
-#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::client::desktop {
@@ -26,7 +26,7 @@ ServerFileCache::ServerFileCache(
     const QString& folderName,
     QObject* parent)
     :
-    FileCache(parent),
+    core::FileCache(parent),
     SystemContextAware(systemContext),
     m_folderName(folderName)
 {
@@ -81,7 +81,7 @@ QString ServerFileCache::cacheFolder() const
 
 QString ServerFileCache::absoluteFilePath(const QString& unsafeFilename) const
 {
-    const QString safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const QString safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
         return {};
 
@@ -113,7 +113,7 @@ void ServerFileCache::downloadFile(const QString& unsafeFilename)
         return;
     }
 
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", unsafeFilename);
@@ -208,7 +208,7 @@ void ServerFileCache::uploadFile(const QString& unsafeFilename)
         return;
     }
 
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", unsafeFilename);
@@ -285,7 +285,7 @@ void ServerFileCache::deleteFile(const QString& unsafeFilename)
         return;
     }
 
-    const auto safeFilename = file_cache::sanitizeFilename(unsafeFilename);
+    const auto safeFilename = core::sanitizeFilename(unsafeFilename);
     if (safeFilename.isEmpty())
     {
         NX_WARNING(this, "Rejecting unsafe filename: %1", unsafeFilename);

@@ -3,13 +3,15 @@
 #include "file_cache.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QSaveFile>
+#include <QtCore/QSet>
 #include <QtGui/QImage>
 
 #include <nx/utils/log/log_main.h>
-#include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
+#include <nx/vms/client/core/common/utils/thread_pool.h>
 
-namespace nx::vms::client::desktop {
+namespace nx::vms::client::core {
 
 FileCache::FileCache(QObject* parent):
     QObject(parent)
@@ -17,6 +19,18 @@ FileCache::FileCache(QObject* parent):
 }
 
 FileCache::~FileCache() = default;
+
+bool FileCache::hasAllowedImageExtension(const QString& filename)
+{
+    static const QSet<QString> kAllowedImageExtensions{"png", "jpg", "jpeg"};
+    return kAllowedImageExtensions.contains(QFileInfo(filename).suffix());
+}
+
+ThreadPool* FileCache::ioThreadPool()
+{
+    static const QString kThreadPoolId = "FileCache_thread_pool";
+    return ThreadPool::instance(kThreadPoolId);
+}
 
 bool FileCache::ensureCacheFolder() const
 {
@@ -40,11 +54,27 @@ FileCache::OperationResult FileCache::storeImage(
         [&image](QSaveFile& file) { return image.save(&file); });
 }
 
+FileCache::OperationResult FileCache::storeImageData(
+    const QString& unsafeFilename, const QByteArray& imageData)
+{
+    if (imageData.isEmpty())
+    {
+        NX_WARNING(this, "Rejecting cache write with empty image data: %1", unsafeFilename);
+        return OperationResult::invalidOperation;
+    }
+
+    return writeImageFile(unsafeFilename,
+        [&imageData](QSaveFile& file)
+        {
+            return file.write(imageData) == imageData.size();
+        });
+}
+
 FileCache::OperationResult FileCache::writeImageFile(
     const QString& unsafeFilename,
     const std::function<bool(QSaveFile&)>& writer)
 {
-    if (!file_cache::hasAllowedImageExtension(unsafeFilename))
+    if (!hasAllowedImageExtension(unsafeFilename))
     {
         NX_WARNING(this, "Rejecting cache write with non-image extension: %1", unsafeFilename);
         return OperationResult::invalidOperation;
@@ -84,4 +114,4 @@ FileCache::OperationResult FileCache::writeImageFile(
     return OperationResult::ok;
 }
 
-} // namespace nx::vms::client::desktop
+} // namespace nx::vms::client::core

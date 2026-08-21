@@ -26,9 +26,19 @@ struct NX_VMS_CLIENT_CORE_API CrossSystemLayoutData
     qint32 fixedHeight = 0;
     std::vector<CrossSystemLayoutItemData> items;
     QString customGroupId;
+
+    /**
+     * Content-derived filename of the background image that serves both as the file name in the
+     * cloud image cache and as the file key in the cloud private files API.
+     */
+    QString backgroundImageFilename;
+    qint32 backgroundWidth = 0;
+    qint32 backgroundHeight = 0;
+    float backgroundOpacity = nx::vms::api::LayoutData::kDefaultBackgroundOpacity;
 };
 #define CrossSystemLayoutData_Fields (id)(name)(cellAspectRatio)(cellSpacing) \
-    (locked)(fixedWidth)(fixedHeight)(items)(customGroupId)
+    (locked)(fixedWidth)(fixedHeight)(items)(customGroupId) \
+    (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
 NX_REFLECTION_INSTRUMENT(CrossSystemLayoutData, CrossSystemLayoutData_Fields)
 
 NX_VMS_CLIENT_CORE_API void fromDataToResource(

@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "file_cache.h"
+#include <nx/vms/client/core/file_cache/file_cache.h>
 
 namespace nx::vms::client::desktop {
 
 /**
  * Image cache backed by the local filesystem only. All operations are synchronous.
  */
-class LocalImageCache: public FileCache
+class LocalImageCache: public core::FileCache
 {
     Q_OBJECT
-    using base_type = FileCache;
+    using base_type = core::FileCache;
 
 public:
     explicit LocalImageCache(QObject* parent = nullptr);
@@ -25,8 +25,6 @@ public:
     virtual QString absoluteFilePath(const QString& unsafeFilename) const override;
 
     virtual void clear() override;
-
-    OperationResult storeImageData(const QString& unsafeFilename, const QByteArray& imageData);
 
 protected:
     virtual QString cacheFolder() const override;
