@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
-      <translation type="unfinished">Invalid parameter `%1`</translation>
+      <translation>معامل غير صالح `%1`</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>

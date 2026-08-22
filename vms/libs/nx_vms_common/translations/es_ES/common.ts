@@ -1817,7 +1817,7 @@
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation type="unfinished">Default codec for export video.</translation>
+      <translation>Códec predeterminado para la exportación de vídeo.</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>
@@ -1829,7 +1829,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
-      <translation type="unfinished">URI for resource_data.json automatic update.</translation>
+      <translation>URI para la actualización automática de resource_data.json.</translation>
     </message>
     <message>
       <source>Meta data storage change policy.</source>
@@ -1837,27 +1837,27 @@
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
-      <translation type="unfinished">Persistent Servers for update storage.</translation>
+      <translation>Servidores persistentes para el almacenamiento de actualizaciones.</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored.</source>
-      <translation type="unfinished">Persistent Servers where updates are stored.</translation>
+      <translation>Servidores persistentes donde se almacenan las actualizaciones.</translation>
     </message>
     <message>
       <source>VMS Server version specific features.</source>
-      <translation type="unfinished">VMS Server version specific features.</translation>
+      <translation>Características específicas de la versión del servidor VMS.</translation>
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>Localización predeterminada para nuevos usuarios.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation type="unfinished">Additional local FS storage types for recording.</translation>
+      <translation>Tipos de almacenamiento FS locales adicionales para la grabación.</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
+      <translation>Mantenga el estado del puerto de E/S activado cuando el servidor se conecte al dispositivo.</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
@@ -1865,31 +1865,31 @@
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
+      <translation>Tamaño del búfer multimedia para dispositivos solo de audio (KB, 1KB-1MB).</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure.</translation>
+      <translation>Forzar los permisos del punto de montaje del almacenamiento de la base de datos analítica en caso de fallo.</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>Compruebe los permisos de transmisión de vídeo en el servidor VMS (en milisegundos).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation type="unfinished">Storage encryption enabled.</translation>
+      <translation>Cifrado de almacenamiento habilitado.</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>
-      <translation type="unfinished">Current storage encryption key.</translation>
+      <translation>Clave de cifrado de almacenamiento actual.</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins.</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins.</translation>
+      <translation>Mostrar servidores en el árbol de recursos para usuarios que no sean administradores.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>Encabezado HTTP: Servidor, variables admitidas: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
       <source>HTTP header: Origin.</source>
@@ -1897,11 +1897,11 @@
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options.</translation>
+      <translation>Encabezado HTTP: X-Frame-Options.</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras.</source>
-      <translation type="unfinished">Use only HTTPS for cameras.</translation>
+      <translation>Utilice únicamente HTTPS para las cámaras.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
@@ -1913,7 +1913,7 @@
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>Habilitar las autenticaciones HTTP Basic y Digest obsoletas (inseguras).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
