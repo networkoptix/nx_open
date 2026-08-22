@@ -549,7 +549,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>您目前處於即時瀏覽模式</translation>
     </message>
   </context>
   <context>
@@ -778,7 +778,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>選擇要分享的內容</translation>
     </message>
     <message>
       <source>Download</source>
@@ -786,7 +786,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>選擇要下載的內容</translation>
     </message>
   </context>
   <context>
@@ -1662,6 +1662,14 @@
     <message>
       <source>Motion</source>
       <translation>位移</translation>
+    </message>
+    <message>
+      <source>Calendar</source>
+      <translation type="unfinished">Calendar</translation>
+    </message>
+    <message>
+      <source>Actions</source>
+      <translation type="unfinished">Actions</translation>
     </message>
   </context>
   <context>

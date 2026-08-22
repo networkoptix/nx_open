@@ -381,7 +381,7 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Chia sẻ Dấu trang</translation>
     </message>
     <message>
       <source>URL</source>
@@ -404,7 +404,7 @@
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Chia sẻ Dấu trang</translation>
     </message>
     <message>
       <source>Lifetime</source>

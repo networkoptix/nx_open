@@ -1664,6 +1664,14 @@
       <source>Motion</source>
       <translation>Bevægelse</translation>
     </message>
+    <message>
+      <source>Calendar</source>
+      <translation type="unfinished">Calendar</translation>
+    </message>
+    <message>
+      <source>Actions</source>
+      <translation type="unfinished">Actions</translation>
+    </message>
   </context>
   <context>
     <name>main</name>

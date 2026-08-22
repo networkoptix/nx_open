@@ -727,7 +727,7 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Chạm vào bất kỳ đâu trên video để căn giữa khung hình tại vị trí đó</translation>
     </message>
   </context>
   <context>
@@ -745,7 +745,7 @@
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Chạm vào bất kỳ đâu trên video để căn giữa khung hình tại vị trí đó</translation>
     </message>
   </context>
   <context>
@@ -946,7 +946,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Chạm vào bất kỳ đâu trên video để căn giữa khung hình tại vị trí đó</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -1662,6 +1662,14 @@
     <message>
       <source>Motion</source>
       <translation>Vận động</translation>
+    </message>
+    <message>
+      <source>Calendar</source>
+      <translation type="unfinished">Calendar</translation>
+    </message>
+    <message>
+      <source>Actions</source>
+      <translation type="unfinished">Actions</translation>
     </message>
   </context>
   <context>
