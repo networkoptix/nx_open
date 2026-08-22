@@ -310,11 +310,11 @@
     </message>
     <message>
       <source>Undo</source>
-      <translation type="unfinished">Undo</translation>
+      <translation>تراجع</translation>
     </message>
     <message>
       <source>Redo</source>
-      <translation type="unfinished">Redo</translation>
+      <translation>إعادة</translation>
     </message>
     <message>
       <source>Select all</source>
