@@ -1666,11 +1666,11 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Kalender</translation>
     </message>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Åtgärder</translation>
     </message>
   </context>
   <context>

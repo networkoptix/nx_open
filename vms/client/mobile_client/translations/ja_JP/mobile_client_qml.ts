@@ -1669,7 +1669,7 @@
     </message>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>アクション</translation>
     </message>
   </context>
   <context>

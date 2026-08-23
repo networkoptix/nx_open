@@ -1672,7 +1672,7 @@
     </message>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Akcje</translation>
     </message>
   </context>
   <context>

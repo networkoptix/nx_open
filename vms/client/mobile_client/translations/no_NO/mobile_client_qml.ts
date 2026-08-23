@@ -1670,7 +1670,7 @@
     </message>
     <message>
       <source>Actions</source>
-      <translation type="unfinished">Actions</translation>
+      <translation>Handlinger</translation>
     </message>
   </context>
   <context>
