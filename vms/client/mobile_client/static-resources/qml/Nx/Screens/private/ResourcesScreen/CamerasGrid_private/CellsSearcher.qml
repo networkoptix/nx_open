@@ -14,21 +14,24 @@ NxObject
         const viewportCenter = Qt.point(flickableWidth / 2, contentY + flickableHeight / 2)
 
         let closestCellIndex = -1
-        let minDistance = Number.MAX_VALUE
+        let minVerticalDistance = Number.MAX_VALUE
+        let minHorizontalDistance = Number.MAX_VALUE
 
         for (let i = 0; i < sizesCalculator.cellsCount; ++i)
         {
             const cellGeometry = geometryCalculator.calculateCellGeometry(i)
 
-            const cellCenter = Qt.point(
-                cellGeometry.x + cellGeometry.width / 2,
-                cellGeometry.y + cellGeometry.height / 2)
+            const verticalDistance = Math.abs(
+                cellGeometry.y + cellGeometry.height / 2 - viewportCenter.y)
+            const horizontalDistance = Math.abs(
+                cellGeometry.x + cellGeometry.width / 2 - viewportCenter.x)
 
-            const distance = MathUtils.distance(viewportCenter, cellCenter)
-
-            if (distance < minDistance)
+            if (verticalDistance < minVerticalDistance
+                || (verticalDistance === minVerticalDistance
+                    && horizontalDistance < minHorizontalDistance))
             {
-                minDistance = distance
+                minVerticalDistance = verticalDistance
+                minHorizontalDistance = horizontalDistance
                 closestCellIndex = i
             }
         }

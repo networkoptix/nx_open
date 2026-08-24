@@ -98,30 +98,71 @@ Item
             if (sizesCalculator.availableWidth === width
                 && sizesCalculator.availableHeight === height)
             {
+                previousContentY = -1
                 return
             }
 
             if (previousContentY < 0)
             {
-                sizesCalculator.availableWidth = width
-                sizesCalculator.availableHeight = height
+                setSizesCalculatorAvailableGeometry()
                 return
             }
 
-            const centerIndex = cellsSearcher.findCellClosestToViewportCenter(
+            const wasAtTop = previousContentY <= 0
+            if (wasAtTop)
+            {
+                setSizesCalculatorAvailableGeometry()
+                contentY = 0
+                return
+            }
+
+            const wasAtBottom = previousContentY >= contentHeight - sizesCalculator.availableHeight
+            if (wasAtBottom)
+            {
+                setSizesCalculatorAvailableGeometry()
+                contentY = Math.max(0, contentHeight - height)
+                return
+            }
+
+            const centerCellIndex = cellsSearcher.findCellClosestToViewportCenter(
                 previousContentY, sizesCalculator.availableWidth, sizesCalculator.availableHeight)
 
+            if (centerCellIndex === -1) //< Empty layout.
+            {
+                setSizesCalculatorAvailableGeometry()
+                contentY = 0
+                return
+            }
+
+            const centerCellRelativePosition =
+                calculateRelativePositionStatic(centerCellIndex, previousContentY)
+
+            setSizesCalculatorAvailableGeometry()
+
+            contentY = contentYToCenterIndexStatic(centerCellIndex, centerCellRelativePosition)
+        }
+
+        function setSizesCalculatorAvailableGeometry()
+        {
             previousContentY = -1
             sizesCalculator.availableWidth = width
             sizesCalculator.availableHeight = height
+        }
 
-            if (centerIndex !== -1)
-                contentY = contentYToCenterIndexStatic(centerIndex)
+        // Relative position of the cell within the viewport.
+        function calculateRelativePositionStatic(cellIndex, contentYValue)
+        {
+            const cellGeometry = geometryCalculator.calculateCellGeometry(cellIndex)
+            const availableSpace = sizesCalculator.availableHeight - cellGeometry.height
+            if (availableSpace <= 0)
+                return d.kCenterAnchorRelativePosition
+
+            return MathUtils.bound(0, (cellGeometry.y - contentYValue) / availableSpace, 1)
         }
 
         // Required for contentY update during screen resize. Must use statically calculated
         // geometry of items.
-        function contentYToCenterIndexStatic(centerIndex)
+        function contentYToCenterIndexStatic(centerIndex, relativePosition)
         {
             if (sizesCalculator.cellsCount === 0)
                 return 0
@@ -133,8 +174,7 @@ Item
 
             // Calculate target contentY to preserve the cell's relative position in viewport.
             const targetContentY = cellGeometry.y
-                - (sizesCalculator.availableHeight - cellGeometry.height)
-                    * d.kCenterAnchorRelativePosition
+                - (sizesCalculator.availableHeight - cellGeometry.height) * relativePosition
 
             if (targetContentY < 0)
                 return 0
