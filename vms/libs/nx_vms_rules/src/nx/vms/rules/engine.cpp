@@ -126,6 +126,14 @@ Engine::Engine(
 
 Engine::~Engine()
 {
+    if (m_discardedEvents > 0 || m_discardedActions > 0)
+    {
+        NX_DEBUG(this,
+            "Discarded %1 events and %2 actions after processing was stopped",
+            m_discardedEvents,
+            m_discardedActions);
+    }
+
     NX_MUTEX_LOCKER lock(&m_ruleMutex);
     m_rules.clear();
     m_ruleCache.reset(m_rules);
@@ -325,6 +333,12 @@ std::optional<ItemDescriptor> Engine::eventDescriptor(const QString& eventId) co
     return {};
 }
 
+const ItemDescriptor* Engine::eventDescriptorPtr(const QString& eventId) const
+{
+    const auto it = m_eventDescriptors.find(eventId);
+    return it != m_eventDescriptors.end() ? &it.value() : nullptr;
+}
+
 Group Engine::eventGroups() const
 {
     QMap<std::string, QStringList> eventByGroup;
@@ -449,6 +463,12 @@ std::optional<ItemDescriptor> Engine::actionDescriptor(const QString& actionId) 
         return it.value();
 
     return {};
+}
+
+const ItemDescriptor* Engine::actionDescriptorPtr(const QString& actionId) const
+{
+    const auto it = m_actionDescriptors.find(actionId);
+    return it != m_actionDescriptors.end() ? &it.value() : nullptr;
 }
 
 bool Engine::registerEventField(const QString& type, const EventFieldConstructor& ctor)
@@ -842,6 +862,13 @@ std::unique_ptr<ActionBuilderField> Engine::buildActionField(
 size_t Engine::processEvent(const EventPtr& event)
 {
     checkOwnThread();
+
+    if (m_processingStopped)
+    {
+        ++m_discardedEvents;
+        return 0;
+    }
+
     NX_VERBOSE(this, "Processing Event: %1, state: %2", event->type(), event->state());
 
     std::vector<ConstRulePtr> triggeredRules;
@@ -914,13 +941,32 @@ size_t Engine::processAnalyticsEvents(const std::vector<EventPtr>& events)
     checkOwnThread();
 
     size_t matchedRules{};
-    for (const auto& event: events)
-        matchedRules += processEvent(event);
+    for (size_t i = 0; i < events.size(); ++i)
+    {
+        if (m_processingStopped)
+        {
+            m_discardedEvents += events.size() - i;
+            break;
+        }
+
+        matchedRules += processEvent(events[i]);
+    }
     return matchedRules;
+}
+
+void Engine::stopProcessing()
+{
+    m_processingStopped = true;
 }
 
 void Engine::onEventReceived(const EventPtr& event, const std::vector<ConstRulePtr>& triggeredRules)
 {
+    if (m_processingStopped)
+    {
+        ++m_discardedEvents;
+        return;
+    }
+
     for (const auto& rule: triggeredRules)
         processAcceptedEvent(event, rule);
 }
@@ -958,6 +1004,12 @@ void Engine::processAction(const ActionPtr& action) const
 void Engine::processAcceptedAction(const ActionPtr& action)
 {
     checkOwnThread();
+
+    if (m_processingStopped)
+    {
+        ++m_discardedActions;
+        return;
+    }
 
     NX_DEBUG(this, "Processing accepted action: %1, rule : %2", action->type(), action->ruleId());
 

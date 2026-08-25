@@ -380,10 +380,11 @@ void ActionBuilder::process(const EventPtr& event)
 
 void ActionBuilder::processEvent(const EventPtr& event)
 {
-    const auto actionDescriptor = engine()->actionDescriptor(m_actionType);
-    const auto eventDescriptor = engine()->eventDescriptor(event->type());
-    if (!NX_ASSERT(eventDescriptor) || !NX_ASSERT(actionDescriptor))
+    if (!NX_ASSERT(engine()->eventDescriptorPtr(event->type()))
+        || !NX_ASSERT(engine()->actionDescriptorPtr(m_actionType)))
+    {
         return;
+    }
 
     // Whether event state is 'started' or 'stopped'.
     const auto isEventProlonged = rules::isProlonged(event);
@@ -468,7 +469,9 @@ void ActionBuilder::buildAndEmitAction(const AggregatedEventPtr& aggregatedEvent
     logAction->setId(nx::Uuid::createUuid());
 
     Actions actions;
-    const auto manifest = engine()->actionDescriptor(actionType());
+    const auto manifest = engine()->actionDescriptorPtr(actionType());
+    if (!NX_ASSERT(manifest))
+        return;
 
     if (manifest->executionTargets.testFlag(ExecutionTarget::clients))
         actions = buildActionsForTargetUsers(aggregatedEvent);
@@ -504,8 +507,10 @@ ActionBuilder::Actions ActionBuilder::buildActionsForTargetUsers(
     if (!NX_ASSERT(targetUsersField))
         return {};
 
-    const auto eventManifest = engine()->eventDescriptor(aggregatedEvent->type());
-    const auto actionManifest = engine()->actionDescriptor(actionType());
+    const auto eventManifest = engine()->eventDescriptorPtr(aggregatedEvent->type());
+    const auto actionManifest = engine()->actionDescriptorPtr(actionType());
+    if (!NX_ASSERT(eventManifest) || !NX_ASSERT(actionManifest))
+        return {};
 
     struct EventUsers
     {
