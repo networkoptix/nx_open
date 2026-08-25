@@ -1668,7 +1668,7 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Kalendarz</translation>
     </message>
     <message>
       <source>Actions</source>

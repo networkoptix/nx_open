@@ -1665,7 +1665,7 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>日曆</translation>
     </message>
     <message>
       <source>Actions</source>

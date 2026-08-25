@@ -550,7 +550,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>Estás en modo en directo</translation>
     </message>
   </context>
   <context>
@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Selecciona o que compartir</translation>
     </message>
     <message>
       <source>Download</source>
@@ -787,7 +787,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Selecciona o que descargar</translation>
     </message>
   </context>
   <context>
@@ -1666,7 +1666,7 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Calendario</translation>
     </message>
     <message>
       <source>Actions</source>
