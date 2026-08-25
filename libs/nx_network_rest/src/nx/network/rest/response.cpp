@@ -5,11 +5,10 @@
 namespace nx::network::rest {
 
 Response::Response(
-    http::StatusCode::Value statusCode, http::HttpHeaders httpHeaders, std::optional<ETags> etags)
-    :
+    http::StatusCode::Value statusCode, http::HttpHeaders httpHeaders, Subscription subscription):
     statusCode(statusCode),
     httpHeaders(std::move(httpHeaders)),
-    etags(std::move(etags))
+    subscription(std::move(subscription))
 {
 }
 

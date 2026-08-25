@@ -18,8 +18,14 @@ NX_REFLECTION_INSTRUMENT(ClientExtensions, (etag))
 struct SubscriptionExtensions: ClientExtensions
 {
     std::optional<std::chrono::milliseconds> updateMs;
+
+    /**%apidoc[opt]
+     * If `true`, each subscription notification is sent as a request and the next notification is
+     * sent only after the response to the previous one is received.
+     */
+    bool sequentialSub = false;
 };
-NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs))
+NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs)(sequentialSub))
 
 template<typename T, typename Extensions = ClientExtensions>
 struct Payload

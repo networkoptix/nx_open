@@ -54,8 +54,6 @@ private:
     virtual void stopWhileInAioThread() override;
     void readNextMessage();
     void readHandler(const nx::Buffer& buffer);
-    void processRequest(rapidjson::Document data);
-    void processQueuedRequest();
     void send(std::string data);
 
 private:
@@ -65,7 +63,6 @@ private:
     nx::network::SocketAddress m_address;
     std::unique_ptr<IncomingProcessor> m_incomingProcessor;
     std::unique_ptr<detail::OutgoingProcessor> m_outgoingProcessor;
-    std::queue<rapidjson::Document> m_queuedRequests;
     std::unique_ptr<nx::network::websocket::WebSocket> m_socket;
     WebSocketConnectionMessages m_outMessages;
 };

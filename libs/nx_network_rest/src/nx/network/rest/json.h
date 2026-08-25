@@ -184,12 +184,19 @@ QJsonValue filter(
 }
 
 template<typename T>
-rapidjson::Document serialize(const T& data, Params params, DefaultValueAction defaultValueAction)
+rapidjson::Document serialize(
+    const T& data, const nx::utils::DotNotationString& with, DefaultValueAction defaultValueAction)
 {
     // TODO: Validate with against data type.
     auto json = nx::json::serialized(data, defaultValueAction == DefaultValueAction::removeEqual);
-    details::filter(&json, details::extractWithParam(&params));
+    details::filter(&json, with);
     return json;
+}
+
+template<typename T>
+rapidjson::Document serialize(const T& data, Params params, DefaultValueAction defaultValueAction)
+{
+    return serialize(data, details::extractWithParam(&params), defaultValueAction);
 }
 
 NX_NETWORK_REST_API QByteArray serialized(

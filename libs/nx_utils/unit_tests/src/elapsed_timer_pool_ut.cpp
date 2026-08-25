@@ -102,6 +102,56 @@ TEST_F(ElapsedTimerPool, timer_can_be_replaced)
     assertTimerIsInvoked();
 }
 
+TEST(ElapsedTimerPoolEarliest, fires_single_earliest_elapsed_timer)
+{
+    ScopedTimeShift timeShift(ClockType::steady);
+    std::vector<int> invoked;
+    utils::ElapsedTimerPool<int> pool([&invoked](int id) { invoked.push_back(id); });
+
+    pool.addTimer(1, std::chrono::seconds(1));
+    pool.addTimer(2, std::chrono::seconds(2));
+
+    // Nothing elapsed yet.
+    ASSERT_FALSE(pool.processEarliestTimer());
+    ASSERT_TRUE(invoked.empty());
+
+    timeShift.applyRelativeShift(std::chrono::seconds(1));
+
+    // Only the earliest (id 1) elapsed: fires exactly one and reports it.
+    ASSERT_TRUE(pool.processEarliestTimer());
+    ASSERT_EQ((std::vector<int>{1}), invoked);
+
+    // Id 2 is not elapsed yet.
+    ASSERT_FALSE(pool.processEarliestTimer());
+    ASSERT_EQ((std::vector<int>{1}), invoked);
+
+    timeShift.applyRelativeShift(std::chrono::seconds(1));
+    ASSERT_TRUE(pool.processEarliestTimer());
+    ASSERT_EQ((std::vector<int>{1, 2}), invoked);
+
+    // No timers left.
+    ASSERT_FALSE(pool.processEarliestTimer());
+}
+
+TEST(ElapsedTimerPoolEarliest, drains_one_per_call_in_deadline_order)
+{
+    ScopedTimeShift timeShift(ClockType::steady);
+    std::vector<int> invoked;
+    utils::ElapsedTimerPool<int> pool([&invoked](int id) { invoked.push_back(id); });
+
+    pool.addTimer(10, std::chrono::seconds(2));
+    pool.addTimer(20, std::chrono::seconds(1)); //< Earlier deadline.
+
+    timeShift.applyRelativeShift(std::chrono::seconds(3)); //< Both elapsed.
+
+    ASSERT_TRUE(pool.processEarliestTimer());
+    ASSERT_TRUE(pool.processEarliestTimer());
+    ASSERT_FALSE(pool.processEarliestTimer());
+
+    // The earlier-deadline timer (20) is drained first.
+    ASSERT_EQ((std::vector<int>{20, 10}), invoked);
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx

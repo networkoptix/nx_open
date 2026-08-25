@@ -32,6 +32,7 @@ public:
         nx::network::http::Method method;
         QString path;
         json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing;
+        nx::utils::DotNotationString with;
     };
 
     SubscriptionHandler(AddMonitor addMonitor): m_addMonitor(std::move(addMonitor)) {}
