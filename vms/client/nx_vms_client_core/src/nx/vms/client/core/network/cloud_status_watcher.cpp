@@ -805,7 +805,7 @@ void CloudStatusWatcher::Private::setStatus(
         emit q->statusChanged(status);
     }
 
-    if (isNewErrorCode && (errorCode != CloudStatusWatcher::NoError))
+    if (isNewErrorCode)
         emit q->errorChanged(errorCode);
 
     if (isJustLoggedOut && errorCode != NoError && errorCode != UserTemporaryLockedOut)

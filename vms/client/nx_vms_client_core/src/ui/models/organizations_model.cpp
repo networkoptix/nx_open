@@ -1161,6 +1161,7 @@ void OrganizationsModel::setStatusWatcher(CloudStatusWatcher* statusWatcher)
             else if (newStatus == CloudStatusWatcher::LoggedOut)
             {
                 d->setTopLevelLoading(false);
+                d->setFirstLoadAttemptFinished(true);
                 d->clearCloudData();
             }
             d->prevStatus = newStatus;

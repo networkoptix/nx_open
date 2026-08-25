@@ -477,9 +477,11 @@ AdaptiveScreen
         property bool currentRootLoading: false
         property bool waitingForLastOpened: appGlobalState.lastOpenedNodeId !== NxGlobals.uuid("")
             && appGlobalState.lastOpenedNodeId !== undefined
-        readonly property bool loading: (organizationsModel.topLevelLoading || currentRootLoading || waitingForLastOpened)
-            && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
-            || !organizationsModel.firstLoadAttemptFinished
+        readonly property bool loading: !organizationsModel.firstLoadAttemptFinished
+            || (!d.cloudConnectionFailed
+                && (organizationsModel.topLevelLoading
+                    || currentRootLoading
+                    || waitingForLastOpened))
 
         ColumnLayout
         {
@@ -881,7 +883,7 @@ AdaptiveScreen
             id: loadingIndicator
 
             anchors.fill: parent
-            visible: sessionsScreenContent.loading && appContext.cloudStatusWatcher.status !== CloudStatusWatcher.Offline
+            visible: sessionsScreenContent.loading && !d.cloudConnectionFailed
 
             readonly property bool topTabsVisible: sessionsScreen.state !== sessionsScreen.inPartnerOrOrgState
 
@@ -971,8 +973,12 @@ AdaptiveScreen
     QtObject
     {
         id: d
+
         property var listPosition: new Map()
         readonly property var kRootId: NxGlobals.uuid("")
+        readonly property bool cloudConnectionFailed:
+            appContext.cloudStatusWatcher.status === CloudStatusWatcher.Offline
+                && appContext.cloudStatusWatcher.error !== CloudStatusWatcher.NoError
     }
 
     Connections
