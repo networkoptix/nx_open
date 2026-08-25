@@ -146,6 +146,10 @@ bool FfmpegMuxer::addVideo(const AVCodecParameters* codecParameters)
             m_container.toStdString(), (AVPixelFormat)m_videoCodecParameters->format);
     }
 
+    // FFmpeg's RTP AV1 muxing requires --experimental.
+    if (m_videoCodecParameters->codec_id == AV_CODEC_ID_AV1 && m_container == QLatin1String("rtp"))
+        m_formatCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
+
     m_videoCodecParameters->sample_aspect_ratio.num = 1;
     m_videoCodecParameters->sample_aspect_ratio.den = 1;
 

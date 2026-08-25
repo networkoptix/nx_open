@@ -13,13 +13,8 @@
 
 namespace {
 
-static const std::set<AVCodecID> kSrtpVideoCodecs =
-{
-    AV_CODEC_ID_VP8,
-    AV_CODEC_ID_VP9,
-    AV_CODEC_ID_H264,
-    AV_CODEC_ID_H265
-};
+static const std::set<AVCodecID> kSrtpVideoCodecs = {
+    AV_CODEC_ID_VP8, AV_CODEC_ID_VP9, AV_CODEC_ID_AV1, AV_CODEC_ID_H264, AV_CODEC_ID_H265};
 
 static const std::set<AVCodecID> kSrtpAudioCodecs =
 {

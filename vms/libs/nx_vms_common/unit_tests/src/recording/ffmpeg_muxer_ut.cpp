@@ -6,6 +6,7 @@
 #include <nx/media/ffmpeg/ffmpeg_utils.h>
 #include <nx/utils/log/log.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
+#include <transcoding/ffmpeg_muxer.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -90,6 +91,30 @@ TEST(FfmpegMuxer, testTimeBase)
     testTimeBase("mp4");
 }
 
+// FFmpeg's RTP AV1 muxing requires --experimental, otherwise avformat_write_header() fails and
+// both the RTSP server and WebRTC end up with no video track.
+TEST(FfmpegMuxer, videoContainerCompatibility)
+{
+    auto addVideo = [](AVCodecID codecId, const QString& container)
+    {
+        ::FfmpegMuxer muxer({});
+        EXPECT_TRUE(muxer.setContainer(container));
+        muxer.setPacketizedMode(container == "rtp");
+
+        AVCodecParameters* codecParameters = avcodec_parameters_alloc();
+        codecParameters->codec_type = AVMEDIA_TYPE_VIDEO;
+        codecParameters->codec_id = codecId;
+        codecParameters->width = 1920;
+        codecParameters->height = 1080;
+        const bool result = muxer.addVideo(codecParameters) && muxer.open();
+        avcodec_parameters_free(&codecParameters);
+        return result;
+    };
+
+    EXPECT_TRUE(addVideo(AV_CODEC_ID_AV1, "rtp"));
+    EXPECT_TRUE(addVideo(AV_CODEC_ID_H264, "rtp")); //< The relaxed compliance is AV1 only.
+    EXPECT_TRUE(addVideo(AV_CODEC_ID_AV1, "matroska")); //< The archive is not affected.
+}
 
 TEST(FfmpegAudioDecoder, decodingG726)
 {

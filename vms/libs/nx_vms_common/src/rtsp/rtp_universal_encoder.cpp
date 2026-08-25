@@ -5,8 +5,8 @@
 #include <array>
 
 #include <core/resource/resource_property_key.h>
-#include <media/filters/remove_aud_delimiter.h>
 #include <media/filters/h2645_prepend_parameter_sets.h>
+#include <media/filters/remove_aud_delimiter.h>
 #include <nx/media/config.h>
 #include <nx/media/utils.h>
 #include <nx/rtp/onvif_header_extension.h>
@@ -106,6 +106,7 @@ bool isCodecSupported(AVCodecID codecId)
         case AV_CODEC_ID_H263P:
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_H265:
+        case AV_CODEC_ID_AV1:
         case AV_CODEC_ID_MPEG1VIDEO:
         case AV_CODEC_ID_MPEG2VIDEO:
         case AV_CODEC_ID_MPEG4:

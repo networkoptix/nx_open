@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include <core/resource/camera_resource.h>
+#include <nx/rtp/parsers/av1_rtp_parser.h>
 #include <nx/rtp/parsers/h264_rtp_parser.h>
 #include <nx/rtp/parsers/hevc_rtp_parser.h>
 #include <nx/rtp/parsers/i_rtp_parser_factory.h>
@@ -54,6 +55,8 @@ nx::rtp::StreamParserPtr makeVideoParser(const QString& codec)
         return std::make_unique<nx::rtp::HevcParser>();
     if (sameCodec(codec, "JPEG"))
         return std::make_unique<nx::rtp::MjpegParser>();
+    if (sameCodec(codec, "AV1") || sameCodec(codec, "AV1X"))
+        return std::make_unique<nx::rtp::Av1Parser>();
     return nullptr;
 }
 

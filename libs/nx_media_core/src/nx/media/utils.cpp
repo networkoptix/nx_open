@@ -198,6 +198,8 @@ QString fromVideoCodectoMimeType(AVCodecID codecId)
             return kMpeg4MimeType;
         case AV_CODEC_ID_MJPEG:
             return kMjpegMimeType;
+        case AV_CODEC_ID_AV1:
+            return kAv1MimeType;
         default:
             NX_ASSERT(false, "Unsupported video codec id %1", codecId);
             return QString();
@@ -216,6 +218,8 @@ AVCodecID fromMimeTypeToVideoCodec(const std::string& mime)
         return AV_CODEC_ID_MJPEG;
     else if (mime == kMpeg4MimeType)
         return AV_CODEC_ID_MPEG4;
+    else if (mime == kAv1MimeType)
+        return AV_CODEC_ID_AV1;
     else
         return AV_CODEC_ID_NONE;
 }

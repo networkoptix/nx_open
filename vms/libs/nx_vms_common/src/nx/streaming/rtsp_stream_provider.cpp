@@ -15,6 +15,7 @@
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/rtp/parsers/aac_rtp_parser.h>
+#include <nx/rtp/parsers/av1_rtp_parser.h>
 #include <nx/rtp/parsers/h264_rtp_parser.h>
 #include <nx/rtp/parsers/hevc_rtp_parser.h>
 #include <nx/rtp/parsers/i_rtp_parser_factory.h>
@@ -611,6 +612,10 @@ nx::rtp::StreamParserPtr RtspStreamProvider::createParser(const QString& codecNa
 
     if (codecName == QLatin1String("H265"))
         return std::make_unique<nx::rtp::HevcParser>();
+
+    // AV1X is the name used by some WebRTC senders.
+    if (codecName == QLatin1String("AV1") || codecName == QLatin1String("AV1X"))
+        return std::make_unique<nx::rtp::Av1Parser>();
 
     if (codecName == QLatin1String("JPEG"))
     {

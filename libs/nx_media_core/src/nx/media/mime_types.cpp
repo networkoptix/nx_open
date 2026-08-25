@@ -9,5 +9,6 @@ const char* kH263MimeType = "video/h263";
 const char* kHevcMimeType = "video/hevc";
 const char* kMpeg4MimeType = "video/mpeg4";
 const char* kMjpegMimeType = "video/mjpeg";
+const char* kAv1MimeType = "video/av1";
 
 } // namespace nx::media
