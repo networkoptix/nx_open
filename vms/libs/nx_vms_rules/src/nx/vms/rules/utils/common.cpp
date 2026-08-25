@@ -52,16 +52,14 @@ bool isLoggingAllowed(const Engine* engine, nx::Uuid ruleId)
     if (omitLoggingField && omitLoggingField->value())
         return false;
 
-    const auto eventDescriptor = engine->eventDescriptor(eventFilters.front()->eventType());
-    if (!NX_ASSERT(eventDescriptor))
+    if (!NX_ASSERT(engine->eventDescriptorPtr(eventFilters.front()->eventType())))
         return false;
 
     const auto actionBuilders = rule->actionBuilders();
     if (!NX_ASSERT(!actionBuilders.empty()))
         return false;
 
-    const auto actionDescriptor = engine->actionDescriptor(actionBuilders.front()->actionType());
-    if (!NX_ASSERT(actionDescriptor))
+    if (!NX_ASSERT(engine->actionDescriptorPtr(actionBuilders.front()->actionType())))
         return false;
 
     return true;

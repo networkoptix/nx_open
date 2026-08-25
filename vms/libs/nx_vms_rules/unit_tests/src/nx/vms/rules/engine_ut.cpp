@@ -553,6 +553,34 @@ TEST_F(EngineTest, notStartedEventIsNotProcessed)
     EXPECT_EQ(engine->processEvent(event), 0);
 }
 
+TEST_F(EngineTest, eventsAreDiscardedAfterProcessingIsStopped)
+{
+    auto executor = TestActionExecutor();
+    engine->addActionExecutor(utils::type<TestAction>(), &executor);
+
+    // Makes rule accepted any event.
+    auto rule = makeRule<TestEvent, TestAction>();
+    engine->updateRule(serialize(rule.get()));
+
+    auto event = TestEventPtr::create(std::chrono::microseconds::zero(), State::instant);
+    EXPECT_EQ(engine->processEvent(event), 1);
+    ASSERT_EQ(executor.count.load(), 1u);
+
+    const auto action = executor.actions.front();
+
+    engine->stopProcessing();
+
+    EXPECT_EQ(engine->processEvent(event), 0);
+    EXPECT_EQ(engine->processAnalyticsEvents({event, event}), 0);
+
+    // Events and actions coming from the router are dropped as well, so neither routing nor
+    // action execution keeps the engine thread busy while it is being torn down.
+    engine->router()->routeEvent(event, {engine->rule(rule->id())});
+    engine->router()->routeAction(action);
+
+    EXPECT_EQ(executor.count.load(), 1u);
+}
+
 TEST_F(EngineTest, timerThread)
 {
     auto plugin = TestPlugin(engine.get());

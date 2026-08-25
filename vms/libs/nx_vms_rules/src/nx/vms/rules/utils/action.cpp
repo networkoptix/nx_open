@@ -17,7 +17,7 @@ namespace nx::vms::rules {
 
 bool isProlonged(const Engine* engine, const ActionBuilder* builder)
 {
-    const auto manifest = engine->actionDescriptor(builder->actionType());
+    const auto manifest = engine->actionDescriptorPtr(builder->actionType());
     if (!manifest || !manifest->flags.testFlag(ItemFlag::prolonged))
         return false;
 

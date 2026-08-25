@@ -113,11 +113,11 @@ EventDurationType getEventDurationType(const vms::rules::ItemDescriptor& eventDe
 EventDurationType getEventDurationType(
     const Engine* engine, const EventFilter* eventFilter)
 {
-    const auto descriptor = engine->eventDescriptor(eventFilter->eventType());
+    const auto descriptor = engine->eventDescriptorPtr(eventFilter->eventType());
     if (!NX_ASSERT(descriptor))
         return {};
 
-    auto result = getEventDurationType(descriptor.value());
+    auto result = getEventDurationType(*descriptor);
 
     if (const auto analyticsEventTypeField =
         eventFilter->fieldByName<AnalyticsEventTypeField>(utils::kEventTypeIdFieldName))

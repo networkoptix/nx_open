@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <optional>
 #include <unordered_map>
@@ -116,6 +117,15 @@ public:
      * @return Event description by event id if the event is registered, std::nullopt otherwise.
      */
     std::optional<ItemDescriptor> eventDescriptor(const QString& id) const;
+
+    /**
+     * Same as eventDescriptor() but does not copy the descriptor. All the events are registered
+     * during the plugin initialization and are never unregistered, so the returned pointer stays
+     * valid for the engine lifetime. Do not use if the events may be registered afterwards.
+     * @return Event description by event id if the event is registered, nullptr otherwise.
+     */
+    const ItemDescriptor* eventDescriptorPtr(const QString& id) const;
+
     Group eventGroups() const;
 
     /**
@@ -151,6 +161,9 @@ public:
      */
     std::optional<ItemDescriptor> actionDescriptor(const QString& id) const;
 
+    /** Same as actionDescriptor() but does not copy the descriptor. @see eventDescriptorPtr(). */
+    const ItemDescriptor* actionDescriptorPtr(const QString& id) const;
+
     ActionPtr buildAction(const EventData& data) const;
     ActionPtr cloneAction(const ActionPtr& action) const;
 
@@ -181,6 +194,10 @@ public:
 
     /** Processes incoming analytics events and returns matched rule count. */
     size_t processAnalyticsEvents(const std::vector<EventPtr>& events);
+
+    // Discards incoming events and actions instead of processing them, so that a queued backlog
+    // is dropped rather than drained on shutdown. May be called from any thread.
+    void stopProcessing();
 
     RunningEventWatcher runningEventWatcher(nx::Uuid ruleId);
 
@@ -254,6 +271,7 @@ private:
 private:
     nx::Uuid m_id;
     std::unique_ptr<Router> m_router;
+    std::atomic_bool m_processingStopped{false};
 
     QList<QPointer<EventConnector>> m_connectors;
     QHash<QString, QPointer<ActionExecutor>> m_executors;
@@ -284,6 +302,10 @@ private: // All the fields below should be used by Engine's thread only.
     EventCache m_eventCache;
 
     QTimer* m_aggregationTimer;
+
+    // Counted while m_processingStopped is set, reported once by the destructor.
+    size_t m_discardedEvents = 0;
+    size_t m_discardedActions = 0;
 };
 
 } // namespace nx::vms::rules

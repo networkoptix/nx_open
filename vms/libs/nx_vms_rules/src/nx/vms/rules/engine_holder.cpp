@@ -47,6 +47,10 @@ void EngineHolder::stop()
         return;
 
     NX_DEBUG(this, "Stopping Engine thread");
+
+    // From the calling thread: the teardown task below queues behind the existing backlog.
+    m_engine->stopProcessing();
+
     nx::utils::AsyncHandlerExecutor(m_thread.get()).submit(
         [this]
         {
