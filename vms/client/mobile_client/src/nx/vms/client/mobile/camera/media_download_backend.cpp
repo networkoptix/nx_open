@@ -9,6 +9,7 @@
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
@@ -60,6 +61,7 @@ struct MediaDownloadBackend::Private
     MediaDownloadBackend* const q;
     bool downloadAvailable = false;
     QnVirtualCameraResourcePtr camera;
+    std::unique_ptr<QnResourceAccessManager::Notifier> accessRightsNotifier;
 
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
 
@@ -281,12 +283,14 @@ void MediaDownloadBackend::setRawResource(QnResource* value)
         const auto systemContext = SystemContext::fromResource(camera);
         systemContext->globalSettings()->disconnect(this);
         systemContext->userWatcher()->disconnect(this);
+        systemContext->resourceAccessManager()->disconnect(this);
     }
 
     if (camera == d->camera)
         return;
 
     d->camera = camera;
+    d->accessRightsNotifier.reset();
 
     if (camera)
     {
@@ -294,7 +298,27 @@ void MediaDownloadBackend::setRawResource(QnResource* value)
         const auto update = [this]() { d->updateDownloadAvailability(); };
         connect(systemContext->globalSettings(), &common::SystemSettings::watermarkChanged,
             this, update);
-        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this, update);
+
+        const auto accessManager = systemContext->resourceAccessManager();
+        d->accessRightsNotifier.reset(accessManager->createNotifier());
+        connect(d->accessRightsNotifier.get(),
+            &QnResourceAccessManager::Notifier::resourceAccessChanged, this, update);
+        connect(accessManager, &QnResourceAccessManager::resourceAccessReset, this, update);
+        connect(accessManager,
+            qOverload<const QnResourceList&>(&QnResourceAccessManager::permissionsDependencyChanged),
+            this, update);
+
+        const auto updateUserSubject =
+            [this, systemContext]()
+            {
+                const auto currentUser = systemContext->userWatcher()->user();
+                d->accessRightsNotifier->setSubjectId(
+                    currentUser ? currentUser->getId() : nx::Uuid{});
+                d->updateDownloadAvailability();
+            };
+        connect(systemContext->userWatcher(), &core::UserWatcher::userChanged, this,
+            updateUserSubject);
+        updateUserSubject();
     }
 
     d->updateDownloadAvailability();
