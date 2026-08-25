@@ -22,6 +22,11 @@ Drawer
     property bool closeAutomatically: true
     property bool closeButtonVisible: !control.bottomEdge
     property int preferredEdge: Qt.RightEdge
+
+    // Scroll the header/footer with the content instead of pinning it, freeing space on a short
+    // side sheet.
+    property bool scrollableHeader: false
+    property bool scrollableFooter: false
     readonly property alias contentDragging: flickable.dragging
     readonly property bool leftEdge: edge === Qt.LeftEdge
     readonly property bool rightEdge: edge === Qt.RightEdge
@@ -153,7 +158,8 @@ Drawer
             id: topShadow
 
             width: parent.width
-            height: content.kGradientSize + (header.visible ? headerProxy.y + headerProxy.height : 0)
+            height: content.kGradientSize
+                + (!control.scrollableHeader && header.visible ? headerProxy.y + headerProxy.height : 0)
             z: 5 //< Must be under header but over the flickable.
 
             distance: flickable.contentY
@@ -164,6 +170,8 @@ Drawer
         Item
         {
             id: header
+
+            parent: control.scrollableHeader ? scrollableContent : content
 
             width: parent.width
             height: StyleHints.headerHeight
@@ -196,19 +204,20 @@ Drawer
             id: flickable
 
             anchors.fill: parent
-            anchors.topMargin: header.visible ? header.height : 24
-            anchors.bottomMargin: footer.visible ? footer.height : 20
+            anchors.topMargin: (!control.scrollableHeader && header.visible) ? header.height : 24
+            anchors.bottomMargin: (!control.scrollableFooter && footer.visible) ? footer.height : 20
 
             z: 1
             interactive: control.interactive && contentHeight > height
-            contentHeight: contentColumn.height
+            contentHeight: scrollableContent.height
             pressDelay: 50 //< Prefers scrolling over dragging the sheet.
 
             Item
             {
                 id: scrollableContent
 
-                height: contentColumn.height
+                height: contentColumn.y + contentColumn.height
+                    + (control.scrollableFooter && footer.visible ? footer.height : 0)
                 width: parent.width
 
                 MouseArea //< Dismisses the keyboard on a tap between the content items.
@@ -227,6 +236,7 @@ Drawer
 
                     spacing: control.spacing
                     x: leftPadding
+                    y: (control.scrollableHeader && header.visible) ? header.height : 0
                     width: parent.width - leftPadding - rightPadding
                 }
             }
@@ -279,9 +289,13 @@ Drawer
             readonly property int kTopMargin: 24
             readonly property int kBottomMargin: 20
 
+            parent: control.scrollableFooter ? scrollableContent : content
+
             width: parent.width
             height: kTopMargin + footerProxy.implicitHeight + kBottomMargin
-            anchors.bottom: parent.bottom
+
+            anchors.bottom: control.scrollableFooter ? undefined : parent.bottom
+            y: control.scrollableFooter ? (contentColumn.y + contentColumn.height) : 0
 
             visible: footerProxy.target
             z: 10
@@ -301,7 +315,8 @@ Drawer
             id: bottomShadow
 
             width: parent.width
-            height: content.kGradientSize + (footer.visible ? footer.height - footer.kTopMargin : 0)
+            height: content.kGradientSize
+                + (!control.scrollableFooter && footer.visible ? footer.height - footer.kTopMargin : 0)
             anchors.bottom: parent.bottom
             z: 5 //< Must be under footer but over the flickable.
 

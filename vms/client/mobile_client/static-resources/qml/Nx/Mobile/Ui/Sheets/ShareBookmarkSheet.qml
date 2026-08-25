@@ -20,6 +20,11 @@ AdaptiveSheet
 
     contentSpacing: 24
 
+    // In landscape the sheet is a short side drawer; free the scarce vertical space by scrolling
+    // the title/close row and the action buttons with the content. In portrait both stay pinned.
+    scrollableHeader: !bottomEdge
+    scrollableFooter: !bottomEdge
+
     title: newBookmarkMode
         ? qsTr("New Bookmark")
         : qsTr("Sharing")

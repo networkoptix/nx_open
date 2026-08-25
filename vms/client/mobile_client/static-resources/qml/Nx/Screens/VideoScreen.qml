@@ -1120,6 +1120,7 @@ Page
             interactive: !objectsTypeSheet.opened
                 && !objectSelectionSheet.opened
                 && !objectActionsMenu.opened
+                && !objectActionsMenu.actionSheetOpened
                 && !ptz.active
                 && !actionSheet.opened
                 && !downloadMediaSheet.opened

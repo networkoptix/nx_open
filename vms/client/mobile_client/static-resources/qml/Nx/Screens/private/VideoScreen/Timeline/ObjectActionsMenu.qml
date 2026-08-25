@@ -26,6 +26,10 @@ Menu
 
     property real minimumDownloadDurationMs: 500
 
+    // True while an action opens a sheet that outlives this menu (the menu closes on trigger),
+    // letting the timeline suspend its gestures while that sheet is on screen.
+    readonly property bool actionSheetOpened: shareAction.sheetOpened
+
     function adjustPosition(invokerRect /*in parent coords*/, indentFromInvoker)
     {
         d.adjustPosition(invokerRect, indentFromInvoker ?? 8)

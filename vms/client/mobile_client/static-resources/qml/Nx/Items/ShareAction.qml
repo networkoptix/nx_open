@@ -19,6 +19,9 @@ Action
     readonly property alias backend: backend
     property int preferredSheetEdge: Qt.RightEdge
 
+    // True while a spawned sheet is visible, so callers can suspend conflicting background gestures.
+    readonly property bool sheetOpened: shareBookmarkSheet.opened || howItWorksSheet.opened
+
     text: d.shared ? qsTr("Shared") : qsTr("Share")
 
     icon.source: d.shared
