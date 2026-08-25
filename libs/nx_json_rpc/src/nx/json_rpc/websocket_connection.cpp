@@ -133,8 +133,6 @@ void WebSocketConnection::stopWhileInAioThread()
 
     m_guards.clear();
     m_socket->pleaseStopSync();
-    std::queue<rapidjson::Document> empty;
-    m_queuedRequests.swap(empty);
 }
 
 void WebSocketConnection::send(
@@ -221,29 +219,14 @@ void WebSocketConnection::readHandler(const nx::Buffer& buffer)
         }
         else
         {
-            processRequest(std::move(data));
+            m_incomingProcessor->processRequest(std::move(data),
+                [this](std::string response)
+                {
+                    if (!response.empty())
+                        send(std::move(response));
+                });
         }
     }
-}
-
-void WebSocketConnection::processRequest(rapidjson::Document data)
-{
-    m_queuedRequests.push(std::move(data));
-    if (m_queuedRequests.size() == 1)
-        processQueuedRequest();
-}
-
-void WebSocketConnection::processQueuedRequest()
-{
-    m_incomingProcessor->processRequest(std::move(m_queuedRequests.front()),
-        [this](std::string response)
-        {
-            if (!response.empty())
-                send(std::move(response));
-            m_queuedRequests.pop();
-            if (!m_queuedRequests.empty())
-                processQueuedRequest();
-        });
 }
 
 void WebSocketConnection::send(std::string data)

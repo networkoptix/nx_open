@@ -96,7 +96,7 @@ struct ResponseAttributes
 {
     nx::network::http::HttpHeaders httpHeaders;
     nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-    std::optional<Response::ETags> etags;
+    Response::Subscription subscription;
 };
 
 template<typename Derived>
@@ -177,10 +177,9 @@ protected:
         Params filters = {},
         json::DefaultValueAction defaultValueAction = json::DefaultValueAction::appendMissing)
     {
-        Response response{
-            responseAttributes.statusCode,
+        Response response{responseAttributes.statusCode,
             std::move(responseAttributes.httpHeaders),
-            std::move(responseAttributes.etags)};
+            std::move(responseAttributes.subscription)};
         if constexpr (std::is_same_v<Void, Data>)
             return response;
 

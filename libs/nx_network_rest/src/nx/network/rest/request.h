@@ -62,6 +62,7 @@ struct Context
     // Next fields are filled by Request constructor.
     std::optional<Crud> crud;
     std::optional<Subs> subs;
+    bool sequentialSub = false;
 };
 
 } // namespace json_rpc

@@ -34,6 +34,7 @@ public:
     using base_type = nx::network::rest::CrudHandler<Derived>;
     using Request = nx::network::rest::Request;
     using ResponseAttributes = nx::network::rest::ResponseAttributes;
+    using Hash = nx::network::rest::CollectionHash;
 
     template<typename... Args>
     CrudHandler(QueryProcessor* queryProcessor, Args&&... args):
@@ -223,12 +224,24 @@ public:
         nx::network::rest::json::DefaultValueAction defaultValueAction =
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
-        auto etags = calculateEtags(&list);
-        auto etag = nx::utils::toBase64Url(etags.combinedHash());
-        if constexpr (requires { Item::etag; })
-            responseAttributes.etags = std::move(etags);
-        return responseWithEtag(nx::network::rest::CollectionHash::Check::list,
-            std::move(etag),
+        auto etag = calculateCollectionEtag(&list, request, &responseAttributes);
+        if (const auto& context = request.jsonRpcContext(); context && context->sequentialSub)
+        {
+            nx::network::http::insertOrReplaceHeader(
+                &responseAttributes.httpHeaders, {"ETag", nx::utils::toBase64Url(etag)});
+            if (matchesRequestEtag(request, Hash::Check::list, etag))
+                return base_type::response(
+                    nx::utils::Void{}, request, std::move(responseAttributes));
+            std::vector<DeleteInput> ids;
+            const auto& items = std::get<std::vector<nx::network::rest::SubscriptionItem>>(
+                responseAttributes.subscription);
+            ids.reserve(items.size());
+            for (const auto& item: items)
+                ids.emplace_back(DeleteInput{item.id});
+            return base_type::response(ids, request, std::move(responseAttributes));
+        }
+        return responseWithEtag(Hash::Check::list,
+            etag,
             std::move(list),
             request,
             std::move(responseAttributes),
@@ -246,8 +259,8 @@ public:
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
         auto etag = calculateEtag(&model, &responseAttributes);
-        return responseWithEtag(nx::network::rest::CollectionHash::Check::item,
-            nx::utils::toBase64Url(etag),
+        return responseWithEtag(Hash::Check::item,
+            etag,
             std::move(model),
             request,
             std::move(responseAttributes),
@@ -255,9 +268,16 @@ public:
             defaultValueAction);
     }
 
+    static bool matchesRequestEtag(const Request& request, Hash::Check check, Hash::ValueView etag)
+    {
+        const auto etagIn =
+            nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
+        return !etagIn.empty() && Hash::check(check, nx::utils::fromBase64Url(etagIn), etag);
+    }
+
     template<typename Data>
-    nx::network::rest::Response responseWithEtag(nx::network::rest::CollectionHash::Check check,
-        std::string etagOut,
+    nx::network::rest::Response responseWithEtag(Hash::Check check,
+        Hash::ValueView etag,
         Data&& data,
         const Request& request,
         nx::network::rest::ResponseAttributes responseAttributes,
@@ -265,12 +285,8 @@ public:
         nx::network::rest::json::DefaultValueAction defaultValueAction)
     {
         nx::network::http::insertOrReplaceHeader(
-            &responseAttributes.httpHeaders, {"ETag", etagOut});
-        auto etagIn =
-            nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
-        if (!etagIn.empty()
-            && nx::network::rest::CollectionHash::check(
-                check, nx::utils::fromBase64Url(etagIn), nx::utils::fromBase64Url(etagOut)))
+            &responseAttributes.httpHeaders, {"ETag", nx::utils::toBase64Url(etag)});
+        if (matchesRequestEtag(request, check, etag))
         {
             responseAttributes.statusCode = nx::network::http::StatusCode::notModified;
             return base_type::response(nx::utils::Void{}, request, std::move(responseAttributes));
@@ -285,23 +301,50 @@ public:
 
 protected:
     template<typename Data>
-    nx::network::rest::CollectionHash calculateEtags(std::vector<Data>* list) {
+    Hash::Value calculateCollectionEtag(std::vector<Data>* list,
+        const Request& request,
+        nx::network::rest::ResponseAttributes* responseAttributes)
+    {
         auto d = static_cast<Derived*>(this);
-        std::vector<nx::network::rest::CollectionHash::Item> data;
+        std::vector<Hash::Item> data;
         data.reserve(list->size());
         for (const auto& item: *list)
         {
             data.emplace_back(d->subscriptionIdFromId(nx::utils::model::getId(item)),
                 nx::reflect::json::serialize(item));
         }
-        auto result = nx::network::rest::CollectionHash{std::move(data)};
-        if constexpr (requires { Data::etag; })
+        Hash etags{std::move(data)};
+        auto result = etags.combinedHash();
+        if (const auto& context = request.jsonRpcContext(); context && context->sequentialSub)
+        {
+            const bool render = !matchesRequestEtag(request, Hash::Check::list, result);
+            auto postProcess = render ? makePostProcessContext(request) : PostProcessContext{};
+            std::vector<nx::network::rest::SubscriptionItem> items;
+            if (render)
+                items.reserve(list->size());
+            for (auto& item: *list)
+            {
+                auto id = d->subscriptionIdFromId(nx::utils::model::getId(item));
+                auto etag = etags.hash(id);
+                if constexpr (requires { Data::etag; })
+                    item.etag = nx::utils::toBase64Url(etag);
+                if (render)
+                {
+                    items.push_back({std::move(id),
+                        std::move(etag),
+                        renderPayload(std::move(item), postProcess)});
+                }
+            }
+            responseAttributes->subscription = std::move(items);
+        }
+        else if constexpr (requires { Data::etag; })
         {
             for (auto& item: *list)
             {
                 item.etag = nx::utils::toBase64Url(
-                    result.hash(d->subscriptionIdFromId(nx::utils::model::getId(item))));
+                    etags.hash(d->subscriptionIdFromId(nx::utils::model::getId(item))));
             }
+            responseAttributes->subscription = std::move(etags);
         }
         return result;
     }
@@ -319,7 +362,7 @@ protected:
         {
             model->etag = nx::utils::toBase64Url(result);
             if (responseAttributes)
-                responseAttributes->etags = std::move(etags);
+                responseAttributes->subscription = std::move(etags);
         }
         return result;
     }
@@ -459,17 +502,8 @@ protected:
                             if (!payload)
                                 continue;
 
-                            auto& data = *payload;
-                            std::string etag;
-                            if constexpr (requires { Data::etag; })
-                                etag = calculateEtag(&data);
-                            nx::network::rest::detail::filter(&data, postProcess.filters);
-                            nx::network::rest::detail::orderBy(&data, postProcess.filters);
-                            auto document = nx::network::rest::json::serialize(data,
-                                std::move(postProcess.filters),
-                                postProcess.defaultValueAction);
-                            this->m_schemas->postprocessResponse(
-                                postProcess.method, postProcess.path, &document);
+                            auto etag = calculateEtag(&*payload);
+                            auto document = renderPayload(std::move(*payload), postProcess);
                             (*callback)(id, notifyType, document, etag);
                         }
                     }
@@ -556,7 +590,19 @@ private:
         }
         result.defaultValueAction =
             this->extractDefaultValueAction(&result.filters, request.apiVersion());
+        result.with = nx::network::rest::json::details::extractWithParam(&result.filters);
         return result;
+    }
+
+    template<typename Data>
+    rapidjson::Document renderPayload(Data data, const PostProcessContext& postProcess)
+    {
+        nx::network::rest::detail::filter(&data, postProcess.filters);
+        nx::network::rest::detail::orderBy(&data, postProcess.filters);
+        auto document = nx::network::rest::json::serialize(
+            data, postProcess.with, postProcess.defaultValueAction);
+        this->m_schemas->postprocessResponse(postProcess.method, postProcess.path, &document);
+        return document;
     }
 
     void notify(const QnAbstractTransaction& transaction)

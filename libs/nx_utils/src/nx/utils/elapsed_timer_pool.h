@@ -78,6 +78,24 @@ public:
     }
 
     /**
+     * Executes timerFunction for the single earliest already-elapsed timer, if any.
+     * @return true if a timer function was executed.
+     */
+    bool processEarliestTimer(TimerFuncArgs... args)
+    {
+        if (m_deadlineToTimerId.empty()
+            || m_deadlineToTimerId.begin()->first > nx::utils::monotonicTime())
+        {
+            return false;
+        }
+
+        auto timerId = std::move(m_deadlineToTimerId.begin()->second);
+        removeTimer(timerId);
+        m_timerFunction(timerId, args...);
+        return true;
+    }
+
+    /**
      * Calculates the delay before the next timerFunction processing.
      * @return std::nullopt if there are no timers, otherwise amount of time between now and the
      * next timerFunction invocation.

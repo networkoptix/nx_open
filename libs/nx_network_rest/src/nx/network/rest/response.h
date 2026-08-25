@@ -2,11 +2,20 @@
 
 #pragma once
 
+#include <variant>
+
 #include "collection_hash.h"
 #include "content.h"
 #include "result.h"
 
 namespace nx::network::rest {
+
+struct SubscriptionItem
+{
+    QString id;
+    std::string etag;
+    rapidjson::Document payload;
+};
 
 struct NX_NETWORK_REST_API Response
 {
@@ -17,12 +26,13 @@ struct NX_NETWORK_REST_API Response
     std::optional<rapidjson::Document> contentBodyJson;
 
     using ETags = CollectionHash;
-    std::optional<ETags> etags;
+    using Subscription = std::variant<std::monostate, ETags, std::vector<SubscriptionItem>>;
+    Subscription subscription;
 
     Response(
         nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::undefined,
         nx::network::http::HttpHeaders httpHeaders = {},
-        std::optional<ETags> etags = {});
+        Subscription subscription = {});
 
     Response(const Result& result, Qn::SerializationFormat format = Qn::SerializationFormat::json);
 
