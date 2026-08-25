@@ -202,10 +202,11 @@ inline bool containsId(const std::vector<nx::Uuid>& ids, const nx::Uuid& id)
     return std::find(ids.begin(), ids.end(), id) != ids.end();
 }
 
-bool canAccess(const Organization& org)
+bool canAccess([[maybe_unused]] const Organization& org)
 {
-    // Organization is accessible if the user has any role in it.
-    return !org.ownRolesIds.empty();
+    // If ChP service reports access to an organization, the organization or some of its contents
+    // are accessible regardless of explicit permissions for that organization.
+    return true;
 }
 
 bool canAccess(const ChannelPartner& cp)
@@ -1338,12 +1339,14 @@ coro::FireAndForget OrganizationsModel::Private::startPolling()
         std::vector<struct Organization> organizationsForLoad;
         organizationsForLoad.reserve(orgList->results.size());
 
+        // List of ChP must be cached before removing inaccessible ChP to correctly check
+        // organization access.
+        for (const auto& partner: channelPartnerList->results)
+            channelPartnersCache.insert(partner.id, partner);
+
         // Hide inaccessible channel partners.
         removeInaccessibleItems(&channelPartnerList->results);
         setChannelPartners(*channelPartnerList);
-
-        for (const auto& partner: channelPartnerList->results)
-            channelPartnersCache.insert(partner.id, partner);
 
         // Fill in organizations access cache.
         const auto isAccessible =
