@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <concepts>
+#include <functional>
+
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -73,8 +76,42 @@ public:
         return LockedType(&m_mutex, &m_value);
     };
 
+    /**
+     * Calls the visitor with the value while holding the lock, so that a caller needing only a
+     * value out of it does not have to name a locker:
+     *     const auto size = m_items.visit([](auto& items) { return items.size(); });
+     *     const auto items = m_items.visit([](const auto& items) { return items; }); //< A copy.
+     * The visitor must not return a reference to the value: the lock is released as visit()
+     * returns, so such a reference would be unguarded.
+     * @return The visitor result.
+     */
+    template<std::invocable<Value&> Visit>
+    decltype(auto) visit(Visit&& visit)
+    {
+        ValueLocker<Value> locker(&m_mutex, &m_value);
+        return std::invoke(std::forward<Visit>(visit), *locker);
+    }
+
+    /**
+     * The visitor gets const access, just like the value of lock() const. The constraint is the
+     * same as of the overload above on purpose: `std::invocable<const Value&>` would instantiate
+     * the body of a generic visitor with a const value, which is a hard error rather than an
+     * unsatisfied constraint, so it would break every mutating visitor instead of only the ones
+     * called on a const Lockable.
+     */
+    template<std::invocable<Value&> Visit>
+    decltype(auto) visit(Visit&& visit) const
+    {
+        const ValueLocker<Value> locker(&m_mutex, &m_value);
+        return std::invoke(std::forward<Visit>(visit), *locker);
+    }
+
 private:
     mutable Mutex m_mutex;
+
+    // TODO: #skolesnik Drop `mutable` - it is only needed because ValueLocker takes a `Value*`,
+    // so the const overloads cannot pass `&m_value`. A locker over a const value, or no locker
+    // at all, removes the need.
     mutable Value m_value;
 };
 
