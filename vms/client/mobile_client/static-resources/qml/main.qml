@@ -178,6 +178,11 @@ Controls.ApplicationWindow
 
             active: d.showCloudOfflineWarning && !siteConnectionBanner.active
             type: Banner.Error
+            action: Controls.Action
+            {
+                text: qsTr("Log out")
+                onTriggered: appContext.cloudStatusWatcher.logoutWithSsoSessionTermination()
+            }
         }
 
         onCloudOfflineChanged:
