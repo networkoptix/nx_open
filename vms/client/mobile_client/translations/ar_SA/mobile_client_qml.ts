@@ -83,7 +83,7 @@
     <name>BetaFeaturesPage</name>
     <message>
       <source>Beta Features</source>
-      <translation type="unfinished">Beta Features</translation>
+      <translation>ميزات تجريبية</translation>
     </message>
     <message>
       <source>Video Download</source>
@@ -145,7 +145,7 @@
     <name>ChannelPartner</name>
     <message>
       <source>Channel Partner</source>
-      <translation type="unfinished">Channel Partner</translation>
+      <translation>شريك القناة</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     <name>OptionSelector</name>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>أي</translation>
     </message>
   </context>
   <context>
@@ -1294,7 +1294,7 @@
     </message>
     <message>
       <source>Bookmark created</source>
-      <translation type="unfinished">Bookmark created</translation>
+      <translation>تم إنشاء العلامة المرجعية</translation>
     </message>
     <message>
       <source>Cannot share bookmark</source>

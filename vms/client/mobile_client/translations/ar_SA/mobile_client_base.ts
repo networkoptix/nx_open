@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>الكاميرات والأجهزة</translation>
     </message>
   </context>
   <context>

@@ -4551,7 +4551,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>2FA DISABLED</source>
-      <translation type="unfinished">2FA DISABLED</translation>
+      <translation>تم تعطيل المصادقة الثنائية</translation>
     </message>
   </context>
   <context>
@@ -4912,7 +4912,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Adaptive</source>
-      <translation type="unfinished">Adaptive</translation>
+      <translation>تكيُّفي</translation>
     </message>
   </context>
   <context>
@@ -5120,7 +5120,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Analytics data can take up large amounts of space.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space.</translation>
+      <translation>قد تشغل بيانات التحليلات مساحات تخزين كبيرة.</translation>
     </message>
     <message>
       <source>We recommend choosing another location for it instead of the system partition.</source>
@@ -8517,7 +8517,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>Set Password</source>
-      <translation type="unfinished">Set Password</translation>
+      <translation>تعيين كلمة المرور</translation>
     </message>
     <message>
       <source>This camera requires password to be set up</source>
@@ -13104,7 +13104,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>الكاميرات والأجهزة</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -13537,7 +13537,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>السمات</translation>
     </message>
   </context>
   <context>
