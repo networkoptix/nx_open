@@ -145,7 +145,7 @@ Item
                 visible: !!text
 
                 elide: Text.ElideRight
-                wrapMode: Text.WrapAnywhere
+                wrapMode: Text.Wrap
                 maximumLineCount: 2
 
                 color: ColorTheme.colors.light4
