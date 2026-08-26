@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Device %1 not found</source>
-      <translation type="unfinished">Device %1 not found</translation>
+      <translation>الجهاز %1 غير موجود</translation>
     </message>
     <message>
       <source>There is no license for camera %1</source>
