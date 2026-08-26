@@ -1873,7 +1873,7 @@
     </message>
     <message>
       <source>Cloud owner account.</source>
-      <translation type="unfinished">Cloud owner account.</translation>
+      <translation>حساب مالك السحابة.</translation>
     </message>
     <message>
       <source>Organization Id.</source>
@@ -2093,7 +2093,7 @@
     </message>
     <message>
       <source>Default video codec.</source>
-      <translation type="unfinished">Default video codec.</translation>
+      <translation>برنامج ترميز الفيديو الافتراضي.</translation>
     </message>
     <message>
       <source>Default codec for export video.</source>

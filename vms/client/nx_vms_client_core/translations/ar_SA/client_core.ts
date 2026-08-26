@@ -337,7 +337,7 @@
     </message>
     <message>
       <source>Any</source>
-      <translation type="unfinished">Any</translation>
+      <translation>أي</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
