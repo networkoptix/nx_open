@@ -35,4 +35,18 @@ void NX_UTILS_API resetProperties(QObject* object)
     }
 }
 
+std::optional<QMetaMethod> findSignal(const QObject* object, QByteArrayView name)
+{
+    const QMetaObject* metaObject = object->metaObject();
+
+    for (int i = metaObject->methodCount() - 1; i >= 0; --i)
+    {
+        const QMetaMethod method = metaObject->method(i);
+        if (method.methodType() == QMetaMethod::Signal && method.name() == name)
+            return method;
+    }
+
+    return std::nullopt;
+}
+
 } // namespace nx::utils
