@@ -216,6 +216,12 @@ ListView
         return NxGlobals.toHtmlEscaped(text)
     }
 
+    function positionAtSite(systemId)
+    {
+        positioner.pendingSystemId = systemId ?? ""
+        Qt.callLater(positioner.tryPosition)
+    }
+
     readonly property var currentRootType: siteList.currentRoot
         ? accessor.getData(siteList.currentRoot, "type")
         : undefined
@@ -352,6 +358,48 @@ ListView
                 onClicked: siteList.itemClicked(modelData.nodeId, modelData.systemId)
                 onEditClicked: siteList.itemEditClicked(modelData.nodeId, modelData.systemId)
             }
+        }
+    }
+
+    NxObject
+    {
+        id: positioner
+
+        property string pendingSystemId: ""
+
+        function tryPosition()
+        {
+            if (!pendingSystemId)
+                return
+
+            if (siteList.height <= 0)
+                return //< Not laid out yet; the request waits for onHeightChanged.
+
+            for (let row = 0; row < rowAccessor.count; ++row)
+            {
+                const cells = rowAccessor.getData(row, "data") ?? []
+                if (cells.some(cell => cell.systemId === pendingSystemId))
+                {
+                    siteList.positionViewAtIndex(row, ListView.Center)
+                    break
+                }
+            }
+
+            pendingSystemId = ""
+        }
+
+        ModelDataAccessor
+        {
+            id: rowAccessor
+
+            model: siteList.model
+        }
+
+        Connections
+        {
+            target: siteList
+
+            function onHeightChanged() { Qt.callLater(positioner.tryPosition) }
         }
     }
 

@@ -205,6 +205,7 @@ Controls.ApplicationWindow
         id: appGlobalState
 
         property var lastOpenedNodeId: NxGlobals.uuid("")
+        property string lastOpenedSystemId: "" //< Used to restore site list scroll position.
 
         // Persists across SessionsScreen recreations (screen is destroyed on session connect).
         property int lastSelectedOrgTab: -1
