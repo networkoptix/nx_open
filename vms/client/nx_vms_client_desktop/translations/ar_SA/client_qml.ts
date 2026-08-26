@@ -756,7 +756,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Attributes</source>
-      <translation type="unfinished">Attributes</translation>
+      <translation>السمات</translation>
     </message>
     <message>
       <source>Select type</source>
@@ -805,7 +805,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTypeSelector</name>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>تحليلات الحدث</translation>
     </message>
   </context>
   <context>
@@ -2386,7 +2386,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>الكاميرات والأجهزة</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -2446,7 +2446,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>الكاميرات والأجهزة</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -2477,7 +2477,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>لا يمكن تحميل المعاينة</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
