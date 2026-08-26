@@ -4,6 +4,7 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QObject>
+#include <QtCore/QStringList>
 
 #include <nx/reflect/instrument.h>
 #include <nx/utils/json/qt_containers_reflect.h>
@@ -52,6 +53,8 @@ public:
         const UserDescriptor& userDescriptor,
         const LayoutDescriptor& layoutDescriptor,
         int position);
+
+    Property<QStringList> completedTutorials{this, "completedTutorials"};
 };
 
 } // namespace nx::vms::client::mobile

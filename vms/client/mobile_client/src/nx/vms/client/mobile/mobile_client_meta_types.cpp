@@ -40,6 +40,8 @@
 #include <nx/vms/client/mobile/timeline/abstract_object_data.h>
 #include <nx/vms/client/mobile/timeline/object_data_adapter.h>
 #include <nx/vms/client/mobile/timeline/objects_loader.h>
+#include <nx/vms/client/mobile/ui/interactive_item_registry.h>
+#include <nx/vms/client/mobile/ui/interactive_item_watcher.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/client/mobile/utils/navigation_bar_utils.h>
 #include <resources/camera_access_rights_helper.h>
@@ -133,6 +135,8 @@ void registerQmlTypes()
     timeline::ObjectsLoader::registerQmlTypes();
     timeline::AbstractObjectData::registerQmlType();
     ObjectDataAdapter::registerQmlType();
+    InteractiveItemRegistry::registerQmlType();
+    InteractiveItemWatcher::registerQmlType();
 
     qmlRegisterUncreatableMetaObject(nx::vms::api::staticMetaObject, "nx.vms.api", 1, 0,
         "API", "API is a namespace");

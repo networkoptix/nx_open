@@ -21,6 +21,7 @@
 #include <nx/vms/client/mobile/push_notification/push_notification_manager.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/ui/interactive_item_registry.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/texture_size_helper.h>
@@ -34,6 +35,7 @@ struct WindowContext::Private
     const std::unique_ptr<SessionManager> sessionManager;
 
     std::unique_ptr<RemoteLogManager> remoteLogManager;
+    std::unique_ptr<InteractiveItemRegistry> interactiveItemRegistry;
     std::unique_ptr<UiController> uiController;
 
     // TODO: #ynikitenkov Move to the application context.
@@ -116,6 +118,7 @@ WindowContext::WindowContext(QObject* parent):
         "mc", appContext()->peerId());
 
     d->remoteLogManager = std::make_unique<RemoteLogManager>();
+    d->interactiveItemRegistry = std::make_unique<InteractiveItemRegistry>();
     d->initializeDepricatedClasses();
     d->initializeMainWindow();
     d->initializeCloudStatusHandling();
@@ -180,6 +183,11 @@ RemoteLogManager* WindowContext::logManager() const
 QnMobileClientUriHandler* WindowContext::uriHandler() const
 {
     return d->uriHandler.get();
+}
+
+InteractiveItemRegistry* WindowContext::interactiveItemRegistry() const
+{
+    return d->interactiveItemRegistry.get();
 }
 
 QnMobileClientUiController* WindowContext::deprecatedUiController() const

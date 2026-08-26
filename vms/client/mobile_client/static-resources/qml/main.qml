@@ -8,6 +8,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile
 import Nx.Mobile.Controls
+import Nx.Mobile.Tutorials
 import Nx.Screens
 import Nx.Ui
 
@@ -238,6 +239,12 @@ Controls.ApplicationWindow
     }
 
     SsoLogoutController {}
+
+    Loader
+    {
+        active: appContext.settings.enableTutorials
+        sourceComponent: Tutorials {}
+    }
 
     onClosing:
         (close) =>

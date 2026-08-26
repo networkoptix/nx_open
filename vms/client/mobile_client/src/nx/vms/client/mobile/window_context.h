@@ -12,6 +12,7 @@ Q_MOC_INCLUDE("mobile_client/mobile_client_uri_handler.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/maintenance/remote_log_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/session/session_manager.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/system_context.h")
+Q_MOC_INCLUDE("nx/vms/client/mobile/ui/interactive_item_registry.h")
 Q_MOC_INCLUDE("nx/vms/client/mobile/ui/ui_controller.h")
 
 class QQuickWindow;
@@ -23,9 +24,10 @@ namespace nx::vms::client::core { class SystemContext; }
 
 namespace nx::vms::client::mobile {
 
+class InteractiveItemRegistry;
+class RemoteLogManager;
 class SessionManager;
 class SystemContext;
-class RemoteLogManager;
 class UiController;
 
 class WindowContext: public core::WindowContext
@@ -53,6 +55,9 @@ class WindowContext: public core::WindowContext
         READ uriHandler
         CONSTANT)
 
+    Q_PROPERTY(
+        InteractiveItemRegistry* interactiveItemRegistry READ interactiveItemRegistry CONSTANT)
+
     // Deprecated classes.
     Q_PROPERTY(QnMobileClientUiController* deprecatedUiController
         READ deprecatedUiController
@@ -76,6 +81,8 @@ public:
     RemoteLogManager* logManager() const;
 
     QnMobileClientUriHandler* uriHandler() const;
+
+    InteractiveItemRegistry* interactiveItemRegistry() const;
 
     // Deprecated classes
     QnMobileClientUiController* deprecatedUiController() const;

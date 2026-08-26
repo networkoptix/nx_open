@@ -93,6 +93,7 @@ struct ApplicationContext::Private
     const Mode mode;
     const nx::Uuid peerId = nx::Uuid::createUuid();
     std::unique_ptr<QnMobileClientSettings> settings;
+    std::unique_ptr<LocalSettings> localSettings;
     std::unique_ptr<QnMobileClientResourceFactory> resourceFactory =
         std::make_unique<QnMobileClientResourceFactory>();
     std::unique_ptr<nx::client::mobile::QmlSettingsAdaptor> settingsAdaptor;
@@ -104,7 +105,6 @@ struct ApplicationContext::Private
     QPointer<QnCameraThumbnailProvider> cameraThumbnailProvider; //< Owned by the QML engine.
     std::shared_ptr<AbstractSecureStorage> secureStorage;
     std::unique_ptr<PushNotificationStorage> pushNotificationStorage;
-    std::unique_ptr<LocalSettings> localSettings;
 
     void initializeTranslations();
     void initializePushManager();
@@ -355,14 +355,13 @@ ApplicationContext::ApplicationContext(
     d->initializeEngine(startupParams);
     d->initializePushManager();
     d->initializePushNotificationStorage();
+    d->localSettings = std::make_unique<LocalSettings>();
     d->initializeMainWindowContext();
     d->initializeMainSystemContext();
     d->initializeTrafficLogginOptionHandling();
     d->initOsSpecificStuff();
     initializeCrossSystemModules();
     d->windowContext->setMainSystemContext(d->mainSystemContext.get());
-
-    d->localSettings.reset(new LocalSettings());
 
     connect(cloudCrossSystemManager(),
         &core::CloudCrossSystemManager::cloudAuthorizationRequested,

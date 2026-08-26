@@ -137,6 +137,7 @@ ToolTip
         id: highlight
 
         parent: control.background
+        z: -1
 
         sourceItem: control.target
         x: control.targetRect.x

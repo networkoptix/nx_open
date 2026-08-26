@@ -7,8 +7,7 @@
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/ini_helpers.h>
-
-using nx::vms::client::core::appContext;
+#include <nx/vms/client/mobile/settings/local_settings.h>
 
 namespace nx::client::mobile {
 
@@ -16,53 +15,55 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
     QQmlPropertyMap(this, parent)
 {
     // Set mobile settings values.
-    const auto mobileIds = qnSettings->variables();
-    QHash<QString, int> mobileProperties;
-    for (int id: mobileIds)
-    {
-        const auto name = qnSettings->name(id);
-        mobileProperties.insert(name, id);
-        insert(name, qnSettings->value(id));
-    }
+    for (int id: qnSettings->variables())
+        insert(qnSettings->name(id), qnSettings->value(id));
 
-    // Set core settings values.
-    const auto coreProperties = appContext()->coreSettings()->properties();
-    for (const auto&[key, value]: coreProperties.asKeyValueRange())
-    {
-        NX_ASSERT(!mobileProperties.contains(key), "Mobile and core settings conflict");
-        insert(key, value->variantValue());
-    }
+    connect(qnSettings,
+        &QnMobileClientSettings::valueChanged,
+        this,
+        [this](int id) { insert(qnSettings->name(id), qnSettings->value(id)); });
 
-    // Subscribe to mobile settings changes.
-    connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
-        [this](int id)
+    // Subscribe to changes from the QML side and map them to mobile settings.
+    connect(this,
+        &QQmlPropertyMap::valueChanged,
+        this,
+        [](const QString& key, const QVariant& value)
         {
-            insert(qnSettings->name(id), qnSettings->value(id));
-        });
-
-    // Subscribe to core settings changes.
-    connect(appContext()->coreSettings(), &vms::client::core::Settings::changed, this,
-        [this](const auto property)
-        {
-            if (!property)
+            if (!qnSettings->setValue(key, value))
                 return;
 
+            qnSettings->save();
+        });
+
+    auto updateFromSettings = [this](auto* property)
+    {
+        if (property && !property->secure)
             insert(property->name, property->variantValue());
-        });
+    };
 
-    // Subscribe to changes from QML side and map them to either core or mobile.
-    connect(this, &QQmlPropertyMap::valueChanged,
-        [mobileProperties=std::move(mobileProperties)](const QString& key, const QVariant& value)
+    auto addStorage = [this, updateFromSettings](nx::utils::property_storage::Storage* storage)
+    {
+        if (!NX_ASSERT(storage))
+            return;
+
+        for (const auto& property: storage->properties())
         {
-            if (auto it = mobileProperties.find(key); it != mobileProperties.end())
-            {
-                qnSettings->setValue(it.value(), value);
-                qnSettings->save();
-                return;
-            }
+            NX_ASSERT(!contains(property->name), "Settings name conflict: %1", property->name);
+            updateFromSettings(property);
+        }
 
-            appContext()->coreSettings()->setValue(key, value);
-        });
+        connect(storage, &nx::utils::property_storage::Storage::changed, this, updateFromSettings);
+
+        // Subscribe to changes from the QML side and map them to the storage.
+        connect(this,
+            &QQmlPropertyMap::valueChanged,
+            this,
+            [storage](const QString& key, const QVariant& value)
+            { storage->setValue(key, value); });
+    };
+
+    addStorage(nx::vms::client::core::appContext()->coreSettings());
+    addStorage(nx::vms::client::mobile::appContext()->localSettings());
 }
 
 QVariant QmlSettingsAdaptor::iniConfigValue(const QString& name)
