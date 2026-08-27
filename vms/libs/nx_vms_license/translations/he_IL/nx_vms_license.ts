@@ -9,13 +9,11 @@
         <numerusform>מתוך %1, %n %2 נמצא בשימוש.</numerusform>
         <numerusform>מתוך %1, %n %2 נמצא בשימוש.</numerusform>
         <numerusform>מתוך %1, %n %2 נמצא בשימוש.</numerusform>
-        <numerusform>מתוך %1, %n %2 נמצא בשימוש.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
         <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
         <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
         <numerusform>מתוך %1, יתבצע שימוש ב%n %2.</numerusform>
@@ -27,13 +25,11 @@
         <numerusform>הפעל %n עוד %1.</numerusform>
         <numerusform>הפעל %n עוד %1.</numerusform>
         <numerusform>הפעל %n עוד %1.</numerusform>
-        <numerusform>הפעל %n עוד %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
         <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
         <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
         <numerusform>ישתמשו ב %n %1 נוספים.</numerusform>
