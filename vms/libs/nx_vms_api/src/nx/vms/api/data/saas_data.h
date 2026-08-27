@@ -106,6 +106,7 @@ struct NX_VMS_API SaasService
     static const QString kAnalyticsIntegrationServiceType;
     static const QString kCloudRecordingType;
     static const QString kLiveViewServiceType;
+    static const QString kGenericServiceType;
 
     /**%apidoc Internal service identifier. */
     nx::Uuid id;

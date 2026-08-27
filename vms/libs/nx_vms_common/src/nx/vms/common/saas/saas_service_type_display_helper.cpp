@@ -22,7 +22,11 @@ QString ServiceTypeDisplayHelper::serviceTypeDisplayString(const QString& servic
 
     if (serviceType == SaasService::kLiveViewServiceType)
         return tr("Live view");
-    NX_ASSERT(false, "No localized display name for unexpected SaaS service type");
+
+    if (serviceType == SaasService::kGenericServiceType)
+        return tr("Generic");
+
+    NX_ASSERT(false, "No localized display name for unexpected SaaS service type: %1", serviceType);
     return serviceType;
 }
 
