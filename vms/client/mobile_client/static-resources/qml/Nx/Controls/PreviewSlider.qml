@@ -15,6 +15,7 @@ Slider
     property bool playerWasPlaying: false
     readonly property real handlePosition:
         visualPosition * (width - leftPadding - rightPadding) + leftPadding - handle.width / 2
+    readonly property int progressLineHeight: 4
 
     implicitHeight: 24
 
@@ -45,7 +46,7 @@ Slider
         id: sliderBackground
 
         width: parent.width
-        height: 4
+        height: slider.progressLineHeight
         color: ColorTheme.colors.dark14
         anchors.verticalCenter: slider.verticalCenter
 

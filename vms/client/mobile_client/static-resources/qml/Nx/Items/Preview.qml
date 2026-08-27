@@ -83,7 +83,7 @@ Rectangle
         anchors.fill: parent
         anchors.bottomMargin: LayoutController.fullscreen
             ? 0
-            : bottomPanel.height
+            : bottomPanel.height + slider.progressLineHeight
 
         audioEnabled: audioController.audioEnabled
         scalable: true
@@ -200,8 +200,9 @@ Rectangle
         LayoutItemProxy
         {
             anchors.right: parent.right
+            anchors.rightMargin: 12
             anchors.bottom: parent.bottom
-            anchors.margins: 12
+            anchors.bottomMargin: 16
 
             target: fullscreenButton
             visible: !LayoutController.fullscreen && root.dataState === Preview.DataState.Available
@@ -210,8 +211,9 @@ Rectangle
         LayoutItemProxy
         {
             anchors.left: parent.left
+            anchors.leftMargin: 12
             anchors.bottom: parent.bottom
-            anchors.margins: 12
+            anchors.bottomMargin: 16
 
             target: timestampText
             visible: !LayoutController.fullscreen
@@ -227,7 +229,9 @@ Rectangle
         anchors.bottom: preview.bottom
         anchors.leftMargin: LayoutController.fullscreen ? 16 : 0
         anchors.rightMargin: LayoutController.fullscreen ? 16 : 0
-        anchors.bottomMargin: LayoutController.fullscreen ? 8 : - (height / 2) + 2
+        anchors.bottomMargin: LayoutController.fullscreen
+            ? 8
+            : -(height / 2 + progressLineHeight / 2)
 
         preview: preview
 
@@ -244,7 +248,9 @@ Rectangle
         anchors.bottom: parent.bottom
         anchors.bottomMargin: LayoutController.fullscreen ? 36 : 0
 
-        height: LayoutController.fullscreen ? 48 : 68
+        height: LayoutController.fullscreen
+            ? 48
+            : LayoutController.isHorizontalCompact ? 75 : 68
 
         RowLayout
         {
@@ -252,7 +258,7 @@ Rectangle
             spacing: 8
 
             anchors.fill: parent
-            anchors.margins: 12
+            anchors.margins: LayoutController.isHorizontalCompact ? 16 : 12
 
             LayoutItemProxy
             {

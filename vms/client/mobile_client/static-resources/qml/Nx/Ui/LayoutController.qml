@@ -72,6 +72,7 @@ NxObject
     }
 
     readonly property bool isCompact: mode === LayoutMode.Compact
+    readonly property bool isHorizontalCompact: mode === LayoutMode.HorizontalCompact
 
     // Whether the screen is split into a content area with the optional side panels around it.
     // Such a layout also moves the navigation into a rail at the left edge, freeing the bottom.

@@ -285,7 +285,7 @@ Item
     {
         id: d
 
-        readonly property bool isPortraitLayout: detailsItem.width < detailsItem.height
+        readonly property bool isPortraitLayout: !LayoutController.isHorizontalCompact
 
         function updateCurrentEvent()
         {
