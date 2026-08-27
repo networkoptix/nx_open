@@ -21,7 +21,9 @@ Control
     background: Rectangle
     {
         radius: 6
-        color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+        color: ColorTheme.transparent(ColorTheme.colors.dark4, 0.5)
+        border.width: 1
+        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
     }
 
     contentItem: RowLayout

@@ -22,23 +22,28 @@ Rectangle
     }
     property int joystickType: JoystickUtils.Type.Any
     property real customRotation: 0
+    property bool overlayStyle: false
     readonly property bool active: mouseArea.pressed
 
     implicitWidth: 112
     implicitHeight: implicitWidth
     radius: width / 2
-    color: ColorTheme.transparent(ColorTheme.colors.dark12, 0.5)
+    color: overlayStyle
+        ? ColorTheme.transparent(ColorTheme.colors.dark4, 0.5)
+        : ColorTheme.colors.dark11
+    border.width: overlayStyle ? 1 : 0
+    border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
 
     Canvas
     {
         id: customCanvas
 
-        property bool drawButtonBorders:
+        property bool highlightSectors:
             joystickType != JoystickUtils.Type.EightWayPtz
             && joystickType != JoystickUtils.Type.FreeWayPtz
 
         anchors.centerIn: parent
-        visible: drawButtonBorders || mouseArea.pressed
+        visible: mouseArea.pressed
         width: parent.width * Screen.devicePixelRatio
         height: parent.height * Screen.devicePixelRatio
         scale: 1.0 / Screen.devicePixelRatio
@@ -51,9 +56,6 @@ Rectangle
 
             if (mouseArea.pressed)
                 drawGradient(context)
-
-            if (drawButtonBorders)
-                drawBorders(context)
         }
 
         function drawGradient(context)
@@ -61,14 +63,16 @@ Rectangle
             if (d.dragging)
                 return
 
-            var gradientStartPoint = drawButtonBorders
+            var gradientStartPoint = highlightSectors
                 ? d.centerPoint
                 : d.centerPoint.minus(d.radialVector)
 
-            context.fillStyle = ColorTheme.colors.dark14
+            context.fillStyle = control.overlayStyle
+                ? ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
+                : ColorTheme.colors.dark13
 
             var angle = JoystickUtils.getAngle(d.radialVector)
-            var angleOffset = customCanvas.drawButtonBorders
+            var angleOffset = customCanvas.highlightSectors
                 && control.joystickType != JoystickUtils.Type.FreeWayPtz
                 ? d.currentSectionData.step / 2
                 : Math.PI
@@ -86,64 +90,6 @@ Rectangle
             context.lineTo(center.x, center.y)
             context.fill()
         }
-
-        function drawLineWithHole(context, from, to, holeLength)
-        {
-            var vector = to.minus(from)
-            var vectorLength = vector.length()
-            var offset = vector.times((vectorLength - holeLength) / (2 * vectorLength))
-            var intermediateTo = from.plus(offset)
-            var intermediateFrom = to.minus(offset)
-
-            context.beginPath()
-            context.moveTo(from.x, from.y)
-            context.lineTo(intermediateTo.x, intermediateTo.y)
-            context.moveTo(intermediateFrom.x, intermediateFrom.y)
-            context.lineTo(to.x, to.y)
-            context.stroke()
-        }
-
-        function drawBorders(context)
-        {
-            var type = control.joystickType
-            var center = d.centerPoint
-            var radius = control.radius
-            var holeLength = markerShadow.width
-
-            switch (type)
-            {
-                case JoystickUtils.Type.TwoWayHorizontal:
-                    var verticalOffset = Qt.vector2d(0, radius)
-                    var topPoint = center.minus(verticalOffset)
-                    var bottomPoint = center.plus(verticalOffset)
-                    drawLineWithHole(context, topPoint, bottomPoint, holeLength)
-                    return
-
-                case JoystickUtils.Type.TwoWayVertical:
-                    var horizontalOffset = Qt.vector2d(radius, 0)
-                    var leftPoint = center.minus(horizontalOffset)
-                    var rightPoint = center.plus(horizontalOffset)
-                    drawLineWithHole(context, leftPoint, rightPoint, holeLength)
-                    return
-
-                case JoystickUtils.Type.FourWayPtz:
-                    var radial = JoystickUtils.getRadialVector(radius, -Math.PI / 4)
-                    var topRight = center.plus(radial)
-                    var bottomLeft = center.minus(radial)
-                    drawLineWithHole(context, topRight, bottomLeft, holeLength)
-
-                    radial = JoystickUtils.getRadialVector(radius, Math.PI / 4)
-                    var bottomRight = center.plus(radial)
-                    var topLeft = center.minus(radial)
-                    drawLineWithHole(context, bottomRight, topLeft, holeLength)
-                    return
-
-                case JoystickUtils.Type.EightWayPtz: //< Fallthrough
-                case JoystickUtils.Type.FreeWayPtz: //< Fallthrough
-                default:
-                    return //< We don't need to draw delimiter lines
-            }
-        }
     }
 
     Item
@@ -155,20 +101,6 @@ Rectangle
         z: 1
         width: 32
         height: width
-
-        Rectangle
-        {
-            id: markerShadow
-
-            width: 40
-            height: width
-            anchors.centerIn: parent
-            radius: width / 2
-            visible: d.dragging
-
-
-            color: ColorTheme.transparent(ColorTheme.colors.light1, 0.2)
-        }
 
         Image
         {

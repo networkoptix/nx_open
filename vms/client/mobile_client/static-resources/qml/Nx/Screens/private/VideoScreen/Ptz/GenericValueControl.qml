@@ -20,20 +20,17 @@ Control
     property alias upButton: upButtonControl
     property alias downButton: downButtonControl
 
+    property int radius: 24
+    property bool overlayStyle: false
+
     implicitWidth: 52
     implicitHeight: 164
 
-    component ValueButton: Button
+    component ValueButton: PtzButton
     {
-        type: Button.Type.LightInterface
-        foregroundColor: ColorTheme.colors.light4
-        background.opacity: 0.6
-        radius: 0
-        padding: 0
+        overlayStyle: control.overlayStyle
+        borderColor: "transparent"
         enabled: control.enableValueControls
-        opacity: enabled ? 1 : 0.3
-        icon.width: 24
-        icon.height: 24
     }
 
     contentItem: ColumnLayout
@@ -74,6 +71,20 @@ Control
         }
     }
 
+    Rectangle
+    {
+        id: border
+
+        anchors.fill: parent
+
+        visible: control.overlayStyle
+
+        radius: control.radius
+        color: "transparent"
+        border.width: 1
+        border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+    }
+
     layer.enabled: true
     layer.effect: OpacityMask
     {
@@ -81,7 +92,7 @@ Control
         {
             width: control.width
             height: control.height
-            radius: 24
+            radius: control.radius
         }
     }
 }

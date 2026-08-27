@@ -122,33 +122,6 @@ Item
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }
-
-                Rectangle
-                {
-                    id: separator
-
-                    color: ColorTheme.colors.dark12
-                    visible: presetViewModel.hasPresets
-
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    Layout.leftMargin: -24
-                    Layout.rightMargin: -24
-                }
-
-                PresetSwitch
-                {
-                    id: sheetPresetSwitch
-
-                    model: presetViewModel.presets
-                    currentIndex: presetViewModel.currentPresetIndex
-                    visible: presetViewModel.hasPresets
-
-                    Layout.fillWidth: true
-
-                    onClicked: control.openPresetList()
-                    onSelected: (index) => control.selectPreset(index)
-                }
             }
 
             MoveOnTapPage
@@ -218,6 +191,8 @@ Item
         id: panel
 
         controller: controller
+        presetViewModel: presetViewModel
+        overlayStyle: control.overlayStyle
 
         onMoveOnTapClicked:
         {
@@ -226,29 +201,8 @@ Item
             else
                 control.openMoveOnTap()
         }
-    }
 
-    PresetSwitch
-    {
-        id: videoPresetSwitch
-
-        parent: targetVideo
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.margins: 16
-
-        visible: control.active
-            && presetViewModel.hasPresets
-            && control.state === "default"
-            && control.overlayStyle
-
-        opacity: control.opacity
-        overlayStyle: true
-
-        model: presetViewModel.presets
-        currentIndex: presetViewModel.currentPresetIndex
-        onClicked: control.openPresetList()
-        onSelected: (index) => control.selectPreset(index)
+        onPresetSwitchClicked: control.openPresetList()
     }
 
     MouseArea

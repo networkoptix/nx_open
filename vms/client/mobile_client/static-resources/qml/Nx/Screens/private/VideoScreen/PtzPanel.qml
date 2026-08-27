@@ -19,6 +19,9 @@ Control
     id: control
 
     property PtzController controller
+    property var presetViewModel
+
+    property bool overlayStyle: false
 
     property alias customRotation: joystick.customRotation
     readonly property alias joystick: joystick
@@ -31,12 +34,13 @@ Control
 
     signal autoFocusClicked()
     signal moveOnTapClicked()
+    signal presetSwitchClicked()
 
     contentItem: ColumnLayout
     {
         id: content
 
-        spacing: 0
+        spacing: control.overlayStyle ? 16 : 20
 
         RowLayout
         {
@@ -48,6 +52,7 @@ Control
                 id: focusControl
 
                 visible: supportsFocusChanging || supportsAutoFocus
+                overlayStyle: control.overlayStyle
                 supportsFocusChanging: controller.capabilities & PtzAPI.Capability.continuousFocus
                 supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
                 onFocusInPressedChanged: moveFocus(focusInPressed, 1)
@@ -72,6 +77,7 @@ Control
                 id: zoomControl
 
                 visible: controller.capabilities & PtzAPI.Capability.continuousZoom
+                overlayStyle: control.overlayStyle
 
                 onZoomInPressedChanged: zoomMove(zoomInPressed, 0.5)
                 onZoomOutPressedChanged: zoomMove(zoomOutPressed, -0.5)
@@ -88,7 +94,22 @@ Control
                 }
             }
 
-            Item { Layout.fillWidth: true }
+            Item
+            {
+                id: inlineSpacer
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                LayoutItemProxy
+                {
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    target: presetSwitch
+                    visible: presetSwitch.inline && presetViewModel.hasPresets
+                }
+            }
 
             ColumnLayout
             {
@@ -96,7 +117,7 @@ Control
 
                 Item { Layout.fillHeight: true }
 
-                Button
+                PtzButton
                 {
                     id: moveOnTapButton
 
@@ -105,15 +126,10 @@ Control
                     Layout.alignment: Qt.AlignRight
 
                     visible: controller.supportsMoveOnTap
+                    overlayStyle: control.overlayStyle
                     radius: width / 2
-                    padding: 0
 
-                    type: Button.Type.LightInterface
-                    foregroundColor: ColorTheme.colors.light4
-                    background.opacity: 0.5
                     icon.source: "image://skin/24x24/Outline/re_centre.svg"
-                    icon.width: 24
-                    icon.height: 24
 
                     onClicked: control.moveOnTapClicked()
                 }
@@ -124,6 +140,8 @@ Control
 
                     readonly property vector2d zeroVector: Qt.vector2d(0, 0)
                     property vector2d movementVector: Qt.vector2d(0, 0)
+
+                    overlayStyle: control.overlayStyle
 
                     Layout.alignment: Qt.AlignBottom
 
@@ -187,5 +205,42 @@ Control
                 }
             }
         }
+
+        Rectangle
+        {
+            id: separator
+
+            color: ColorTheme.colors.dark12
+            visible: !control.overlayStyle && presetViewModel.hasPresets
+
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+            Layout.leftMargin: -24
+            Layout.rightMargin: -24
+        }
+
+        LayoutItemProxy
+        {
+            Layout.fillWidth: true
+
+            target: presetSwitch
+            visible: !presetSwitch.inline && presetViewModel.hasPresets
+        }
+    }
+
+    PresetSwitch
+    {
+        id: presetSwitch
+
+        readonly property bool inline: control.overlayStyle && implicitWidth <= inlineSpacer.width
+
+        visible: presetViewModel.hasPresets
+        overlayStyle: control.overlayStyle
+
+        model: presetViewModel.presets
+        currentIndex: presetViewModel.currentPresetIndex
+
+        onClicked: control.presetSwitchClicked()
+        onSelected: (index) => presetViewModel.setCurrentPreset(index)
     }
 }

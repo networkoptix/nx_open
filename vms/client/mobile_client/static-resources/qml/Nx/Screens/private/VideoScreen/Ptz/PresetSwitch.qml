@@ -2,6 +2,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Shapes
 
 import Nx.Controls
@@ -21,20 +22,27 @@ Control
     signal selected(int index)
     signal clicked()
 
-    implicitWidth: 164
     implicitHeight: overlayStyle ? 36 : 24
 
-    topPadding: overlayStyle ? 8 : 0
-    bottomPadding: overlayStyle ? 4 : 0
+    topPadding: overlayStyle ? 6 : 0
+    bottomPadding: overlayStyle ? 6 : 0
     leftPadding: overlayStyle ? 12 : 0
     rightPadding: overlayStyle ? 12 : 0
 
-    background: Rectangle
+    background: MouseArea
     {
-        visible: overlayStyle
-        radius: 6
-        color: ColorTheme.colors.dark8
-        opacity: 0.5
+        Rectangle
+        {
+            anchors.fill: parent
+
+            visible: overlayStyle
+            radius: 6
+            color: ColorTheme.transparent(ColorTheme.colors.dark4, 0.5)
+            border.width: 1
+            border.color: ColorTheme.transparent(ColorTheme.colors.light1, 0.1)
+        }
+
+        onClicked: control.clicked()
     }
 
     ModelDataAccessor
@@ -42,56 +50,15 @@ Control
         id: modelAccessor
     }
 
-    contentItem: Item
+    contentItem: RowLayout
     {
-        Text
-        {
-            id: title
-
-            anchors.centerIn: parent
-
-            color: hasCurrentIndex ? ColorTheme.colors.light4 : ColorTheme.colors.light10
-            font.pixelSize: overlayStyle ? 14 : 16
-            font.weight: hasCurrentIndex ? Font.Normal : Font.Medium
-            text: hasCurrentIndex
-                ? modelAccessor.getData(currentIndex, "display")
-                : qsTr("Select Preset")
-
-            Shape
-            {
-                id: dotLine
-
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.bottom
-
-                visible: !hasCurrentIndex
-
-                ShapePath
-                {
-                    strokeStyle: ShapePath.DashLine
-                    dashPattern: [0.001, 2]
-                    strokeWidth: 1
-                    strokeColor: ColorTheme.colors.light10
-                    capStyle: ShapePath.RoundCap
-
-                    PathLine { x: dotLine.width }
-                }
-            }
-        }
-
-        MouseArea
-        {
-            anchors.fill: parent
-            onClicked: control.clicked()
-        }
+        spacing: 4
 
         IconButton
         {
             id: previousButton
 
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
             enabled: currentIndex > 0
             compact: true
@@ -102,12 +69,54 @@ Control
             onClicked: control.selected(currentIndex - 1)
         }
 
+        Text
+        {
+            id: title
+
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignCenter
+            Layout.minimumWidth: 40
+            Layout.maximumWidth: Math.max(Math.ceil(implicitWidth), Layout.minimumWidth)
+
+            horizontalAlignment: Qt.AlignHCenter
+
+            color: hasCurrentIndex ? ColorTheme.colors.light4 : ColorTheme.colors.light10
+
+            font.pixelSize: overlayStyle ? 14 : 16
+            font.weight: overlayStyle ? Font.Medium : Font.Normal
+            elide: Text.ElideRight
+            text: hasCurrentIndex
+                ? modelAccessor.getData(currentIndex, "display")
+                : qsTr("Select Preset")
+
+            Shape
+            {
+                id: dotLine
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.bottom
+                width: title.contentWidth
+
+                visible: overlayStyle || !hasCurrentIndex
+
+                ShapePath
+                {
+                    strokeStyle: ShapePath.DashLine
+                    dashPattern: [0.001, 2]
+                    strokeWidth: 1
+                    strokeColor: title.color
+                    capStyle: ShapePath.RoundCap
+
+                    PathLine { x: dotLine.width }
+                }
+            }
+        }
+
         IconButton
         {
             id: nextButton
 
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
+            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
 
             enabled: currentIndex < modelAccessor.count - 1
             compact: true

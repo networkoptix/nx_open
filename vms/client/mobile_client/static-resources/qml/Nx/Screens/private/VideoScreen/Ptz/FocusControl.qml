@@ -17,17 +17,11 @@ GenericValueControl
     upButton.icon.source: "image://skin/24x24/Outline/plus.svg"
     downButton.icon.source: "image://skin/24x24/Outline/minus.svg"
 
-    centralArea: Button
+    centralArea: PtzButton
     {
-        type: Button.Type.LightInterface
-        foregroundColor: ColorTheme.colors.light10
-        background.opacity: 0.6
-        radius: 0
-        leftPadding: 0
-        rightPadding: 0
+        overlayStyle: control.overlayStyle
+        borderColor: "transparent"
         icon.source: "image://skin/24x24/Outline/af.svg"
-        icon.width: 24
-        icon.height: 24
         onClicked: control.autoFocusClicked()
     }
 }

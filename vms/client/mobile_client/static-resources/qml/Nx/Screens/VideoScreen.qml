@@ -1454,7 +1454,7 @@ Page
             id: bottomOverlayControls
 
             height: 56
-            visible: video.shown
+            visible: video.shown && (!d.ptzMode || !ptz.overlayStyle)
 
             anchors.bottom: content.bottom
             anchors.right: content.right
@@ -1552,7 +1552,7 @@ Page
             customRotation: controller.resourceHelper.customRotation
 
             active: d.ptzMode
-            overlayStyle: LayoutController.fullscreen
+            overlayStyle: LayoutController.fullscreen || LayoutController.hasSidePanels
             opacity: d.controlsOpacity
 
             onActiveChanged:
