@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Developer</source>
-      <translation type="unfinished">Developer</translation>
+      <translation>المطور</translation>
     </message>
     <message>
       <source>Open source libraries</source>
@@ -123,7 +123,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
     <message>
       <source>Open Files Folder</source>
@@ -1489,7 +1489,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -1501,7 +1501,7 @@
     </message>
     <message>
       <source>Download Full Report</source>
-      <translation type="unfinished">Download Full Report</translation>
+      <translation>تحميل التقرير الكامل</translation>
     </message>
   </context>
   <context>
