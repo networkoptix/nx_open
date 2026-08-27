@@ -12,7 +12,7 @@ namespace nx::vms::client::mobile {
 namespace timeline {
 namespace {
 
-static const QString kIconPath = "image://skin/20x20/Outline/motion.svg";
+static const QString kIconPath = "image://skin/20x20/Solid/motion.svg";
 
 qint64 getPreviewTimeMs(const QnTimePeriod& motion)
 {

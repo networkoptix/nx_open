@@ -13,7 +13,7 @@ namespace timeline {
 
 namespace {
 
-static const QString kIconPath = "image://skin/20x20/Outline/bookmark.svg";
+static const QString kIconPath = "image://skin/20x20/Solid/bookmark.svg";
 
 } // namespace
 

@@ -1231,13 +1231,13 @@ Page
                             switch (timeline.objectsType)
                             {
                                 case Timeline.ObjectsLoader.ObjectsType.motion:
-                                    return "image://skin/24x24/Outline/motion.svg"
+                                    return "image://skin/24x24/Solid/motion.svg"
 
                                 case Timeline.ObjectsLoader.ObjectsType.bookmarks:
-                                    return "image://skin/24x24/Outline/bookmark.svg"
+                                    return "image://skin/24x24/Solid/bookmark.svg"
 
                                 case Timeline.ObjectsLoader.ObjectsType.analytics:
-                                    return "image://skin/24x24/Outline/object.svg"
+                                    return "image://skin/24x24/Solid/object.svg"
                             }
 
                             console.assert(false, `Unknown objectsType (${timeline.objectsType})`)

@@ -56,7 +56,7 @@ AdaptiveSheet
         id: motionsButton
 
         text: qsTr("Motion")
-        icon.source: "image://skin/24x24/Outline/motion.svg?primary=light10"
+        icon.source: "image://skin/24x24/Solid/motion.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.motion
         width: parent.width
         checked: true
@@ -67,7 +67,7 @@ AdaptiveSheet
         id: bookmarksButton
 
         text: qsTr("Bookmarks")
-        icon.source: "image://skin/24x24/Outline/bookmark.svg?primary=light10"
+        icon.source: "image://skin/24x24/Solid/bookmark.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.bookmarks
         width: parent.width
         visible: sheet.bookmarksAvailable
@@ -78,7 +78,7 @@ AdaptiveSheet
         id: objectsButton
 
         text: qsTr("Objects")
-        icon.source: "image://skin/24x24/Outline/object.svg?primary=light10"
+        icon.source: "image://skin/24x24/Solid/object.svg?primary=light10"
         objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
         width: parent.width
         visible: sheet.objectsAvailable
