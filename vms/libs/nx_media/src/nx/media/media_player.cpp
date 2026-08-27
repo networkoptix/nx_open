@@ -51,6 +51,13 @@ static constexpr qint64 kLivePosition = -1;
 // Resync playback timer if a video frame is too late.
 static constexpr int kMaxDelayForResyncMs = 500;
 
+// Top playback speed at which audio is still played; above it audio is muted.
+static constexpr double kMaxAudioPlaybackSpeed = 2.0;
+
+// Top playback speed the decoder sustains with the full-frame stream. Above it the player
+// switches to the low-resolution, I-frames-only stream to reach the speed (only key frames).
+static constexpr double kMaxFullFrameSpeed = 4.0;
+
 // Max allowed amount of underflow/overflow issues in Live mode before extending live buffer.
 static constexpr int kMaxCounterForWrongLiveBuffer = 2;
 
@@ -306,9 +313,15 @@ void Player::Private::setState(State value)
         return;
 
     NX_DEBUG(this, "State changed: %1", value);
+    const bool wasPlaying = state == State::Playing;
     state = value;
     if (state == State::Playing)
         setError(Error::NoError);
+
+    // High speed uses the I-frames-only stream only while playing; re-apply quality on
+    // preview/pause transitions so those keep the full-frame stream.
+    if (std::abs(speed) > kMaxFullFrameSpeed && wasPlaying != (state == State::Playing))
+        applyVideoQuality();
 
     emit q->playbackStateChanged();
 }
@@ -752,6 +765,17 @@ void Player::Private::applyVideoQuality()
     if (!camera || !camera->hasVideo())
         return; //< Setting videoQuality for files is not supported.
 
+    // Above kMaxFullFrameSpeed the decoder can't sustain the full-frame stream; switch to the
+    // low-resolution, I-frames-only stream to reach the requested speed (lower speeds keep the
+    // user quality). Only while playing: in the low stream the RTSP delegate reopens the session
+    // on every seek (see beforeSeek()), so scrub/pause keep the full stream to avoid thrashing.
+    if (state == State::Playing && std::abs(speed) > kMaxFullFrameSpeed)
+    {
+        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+        at_hurryUp(); //< skip waiting for current frame
+        return;
+    }
+
     const auto currentVideoDecoders = dataConsumer
         ? dataConsumer->currentVideoDecoders()
         : std::vector<AbstractVideoDecoder*>();
@@ -966,9 +990,8 @@ void Player::Private::updateAudio()
 {
     if (dataConsumer)
     {
-        dataConsumer->setAudioEnabled(isAudioEnabled
-            && speed <= 2 && speed > 0
-            && state == State::Playing);
+        dataConsumer->setAudioEnabled(isAudioEnabled && speed <= kMaxAudioPlaybackSpeed
+            && speed > 0 && state == State::Playing);
     }
 }
 
@@ -1148,6 +1171,7 @@ void Player::setSpeed(double value)
         d->dataConsumer->setPlaySpeed(value);
         d->updateAudio();
         d->archiveReader->setSpeed(value);
+        d->applyVideoQuality(); //< Switch to/from the I-frames-only stream for high speeds.
         d->lastVideoPtsMs.reset();
         d->at_hurryUp();
     }

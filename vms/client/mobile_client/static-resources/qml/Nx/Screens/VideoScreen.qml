@@ -977,6 +977,17 @@ Page
 
                             onMoved:
                                 controller.setSpeed(speed)
+
+                            // Reflect the actual playback speed so the control stays correct
+                            // when the speed is changed elsewhere (e.g. the fullscreen controls).
+                            Binding
+                            {
+                                target: speedControl
+                                property: "speed"
+                                value: controller.speed
+                                when: !speedControl.pressed
+                                restoreMode: Binding.RestoreNone
+                            }
                         }
 
                         onEnabledChanged:
