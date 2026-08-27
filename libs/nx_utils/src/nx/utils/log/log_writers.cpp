@@ -2,6 +2,7 @@
 
 #include "log_writers.h"
 
+#include <cstdio>
 #include <iostream>
 
 #include <quazip/quazip.h>
@@ -13,6 +14,10 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QTemporaryFile>
 
+#if defined(Q_OS_WIN)
+    #include <QtCore/qt_windows.h>
+#endif
+
 #include <nx/reflect/enum_string_conversion.h>
 #include <nx/utils/nx_utils_ini.h>
 #include <nx/utils/scope_guard.h>
@@ -20,7 +25,28 @@
 #include "storage_info.h"
 #include "to_string.h"
 
-static constexpr int kBufferSize = 64 * 1024;
+namespace {
+
+constexpr int kBufferSize = 64 * 1024;
+
+bool renameFileWithoutCopyFallback(const QString& sourcePath, const QString& targetPath)
+{
+    if (QFile::exists(targetPath))
+        return false;
+
+#if defined(Q_OS_WIN)
+    const auto nativeSourcePath = QDir::toNativeSeparators(sourcePath);
+    const auto nativeTargetPath = QDir::toNativeSeparators(targetPath);
+    return MoveFileW(reinterpret_cast<LPCWSTR>(nativeSourcePath.utf16()),
+        reinterpret_cast<LPCWSTR>(nativeTargetPath.utf16()));
+#else
+    const auto encodedSourcePath = QFile::encodeName(sourcePath);
+    const auto encodedTargetPath = QFile::encodeName(targetPath);
+    return std::rename(encodedSourcePath.constData(), encodedTargetPath.constData()) == 0;
+#endif
+}
+
+} // namespace
 
 namespace nx::log {
 
@@ -254,12 +280,18 @@ void File::archive(QString fileName, QString archiveName)
         return;
     }
 
-    textLog.close();
-    textLog.remove();
-
     zippedLog.close();
     archive.close();
-    archiveFile.rename(archiveName);
+    archiveFile.close();
+    if (!renameFileWithoutCopyFallback(tmpArchiveName, archiveName))
+    {
+        std::cerr << nx::toString(this).toStdString() << ": Could not finalize archived log file "
+                  << tmpArchiveName.toStdString() << " as " << archiveName.toStdString() << '\n';
+        return;
+    }
+
+    textLog.close();
+    textLog.remove();
 }
 
 void File::rotateAndStartArchivingIfNeeded()
@@ -307,7 +339,9 @@ void File::rotateAndStartArchivingIfNeeded()
                 ? Extension::log
                 : Extension::zip);
         if (fileName != correctName)
-            dir.rename(fileName, correctName);
+        {
+            renameFileWithoutCopyFallback(dir.filePath(fileName), dir.filePath(correctName));
+        }
     }
 
     if (!m_settings.archivingEnabled)
@@ -318,7 +352,11 @@ void File::rotateAndStartArchivingIfNeeded()
             std::cerr << nx::toString(this).toStdString() << ": Replacing existing log file "
                 << rotateName.toStdString() << '\n';
         }
-        QFile::rename(getFileName(), rotateName);
+        if (!renameFileWithoutCopyFallback(getFileName(), rotateName))
+        {
+            std::cerr << nx::toString(this).toStdString() << ": Could not rotate log file "
+                      << getFileName().toStdString() << " to " << rotateName.toStdString() << '\n';
+        }
         return;
     }
 
@@ -329,7 +367,14 @@ void File::rotateAndStartArchivingIfNeeded()
         std::cerr << nx::toString(this).toStdString() << ": Replacing existing archived log file "
             << archiveName.toStdString() << '\n';
     }
-    QFile::rename(getFileName(), tmpName);
+    if (!renameFileWithoutCopyFallback(getFileName(), tmpName))
+    {
+        // A copying fallback must not run here: rotation is synchronous under the log writer lock,
+        // so a blocked copy would stop every thread trying to write a log message.
+        std::cerr << nx::toString(this).toStdString() << ": Could not rotate log file "
+                  << getFileName().toStdString() << " to " << tmpName.toStdString() << '\n';
+        return;
+    }
     try
     {
         m_archive = std::async(std::launch::async, &File::archive, this, tmpName, archiveName);
@@ -389,7 +434,9 @@ void File::rotateLeftovers()
             const auto correctName = QFileInfo(makeFileName(m_settings.name, rotation++, Extension::tmp))
                 .fileName();
             if (fileName != correctName)
-                dir.rename(fileName, correctName);
+            {
+                renameFileWithoutCopyFallback(dir.filePath(fileName), dir.filePath(correctName));
+            }
         }
     }
 
@@ -418,7 +465,9 @@ void File::rotateLeftovers()
                 fileName.endsWith(toQString(Extension::log)) ? Extension::tmp : Extension::zipTmp))
                 .fileName();
             if (fileName != correctName)
-                dir.rename(fileName, correctName);
+            {
+                renameFileWithoutCopyFallback(dir.filePath(fileName), dir.filePath(correctName));
+            }
         }
     }
 
@@ -432,7 +481,7 @@ void File::rotateLeftovers()
             const auto correctName = fileName.endsWith(toQString(Extension::tmp))
                 ? fileName.chopped(toQString(Extension::tmp).size()) + toQString(Extension::log)
                 : fileName.chopped(toQString(Extension::zipTmp).size()) + toQString(Extension::zip);
-            dir.rename(fileName, correctName);
+            renameFileWithoutCopyFallback(dir.filePath(fileName), dir.filePath(correctName));
             continue;
         }
 

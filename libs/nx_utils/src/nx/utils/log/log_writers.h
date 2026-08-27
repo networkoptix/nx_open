@@ -45,6 +45,10 @@ private:
 
 /**
  * File writer with backup rotation.
+ *
+ * Construction also recovers leftover log and temporary archive files from an interrupted
+ * previous run. Runtime rotation avoids Qt's file-copy fallback while logging locks are held;
+ * failed rotations remain on disk for a later attempt or constructor-time recovery.
  */
 class NX_UTILS_API File: public AbstractWriter
 {
