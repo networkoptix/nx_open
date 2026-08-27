@@ -748,7 +748,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>إنشاء</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -847,7 +847,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
   </context>
   <context>
@@ -1784,7 +1784,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>إنشاء</translation>
     </message>
   </context>
   <context>
@@ -2149,7 +2149,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
     <message>
       <source>Finished</source>

@@ -2079,7 +2079,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>استمر</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -3125,7 +3125,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>إنشاء</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -5998,11 +5998,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>حذف تخطيط?</translation>
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>حذف المستخدم؟</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -6985,7 +6985,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>معطل</translation>
     </message>
   </context>
   <context>
@@ -9366,7 +9366,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation type="unfinished">Custom number that can be assigned to a layout for quick identification and access</translation>
+      <translation>رقم مخصص يمكن تعيينه إلى تخطيط للتعرف السريع والوصول</translation>
     </message>
     <message>
       <source>This ID is already in use. Use Generate button to find a free ID.</source>
@@ -9392,7 +9392,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>معطل</translation>
     </message>
   </context>
   <context>
@@ -9651,7 +9651,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Debug</source>
-      <translation type="unfinished">Debug</translation>
+      <translation>تنقيح</translation>
     </message>
     <message>
       <source>Verbose</source>
@@ -11079,7 +11079,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Confirm</source>
-      <translation type="unfinished">Confirm</translation>
+      <translation>تأكيد</translation>
     </message>
   </context>
   <context>
@@ -11370,7 +11370,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>لا يؤثر على الاتصالات التي أنشأها الخادم.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -11542,11 +11542,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>الاتصال على أي حال</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>استمر</translation>
     </message>
     <message>
       <source>I trust this server</source>
@@ -12391,7 +12391,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>إنشاء</translation>
     </message>
     <message>
       <source>New Link - %1</source>
@@ -12813,7 +12813,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>أدوات المطور</translation>
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>

@@ -25,14 +25,12 @@
         <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
         <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
         <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
         <numerusform>אירע לראשונה: %1 ב %2 (בסך הכל %n פעמים)</numerusform>
@@ -312,14 +310,12 @@
         <numerusform>Selected devices were removed</numerusform>
         <numerusform>Selected devices were removed</numerusform>
         <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
       <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
         <numerusform>Selected cameras were removed</numerusform>
         <numerusform>Selected cameras were removed</numerusform>
         <numerusform>Selected cameras were removed</numerusform>
@@ -332,14 +328,12 @@
         <numerusform>Selected servers were removed</numerusform>
         <numerusform>Selected servers were removed</numerusform>
         <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <comment>Numerus form depend on layouts count</comment>
       <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
         <numerusform>Selected layouts were removed</numerusform>
         <numerusform>Selected layouts were removed</numerusform>
         <numerusform>Selected layouts were removed</numerusform>
@@ -366,7 +360,6 @@
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
       <translation>
-        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
         <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
@@ -686,14 +679,12 @@
         <numerusform>Some of the headers are not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
         <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
       <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
         <numerusform>All the headers are not valid</numerusform>
@@ -750,7 +741,6 @@
       <source>%1 (%n times)</source>
       <comment>%1 is a cause of the event</comment>
       <translation>
-        <numerusform>%1 (%n פעמים)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
         <numerusform>%1 (%n פעמים)</numerusform>
@@ -822,7 +812,6 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
         <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
         <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
         <numerusform>לא התקבל מידע ב%n השניות האחרונות.</numerusform>
@@ -1045,7 +1034,6 @@
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1054,13 +1042,11 @@
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
