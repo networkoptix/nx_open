@@ -381,13 +381,11 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>Batch Edit - %n Users</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
         <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
@@ -495,13 +493,11 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>%n chosen devices</numerusform>
         <numerusform>%n chosen devices</numerusform>
         <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
@@ -770,7 +766,6 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
       <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
         <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
@@ -1258,7 +1253,6 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
         <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
       </translation>
     </message>
     <message>
@@ -1526,7 +1520,6 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>שורה זו דורשת לפחות %n נקודות.</numerusform>
         <numerusform>שורה זו דורשת לפחות %n נקודות.</numerusform>
         <numerusform>שורה זו דורשת לפחות %n נקודות.</numerusform>
-        <numerusform>שורה זו דורשת לפחות %n נקודות.</numerusform>
       </translation>
     </message>
     <message>
@@ -1536,7 +1529,6 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
@@ -1743,7 +1735,6 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1826,7 +1817,6 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>with %n attributes</source>
       <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
         <numerusform>with %n attributes</numerusform>
         <numerusform>with %n attributes</numerusform>
         <numerusform>with %n attributes</numerusform>
@@ -2059,7 +2049,6 @@ Select an Integration to begin configuring its parameters.</translation>
         <numerusform>מצולע זה דורש לפחות %n נקודות.</numerusform>
         <numerusform>מצולע זה דורש לפחות %n נקודות.</numerusform>
         <numerusform>מצולע זה דורש לפחות %n נקודות.</numerusform>
-        <numerusform>מצולע זה דורש לפחות %n נקודות.</numerusform>
       </translation>
     </message>
     <message>
@@ -2069,7 +2058,6 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
         <numerusform>הגעת למספר הנקודות המרבי (%n נקודות).</numerusform>
@@ -2399,7 +2387,6 @@ Press Alt + Click to follow object</translation>
         <numerusform>... ועוד %n</numerusform>
         <numerusform>... ועוד %n</numerusform>
         <numerusform>... ועוד %n</numerusform>
-        <numerusform>... ועוד %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2652,7 +2639,6 @@ Press Alt + Click to follow object</translation>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
         <numerusform>הגדר עבור כל %n מצלמות</numerusform>
-        <numerusform>הגדר עבור כל %n מצלמות</numerusform>
       </translation>
     </message>
     <message>
@@ -2857,7 +2843,6 @@ Press Alt + Click to follow object</translation>
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>

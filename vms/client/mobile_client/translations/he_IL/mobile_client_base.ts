@@ -10,7 +10,6 @@
         <numerusform>%n Object Attributes</numerusform>
         <numerusform>%n Object Attributes</numerusform>
         <numerusform>%n Object Attributes</numerusform>
-        <numerusform>%n Object Attributes</numerusform>
       </translation>
     </message>
     <message>

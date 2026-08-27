@@ -109,14 +109,12 @@
         <numerusform>Bytes</numerusform>
         <numerusform>Bytes</numerusform>
         <numerusform>Bytes</numerusform>
-        <numerusform>Bytes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Numerus: Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>קילובייט</numerusform>
         <numerusform>קילובייט</numerusform>
         <numerusform>קילובייט</numerusform>
         <numerusform>קילובייט</numerusform>
@@ -129,14 +127,12 @@
         <numerusform>מגהבייט</numerusform>
         <numerusform>מגהבייט</numerusform>
         <numerusform>מגהבייט</numerusform>
-        <numerusform>מגהבייט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Numerus: Full suffix for displaying gigabytes</comment>
       <translation>
-        <numerusform>ג'יגה-בייט</numerusform>
         <numerusform>ג'יגה-בייט</numerusform>
         <numerusform>ג'יגה-בייט</numerusform>
         <numerusform>ג'יגה-בייט</numerusform>
@@ -149,14 +145,12 @@
         <numerusform>טרה-בייטים</numerusform>
         <numerusform>טרה-בייטים</numerusform>
         <numerusform>טרה-בייטים</numerusform>
-        <numerusform>טרה-בייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Numerus: Full suffix for displaying petabytes</comment>
       <translation>
-        <numerusform>פטאבייטים</numerusform>
         <numerusform>פטאבייטים</numerusform>
         <numerusform>פטאבייטים</numerusform>
         <numerusform>פטאבייטים</numerusform>
@@ -239,7 +233,6 @@
         <numerusform>התקנים %n מ %1</numerusform>
         <numerusform>התקנים %n מ %1</numerusform>
         <numerusform>התקנים %n מ %1</numerusform>
-        <numerusform>התקנים %n מ %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -248,13 +241,11 @@
         <numerusform>מצלמות %n מ %1</numerusform>
         <numerusform>מצלמות %n מ %1</numerusform>
         <numerusform>מצלמות %n מ %1</numerusform>
-        <numerusform>מצלמות %n מ %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 I/O modules</source>
       <translation>
-        <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
         <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
         <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
         <numerusform>מודולי קלט/פלט %n מ %1</numerusform>
@@ -296,7 +287,6 @@
       <source>%1 does not support two-way audio</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
       <translation>
-        <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
         <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
         <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
         <numerusform>%1 אינו תומך באודיו דו-כיווני</numerusform>
@@ -539,7 +529,6 @@
         <numerusform>ל%1 אין כניסות קלט</numerusform>
         <numerusform>ל%1 אין כניסות קלט</numerusform>
         <numerusform>ל%1 אין כניסות קלט</numerusform>
-        <numerusform>ל%1 אין כניסות קלט</numerusform>
       </translation>
     </message>
   </context>
@@ -566,7 +555,6 @@
         <numerusform>ל%1 אין יציאות ממסר</numerusform>
         <numerusform>ל%1 אין יציאות ממסר</numerusform>
         <numerusform>ל%1 אין יציאות ממסר</numerusform>
-        <numerusform>ל%1 אין יציאות ממסר</numerusform>
       </translation>
     </message>
   </context>
@@ -583,7 +571,6 @@
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>
-        <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
         <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
         <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
         <numerusform>%n מתוך %1 משתמשים שנבחרו אינם %2 משתמשים ולא יקבלו התראות לנייד.</numerusform>
@@ -734,7 +721,6 @@
         <numerusform>%n רישיון זמני</numerusform>
         <numerusform>%n רישיונות זמניים</numerusform>
         <numerusform>%n רישיונות זמניים</numerusform>
-        <numerusform>%n רישיונות זמניים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -743,13 +729,11 @@
         <numerusform>%n רישיון אנלוגי</numerusform>
         <numerusform>%n רישיונות אנלוגים</numerusform>
         <numerusform>%n רישיונות אנלוגים</numerusform>
-        <numerusform>%n רישיונות אנלוגים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>%n רישיונות מקצועיים</numerusform>
         <numerusform>%n רישיונות מקצועיים</numerusform>
         <numerusform>%n רישיונות מקצועיים</numerusform>
         <numerusform>%n רישיונות מקצועיים</numerusform>
@@ -761,13 +745,11 @@
         <numerusform>%n רישיונות קצה</numerusform>
         <numerusform>%n רישיונות קצה</numerusform>
         <numerusform>%n רישיונות קצה</numerusform>
-        <numerusform>%n רישיונות קצה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>%n רשיונות Vmax</numerusform>
         <numerusform>%n רשיונות Vmax</numerusform>
         <numerusform>%n רשיונות Vmax</numerusform>
         <numerusform>%n רשיונות Vmax</numerusform>
@@ -779,13 +761,11 @@
         <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
         <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
         <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
-        <numerusform>%n רשיונות מקודד אנלוגי</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n רישיונות קיר וידאו</numerusform>
         <numerusform>%n רישיונות קיר וידאו</numerusform>
         <numerusform>%n רישיונות קיר וידאו</numerusform>
         <numerusform>%n רישיונות קיר וידאו</numerusform>
@@ -797,13 +777,11 @@
         <numerusform>%n רישיונות התקן קלט / פלט</numerusform>
         <numerusform>%n רישיונות התקן קלט / פלט</numerusform>
         <numerusform>%n רישיונות קלט / פלט</numerusform>
-        <numerusform>%n רישיונות קלט / פלט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>%n רישיונות התחלה</numerusform>
         <numerusform>%n רישיונות התחלה</numerusform>
         <numerusform>%n רישיונות התחלה</numerusform>
         <numerusform>%n רישיונות התחלה</numerusform>
@@ -815,13 +793,11 @@
         <numerusform>%n רישיונות גישור</numerusform>
         <numerusform>%n רישיונות גישור</numerusform>
         <numerusform>%n רישיונות גישור</numerusform>
-        <numerusform>%n רישיונות גישור</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>%n רישיונות לא חוקיים</numerusform>
         <numerusform>%n רישיונות לא חוקיים</numerusform>
         <numerusform>%n רישיונות לא חוקיים</numerusform>
         <numerusform>%n רישיונות לא חוקיים</numerusform>
@@ -837,14 +813,12 @@
         <numerusform>%n רישיונות חינם</numerusform>
         <numerusform>%n רישיונות חינם</numerusform>
         <numerusform>%n רישיונות חינם</numerusform>
-        <numerusform>%n רישיונות חינם</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רישיונות זמניים</numerusform>
         <numerusform>%n/%1 רישיונות זמניים</numerusform>
         <numerusform>%n/%1 רישיונות זמניים</numerusform>
         <numerusform>%n/%1 רישיונות זמניים</numerusform>
@@ -857,14 +831,12 @@
         <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
         <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
         <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
-        <numerusform>%n/%1 רישיונות אנלוגיים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
         <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
         <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
         <numerusform>%n/%1 רשיונות מקצועיים</numerusform>
@@ -877,14 +849,12 @@
         <numerusform>%n/%1 רשיונות Edge</numerusform>
         <numerusform>%n/%1 רשיונות Edge</numerusform>
         <numerusform>%n/%1 רשיונות Edge</numerusform>
-        <numerusform>%n/%1 רשיונות Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רשיונות Vmax</numerusform>
         <numerusform>%n/%1 רשיונות Vmax</numerusform>
         <numerusform>%n/%1 רשיונות Vmax</numerusform>
         <numerusform>%n/%1 רשיונות Vmax</numerusform>
@@ -897,14 +867,12 @@
         <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
         <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
         <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
-        <numerusform>%n/%1 רשיונות מקודד אנלוגי</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
         <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
         <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
         <numerusform>%n/%1 רישיונות קיר וידאו</numerusform>
@@ -917,14 +885,12 @@
         <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
         <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
         <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
-        <numerusform>%n/%1 רשיונות מודול קלט/פלט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רישיונות התחלה</numerusform>
         <numerusform>%n/%1 רישיונות התחלה</numerusform>
         <numerusform>%n/%1 רישיונות התחלה</numerusform>
         <numerusform>%n/%1 רישיונות התחלה</numerusform>
@@ -937,7 +903,6 @@
         <numerusform>%n/%1 רישיונות חינם</numerusform>
         <numerusform>%n/%1 רישיונות חינם</numerusform>
         <numerusform>%n/%1 רישיונות חינם</numerusform>
-        <numerusform>%n/%1 רישיונות חינם</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -947,14 +912,12 @@
         <numerusform>%n/%1 רשיונות גישור</numerusform>
         <numerusform>%n/%1 רשיונות גישור</numerusform>
         <numerusform>%n/%1 רשיונות גישור</numerusform>
-        <numerusform>%n/%1 רשיונות גישור</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
         <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
         <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
         <numerusform>%n/%1 רישיונות לא חוקיים</numerusform>
@@ -974,14 +937,12 @@
         <numerusform>%n NVR Licenses</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
@@ -997,14 +958,12 @@
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
@@ -1037,13 +996,11 @@
         <numerusform>%n groups</numerusform>
         <numerusform>%n groups</numerusform>
         <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n users</source>
       <translation>
-        <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
@@ -1061,7 +1018,6 @@
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
       </translation>
     </message>
     <message>
@@ -1073,7 +1029,6 @@
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
@@ -1093,13 +1048,11 @@
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
@@ -1111,13 +1064,11 @@
         <numerusform>%n התקני קלט/פלט</numerusform>
         <numerusform>%n התקני קלט/פלט</numerusform>
         <numerusform>%n התקני קלט/פלט</numerusform>
-        <numerusform>%n התקני קלט/פלט</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation>
-        <numerusform>%n התקני קלט/פלט</numerusform>
         <numerusform>%n התקני קלט/פלט</numerusform>
         <numerusform>%n התקני קלט/פלט</numerusform>
         <numerusform>%n התקני קלט/פלט</numerusform>
@@ -1129,13 +1080,11 @@
         <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
-        <numerusform>%n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
       <translation>
-        <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
@@ -1265,14 +1214,12 @@
         <numerusform>מילי שניות</numerusform>
         <numerusform>מילי שניות</numerusform>
         <numerusform>מילי שניות</numerusform>
-        <numerusform>מילי שניות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Numerus: Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>שניות</numerusform>
         <numerusform>שניות</numerusform>
         <numerusform>שניות</numerusform>
         <numerusform>שניות</numerusform>
@@ -1285,14 +1232,12 @@
         <numerusform>דקות</numerusform>
         <numerusform>דקות</numerusform>
         <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>שעות</numerusform>
         <numerusform>שעות</numerusform>
         <numerusform>שעות</numerusform>
         <numerusform>שעות</numerusform>
@@ -1305,14 +1250,12 @@
         <numerusform>ימים</numerusform>
         <numerusform>ימים</numerusform>
         <numerusform>ימים</numerusform>
-        <numerusform>ימים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Numerus: Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>שבועות</numerusform>
         <numerusform>שבועות</numerusform>
         <numerusform>שבועות</numerusform>
         <numerusform>שבועות</numerusform>
@@ -1325,14 +1268,12 @@
         <numerusform>חודשים</numerusform>
         <numerusform>חודשים</numerusform>
         <numerusform>חודשים</numerusform>
-        <numerusform>חודשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Numerus: Full suffix for displaying years</comment>
       <translation>
-        <numerusform>שנים</numerusform>
         <numerusform>שנים</numerusform>
         <numerusform>שנים</numerusform>
         <numerusform>שנים</numerusform>
@@ -1385,14 +1326,12 @@
         <numerusform>Milliseconds</numerusform>
         <numerusform>Milliseconds</numerusform>
         <numerusform>Milliseconds</numerusform>
-        <numerusform>Milliseconds</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Seconds</source>
       <comment>Numerus: Capitalized full suffix for displaying seconds</comment>
       <translation type="unfinished">
-        <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
         <numerusform>Seconds</numerusform>
@@ -1405,14 +1344,12 @@
         <numerusform>דקות</numerusform>
         <numerusform>דקות</numerusform>
         <numerusform>דקות</numerusform>
-        <numerusform>דקות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
       <translation type="unfinished">
-        <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
         <numerusform>Hours</numerusform>
@@ -1425,14 +1362,12 @@
         <numerusform>Days</numerusform>
         <numerusform>Days</numerusform>
         <numerusform>Days</numerusform>
-        <numerusform>Days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Weeks</source>
       <comment>Numerus: Capitalized full suffix for displaying weeks</comment>
       <translation type="unfinished">
-        <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
         <numerusform>Weeks</numerusform>
@@ -1445,14 +1380,12 @@
         <numerusform>Months</numerusform>
         <numerusform>Months</numerusform>
         <numerusform>Months</numerusform>
-        <numerusform>Months</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Years</source>
       <comment>Numerus: Capitalized full suffix for displaying years</comment>
       <translation type="unfinished">
-        <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>
         <numerusform>Years</numerusform>
@@ -1602,7 +1535,6 @@
         <numerusform>%n minutes ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
         <numerusform>%n minutes ago</numerusform>
-        <numerusform>%n minutes ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1611,13 +1543,11 @@
         <numerusform>%n hours ago</numerusform>
         <numerusform>%n hours ago</numerusform>
         <numerusform>%n hours ago</numerusform>
-        <numerusform>%n hours ago</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
       <translation type="unfinished">
-        <numerusform>%n days ago</numerusform>
         <numerusform>%n days ago</numerusform>
         <numerusform>%n days ago</numerusform>
         <numerusform>%n days ago</numerusform>

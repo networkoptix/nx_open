@@ -60,7 +60,6 @@
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
         <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
       </translation>
     </message>
   </context>
@@ -80,14 +79,12 @@
         <numerusform>%1 בשימוש</numerusform>
         <numerusform>%1 בשימוש</numerusform>
         <numerusform>%1 בשימוש</numerusform>
-        <numerusform>%1 בשימוש</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Numerus: text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -1134,7 +1131,6 @@
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1144,14 +1140,12 @@
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
         <numerusform>Mute Items</numerusform>
-        <numerusform>Mute Items</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Unmute Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
-        <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
         <numerusform>Unmute Items</numerusform>
@@ -1317,7 +1311,6 @@
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
-        <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
   </context>
@@ -1449,13 +1442,11 @@ License Key: %2</translation>
         <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
         <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
         <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
-        <numerusform>נכשל הניסיון להשבית %n רישיונות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation>
-        <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
@@ -1487,14 +1478,12 @@ License Key: %2</translation>
         <numerusform>%n רישיונות הושבתו</numerusform>
         <numerusform>%n רישיונות הושבתו</numerusform>
         <numerusform>%n רישיונות הושבתו</numerusform>
-        <numerusform>%n רישיונות הושבתו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
       <comment>Numerus form depends on the amount of licenses</comment>
       <translation>
-        <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
         <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
         <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
         <numerusform>אין אפשרות להשבית את הרישיונות</numerusform>
@@ -1507,7 +1496,6 @@ License Key: %2</translation>
         <numerusform>השבת %n אחרים</numerusform>
         <numerusform>השבת %n אחרים</numerusform>
         <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
       </translation>
     </message>
   </context>
@@ -1516,7 +1504,6 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n channels.</source>
       <translation>
-        <numerusform>%n ערוצים.</numerusform>
         <numerusform>%n ערוצים.</numerusform>
         <numerusform>%n ערוצים.</numerusform>
         <numerusform>%n ערוצים.</numerusform>
@@ -1573,7 +1560,6 @@ License Key: %2</translation>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Numerus form depends on the amount of characters</comment>
       <translation>
-        <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
         <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
         <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
         <numerusform>שם הקובץ אינו יכול להכיל את התווים השמורים הבאים:</numerusform>
@@ -1722,7 +1708,6 @@ License Key: %2</translation>
         <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
         <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
         <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
-        <numerusform>הסיסמה צריכה להכיל %n שילובים שונים של תווים, סמלים או ספרות</numerusform>
       </translation>
     </message>
     <message>
@@ -1751,13 +1736,11 @@ License Key: %2</translation>
         <numerusform>סיסמה חייבת להכיל לפחות %n תווים</numerusform>
         <numerusform>סיסמה חייבת להכיל לפחות %n תווים</numerusform>
         <numerusform>סיסמה חייבת להכיל לפחות %n תווים</numerusform>
-        <numerusform>סיסמה חייבת להכיל לפחות %n תווים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters</source>
       <translation>
-        <numerusform>הסיסמה חייבת להיות פחות מ %n תווים</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים</numerusform>
         <numerusform>הסיסמה חייבת להיות פחות מ %n תווים</numerusform>
@@ -1782,14 +1765,12 @@ License Key: %2</translation>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד</numerusform>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד</numerusform>
         <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד</numerusform>
-        <numerusform>הסיסמה לאי כולה להכיל %n תווים או יותר רצופים ביחד</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
       <translation>
-        <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר</numerusform>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר</numerusform>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר</numerusform>
         <numerusform>הסיסמה לא תכיל %n תווים חוזרים או יותר</numerusform>
@@ -2183,14 +2164,12 @@ License Key: %2</translation>
         <numerusform>פרטים עבור %n שיחות של %1</numerusform>
         <numerusform>פרטים עבור %n שיחות של %1</numerusform>
         <numerusform>פרטים עבור %n שיחות של %1</numerusform>
-        <numerusform>פרטים עבור %n שיחות של %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
         <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
         <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
         <numerusform>פרטים עבור %n מצלמות של %1</numerusform>
@@ -2211,7 +2190,6 @@ License Key: %2</translation>
         <numerusform>These devices are removed from Site</numerusform>
         <numerusform>These devices are removed from Site</numerusform>
         <numerusform>These devices are removed from Site</numerusform>
-        <numerusform>These devices are removed from Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -2221,14 +2199,12 @@ License Key: %2</translation>
         <numerusform>These cameras are removed from Site</numerusform>
         <numerusform>These cameras are removed from Site</numerusform>
         <numerusform>These cameras are removed from Site</numerusform>
-        <numerusform>These cameras are removed from Site</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from Site</source>
       <comment>Numerus form depends on the number of resources</comment>
       <translation type="unfinished">
-        <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
         <numerusform>These resources are removed from Site</numerusform>
@@ -2363,7 +2339,6 @@ License Key: %2</translation>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
-        <numerusform>%n פעולות</numerusform>
       </translation>
     </message>
     <message>
@@ -2475,7 +2450,6 @@ License Key: %2</translation>
       <source>You have %n notifications</source>
       <translation>
         <numerusform>יש לך התראה %n</numerusform>
-        <numerusform>יש לך %n התראות</numerusform>
         <numerusform>יש לך %n התראות</numerusform>
         <numerusform>יש לך %n התראות</numerusform>
       </translation>
@@ -2630,14 +2604,12 @@ License Key: %2</translation>
         <numerusform>נמצא התקן %n</numerusform>
         <numerusform>נמצאו %n התקנים</numerusform>
         <numerusform>נמצאו %n התקנים</numerusform>
-        <numerusform>נמצאו %n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation>
         <numerusform>נמצאה מצלמה %n</numerusform>
-        <numerusform>נמצאו %n מצלמות</numerusform>
         <numerusform>נמצאו %n מצלמות</numerusform>
         <numerusform>נמצאו %n מצלמות</numerusform>
       </translation>
@@ -2654,7 +2626,6 @@ License Key: %2</translation>
       <source>%n I/O modules found</source>
       <translation>
         <numerusform>נמצא התקן קלט/פלט %n</numerusform>
-        <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
         <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
         <numerusform>נמצאו %n התקני קלט/פלט</numerusform>
       </translation>
@@ -3426,7 +3397,6 @@ License Key: %2</translation>
         <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
         <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
         <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
-        <numerusform>הרישיון יפוג בעוד- %n ימים</numerusform>
       </translation>
     </message>
     <message>
@@ -3628,7 +3598,6 @@ License Key: %2</translation>
         <numerusform>Set for %n devices</numerusform>
         <numerusform>Set for %n devices</numerusform>
         <numerusform>Set for %n devices</numerusform>
-        <numerusform>Set for %n devices</numerusform>
       </translation>
     </message>
   </context>
@@ -3794,14 +3763,12 @@ License Key: %2</translation>
         <numerusform>פריסט זה יופעל לאחר דקה %n של חוסר פעילות</numerusform>
         <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
         <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
-        <numerusform>פריסט זה יופעל לאחר %n דקות של חוסר פעילות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
         <numerusform>לסיור מיקום חופף %n</numerusform>
-        <numerusform>לסיור %n מיקומים חופפים</numerusform>
         <numerusform>לסיור %n מיקומים חופפים</numerusform>
         <numerusform>לסיור %n מיקומים חופפים</numerusform>
       </translation>
@@ -3833,7 +3800,6 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation>
-        <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
         <numerusform>בערך %n דקות</numerusform>
@@ -3926,7 +3892,6 @@ License Key: %2</translation>
         <numerusform>סך הכל %1 %n התקנים</numerusform>
         <numerusform>סך הכל %1 %n התקנים</numerusform>
         <numerusform>סך הכל %1 %n התקנים</numerusform>
-        <numerusform>סך הכל %1 %n התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3936,14 +3901,12 @@ License Key: %2</translation>
         <numerusform>סך הכל %1 %n מצלמות</numerusform>
         <numerusform>סך הכל %1 %n מצלמות</numerusform>
         <numerusform>סך הכל %1 %n מצלמות</numerusform>
-        <numerusform>סך הכל %1 %n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n I/O modules</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation>
-        <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
         <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
         <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
         <numerusform>סה"כ %1 %n מודולי קלט / פלט</numerusform>
@@ -4162,7 +4125,6 @@ License Key: %2</translation>
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
-        <numerusform>%n פריסות</numerusform>
       </translation>
     </message>
   </context>
@@ -4186,7 +4148,6 @@ License Key: %2</translation>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
-        <numerusform>%n שרתים</numerusform>
       </translation>
     </message>
   </context>
@@ -4207,7 +4168,6 @@ License Key: %2</translation>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
@@ -4295,7 +4255,6 @@ License Key: %2</translation>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
       </translation>
     </message>
     <message>
@@ -4322,7 +4281,6 @@ License Key: %2</translation>
       <source>Certificates</source>
       <comment>Numerus form depends on the certificates count</comment>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
@@ -4521,7 +4479,6 @@ License Key: %2</translation>
       <source>%n TB</source>
       <comment>Numerus: TB for terabytes</comment>
       <translation>
-        <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -5094,13 +5051,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Storage is not configured on %n servers</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
         <numerusform>Storage is not configured on %n servers</numerusform>
-        <numerusform>Storage is not configured on %n servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup storage is not configured on %n servers</source>
       <translation type="unfinished">
-        <numerusform>Backup storage is not configured on %n servers</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
         <numerusform>Backup storage is not configured on %n servers</numerusform>
@@ -5116,13 +5071,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
         <numerusform>Recording schedule is invalid on %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid on %n cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
         <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
         <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
         <numerusform>כתובת האימייל אינה מוגדרת עבור %n משתמשים</numerusform>
@@ -5143,13 +5096,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
         <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
-        <numerusform>Storage for analytics data is not set on %n Servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>System storage is used for analytics data on %n servers</source>
       <translation type="unfinished">
-        <numerusform>System storage is used for analytics data on %n servers</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
         <numerusform>System storage is used for analytics data on %n servers</numerusform>
@@ -5197,7 +5148,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
         <numerusform>Site will stop functioning in %n days</numerusform>
-        <numerusform>Site will stop functioning in %n days</numerusform>
       </translation>
     </message>
     <message>
@@ -5236,7 +5186,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>+ %n more</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation type="unfinished">
-        <numerusform>+ %n more</numerusform>
         <numerusform>+ %n more</numerusform>
         <numerusform>+ %n more</numerusform>
         <numerusform>+ %n more</numerusform>
@@ -5373,7 +5322,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>מחשב %1 - תצוגות %2</numerusform>
         <numerusform>מחשב %1 - תצוגות %2</numerusform>
         <numerusform>מחשב %1 - תצוגות %2</numerusform>
-        <numerusform>מחשב %1 - תצוגות %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5417,7 +5365,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
       <translation>
-        <numerusform>מחק %n סימניות?</numerusform>
         <numerusform>מחק %n סימניות?</numerusform>
         <numerusform>מחק %n סימניות?</numerusform>
         <numerusform>מחק %n סימניות?</numerusform>
@@ -5466,7 +5413,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
         <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
         <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
-        <numerusform>%n הפריטים הבאים לא נשמרים:</numerusform>
       </translation>
     </message>
     <message>
@@ -5476,7 +5422,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n items:</source>
       <translation>
-        <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
         <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
         <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
         <numerusform>מחיקת %n פריטים נכשלה:</numerusform>
@@ -5598,13 +5543,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
         <numerusform>Failed to open %n devices on the video wall:</numerusform>
-        <numerusform>Failed to open %n devices on the video wall:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to open %n cameras on the video wall:</source>
       <translation type="unfinished">
-        <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
         <numerusform>Failed to open %n cameras on the video wall:</numerusform>
@@ -5633,14 +5576,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
-        <numerusform>You cannot add to the video wall devices for which you do not have View Live permission.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You cannot add to the video wall cameras for which you do not have View Live permission.</source>
       <comment>Numerus form depends on the number of cameras</comment>
       <translation type="unfinished">
-        <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
         <numerusform>You cannot add to the video wall cameras for which you do not have View Live permission.</numerusform>
@@ -5679,7 +5620,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
         <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
         <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
-        <numerusform>האם להסיר %n פריטים מפריסה?</numerusform>
       </translation>
     </message>
     <message>
@@ -5700,13 +5640,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>מחק %n התקנים?</numerusform>
         <numerusform>מחק %n התקנים?</numerusform>
         <numerusform>מחק %n התקנים?</numerusform>
-        <numerusform>מחק %n התקנים?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n cameras?</source>
       <translation>
-        <numerusform>מחק %n מצלמות?</numerusform>
         <numerusform>מחק %n מצלמות?</numerusform>
         <numerusform>מחק %n מצלמות?</numerusform>
         <numerusform>מחק %n מצלמות?</numerusform>
@@ -5718,13 +5656,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
         <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
         <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
-        <numerusform>מחק %n מודולי קלט / פלט?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>מחק %n פריטים?</numerusform>
         <numerusform>מחק %n פריטים?</numerusform>
         <numerusform>מחק %n פריטים?</numerusform>
         <numerusform>מחק %n פריטים?</numerusform>
@@ -5736,7 +5672,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מהם התגלו באופן אוטומטי.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -5745,13 +5680,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
-        <numerusform>%n מצלמות התגלו באופן אוטומטי.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules are auto-discovered.</source>
       <translation>
-        <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
         <numerusform>%n התקני קלט/פלט התגלו באופן אוטומטי.</numerusform>
@@ -5775,7 +5708,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
         <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
         <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
-        <numerusform>האם להסיר %n פריטים מסיור הפריסות?</numerusform>
       </translation>
     </message>
     <message>
@@ -5789,7 +5721,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
         <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
         <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
         <numerusform>קבצי וידאו מסוימים עדיין מועלים ל %n מצלמות וירטואליות:</numerusform>
@@ -5861,13 +5792,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Delete %n layouts?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
         <numerusform>Delete %n layouts?</numerusform>
-        <numerusform>Delete %n layouts?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n items were not deleted.</source>
       <translation type="unfinished">
-        <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
         <numerusform>%n items were not deleted.</numerusform>
@@ -5884,7 +5813,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n matrices?</source>
       <translation>
-        <numerusform>האם למחוק %n מטריצות?</numerusform>
         <numerusform>האם למחוק %n מטריצות?</numerusform>
         <numerusform>האם למחוק %n מטריצות?</numerusform>
         <numerusform>האם למחוק %n מטריצות?</numerusform>
@@ -5906,13 +5834,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>%n layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n users?</source>
       <translation>
-        <numerusform>מחק %n משתמשים?</numerusform>
         <numerusform>מחק %n משתמשים?</numerusform>
         <numerusform>מחק %n משתמשים?</numerusform>
         <numerusform>מחק %n משתמשים?</numerusform>
@@ -5933,14 +5859,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
         <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
-        <numerusform>These layouts are shared with other users, so they will be deleted for their accounts as well.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</source>
       <comment>Numerus form depends on the amount of web pages</comment>
       <translation type="unfinished">
-        <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
         <numerusform>You are about to move these web pages to Server &quot;%1&quot;. These web pages proxy all requested contents, and their proxy server will change to Server &quot;%1&quot;.</numerusform>
@@ -6072,7 +5996,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
-        <numerusform>%n פריסות</numerusform>
       </translation>
     </message>
     <message>
@@ -6082,7 +6005,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Source Server and %n Servers</source>
       <translation type="unfinished">
-        <numerusform>Source Server and %n Servers</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
         <numerusform>Source Server and %n Servers</numerusform>
@@ -6134,7 +6056,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
-        <numerusform>%n שרתים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6143,13 +6064,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
       <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
         <numerusform>%n Groups</numerusform>
@@ -6181,13 +6100,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n removed devices</numerusform>
         <numerusform>%n removed devices</numerusform>
         <numerusform>%n removed devices</numerusform>
-        <numerusform>%n removed devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed cameras</source>
       <translation type="unfinished">
-        <numerusform>%n removed cameras</numerusform>
         <numerusform>%n removed cameras</numerusform>
         <numerusform>%n removed cameras</numerusform>
         <numerusform>%n removed cameras</numerusform>
@@ -6199,13 +6116,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n removed servers</numerusform>
         <numerusform>%n removed servers</numerusform>
         <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n removed layouts</source>
       <translation type="unfinished">
-        <numerusform>%n removed layouts</numerusform>
         <numerusform>%n removed layouts</numerusform>
         <numerusform>%n removed layouts</numerusform>
         <numerusform>%n removed layouts</numerusform>
@@ -6217,13 +6132,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n subjects more</numerusform>
         <numerusform>%n subjects more</numerusform>
         <numerusform>%n subjects more</numerusform>
-        <numerusform>%n subjects more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices more</source>
       <translation type="unfinished">
-        <numerusform>%n devices more</numerusform>
         <numerusform>%n devices more</numerusform>
         <numerusform>%n devices more</numerusform>
         <numerusform>%n devices more</numerusform>
@@ -6235,7 +6148,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n cameras more</numerusform>
         <numerusform>%n cameras more</numerusform>
         <numerusform>%n cameras more</numerusform>
-        <numerusform>%n cameras more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6244,13 +6156,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n servers more</numerusform>
         <numerusform>%n servers more</numerusform>
         <numerusform>%n servers more</numerusform>
-        <numerusform>%n servers more</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n layouts more</source>
       <translation type="unfinished">
-        <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
         <numerusform>%n layouts more</numerusform>
@@ -6263,7 +6173,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n נושאים שהוסרו</numerusform>
         <numerusform>%n נושאים שהוסרו</numerusform>
         <numerusform>%n נושאים שהוסרו</numerusform>
-        <numerusform>%n נושאים שהוסרו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6273,14 +6182,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>מקור ועוד %n מצלמות</numerusform>
         <numerusform>מקור ועוד %n מצלמות</numerusform>
         <numerusform>מקור ועוד %n מצלמות</numerusform>
-        <numerusform>מקור ועוד %n מצלמות</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n additional</source>
       <comment>Numerus: placeholder for explicitly added items</comment>
       <translation>
-        <numerusform>%n נוספים</numerusform>
         <numerusform>%n נוספים</numerusform>
         <numerusform>%n נוספים</numerusform>
         <numerusform>%n נוספים</numerusform>
@@ -6363,13 +6270,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
         <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
-        <numerusform>%n existing LDAP groups are not found in the LDAP database.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
       <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
         <numerusform>Delete %n groups</numerusform>
         <numerusform>Delete %n groups</numerusform>
         <numerusform>Delete %n groups</numerusform>
@@ -6386,7 +6291,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to delete %n groups.</source>
       <translation type="unfinished">
-        <numerusform>Failed to delete %n groups.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
         <numerusform>Failed to delete %n groups.</numerusform>
@@ -6433,13 +6337,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>מחק %n משתמשים</numerusform>
         <numerusform>מחק %n משתמשים</numerusform>
         <numerusform>מחק %n משתמשים</numerusform>
-        <numerusform>מחק %n משתמשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>LDAP server is offline. %n users are not able to log in.</source>
       <translation type="unfinished">
-        <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
         <numerusform>LDAP server is offline. %n users are not able to log in.</numerusform>
@@ -6455,13 +6357,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
         <numerusform>Failed to delete %n users.</numerusform>
-        <numerusform>Failed to delete %n users.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n existing LDAP users are not found in the LDAP database</source>
       <translation type="unfinished">
-        <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
         <numerusform>%n existing LDAP users are not found in the LDAP database</numerusform>
@@ -6512,7 +6412,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n rules?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
         <numerusform>Delete %n rules?</numerusform>
@@ -6668,13 +6567,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n chosen devices</numerusform>
         <numerusform>%n chosen devices</numerusform>
         <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
       <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
         <numerusform>%n chosen cameras</numerusform>
@@ -6789,7 +6686,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n objects</source>
       <translation>
-        <numerusform>%n אובייקטים</numerusform>
         <numerusform>%n אובייקטים</numerusform>
         <numerusform>%n אובייקטים</numerusform>
         <numerusform>%n אובייקטים</numerusform>
@@ -6977,13 +6873,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n suitable cloud storage services are required</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
         <numerusform>%n suitable cloud storage services are required</numerusform>
-        <numerusform>%n suitable cloud storage services are required</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Megapixels</source>
       <translation type="unfinished">
-        <numerusform>%n Megapixels</numerusform>
         <numerusform>%n Megapixels</numerusform>
         <numerusform>%n Megapixels</numerusform>
         <numerusform>%n Megapixels</numerusform>
@@ -7000,7 +6894,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n suitable cloud storage services available</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
         <numerusform>%n suitable cloud storage services available</numerusform>
@@ -7029,7 +6922,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
         <numerusform>%n MP</numerusform>
-        <numerusform>%n MP</numerusform>
       </translation>
     </message>
   </context>
@@ -7050,7 +6942,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Set for %n selected devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
@@ -7082,13 +6973,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Backup will not be activated for %n devices:</numerusform>
         <numerusform>Backup will not be activated for %n devices:</numerusform>
         <numerusform>Backup will not be activated for %n devices:</numerusform>
-        <numerusform>Backup will not be activated for %n devices:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n suitable cloud storage services are required to activate backup for them.</source>
       <translation type="unfinished">
-        <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
         <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
         <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
         <numerusform>%n suitable cloud storage services are required to activate backup for them.</numerusform>
@@ -7176,13 +7065,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Backup is enabled for %n devices</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
@@ -7207,7 +7094,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
@@ -7342,7 +7228,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
         <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
         <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
         <numerusform>קוד זיהוי זה כבר בשימוש ב %n מצלמות אחרות:</numerusform>
@@ -7534,14 +7419,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Use Services</numerusform>
         <numerusform>Use Services</numerusform>
         <numerusform>Use Services</numerusform>
-        <numerusform>Use Services</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use Licenses</source>
       <comment>Numerus form depends on the devices count</comment>
       <translation type="unfinished">
-        <numerusform>Use Licenses</numerusform>
         <numerusform>Use Licenses</numerusform>
         <numerusform>Use Licenses</numerusform>
         <numerusform>Use Licenses</numerusform>
@@ -7761,7 +7644,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
-        <numerusform>שינויים ב %n ההתקנים הבאים לא יישמרו:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7770,13 +7652,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
-        <numerusform>שינויים ב %n המצלמות הבאות לא יישמרו:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n I/O Modules are not saved:</source>
       <translation>
-        <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
         <numerusform>שינויים ב %n ההתקני קלט/פלט הבאים לא יישמרו:</numerusform>
@@ -7867,13 +7747,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Failed to enable audio on %n devices</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
@@ -7902,14 +7780,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
       <comment>Numerus form depends on the total number of devices</comment>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
         <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
@@ -8351,7 +8227,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
-        <numerusform>הוספת %n התקנים נכשלה</numerusform>
       </translation>
     </message>
     <message>
@@ -8400,7 +8275,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
-        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
       </translation>
     </message>
     <message>
@@ -8410,7 +8284,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation>
-        <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
@@ -8492,14 +8365,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
         <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
         <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
-        <numerusform>יומן אירועים לתקופה שבין %1 ל %2 - %n אירועים נמצאו</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
         <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
         <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
         <numerusform>יומן אירועים עבור %1 - %n אירועים נמצאו</numerusform>
@@ -8524,14 +8395,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
-        <numerusform>Event log for period from %1 to %2 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
         <numerusform>Event log for %1 - Showing first %n events. To find specific events, please adjust the date range or apply additional filters</numerusform>
@@ -8920,14 +8789,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n סה"כ התקנים</numerusform>
         <numerusform>%n סה"כ התקנים</numerusform>
         <numerusform>%n סה"כ התקנים</numerusform>
-        <numerusform>%n סה"כ התקנים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n new</source>
       <comment>Numerus: %n is the count of new devices</comment>
       <translation>
-        <numerusform>%n חדש</numerusform>
         <numerusform>%n חדש</numerusform>
         <numerusform>%n חדש</numerusform>
         <numerusform>%n חדש</numerusform>
@@ -8962,7 +8829,6 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
@@ -9299,7 +9165,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n ערוצים.</numerusform>
         <numerusform>%n ערוצים.</numerusform>
         <numerusform>%n ערוצים.</numerusform>
-        <numerusform>%n ערוצים.</numerusform>
       </translation>
     </message>
     <message>
@@ -9313,7 +9178,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
-        <numerusform>נותרו %n ביטולים.</numerusform>
         <numerusform>נותרו %n ביטולים.</numerusform>
         <numerusform>נותרו %n ביטולים.</numerusform>
         <numerusform>נותרו %n ביטולים.</numerusform>
@@ -9338,7 +9202,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
         <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
         <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
-        <numerusform>%1 נמצאים כרגע בשימוש</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9348,14 +9211,12 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>לפחות %1 נדרשים</numerusform>
         <numerusform>לפחות %1 נדרשים</numerusform>
         <numerusform>לפחות %1 נדרשים</numerusform>
-        <numerusform>לפחות %1 נדרשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <comment>Numerus form depends on the amount of licenses</comment>
       <translation>
-        <numerusform>להשבית רישיונות?</numerusform>
         <numerusform>להשבית רישיונות?</numerusform>
         <numerusform>להשבית רישיונות?</numerusform>
         <numerusform>להשבית רישיונות?</numerusform>
@@ -9379,7 +9240,6 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
@@ -9495,7 +9355,6 @@ Remember to return the Logging Level to its default setting after you have colle
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
         <numerusform>Debug logging is enabled on %n Servers</numerusform>
-        <numerusform>Debug logging is enabled on %n Servers</numerusform>
       </translation>
     </message>
     <message>
@@ -9573,7 +9432,6 @@ Site performance is degraded.</translation>
       <source>%n selected:</source>
       <comment>Numerus: %n is a number of selected rows</comment>
       <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
         <numerusform>%n selected:</numerusform>
@@ -9988,7 +9846,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
         <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
         <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
-        <numerusform>חסרה חבילת העדכון עבור תוכנת הקליינט ו %n שרתים</numerusform>
       </translation>
     </message>
     <message>
@@ -10248,7 +10105,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
         <numerusform>הוספת %n התקנים נכשלה</numerusform>
-        <numerusform>הוספת %n התקנים נכשלה</numerusform>
       </translation>
     </message>
     <message>
@@ -10289,7 +10145,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
         <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
-        <numerusform>%n התקנים מתווספים. באפשרותך לסגור את תיבת הדו-שיח או להתחיל חיפוש חדש</numerusform>
       </translation>
     </message>
     <message>
@@ -10299,7 +10154,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation>
-        <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
         <numerusform>הוסף %n התקנים</numerusform>
@@ -10370,7 +10224,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
-        <numerusform>%n notifications</numerusform>
       </translation>
     </message>
     <message>
@@ -10400,7 +10253,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <message numerus="yes">
       <source>%n notification types</source>
       <translation type="unfinished">
-        <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
         <numerusform>%n notification types</numerusform>
@@ -10735,7 +10587,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
         <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
-        <numerusform>עבור ייצוא כ Rapid Review אורך וידאו צריך להיות לפחות %n שניות.</numerusform>
       </translation>
     </message>
   </context>
@@ -10798,7 +10649,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
         <numerusform>%1 and %n more layouts</numerusform>
-        <numerusform>%1 and %n more layouts</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10808,14 +10658,12 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
         <numerusform>%1 and %n more video walls</numerusform>
-        <numerusform>%1 and %n more video walls</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 and %n more groups</source>
       <comment>Numerus: %1 will be substituted with a user group name</comment>
       <translation type="unfinished">
-        <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
         <numerusform>%1 and %n more groups</numerusform>
@@ -10867,13 +10715,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
-        <numerusform>%n אירועי תנועה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
@@ -10885,7 +10731,6 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
-        <numerusform>%n אירועים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -10894,13 +10739,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
         <numerusform>%n אובייקטים</numerusform>
         <numerusform>%n אובייקטים</numerusform>
         <numerusform>%n אובייקטים</numerusform>
-        <numerusform>%n אובייקטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n notifications</source>
       <translation type="unfinished">
-        <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
         <numerusform>%n notifications</numerusform>
@@ -11158,7 +11001,6 @@ You can still change quality and FPS directly on the camera.</translation>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
         <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
       </translation>
     </message>
     <message>
@@ -11210,7 +11052,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message numerus="yes">
       <source>%n objects selected</source>
       <translation type="unfinished">
-        <numerusform>%n objects selected</numerusform>
         <numerusform>%n objects selected</numerusform>
         <numerusform>%n objects selected</numerusform>
         <numerusform>%n objects selected</numerusform>
@@ -11326,7 +11167,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
         <numerusform>I trust these servers</numerusform>
-        <numerusform>I trust these servers</numerusform>
       </translation>
     </message>
   </context>
@@ -11342,7 +11182,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
@@ -11575,7 +11414,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
-        <numerusform>%n אירועי תנועה</numerusform>
       </translation>
     </message>
     <message>
@@ -11663,7 +11501,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -11672,13 +11509,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
       <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
         <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
@@ -11775,14 +11610,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
         <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
         <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
-        <numerusform>לחץ לחיצה כפולה בכדי להוסיף מצלמות לפריסה הנוכחית או ללחוץ על Ctrl + לחיצה כדי לפתוח בכרטיסייה חדשה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>
         <numerusform>... ו %n נוספים</numerusform>
@@ -12275,13 +12108,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
         <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
         <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
-        <numerusform>הקבצים שנבחרו הקלטו ב- %1, אך ניתן להעלות רק קבצים שהוקלטו ב- %n הימים האחרונים. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
         <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
         <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
         <numerusform>קבצים שנבחריו הוקלטו בין %1 ו- %2, אך רק קבצים שהוקלטו ב- %n הימים האחרונים ניתנים להעלאה. באפשרותך לשנות זאת בהגדרות ארכיון של המצלמה.</numerusform>
@@ -12363,14 +12194,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
         <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
         <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
-        <numerusform>פורמטים של קבצים שנבחרו אינם נתמכים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation>
-        <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
         <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
         <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
         <numerusform>לקבצים שנבחרו אין חותמות זמן</numerusform>
@@ -12383,14 +12212,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
         <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
         <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
-        <numerusform>הקבצים שנבחרו ישנים מדי</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation>
-        <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
         <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
         <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
         <numerusform>הקבצים שנבחרו הם באותם זמנים שעבורן הסרטונים כבר נטענים</numerusform>
@@ -12403,14 +12230,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
         <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
         <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
-        <numerusform>באפשרותך לטעון קבצים אלה למופע אחר של מצלמה וירטואלית.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <comment>Numerus form depends on the number of files</comment>
       <translation>
-        <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
         <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
         <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
         <numerusform>קבצים נבחרים מכסים תקופות שעבורן כבר הועלו סרטונים</numerusform>
@@ -12423,14 +12248,12 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
         <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
         <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
         <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
-        <numerusform>ייתכן שחלק מהקטעים יימחקו לאחר העלאת קבצים אלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <comment>Numerus form depends on the amount of files uploaded</comment>
       <translation>
-        <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
         <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
         <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
         <numerusform>לא נותר מקום פנוי רב על השרתים. יתכן והקלטות ישנות ימחקו בכדי לפנות מקום. שים לב שאם הקבצים הנבחרים יהיו הישנים ביותר בשרת, הם יימחקו מיד לאחר טעינתם.</numerusform>
@@ -12494,7 +12317,6 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>%n events</source>
       <translation>
-        <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
         <numerusform>%n אירועים</numerusform>
@@ -12640,7 +12462,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
         <numerusform>%n סימניות</numerusform>
@@ -13158,7 +12979,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n custom headers</numerusform>
         <numerusform>%n custom headers</numerusform>
         <numerusform>%n custom headers</numerusform>
-        <numerusform>%n custom headers</numerusform>
       </translation>
     </message>
   </context>
@@ -13230,7 +13050,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
         <numerusform>%n שרתים</numerusform>
-        <numerusform>%n שרתים</numerusform>
       </translation>
     </message>
     <message>
@@ -13240,7 +13059,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
         <numerusform>%n פריסות</numerusform>
@@ -13278,7 +13096,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Source and %n more Cameras</source>
       <comment>Numerus: placeholder for more items</comment>
       <translation>
-        <numerusform>מקור ועוד %n מצלמות</numerusform>
         <numerusform>מקור ועוד %n מצלמות</numerusform>
         <numerusform>מקור ועוד %n מצלמות</numerusform>
         <numerusform>מקור ועוד %n מצלמות</numerusform>
@@ -13373,14 +13190,12 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>Some of the rules were not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
         <numerusform>Some of the rules were not enabled</numerusform>
-        <numerusform>Some of the rules were not enabled</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</source>
       <comment>Numerus form depends on the invalid rule count</comment>
       <translation type="unfinished">
-        <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
         <numerusform>Some of the selected rules can not be enabled as they have wrong parameters. Fix them and enable the rule again.</numerusform>
@@ -13445,7 +13260,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
         <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
       </translation>
     </message>
   </context>
@@ -13501,7 +13315,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>שים לב כי כל רישיון יכול להתבטל מקסימום %n פעמים.</numerusform>
         <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
         <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
-        <numerusform>שים לב כי כל מפתח רישיון עשוי להיות מבוטל מקסימום %n פעמים.</numerusform>
       </translation>
     </message>
   </context>
@@ -13521,7 +13334,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>העברת %n התקנים נכשלה</numerusform>
         <numerusform>העברת %n התקנים נכשלה</numerusform>
         <numerusform>העברת %n התקנים נכשלה</numerusform>
-        <numerusform>העברת %n התקנים נכשלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -13530,13 +13342,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>העברת %n מצלמות נכשלה</numerusform>
         <numerusform>העברת %n מצלמות נכשלה</numerusform>
         <numerusform>העברת %n מצלמות נכשלה</numerusform>
-        <numerusform>העברת %n מצלמות נכשלה</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
       <translation>
-        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
         <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
         <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
         <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
@@ -13552,7 +13362,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
-        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקנים. להעביר אותם בכל זאת?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -13561,13 +13370,11 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
-        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n מצלמות. להעביר אותן בכל זאת?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
         <numerusform>לשרת &quot;%1&quot; אין אפשרות לגשת ל %n התקני קלט /פלט. להעביר אותם בכל זאת?</numerusform>
@@ -13611,7 +13418,6 @@ We recommend you not to open this web page. If you understand the risks, you can
         <numerusform>האם אתה בטוח שברצונך למחוק %n קובץ זה?</numerusform>
         <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
         <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
-        <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
       </translation>
     </message>
     <message>
@@ -13646,7 +13452,6 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation>
-        <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
         <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
         <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>
         <numerusform>כשלון בשינוי הסיסמה ב- %n מצלמות של %1</numerusform>

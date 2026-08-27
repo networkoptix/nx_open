@@ -181,7 +181,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>الاتصال بـ %1 من خلال حساب مالك الموقع</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -576,7 +576,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>استمر</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -651,7 +651,7 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>الاتصال على أي حال</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -970,7 +970,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -1541,7 +1541,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>استمر</translation>
     </message>
   </context>
   <context>

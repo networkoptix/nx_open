@@ -389,7 +389,6 @@
         <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message>
