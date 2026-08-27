@@ -27,6 +27,7 @@ const QString SaasService::kLocalRecordingServiceType("local_recording");
 const QString SaasService::kAnalyticsIntegrationServiceType("analytics");
 const QString SaasService::kCloudRecordingType("cloud_storage");
 const QString SaasService::kLiveViewServiceType("live_view");
+const QString SaasService::kGenericServiceType("generic");
 
 template <typename T>
 struct Field
