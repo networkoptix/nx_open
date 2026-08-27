@@ -231,7 +231,6 @@
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
         <numerusform>Cannot verify the identity of %n servers</numerusform>
-        <numerusform>Cannot verify the identity of %n servers</numerusform>
       </translation>
     </message>
     <message>
@@ -340,7 +339,6 @@
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
       <translation>
-        <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>

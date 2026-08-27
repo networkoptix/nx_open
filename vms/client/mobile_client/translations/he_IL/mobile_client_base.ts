@@ -10,14 +10,12 @@
         <numerusform>%n Object Types</numerusform>
         <numerusform>%n Object Types</numerusform>
         <numerusform>%n Object Types</numerusform>
-        <numerusform>%n Object Types</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Object Attributes</source>
       <comment>%n is number of attributes</comment>
       <translation type="unfinished">
-        <numerusform>%n Object Attributes</numerusform>
         <numerusform>%n Object Attributes</numerusform>
         <numerusform>%n Object Attributes</numerusform>
         <numerusform>%n Object Attributes</numerusform>

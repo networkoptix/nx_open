@@ -165,7 +165,7 @@
     <message>
       <source>Connect to %1 by site owner’s account</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Connect to %1 by site owner’s account</translation>
+      <translation>الاتصال بـ %1 من خلال حساب مالك الموقع</translation>
     </message>
     <message>
       <source>Open Site Settings page and click &quot;change&quot; link next to the owner&apos;s name</source>
@@ -464,7 +464,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>استمر</translation>
     </message>
     <message>
       <source>Do not show this window again</source>
@@ -679,7 +679,7 @@
     </message>
     <message>
       <source>Done</source>
-      <translation type="unfinished">Done</translation>
+      <translation>تم</translation>
     </message>
     <message>
       <source>SELECT</source>
