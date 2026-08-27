@@ -187,6 +187,11 @@ core::LayoutResourcePtr convertLayoutToCloud(
     if (!cloudLayout)
         return cloudLayout;
 
+    // The cloned background image filename refers to an image that is not yet available in the
+    // cloud cache. Reset the filename so the cloud layout restores its background only after the
+    // image becomes available there.
+    cloudLayout->setBackgroundImageFilename({});
+
     ensureBackgroundImageInCloudCache(layout, cloudLayout,
         [cloudLayout, onCompleted = std::move(onCompleted)](bool success)
         {
