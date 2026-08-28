@@ -1889,7 +1889,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>التركيز...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
@@ -1970,7 +1970,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>رسائل البريد الإلكتروني</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -2890,7 +2890,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>سيتم الحفاظ على البيانات الموجودة (إعدادات الموقع والأرشيف)</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
@@ -4704,7 +4704,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>حصري</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -4880,7 +4880,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>حصري</translation>
     </message>
     <message>
       <source>Shared</source>
@@ -5557,7 +5557,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>التركيز...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -7519,15 +7519,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>تنتهي الصلاحية خلال ساعة</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>تنتهي مدة الصلاحية خلال يوم </translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>تنتهي الصلاحية خلال شهر</translation>
     </message>
     <message>
       <source>Never expires</source>
@@ -11455,7 +11455,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>تفعيل تشفير حركة بيانات RTSP</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -11488,7 +11488,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>تشفير حركة مرور الفيديو قد يزيد بشكل كبير من استخدام المعالج</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>

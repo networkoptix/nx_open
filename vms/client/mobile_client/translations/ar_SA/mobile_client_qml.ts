@@ -157,7 +157,7 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>اتبع خطوات المعالج</translation>
     </message>
     <message>
       <source>OK</source>
@@ -446,7 +446,7 @@
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>المرشحات</translation>
     </message>
     <message>
       <source>Details</source>
@@ -1236,7 +1236,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>مجلد فارغ</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
@@ -1333,15 +1333,15 @@
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>تنتهي الصلاحية خلال ساعة</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>تنتهي مدة الصلاحية خلال يوم </translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>تنتهي الصلاحية خلال شهر</translation>
     </message>
     <message>
       <source>Never expires</source>
@@ -1520,6 +1520,17 @@
     <message>
       <source>Period</source>
       <translation type="unfinished">Period</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialToolTip</name>
+    <message>
+      <source>Skip</source>
+      <translation type="unfinished">Skip</translation>
+    </message>
+    <message>
+      <source>Ok, I got it</source>
+      <translation type="unfinished">Ok, I got it</translation>
     </message>
   </context>
   <context>

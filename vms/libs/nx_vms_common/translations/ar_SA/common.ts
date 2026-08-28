@@ -2004,7 +2004,7 @@
     </message>
     <message>
       <source>Event log period (days).</source>
-      <translation type="unfinished">Event log period (days).</translation>
+      <translation>فترة سجل الأحداث (بالأيام).</translation>
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
