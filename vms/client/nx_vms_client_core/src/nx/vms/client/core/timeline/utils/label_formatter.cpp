@@ -78,8 +78,14 @@ struct LabelFormatter::Private
         return locale.toString(dt, u"d MMM yy"_qs);
     }
 
-    QString hoursMinutes(const QDateTime& dt) const
+    QString hoursMinutes(const QDateTime& dt, bool omitAmPm = false) const
     {
+        if (amPm && omitAmPm)
+        {
+            const auto intermediate = timeLocale.toString(dt, u"h:mm\nAP"_qs);
+            return intermediate.mid(0, intermediate.indexOf(u'\n'));
+        }
+
         return timeLocale.toString(dt, hoursMinutesFormat);
     }
 
@@ -240,7 +246,9 @@ QString LabelFormatter::windowHeader(
 
     if (startTime.hour() != endTime.hour() || startTime.minute() != endTime.minute())
     {
-        return nx::format(u"%1 - %2, %3"_qs, d->hoursMinutes(startDt),
+        const bool sameAmPm = (startTime.hour() < 12) == (endTime.hour() < 12);
+
+        return nx::format(u"%1 - %2, %3"_qs, d->hoursMinutes(startDt, /*omitAmPm*/ sameAmPm),
             d->hoursMinutes(endDt), d->dayMonthYear(endDt));
     }
 
