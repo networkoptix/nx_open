@@ -2182,11 +2182,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>فرض على الخوادم قبول الاتصالات المشفرة فقط</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>تشفير حركة مرور الفيديو إلى عملاء سطح المكتب والجوال</translation>
     </message>
     <message>
       <source>Manage Users</source>

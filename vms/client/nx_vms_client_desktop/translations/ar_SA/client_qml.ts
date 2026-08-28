@@ -3156,7 +3156,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Duplicate</source>
-      <translation type="unfinished">Duplicate</translation>
+      <translation>كرر</translation>
     </message>
     <message>
       <source>Delete</source>
