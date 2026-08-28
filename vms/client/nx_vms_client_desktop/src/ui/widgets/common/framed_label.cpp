@@ -129,7 +129,7 @@ void QnFramedLabel::paintEvent(QPaintEvent* event)
 
 bool QnFramedLabel::pixmapExists() const
 {
-    return pixmap().isNull();
+    return !pixmap().isNull();
 }
 
 QSize QnFramedLabel::frameSize() const
