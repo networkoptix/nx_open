@@ -186,7 +186,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>فشل الوصول إلى الموقع</translation>
     </message>
   </context>
   <context>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>المجلدات</translation>
     </message>
     <message>
       <source>Sites</source>
