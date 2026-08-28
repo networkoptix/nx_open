@@ -1519,6 +1519,17 @@
     </message>
 </context>
 <context>
+    <name>TutorialToolTip</name>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok, I got it</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
         <source>OK</source>
