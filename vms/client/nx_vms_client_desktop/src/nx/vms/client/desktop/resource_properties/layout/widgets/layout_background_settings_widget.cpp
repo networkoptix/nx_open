@@ -12,7 +12,9 @@
 #include <QtGui/QScreen>
 #include <QtWidgets/QApplication>
 
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/cross_system/cloud_image_cache.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/file_cache/image_importer.h>
@@ -156,10 +158,24 @@ void LayoutBackgroundSettingsWidget::uploadImage()
                     onImageUploaded(filename, false);
                     return;
                 }
-                if (auto serverCache = qobject_cast<ServerFileCache*>(d->cache.data()))
+                if (auto cloudCache = qobject_cast<core::CloudImageCache*>(d->cache.data()))
+                {
+                    cloudCache->uploadFile(filename,
+                        nx::utils::guarded(this,
+                            [this, filename](FileCache::OperationResult result)
+                            {
+                                onImageUploaded(
+                                    filename, result == FileCache::OperationResult::ok);
+                            }));
+                }
+                else if (auto serverCache = qobject_cast<ServerFileCache*>(d->cache.data()))
+                {
                     serverCache->uploadFile(filename);
+                }
                 else
-                    onImageUploaded(filename, true);
+                {
+                    onImageUploaded(filename, true); //< A local cache needs no upload.
+                }
             });
     }
 
