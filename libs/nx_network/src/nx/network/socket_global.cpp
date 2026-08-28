@@ -2,6 +2,7 @@
 
 #include "socket_global.h"
 
+#include <algorithm>
 #include <map>
 #include <optional>
 
@@ -404,6 +405,7 @@ void SocketGlobals::initializeNetworking(const ArgumentParser& arguments)
 
     int aioThreadCount = 0;
     arguments.read("aio-thread-count", &aioThreadCount);
+    aioThreadCount = std::max(0, aioThreadCount);
     bool enableAioThreadWatcher = false;
     arguments.read("enable-aio-thread-watcher", &enableAioThreadWatcher);
     m_impl->aioServiceGuard.initialize(aioThreadCount, enableAioThreadWatcher);
