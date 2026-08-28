@@ -285,4 +285,9 @@ QString metaVersionSuffix()
     return R"(${usedMetaVersion})";
 }
 
+QString saasPromoUrl()
+{
+    return R"(${customization.saasPromoUrl})";
+}
+
 } // namespace nx::branding

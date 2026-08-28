@@ -459,7 +459,7 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qt::ForegroundRole] = "foregroundColor";
     roles[Qn::AdditionalTextRole] = "additionalText";
     roles[Qn::RemovableRole] = "isCloseable";
-    roles[Qn::AlternateColorRole] = "isInformer";
+    roles[Qn::TileVisualStyleRole] = "visualStyle";
     roles[Qn::ProgressValueRole] = "progressValue";
     roles[Qn::HelpTopicIdRole] = "helpTopicId";
     return roles;

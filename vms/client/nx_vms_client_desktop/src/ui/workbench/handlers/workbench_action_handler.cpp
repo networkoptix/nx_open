@@ -48,6 +48,7 @@
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/authutil.h>
 #include <nx/analytics/utils.h>
+#include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <nx/network/address_resolver.h>
@@ -488,6 +489,9 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(menu::CameraAuthenticationAction), &QAction::triggered,
         this, &ActionHandler::cameraAuthenticationActionTriggered);
+
+    connect(action(menu::OpenSaasPromoAction), &QAction::triggered,
+        this, &ActionHandler::openSaasPromoActionTriggered);
 }
 
 ActionHandler::~ActionHandler()
@@ -3486,6 +3490,13 @@ void ActionHandler::at_openImportFromDevicesDialog_triggered()
     connect(dialog, &QmlDialogWrapper::done, dialog, &QObject::deleteLater);
 
     dialog->open();
+}
+
+void ActionHandler::openSaasPromoActionTriggered()
+{
+    const auto promoUrl = nx::Url::fromUserInput(nx::branding::saasPromoUrl());
+    if (promoUrl.isValid())
+        QDesktopServices::openUrl(promoUrl.toQUrl());
 }
 
 void ActionHandler::deleteDialogs()

@@ -600,6 +600,9 @@ menu::IDType SystemHealthListModel::Private::action(int index) const
         case MessageType::remoteArchiveSyncError:
             return menu::OpenImportFromDevices;
 
+        case MessageType::saasPromo:
+            return menu::OpenSaasPromoAction;
+
         default:
             return menu::NoAction;
     }
@@ -840,6 +843,7 @@ int SystemHealthListModel::Private::priority(SystemContext* systemContext, Messa
     // Custom priorities from higher to lower.
     enum CustomPriority
     {
+        kSaasPromoPriority,
         kCloudPromoPriority,
         kDefaultCameraPasswordsPriority,
         kInvalidRecordingSchedulePriority,
@@ -850,6 +854,9 @@ int SystemHealthListModel::Private::priority(SystemContext* systemContext, Messa
 
     switch (message)
     {
+        case MessageType::saasPromo:
+            return priorityValue(kSaasPromoPriority);
+
         case MessageType::cloudPromo:
             return priorityValue(kCloudPromoPriority);
 

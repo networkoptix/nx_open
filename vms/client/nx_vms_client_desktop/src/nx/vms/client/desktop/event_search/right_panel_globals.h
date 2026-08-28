@@ -32,6 +32,14 @@ enum class SystemSelection
 };
 Q_ENUM_NS(SystemSelection)
 
+enum class TileVisualStyle
+{
+    standard,
+    informer,
+    promo
+};
+Q_ENUM_NS(TileVisualStyle)
+
 struct VmsEvent
 {
     nx::vms::api::EventType id;

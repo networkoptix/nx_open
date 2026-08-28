@@ -118,6 +118,8 @@ QString QnSystemHealthStringsHelper::messageShortTitle(
             return tr("Cloud storage is available");
         case MessageType::cloudStorageIsEnabled:
             return tr("Cloud storage is enabled");
+        case MessageType::saasPromo:
+            return tr("Upgrade to Enterprise");
 
         default:
             break;
@@ -132,6 +134,8 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(
    const QSet<QnResourcePtr>& resources)
 {
     namespace html = nx::vms::common::html;
+
+    static const auto kRocketEmoji = QStringLiteral("\U0001F680");
 
     switch (messageType)
     {
@@ -197,6 +201,9 @@ QString QnSystemHealthStringsHelper::messageNotificationTitle(
                       resources.size());
         }
 
+        case MessageType::saasPromo:
+            return NX_FMT("%1 %2", kRocketEmoji, messageShortTitle(systemContext, messageType));
+
         default:
             break;
     }
@@ -228,6 +235,10 @@ QString QnSystemHealthStringsHelper::messageDescription(MessageType messageType)
         }
         case MessageType::notificationLanguageDiffers:
             return tr("Notifications language differs from the interface language");
+        case MessageType::saasPromo:
+            return tr("Unlock exclusive features for actionable video intelligence and "
+                "data-driven operations at scale");
+
         default:
             return {};
     }
@@ -242,8 +253,9 @@ QString QnSystemHealthStringsHelper::messageTooltip(
 
     switch (messageType)
     {
-        // disable tooltip for promo
+        // Disable tooltip for promo.
         case MessageType::cloudPromo:
+        case MessageType::saasPromo:
             return QString();
 
         case MessageType::defaultCameraPasswords:

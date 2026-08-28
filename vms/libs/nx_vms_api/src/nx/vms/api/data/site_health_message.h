@@ -86,6 +86,8 @@ NX_REFLECTION_ENUM_CLASS(SiteHealthMessageType,
     cloudStorageIsAvailable = 42, //< Generated on the client side
     cloudStorageIsEnabled = 43, //< Generated on the client side
 
+    saasPromo = 44, //< 'Upgrade to Enterprise' promo message. Generated on the client side.
+
     count
 )
 

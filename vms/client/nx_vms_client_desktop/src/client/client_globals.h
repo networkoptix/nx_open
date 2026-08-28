@@ -384,6 +384,8 @@ namespace Qn
 
         WorkbenchStateRole,
 
+        TileVisualStyleRole, /**< Role for event tile visual style (RightPanel::TileVisualStyle). */
+
         ItemDataRoleCount,
     };
 

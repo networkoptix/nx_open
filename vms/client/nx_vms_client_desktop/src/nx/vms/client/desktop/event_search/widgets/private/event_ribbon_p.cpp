@@ -311,10 +311,9 @@ void EventRibbon::Private::updateTile(int index)
         return;
     }
 
-    // Select tile color style.
-    widget->setVisualStyle(modelIndex.data(Qn::AlternateColorRole).toBool()
-        ? EventTile::Style::informer
-        : EventTile::Style::standard);
+    // Select tile visual style.
+    widget->setVisualStyle(
+        modelIndex.data(Qn::TileVisualStyleRole).value<RightPanel::TileVisualStyle>());
 
     QString tileDescription = modelIndex.data(core::DescriptionTextRole).toString();
 

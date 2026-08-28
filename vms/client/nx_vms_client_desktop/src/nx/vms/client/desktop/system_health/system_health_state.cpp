@@ -16,6 +16,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <licensing/license.h>
+#include <nx/branding.h>
 #include <nx/vms/api/data/storage_flags.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
@@ -112,6 +113,7 @@ SystemHealthState::Private::Private(SystemHealthState* q):
             update(SystemHealthIndex::cloudPromo);
             update(SystemHealthIndex::metadataStorageNotSet);
             update(SystemHealthIndex::metadataOnSystemStorage);
+            update(SystemHealthIndex::saasPromo);
             updateCamerasWithDefaultPassword();
             updateCamerasWithInvalidSchedule();
             updateUsersWithInvalidEmail();
@@ -217,6 +219,15 @@ SystemHealthState::Private::Private(SystemHealthState* q):
         updateSlot(cloudPromo));
 
     update(SystemHealthIndex::cloudPromo);
+
+    // SaasPromo.
+
+    connect(systemSettings(), &SystemSettings::cloudSettingsChanged, q, updateSlot(saasPromo));
+
+    connect(&showOnceSettings()->saasPromo, &ShowOnceSettings::BaseProperty::changed, q,
+        updateSlot(saasPromo));
+
+    update(SystemHealthIndex::saasPromo);
 
     // Metadata storage issues.
 
@@ -497,6 +508,13 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
         case SystemHealthIndex::cloudStorageIsEnabled:
             return hasPowerUserPermissions()
                 && m_cloudStorageWatcher->enabledCloudStorageCount() > 0;
+
+        case SystemHealthIndex::saasPromo:
+            return hasPowerUserPermissions()
+                && !systemSettings()->cloudSystemId().isEmpty()
+                && systemSettings()->organizationId().isNull()
+                && !nx::branding::saasPromoUrl().isEmpty()
+                && !showOnceSettings()->saasPromo();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");

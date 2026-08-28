@@ -178,4 +178,7 @@ NX_BRANDING_API QString customOpenSourceLibrariesUrl();
 /** Addition to the version string for MetaVMS, or an empty string for non-MetaVMS builds. */
 NX_BRANDING_API QString metaVersionSuffix();
 
+/** SaaS promotion page URL. */
+NX_BRANDING_API QString saasPromoUrl();
+
 } // namespace nx::branding

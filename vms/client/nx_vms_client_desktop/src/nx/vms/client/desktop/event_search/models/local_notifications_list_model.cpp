@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/extensions/local_notifications_manager.h>
 #include <ui/common/notification_levels.h>
@@ -205,8 +206,8 @@ QVariant LocalNotificationsListModel::data(const QModelIndex& index, int role) c
         case Qn::ProgressFormatRole:
             return QVariant::fromValue(manager->progressFormat(notificationId));
 
-        case Qn::AlternateColorRole:
-            return true;
+        case Qn::TileVisualStyleRole:
+            return QVariant::fromValue(RightPanel::TileVisualStyle::informer);
 
         case Qn::NotificationLevelRole:
             return QVariant::fromValue(manager->level(notificationId));

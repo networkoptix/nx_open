@@ -1558,6 +1558,11 @@ enum IDType
      */
     AcknowledgeNotificationAction,
 
+    /**
+     * Opens the SaaS promo page in the system's default browser.
+     */
+    OpenSaasPromoAction,
+
     ActionCount,
 
     NoAction = -1

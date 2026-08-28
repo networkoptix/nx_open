@@ -45,6 +45,10 @@ static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewR
 
 static constexpr auto kRoundingRadius = 2;
 
+// A radial gradient in the bottom right corner of a promo tile.
+static constexpr qreal kPromoGradientOpacity = 0.3;
+static constexpr qreal kPromoGradientRadius = 80.0;
+
 static constexpr int kMaxNumberOfDisplayedAttributes = 4;
 
 static constexpr auto kTitleFontWeight = QFont::Medium;
@@ -134,6 +138,7 @@ EventTile::EventTile(QWidget* parent):
     ui->nameLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->nameLabel->setOpenExternalLinks(false);
 
+    ui->iconLabel->hide();
     ui->extraIconLabel->hide();
 
     font.setWeight(kTimestampFontWeight);
@@ -540,6 +545,19 @@ void EventTile::paintEvent(QPaintEvent* /*event*/)
     painter.setPen(Qt::NoPen);
     painter.setBrush(palette().brush(backgroundRole()));
     painter.drawRoundedRect(rect(), kRoundingRadius, kRoundingRadius);
+
+    if (d->style == RightPanel::TileVisualStyle::promo)
+    {
+        const QPointF gradientCenter(width(), height());
+        const auto gradientColor = core::ColorTheme::transparent(
+            core::colorTheme()->color("brand"), kPromoGradientOpacity);
+
+        QRadialGradient gradient(gradientCenter, kPromoGradientRadius);
+        gradient.setColorAt(0.0, gradientColor);
+        gradient.setColorAt(1.0, Qt::transparent);
+        painter.setBrush(gradient);
+        painter.drawEllipse(gradientCenter, kPromoGradientRadius, kPromoGradientRadius);
+    }
 }
 
 QSize EventTile::minimumSizeHint() const
@@ -801,12 +819,12 @@ void EventTile::setMode(Mode value)
     }
 }
 
-EventTile::Style EventTile::visualStyle() const
+RightPanel::TileVisualStyle EventTile::visualStyle() const
 {
     return d->style;
 }
 
-void EventTile::setVisualStyle(Style value)
+void EventTile::setVisualStyle(RightPanel::TileVisualStyle value)
 {
     if (d->style == value)
         return;

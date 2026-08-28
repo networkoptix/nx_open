@@ -208,6 +208,8 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
 
         IDR_ITEM(RemoteConnectionRole),
 
+        IDR_ITEM(TileVisualStyleRole),
+
         IDR_ITEM(ItemDataRoleCount)
 
         #undef IDR_ITEM

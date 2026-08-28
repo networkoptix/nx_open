@@ -248,6 +248,8 @@ protected:
 
     void cameraAuthenticationActionTriggered();
 
+    void openSaasPromoActionTriggered();
+
 private:
     void showSingleCameraErrorMessage(const QString& explanation = QString());
     void showMultipleCamerasErrorMessage(

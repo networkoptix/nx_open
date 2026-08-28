@@ -240,6 +240,10 @@ void initialize(Manager* manager, Action* root)
                 MatchMode::any)
             && !condition::showreelIsRunning());
 
+    factory(OpenSaasPromoAction)
+        .flags(NoTarget)
+        .requiredPowerUserPermissions();
+
 //-------------------------------------------------------------------------------------------------
 // VMS Rules and Event log actions.
 

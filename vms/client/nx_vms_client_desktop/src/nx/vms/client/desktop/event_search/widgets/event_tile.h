@@ -10,6 +10,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 
 namespace Ui { class EventTile; }
 
@@ -117,14 +118,8 @@ public:
     Mode mode() const;
     void setMode(Mode value);
 
-    enum class Style
-    {
-        standard,
-        informer
-    };
-
-    Style visualStyle() const;
-    void setVisualStyle(Style value);
+    RightPanel::TileVisualStyle visualStyle() const;
+    void setVisualStyle(RightPanel::TileVisualStyle value);
 
     bool highlighted() const;
     void setHighlighted(bool value);

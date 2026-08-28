@@ -21,6 +21,12 @@ public:
     Property<bool> cloudPromo{this, "cloudPromo"};
 
     /**
+     * SaaS Promo informer. Displayed for Power Users if the Site is connected to the Cloud, but is
+     * not a part of an Organization.
+     */
+    Property<bool> saasPromo{this, "saasPromo"};
+
+    /**
      * Warning which is displayed when forcing secure authentication for the digest-enabled user.
      */
     Property<bool> digestDisableNotification{this, "digestDisableNotification"};

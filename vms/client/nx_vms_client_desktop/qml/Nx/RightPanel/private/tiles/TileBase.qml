@@ -5,6 +5,8 @@ import QtQuick.Controls 2.14
 
 import Nx.Core 1.0
 
+import nx.vms.client.desktop
+
 import ".."
 
 Control
@@ -25,13 +27,15 @@ Control
 
     hoverEnabled: true
 
-    property color backgroundColor: model.isInformer
-        ? ColorTheme.colors.dark8
-        : ColorTheme.colors.dark5
+    readonly property int visualStyle: model.visualStyle ?? RightPanel.TileVisualStyle.standard
 
-    property color hoveredBackgroundColor: model.isInformer
-        ? ColorTheme.colors.dark9
-        : ColorTheme.colors.dark6
+    property color backgroundColor: tile.visualStyle === RightPanel.TileVisualStyle.standard
+        ? ColorTheme.colors.dark5
+        : ColorTheme.colors.dark8
+
+    property color hoveredBackgroundColor: tile.visualStyle === RightPanel.TileVisualStyle.standard
+        ? ColorTheme.colors.dark6
+        : ColorTheme.colors.dark9
 
     property color effectiveBackgroundColor:
     {

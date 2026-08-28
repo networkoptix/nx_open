@@ -27,7 +27,7 @@ using namespace std::chrono;
 
 namespace {
 
-static constexpr qsizetype kResourcesInforemersTextSize = 12;
+static constexpr qsizetype kResourcesInformersTextSize = 12;
 // TODO: #vbutkevich make value dynamic, after removing QnSystemHealthStringsHelper::resourceText.
 static constexpr qsizetype kMaxResourceTextWidth = 50;
 static constexpr qsizetype kResourcesTextSize = 10;
@@ -175,7 +175,7 @@ void EventTile::Private::updatePalette()
         const auto base = core::colorTheme()->color("@light1");
 
         int darkerBy = highlighted ? 1 : 0;
-        if (style != Style::informer)
+        if (style == RightPanel::TileVisualStyle::standard)
             darkerBy += 3;
 
         pal.setColor(QPalette::Window, core::colorTheme()->darker(base, darkerBy));
@@ -187,7 +187,7 @@ void EventTile::Private::updatePalette()
         const auto base = core::colorTheme()->color("dark5");
 
         int lighterBy = highlighted ? 1 : 0;
-        if (style == Style::informer)
+        if (style != RightPanel::TileVisualStyle::standard)
             lighterBy += 2;
 
         pal.setColor(QPalette::Window, core::colorTheme()->lighter(base, lighterBy));
@@ -200,14 +200,14 @@ void EventTile::Private::updatePalette()
 
 void EventTile::Private::updateIcon()
 {
-    // Icon label is always visible. It keeps column width fixed.
-
     if (iconPath.isEmpty())
     {
         q->ui->iconLabel->setPixmap({});
+        q->ui->iconLabel->hide();
         return;
     }
 
+    q->ui->iconLabel->show();
     core::SvgIconColorer::ThemeSubstitutions colorTheme =
         {{QnIcon::Normal, {.primary = q->titleColor().toRgb().name().toLatin1()}}};
     q->ui->iconLabel->setPixmap(qnSkin->icon(iconPath, colorTheme).pixmap(20, 20));
@@ -244,14 +244,16 @@ QString EventTile::Private::getElidedResourceTextForInformers(const QStringList&
 void EventTile::Private::updateResourceListStyle()
 {
     auto font = q->ui->resourceListLabel->font();
-    font.setPixelSize(
-        style == Style::standard ? kResourcesTextSize : kResourcesInforemersTextSize);
+    font.setPixelSize(style == RightPanel::TileVisualStyle::standard
+        ? kResourcesTextSize
+        : kResourcesInformersTextSize);
     q->ui->resourceListLabel->setFont(font);
 }
 
 QString EventTile::Private::getElidedResourceText(const QStringList& list)
 {
-    if (q->visualStyle() == Style::informer)
+    if (q->visualStyle() == RightPanel::TileVisualStyle::informer
+        || q->visualStyle() == RightPanel::TileVisualStyle::promo)
         return getElidedResourceTextForInformers(list);
 
     if (list.empty())

@@ -63,6 +63,7 @@ nx::vms::event::Level QnNotificationLevel::valueOf(
     switch (messageType)
     {
         case MessageType::cloudPromo:
+        case MessageType::saasPromo:
             return nx::vms::event::Level::other;
 
         // Gray notifications.

@@ -7,6 +7,7 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/utils/metatypes.h>
+#include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -80,8 +81,10 @@ QVariant SystemHealthListModel::data(const QModelIndex& index, int role) const
         case Qn::CommandActionRole:
             return QVariant::fromValue(d->commandAction(index.row()));
 
-        case Qn::AlternateColorRole:
-            return true;
+        case Qn::TileVisualStyleRole:
+            return QVariant::fromValue(d->messageType(index.row()) == MessageType::saasPromo
+                ? RightPanel::TileVisualStyle::promo
+                : RightPanel::TileVisualStyle::informer);
 
         case Qn::RemovableRole:
             return d->isCloseable(index.row());
@@ -154,6 +157,11 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
         if (messageType == MessageType::cloudPromo)
         {
             executeLater([]() { showOnceSettings()->cloudPromo = true; }, this);
+            break;
+        }
+        else if (messageType == MessageType::saasPromo)
+        {
+            executeLater([]() { showOnceSettings()->saasPromo = true; }, this);
             break;
         }
         else if (messageType == MessageType::cloudStorageIsAvailable)

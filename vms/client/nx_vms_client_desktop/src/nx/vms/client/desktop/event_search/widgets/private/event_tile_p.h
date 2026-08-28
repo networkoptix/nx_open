@@ -47,7 +47,7 @@ public:
     std::optional<qreal> progressValue = 0.0;
     bool isRead = false;
     bool footerEnabled = true;
-    Style style = Style::standard;
+    RightPanel::TileVisualStyle style = RightPanel::TileVisualStyle::standard;
     bool highlighted = false;
     QPalette defaultTitlePalette;
     Qt::MouseButton clickButton = Qt::NoButton;

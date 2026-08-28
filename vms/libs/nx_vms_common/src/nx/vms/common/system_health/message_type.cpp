@@ -9,7 +9,8 @@ namespace {
 using namespace nx::vms::common::system_health;
 
 static const std::set<MessageType> kMessagesNotSupportedBySaas{
-    MessageType::noLicenses
+    MessageType::noLicenses,
+    MessageType::saasPromo,
 };
 
 static const std::set<MessageType> kMessagesSpecificForSaas{
@@ -71,6 +72,7 @@ bool isMessageLocked(MessageType message)
         case MessageType::notificationLanguageDiffers:
         case MessageType::cloudStorageIsEnabled:
         case MessageType::cloudStorageIsAvailable:
+        case MessageType::saasPromo:
             return true;
 
         default:

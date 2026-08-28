@@ -79,7 +79,7 @@ Data roles used:
 - Qn::BusyIndicatorVisibleRole - whether the tile is a busy indicator
 - Qn::ProgressValueRole - current progress value and a sign that the tile is a progress
 information tile
-- Qn::AlternateColorRole - whether the tile has *informer* color scheme
+- Qn::TileVisualStyleRole - tile visual style (RightPanel::TileVisualStyle): *standard*, *informer* or *promo*
 - Qn::TimestampTextRole - tile timestamp
 - Qn::DurationRole - tile duration (used in currently played tiles highlighting)
 - Qn::AdditionalTextRole - tile footer text
@@ -113,7 +113,7 @@ the view when more data is being asynchronously fetched by an item model (see
 [AbstractAsyncSearchListModel](@ref nx::vms::client::desktop::AbstractAsyncSearchListModel)).
 
 **Informational tiles** have switcheable *narrow* or *wide* layout. Can have special captionless mode
-(used in Motion tab). Can have *standard* or *informer* visual styles (color schemes).
+(used in Motion tab). Can have *standard*, *informer* or *promo* visual styles (color schemes).
 Consist of several fields (all except caption are optional):
 - caption
 - icon
