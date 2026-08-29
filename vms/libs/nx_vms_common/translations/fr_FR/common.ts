@@ -1365,6 +1365,10 @@
       <source>Live view</source>
       <translation>Vue en direct</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Générique</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

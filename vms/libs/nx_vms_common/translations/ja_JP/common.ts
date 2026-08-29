@@ -1298,6 +1298,10 @@
       <source>Live view</source>
       <translation>ライブ映像</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>汎用</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

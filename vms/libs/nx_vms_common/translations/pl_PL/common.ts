@@ -1499,6 +1499,10 @@
       <source>Live view</source>
       <translation>Podgląd na żywo</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Ogólne</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>
