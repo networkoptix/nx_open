@@ -17,10 +17,15 @@
 #include <IOKit/storage/IOBlockStorageDriver.h>
 #include <IOKit/IOBSD.h>
 
-#include <map>
-#include <vector>
+#include <algorithm>
 #include <chrono>
+#include <cstring>
+#include <map>
+#include <string>
+#include <string_view>
 #include <thread>
+#include <unordered_map>
+#include <vector>
 
 #include <QtNetwork/QNetworkInterface>
 
@@ -42,6 +47,13 @@ static const auto kIOPortDefault =
 #else
     kIOMainPortDefault;
 #endif
+
+/** Views a NUL-terminated string in a fixed-size buffer without scanning past its end. */
+template<std::size_t N>
+std::string_view boundedStringView(const char (&buffer)[N])
+{
+    return {buffer, strnlen(buffer, N)};
+}
 
 static QString dictionaryGetString(CFDictionaryRef properties, CFStringRef name)
 {
@@ -172,7 +184,7 @@ public:
     {
     }
 
-    QList<ActivityMonitor::NetworkLoad> totalNetworkLoad();
+    std::vector<ActivityMonitor::NetworkLoad> totalNetworkLoad();
 
 private:
     class InterfaceStatisticsContext: public ActivityMonitor::NetworkLoad
@@ -205,9 +217,9 @@ void MacMonitor::NetworkLoadMonitor::updateNetworkInterfaceStat(
 
     InterfaceStatisticsContext& ctx = m_ifNameToStatistics[interface.name()];
 
-    if (ctx.interfaceName.isEmpty())
+    if (ctx.interfaceName.empty())
     {
-        ctx.interfaceName = interface.name();
+        ctx.interfaceName = interface.name().toUtf8().toStdString();
         ctx.macAddress = nx::utils::MacAddress(interface.hardwareAddress());
         switch (interface.type())
         {
@@ -296,13 +308,13 @@ void MacMonitor::NetworkLoadMonitor::updateNetworkStat()
     m_networkStatCalcTimer.restart();
 }
 
-QList<ActivityMonitor::NetworkLoad> MacMonitor::NetworkLoadMonitor::totalNetworkLoad()
+std::vector<ActivityMonitor::NetworkLoad> MacMonitor::NetworkLoadMonitor::totalNetworkLoad()
 {
     NX_MUTEX_LOCKER lock(&m_networkLoadMutex);
 
     updateNetworkStat();
 
-    QList<ActivityMonitor::NetworkLoad> netStat;
+    std::vector<ActivityMonitor::NetworkLoad> netStat;
     for (auto it = m_ifNameToStatistics.begin(); it != m_ifNameToStatistics.end(); ++it)
         netStat.push_back(it->second);
 
@@ -321,11 +333,11 @@ public:
 
     virtual ~CpuLoadMonitor() {}
 
-    qreal getTotalCpuLoad();
-    qreal getSelfCpuLoad();
+    double getTotalCpuLoad();
+    double getSelfCpuLoad();
 
 private:
-    qreal calculateTotalCpuLoad(unsigned long long idleTicks, unsigned long long totalTicks);
+    double calculateTotalCpuLoad(unsigned long long idleTicks, unsigned long long totalTicks);
 
     nx::Mutex m_cpuLoadMutex;
 
@@ -336,7 +348,7 @@ private:
     time_point<steady_clock> m_timeStamp{};
 };
 
-qreal MacMonitor::CpuLoadMonitor::calculateTotalCpuLoad(
+double MacMonitor::CpuLoadMonitor::calculateTotalCpuLoad(
     unsigned long long idleTicks, unsigned long long totalTicks)
 {
     unsigned long long totalTicksSinceLastTime = totalTicks - m_prevTotalTicks;
@@ -344,14 +356,14 @@ qreal MacMonitor::CpuLoadMonitor::calculateTotalCpuLoad(
     m_prevTotalTicks = totalTicks;
     m_prevIdleTicks = idleTicks;
 
-    qreal idleRate = 0;
+    double idleRate = 0;
     if (totalTicksSinceLastTime > 0)
-        idleRate = static_cast<qreal>(idleTicksSinceLastTime) / totalTicksSinceLastTime;
+        idleRate = static_cast<double>(idleTicksSinceLastTime) / totalTicksSinceLastTime;
 
     return 1.0 - idleRate;
 }
 
-qreal MacMonitor::CpuLoadMonitor::getTotalCpuLoad()
+double MacMonitor::CpuLoadMonitor::getTotalCpuLoad()
 {
     NX_MUTEX_LOCKER lock(&m_cpuLoadMutex);
 
@@ -373,7 +385,7 @@ qreal MacMonitor::CpuLoadMonitor::getTotalCpuLoad()
     return calculateTotalCpuLoad(cpuinfo.cpu_ticks[CPU_STATE_IDLE], totalTicks);
 }
 
-qreal MacMonitor::CpuLoadMonitor::getSelfCpuLoad()
+double MacMonitor::CpuLoadMonitor::getSelfCpuLoad()
 {
     NX_MUTEX_LOCKER lock(&m_cpuLoadMutex);
 
@@ -397,16 +409,16 @@ qreal MacMonitor::CpuLoadMonitor::getSelfCpuLoad()
     if (totalDelta == microseconds::zero())
         return 0;
 
-    return static_cast<qreal>(usageDelta.count())
+    return static_cast<double>(usageDelta.count())
         / (totalDelta.count() * std::thread::hardware_concurrency());
 }
 
-qreal MacMonitor::totalCpuUsage()
+double MacMonitor::totalCpuUsage()
 {
     return m_cpuLoadMonitor->getTotalCpuLoad();
 }
 
-qreal MacMonitor::thisProcessCpuUsage()
+double MacMonitor::thisProcessCpuUsage()
 {
     return m_cpuLoadMonitor->getSelfCpuLoad();
 }
@@ -421,24 +433,25 @@ public:
 
     virtual ~GpuLoadMonitor() {}
 
-    qreal getSelfGpuLoad();
+    double getSelfGpuLoad();
 
 private:
     struct GpuAccumData
     {
-        int64_t deviceUtilizationPercentage = 0; //< Value in range 0..100.
-        int64_t selfGpuTime = 0;
-        int64_t totalGpuTime = 0;
+        std::int64_t deviceUtilizationPercentage = 0; //< Value in range 0..100.
+        std::int64_t selfGpuTime = 0;
+        std::int64_t totalGpuTime = 0;
 
-        qreal computeSelfGpuLoad(const GpuAccumData& prev) const
+        double computeSelfGpuLoad(const GpuAccumData& prev) const
         {
-            const qreal selfDelta = selfGpuTime - prev.selfGpuTime;
+            const double selfDelta = selfGpuTime - prev.selfGpuTime;
             const auto totalDelta = totalGpuTime - prev.totalGpuTime;
 
             if (totalDelta == 0)
                 return 0.0;
 
-            return 0.01 * (qreal) deviceUtilizationPercentage * selfDelta / totalDelta;
+            return 0.01 * static_cast<double>(deviceUtilizationPercentage) * selfDelta
+                / totalDelta;
         }
     };
 
@@ -449,12 +462,12 @@ private:
     std::vector<GpuAccumData> m_prevGpuAccumData;
 };
 
-qreal MacMonitor::thisProcessGpuUsage()
+double MacMonitor::thisProcessGpuUsage()
 {
     return m_gpuLoadMonitor->getSelfGpuLoad();
 }
 
-qreal MacMonitor::GpuLoadMonitor::getSelfGpuLoad()
+double MacMonitor::GpuLoadMonitor::getSelfGpuLoad()
 {
     // For each GPU get accumulated self GPU time, overall GPU time, and use previously accumulated
     // values to compute relative GPU load. Each GPU also reports device utilization percentage, so
@@ -471,7 +484,7 @@ qreal MacMonitor::GpuLoadMonitor::getSelfGpuLoad()
     }
 
     // We can return only a single value, so select a GPU with maximum load.
-    qreal maxGpuLoad = 0.0;
+    double maxGpuLoad = 0.0;
 
     // Assume GPUs are always returned in the same order.
     for (size_t i = 0; i < gpuAccumData.size(); ++i)
@@ -576,21 +589,21 @@ public:
 
     virtual ~HddLoadMonitor() {}
 
-    QList<ActivityMonitor::HddLoad> getTotalHddLoad();
+    std::vector<ActivityMonitor::HddLoad> getTotalHddLoad();
 
 private:
     static QString getDriveName(io_registry_entry_t drive);
     static nanoseconds getGetDriveReadWriteTime(io_registry_entry_t drive);
-    qreal computeHddLoad(
+    double computeHddLoad(
         const ActivityMonitor::Hdd& hdd, nanoseconds timeReadWrite, nanoseconds timeDiff);
 
     nx::Mutex m_hddLoadMutex;
 
-    QHash<QString, nanoseconds> m_readWriteTotalByHddName;
+    std::unordered_map<std::string, nanoseconds> m_readWriteTotalByHddName;
     time_point<steady_clock> m_timeStamp{};
 };
 
-qreal MacMonitor::HddLoadMonitor::computeHddLoad(
+double MacMonitor::HddLoadMonitor::computeHddLoad(
     const ActivityMonitor::Hdd& hdd, nanoseconds timeReadWrite, nanoseconds timeDiff)
 {
     if (!m_readWriteTotalByHddName.contains(hdd.name) || timeDiff == nanoseconds::zero())
@@ -603,9 +616,9 @@ qreal MacMonitor::HddLoadMonitor::computeHddLoad(
     nanoseconds readWriteDiff = timeReadWrite - last;
     last = timeReadWrite;
 
-    const auto ratio = static_cast<qreal>(readWriteDiff.count()) / timeDiff.count();
+    const auto ratio = static_cast<double>(readWriteDiff.count()) / timeDiff.count();
 
-    return qMin(ratio, 1.0);
+    return std::min(ratio, 1.0);
 }
 
 QString MacMonitor::HddLoadMonitor::getDriveName(io_registry_entry_t drive)
@@ -650,7 +663,7 @@ nanoseconds MacMonitor::HddLoadMonitor::getGetDriveReadWriteTime(io_registry_ent
     return nanoseconds(timeRead + timeWrite);
 }
 
-QList<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
+std::vector<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
 {
     NX_MUTEX_LOCKER lock(&m_hddLoadMutex);
 
@@ -668,7 +681,7 @@ QList<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
     const auto driveListGuard =
         nx::utils::makeScopeGuard([&driveList]() { IOObjectRelease(driveList); });
 
-    QList<ActivityMonitor::HddLoad> result;
+    std::vector<ActivityMonitor::HddLoad> result;
 
     const auto timeStamp = std::chrono::steady_clock::now();
     const auto timeDiff = duration_cast<nanoseconds>(timeStamp - m_timeStamp);
@@ -682,15 +695,22 @@ QList<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
         if (driveName.isEmpty())
             continue;
 
-        Hdd hdd(id++, driveName, driveName);
+        Hdd hdd{
+            .id = id++,
+            .name = driveName.toUtf8().toStdString(),
+            .partitions = driveName.toUtf8().toStdString(),
+        };
         const nanoseconds driveReadWriteTime = getGetDriveReadWriteTime(drive);
-        result.push_back(HddLoad(hdd, computeHddLoad(hdd, driveReadWriteTime, timeDiff)));
+        result.push_back({
+            .hdd = hdd,
+            .load = computeHddLoad(hdd, driveReadWriteTime, timeDiff),
+        });
     }
 
     return result;
 }
 
-QList<ActivityMonitor::HddLoad> MacMonitor::totalHddLoad()
+std::vector<ActivityMonitor::HddLoad> MacMonitor::totalHddLoad()
 {
     return m_hddLoadMonitor->getTotalHddLoad();
 }
@@ -708,9 +728,9 @@ MacMonitor::~MacMonitor()
 {
 }
 
-QList<ActivityMonitor::PartitionSpace> MacMonitor::totalPartitionSpaceInfo()
+std::vector<ActivityMonitor::PartitionSpace> MacMonitor::totalPartitionSpaceInfo()
 {
-    QList<ActivityMonitor::PartitionSpace> foundPartitions;
+    std::vector<ActivityMonitor::PartitionSpace> foundPartitions;
 
     int count = getfsstat(nullptr, 0, MNT_NOWAIT);
 
@@ -736,21 +756,21 @@ QList<ActivityMonitor::PartitionSpace> MacMonitor::totalPartitionSpaceInfo()
         if (fs.f_flags & MNT_DONTBROWSE || fs.f_owner != 0)
             continue;
 
-        partition.devName = QLatin1String(fs.f_mntfromname);
-        partition.path = QLatin1String(fs.f_mntonname);
+        partition.devName = boundedStringView(fs.f_mntfromname);
+        partition.path = boundedStringView(fs.f_mntonname);
         partition.freeBytes = fs.f_bavail * fs.f_bsize;
         partition.sizeBytes = fs.f_blocks * fs.f_bsize;
         partition.type = (fs.f_flags & MNT_REMOVABLE)
             ? PartitionType::removable
-            : getPartitionTypeByFsType(fs.f_fstypename);
+            : getPartitionTypeByFsType(boundedStringView(fs.f_fstypename));
 
-        foundPartitions << partition;
+        foundPartitions.push_back(std::move(partition));
     }
 
     return foundPartitions;
 }
 
-QList<ActivityMonitor::NetworkLoad> MacMonitor::totalNetworkLoad()
+std::vector<ActivityMonitor::NetworkLoad> MacMonitor::totalNetworkLoad()
 {
     return m_networkLoadMonitor->totalNetworkLoad();
 }
@@ -768,7 +788,7 @@ int MacMonitor::thisProcessThreads()
     return count;
 }
 
-quint64 MacMonitor::totalRamUsageBytes()
+std::uint64_t MacMonitor::totalRamUsageBytes()
 {
     vm_size_t pageSize;
     vm_statistics64_data_t vmStats;
@@ -791,11 +811,12 @@ quint64 MacMonitor::totalRamUsageBytes()
         return 0;
     }
 
-    return (static_cast<quint64>(vmStats.active_count) + static_cast<quint64>(vmStats.wire_count))
-        * static_cast<quint64>(pageSize);
+    return (static_cast<std::uint64_t>(vmStats.active_count)
+               + static_cast<std::uint64_t>(vmStats.wire_count))
+        * static_cast<std::uint64_t>(pageSize);
 }
 
-quint64 MacMonitor::thisProcessRamUsageBytes()
+std::uint64_t MacMonitor::thisProcessRamUsageBytes()
 {
     struct task_basic_info info;
     mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
@@ -810,7 +831,7 @@ quint64 MacMonitor::thisProcessRamUsageBytes()
     return info.resident_size;
 }
 
-quint64 MacMonitor::thisProcessPrivateRamUsageBytes()
+std::uint64_t MacMonitor::thisProcessPrivateRamUsageBytes()
 {
     vm_size_t pageSize = 0;
     if (host_page_size(mach_host_self(), &pageSize) != KERN_SUCCESS)
@@ -819,7 +840,7 @@ quint64 MacMonitor::thisProcessPrivateRamUsageBytes()
         return 0;
     }
 
-    quint64 result = 0;
+    std::uint64_t result = 0;
     mach_vm_size_t size = 0;
 
     // Iterate over memory regions and collect statistics.

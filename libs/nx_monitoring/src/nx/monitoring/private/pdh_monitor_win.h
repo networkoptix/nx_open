@@ -4,11 +4,10 @@
 
 #include <chrono>
 #include <tuple>
+#include <unordered_map>
+#include <vector>
 
 #include <pdh.h>
-
-#include <QtCore/QHash>
-#include <QtCore/QList>
 
 #include "../activity_monitor.h"
 
@@ -36,9 +35,9 @@ public:
 
     bool collectMonitoringData();
 
-    qreal getTotalCpuLoad();
-    qreal getThisProcessGpuUsage();
-    QList<ActivityMonitor::HddLoad> getTotalHddLoad();
+    double getTotalCpuLoad();
+    double getThisProcessGpuUsage();
+    std::vector<ActivityMonitor::HddLoad> getTotalHddLoad();
 
 private:
     void addTotalCpuLoadCounter();
@@ -47,7 +46,7 @@ private:
     void readTotalCpuLoad();
     void readGpuTimeCounterValues(std::chrono::milliseconds delta);
     void readDiskCounterValues();
-    qreal diskCounterValue(const PDH_RAW_COUNTER& last, const PDH_RAW_COUNTER& current);
+    double diskCounterValue(const PDH_RAW_COUNTER& last, const PDH_RAW_COUNTER& current);
     void calculateTotalHddLoad();
     // It is needed for query, containing wildcard.
     bool checkCountersExist(const QString& query) const;
@@ -81,20 +80,19 @@ private:
     /** Disk time counter, <tt>'\PhysicalDisk(*)\% Disk Time'</tt>. */
     PDH_HCOUNTER m_diskTimeCounter = INVALID_HANDLE_VALUE;
 
-    /** Data collected from the disk time counter, in a sane format.
-     * Note that strings stored here point into the raw data buffer. */
-    QHash<int, HddItem> m_itemByDiskId;
+    /** Data collected from the disk time counter, in a sane format. */
+    std::unordered_map<int, HddItem> m_itemByDiskId;
 
     /** Data collected from the disk time counter during the last collect operation. */
-    QHash<int, HddItem> m_lastItemByDiskId;
+    std::unordered_map<int, HddItem> m_lastItemByDiskId;
 
     /** Previous value for GPU running time for this process. */
-    qint64 m_lastGpuRunningTime = 0;
+    std::int64_t m_lastGpuRunningTime = 0;
 
     /** Final result values. */
-    qreal m_totalCpuLoad = 0;
-    qreal m_thisProcessGpuUsage = 0;
-    QList<ActivityMonitor::HddLoad> m_totalHddLoad;
+    double m_totalCpuLoad = 0.0;
+    double m_thisProcessGpuUsage = 0.0;
+    std::vector<ActivityMonitor::HddLoad> m_totalHddLoad;
     bool m_initialized = false;
 };
 

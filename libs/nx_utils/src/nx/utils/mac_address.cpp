@@ -2,28 +2,17 @@
 
 #include "mac_address.h"
 
-#include <QtCore/QList>
+#include <algorithm>
+#include <array>
 
 #include <nx/utils/random.h>
 
 namespace nx::utils {
 
-namespace {
+constexpr std::array kAllowedDelimiters{'-', ':'};
 
-static const QList<QChar> kAllowedDelimiters{'-', ':'};
-
-} // namespace
-
-MacAddress::MacAddress(const Data& bytes)
+MacAddress::MacAddress(const Data& bytes): m_data(bytes)
 {
-    int index = 0;
-    for (auto byte: bytes)
-    {
-        m_data[index] = byte;
-        ++index;
-        if (index == kMacAddressLength)
-            break;
-    }
 }
 
 MacAddress::MacAddress(const QLatin1String& mac):
@@ -42,27 +31,21 @@ MacAddress::MacAddress(QStringView mac)
     const bool hasDelimiters = mac.length() == kMacAddressLength * 3 - 1;
     if (hasDelimiters)
     {
-        QChar delimiter;
-
-        static const QList<int> kDelimiterIndices{2,5,8,11,14};
+        static constexpr std::array kDelimiterIndices{2, 5, 8, 11, 14};
 
         // Check variant with delimiters. Only '-' or ':' are allowed.
-        for (const QChar& c: kAllowedDelimiters)
-        {
-            if (std::ranges::all_of(
-                kDelimiterIndices,
-                [mac, c](int index) { return mac[index] == c; }))
+        const auto delimiterIt = std::ranges::find_if(kAllowedDelimiters,
+            [mac](char c)
             {
-                delimiter = c;
-                break;
-            }
-        }
+                return std::ranges::all_of(
+                    kDelimiterIndices, [mac, c](int i) { return QLatin1Char(c) == mac[i]; });
+            });
 
-        if (delimiter.isNull())
+        if (delimiterIt == kAllowedDelimiters.end())
             return;
 
         // Check excessive delimiters.
-        if (mac.count(delimiter) != kMacAddressLength - 1)
+        if (mac.count(QLatin1Char(*delimiterIt)) != kMacAddressLength - 1)
             return;
     }
     else if (mac.length() != kMacAddressLength * 2)
@@ -100,7 +83,7 @@ MacAddress::MacAddress(std::string_view mac):
 MacAddress MacAddress::fromRawData(const unsigned char* mac)
 {
     MacAddress result;
-    std::copy(mac, mac + kMacAddressLength, std::begin(result.m_data));
+    std::ranges::copy_n(mac, kMacAddressLength, result.m_data.begin());
     return result;
 }
 
@@ -124,16 +107,22 @@ const std::array<quint8, MacAddress::kMacAddressLength>& MacAddress::bytes() con
 
 QString MacAddress::toString() const
 {
-    QStringList bytes;
-    std::transform(
-        m_data.cbegin(),
-        m_data.cend(),
-        std::back_inserter(bytes),
-        [](auto byte)
-        {
-            return QString("%1").arg((uint)byte, 2, 16, QChar('0')).toUpper();
-        });
-    return bytes.join(kAllowedDelimiters[0]);
+    return QString::fromStdString(toStdString());
+}
+
+std::string MacAddress::toStdString() const
+{
+    static constexpr std::string_view kHexDigits = "0123456789ABCDEF";
+
+    std::string result(kMacAddressLength * 3 - 1, kAllowedDelimiters[0]);
+    for (std::size_t i = 0; i < m_data.size(); ++i)
+    {
+        const auto byte = m_data[i];
+        const auto resultIndex = i * 3;
+        result[resultIndex] = kHexDigits[byte >> 4];
+        result[resultIndex + 1] = kHexDigits[byte & 0x0F];
+    }
+    return result;
 }
 
 bool MacAddress::operator<(const MacAddress& other) const

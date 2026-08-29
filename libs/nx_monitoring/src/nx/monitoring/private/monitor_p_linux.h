@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <map>
+#include <unordered_map>
+#include <vector>
+
 #include <nx/utils/elapsed_timer.h>
 #include <sys/times.h>
 
@@ -12,8 +16,8 @@ namespace nx::monitoring {
 class InterfaceStatisticsContext: public ActivityMonitor::NetworkLoad
 {
 public:
-    uint64_t bytesReceived;
-    uint64_t bytesSent;
+    std::uint64_t bytesReceived;
+    std::uint64_t bytesSent;
 
     InterfaceStatisticsContext();
 
@@ -36,21 +40,21 @@ public:
 public:
     Private();
 
-    qreal thisProcessCpuUsage();
-    QList<HddLoad> totalHddLoad();
-    QList<ActivityMonitor::NetworkLoad> totalNetworkLoad();
+    double thisProcessCpuUsage();
+    std::vector<HddLoad> totalHddLoad();
+    std::vector<ActivityMonitor::NetworkLoad> totalNetworkLoad();
     void updatePartitions();
 
     int calculateId(int majorNumber, int minorNumber);
 
-    QList<HddLoad> zeroLoad() const;
+    std::vector<HddLoad> zeroLoad() const;
 
 protected:
     void calcNetworkStat();
 
 private:
-    QHash<int, Hdd> m_diskById;
-    QHash<int, unsigned int> m_lastDiskTimeById;
+    std::unordered_map<int, Hdd> m_diskById;
+    std::unordered_map<int, unsigned int> m_lastDiskTimeById;
     std::map<QString, InterfaceStatisticsContext> m_ifNameToStatistics;
     nx::utils::ElapsedTimer m_networkStatCalcTimer;
     nx::utils::ElapsedTimer m_hddStatCalcTimer;

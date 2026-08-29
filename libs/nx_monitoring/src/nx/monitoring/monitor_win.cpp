@@ -2,8 +2,9 @@
 
 #include "monitor_win.h"
 
-#include <thread>
 #include <cstdlib>
+#include <string>
+#include <thread>
 
 #include <windows.h>
 #include <winioctl.h>
@@ -27,7 +28,7 @@ namespace nx::monitoring {
 
 class WindowsMonitorPrivate
 {
-    using TimePoint = quint64;
+    using TimePoint = std::uint64_t;
 
 public:
     WindowsMonitorPrivate()
@@ -46,13 +47,13 @@ public:
         prevUserTime = *reinterpret_cast<TimePoint*>(&userTimeStruct);
     }
 
-    qreal getTotalCpuLoad()
+    double getTotalCpuLoad()
     {
         pdhMonitor.collectMonitoringData();
         return pdhMonitor.getTotalCpuLoad();
     }
 
-    qreal getThisProcessCpuUsage()
+    double getThisProcessCpuUsage()
     {
         FILETIME currentTimeStruct;
         GetSystemTimeAsFileTime(&currentTimeStruct);
@@ -63,7 +64,7 @@ public:
         const TimePoint kernelTime = *reinterpret_cast<TimePoint*>(&kernelTimeStruct);
         const TimePoint userTime = *reinterpret_cast<TimePoint*>(&userTimeStruct);
 
-        qreal result = (kernelTime - prevKernelTime) + (userTime - prevUserTime);
+        double result = (kernelTime - prevKernelTime) + (userTime - prevUserTime);
         result /= (currentTime - prevTimePoint);
         result /= std::thread::hardware_concurrency();
 
@@ -74,13 +75,13 @@ public:
         return result;
     }
 
-    qreal getThisProcessGpuUsage()
+    double getThisProcessGpuUsage()
     {
         pdhMonitor.collectMonitoringData();
         return pdhMonitor.getThisProcessGpuUsage();
     }
 
-    QList<nx::monitoring::ActivityMonitor::HddLoad> getTotalHddLoad()
+    std::vector<nx::monitoring::ActivityMonitor::HddLoad> getTotalHddLoad()
     {
         pdhMonitor.collectMonitoringData();
         return pdhMonitor.getTotalHddLoad();
@@ -113,7 +114,7 @@ public:
 
         ++m_networkStatCalcCounter;
 
-        const qint64 currentClock = m_networkStatTimer.elapsed();
+        const std::int64_t currentClock = m_networkStatTimer.elapsed();
         for (size_t i = 0; i < networkInterfaceTable->dwNumEntries; ++i)
         {
             const MIB_IFROW& ifInfo = networkInterfaceTable->table[i];
@@ -134,10 +135,12 @@ public:
                 p = m_interfaceLoadByMAC.emplace(physicalAddress, NetworkInterfaceStatData());
             if (p.second)
             {
-                p.first->second.load.interfaceName = (ifInfo.dwDescrLen == 0)
-                    ? QString("Unnamed")
-                    : QString::fromLocal8Bit(reinterpret_cast<const char*>(ifInfo.bDescr),
-                        ifInfo.dwDescrLen - 1);
+                p.first->second.load.interfaceName = ifInfo.dwDescrLen == 0
+                    ? "Unnamed"
+                    : QString::fromLocal8Bit(
+                          reinterpret_cast<const char*>(ifInfo.bDescr), ifInfo.dwDescrLen - 1)
+                          .toUtf8()
+                          .toStdString();
 
                 p.first->second.load.macAddress = nx::utils::MacAddress::fromRawData(
                     reinterpret_cast<const unsigned char*>(physicalAddress.constData()));
@@ -151,7 +154,7 @@ public:
             intfLoad.networkStatCalcCounter = m_networkStatCalcCounter;
             if (intfLoad.prevMeasureClock == currentClock)
                 continue;   //not calculating load
-            const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
+            const std::int64_t msPassed = currentClock - intfLoad.prevMeasureClock;
             intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3
                 + ((ifInfo.dwInOctets - (DWORD) p.first->second.inOctets) * MS_PER_SEC / msPassed)
                 * 0.7;
@@ -174,9 +177,9 @@ public:
         }
     }
 
-    QList<nx::monitoring::ActivityMonitor::NetworkLoad> networkInterfacelLoadData()
+    std::vector<nx::monitoring::ActivityMonitor::NetworkLoad> networkInterfacelLoadData()
     {
-        QList<nx::monitoring::ActivityMonitor::NetworkLoad> loadData;
+        std::vector<nx::monitoring::ActivityMonitor::NetworkLoad> loadData;
         for (const auto& ifStatData: m_interfaceLoadByMAC)
             loadData.push_back(ifStatData.second.load);
         return loadData;
@@ -188,7 +191,7 @@ private:
         nx::monitoring::ActivityMonitor::NetworkLoad load;
         ULONG64 inOctets = 0;
         ULONG64 outOctets = 0;
-        qint64 prevMeasureClock = -1;
+        std::int64_t prevMeasureClock = -1;
         size_t networkStatCalcCounter = 0;
     };
 
@@ -217,13 +220,13 @@ WindowsMonitor::~WindowsMonitor()
 {
 }
 
-qreal WindowsMonitor::totalCpuUsage()
+double WindowsMonitor::totalCpuUsage()
 {
     Q_D(WindowsMonitor);
     return d->getTotalCpuLoad();
 }
 
-quint64 WindowsMonitor::totalRamUsageBytes()
+std::uint64_t WindowsMonitor::totalRamUsageBytes()
 {
     MEMORYSTATUSEX memstat;
     memstat.dwLength = sizeof(memstat);
@@ -236,13 +239,13 @@ quint64 WindowsMonitor::totalRamUsageBytes()
     return memstat.ullTotalPhys - memstat.ullAvailPhys;
 }
 
-qreal WindowsMonitor::thisProcessCpuUsage()
+double WindowsMonitor::thisProcessCpuUsage()
 {
     Q_D(WindowsMonitor);
     return d->getThisProcessCpuUsage();
 }
 
-qreal WindowsMonitor::thisProcessGpuUsage()
+double WindowsMonitor::thisProcessGpuUsage()
 {
     Q_D(WindowsMonitor);
     return d->getThisProcessGpuUsage();
@@ -320,7 +323,7 @@ static ActivityMonitor::PartitionType getPartitionType(const QString& driveName)
     return ActivityMonitor::PartitionType::unknown;
 }
 
-static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
+static std::tuple<std::int64_t, std::int64_t> getSpaceInfo(const QString& driveName)
 {
     ULARGE_INTEGER bytesAvailable;
     ULARGE_INTEGER bytesTotal;
@@ -337,8 +340,8 @@ static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
 static ActivityMonitor::PartitionSpace getPartitionInfo(const QString& driveName)
 {
     ActivityMonitor::PartitionSpace result;
-    result.path = driveName;
-    result.devName = driveName;
+    result.path = std::filesystem::path(driveName.toStdU16String());
+    result.devName = driveName.toUtf8().toStdString();
     result.type = getPartitionType(driveName);
     std::tie(result.sizeBytes, result.freeBytes) = getSpaceInfo(driveName);
 
@@ -347,22 +350,22 @@ static ActivityMonitor::PartitionSpace getPartitionInfo(const QString& driveName
 
 } // <anonymous>
 
-QList<nx::monitoring::ActivityMonitor::PartitionSpace> WindowsMonitor::totalPartitionSpaceInfo()
+std::vector<ActivityMonitor::PartitionSpace> WindowsMonitor::totalPartitionSpaceInfo()
 {
-    QList<ActivityMonitor::PartitionSpace> result;
+    std::vector<ActivityMonitor::PartitionSpace> result;
     for (const auto& n: getDriveNames())
-        result.append(getPartitionInfo(n));
+        result.push_back(getPartitionInfo(n));
 
     return result;
 }
 
-QList<nx::monitoring::ActivityMonitor::HddLoad> WindowsMonitor::totalHddLoad()
+std::vector<nx::monitoring::ActivityMonitor::HddLoad> WindowsMonitor::totalHddLoad()
 {
     Q_D(WindowsMonitor);
     return d->getTotalHddLoad();
 }
 
-QList<nx::monitoring::ActivityMonitor::NetworkLoad> WindowsMonitor::totalNetworkLoad()
+std::vector<nx::monitoring::ActivityMonitor::NetworkLoad> WindowsMonitor::totalNetworkLoad()
 {
     Q_D(WindowsMonitor);
 
@@ -385,7 +388,7 @@ int WindowsMonitor::thisProcessThreads()
     return isOk ? entry.cntThreads : 0;
 }
 
-quint64 WindowsMonitor::thisProcessRamUsageBytes()
+std::uint64_t WindowsMonitor::thisProcessRamUsageBytes()
 {
     PROCESS_MEMORY_COUNTERS counters;
     if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
@@ -394,7 +397,7 @@ quint64 WindowsMonitor::thisProcessRamUsageBytes()
     return 0;
 }
 
-quint64 WindowsMonitor::thisProcessPrivateRamUsageBytes()
+std::uint64_t WindowsMonitor::thisProcessPrivateRamUsageBytes()
 {
     PROCESS_MEMORY_COUNTERS_EX counters;
     if (GetProcessMemoryInfo(

@@ -73,6 +73,7 @@ TEST_F(MacAddressTest, checkToString)
 {
     MacAddress mac(QString("00:11:22:33:44:55"));
     ASSERT_EQ(mac.toString().toStdString(), "00-11-22-33-44-55");
+    ASSERT_EQ(mac.toStdString(), "00-11-22-33-44-55");
 }
 
 } // namespace nx::utils::test

@@ -2,6 +2,8 @@
 
 #include "pdh_monitor_win.h"
 
+#include <string>
+
 #include <windows.h>
 #include <winioctl.h>
 #include <pdhmsg.h>
@@ -117,17 +119,17 @@ bool PdhMonitor::collectMonitoringData()
     return true;
 }
 
-qreal PdhMonitor::getTotalCpuLoad()
+double PdhMonitor::getTotalCpuLoad()
 {
     return m_totalCpuLoad;
 }
 
-qreal PdhMonitor::getThisProcessGpuUsage()
+double PdhMonitor::getThisProcessGpuUsage()
 {
     return m_thisProcessGpuUsage;
 }
 
-QList<ActivityMonitor::HddLoad> PdhMonitor::getTotalHddLoad()
+std::vector<ActivityMonitor::HddLoad> PdhMonitor::getTotalHddLoad()
 {
     return m_totalHddLoad;
 }
@@ -301,7 +303,7 @@ void PdhMonitor::readGpuTimeCounterValues(std::chrono::milliseconds interval)
     const auto runningDelta = maxGpuRunningTime - m_lastGpuRunningTime;
     m_lastGpuRunningTime = maxGpuRunningTime;
 
-    m_thisProcessGpuUsage = (qreal) runningDelta / (interval.count() * 10'000.0);
+    m_thisProcessGpuUsage = static_cast<double>(runningDelta) / (interval.count() * 10'000.0);
 }
 
 void PdhMonitor::readDiskCounterValues()
@@ -352,33 +354,39 @@ void PdhMonitor::readDiskCounterValues()
         if (!parseDiskDescription(items[i].szName, &id, &partitions))
             continue; //< A '_Total' entry or something unexpected.
 
-        ActivityMonitor::Hdd hdd(id, QLatin1String("HDD") + QString::number(id),
-            QString::fromWCharArray(partitions));
+        QString partitionsText = QString::fromWCharArray(partitions);
+        const QString hddName = QLatin1String("HDD") + QString::number(id);
+        ActivityMonitor::Hdd hdd{
+            .id = id,
+            .name = hddName.toUtf8().toStdString(),
+            .partitions = partitionsText.toUtf8().toStdString(),
+        };
         // 'partitions' string is unreliable on VirtualBox.
-        if (!hdd.partitions.contains(L':'))
+        if (!partitionsText.contains(L':'))
         {
             if (driveIndexToPartitions.contains(id))
             {
-                hdd.partitions = driveIndexToPartitions[id];
+                partitionsText = driveIndexToPartitions[id];
             }
             else
             {
-                NX_VERBOSE(
-                    this,
+                NX_VERBOSE(this,
                     "readDiskCounterValues: Disk item '%1' partition '%2' doesn't contain ':'. "
                     "Using id '%3' instead",
-                    items[i].szName, hdd.partitions, hdd.name);
-                hdd.partitions = hdd.name;
+                    items[i].szName,
+                    partitionsText,
+                    hddName);
+                partitionsText = hddName;
             }
+            hdd.partitions = partitionsText.toUtf8().toStdString();
         }
 
         m_itemByDiskId[id] = HddItem(hdd,  items[i].RawValue);
     }
 }
 
-qreal PdhMonitor::diskCounterValue(
-    const PDH_RAW_COUNTER& last_counter_value,
-    const PDH_RAW_COUNTER& current)
+double PdhMonitor::diskCounterValue(
+    const PDH_RAW_COUNTER& last_counter_value, const PDH_RAW_COUNTER& current)
 {
     if (last_counter_value.FirstValue == current.FirstValue)
         return 0.0;
@@ -404,17 +412,17 @@ void PdhMonitor::calculateTotalHddLoad()
     m_lastItemByDiskId = m_itemByDiskId;
     readDiskCounterValues();
 
-    QList<ActivityMonitor::HddLoad> result;
-    for (const HddItem& item: m_itemByDiskId)
+    std::vector<ActivityMonitor::HddLoad> result;
+    for (const auto& [diskId, item]: m_itemByDiskId)
     {
-        qreal load = 0.0;
-        if (m_lastItemByDiskId.contains(item.hdd.id))
-            load = diskCounterValue(m_lastItemByDiskId[item.hdd.id].counter, item.counter);
+        double load = 0.0;
+        if (m_lastItemByDiskId.contains(diskId))
+            load = diskCounterValue(m_lastItemByDiskId.at(diskId).counter, item.counter);
 
-        result.push_back(ActivityMonitor::HddLoad(item.hdd, load));
+        result.push_back({.hdd = item.hdd, .load = load});
     }
 
-    m_totalHddLoad = result;
+    m_totalHddLoad = std::move(result);
 }
 
 bool PdhMonitor::checkCountersExist(const QString& query) const
