@@ -1521,11 +1521,11 @@
     <name>TutorialToolTip</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>スキップ</translation>
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>了解しました。</translation>
     </message>
   </context>
   <context>
@@ -1697,6 +1697,10 @@
     <message>
       <source>Back to Welcome Screen</source>
       <translation>初期画面に戻る</translation>
+    </message>
+    <message>
+      <source>Log out</source>
+      <translation type="unfinished">Log out</translation>
     </message>
   </context>
 </TS>

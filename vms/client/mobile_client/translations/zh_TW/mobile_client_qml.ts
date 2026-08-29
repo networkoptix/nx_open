@@ -1521,7 +1521,7 @@
     <name>TutorialToolTip</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>略過</translation>
     </message>
     <message>
       <source>Ok, I got it</source>
@@ -1697,6 +1697,10 @@
     <message>
       <source>Back to Welcome Screen</source>
       <translation>返回歡迎畫面</translation>
+    </message>
+    <message>
+      <source>Log out</source>
+      <translation type="unfinished">Log out</translation>
     </message>
   </context>
 </TS>

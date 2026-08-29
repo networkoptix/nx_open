@@ -1699,5 +1699,9 @@
       <source>Back to Welcome Screen</source>
       <translation type="unfinished">Back to Welcome Screen</translation>
     </message>
+    <message>
+      <source>Log out</source>
+      <translation type="unfinished">Log out</translation>
+    </message>
   </context>
 </TS>

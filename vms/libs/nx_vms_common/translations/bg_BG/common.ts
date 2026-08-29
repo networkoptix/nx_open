@@ -1429,6 +1429,10 @@
       <source>Live view</source>
       <translation type="unfinished">Live view</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation type="unfinished">Generic</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

@@ -1362,6 +1362,10 @@
       <source>Live view</source>
       <translation>Tampilan live</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Generik</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

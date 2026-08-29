@@ -1522,7 +1522,7 @@
     <name>TutorialToolTip</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Hopp over</translation>
     </message>
     <message>
       <source>Ok, I got it</source>
@@ -1698,6 +1698,10 @@
     <message>
       <source>Back to Welcome Screen</source>
       <translation type="unfinished">Back to Welcome Screen</translation>
+    </message>
+    <message>
+      <source>Log out</source>
+      <translation type="unfinished">Log out</translation>
     </message>
   </context>
 </TS>

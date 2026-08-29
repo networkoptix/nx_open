@@ -1429,6 +1429,10 @@
       <source>Live view</source>
       <translation>Ζωντανή προβολή</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Γενικό</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

@@ -5139,6 +5139,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>+ %n daha fazla</numerusform>
       </translation>
     </message>
+    <message>
+      <source>Upgrade to Enterprise</source>
+      <translation type="unfinished">Upgrade to Enterprise</translation>
+    </message>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>

@@ -1362,6 +1362,10 @@
       <source>Live view</source>
       <translation>Xem trực tiếp</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Tổng quan</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

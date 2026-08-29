@@ -1362,6 +1362,10 @@
       <source>Live view</source>
       <translation>실시간 보기</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>일반</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>

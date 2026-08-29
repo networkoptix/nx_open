@@ -1697,6 +1697,10 @@
       <source>Live view</source>
       <translation>عرض مباشر</translation>
     </message>
+    <message>
+      <source>Generic</source>
+      <translation>Generic</translation>
+    </message>
   </context>
   <context>
     <name>StringsHelper</name>
