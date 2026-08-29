@@ -16,16 +16,16 @@ public:
     MacMonitor();
     virtual ~MacMonitor();
 
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+    virtual std::vector<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual int thisProcessThreads() override;
-    virtual QList<NetworkLoad> totalNetworkLoad() override;
-    virtual quint64 totalRamUsageBytes() override;
-    virtual quint64 thisProcessRamUsageBytes() override;
-    virtual quint64 thisProcessPrivateRamUsageBytes() override;
-    virtual qreal totalCpuUsage() override;
-    virtual qreal thisProcessCpuUsage() override;
-    virtual qreal thisProcessGpuUsage() override;
-    virtual QList<HddLoad> totalHddLoad() override;
+    virtual std::vector<NetworkLoad> totalNetworkLoad() override;
+    virtual std::uint64_t totalRamUsageBytes() override;
+    virtual std::uint64_t thisProcessRamUsageBytes() override;
+    virtual std::uint64_t thisProcessPrivateRamUsageBytes() override;
+    virtual double totalCpuUsage() override;
+    virtual double thisProcessCpuUsage() override;
+    virtual double thisProcessGpuUsage() override;
+    virtual std::vector<HddLoad> totalHddLoad() override;
 
 private:
     class NetworkLoadMonitor;

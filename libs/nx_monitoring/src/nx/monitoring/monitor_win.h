@@ -18,16 +18,16 @@ public:
     WindowsMonitor();
     virtual ~WindowsMonitor();
 
-    virtual qreal totalCpuUsage() override;
-    virtual quint64 totalRamUsageBytes() override;
-    virtual qreal thisProcessCpuUsage() override;
-    virtual qreal thisProcessGpuUsage() override;
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
-    virtual QList<HddLoad> totalHddLoad() override;
-    virtual QList<NetworkLoad> totalNetworkLoad() override;
+    virtual double totalCpuUsage() override;
+    virtual std::uint64_t totalRamUsageBytes() override;
+    virtual double thisProcessCpuUsage() override;
+    virtual double thisProcessGpuUsage() override;
+    virtual std::vector<PartitionSpace> totalPartitionSpaceInfo() override;
+    virtual std::vector<HddLoad> totalHddLoad() override;
+    virtual std::vector<NetworkLoad> totalNetworkLoad() override;
     virtual int thisProcessThreads() override;
-    virtual quint64 thisProcessRamUsageBytes() override;
-    virtual quint64 thisProcessPrivateRamUsageBytes() override;
+    virtual std::uint64_t thisProcessRamUsageBytes() override;
+    virtual std::uint64_t thisProcessPrivateRamUsageBytes() override;
 
 private:
     Q_DECLARE_PRIVATE(WindowsMonitor);

@@ -18,14 +18,14 @@ public:
     LinuxMonitor();
     virtual ~LinuxMonitor() override;
 
-    virtual qreal totalCpuUsage() override;
-    virtual quint64 totalRamUsageBytes() override;
-    virtual quint64 thisProcessRamUsageBytes() override;
-    virtual quint64 thisProcessPrivateRamUsageBytes() override;
-    virtual qreal thisProcessCpuUsage() override;
-    virtual QList<HddLoad> totalHddLoad() override;
-    virtual QList<NetworkLoad> totalNetworkLoad() override;
-    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+    virtual double totalCpuUsage() override;
+    virtual std::uint64_t totalRamUsageBytes() override;
+    virtual std::uint64_t thisProcessRamUsageBytes() override;
+    virtual std::uint64_t thisProcessPrivateRamUsageBytes() override;
+    virtual double thisProcessCpuUsage() override;
+    virtual std::vector<HddLoad> totalHddLoad() override;
+    virtual std::vector<NetworkLoad> totalNetworkLoad() override;
+    virtual std::vector<PartitionSpace> totalPartitionSpaceInfo() override;
 
     virtual void setPartitionInformationProvider(
         std::unique_ptr<PartitionsInformationProvider> partitionInformationProvider) override;

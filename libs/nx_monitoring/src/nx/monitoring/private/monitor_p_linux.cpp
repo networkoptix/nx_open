@@ -2,15 +2,11 @@
 
 #include "monitor_p_linux.h"
 
-#include <iostream>
 #include <map>
-#include <set>
-#include <chrono>
-#include <thread>
+#include <string>
 
-#include <QtCore/QFile>
 #include <QtCore/QDir>
-#include <QtCore/QHash>
+#include <QtCore/QFile>
 
 #include <time.h>
 #include <signal.h>
@@ -100,7 +96,7 @@ InterfaceStatisticsContext InterfaceStatisticsContext::create(const QString& nam
 {
     InterfaceStatisticsContext ctx;
 
-    ctx.interfaceName = name;
+    ctx.interfaceName = name.toUtf8().toStdString();
     ctx.macAddress = nx::utils::MacAddress(QLatin1String(
         readFileContents(QString::fromLatin1("/sys/class/net/%1/address").arg(name))));
 
@@ -128,9 +124,11 @@ void InterfaceStatisticsContext::update(int64_t elapsed)
     // Used, if interface speed cannot be read (noticed on vmware).
     static const int kDefaultInterfaceSpeedMpbs = 1000;
     static const int kMsPerSec = 1000;
+    const QString name = QString::fromStdString(interfaceName);
 
     bytesPerSecMax = readFileContents(
-        nx::format("/sys/class/net/%1/speed").arg(interfaceName)).toInt() * BYTES_PER_MB / CHAR_BIT;
+        nx::format("/sys/class/net/%1/speed").arg(name)).toInt()
+        * BYTES_PER_MB / CHAR_BIT;
     if (!bytesPerSecMax)
     {
         bytesPerSecMax = kDefaultInterfaceSpeedMpbs * 1024 * 1024 / CHAR_BIT;
@@ -138,7 +136,8 @@ void InterfaceStatisticsContext::update(int64_t elapsed)
     }
 
     const uint64_t rx_bytes = readFileContents(
-        nx::format("/sys/class/net/%1/statistics/rx_bytes").arg(interfaceName)).toULongLong();
+        nx::format("/sys/class/net/%1/statistics/rx_bytes").arg(name))
+            .toULongLong();
     if (bytesReceived > 0)
     {
         auto currentValue = static_cast<int64_t>(rx_bytes - bytesReceived) * kMsPerSec / elapsed;
@@ -147,7 +146,8 @@ void InterfaceStatisticsContext::update(int64_t elapsed)
     bytesReceived = rx_bytes;
 
     const uint64_t tx_bytes = readFileContents(
-        nx::format("/sys/class/net/%1/statistics/tx_bytes").arg(interfaceName)).toULongLong();
+        nx::format("/sys/class/net/%1/statistics/tx_bytes").arg(name))
+            .toULongLong();
     if (bytesSent > 0)
     {
         auto currentValue = static_cast<int64_t>(tx_bytes - bytesSent) * kMsPerSec / elapsed;
@@ -168,7 +168,7 @@ LinuxMonitor::Private::Private():
     memset(&m_previousProcessTimes, 0, sizeof(m_previousProcessTimes));
 }
 
-qreal LinuxMonitor::Private::thisProcessCpuUsage()
+double LinuxMonitor::Private::thisProcessCpuUsage()
 {
     struct tms currentProcessTimes{};
     const clock_t currentProcessElapsedClocks = times(&currentProcessTimes);
@@ -192,20 +192,21 @@ qreal LinuxMonitor::Private::thisProcessCpuUsage()
     if (!NX_ASSERT(elapsedDelta > 0, "This method can't be called more often than 1 / _SC_CLK_TCK"))
         return 0;
 
-    const qreal cpuUsage = (systemTimeDelta + userTimeDelta) / static_cast<qreal>(elapsedDelta);
+    const double cpuUsage =
+        (systemTimeDelta + userTimeDelta) / static_cast<double>(elapsedDelta);
 
     m_previousProcessElapsedClocks = currentProcessElapsedClocks;
     m_previousProcessTimes = currentProcessTimes;
     return cpuUsage;
 }
 
-QList<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad()
+std::vector<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad()
 {
-    QList<HddLoad> result;
+    std::vector<HddLoad> result;
 
     updatePartitions();
 
-    const qint64 elapsed = m_hddStatCalcTimer.elapsed().count();
+    const std::int64_t elapsed = m_hddStatCalcTimer.elapsed().count();
     if( elapsed == 0 )
     {
         m_hddStatCalcTimer.restart();
@@ -220,7 +221,7 @@ QList<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad()
         return zeroLoad();
     }
 
-    QHash<int, unsigned int> diskTimeById;
+    std::unordered_map<int, unsigned int> diskTimeById;
     char line[MAX_LINE_LENGTH];
     while(fgets(line, MAX_LINE_LENGTH, file.get()) != nullptr) {
         DiskStatSys diskStat;
@@ -248,15 +249,15 @@ QList<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad()
         int id = calculateId(diskStat.major_num, diskStat.minor_num);
         if(!m_diskById.contains(id))
             continue; /* Not a partition. */
-        const Hdd &hdd = m_diskById[id];
+        const Hdd& hdd = m_diskById.at(id);
 
         diskTimeById[id] = diskStat.tot_io_ms;
 
-        qreal load = 0.0;
+        double load = 0.0;
         if(m_lastDiskTimeById.contains(id))
-            load = static_cast<qreal>(diskStat.tot_io_ms - m_lastDiskTimeById[id]) / elapsed;
+            load = static_cast<double>(diskStat.tot_io_ms - m_lastDiskTimeById.at(id)) / elapsed;
 
-        result.push_back(HddLoad(hdd, load));
+        result.push_back({.hdd = hdd, .load = load});
     }
     m_lastDiskTimeById = diskTimeById;
 
@@ -265,11 +266,11 @@ QList<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad()
     return result;
 }
 
-QList<ActivityMonitor::NetworkLoad> LinuxMonitor::Private::totalNetworkLoad()
+std::vector<ActivityMonitor::NetworkLoad> LinuxMonitor::Private::totalNetworkLoad()
 {
     calcNetworkStat();
 
-    QList<ActivityMonitor::NetworkLoad> netStat;
+    std::vector<ActivityMonitor::NetworkLoad> netStat;
     for (auto it = m_ifNameToStatistics.begin(); it != m_ifNameToStatistics.end(); ++it)
         netStat.push_back(it->second);
 
@@ -326,7 +327,11 @@ void LinuxMonitor::Private::updatePartitions()
         }
 
         const int id = calculateId(int(major), int(minor));
-        m_diskById[id] = Hdd( id, devName, devName );
+        m_diskById[id] = {
+            .id = id,
+            .name = devName.toUtf8().toStdString(),
+            .partitions = devName.toUtf8().toStdString(),
+        };
     }
 
     // TODO: #rvasilenko Read network drives?
@@ -337,11 +342,11 @@ int LinuxMonitor::Private::calculateId(int majorNumber, int minorNumber)
     return (majorNumber << 16) + minorNumber;
 }
 
-QList<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::zeroLoad() const
+std::vector<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::zeroLoad() const
 {
-    QList<HddLoad> result;
-    foreach(const Hdd &hdd, m_diskById)
-        result.push_back(HddLoad(hdd, 0.0));
+    std::vector<HddLoad> result;
+    for (const auto& [id, hdd]: m_diskById)
+        result.push_back({.hdd = hdd, .load = 0.0});
     return result;
 }
 

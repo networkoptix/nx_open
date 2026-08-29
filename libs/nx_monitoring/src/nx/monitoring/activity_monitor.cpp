@@ -2,9 +2,13 @@
 
 #include "activity_monitor.h"
 
+#include <ranges>
+#include <stdexcept>
+#include <unordered_map>
+
+#include <nx/ranges.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/log/format.h>
-#include <nx/utils/std/algorithm.h>
 
 #if defined(Q_OS_WIN)
     #include <nx/monitoring/monitor_win.h>
@@ -20,13 +24,12 @@
 namespace nx::monitoring {
 
 ActivityMonitor::NetworkLoad ActivityMonitor::networkInterfaceLoadOrThrow(
-    const QString& interfaceName)
+    std::string_view interfaceName)
 {
-    auto totalLoad = totalNetworkLoad();
-    auto interfaceLoad = nx::utils::find_if(totalLoad,
-        [&interfaceName](const auto& load){ return load.interfaceName == interfaceName; });
-    if (interfaceLoad == nullptr)
-        throw std::invalid_argument("Interface [" + interfaceName.toStdString() + "] not found");
+    const std::vector totalLoad = totalNetworkLoad();
+    const auto interfaceLoad = std::ranges::find(totalLoad, interfaceName, &NetworkLoad::interfaceName);
+    if (interfaceLoad == totalLoad.end())
+        throw std::invalid_argument("Interface [" + std::string(interfaceName) + "] not found");
 
     return *interfaceLoad;
 }
@@ -34,42 +37,42 @@ ActivityMonitor::NetworkLoad ActivityMonitor::networkInterfaceLoadOrThrow(
 ActivityMonitor::NetworkLoad ActivityMonitor::networkInterfaceLoadOrThrow(
     const nx::utils::MacAddress& macAddress)
 {
-    auto totalLoad = totalNetworkLoad();
-    auto interfaceLoad = nx::utils::find_if(totalLoad,
-        [&macAddress](const auto& load){ return load.macAddress == macAddress; });
-    if (interfaceLoad == nullptr)
-    {
+    const std::vector totalLoad = totalNetworkLoad();
+    const auto interfaceLoad = std::ranges::find(totalLoad, macAddress, &NetworkLoad::macAddress);
+    if (interfaceLoad == totalLoad.end())
         throw std::invalid_argument(
-            "Interface with MAC [" + macAddress.toString().toStdString() + "] not found");
-    }
+            "Interface with MAC [" + macAddress.toStdString() + "] not found");
 
     return *interfaceLoad;
 }
 
-QList<ActivityMonitor::NetworkLoad> ActivityMonitor::totalNetworkLoad(NetworkInterfaceTypes types)
+std::vector<ActivityMonitor::NetworkLoad> ActivityMonitor::totalNetworkLoad(
+    NetworkInterfaceTypes types)
 {
-    QList<NetworkLoad> result;
-    for(const NetworkLoad &load: totalNetworkLoad())
-        if(load.type & types)
-            result.push_back(load);
-    return result;
+    return totalNetworkLoad()
+        | std::views::filter(
+            [types](const NetworkLoad& load) { return types.testFlag(load.type); })
+        | nx::ranges::to<std::vector>();
 }
 
-QList<ActivityMonitor::PartitionSpace> ActivityMonitor::totalPartitionSpaceInfo(
+std::vector<ActivityMonitor::PartitionSpace> ActivityMonitor::totalPartitionSpaceInfo(
     PartitionTypes types)
 {
-    QList<PartitionSpace> result;
-    for(const PartitionSpace &partition: totalPartitionSpaceInfo())
-        if(partition.type & types)
-            result.push_back(partition);
-    return result;
+    return totalPartitionSpaceInfo()
+        | std::views::filter(
+            [types](const PartitionSpace& partition) { return types.testFlag(partition.type); })
+        | nx::ranges::to<std::vector>();
 }
 
-QString toString(const ActivityMonitor::PartitionSpace& value)
+std::string toString(const ActivityMonitor::PartitionSpace& value)
 {
-    return nx::format("Partition(name='%1', path='%2', type=%3, space=%4/%5)").args(
-        value.devName, value.path, nx::reflect::toString(value.type),
-        value.freeBytes, value.sizeBytes);
+    return nx::format("Partition(name='%1', path='%2', type=%3, space=%4/%5)")
+        .args(value.devName,
+            value.path.string(),
+            nx::reflect::toString(value.type),
+            value.freeBytes,
+            value.sizeBytes)
+        .toStdString();
 }
 
 std::unique_ptr<ActivityMonitor> ActivityMonitor::createForCurrentPlatform()
@@ -77,9 +80,10 @@ std::unique_ptr<ActivityMonitor> ActivityMonitor::createForCurrentPlatform()
     return std::make_unique<MonitorImplementation>();
 }
 
-ActivityMonitor::PartitionType ActivityMonitor::getPartitionTypeByFsType(const QString& fsTypeName)
+ActivityMonitor::PartitionType ActivityMonitor::getPartitionTypeByFsType(
+    std::string_view fsTypeName)
 {
-    static const QHash<QString, ActivityMonitor::PartitionType> kFsTypes = {
+    static const std::unordered_map<std::string_view, ActivityMonitor::PartitionType> kFsTypes = {
         { "apfs", PartitionType::local},
         { "ffs", PartitionType::local},
         { "hfs", PartitionType::local},
@@ -106,7 +110,8 @@ ActivityMonitor::PartitionType ActivityMonitor::getPartitionTypeByFsType(const Q
         { "ramfs", PartitionType::ram},
         { "tmpfs", PartitionType::ram},
     };
-    return kFsTypes.value(fsTypeName, PartitionType::unknown);
+    const auto type = kFsTypes.find(fsTypeName);
+    return type != kFsTypes.end() ? type->second : PartitionType::unknown;
 }
 
 } // namespace nx::monitoring

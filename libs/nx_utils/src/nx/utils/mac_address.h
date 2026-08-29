@@ -3,6 +3,7 @@
 #pragma once
 
 #include <array>
+#include <string>
 #include <string_view>
 
 #include <QtCore/QHash>
@@ -30,6 +31,7 @@ public:
 
     const Data& bytes() const;
     QString toString() const;
+    std::string toStdString() const;
 
     bool operator==(const MacAddress& other) const;
     bool operator!=(const MacAddress& other) const;

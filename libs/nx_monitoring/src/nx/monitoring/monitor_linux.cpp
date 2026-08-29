@@ -2,8 +2,6 @@
 
 #include "monitor_linux.h"
 
-#include <iostream>
-#include <map>
 #include <optional>
 #include <thread>
 
@@ -24,8 +22,8 @@ namespace {
 
 struct MemoryStats
 {
-    quint64 residentSize;
-    quint64 sharedSize;
+    std::uint64_t residentSize;
+    std::uint64_t sharedSize;
 };
 
 MemoryStats getMemoryStats()
@@ -47,7 +45,7 @@ MemoryStats getMemoryStats()
     statm >> result.residentSize;
     statm >> result.sharedSize;
 
-    static const quint64 pageSize = sysconf(_SC_PAGE_SIZE);
+    static const std::uint64_t pageSize = sysconf(_SC_PAGE_SIZE);
 
     // Convert sizes to bytes.
     result.residentSize *= pageSize;
@@ -68,7 +66,7 @@ LinuxMonitor::~LinuxMonitor()
 {
 }
 
-qreal LinuxMonitor::totalCpuUsage()
+double LinuxMonitor::totalCpuUsage()
 {
     std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/stat", "r"), fclose );
     if(!file)
@@ -115,10 +113,10 @@ qreal LinuxMonitor::totalCpuUsage()
     d->prevCPUTimeTotal = cpuTimeTotal;
     if( cpuTimeTotalDiff <= 0 )
         return 0;
-    return 1.0 - cpuTimeIdleDiff / static_cast<qreal>(cpuTimeTotalDiff);
+    return 1.0 - cpuTimeIdleDiff / static_cast<double>(cpuTimeTotalDiff);
 }
 
-quint64 LinuxMonitor::totalRamUsageBytes()
+std::uint64_t LinuxMonitor::totalRamUsageBytes()
 {
     std::unique_ptr<FILE, decltype(&fclose)> file(fopen("/proc/meminfo", "r"), fclose);
     if (!file)
@@ -163,35 +161,35 @@ quint64 LinuxMonitor::totalRamUsageBytes()
     return (*memTotalKB - *memFreeKB - *memCachedKB) * 1024;
 }
 
-quint64 LinuxMonitor::thisProcessRamUsageBytes()
+std::uint64_t LinuxMonitor::thisProcessRamUsageBytes()
 {
     const MemoryStats stats = getMemoryStats();
     return stats.residentSize;
 }
 
-quint64 LinuxMonitor::thisProcessPrivateRamUsageBytes()
+std::uint64_t LinuxMonitor::thisProcessPrivateRamUsageBytes()
 {
     const MemoryStats stats = getMemoryStats();
     return stats.residentSize - stats.sharedSize;
 }
 
-qreal LinuxMonitor::thisProcessCpuUsage()
+double LinuxMonitor::thisProcessCpuUsage()
 {
     // Normalising for multicore processors.
-    return d->thisProcessCpuUsage() / qreal(std::thread::hardware_concurrency());
+    return d->thisProcessCpuUsage() / static_cast<double>(std::thread::hardware_concurrency());
 }
 
-QList<ActivityMonitor::HddLoad> LinuxMonitor::totalHddLoad()
+std::vector<ActivityMonitor::HddLoad> LinuxMonitor::totalHddLoad()
 {
     return d->totalHddLoad();
 }
 
-QList<ActivityMonitor::NetworkLoad> LinuxMonitor::totalNetworkLoad()
+std::vector<ActivityMonitor::NetworkLoad> LinuxMonitor::totalNetworkLoad()
 {
     return d->totalNetworkLoad();
 }
 
-QList<ActivityMonitor::PartitionSpace> LinuxMonitor::totalPartitionSpaceInfo()
+std::vector<ActivityMonitor::PartitionSpace> LinuxMonitor::totalPartitionSpaceInfo()
 {
     if (d->partitionsInfoProvider)
         return d->partitionsInfoProvider->partitionInfo();
