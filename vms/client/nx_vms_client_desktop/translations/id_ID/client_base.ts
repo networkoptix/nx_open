@@ -5091,7 +5091,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Tingkatkan ke Enterprise</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>

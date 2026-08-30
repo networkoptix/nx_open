@@ -1700,7 +1700,7 @@
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>登出</translation>
     </message>
   </context>
 </TS>

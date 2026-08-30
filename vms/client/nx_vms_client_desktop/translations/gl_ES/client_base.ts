@@ -5142,7 +5142,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Actualizar a Enterprise</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>

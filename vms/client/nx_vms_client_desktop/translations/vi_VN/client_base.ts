@@ -5091,7 +5091,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Nâng cấp lên bản Enterprise</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>

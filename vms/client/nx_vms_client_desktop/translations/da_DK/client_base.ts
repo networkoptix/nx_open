@@ -5142,11 +5142,11 @@ Hvis du havde til hensigt at flytte analysedata til en anden lagringsplacering, 
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Opgrader til Enterprise</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Lås op for eksklusive funktioner til brugbar videointelligens og datadrevne operationer i stor skala</translation>
     </message>
   </context>
   <context>

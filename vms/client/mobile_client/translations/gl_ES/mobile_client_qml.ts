@@ -1701,7 +1701,7 @@
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Pechar sesión</translation>
     </message>
   </context>
 </TS>

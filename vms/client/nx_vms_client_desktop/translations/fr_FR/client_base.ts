@@ -5142,7 +5142,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Mettre à niveau vers Entreprise</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>

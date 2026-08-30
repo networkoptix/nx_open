@@ -5142,7 +5142,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upgrade to Enterprise</source>
-      <translation type="unfinished">Upgrade to Enterprise</translation>
+      <translation>Байгууллага руу шинэчлэх</translation>
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>

@@ -1705,7 +1705,7 @@
     </message>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>تسجيل الخروج</translation>
     </message>
   </context>
 </TS>
