@@ -5099,7 +5099,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>実用的なビデオインテリジェンスと大規模なデータ駆動型オペレーションを実現する限定機能をアンロック</translation>
     </message>
   </context>
   <context>

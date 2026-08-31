@@ -568,7 +568,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>آلية العمل</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -620,7 +620,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>الواجهة</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -1044,7 +1044,7 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>من</translation>
     </message>
     <message>
       <source>To</source>

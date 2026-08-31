@@ -536,7 +536,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>غير متوافق</translation>
     </message>
     <message>
       <source>Pending</source>
@@ -1119,7 +1119,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>Description</source>
@@ -1334,7 +1334,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -2242,7 +2242,7 @@ Press Alt + Click to follow object</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>من</translation>
     </message>
     <message>
       <source>to</source>
@@ -2476,7 +2476,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
   </context>
   <context>
@@ -2945,7 +2945,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>الاسم الكامل</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3047,11 +3047,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>الاسم الكامل</translation>
     </message>
     <message>
       <source>Account Settings</source>

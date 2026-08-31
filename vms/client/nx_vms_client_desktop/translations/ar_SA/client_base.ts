@@ -3264,7 +3264,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
     <message>
       <source>Open Integrations</source>
@@ -5017,7 +5017,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
     <message>
       <source>Services</source>
@@ -6282,7 +6282,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -8104,7 +8104,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
   </context>
   <context>
@@ -9039,7 +9039,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -9744,7 +9744,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>Debug</source>
@@ -12393,7 +12393,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>الاسم الكامل</translation>
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
@@ -13144,7 +13144,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>تكاملات</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -13371,7 +13371,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>معلومات</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -13704,7 +13704,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>من</translation>
     </message>
     <message>
       <source>Not contains keywords</source>

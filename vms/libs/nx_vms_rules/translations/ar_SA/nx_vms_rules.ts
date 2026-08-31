@@ -1012,7 +1012,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>رأس الصفحة</translation>
     </message>
     <message>
       <source>Body</source>
