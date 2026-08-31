@@ -162,9 +162,7 @@ rest::ErrorOrData<T> parseMessageBody(
         else if constexpr (std::is_same_v<T, JsonRpcResultType>)
         {
             T data;
-            *success = deserializeResponse(
-                std::string_view(messageBody.data(), messageBody.size()),
-                &data);
+            *success = deserializeResponse(messageBody, &data);
 
             if (*success)
                 return data;
@@ -175,16 +173,16 @@ rest::ErrorOrData<T> parseMessageBody(
         }
         else
         {
-            using V = std::variant<T, nx::network::rest::Result>;
-            auto [data, result] = nx::reflect::json::deserialize<V>(messageBody.data());
+            auto [data, result] = nx::reflect::json::deserialize<T>(messageBody);
             *success = result;
+
             if (result)
-            {
-                if (std::holds_alternative<T>(data))
-                    return std::get<T>(data);
-                else
-                    return std::unexpected(std::get<nx::network::rest::Result>(data));
-            }
+                return data;
+
+            auto [error, errorResult] =
+                nx::reflect::json::deserialize<nx::network::rest::Result>(messageBody);
+            if (errorResult && error.errorId != nx::network::rest::ErrorId::ok)
+                return std::unexpected(std::move(error));
 
             NX_ASSERT(false, "Data cannot be deserialized:\n %1\nType: %2",
                 messageBody.left(kMessageBodyLogSize), typeid(T).name());
@@ -195,7 +193,7 @@ rest::ErrorOrData<T> parseMessageBody(
     auto result = nx::vms::common::api::parseRestResult(statusLine.statusCode, format, messageBody);
     *success = (result.errorId == nx::network::rest::ErrorId::ok);
 
-    return std::unexpected(result);
+    return std::unexpected(std::move(result));
 }
 
 template <typename T>
@@ -253,7 +251,6 @@ rest::ErrorOrData<T> parseJsonBody(
         *success = true;
         return T();
     }
-
 }
 
 template <typename T>
