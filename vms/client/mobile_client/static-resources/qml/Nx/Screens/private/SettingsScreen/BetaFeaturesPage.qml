@@ -72,6 +72,24 @@ BaseSettingsPage
         }
     }
 
+    LabeledSwitch
+    {
+        id: mirrorTimelineSwitch
+
+        width: parent.width
+        text: qsTr("Mirror Timeline")
+
+        extraText:
+            qsTr("Flip the timeline for left-handed use. Applies to phone-sized screens only.")
+
+        checkState: appContext.settings.leftHandedMode
+            ? Qt.Checked
+            : Qt.Unchecked
+
+        onCheckStateChanged:
+            appContext.settings.leftHandedMode = checkState != Qt.Unchecked
+    }
+
     QtObject
     {
         id: d

@@ -34,15 +34,4 @@ BaseSettingsPage
         onCheckStateChanged:
             appContext.settings.serverTimeMode = checkState != Qt.Unchecked
     }
-
-    LabeledSwitch
-    {
-        width: parent.width
-        text: qsTr("Mirror Timeline")
-        extraText: qsTr("Flip the timeline for left-handed use")
-        checkState: appContext.settings.leftHandedMode ? Qt.Checked : Qt.Unchecked
-
-        onCheckStateChanged:
-            appContext.settings.leftHandedMode = checkState != Qt.Unchecked
-    }
 }
