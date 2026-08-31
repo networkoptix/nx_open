@@ -57,7 +57,7 @@ Item
         snapMode: ListView.SnapOneItem
         boundsBehavior: Flickable.StopAtBounds
         maximumFlickVelocity: 4 * width
-        cacheBuffer: width
+        cacheBuffer: Math.max(width, 0)
         reuseItems: true
         highlightRangeMode: ListView.StrictlyEnforceRange
         preferredHighlightBegin: 0
