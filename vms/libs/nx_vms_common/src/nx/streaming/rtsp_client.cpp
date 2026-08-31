@@ -499,8 +499,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::Url& url, qint64 startTim
 
         m_tcpSock->setRecvTimeout(TCP_RECEIVE_TIMEOUT_MS);
         const nx::network::SocketAddress targetAddress =
-            m_proxyAddress.value_or(
-                nx::network::url::getEndpoint(m_url, nx::network::rtsp::DEFAULT_RTSP_PORT));
+            m_proxyAddress.value_or(nx::network::url::getEndpoint(m_url));
 
         if (!m_tcpSock->connect(targetAddress, m_tcpConnectionTimeout))
             return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
@@ -1977,7 +1976,9 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
         addAdditionAttrs(&request);
 
     NX_VERBOSE(this, "Send: %1", request.requestLine.toString());
-    const int port = m_url.port(nx::network::rtsp::DEFAULT_RTSP_PORT);
+    const auto defaultPort =
+        nx::network::url::getDefaultPortForScheme(m_url.scheme().toStdString());
+    const int port = m_url.port(defaultPort.value_or(nx::network::rtsp::DEFAULT_RTSP_PORT));
 
     if (!m_tcpSock)
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(m_url.host(), port);
