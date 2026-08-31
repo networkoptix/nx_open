@@ -1172,6 +1172,12 @@ Page
             selector: objectSelectionSheet
             parent: modernVideoScreen.contentItem
             minimumDownloadDurationMs: timeline.minimumDurationMs
+
+            onSeekRequested: (timestampMs) =>
+            {
+                if (timestampMs > 0)
+                    timeline.setPosition(timestampMs)
+            }
         }
 
         Rectangle

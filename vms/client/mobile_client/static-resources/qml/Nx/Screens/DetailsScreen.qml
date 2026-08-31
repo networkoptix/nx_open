@@ -2,6 +2,7 @@
 
 import QtQuick
 
+import Nx.Common
 import Nx.Core
 import Nx.Items
 import Nx.Ui
@@ -20,6 +21,8 @@ AdaptiveScreen
     required property var objectList
 
     title: detailsItem.title
+
+    signal showOnCameraRequested(Resource resource, real timestampMs)
 
     menuButton
     {
@@ -44,7 +47,9 @@ AdaptiveScreen
 
         onNextClicked: currentIndex = MathUtils.bound(0, currentIndex + 1, objectList.length - 1)
         onPreviousClicked: currentIndex = MathUtils.bound(0, currentIndex - 1, objectList.length - 1)
-        onShowOnCameraRequested: Workflow.popCurrentScreen()
         onBackClicked: Workflow.popCurrentScreen()
+
+        onShowOnCameraRequested:
+            (resource, timestampMs) => root.showOnCameraRequested(resource, timestampMs)
     }
 }

@@ -30,6 +30,8 @@ Menu
     // letting the timeline suspend its gestures while that sheet is on screen.
     readonly property bool actionSheetOpened: shareAction.sheetOpened
 
+    signal seekRequested(real positionMs)
+
     function adjustPosition(invokerRect /*in parent coords*/, indentFromInvoker)
     {
         d.adjustPosition(invokerRect, indentFromInvoker ?? 8)
@@ -91,6 +93,20 @@ Menu
                     return
 
                 Workflow.openDetailsScreen(menu.objectsType, d.objectsData)
+
+                if (!stackView.currentItem.showOnCameraRequested) //< Screen opening error check.
+                    return
+
+                const detailsScreen = stackView.currentItem
+                detailsScreen.showOnCameraRequested.connect(
+                    (resource, timestampMs) =>
+                    {
+                        if (stackView.currentItem !== detailsScreen || resource !== menu.resource)
+                            return
+
+                        menu.seekRequested(timestampMs)
+                        Workflow.popCurrentScreen();
+                    });
             }
         }
 
