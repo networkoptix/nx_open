@@ -1243,6 +1243,8 @@ Page
 
                     ControlButton
                     {
+                        id: objectTypeButton
+
                         icon.source:
                         {
                             switch (timeline.objectsType)
