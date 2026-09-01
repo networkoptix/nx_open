@@ -676,7 +676,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>مفتاح</translation>
     </message>
     <message>
       <source>Value</source>
@@ -1198,7 +1198,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>بروتوكول النفاذ إلى الدليل البسيط LDAP</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
@@ -1937,7 +1937,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>بروتوكول النفاذ إلى الدليل البسيط LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>

@@ -109,6 +109,14 @@
       <source>Use multiple decoders to improve performance</source>
       <translation>Använd flera avkodare för att förbättra prestandan</translation>
     </message>
+    <message>
+      <source>Mirror Timeline</source>
+      <translation type="unfinished">Mirror Timeline</translation>
+    </message>
+    <message>
+      <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
+      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
@@ -633,14 +641,6 @@
     <message>
       <source>Allows to show server time for the camera</source>
       <translation>Tillåter att visa servertid för kameran</translation>
-    </message>
-    <message>
-      <source>Mirror Timeline</source>
-      <translation>Spegla tidslinje</translation>
-    </message>
-    <message>
-      <source>Flip the timeline for left-handed use</source>
-      <translation>Vänd tidslinjen för vänsterhänt användning</translation>
     </message>
   </context>
   <context>

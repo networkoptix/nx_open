@@ -5146,7 +5146,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Ξεκλειδώστε αποκλειστικές δυνατότητες για αξιοποιήσιμες πληροφορίες από βίντεο και λειτουργίες που βασίζονται σε δεδομένα, σε μεγάλη κλίμακα</translation>
     </message>
   </context>
   <context>

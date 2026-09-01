@@ -109,6 +109,14 @@
       <source>Use multiple decoders to improve performance</source>
       <translation>Usa varios descodificadores para mellorar o rendemento</translation>
     </message>
+    <message>
+      <source>Mirror Timeline</source>
+      <translation type="unfinished">Mirror Timeline</translation>
+    </message>
+    <message>
+      <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
+      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
@@ -633,14 +641,6 @@
     <message>
       <source>Allows to show server time for the camera</source>
       <translation>Permite mostrar a hora do servidor para a cámara</translation>
-    </message>
-    <message>
-      <source>Mirror Timeline</source>
-      <translation>Liña de tempo espellada</translation>
-    </message>
-    <message>
-      <source>Flip the timeline for left-handed use</source>
-      <translation>Inverter a liña de tempo para uso por persoas zurdas</translation>
     </message>
   </context>
   <context>
@@ -1526,7 +1526,7 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>De acordo, xa o entendín</translation>
     </message>
   </context>
   <context>

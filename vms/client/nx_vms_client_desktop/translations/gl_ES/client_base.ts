@@ -5146,7 +5146,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Desbloquea funcións exclusivas para intelixencia de vídeo procesable e operacións baseadas en datos a escala</translation>
     </message>
   </context>
   <context>

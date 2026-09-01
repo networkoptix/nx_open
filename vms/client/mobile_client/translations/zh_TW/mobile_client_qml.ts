@@ -109,6 +109,14 @@
       <source>Use multiple decoders to improve performance</source>
       <translation>使用多個解碼器以提高效能</translation>
     </message>
+    <message>
+      <source>Mirror Timeline</source>
+      <translation type="unfinished">Mirror Timeline</translation>
+    </message>
+    <message>
+      <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
+      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
@@ -632,14 +640,6 @@
     <message>
       <source>Allows to show server time for the camera</source>
       <translation>允許攝影機顯示伺服器時間</translation>
-    </message>
-    <message>
-      <source>Mirror Timeline</source>
-      <translation>鏡像時間軸</translation>
-    </message>
-    <message>
-      <source>Flip the timeline for left-handed use</source>
-      <translation>翻轉時間軸以方便左手慣用者使用</translation>
     </message>
   </context>
   <context>

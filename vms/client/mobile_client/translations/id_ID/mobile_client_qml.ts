@@ -109,6 +109,14 @@
       <source>Use multiple decoders to improve performance</source>
       <translation>Gunakan beberapa dekoder untuk meningkatkan kinerja</translation>
     </message>
+    <message>
+      <source>Mirror Timeline</source>
+      <translation type="unfinished">Mirror Timeline</translation>
+    </message>
+    <message>
+      <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
+      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+    </message>
   </context>
   <context>
     <name>BooleanSelector</name>
@@ -632,14 +640,6 @@
     <message>
       <source>Allows to show server time for the camera</source>
       <translation>Mengijinkan untuk menampilkan waktu server pada kamera</translation>
-    </message>
-    <message>
-      <source>Mirror Timeline</source>
-      <translation>Mirror Timeline</translation>
-    </message>
-    <message>
-      <source>Flip the timeline for left-handed use</source>
-      <translation>Balikkan timeline untuk penggunaan tangan kiri</translation>
     </message>
   </context>
   <context>
