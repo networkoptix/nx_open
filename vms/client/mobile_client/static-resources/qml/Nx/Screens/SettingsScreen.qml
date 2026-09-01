@@ -85,6 +85,12 @@ AdaptiveScreen
             .arg(StyleHints.foregroundColorName)
         visible: state !== ""
 
+        onClicked:
+        {
+            if (settingsScreen.customBackHandler)
+                settingsScreen.customBackHandler()
+        }
+
         states:
         [
             State
@@ -97,7 +103,7 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked:
+                    settingsScreen.customBackHandler: () =>
                     {
                         if (settingsScreen.contentItem === settingsNavigation)
                         {
@@ -120,7 +126,8 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: settingsScreen.setContentItem(settingsNavigation)
+                    settingsScreen.customBackHandler:
+                        () => settingsScreen.setContentItem(settingsNavigation)
                 }
             },
             State
@@ -130,7 +137,7 @@ AdaptiveScreen
 
                 PropertyChanges
                 {
-                    backButton.onClicked: Workflow.openMenuScreen()
+                    settingsScreen.customBackHandler: () => Workflow.openMenuScreen()
                 }
             }
         ]

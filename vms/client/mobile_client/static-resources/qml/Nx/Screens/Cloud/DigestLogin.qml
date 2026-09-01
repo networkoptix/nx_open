@@ -19,12 +19,14 @@ Page
 
     objectName: "digestLoginToCloudScreen"
 
-    onLeftButtonClicked:
+    customBackHandler: () =>
     {
         passwordTextField.enabled = false //< Supress empty password warning under the field.
         Workflow.popCurrentScreen()
         Workflow.openSessionsScreen()
     }
+
+    onLeftButtonClicked: customBackHandler()
 
     Column
     {

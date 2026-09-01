@@ -17,7 +17,8 @@ Page
     objectName: "customConnectionScreen"
 
     title: systemName ? systemName : qsTr("Connect to Server")
-    onLeftButtonClicked: cancelScreen();
+    onLeftButtonClicked: customBackHandler()
+    customBackHandler: () => cancelScreen()
 
     property alias systemId: systemHostsModel.systemId
     property alias localSystemId: authenticationDataModel.localSystemId
