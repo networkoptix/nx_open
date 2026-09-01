@@ -573,6 +573,7 @@ void AsyncImageWidget::setLoadingIndicationVisible(bool visible)
             break;
 
         case ReloadMode::showPreviousImage:
+            m_indicator->setVisible(visible && m_preview.isNull());
             break;
 
         case ReloadMode::showBlurredPreviousImage:
