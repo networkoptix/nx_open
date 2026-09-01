@@ -109,6 +109,14 @@
         <source>Use multiple decoders to improve performance</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Mirror Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BooleanSelector</name>
@@ -632,14 +640,6 @@
     </message>
     <message>
         <source>Allows to show server time for the camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mirror Timeline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Flip the timeline for left-handed use</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
