@@ -231,7 +231,7 @@ struct NX_UTILS_API ValueHelper
 
     ValueHelper(ValueHelper&&) = default;
     ValueHelper(const ValueHelper&) = delete;
-    ValueHelper& operator=(ValueHelper&& valueHelper) noexcept;
+    ValueHelper& operator=(ValueHelper&& valueHelper) = delete;
     ValueHelper& operator=(const ValueHelper&) = delete;
 
     bool isNull() const;

@@ -14,13 +14,6 @@ ValueHelper::ValueHelper(const QString& val, ::rapidjson::Document::AllocatorTyp
 {
 }
 
-ValueHelper& ValueHelper::operator=(ValueHelper&& valueHelper) noexcept
-{
-    value = std::move(valueHelper.value);
-    allocator = std::move(valueHelper.allocator);
-    return *this;
-}
-
 bool ValueHelper::isNull() const
 {
     return value.IsNull();
