@@ -4697,7 +4697,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>معزول</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -4861,7 +4861,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>معزول</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -6466,7 +6466,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>بروتوكول النفاذ إلى الدليل البسيط LDAP</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -9459,7 +9459,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>بروتوكول النفاذ إلى الدليل البسيط LDAP</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -12311,7 +12311,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>بروتوكول النفاذ إلى الدليل البسيط LDAP</translation>
     </message>
   </context>
   <context>
@@ -13459,7 +13459,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>مفتاح</translation>
     </message>
     <message>
       <source>Value</source>
