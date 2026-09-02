@@ -111,11 +111,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Κατοπτρισμός χρονολογίου</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Αναστροφή της χρονογραμμής για χρήση από αριστερόχειρες. Ισχύει μόνο για οθόνες μεγέθους τηλεφώνου.</translation>
     </message>
   </context>
   <context>

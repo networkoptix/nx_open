@@ -111,11 +111,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Spejl Tidslinje</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Vend tidslinjen til venstrehåndet brug. Gælder kun for telefonstørrelse skærme.</translation>
     </message>
   </context>
   <context>

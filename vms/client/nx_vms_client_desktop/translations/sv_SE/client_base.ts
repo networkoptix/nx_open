@@ -5146,7 +5146,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Lås upp exklusiva funktioner för handlingskraftig videointelligens och datadriven verksamhet i stor skala</translation>
     </message>
   </context>
   <context>

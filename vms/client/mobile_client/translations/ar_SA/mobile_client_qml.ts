@@ -682,7 +682,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
   </context>
   <context>
@@ -1220,7 +1220,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1423,7 +1423,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>Log In to Cloud</source>
@@ -1602,7 +1602,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>Offline</source>

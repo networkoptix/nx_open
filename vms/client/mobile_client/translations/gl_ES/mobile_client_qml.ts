@@ -111,11 +111,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Liña de tempo espellada</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Inverter a liña de tempo para o seu uso por persoas zurdas. Só se aplica a pantallas de tamaño dun teléfono.</translation>
     </message>
   </context>
   <context>
@@ -701,7 +701,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Desconectar %1 de %2?</translation>
     </message>
   </context>
   <context>

@@ -408,7 +408,7 @@
     </message>
     <message>
       <source>Lifetime</source>
-      <translation type="unfinished">Lifetime</translation>
+      <translation>مدى الحياة</translation>
     </message>
     <message>
       <source>Password protection</source>
@@ -1366,7 +1366,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>مقفل</translation>
     </message>
     <message>
       <source>Width</source>
