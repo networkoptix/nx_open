@@ -910,7 +910,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1122,7 +1122,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
   </context>
   <context>
@@ -1310,7 +1310,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>2FA Disabled</source>
