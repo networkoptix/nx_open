@@ -13,7 +13,7 @@ Item
 {
     id: control
 
-    default property alias data: contentItem.data
+    default property alias contentHolderData: contentItem.data
 
     property real maxZoomFactor: 4
     property Item content: contentItem.children.length ? contentItem.children[0] : null

@@ -10,7 +10,7 @@ import nx.vms.client.mobile
 
 QuickControls.Page
 {
-    default property alias data: contentColumn.data
+    default property alias pageData: contentColumn.data
 
     property Item rightControl
 

@@ -13,7 +13,7 @@ BaseAdaptiveSheet
     property alias titleTextItem: titleTextItem
     property alias titleCustomArea: customArea
     property alias contentSpacing: contentColumn.spacing
-    default property alias data: contentColumn.data
+    default property alias sheetData: contentColumn.data
 
     spacing: 14
 
