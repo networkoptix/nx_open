@@ -76,6 +76,9 @@ struct CSNode
 class UDT_API CSndUList
 {
 public:
+    // Number of entries the heap array is created with.
+    static constexpr int kInitialHeapCapacity = 4096;
+
     CSndUList(
         CTimer* timer,
         std::mutex* windowLock,
@@ -90,9 +93,10 @@ public:
     //    1) [in] u: pointer to the UDT instance
     //    2) [in] reschedule: if the timestamp should be rescheduled
     // Returned value:
-    //    None.
+    //    Error with OsErrorCode::noBufferSpace if the socket is not on the list yet and the list
+    //    is at capacity. The socket is not scheduled in that case.
 
-    void update(std::shared_ptr<CUDT> u, bool reschedule = true);
+    Result<> update(std::shared_ptr<CUDT> u, bool reschedule = true);
 
     // Functionality:
     //    Retrieve the next packet and peer address from the first entry, and reschedule it in the queue.
@@ -123,19 +127,21 @@ public:
 
     int lastEntry() const { return m_iLastEntry; }
 
+    // Number of sockets the list can hold. The array is never grown, so a socket offered once
+    // lastEntry() has reached heapCapacity() - 1 is refused instead of scheduled.
+    int heapCapacity() const { return static_cast<int>(m_nodeHeap.size()); }
+
 private:
-    void insert_(
+    Result<> insert_(
         std::chrono::microseconds ts,
         CSNode* n);
 
     void remove_(CSNode* n);
 
 private:
-    // The heap array. CSNode objects are owned by m_socketToNode.
+    // The heap array, of fixed capacity. CSNode objects are owned by m_socketToNode.
     std::vector<CSNode*> m_nodeHeap;
     std::map<CUDT*, std::unique_ptr<CSNode>> m_socketToNode;
-    // physical length of the array
-    int m_iArrayLength = 0;
     // position of last entry on the heap array
     int m_iLastEntry = -1;
 

@@ -371,6 +371,7 @@ namespace OsErrorCode
     static constexpr UDT::Errno notSupported = WSAEOPNOTSUPP;
     static constexpr UDT::Errno timedOut = WSAETIMEDOUT;
     static constexpr UDT::Errno messageTooLarge = WSAEMSGSIZE;
+    static constexpr UDT::Errno noBufferSpace = WSAENOBUFS;
     static constexpr UDT::Errno connectionReset = WSAECONNRESET;
     static constexpr UDT::Errno io = ERROR_GEN_FAILURE;
 #else
@@ -388,6 +389,7 @@ namespace OsErrorCode
     static constexpr UDT::Errno notSupported = EOPNOTSUPP;
     static constexpr UDT::Errno timedOut = ETIMEDOUT;
     static constexpr UDT::Errno messageTooLarge = EMSGSIZE;
+    static constexpr UDT::Errno noBufferSpace = ENOBUFS;
     static constexpr UDT::Errno connectionReset = ECONNRESET;
     static constexpr UDT::Errno io = EIO;
 #endif

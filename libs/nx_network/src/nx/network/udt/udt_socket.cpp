@@ -680,6 +680,12 @@ int UdtStreamSocket::send(const void* buffer, std::size_t bufferLen)
     {
         const auto sysErrorCode = detail::getLastUdtErrorAsSystemErrorCode();
 
+        if (sysErrorCode == SystemError::noBufferSpace)
+        {
+            NX_WARNING(
+                this, "The UDT send list is at capacity, refusing to send %1 bytes", bufferLen);
+        }
+
         if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
 
