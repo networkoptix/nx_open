@@ -120,6 +120,8 @@ class StunAsyncClientAcceptanceTest:
     public BasicStunAsyncClientAcceptanceTest
 {
 public:
+    static constexpr auto kWaitTimeout = std::chrono::seconds(30);
+
     StunAsyncClientAcceptanceTest()
     {
         AbstractAsyncClient::Settings clientSettings;
@@ -371,7 +373,8 @@ protected:
 
     void thenClientReceivesIndication()
     {
-        m_indicationsReceived.pop();
+        // Fail before the CI per-test timeout instead of leaving a missing indication hanging.
+        ASSERT_TRUE(m_indicationsReceived.pop(kWaitTimeout));
     }
 
     void thenClientReportedConnectionClosure()
@@ -608,9 +611,13 @@ TYPED_TEST_P(
     this->thenClientReconnects();
 }
 
+// Complete an end-to-end round trip before sending server-originated data through a newly opened
+// HTTP tunnel. The connect callback alone did not provide a reliable readiness barrier in this
+// test.
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication)
 {
     this->givenConnectedClient();
+    this->thenClientIsAbleToPerformRequests();
     this->whenServerSendsIndication();
     this->thenClientReceivesIndication();
 }
@@ -620,6 +627,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, subscription_to_every_indication)
     this->subscribeToEveryIndication();
 
     this->givenConnectedClient();
+    this->thenClientIsAbleToPerformRequests();
     this->whenServerSendsIndication();
     this->thenClientReceivesIndication();
 }
@@ -627,6 +635,7 @@ TYPED_TEST_P(StunAsyncClientAcceptanceTest, subscription_to_every_indication)
 TYPED_TEST_P(StunAsyncClientAcceptanceTest, client_receives_indication_after_reconnect)
 {
     this->givenReconnectedClient();
+    this->thenClientIsAbleToPerformRequests();
     this->whenServerSendsIndication();
     this->thenClientReceivesIndication();
 }
