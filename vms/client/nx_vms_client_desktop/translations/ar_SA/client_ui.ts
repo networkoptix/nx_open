@@ -1281,7 +1281,7 @@
     <name>LayoutGeneralSettingsWidget</name>
     <message>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>مقفل</translation>
     </message>
     <message>
       <source>Width</source>
