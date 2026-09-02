@@ -15,6 +15,8 @@ namespace network {
 namespace aio {
 namespace test {
 
+constexpr auto kWaitTimeout = std::chrono::seconds(30); //< Below the CI per-test time limit.
+
 class TestPollable:
     public aio::BasicPollable
 {
@@ -187,20 +189,24 @@ TEST_F(BasicPollable, stopWhileInAioThread)
 TEST_F(BasicPollable, post_cancelled_by_pleaseStopSync_called_within_aio_thread)
 {
     std::promise<void> secondCallPosted;
+    std::promise<void> stopCompleted;
+    const std::future stopCompletedFuture = stopCompleted.get_future();
     std::atomic<int> asyncCallsDone(0);
 
     pollable().post(
-        [this, &asyncCallsDone, &secondCallPosted]()
+        [this, &asyncCallsDone, &secondCallPosted, &stopCompleted]()
         {
             ++asyncCallsDone;
             secondCallPosted.get_future().wait();
             pollable().pleaseStopSync();
+            stopCompleted.set_value();
         });
 
     pollable().post([&asyncCallsDone]() { ++asyncCallsDone; });
     secondCallPosted.set_value();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    // A fixed delay can observe the counter before a busy AIO thread completes the stop request.
+    ASSERT_EQ(std::future_status::ready, stopCompletedFuture.wait_for(kWaitTimeout));
     ASSERT_EQ(1, asyncCallsDone.load());
 }
 

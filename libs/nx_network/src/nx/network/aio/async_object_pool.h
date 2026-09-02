@@ -36,6 +36,8 @@ public:
     AsyncObjectPool(AIOService* aioService, FactoryFunc func):
         m_factoryFunc(std::move(func))
     {
+        // FIXME: #skolesnik AIOService::initialize() may return before AioThread::run()
+        // initializes systemThreadId(), causing multiple workers to be registered under 0.
         for (auto t: aioService->getAllAioThreads())
             m_workers[t->systemThreadId()] = nullptr;
     }

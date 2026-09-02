@@ -11,6 +11,8 @@ using namespace std::chrono;
 
 namespace nx::utils::test {
 
+constexpr auto kWaitTimeout = 30s; //< Below the CI per-test time limit.
+
 class TimerManager: public ::testing::Test
 {
 public:
@@ -149,17 +151,22 @@ TEST_F(TimerManager, deleteFromCallBack)
     utils::TimerManager mgr;
     int fireCount = 0;
     const std::chrono::milliseconds kTimeout(10);
+    std::promise<void> timerDeleted;
+    const std::future timerDeletedFuture = timerDeleted.get_future();
 
     mgr.addNonStopTimer(
-        [&mgr, &fireCount](nx::utils::TimerId timerId)
+        [&mgr, &fireCount, &timerDeleted](nx::utils::TimerId timerId)
         {
             ++fireCount;
             mgr.deleteTimer(timerId);
+            if (fireCount == 1)
+                timerDeleted.set_value();
         },
         kTimeout,
         kTimeout);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(kTimeout * 10));
+    // A fixed delay can expire before the timer callback runs on a loaded host.
+    ASSERT_EQ(std::future_status::ready, timerDeletedFuture.wait_for(kWaitTimeout));
     mgr.stop();
     ASSERT_EQ(fireCount, 1);
 }
