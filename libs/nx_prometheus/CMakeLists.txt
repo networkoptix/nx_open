@@ -6,6 +6,7 @@ nx_add_target(nx_prometheus LIBRARY
     NO_MOC
     PRIVATE_LIBS
         prometheus-cpp::core
+        nx_utils
     FOLDER common/libs
 )
 

@@ -2,6 +2,11 @@
 
 #include "registry.h"
 
+#include <exception>
+#include <mutex>
+#include <utility>
+
+#include <nx/utils/log/log.h>
 #include <prometheus/counter.h>
 #include <prometheus/gauge.h>
 #include <prometheus/histogram.h>
@@ -73,6 +78,42 @@ HistogramFamily::HistogramFamily(
 {
 }
 
+CollectorHandle::CollectorHandle(Registry* registry, std::uint64_t id):
+    m_registry(registry),
+    m_id(id)
+{
+}
+
+CollectorHandle::CollectorHandle(CollectorHandle&& other) noexcept:
+    m_registry(std::exchange(other.m_registry, nullptr)),
+    m_id(std::exchange(other.m_id, 0))
+{
+}
+
+CollectorHandle& CollectorHandle::operator=(CollectorHandle&& other) noexcept
+{
+    if (this != &other)
+    {
+        reset();
+        m_registry = std::exchange(other.m_registry, nullptr);
+        m_id = std::exchange(other.m_id, 0);
+    }
+    return *this;
+}
+
+CollectorHandle::~CollectorHandle()
+{
+    reset();
+}
+
+void CollectorHandle::reset()
+{
+    if (m_registry)
+        m_registry->deregisterCollector(m_id);
+    m_registry = nullptr;
+    m_id = 0;
+}
+
 struct Registry::Private
 {
     explicit Private(details::Labels labels):
@@ -82,6 +123,10 @@ struct Registry::Private
 
     details::Registry registry;
     const details::Labels constantLabels;
+
+    std::mutex collectorMutex;
+    std::map<std::uint64_t, std::function<void()>> collectors;
+    std::uint64_t nextCollectorId = 1;
 };
 
 Registry::Registry(std::string serviceName, std::string environment):
@@ -135,8 +180,41 @@ HistogramFamily Registry::histogramFamily(
     return HistogramFamily(&family, std::move(buckets));
 }
 
+CollectorHandle Registry::registerCollector(std::function<void()> collector)
+{
+    std::lock_guard lock(d->collectorMutex);
+    const auto id = d->nextCollectorId++;
+    d->collectors.emplace(id, std::move(collector));
+    return CollectorHandle(this, id);
+}
+
+void Registry::deregisterCollector(std::uint64_t id)
+{
+    std::lock_guard lock(d->collectorMutex);
+    d->collectors.erase(id);
+}
+
 std::string Registry::serialize() const
 {
+    // Invoked under the lock so that deregisterCollector() blocks until an in-flight scrape has
+    // finished: a handle destroyed on another thread must not let its owner die mid-callback.
+    std::lock_guard lock(d->collectorMutex);
+    for (const auto& entry: d->collectors)
+    {
+        try
+        {
+            entry.second();
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Metrics collector failed: %1", e.what());
+        }
+        catch (...)
+        {
+            NX_WARNING(this, "Metrics collector failed with an unknown exception");
+        }
+    }
+
     return details::TextSerializer().Serialize(d->registry.Collect());
 }
 

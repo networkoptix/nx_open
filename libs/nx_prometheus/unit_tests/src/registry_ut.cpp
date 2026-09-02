@@ -1,6 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <atomic>
+#include <chrono>
 #include <stdexcept>
+#include <thread>
+#include <utility>
 
 #include <gtest/gtest.h>
 
@@ -145,6 +149,113 @@ TEST_F(PrometheusRegistry, histogram_family_resolved_once_reuses_series_per_labe
             "request_duration_seconds_count{" + constantLabels + ",route=\"/ping\"} 2"),
         std::string::npos);
     EXPECT_NE(serialized.find("route=\"/status\""), std::string::npos);
+}
+
+TEST_F(PrometheusRegistry, registered_collector_runs_on_every_serialize)
+{
+    auto gauge = registry.gauge("pending_items", "Pending items");
+    int callCount = 0;
+    const auto handle = registry.registerCollector(
+        [&callCount, &gauge]()
+        {
+            ++callCount;
+            gauge.set(callCount);
+        });
+
+    EXPECT_NE(registry.serialize().find("pending_items{"), std::string::npos);
+    EXPECT_EQ(callCount, 1);
+    registry.serialize();
+    EXPECT_EQ(callCount, 2);
+}
+
+TEST_F(PrometheusRegistry, collector_value_is_sampled_at_scrape_time)
+{
+    auto gauge = registry.gauge("queue_depth", "Queued items");
+    int source = 7;
+    const auto handle = registry.registerCollector([&gauge, &source]() { gauge.set(source); });
+
+    // The value changes after registration, so a scrape reflecting it proves the callback is
+    // read at serialize() rather than at registration.
+    source = 42;
+    const std::string constantLabels = std::string("{") + Registry::kLabelEnvironment + "=\""
+        + kEnvironment + "\"," + Registry::kLabelServiceName + "=\"" + kServiceName + "\"}";
+    EXPECT_NE(
+        registry.serialize().find("queue_depth" + constantLabels + " 42"), std::string::npos);
+}
+
+TEST_F(PrometheusRegistry, destroyed_handle_stops_the_collector)
+{
+    int callCount = 0;
+    {
+        const auto handle = registry.registerCollector([&callCount]() { ++callCount; });
+        registry.serialize();
+        EXPECT_EQ(callCount, 1);
+    }
+
+    registry.serialize();
+    EXPECT_EQ(callCount, 1);
+}
+
+TEST_F(PrometheusRegistry, reset_handle_stops_the_collector)
+{
+    int callCount = 0;
+    auto handle = registry.registerCollector([&callCount]() { ++callCount; });
+    registry.serialize();
+    EXPECT_EQ(callCount, 1);
+
+    handle.reset();
+    registry.serialize();
+    EXPECT_EQ(callCount, 1);
+}
+
+TEST_F(PrometheusRegistry, moved_handle_keeps_the_collector_registered)
+{
+    int callCount = 0;
+    auto handle = registry.registerCollector([&callCount]() { ++callCount; });
+    auto moved = std::move(handle);
+    registry.serialize();
+    EXPECT_EQ(callCount, 1);
+
+    moved.reset();
+    registry.serialize();
+    EXPECT_EQ(callCount, 1);
+}
+
+TEST_F(PrometheusRegistry, throwing_collector_does_not_break_the_scrape)
+{
+    registry.counter("events_total", "Processed events").increment();
+    const auto throwing =
+        registry.registerCollector([]() { throw std::runtime_error("collector failure"); });
+    int callCount = 0;
+    const auto healthy = registry.registerCollector([&callCount]() { ++callCount; });
+
+    std::string serialized;
+    ASSERT_NO_THROW(serialized = registry.serialize());
+    EXPECT_NE(serialized.find("# TYPE events_total counter"), std::string::npos);
+    EXPECT_EQ(callCount, 1);
+}
+
+TEST_F(PrometheusRegistry, reset_waits_for_a_collector_running_on_another_thread)
+{
+    std::atomic<bool> collectorEntered{false};
+    std::atomic<bool> collectorLeft{false};
+    auto handle = registry.registerCollector(
+        [&collectorEntered, &collectorLeft]()
+        {
+            collectorEntered = true;
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            collectorLeft = true;
+        });
+
+    std::thread scrape([this]() { registry.serialize(); });
+    while (!collectorEntered)
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+    // reset() must not return while the collector is still reading the object it captured.
+    handle.reset();
+    EXPECT_TRUE(collectorLeft);
+
+    scrape.join();
 }
 
 } // namespace nx::prometheus::test

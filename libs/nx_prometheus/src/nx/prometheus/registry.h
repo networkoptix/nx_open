@@ -3,6 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -95,12 +97,44 @@ private:
     std::vector<double> m_buckets;
 };
 
+class Registry;
+
+/**
+ * Keeps one scrape-time collector registered. Destroying or resetting the handle deregisters the
+ * callback and waits for a concurrent scrape to finish running it, so a collector never outlives
+ * the object whose values it reads.
+ *
+ * Holds a raw Registry*, so it must not outlive the registry: ~CollectorHandle calls back into it.
+ */
+class NX_PROMETHEUS_API CollectorHandle
+{
+public:
+    CollectorHandle() = default;
+    ~CollectorHandle();
+
+    CollectorHandle(CollectorHandle&& other) noexcept;
+    CollectorHandle& operator=(CollectorHandle&& other) noexcept;
+
+    CollectorHandle(const CollectorHandle&) = delete;
+    CollectorHandle& operator=(const CollectorHandle&) = delete;
+
+    void reset();
+
+private:
+    friend class Registry;
+    CollectorHandle(Registry* registry, std::uint64_t id);
+
+    Registry* m_registry = nullptr;
+    std::uint64_t m_id = 0;
+};
+
 /**
  * Collects Prometheus metrics of one application and serializes them into the text exposition
  * format for a /metrics scrape handler. serviceName and environment are attached as constant
  * labels to every series, following the conventions of the Go nxidentity package.
  *
- * All methods are thread-safe (delegated to prometheus-cpp internal locking).
+ * All methods are thread-safe: metric access is delegated to prometheus-cpp internal locking,
+ * collector registration is guarded by the Registry itself.
  */
 class NX_PROMETHEUS_API Registry
 {
@@ -137,9 +171,23 @@ public:
         const std::string& help,
         std::vector<double> buckets);
 
+    /**
+     * Registers a callback invoked at the head of every serialize(), for values whose interesting
+     * reading is the one taken at scrape time - queue depths and the like. A collector that
+     * throws is logged and skipped, leaving the rest of the scrape intact.
+     *
+     * A collector must not register or deregister collectors, nor otherwise re-enter the
+     * registry's collector set: it runs under the lock that serializes those operations, which is
+     * what makes destroying a handle wait for an in-flight scrape instead of racing it.
+     */
+    [[nodiscard]] CollectorHandle registerCollector(std::function<void()> collector);
+
     std::string serialize() const;
 
 private:
+    friend class CollectorHandle;
+    void deregisterCollector(std::uint64_t id);
+
     struct Private;
     const std::unique_ptr<Private> d;
 };

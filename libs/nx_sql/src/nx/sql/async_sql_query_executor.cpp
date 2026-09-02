@@ -38,13 +38,10 @@ static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod{1};
 const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
 
 AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
-    const ConnectionOptions& connectionOptions)
-    :
+    const ConnectionOptions& connectionOptions, nx::prometheus::Registry* metricsRegistry):
     m_connectionOptions(connectionOptions),
     m_statisticsCollector(
-        kDefaultStatisticsAggregationPeriod,
-        m_queryQueue,
-        &m_dbThreadPoolSize)
+        kDefaultStatisticsAggregationPeriod, m_queryQueue, &m_dbThreadPoolSize, metricsRegistry)
 {
     m_dropConnectionThread = std::thread(
         std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));

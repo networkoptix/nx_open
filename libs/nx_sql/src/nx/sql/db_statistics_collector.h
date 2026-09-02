@@ -6,7 +6,9 @@
 #include <deque>
 #include <optional>
 #include <unordered_map>
+#include <vector>
 
+#include <nx/prometheus/registry.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/math/average_per_period.h>
@@ -15,6 +17,7 @@
 #include <nx/utils/math/summary_statistics_per_period.h>
 #include <nx/utils/thread/mutex.h>
 
+#include "metrics.h"
 #include "types.h"
 
 namespace nx::sql {
@@ -37,10 +40,14 @@ struct QueryExecutionTaskRecord
 class NX_SQL_API StatisticsCollector
 {
 public:
-    StatisticsCollector(
-        std::chrono::milliseconds period,
+    /**
+     * If metricsRegistry is not null, Prometheus series are emitted in addition to the
+     * aggregated statistics: per task while recording, and queue gauges at scrape time.
+     */
+    StatisticsCollector(std::chrono::milliseconds period,
         const detail::QueryQueue& queryQueue,
-        std::atomic<std::size_t>* dbThreadPoolSize);
+        std::atomic<std::size_t>* dbThreadPoolSize,
+        nx::prometheus::Registry* metricsRegistry = nullptr);
 
     /**
      * Record statistics about how long it took to perform a query execution task.
@@ -94,6 +101,7 @@ private:
     const std::chrono::milliseconds m_period;
     const detail::QueryQueue& m_queryQueue;
     std::atomic<std::size_t>* m_dbThreadPoolSize = nullptr;
+    std::optional<detail::Metrics> m_metrics;
     mutable nx::Mutex m_mutex;
     QueryExecutionTaskContext m_queryExecutionTaskStatistics;
     int m_totalModificationRequests = 0;
