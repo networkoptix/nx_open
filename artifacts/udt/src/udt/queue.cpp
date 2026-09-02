@@ -151,19 +151,18 @@ CSndUList::CSndUList(
     std::mutex* windowLock,
     std::condition_variable* windowCond)
     :
-    m_iArrayLength(4096),
+    m_nodeHeap(kInitialHeapCapacity, nullptr),
     m_pWindowLock(windowLock),
     m_pWindowCond(windowCond),
     m_timer(timer)
 {
-    m_nodeHeap.resize(m_iArrayLength, nullptr);
 }
 
 CSndUList::~CSndUList()
 {
 }
 
-void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
+Result<> CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -180,19 +179,19 @@ void CSndUList::update(std::shared_ptr<CUDT> u, bool reschedule)
     if (n->locationOnHeap >= 0)
     {
         if (!reschedule)
-            return;
+            return success();
 
         if (n->locationOnHeap == 0)
         {
             n->timestamp = std::chrono::microseconds(1);
             m_timer->interrupt();
-            return;
+            return success();
         }
 
         remove_(n);
     }
 
-    insert_(std::chrono::microseconds(1), n);
+    return insert_(std::chrono::microseconds(1), n);
 }
 
 std::unique_ptr<CPacket> CSndUList::pop(detail::SocketAddress& addr)
@@ -226,9 +225,10 @@ std::unique_ptr<CPacket> CSndUList::pop(detail::SocketAddress& addr)
 
     addr = u->peerAddr();
 
-    // insert a new entry, ts is the next processing time
+    // insert a new entry, ts is the next processing time. The node was just removed, so there is
+    // room for it and insert_ cannot fail here.
     if (ts > std::chrono::microseconds::zero())
-        insert_(ts, n);
+        (void) insert_(ts, n);
 
     return pkt;
 }
@@ -257,13 +257,21 @@ std::chrono::microseconds CSndUList::getNextProcTime() const
     return m_nodeHeap[0]->timestamp;
 }
 
-void CSndUList::insert_(
+Result<> CSndUList::insert_(
     std::chrono::microseconds ts,
     CSNode* n)
 {
     // do not insert repeated node
     if (n->locationOnHeap >= 0)
-        return;
+        return success();
+
+    // The array is not grown: a socket that does not fit is refused, rather than served with
+    // memory taken from everything else on the machine.
+    if (m_iLastEntry + 1 == heapCapacity())
+    {
+        UDT_LOG_WARN("Send list is at capacity ({}), not scheduling the socket", heapCapacity());
+        return Error(OsErrorCode::noBufferSpace);
+    }
 
     m_iLastEntry++;
     m_nodeHeap[m_iLastEntry] = n;
@@ -298,6 +306,8 @@ void CSndUList::insert_(
         std::lock_guard<std::mutex> lock(*m_pWindowLock);
         m_pWindowCond->notify_all();
     }
+
+    return success();
 }
 
 void CSndUList::remove_(CSNode* n)

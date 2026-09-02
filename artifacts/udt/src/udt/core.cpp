@@ -1017,7 +1017,8 @@ Result<int> CUDT::send(const char* data, int len)
     m_pSndBuffer->addBuffer(data, size);
 
     // insert this socket to send list if it is not on the list yet
-    sndQueue().sndUList().update(shared_from_this(), false);
+    if (auto result = sndQueue().sndUList().update(shared_from_this(), false); !result.ok())
+        return result.error();
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1170,7 +1171,8 @@ Result<int> CUDT::sendmsg(const char* data, int len, std::chrono::milliseconds t
     m_pSndBuffer->addBuffer(data, len, ttl, inorder);
 
     // insert this socket to the send list if it is not on the list yet
-    sndQueue().sndUList().update(shared_from_this(), false);
+    if (auto result = sndQueue().sndUList().update(shared_from_this(), false); !result.ok())
+        return result.error();
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
@@ -1337,7 +1339,8 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
         }
 
         // insert this socket to send list if it is not on the list yet
-        sndQueue().sndUList().update(shared_from_this(), false);
+        if (auto result = sndQueue().sndUList().update(shared_from_this(), false); !result.ok())
+            return result.error();
     }
 
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
@@ -1859,7 +1862,9 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             s_UDTUnited->m_EPoll.update_events(m_SocketId, m_sPollID, UDT_EPOLL_OUT, true);
 
             // insert this socket to send list if it is not on the list yet
-            sndQueue().sndUList().update(shared_from_this(), false);
+            // Nothing to report the refusal to: processCtrl() is driven by the receive
+            // queue, not by a caller. insert_() traces it.
+            (void) sndQueue().sndUList().update(shared_from_this(), false);
 
             // Update RTT
             //m_iRTT = *((int32_t *)ctrlpkt.m_pcData + 1);
@@ -1975,7 +1980,7 @@ void CUDT::processCtrl(const CPacket* ctrlpkt)
             }
 
             // the lost packet (retransmission) should be sent out immediately
-            sndQueue().sndUList().update(shared_from_this());
+            (void) sndQueue().sndUList().update(shared_from_this());
 
             ++m_iRecvNAK;
             ++m_iRecvNAKTotal;
@@ -2338,7 +2343,7 @@ void CUDT::checkTimers(bool forceAck)
             m_bShutdown = false;
 
             // update send U list to remove this socket
-            sndQueue().sndUList().update(shared_from_this());
+            (void) sndQueue().sndUList().update(shared_from_this());
 
             releaseSynch();
 
@@ -2365,7 +2370,7 @@ void CUDT::checkTimers(bool forceAck)
             CCUpdate();
 
             // immediately restart transmission
-            sndQueue().sndUList().update(shared_from_this());
+            (void) sndQueue().sndUList().update(shared_from_this());
         }
         else
         {
