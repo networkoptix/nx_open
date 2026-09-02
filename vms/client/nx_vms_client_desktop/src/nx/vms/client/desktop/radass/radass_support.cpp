@@ -61,7 +61,8 @@ bool isRadassSupported(const LayoutItemIndex& item)
 
 bool isRadassSupported(const QnVirtualCameraResourcePtr& camera)
 {
-    return camera && camera->hasDualStreaming();
+    return camera && camera->hasDualStreaming()
+        && camera->getStatus() != nx::vms::api::ResourceStatus::unauthorized;
 }
 
 bool isRadassSupported(const QnVirtualCameraResourceList& cameras, MatchMode match)
