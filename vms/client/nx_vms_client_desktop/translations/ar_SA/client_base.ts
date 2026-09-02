@@ -4453,7 +4453,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>تسجيل الدخول</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
