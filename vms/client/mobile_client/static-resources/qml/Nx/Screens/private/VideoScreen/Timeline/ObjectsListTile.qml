@@ -225,6 +225,9 @@ Item
             {
                 id: iconRow
 
+                readonly property bool showIcons:
+                    tile.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+
                 LayoutMirroring.enabled: false
 
                 topPadding: 4
@@ -233,7 +236,7 @@ Item
                 Repeater
                 {
                     // Up to 3 icons are drawn.
-                    model: (tile.iconPaths ?? []).slice(0, 3)
+                    model: iconRow.showIcons ? (tile.iconPaths ?? []).slice(0, 3) : []
 
                     ColoredImage
                     {
