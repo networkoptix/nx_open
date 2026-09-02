@@ -165,7 +165,7 @@ Rectangle
             objectName: "qrButton"
             iconSource: "image://skin/24x24/Outline/qr.svg"
             screenId: Controller.UnknownScreen
-            visible: windowContext.mainSystemContext.featureAccess.canUseDeployByQrFeature
+            visible: windowContext.mainSystemContext?.featureAccess.canUseDeployByQrFeature ?? false
             onClicked: windowContext.mainSystemContext.deploymentManager.deployNewServer()
         }
 
@@ -194,9 +194,14 @@ Rectangle
             onClicked:
             {
                 if (LayoutController.hasSidePanels)
-                    Workflow.openDialog("../Mobile/Popups/LogoutConfirmationPopup.qml")
+                {
+                    Workflow.openDialog(
+                        "../Mobile/Popups/LogoutConfirmationPopup.qml", {}, mainWindow.contentItem)
+                }
                 else
+                {
                     windowContext.sessionManager.stopSessionByUser()
+                }
             }
         }
     }

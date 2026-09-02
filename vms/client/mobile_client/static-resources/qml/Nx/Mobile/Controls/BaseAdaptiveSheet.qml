@@ -17,7 +17,7 @@ Drawer
 
     property alias header: headerProxy.target
     property alias footer: footerProxy.target
-    default property alias data: contentColumn.data
+    default property alias baseSheetData: contentColumn.data
 
     property bool closeAutomatically: true
     property bool closeButtonVisible: !control.bottomEdge

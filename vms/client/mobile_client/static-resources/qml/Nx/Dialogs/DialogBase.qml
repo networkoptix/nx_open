@@ -14,7 +14,7 @@ Popup
 
     property string result
     property bool disableAutoClose: false
-    default property alias data: content.data
+    default property alias dialogData: content.data
 
     width: Math.min(328, parent ? parent.width - 32 : 0)
     height: parent ? parent.height : 0

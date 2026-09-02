@@ -11,7 +11,7 @@ Popup
 {
     id: control
 
-    default property alias data: contentFlickable.data
+    default property alias sheetData: contentFlickable.data
     property alias title: sheetTitleText.text
     readonly property int headerHeight: 56
 

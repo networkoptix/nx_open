@@ -9,7 +9,7 @@ Item
 {
     id: skeleton
 
-    default property alias data: skeletonMask.data
+    default property alias maskData: skeletonMask.data
 
     property color color: ColorTheme.colors.dark6
     property color fillerColor: Qt.rgba(0.12, 0.15, 0.16, 1)

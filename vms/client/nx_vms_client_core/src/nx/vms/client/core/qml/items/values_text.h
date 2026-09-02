@@ -17,8 +17,6 @@ class ValuesText: public QQuickItem
     Q_OBJECT
     using base_type = QQuickItem;
 
-    Q_PROPERTY(qreal implicitWidth READ implicitWidth NOTIFY implicitWidthChanged)
-    Q_PROPERTY(qreal implicitHeight READ implicitHeight NOTIFY implicitHeightChanged)
     Q_PROPERTY(QStringList values READ values WRITE setValues NOTIFY valuesChanged)
     Q_PROPERTY(
         QStringList colorValues READ colorValues WRITE setColorValues NOTIFY colorValuesChanged)

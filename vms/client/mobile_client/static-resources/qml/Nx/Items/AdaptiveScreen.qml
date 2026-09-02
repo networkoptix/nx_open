@@ -15,7 +15,7 @@ FocusScope
 {
     id: root
 
-    default property alias data: container.data
+    default property alias contentData: container.data
 
     // Emitted whenever AdaptiveScreen closes a panel: the panel's close button was pressed, the
     // auto-close logic hid it because the content area would not fit, or `showPanel()` cross-closed
