@@ -24,5 +24,5 @@ ShaderEffect
         (edges & Qt.RightEdge) ? (rightGradientWidth / width) : 0.0,
         (edges & Qt.BottomEdge) ? (bottomGradientWidth / height) : 0.0)
 
-    fragmentShader: "qrc:/qml/Nx/Effects/EdgeOpacityGradient.frag.qsb"
+    fragmentShader: "qrc:/qml/Nx/Core/Effects/EdgeOpacityGradient.frag.qsb"
 }

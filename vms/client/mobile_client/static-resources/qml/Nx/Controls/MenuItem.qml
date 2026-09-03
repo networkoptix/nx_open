@@ -20,6 +20,7 @@ MenuItem
     property real descriptionSpacing: 2
 
     property bool showDisabled: false
+    property bool showIndicator: checkable
 
     font.pixelSize: 16
     leftPadding: 20
@@ -32,7 +33,7 @@ MenuItem
         ? Math.max(
             background.implicitWidth,
             contentItem.implicitWidth
-                + (indicator && control.checkable ? indicator.implicitWidth + spacing : 0)
+                + (indicator && control.showIndicator ? indicator.implicitWidth + spacing : 0)
                 + leftPadding + rightPadding)
         : 0
     implicitHeight: (enabled || showDisabled)
@@ -92,7 +93,7 @@ MenuItem
             anchors.left: icon.right
             anchors.leftMargin: icon.visible ? control.spacing : 0
             anchors.right: parent.right
-            anchors.rightMargin: control.indicator && control.checkable
+            anchors.rightMargin: control.indicator && control.showIndicator
                 ? indicator.width + control.spacing
                 : 0
 
@@ -127,7 +128,7 @@ MenuItem
     {
         x: control.width - control.rightPadding - width
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
-        visible: control.checkable && control.checked
+        visible: control.showIndicator && control.checked
 
         sourcePath: "image://skin/20x20/Outline/check.svg"
         sourceSize: Qt.size(20, 20)

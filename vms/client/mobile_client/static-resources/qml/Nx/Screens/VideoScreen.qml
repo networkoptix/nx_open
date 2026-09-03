@@ -1134,6 +1134,7 @@ Page
                 && !actionSheet.opened
                 && !downloadMediaSheet.opened
                 && !mainWindow.banner.modalActive
+                && !speedControl.menuOpened
 
             timeZone: video.resourceHelper.timeZone
 

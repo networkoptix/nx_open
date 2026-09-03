@@ -8,12 +8,14 @@ Menu
 {
     id: control
 
+    property real minimumWidth: 200
+
     width:
     {
         let implicitItemWidth = 0
         for (let i = 0; i < control.count; ++i)
             implicitItemWidth = Math.max(implicitItemWidth, itemAt(i).implicitWidth)
-        return implicitItemWidth + leftPadding + rightPadding
+        return Math.max(minimumWidth, implicitItemWidth + leftPadding + rightPadding)
     }
 
     topPadding: 8

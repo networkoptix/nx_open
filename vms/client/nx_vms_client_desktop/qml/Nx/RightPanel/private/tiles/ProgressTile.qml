@@ -3,7 +3,7 @@
 import QtQuick
 
 import Nx.Controls
-import Nx.Effects
+import Nx.Core.Effects
 
 import nx.vms.client.core
 import nx.vms.client.desktop

@@ -7,7 +7,7 @@ import Nx.Analytics
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Controls
-import Nx.Effects
+import Nx.Core.Effects
 import Nx.Items
 
 import nx.vms.client.core
