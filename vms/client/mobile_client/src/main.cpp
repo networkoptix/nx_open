@@ -355,6 +355,12 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     if (nx::build_info::isMacOsX())
         qputenv("QT_WEBVIEW_PLUGIN", "native");
 
+    // Qt's default threaded render loop can intermittently cause prolonged locks of the GUI
+    // thread on the Linux build (used for functional testing), freezing the whole client. The
+    // desktop client applies the same workaround. Skip if already configured externally.
+    if (nx::build_info::isLinux() && qgetenv("QSG_RENDER_LOOP").isEmpty())
+        qputenv("QSG_RENDER_LOOP", "basic");
+
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
