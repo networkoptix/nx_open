@@ -62,6 +62,17 @@ Page
 
     signal backClicked()
 
+    customBackHandler: () =>
+    {
+        if (!modernVideoScreen.StackView.view) //< The screen is embedded into another one.
+        {
+            modernVideoScreen.backClicked()
+            return
+        }
+
+        Workflow.popCurrentScreen()
+    }
+
     backgroundColor: "black"
     clip: false
 
@@ -370,7 +381,7 @@ Page
         }
     }
 
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    onLeftButtonClicked: customBackHandler()
 
     rightControl: ToolBarButton
     {
@@ -705,16 +716,7 @@ Page
 
         hasActionButton: actionSheet.hasActions
 
-        onBackButtonClicked:
-        {
-            if (!modernVideoScreen.StackView.view)
-            {
-                modernVideoScreen.backClicked()
-                return
-            }
-
-            Workflow.popCurrentScreen()
-        }
+        onBackButtonClicked: modernVideoScreen.customBackHandler()
 
         onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
 
