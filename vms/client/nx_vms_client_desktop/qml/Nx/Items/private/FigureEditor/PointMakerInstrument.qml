@@ -43,7 +43,9 @@ Instrument
 
             function makePoint(p)
             {
-                return Qt.point(F.relX(p.x, item), F.relY(p.y, item))
+                return Qt.point(
+                    F.relX(MathUtils.bound(0, p.x, item.width), item),
+                    F.relY(MathUtils.bound(0, p.y, item.height), item))
             }
 
             function shouldFinish()
