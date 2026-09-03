@@ -2,9 +2,12 @@
 
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Window
 
+import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Effects
 import Nx.Mobile.Controls
 
 Rectangle
@@ -18,7 +21,7 @@ Rectangle
     property alias displayedText: speedButton.text
 
     property real expandedWidth: 300
-    readonly property real collapsedWidth: speedButton.width
+    readonly property real collapsedWidth: speedButton.width + horizontalMargins * 2
     property bool expanded: false
     property real expandCollapseDurationMs: 150
     property alias displayCollapseButton: speedControlCollapseButton.visible
@@ -44,28 +47,45 @@ Rectangle
     // Whether the slider is pressed and held by the user.
     property alias pressed: speedSlider.pressed
 
+    // Whether the quick access menu is opened.
+    readonly property alias menuOpened: quickAccessMenu.opened
+
+    // A set of quick access speeds (via menu).
+    // These values must be the powers of two.
+    // They will be rounded to the nearest power of two internally.
+    // This set will also be constrained by other constraints (e.g. `reversible`).
+    property var quickAccessSpeeds: [-4, -2, -1, 0.5, 1, 2, 4, 8]
+
+    // Margins between the quick access menu and the window edges.
+    property real menuMargins: 12
+
+    // The gap between the speed button and the menu popup.
+    property real menuSpacing: 12
+
+    // Additional margins.
+    property real margins: 0
+    property real horizontalMargins: margins
+    property real verticalMargins: margins
+
     signal moved()
 
-    width: expanded ? expandedWidth : collapsedWidth
-    height: speedButton.height
+    implicitWidth: expanded ? expandedWidth : collapsedWidth
+    implicitHeight: speedButton.height + verticalMargins * 2
     clip: true
 
-    Behavior on width { NumberAnimation { duration: expandCollapseDurationMs }}
+    Behavior on implicitWidth { NumberAnimation { duration: expandCollapseDurationMs }}
 
     ControlButton
     {
         id: speedButton
 
-        enabled: !speedControl.expanded
+        readonly property bool transparentControlMode: speedControl.color.a < 1.0
+
         suppressDisabledState: true
         anchors.left: speedControl.left
+        anchors.leftMargin: speedControl.horizontalMargins
+        anchors.verticalCenter: speedControl.verticalCenter
         width: 60
-
-        Binding on backgroundColor
-        {
-            when: speedControl.color.a < 1.0
-            value: "transparent"
-        }
 
         text:
         {
@@ -81,7 +101,37 @@ Rectangle
         }
 
         onClicked:
-            speedControl.expanded = true
+        {
+            if (speedControl.expanded)
+                quickAccessMenu.open()
+            else
+                speedControl.expanded = true
+        }
+
+        onPressAndHold:
+            quickAccessMenu.open()
+
+        Binding on backgroundColor
+        {
+            when: speedButton.transparentControlMode
+            value: "transparent"
+        }
+
+        Rectangle
+        {
+            id: extraBackground
+
+            visible: speedControl.menuOpened
+            parent: speedButton.background
+            anchors.fill: parent
+            radius: speedButton.radius
+
+            border.color: ColorTheme.colors.dark15
+
+            color: speedButton.transparentControlMode
+                ? ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+                : ColorTheme.colors.dark11
+        }
     }
 
     RowLayout
@@ -89,10 +139,11 @@ Rectangle
         id: expandedLayout
 
         anchors.left: speedButton.right
+        anchors.verticalCenter: speedControl.verticalCenter
         spacing: 0
 
-        height: speedControl.height
-        width: speedControl.expandedWidth - speedButton.width
+        height: speedControl.height - speedControl.verticalMargins * 2
+        width: speedControl.expandedWidth - speedButton.width - speedControl.horizontalMargins * 2
 
         Slider
         {
@@ -120,6 +171,9 @@ Rectangle
              * `minExponent` - power-of-two exponent of minimum speed
              * `maxExponent` - power-of-two exponent of maximum forward speed
              * `maxReverseExponent` (optional) - power-of-two exponent of maximum backward speed
+             * `minSpeed` - adjusted minimum speed
+             * `maxSpeed` - adjusted maximum forward speed
+             * `maxReverseSpeed` - adjusted maximum backward speed
              * `minSliderValue` - minimum linear value for the slider
              * `maxSliderValue` - maximum linear value for the slider
              * `unitSpeedValue` - 0 or 1, depending on pausability
@@ -130,13 +184,13 @@ Rectangle
                 const reversible = speedControl.reversible && speedControl.maximumReverseSpeed != 0
 
                 // Minimum speed should not be greater than 1x.
-                const minSpeed = Math.min(1, Math.abs(speedControl.minimumSpeed))
+                result.minSpeed = Math.min(1, Math.abs(speedControl.minimumSpeed))
 
                 // Maximum speed should not be lesser than 1x or `minSpeed`.
-                const maxSpeed = Math.max(1, minSpeed, Math.abs(speedControl.maximumSpeed))
+                result.maxSpeed = Math.max(1, result.minSpeed, Math.abs(speedControl.maximumSpeed))
 
-                result.minExponent = Math.round(Math.log2(minSpeed))
-                result.maxExponent = Math.round(Math.log2(maxSpeed))
+                result.minExponent = Math.round(Math.log2(result.minSpeed))
+                result.maxExponent = Math.round(Math.log2(result.maxSpeed))
                 result.unitSpeedValue = speedControl.pausable ? 1 : 0
 
                 result.maxSliderValue = result.maxExponent - result.minExponent
@@ -144,15 +198,15 @@ Rectangle
 
                 if (reversible)
                 {
-                    const maxReverseSpeed = Math.max(
-                        1, minSpeed, Math.abs(speedControl.maximumReverseSpeed))
+                    result.maxReverseSpeed = Math.max(
+                        1, result.minSpeed, Math.abs(speedControl.maximumReverseSpeed))
 
-                    result.maxReverseExponent = Math.round(Math.log2(maxReverseSpeed))
-
+                    result.maxReverseExponent = Math.round(Math.log2(result.maxReverseSpeed))
                     result.minSliderValue = -(result.maxReverseExponent - result.minExponent + 1)
                 }
                 else
                 {
+                    result.maxReverseSpeed = 0
                     result.minSliderValue = 0
                 }
 
@@ -231,5 +285,114 @@ Rectangle
     {
         if (!effectivePaused && speed == 0)
             speed = 1
+    }
+
+    Menu
+    {
+        id: quickAccessMenu
+
+        readonly property int dimmedEdges:
+        {
+            let result = 0
+            if (!contentItem.atYBeginning)
+                result |= Qt.TopEdge
+            if (!contentItem.atYEnd)
+                result |= Qt.BottomEdge
+            return result
+        }
+
+        parent: speedButton
+        margins: speedControl.menuMargins
+
+        onAboutToShow:
+            updatePosition()
+
+        function updatePosition()
+        {
+            const windowItem = speedControl.Window.window.contentItem
+            const parentTop = parent.mapToItem(windowItem, 0, 0).y
+            const parentBottom = parent.mapToItem(windowItem, 0, parent.height).y
+
+            const spaceAbove = parentTop - windowItem.SafeArea.margins.top
+            const spaceBelow = windowItem.height - windowItem.SafeArea.margins.bottom - parentBottom
+
+            const margin = quickAccessMenu.margins
+            const gap = speedControl.menuSpacing
+
+            if (spaceBelow > spaceAbove)
+            {
+                height = Math.min(implicitHeight, spaceBelow - margin - gap)
+                y = parent.height + gap
+            }
+            else
+            {
+                height = Math.min(implicitHeight, spaceAbove - margin - gap)
+                y = -(height + gap)
+            }
+        }
+
+        Repeater
+        {
+            model: speedControl.quickAccessSpeeds.reduce(
+                (result, value) =>
+                {
+                    const absSpeed = 2.0 ** Math.round(Math.log2(Math.abs(value)))
+                    if (absSpeed >= speedSlider.parameters.minSpeed)
+                    {
+                        if (value < 0 && absSpeed <= speedSlider.parameters.maxReverseSpeed)
+                            result.push(-absSpeed)
+                        else if (value > 0 && absSpeed <= speedSlider.parameters.maxSpeed)
+                            result.push(absSpeed)
+                    }
+
+                    return result
+                },
+                [])
+
+            MenuItem
+            {
+                id: menuItem
+
+                readonly property real speed: modelData
+
+                text: `${menuItem.speed}x`
+                checkable: false
+                showIndicator: true
+                checked: menuItem.speed === speedControl.effectiveSpeed
+                enabled: !speedControl.forced1x || menuItem.speed === 1 || menuItem.speed < 0
+                showDisabled: true
+
+                onTriggered:
+                {
+                    speedControl.speed = menuItem.speed
+                    speedControl.moved()
+                }
+            }
+        }
+
+        Component
+        {
+            id: effectComponent
+
+            EdgeOpacityGradient
+            {
+                edges: quickAccessMenu.dimmedEdges
+                gradientWidth: 32
+            }
+        }
+
+        Component.onCompleted:
+        {
+            contentItem.layer.effect = effectComponent
+            contentItem.layer.enabled = Qt.binding(() => !!quickAccessMenu.dimmedEdges)
+        }
+    }
+
+    Connections
+    {
+        target: speedControl.Window.window
+
+        function onHeightChanged() { quickAccessMenu.close() }
+        function onWidthChanged() { quickAccessMenu.close() }
     }
 }

@@ -6,7 +6,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.Items
 import Nx.Controls
-import Nx.Effects
+import Nx.Core.Effects
 import Nx.Items
 import Nx.RightPanel
 

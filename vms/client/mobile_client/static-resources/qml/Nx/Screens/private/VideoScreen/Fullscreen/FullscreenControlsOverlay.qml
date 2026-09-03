@@ -110,7 +110,9 @@ Item
 
         function reportUserActivity()
         {
-            if (overlayVisible)
+            if (speedControl.menuOpened)
+                userInactivityTimer.stop()
+            else if (overlayVisible)
                 userInactivityTimer.restart()
         }
     }
@@ -446,7 +448,7 @@ Item
 
             LayoutItemProxy
             {
-                Layout.preferredWidth: speedControl.expandedWidth
+                Layout.preferredWidth: speedControl.implicitWidth
 
                 target: speedControl
                 visible: control.showPlaybackControls && opacityController.speedControlOpacity > 0
@@ -570,9 +572,9 @@ Item
     {
         id: speedControl
 
-        implicitHeight: 48
         opacity: opacityController.speedControlOpacity
         color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+        margins: 2
         radius: 6
         expanded: true
         expandedWidth: LayoutController.isPortrait ? portraitBottomControlsLayout.width : 400
@@ -583,6 +585,9 @@ Item
 
         onMoved:
             controller.setSpeed(speed)
+
+        onMenuOpenedChanged:
+            opacityController.reportUserActivity()
 
         // Reflect the actual playback speed so the control stays correct when the speed is
         // changed elsewhere (e.g. the normal-mode controls).
