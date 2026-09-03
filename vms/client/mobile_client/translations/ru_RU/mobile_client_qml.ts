@@ -393,11 +393,11 @@
     <message numerus="yes">
       <source>%n minutes</source>
       <comment>Number of minutes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n минут(ы)</numerusform>
-        <numerusform>%n минут(ы)</numerusform>
-        <numerusform>%n минут(ы)</numerusform>
-        <numerusform>%n минут(ы)</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message>
