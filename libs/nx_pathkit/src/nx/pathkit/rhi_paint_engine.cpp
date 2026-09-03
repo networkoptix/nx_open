@@ -374,17 +374,16 @@ void RhiPaintEngine::drawCustom(const PaintCustom& custom)
 }
 
 void RhiPaintEngine::drawTexture(
-    const QRectF& dst, std::shared_ptr<QRhiTexture> texture, bool mirrorY)
+    const QRectF& dst, std::shared_ptr<QRhiTexture> texture, bool mirrorY, bool pixelPerfect)
 {
     const auto size = texture->pixelSize();
-    m_data->append(PaintTexture{
-        .dst = dst,
+    m_data->append(PaintTexture{.dst = dst,
         .texture = texture,
         .src = QRectF(0, 0, size.width(), size.height()), //< Currently unused.
         .transform = state->transform(),
         .opacity = painter()->opacity(),
-        .mirrorY = mirrorY
-    });
+        .mirrorY = mirrorY,
+        .pixelPerfect = pixelPerfect});
 }
 
 void RhiPaintEngine::updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op)
