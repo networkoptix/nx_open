@@ -101,7 +101,6 @@ Rectangle
                 id: iconIndicator
 
                 visible: !!text
-                width: 12
             }
         }
     }

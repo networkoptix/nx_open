@@ -3,30 +3,33 @@
 import QtQuick
 
 import Nx.Core
+import Nx.Ui
 
 Rectangle
 {
-    property alias text: text.text
+    property alias text: textItem.text
 
     anchors.top: parent.top
     anchors.right: parent.right
 
     color: ColorTheme.colors.red_attention
-    width: 6
-    height: width
-    radius: width / 2
+    width: text ? Math.max(12, textItem.width) : 6
+    height: text ? 12 : 6
+    radius: (text ? 12 : 6) / 2
 
     Text
     {
-        id: text
+        id: textItem
 
-        anchors.fill: parent
+        anchors.centerIn: parent
 
         topPadding: 1
+        visible: text
+
         horizontalAlignment: Qt.AlignHCenter
         verticalAlignment: Qt.AlignVCenter
 
-        color: ColorTheme.colors.light4
+        color: StyleHints.foregroundColor
         font.pixelSize: 8
         font.weight: Font.Medium
     }
