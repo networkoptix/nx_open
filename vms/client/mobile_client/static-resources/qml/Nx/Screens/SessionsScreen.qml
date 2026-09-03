@@ -247,8 +247,6 @@ AdaptiveScreen
                         .arg(StyleHints.foregroundColorName)
                     visible: feedStateProvider.count !== 0
 
-                    indicator.width: 6
-                    indicator.height: 6
                     indicator.visible: feed.filtered
 
                     onClicked: feed.openFilterMenu()
@@ -350,8 +348,6 @@ AdaptiveScreen
                     visible: !emptyListPlaceholder.visible && !LayoutController.hasSidePanels
                     icon.source: feedStateProvider.buttonIconSource
 
-                    indicator.width: 12
-                    indicator.height: 12
                     indicator.text: feedStateProvider.buttonIconIndicatorText
                     indicator.visible: feedStateProvider.buttonIconIndicatorText.length !== 0
 
