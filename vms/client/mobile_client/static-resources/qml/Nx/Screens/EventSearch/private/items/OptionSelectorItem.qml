@@ -7,17 +7,20 @@ import Nx.Controls
 import Nx.Mobile.Controls
 import Nx.Ui
 
-// TODO: update comment below.
 /**
- * Option selection underlying screen implementation. Works in ties with OptionSelector component.
- * Implements basic "apply", "open" and "close functionality" and flickable central area which
- * contains custom components. Manages connections between selector and its value management
- * functions.
- * Delegate can have following signals and function to setup interaction with screen:
- *     - "applyRequest" signal to signalize that we want to apply data immediately and close
- *       selector screen.
- *     - "setValue" function to update current selected value.
- *     - "clear" function to clear currently selected value.
+ * Content of the option selection screen. Hosts `selector.screenDelegate` in a flickable area and
+ * forwards `apply()`, `clear()` and the `applyRequested` signal to it. Opening and closing the
+ * screen is up to the host.
+ *
+ * Every member of the delegate interface is optional:
+ *     - `selector` property: receives the current OptionSelector.
+ *     - `searchEdit` property: receives the header SearchEdit, the delegate controls its
+ *       visibility. Without this property the search field is hidden.
+ *     - `setValue(value)`: called with the selector value once the delegate is loaded.
+ *     - `apply()`: commits the delegate state to the selector.
+ *     - `clear()`: resets the selected value.
+ *     - `applyRequested` signal: apply immediately and close the screen. Its presence also makes
+ *       `closesOnApply` true.
  */
 Item
 {
