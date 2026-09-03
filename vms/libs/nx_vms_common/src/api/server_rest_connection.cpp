@@ -3110,10 +3110,6 @@ Handle ServerConnection::Private::sendRequest(const ContextPtr& context)
     Handle requestId = httpClientPool->sendRequest(context);
     NX_VERBOSE(logTag, "<%1> %2: %3", requestId, metrics->totalServerRequests.name(), total);
 
-    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
-    if (!requestId || context->isFinished())
-        return 0;
-
     return requestId;
 }
 
