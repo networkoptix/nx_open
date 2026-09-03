@@ -766,7 +766,7 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
 
 QSize GraphicsQmlView::Private::rounded(const QSizeF& size)
 {
-    // Round to the nearest integer to avoid artifacts when using GL_NEAREST.
+    // Rounded to a whole pixel, because the texture is drawn without interpolation.
     return size.toSize();
 }
 
@@ -975,10 +975,11 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
             if (auto pe = dynamic_cast<nx::pathkit::RhiPaintEngine*>(painter->paintEngine()))
             {
-                pe->drawTexture(
-                    QRectF(0, 0, size().width(), size().height()),
+                // The texture is rendered for the rounded item size, so the destination uses it.
+                pe->drawTexture(QRectF(QPointF(), QSizeF(Private::rounded(size()))),
                     d->rhiTexture,
-                    /* mirrorY */ d->quickWindow->rhi()->isYUpInFramebuffer());
+                    /* mirrorY */ d->quickWindow->rhi()->isYUpInFramebuffer(),
+                    /* pixelPerfect */ true);
             }
         }
         return;

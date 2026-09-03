@@ -145,8 +145,7 @@ private:
         QRectF* outRect);
 
     QRhiShaderResourceBindings* getTextureBindings(
-        std::shared_ptr<QRhiTexture> texture,
-        QRectF* outRect);
+        std::shared_ptr<QRhiTexture> texture, QRectF* outRect, bool nearest = false);
 
     std::shared_ptr<QRhiTexture> textureForGradient(
         QRhiResourceUpdateBatch* rub,
@@ -183,6 +182,7 @@ private:
     std::unique_ptr<QRhiBuffer> tubuf; //< Uniform
     std::unique_ptr<QRhiBuffer> tvbuf; //< Vertex + texture coordinates.
     std::unique_ptr<QRhiSampler> sampler;
+    std::unique_ptr<QRhiSampler> nearestSampler; //< For textures drawn 1:1 with device pixels.
     std::unique_ptr<QRhiShaderResourceBindings> tsrb;
 
     std::unique_ptr<Atlas> atlas;
@@ -195,6 +195,7 @@ private:
     {
         std::shared_ptr<QRhiTexture> texture;
         std::unique_ptr<QRhiShaderResourceBindings> tsrb;
+        bool nearest = false;
     };
     std::vector<Texture> textures;
 

@@ -49,6 +49,7 @@ struct PaintTexture
     QTransform transform;
     qreal opacity = 1.0;
     bool mirrorY = false;
+    bool pixelPerfect = false; //< Exact texel to device pixel mapping, see drawTexture().
 };
 
 struct PaintCustom
@@ -190,7 +191,19 @@ public:
     void drawPolygon(const QPointF* points, int pointCount, QPaintEngine::PolygonDrawMode mode) override;
 
     void drawCustom(const PaintCustom& custom);
-    void drawTexture(const QRectF& dst, std::shared_ptr<QRhiTexture> texture, bool mirrorY = false);
+
+    /**
+     * Draws the texture into the given rectangle in the current logical coordinates.
+     *
+     * With `pixelPerfect`, the destination is snapped to the device pixel grid, given exactly as
+     * many device pixels as the texture has texels, and sampled without interpolation. Intended
+     * for content already rasterized at the device resolution. Applies only to an upright scale
+     * and translation already asking for that size; otherwise the texture is drawn the usual way.
+     */
+    void drawTexture(const QRectF& dst,
+        std::shared_ptr<QRhiTexture> texture,
+        bool mirrorY = false,
+        bool pixelPerfect = false);
 
 private:
     void updateClipPath(const QPainterPath& clipPath, Qt::ClipOperation op);

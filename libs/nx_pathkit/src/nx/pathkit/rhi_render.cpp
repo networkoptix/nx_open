@@ -11,6 +11,9 @@
 
 #include "rhi_render.h"
 
+#include <limits>
+#include <optional>
+
 #include <QtCore/QFile>
 #include <QtCore/QScopeGuard>
 #include <QtGui/QImage>
@@ -247,6 +250,45 @@ void fillGradientBrushVerts(
     }
 }
 
+/** A float holds every integer only up to 2^digits; above that the grid step is 2. */
+constexpr qreal kMaxExactVertex = 1LL << std::numeric_limits<float>::digits;
+
+/**
+ * Maps the destination rectangle to the device pixel grid so that it covers exactly as many device
+ * pixels as the texture has texels, starting at an integer offset. Returns std::nullopt unless the
+ * transform is an upright scale and translation, the destination lands within a pixel of the
+ * texture size, and its position is finite and small enough to round - anything else is a request
+ * to resample, and the texture must be drawn the usual way.
+ */
+std::optional<QRectF> alignToDevicePixels(
+    const QTransform& transform, const QRectF& dst, const QSize& textureSize)
+{
+    if (transform.type() > QTransform::TxScale)
+        return std::nullopt;
+
+    if (transform.m11() <= 0 || transform.m22() <= 0)
+        return std::nullopt;
+
+    const QRectF deviceRect = transform.mapRect(dst);
+
+    // Negated on purpose: a NaN must fail this check, not slip through it.
+    if (!(qAbs(deviceRect.width() - textureSize.width()) < 1.0)
+        || !(qAbs(deviceRect.height() - textureSize.height()) < 1.0))
+    {
+        return std::nullopt;
+    }
+
+    // The far corner has to stay on the grid as well, and a NaN fails this the same way.
+    if (!(qAbs(deviceRect.left()) + textureSize.width() <= kMaxExactVertex)
+        || !(qAbs(deviceRect.top()) + textureSize.height() <= kMaxExactVertex))
+    {
+        return std::nullopt;
+    }
+
+    return QRectF(
+        QPointF(qRound(deviceRect.left()), qRound(deviceRect.top())), QSizeF(textureSize));
+}
+
 } // namespace
 
 static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
@@ -312,6 +354,13 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
         QRhiSampler::ClampToEdge,
         QRhiSampler::ClampToEdge));
     sampler->create();
+
+    nearestSampler.reset(m_rhi->newSampler(QRhiSampler::Nearest,
+        QRhiSampler::Nearest,
+        QRhiSampler::None,
+        QRhiSampler::ClampToEdge,
+        QRhiSampler::ClampToEdge));
+    nearestSampler->create();
 
     tsrb.reset(m_rhi->newShaderResourceBindings());
     tsrb->setBindings({
@@ -536,27 +585,21 @@ QImage RhiPaintDeviceRenderer::getImage(const QPixmap& pixmap)
 }
 
 QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
-    std::shared_ptr<QRhiTexture> texture,
-    QRectF* outRect)
+    std::shared_ptr<QRhiTexture> texture, QRectF* outRect, bool nearest)
 {
-    if (textures.empty() || textures.back().texture != texture)
+    if (textures.empty() || textures.back().texture != texture
+        || textures.back().nearest != nearest)
     {
         std::unique_ptr<QRhiShaderResourceBindings> tsrb(m_rhi->newShaderResourceBindings());
-        tsrb->setBindings({
-            QRhiShaderResourceBinding::uniformBuffer(0,
-                kCommonVisibility,
-                ubuf.get()),
-            QRhiShaderResourceBinding::sampledTexture(1,
-                QRhiShaderResourceBinding::FragmentStage,
-                texture.get(),
-                sampler.get())
-        });
+        tsrb->setBindings(
+            {QRhiShaderResourceBinding::uniformBuffer(0, kCommonVisibility, ubuf.get()),
+                QRhiShaderResourceBinding::sampledTexture(1,
+                    QRhiShaderResourceBinding::FragmentStage,
+                    texture.get(),
+                    nearest ? nearestSampler.get() : sampler.get())});
         tsrb->create();
 
-        textures.push_back({
-            .texture = texture,
-            .tsrb = std::move(tsrb)
-        });
+        textures.push_back({.texture = texture, .tsrb = std::move(tsrb), .nearest = nearest});
     }
 
     *outRect = QRectF(0, 0, 1, 1);
@@ -1010,15 +1053,27 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
         }
         else if (auto paintTexture = std::get_if<PaintTexture>(&entry))
         {
+            // The destination is in general neither integer nor integer sized in device pixels,
+            // so it is aligned here instead of being mapped by the painter transform.
+            const std::optional<QRectF> alignedDst = paintTexture->pixelPerfect
+                ? alignToDevicePixels(paintTexture->transform,
+                      paintTexture->dst,
+                      paintTexture->texture->pixelSize())
+                : std::nullopt;
+
             QRectF src;
-            auto bindings = getTextureBindings(paintTexture->texture, &src);
+            auto bindings = getTextureBindings(
+                paintTexture->texture, &src, /*nearest*/ alignedDst.has_value());
 
-            const auto dst = paintTexture->dst;
+            const auto dst = alignedDst.value_or(paintTexture->dst);
 
-            const QPointF topLeft = paintTexture->transform.map(dst.topLeft());
-            const QPointF topRight = paintTexture->transform.map(dst.topRight());
-            const QPointF bottomLeft = paintTexture->transform.map(dst.bottomLeft());
-            const QPointF bottomRight = paintTexture->transform.map(dst.bottomRight());
+            // The aligned rectangle is already in device coordinates.
+            const auto transform = alignedDst ? QTransform() : paintTexture->transform;
+
+            const QPointF topLeft = transform.map(dst.topLeft());
+            const QPointF topRight = transform.map(dst.topRight());
+            const QPointF bottomLeft = transform.map(dst.bottomLeft());
+            const QPointF bottomRight = transform.map(dst.bottomRight());
 
             const qreal vx[4] = {topLeft.x(), topRight.x(), bottomRight.x(), bottomLeft.x()};
             const qreal vy[4] = {topLeft.y(), topRight.y(), bottomRight.y(), bottomLeft.y()};
