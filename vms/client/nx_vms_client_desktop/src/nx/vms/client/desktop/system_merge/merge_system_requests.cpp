@@ -144,6 +144,45 @@ std::unique_ptr<nx::network::AbstractStreamSocket> takeSocketSync(
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+nx::network::rest::Result tunnelError(nx::network::http::StatusCode::Value proxyStatusCode,
+    const nx::network::SocketAddress& target,
+    const QString& proxyName)
+{
+    namespace StatusCode = nx::network::http::StatusCode;
+    using nx::network::rest::ErrorId;
+    using nx::network::rest::Result;
+
+    switch (proxyStatusCode)
+    {
+        // No response at all means that it is the connection to the proxy Server itself which is
+        // broken, the target is not involved yet.
+        case StatusCode::undefined:
+            return Result{ErrorId::serviceUnavailable,
+                MergeSystemRequestsManager::tr(
+                    "Cannot connect to Server %1.", "%1 is a Server name")
+                    .arg(proxyName)};
+
+        // A gateway status means the tunnel has not been established and the target has sent
+        // nothing: the Server itself answers with badGateway, an intermediary may add the rest.
+        case StatusCode::badGateway:
+        case StatusCode::serviceUnavailable:
+        case StatusCode::gatewayTimeOut:
+            return Result{ErrorId::serviceUnavailable,
+                MergeSystemRequestsManager::tr(
+                    "Server %1 cannot connect to %2. Make sure the address is correct and the "
+                    "target Site is online and reachable from %1.",
+                    "%1 is a Server name, %2 is an address of the target Site")
+                    .arg(proxyName, QString::fromStdString(target.toString()))};
+
+        default:
+            return Result{Result::errorFromHttpStatus(proxyStatusCode)};
+    }
+}
+
+} // namespace
+
 class MergeSystemRequestsManager::Private
 {
 public:
@@ -185,48 +224,48 @@ public:
         nx::Buffer data,
         Callback<Data> callback)
     {
-        auto onConnect =
-            [this,
-            callback = std::move(callback),
-            path,
-            method,
-            token,
-            data = std::move(data),
-            targetAdapterFunc = std::move(targetAdapterFunc)](
-                std::shared_ptr<nx::network::http::AsyncClient> client)
+        auto onConnect = [this,
+                             callback = std::move(callback),
+                             path,
+                             method,
+                             token,
+                             target,
+                             proxyName = proxy->getName(),
+                             data = std::move(data),
+                             targetAdapterFunc = std::move(targetAdapterFunc)](
+                             std::shared_ptr<nx::network::http::AsyncClient> client)
+        {
+            if (!client || client->failed() || !client->response()
+                || (client->response()->statusLine.statusCode
+                    == nx::network::http::StatusCode::undefined))
             {
-                if (!client || client->failed() || !client->response()
-                    || (client->response()->statusLine.statusCode ==
-                        nx::network::http::StatusCode::undefined))
-                {
-                    NX_DEBUG(this, "Can't connect to proxy, IO error.");
-                    callback(std::unexpected(
-                        nx::network::rest::Result::serviceUnavailable()));
-                    return;
-                }
+                NX_DEBUG(this, "Can't connect to proxy, IO error.");
+                callback(std::unexpected(
+                    tunnelError(nx::network::http::StatusCode::undefined, target, proxyName)));
+                return;
+            }
 
-                const auto statusCode = client->response()->statusLine.statusCode;
-                if (statusCode != nx::network::http::StatusCode::ok)
-                {
-                    NX_DEBUG(
-                        this, "Can't connect to proxy, unexpected HTTP status: %1", statusCode);
-                    const auto result = nx::network::rest::Result{
-                        nx::network::rest::Result::errorFromHttpStatus(statusCode)};
-                    callback(std::unexpected(result));
-                    return;
-                }
+            const auto statusCode = client->response()->statusLine.statusCode;
+            if (statusCode != nx::network::http::StatusCode::ok)
+            {
+                NX_DEBUG(this, "Can't connect to proxy, unexpected HTTP status: %1", statusCode);
+                callback(std::unexpected(
+                    tunnelError(static_cast<nx::network::http::StatusCode::Value>(statusCode),
+                        target,
+                        proxyName)));
+                return;
+            }
 
-                // Async client's socket is taken in it's own AIO-thread to avoid deadlock.
-                // Async client itself created and destroyed in UI-thread, so we can safely use
-                // shared pointer to it.
-                Request request = makeConnectedRequest(
-                    takeSocketSync(client.get()),
-                    std::move(targetAdapterFunc),
-                    path,
-                    token,
-                    std::move(data));
-                doRequest(method, std::move(request), std::move(callback));
-            };
+            // Async client's socket is taken in it's own AIO-thread to avoid deadlock.
+            // Async client itself created and destroyed in UI-thread, so we can safely use
+            // shared pointer to it.
+            Request request = makeConnectedRequest(takeSocketSync(client.get()),
+                std::move(targetAdapterFunc),
+                path,
+                token,
+                std::move(data));
+            doRequest(method, std::move(request), std::move(callback));
+        };
 
         auto connectClient = makeConnectClient(proxy, std::move(proxyAdapterFunc));
         setupClient(connectClient.get());
