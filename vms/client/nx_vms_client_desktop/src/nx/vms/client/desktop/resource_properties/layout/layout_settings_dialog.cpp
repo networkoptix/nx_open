@@ -6,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 
 #include <core/resource/layout_resource.h>
+#include <nx/vms/client/core/cross_system/cloud_layouts_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/file_cache/file_cache_utils.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -19,6 +20,15 @@
 #include "widgets/layout_general_settings_widget.h"
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+bool isBackgroundSupported(const LayoutSettingsDialogState& state)
+{
+    return !state.isCrossSystem || appContext()->cloudLayoutsManager()->backgroundsEnabled();
+}
+
+} // namespace
 
 using State = LayoutSettingsDialogState;
 using BackgroundImageStatus = State::BackgroundImageStatus;
@@ -38,13 +48,16 @@ struct LayoutSettingsDialog::Private
         layout->setLogicalId(state.logicalId);
         layout->setFixedSize(state.fixedSizeEnabled ? state.fixedSize : QSize());
 
-        const auto& background = state.background;
-        layout->setBackgroundImageFilename(background.filename);
-        // Do not save size change if no image was set.
-        if (!background.filename.isEmpty())
+        if (isBackgroundSupported(state))
         {
-            layout->setBackgroundSize({background.width.value, background.height.value});
-            layout->setBackgroundOpacity(0.01 * background.opacityPercent);
+            const auto& background = state.background;
+            layout->setBackgroundImageFilename(background.filename);
+            // Do not save size change if no image was set.
+            if (!background.filename.isEmpty())
+            {
+                layout->setBackgroundSize({background.width.value, background.height.value});
+                layout->setBackgroundOpacity(0.01 * background.opacityPercent);
+            }
         }
     }
 };
@@ -87,18 +100,26 @@ void LayoutSettingsDialog::setLayout(const QnLayoutResourcePtr& layout)
 
     if (layout && NX_ASSERT(layout->systemContext()))
     {
-        d->logicalIdsWatcher = std::make_unique<LayoutLogicalIdsWatcher>(
-            d->store.data(),
-            layout,
-            this);
-        d->backgroundTab->initCache(file_cache::backgroundImageCache(layout));
-
+        d->logicalIdsWatcher =
+            std::make_unique<LayoutLogicalIdsWatcher>(d->store.data(), layout, this);
         d->store->loadLayout(layout);
+
+        const auto backgroundCache = isBackgroundSupported(d->store->state())
+            ? file_cache::backgroundImageCache(layout)
+            : nullptr;
+        d->backgroundTab->initCache(backgroundCache);
     }
 }
 
 void LayoutSettingsDialog::accept()
 {
+    if (!isBackgroundSupported(d->store->state()))
+    {
+        d->applyChanges();
+        base_type::accept();
+        return;
+    }
+
     const auto& background = d->store->state().background;
 
     switch (background.status)
@@ -137,7 +158,11 @@ void LayoutSettingsDialog::accept()
 
 void LayoutSettingsDialog::loadState(const LayoutSettingsDialogState& state)
 {
-    const bool isLoading = state.background.loadingInProgress();
+    const bool backgroundSupported = isBackgroundSupported(state);
+    const bool isLoading = backgroundSupported && state.background.loadingInProgress();
+
+    setPageVisible(static_cast<int>(Tab::background), backgroundSupported);
+
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(!isLoading);
 }
 

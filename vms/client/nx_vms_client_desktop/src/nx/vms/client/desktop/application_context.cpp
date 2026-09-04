@@ -559,6 +559,9 @@ struct ApplicationContext::Private
     {
         q->core::ApplicationContext::initializeCrossSystemModules();
 
+        q->cloudLayoutsManager()->setBackgroundsEnabled(
+            ini().crossSystemLayoutsBackgrounds && mode == Mode::desktopClient);
+
         registerDebugAction("Cross-site contexts reset",
             [this](auto)
             {
