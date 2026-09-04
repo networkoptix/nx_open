@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/ssl/helpers.h>
@@ -24,6 +26,8 @@ namespace nx::vms::client::desktop {
  */
 class MergeSystemRequestsManager
 {
+    Q_DECLARE_TR_FUNCTIONS(MergeSystemRequestsManager)
+
     template<typename Data>
     using Callback = std::function<void(const rest::ErrorOrData<Data>& data)>;
 

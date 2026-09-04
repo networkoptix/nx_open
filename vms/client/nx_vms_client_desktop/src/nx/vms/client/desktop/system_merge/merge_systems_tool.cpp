@@ -15,7 +15,6 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/utils/rest_error_strings.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -183,10 +182,9 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
                     const auto& error = status.error();
                     NX_WARNING(
                         this, "Can't dry run merge, rest result: %1", QJson::serialized(error));
-                    reportSystemFound(
-                        *ctx,
+                    reportSystemFound(*ctx,
                         mergeStatusFromResult(error),
-                        RestErrorStrings::description(error),
+                        error.errorString,
                         true,
                         nx::vms::api::MergeStatusReply());
                 }
@@ -344,11 +342,7 @@ void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
         }
         else
         {
-            reportSystemFound(
-                ctx,
-                mergeStatusFromResult(error),
-                RestErrorStrings::description(error),
-                true);
+            reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
         }
     }
 }
@@ -399,11 +393,7 @@ void MergeSystemsTool::at_sessionCreated(
     {
         const auto& error = loginSession.error();
         NX_WARNING(this, "Can't create session, rest result: %1", QJson::serialized(error));
-        reportSystemFound(
-            ctx,
-            mergeStatusFromResult(error),
-            RestErrorStrings::description(error),
-            true);
+        reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
     }
 }
 
@@ -425,11 +415,7 @@ void MergeSystemsTool::at_licensesReceived(
     {
         const auto& error = licenseDataList.error();
         NX_WARNING(this, "Can't get licenses, rest result: %1", QJson::serialized(error));
-        reportSystemFound(
-            ctx,
-            mergeStatusFromResult(error),
-            RestErrorStrings::description(error),
-            true);
+        reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
     }
 }
 
@@ -451,10 +437,7 @@ void MergeSystemsTool::at_mergeStarted(
     {
         const auto& error = mergeStatus.error();
         NX_WARNING(this, "Can't merge systems, rest result: %1", QJson::serialized(error));
-        reportMergeFinished(
-            ctx,
-            mergeStatusFromResult(error),
-            RestErrorStrings::description(error));
+        reportMergeFinished(ctx, mergeStatusFromResult(error), error.errorString);
     }
 }
 
