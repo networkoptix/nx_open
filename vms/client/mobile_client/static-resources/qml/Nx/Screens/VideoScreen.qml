@@ -213,10 +213,6 @@ Page
                 cameraSwitcher.height: modernVideoScreen.height
 
                 fullscreenControlsOverlay.visible: !d.ptzMode
-                navigatorProxyItem.visible: false
-                navigationBar.visible: false
-                bottomBar.visible: false
-                bottomOverlayControls.visible: false
             }
         }
     ]
@@ -734,6 +730,8 @@ Page
             : navigationBarContent.height + navigationBarContent.contentMargin * 2
         color: modernVideoScreen.backgroundColor
 
+        visible: !LayoutController.fullscreen
+
         // The playback controls are the primary content of the bar: once it gets too narrow to
         // keep them between the panel buttons, the buttons give way.
         readonly property bool fitsPanelButtons: width >= navigationBarContent.requiredWidth
@@ -1092,7 +1090,7 @@ Page
 
         implicitWidth: 360
         target: navigator
-        visible: modernVideoScreen.ownsNavigator
+        visible: !LayoutController.fullscreen && modernVideoScreen.ownsNavigator
     }
 
     // Whether the given video screen owns the navigator item. If the video screen owns navigator
@@ -1193,7 +1191,7 @@ Page
             height: navigationBar.height
 
             anchors.bottom: navigator.bottom
-            visible: d.hasArchive
+            visible: !LayoutController.fullscreen && d.hasArchive
 
             color: ColorTheme.colors.dark4
 
@@ -1456,7 +1454,8 @@ Page
             id: bottomOverlayControls
 
             height: 56
-            visible: video.shown && (!d.ptzMode || !ptz.overlayStyle)
+            visible: !LayoutController.fullscreen
+                && video.shown && (!d.ptzMode || !ptz.overlayStyle)
 
             anchors.bottom: content.bottom
             anchors.right: content.right

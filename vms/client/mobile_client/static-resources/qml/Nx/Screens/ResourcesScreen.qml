@@ -230,6 +230,25 @@ AdaptiveScreen
         restoreMode: Binding.RestoreNone
     }
 
+    Connections
+    {
+        target: LayoutController
+
+        function onFullscreenChanged()
+        {
+            if (!resourcesScreen.isActive)
+                return
+
+            if (LayoutController.fullscreen)
+                return
+
+            if (leftPanel.item)
+                leftPanel.visible = appContext.settings.resourcesPanelVisible
+            if (rightPanel.item)
+                rightPanel.visible = appContext.settings.timelinePanelVisible
+        }
+    }
+
     ResourceTreeItem
     {
         id: resourceTreeSheet
