@@ -921,7 +921,7 @@ Queres eliminalo de todos os xeitos?</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation>Solicitar</translation>
+      <translation>Aplicar</translation>
     </message>
     <message>
       <source>Reset</source>
