@@ -179,7 +179,7 @@ FocusScope
 
     Binding
     {
-        when: LayoutController.fullscreen
+        when: LayoutController.fullscreen && root.isActive
         restoreMode: Binding.RestoreBindingOrValue
 
         leftPanel.visible: false
