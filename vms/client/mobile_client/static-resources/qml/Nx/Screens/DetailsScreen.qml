@@ -47,7 +47,6 @@ AdaptiveScreen
 
         onNextClicked: currentIndex = MathUtils.bound(0, currentIndex + 1, objectList.length - 1)
         onPreviousClicked: currentIndex = MathUtils.bound(0, currentIndex - 1, objectList.length - 1)
-        onBackClicked: Workflow.popCurrentScreen()
 
         onShowOnCameraRequested:
             (resource, timestampMs) => root.showOnCameraRequested(resource, timestampMs)

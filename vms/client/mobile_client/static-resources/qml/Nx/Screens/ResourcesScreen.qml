@@ -358,8 +358,6 @@ AdaptiveScreen
                 // anchor the menu to it instead of VideoScreen's hidden internal kebab.
                 menuAnchor: resourcesScreen.menuButton
 
-                onBackClicked: resourcesScreen.closeVideoScreen()
-
                 Component.onCompleted:
                 {
                     selectedObjectsType = appContext.settings.selectedObjectsType

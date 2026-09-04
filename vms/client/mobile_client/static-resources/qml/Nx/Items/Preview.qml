@@ -41,7 +41,6 @@ Rectangle
     enum DataState { Available, Checking, NoData }
     property int dataState: Preview.DataState.Available
 
-    signal back()
     signal previous()
     signal next()
     signal showOnCamera()
@@ -143,7 +142,7 @@ Rectangle
 
             icon.source: "image://skin/24x24/Outline/arrow_back.svg"
 
-            onClicked: root.back()
+            onClicked: LayoutController.exitFullscreen()
         }
 
         ColumnLayout

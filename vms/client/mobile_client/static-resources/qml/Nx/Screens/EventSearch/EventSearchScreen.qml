@@ -242,12 +242,6 @@ AdaptiveScreen
         {
             target: detailsLoader.item ?? null
 
-            function onBackClicked()
-            {
-                if (screen.customBackHandler)
-                    screen.customBackHandler()
-            }
-
             function onShowOnCameraRequested(resource, timestampMs)
             {
                 Workflow.openVideoScreen(

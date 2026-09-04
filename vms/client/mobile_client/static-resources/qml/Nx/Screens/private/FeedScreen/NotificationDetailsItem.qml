@@ -22,8 +22,6 @@ Item
     property alias notification: d.notification
     property alias gestureExclusionEnabled: preview.gestureExclusionEnabled
 
-    signal backClicked()
-
     Preview
     {
         id: preview
@@ -50,7 +48,6 @@ Item
         onShowOnCamera: d.showOnCamera()
         onPrevious: d.selectResource(d.currentIndex - 1)
         onNext: d.selectResource(d.currentIndex + 1)
-        onBack: root.backClicked()
     }
 
     Flickable
