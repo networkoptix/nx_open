@@ -95,7 +95,7 @@ AdaptiveSheet
 
     onSelectedTypeChanged:
     {
-        for (let item of sheet.data)
+        for (let item of sheet.sheetData)
         {
             if (item instanceof ObjectsTypeRadioButton && item.objectsType === selectedType)
             {
