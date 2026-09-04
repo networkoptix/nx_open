@@ -38,6 +38,13 @@ public:
     /** Update cloud layout resources by fetching the latest data. */
     void updateLayouts();
 
+    /**
+     * Sets whether background images of the cloud layouts allowed to be transferred to and from
+     * the cloud image storage.
+     */
+    void setBackgroundsEnabled(bool value);
+    bool backgroundsEnabled() const;
+
     /** Cache for the cloud layout background images. */
     CloudImageCache* imageCache() const;
 

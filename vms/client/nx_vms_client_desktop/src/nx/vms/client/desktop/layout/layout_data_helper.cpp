@@ -113,6 +113,12 @@ void ensureBackgroundImageInCloudCache(
         return;
     }
 
+    if (!appContext()->cloudLayoutsManager()->backgroundsEnabled())
+    {
+        executeLater([callback] { callback(false); }, cloudLayout.get());
+        return;
+    }
+
     const auto sourceCache = file_cache::backgroundImageCache(layout);
     const QString sourcePath = sourceCache ? sourceCache->absoluteFilePath(filename) : QString();
     if (sourcePath.isEmpty())

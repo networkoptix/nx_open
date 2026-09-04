@@ -60,18 +60,25 @@ enum class BackgroundCacheType
     cloud,
 };
 
-BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
+bool hasImageBackground(const LayoutResourcePtr& layout)
 {
     if (!layout->hasBackground())
-    {
-        const auto workbenchLayout = QnWorkbenchLayout::instance(layout);
-        if (workbenchLayout && workbenchLayout->flags().testFlag(QnLayoutFlag::SpecialBackground))
-            return BackgroundType::Special;
+        return false;
 
-        return BackgroundType::Default;
-    }
+    return !layout->hasFlags(Qn::cross_system)
+        || appContext()->cloudLayoutsManager()->backgroundsEnabled();
+}
 
-    return BackgroundType::Image;
+BackgroundType backgroundTypeFromLayout(const LayoutResourcePtr& layout)
+{
+    if (hasImageBackground(layout))
+        return BackgroundType::Image;
+
+    const auto workbenchLayout = QnWorkbenchLayout::instance(layout);
+    if (workbenchLayout && workbenchLayout->flags().testFlag(QnLayoutFlag::SpecialBackground))
+        return BackgroundType::Special;
+
+    return BackgroundType::Default;
 }
 
 BackgroundCacheType backgroundCacheType(const LayoutResourcePtr& layout)

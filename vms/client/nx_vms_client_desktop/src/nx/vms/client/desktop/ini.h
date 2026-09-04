@@ -358,6 +358,12 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, audioVisualization,
         "[Feature] Show audio visualizers on audio-only items.");
 
+    // VMS-62302
+    NX_INI_FLAG(false,
+        crossSystemLayoutsBackgrounds,
+        "[Feature] Allows to use background images on cross-system layouts. Requires the private "
+        "files storage service to be available in the cloud.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

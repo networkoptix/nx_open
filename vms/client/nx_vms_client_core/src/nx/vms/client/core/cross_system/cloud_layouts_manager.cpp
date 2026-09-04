@@ -89,10 +89,7 @@ struct CloudLayoutsManager::Private
     nx::cloud::db::client::ApiRequestsExecutor apiRequestExecutor;
     std::unique_ptr<QTimer> timer = std::make_unique<QTimer>();
     QnUserResourcePtr user;
-
-    // Only the desktop client displays layout backgrounds.
-    const bool backgroundImageDownloadsEnabled =
-        appContext()->mode() == ApplicationContext::Mode::desktopClient;
+    bool backgroundsEnabled = false;
 
     // Declared after the executor it shares; destroyed first, stopping pending file transfers.
     std::unique_ptr<CloudImageCache> imageCache;
@@ -145,7 +142,7 @@ struct CloudLayoutsManager::Private
             if (layoutData.id.isNull())
                 continue;
 
-            if (backgroundImageDownloadsEnabled && !layoutData.backgroundImageFilename.isEmpty())
+            if (backgroundsEnabled && !layoutData.backgroundImageFilename.isEmpty())
                 imageCache->downloadFile(layoutData.backgroundImageFilename);
 
             if (auto existingLayout = resourcePool->getResourceById<CrossSystemLayoutResource>(
@@ -355,8 +352,11 @@ struct CloudLayoutsManager::Private
 
     void deleteBackgroundIfUnused(const QString& filename, const nx::Uuid& excludedLayoutId)
     {
-        if (filename.isEmpty() || isBackgroundInUse(filename, excludedLayoutId))
+        if (!backgroundsEnabled || filename.isEmpty()
+            || isBackgroundInUse(filename, excludedLayoutId))
+        {
             return;
+        }
 
         imageCache->deleteFile(filename);
     }
@@ -423,6 +423,14 @@ struct CloudLayoutsManager::Private
         const bool backgroundChanged =
             isNewLayout || previousBackgroundFilename != layout->backgroundImageFilename();
 
+        if (!backgroundsEnabled && backgroundChanged && !isNewLayout)
+        {
+            const auto snapshot = layout->snapshot();
+            layout->setBackgroundImageFilename(snapshot.backgroundImageFilename);
+            layout->setBackgroundSize({snapshot.backgroundWidth, snapshot.backgroundHeight});
+            layout->setBackgroundOpacity(snapshot.backgroundOpacity);
+        }
+
         auto proceedWithSave =
             [this, layout, isNewLayout, previousBackgroundFilename,
                 callback = std::move(callback)](bool uploadOk) mutable
@@ -458,7 +466,8 @@ struct CloudLayoutsManager::Private
                 sendSaveLayoutRequest(layoutData, std::move(onSaved), isNewLayout);
             };
 
-        if (backgroundChanged && !layout->backgroundImageFilename().isEmpty())
+        if (backgroundsEnabled && backgroundChanged
+            && !layout->backgroundImageFilename().isEmpty())
         {
             imageCache->uploadFile(layout->backgroundImageFilename(),
                 [proceedWithSave = std::move(proceedWithSave)](
@@ -566,6 +575,16 @@ bool CloudLayoutsManager::deleteLayout(const QnLayoutResourcePtr& layout)
 void CloudLayoutsManager::updateLayouts()
 {
     d->updateLayouts();
+}
+
+void CloudLayoutsManager::setBackgroundsEnabled(bool value)
+{
+    d->backgroundsEnabled = value;
+}
+
+bool CloudLayoutsManager::backgroundsEnabled() const
+{
+    return d->backgroundsEnabled;
 }
 
 CloudImageCache* CloudLayoutsManager::imageCache() const
