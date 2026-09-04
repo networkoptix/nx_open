@@ -1012,6 +1012,21 @@ RadassMode RadassController::mode(AbstractVideoDisplay* display) const
     return consumer->mode;
 }
 
+RadassMode RadassController::effectiveMode(AbstractVideoDisplay* display) const
+{
+    NX_MUTEX_LOCKER lock(&d->mutex);
+    auto consumer = d->findByDisplay(display);
+    if (!NX_ASSERT(d->isValid(consumer)))
+        return RadassMode::Auto;
+
+    // Fullscreen, zoom window and fisheye dewarping force the stream to High quality regardless
+    // of the stored mode, so reflect that in the reported mode instead of the stale preference.
+    if (isForcedHqDisplay(display))
+        return RadassMode::High;
+
+    return consumer->mode;
+}
+
 void RadassController::setMode(AbstractVideoDisplay* display, RadassMode mode)
 {
     NX_MUTEX_LOCKER lock(&d->mutex);

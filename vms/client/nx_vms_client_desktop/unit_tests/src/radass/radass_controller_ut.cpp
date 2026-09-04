@@ -152,6 +152,11 @@ TEST_F(RadassControllerTest, Fullscreencamera_FT392_C20113)
     passIteration();
     ASSERT_EQ(cameras[1]->qualityValue, MEDIA_Quality_High);
 
+    // VMS-62039: the Resolution menu must reflect the actually streamed quality (High) even
+    // though the stored user preference is still Low.
+    ASSERT_EQ(controller->mode(cameras[1].data()), RadassMode::Low);
+    ASSERT_EQ(controller->effectiveMode(cameras[1].data()), RadassMode::High);
+
     // This test is consistent with current RADASS implementation  and not consistent with C20113.
     // The test description is also wrong - actually we need to emulate onSlowStream() as well.
     cameras[1]->speed = 16;
@@ -167,6 +172,7 @@ TEST_F(RadassControllerTest, Fullscreencamera_FT392_C20113)
     cameras[1]->fullScreen = false;
     passIteration();
     ASSERT_EQ(cameras[1]->qualityValue, MEDIA_Quality_Low);
+    ASSERT_EQ(controller->effectiveMode(cameras[1].data()), RadassMode::Low);
 }
 
 /**

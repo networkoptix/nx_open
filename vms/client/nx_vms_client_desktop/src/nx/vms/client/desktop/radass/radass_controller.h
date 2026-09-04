@@ -27,6 +27,7 @@ public:
     int consumerCount() const;
 
     RadassMode mode(AbstractVideoDisplay* display) const;
+    RadassMode effectiveMode(AbstractVideoDisplay* display) const;
     void setMode(AbstractVideoDisplay* display, RadassMode mode);
 
 signals:

@@ -2,18 +2,26 @@
 
 #include "radass_action_factory.h"
 
+#include <algorithm>
+
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 
+#include <camera/cam_display.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
+#include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
+#include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 
 namespace nx::vms::client::desktop {
@@ -38,6 +46,29 @@ QList<QAction*> RadassActionFactory::newActions(const Parameters& parameters,
         ? manager->mode(workbench()->currentLayoutResource())
         : manager->mode(items);
 
+    // The stored mode may be stale: fullscreen, zoom window and fisheye dewarping force the
+    // stream to High quality regardless of it. Show the actually streamed quality instead.
+    auto effectiveMode = currentMode;
+    if (currentMode == RadassMode::Low && !items.empty())
+    {
+        auto supportedItems =
+            items | std::views::filter([](const auto& item) { return isRadassSupported(item); });
+
+        const auto controller = appContext()->radassController();
+        const bool allForcedToHigh = !supportedItems.empty()
+            && std::ranges::all_of(supportedItems,
+                [this, controller](const auto& item)
+                {
+                    const auto widget =
+                        qobject_cast<QnMediaResourceWidget*>(display()->widget(item.uuid()));
+                    const auto camDisplay = widget ? widget->camDisplay() : nullptr;
+                    return camDisplay && controller->effectiveMode(camDisplay) == RadassMode::High;
+                });
+
+        if (allForcedToHigh)
+            effectiveMode = RadassMode::High;
+    }
+
     auto addAction =
         [this, actionGroup, items, parent]
         (RadassMode mode, const QString& text, bool checked)
@@ -56,11 +87,11 @@ QList<QAction*> RadassActionFactory::newActions(const Parameters& parameters,
             actionGroup->addAction(action);
         };
 
-    addAction(RadassMode::Auto, tr("Auto"), currentMode == RadassMode::Auto);
-    addAction(RadassMode::Low, tr("Low"), currentMode == RadassMode::Low);
-    addAction(RadassMode::High, tr("High"), currentMode == RadassMode::High);
+    addAction(RadassMode::Auto, tr("Auto"), effectiveMode == RadassMode::Auto);
+    addAction(RadassMode::Low, tr("Low"), effectiveMode == RadassMode::Low);
+    addAction(RadassMode::High, tr("High"), effectiveMode == RadassMode::High);
 
-    if (currentMode == RadassMode::Custom)
+    if (effectiveMode == RadassMode::Custom)
         addAction(RadassMode::Custom, tr("Custom"), true);
 
     return actionGroup->actions();
