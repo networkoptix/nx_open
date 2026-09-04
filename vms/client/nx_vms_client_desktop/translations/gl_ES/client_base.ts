@@ -6343,7 +6343,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Apply</source>
-      <translation>Solicitar</translation>
+      <translation>Aplicar</translation>
     </message>
     <message>
       <source>Unsaved changes:</source>
@@ -8903,7 +8903,7 @@ Se tiñas intención de mover os datos analíticos a outra localización de alma
     </message>
     <message>
       <source>Apply</source>
-      <translation>Solicitar</translation>
+      <translation>Aplicar</translation>
     </message>
     <message>
       <source>Synchronize LDAP Users and Groups</source>
@@ -9137,7 +9137,7 @@ Lembra devolver o nivel de rexistro á súa configuración predeterminada despoi
     </message>
     <message>
       <source>Apply</source>
-      <translation>Solicitar</translation>
+      <translation>Aplicar</translation>
     </message>
     <message>
       <source>Debug logging is enabled on the client</source>
