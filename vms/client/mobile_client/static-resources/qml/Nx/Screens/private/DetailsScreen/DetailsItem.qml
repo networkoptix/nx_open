@@ -33,7 +33,6 @@ Item
     property alias gestureExclusionEnabled: preview.gestureExclusionEnabled
     property bool showPreviewImage: false
 
-    signal backClicked()
     signal searchRequested(string text)
     signal nextClicked()
     signal previousClicked()
@@ -97,7 +96,6 @@ Item
 
         onNext: detailsItem.nextClicked()
         onPrevious: detailsItem.previousClicked()
-        onBack: detailsItem.backClicked()
         onShowOnCamera:
         {
             detailsItem.showOnCameraRequested(

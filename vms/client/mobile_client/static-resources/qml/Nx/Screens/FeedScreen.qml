@@ -162,8 +162,6 @@ AdaptiveScreen
         gestureExclusionEnabled: LayoutController.isPortrait
             && feedScreen.isActive
             && feedScreen.contentItem === notificationDetailsItem
-
-        onBackClicked: d.closeDetails()
     }
 
     Connections

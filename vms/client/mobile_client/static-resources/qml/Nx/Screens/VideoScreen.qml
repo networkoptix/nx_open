@@ -60,8 +60,6 @@ Page
     property bool leftPanelButtonWanted: false
     property bool rightPanelButtonWanted: false
 
-    signal backClicked()
-
     customBackHandler: () =>
     {
         if (!modernVideoScreen.StackView.view) //< The screen is embedded into another one.
@@ -716,7 +714,7 @@ Page
 
         hasActionButton: actionSheet.hasActions
 
-        onBackButtonClicked: modernVideoScreen.customBackHandler()
+        onBackButtonClicked: LayoutController.exitFullscreen()
 
         onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
 
