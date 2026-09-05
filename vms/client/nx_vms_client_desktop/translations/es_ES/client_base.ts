@@ -1553,6 +1553,19 @@ Clave de licencia: %2</translation>
     </message>
   </context>
   <context>
+    <name>MergeSystemRequestsManager</name>
+    <message>
+      <source>Cannot connect to Server %1.</source>
+      <comment>%1 is a Server name</comment>
+      <translation type="unfinished">Cannot connect to Server %1.</translation>
+    </message>
+    <message>
+      <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
+      <comment>%1 is a Server name, %2 is an address of the target Site</comment>
+      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+    </message>
+  </context>
+  <context>
     <name>OauthLoginDialog</name>
     <message>
       <source>Connect to Site</source>
