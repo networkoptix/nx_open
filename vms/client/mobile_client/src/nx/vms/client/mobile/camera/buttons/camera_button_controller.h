@@ -14,7 +14,6 @@ class CameraButtonController: public core::AggregatedCameraButtonController
 public:
     enum class ButtonGroup
     {
-        ptz,
         objectTracking,
         twoWayAudio,
         softTriggers,

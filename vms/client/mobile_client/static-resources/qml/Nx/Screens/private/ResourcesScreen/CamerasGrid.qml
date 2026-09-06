@@ -25,7 +25,7 @@ Item
     property int topMargin: 0
     property int bottomMargin: 0
 
-    signal openVideoScreen(var resource, var thumbnailUrl, var camerasModel)
+    signal openVideoScreen(var resource, var camerasModel)
 
     function getMediaPlayer(index)
     {
@@ -390,7 +390,7 @@ Item
                                 // contentY centering to prevent excessive jump.
                                 flickable.previousContentY = -1
 
-                                control.openVideoScreen(resource, thumbnail, camerasModel)
+                                control.openVideoScreen(resource, camerasModel)
                             }
 
                             onThumbnailRefreshRequested: camerasModel.refreshThumbnail(index)

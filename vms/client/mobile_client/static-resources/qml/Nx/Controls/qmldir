@@ -26,7 +26,6 @@ CircleBusyIndicator 1.0 CircleBusyIndicator.qml
 WarningPanel 1.0 WarningPanel.qml
 FieldWarning 1.0 FieldWarning.qml
 WheelSwitchArea 1.0 WheelSwitchArea.qml
-ActionButtonsPanel 1.0 ActionButtonsPanel.qml
 ActivityPreloader 1.0 ActivityPreloader.qml
 SearchEdit 1.0 SearchEdit.qml
 PreloaderOverlay 1.0 PreloaderOverlay.qml

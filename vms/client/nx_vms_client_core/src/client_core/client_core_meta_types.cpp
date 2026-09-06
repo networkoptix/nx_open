@@ -84,7 +84,6 @@
 #include <nx/vms/client/core/thumbnails/resource_id_thumbnail.h>
 #include <nx/vms/client/core/time/calendar_model.h>
 #include <nx/vms/client/core/time/day_hours_model.h>
-#include <nx/vms/client/core/time/display_time_helper.h>
 #include <nx/vms/client/core/time/duration_formatter.h>
 #include <nx/vms/client/core/time/month_list_model.h>
 #include <nx/vms/client/core/timeline/items/chunk_bar.h>
@@ -204,7 +203,6 @@ void registerQmlTypesInternal()
     AbstractResourceThumbnail::registerQmlType();
     PersistentIndexWatcher::registerQmlType();
     FileIO::registerQmlType();
-    DisplayTimeHelper::registerQmlType();
     OauthClient::registerQmlType();
     CalendarModel::registerQmlType();
     DayHoursModel::registerQmlType();

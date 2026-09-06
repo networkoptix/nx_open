@@ -12,7 +12,6 @@
 #include <models/camera_list_model.h>
 #include <models/layouts_model.h>
 #include <nx/client/mobile/motion/chunk_position_watcher.h>
-#include <nx/client/mobile/motion/motion_playback_mask_watcher.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 #include <nx/mobile_client/controllers/audio_controller.h>
 #include <nx/mobile_client/controllers/resource_ptz_controller.h>
@@ -46,7 +45,6 @@
 #include <resources/camera_access_rights_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <ui/models/systems_model.h>
-#include <ui/timeline/timeline.h>
 #include <utils/developer_settings_helper.h>
 #include <utils/mobile_app_info.h>
 #include <watchers/available_cameras_watcher.h>
@@ -73,7 +71,6 @@ void registerQmlTypes()
     qmlRegisterType<QnLayoutsModel>("Nx.Mobile", 1, 0, "QnLayoutsModel");
     qmlRegisterType<core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
     qmlRegisterType<QnCameraAccessRightsHelper>("Nx.Mobile", 1, 0, "QnCameraAccessRightsHelper");
-    qmlRegisterType<QnTimeline>("Nx.Mobile", 1, 0, "QnTimelineView");
     qmlRegisterType<core::CloudStatusWatcher>(
         "nx.vms.client.core", 1, 0, "CloudStatusWatcher");
     qmlRegisterType<QnCloudSystemInformationWatcher>("Nx.Mobile", 1, 0,
@@ -113,7 +110,6 @@ void registerQmlTypes()
         utils::SystemUri::ReferralContext::WelcomePage);
     core::WatermarkWatcher::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
-    nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
     nx::client::mobile::ChunkPositionWatcher::registerQmlType();
     AudioController::registerQmlType();
     PushNotificationManager::registerQmlType();

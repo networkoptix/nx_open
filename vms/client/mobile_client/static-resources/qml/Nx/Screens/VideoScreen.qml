@@ -30,7 +30,7 @@ import "private/VideoScreen/utils.js" as VideoScreenUtils
 
 Page
 {
-    id: modernVideoScreen //< For the FT purposes must be different from the DeprecatedVideoScreen id.
+    id: modernVideoScreen
 
     objectName: "videoScreen"
 
