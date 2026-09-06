@@ -7,7 +7,6 @@
 #include <nx/utils/algorithm/comparator.h>
 #include <nx/vms/client/core/camera/buttons/camera_button_data.h>
 #include <nx/vms/client/core/skin/soft_trigger_pixmaps.h>
-#include <nx/vms/client/mobile/camera/buttons/camera_button_controller.h>
 
 namespace nx::vms::client::mobile {
 
@@ -26,14 +25,6 @@ enum Roles
     enabled,
     group
 };
-
-QString getIconPath(int group, const QString& iconName)
-{
-    return group == static_cast<int>(CameraButtonController::ButtonGroup::ptz)
-        ? iconName
-        : QStringLiteral("image://skin/%1").arg(
-            core::SoftTriggerPixmaps::effectivePixmapPath(iconName));
-}
 
 } // namespace
 
@@ -180,7 +171,8 @@ QVariant CameraButtonsModel::data(const QModelIndex &index, int role) const
         case Roles::hint:
             return button->hint;
         case Roles::iconPath:
-            return getIconPath(button->group, button->iconName);
+            return QStringLiteral("image://skin/%1")
+                .arg(core::SoftTriggerPixmaps::effectivePixmapPath(button->iconName));
         case Roles::type:
             return static_cast<int>(button->type);
         case Roles::enabled:

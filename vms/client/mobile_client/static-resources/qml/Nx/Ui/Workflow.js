@@ -118,8 +118,7 @@ function openResourcesScreen(systemName, filterIds = [])
     }
 }
 
-function openVideoScreen(
-    resource, screenshotUrl, timestamp, camerasModel, selectedObjectsType, isAuxiliary)
+function openVideoScreen(resource, timestamp, camerasModel, selectedObjectsType, isAuxiliary)
 {
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =
@@ -127,21 +126,15 @@ function openVideoScreen(
             "initialResource": resource,
             "targetTimestamp": targetTimestamp,
             "auxiliary": isAuxiliary ?? false,
-            "selectedObjectsType": appContext.settings.selectedObjectsType ?? Timeline.ObjectsLoader.ObjectsType.motion
+            "selectedObjectsType": selectedObjectsType
+                ?? appContext.settings.selectedObjectsType
+                ?? Timeline.ObjectsLoader.ObjectsType.motion
         }
 
     if (camerasModel)
         properties["camerasModel"] = camerasModel
 
-    if (!appContext.settings.newTimelinePrototype)
-        properties["initialScreenshot"] = screenshotUrl ?? ""
-
-    if (selectedObjectsType && appContext.settings.newTimelinePrototype)
-        properties["selectedObjectsType"] = selectedObjectsType
-
-    const screen = appContext.settings.newTimelinePrototype
-        ? stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
-        : stackView.pushScreen(Qt.resolvedUrl("../Screens/DeprecatedVideoScreen.qml"), properties)
+    stackView.pushScreen(Qt.resolvedUrl("../Screens/VideoScreen.qml"), properties)
 }
 
 // Pushes or replaces Settings screen based on 'push' parameter. Pushing is required to be able

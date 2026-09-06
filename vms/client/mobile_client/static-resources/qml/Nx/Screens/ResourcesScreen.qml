@@ -303,7 +303,7 @@ AdaptiveScreen
         rightMargin : LayoutController.hasSidePanels ? 20 : 0
         topMargin : LayoutController.hasSidePanels ? 20 : 0
 
-        onOpenVideoScreen: (resource, thumbnailUrl, camerasModel) =>
+        onOpenVideoScreen: (resource, camerasModel) =>
         {
             stopMediaPlayers()
 

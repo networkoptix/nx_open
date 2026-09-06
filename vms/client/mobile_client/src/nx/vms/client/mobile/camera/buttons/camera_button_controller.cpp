@@ -4,11 +4,9 @@
 
 #include <QtQml/QtQml>
 
-#include <mobile_client/mobile_client_settings.h>
 #include <nx/vms/client/core/camera/buttons/extended_output_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/soft_trigger_camera_button_controller.h>
 #include <nx/vms/client/core/camera/buttons/two_way_audio_camera_button_controller.h>
-#include <nx/vms/client/mobile/camera/buttons/ptz_camera_button_controller.h>
 #include <utils/common/delayed.h>
 
 namespace nx::vms::client::mobile {
@@ -21,30 +19,24 @@ void CameraButtonController::registerQmlType()
 CameraButtonController::CameraButtonController(QObject* parent):
     base_type(parent)
 {
-    const auto lazyInitialize =
-        [this]()
-        {
-            if (!qnSettings->newTimelinePrototype())
-                addController<PtzCameraButtonController>(ButtonGroup::ptz);
+    const auto lazyInitialize = [this]()
+    {
+        addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
 
-            addController<core::TwoWayAudioCameraButtonController>(ButtonGroup::twoWayAudio);
+        addController<core::SoftTriggerCameraButtonController>(
+            ButtonGroup::softTriggers, core::SoftTriggerCameraButtonController::HintStyle::mobile);
 
-            using HintStyle = core::SoftTriggerCameraButtonController::HintStyle;
-            addController<core::SoftTriggerCameraButtonController>(
-                ButtonGroup::softTriggers, HintStyle::mobile);
+        const auto commonOutputs = api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)
+            | api::ExtendedCameraOutput::fan | api::ExtendedCameraOutput::wiper
+            | api::ExtendedCameraOutput::powerRelay;
 
-            const auto commonOutputs =
-                api::ExtendedCameraOutputs(api::ExtendedCameraOutput::heater)
-                | api::ExtendedCameraOutput::fan
-                | api::ExtendedCameraOutput::wiper
-                | api::ExtendedCameraOutput::powerRelay;
+        addController<core::ExtendedOutputCameraButtonController>(
+            ButtonGroup::extendedOutputs, commonOutputs);
 
-            addController<core::ExtendedOutputCameraButtonController>(
-                ButtonGroup::extendedOutputs, commonOutputs);
+        addController<core::ExtendedOutputCameraButtonController>(
+            ButtonGroup::objectTracking, api::ExtendedCameraOutput::autoTracking);
+    };
 
-            addController<core::ExtendedOutputCameraButtonController>(
-                ButtonGroup::objectTracking, api::ExtendedCameraOutput::autoTracking);
-        };
     executeLater(lazyInitialize, this);
 }
 

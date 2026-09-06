@@ -226,23 +226,6 @@ BaseSettingsPage
             }
         }
 
-        LabeledSwitch
-        {
-            id: newTimeline
-
-            width: parent.width
-            text: "New Timeline Prototype"
-            checkState: appContext.settings.newTimelinePrototype ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged:
-            {
-                const value = checkState != Qt.Unchecked
-                if (value === appContext.settings.newTimelinePrototype)
-                    return
-
-                appContext.settings.newTimelinePrototype = value
-            }
-        }
-
         Row
         {
             spacing: 8

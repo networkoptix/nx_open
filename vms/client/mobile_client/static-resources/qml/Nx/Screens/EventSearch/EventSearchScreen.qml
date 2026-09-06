@@ -246,7 +246,6 @@ AdaptiveScreen
             {
                 Workflow.openVideoScreen(
                     resource,
-                    /*screenshotUrl*/ undefined,
                     timestampMs,
                     screen.camerasModel,
                     screen.analyticsSearchMode
