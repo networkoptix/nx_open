@@ -39,4 +39,38 @@ TEST_F(HttpServerSettings, load_extraResponseHeaders)
         httpServerSettings().extraSuccessResponseHeaders.find("other")->second);
 }
 
+// ANAS-323: request body size must be capped by default, and configurable per service.
+
+TEST_F(HttpServerSettings, maxMessageBodySize_defaults_to_a_safe_non_zero_value)
+{
+    loadSettings();
+
+    ASSERT_EQ(Settings::kDefaultMaxMessageBodySize, httpServerSettings().maxMessageBodySize);
+}
+
+TEST_F(HttpServerSettings, load_maxMessageBodySize)
+{
+    addArg("-http/maxMessageBodySize", "12345");
+
+    loadSettings();
+
+    ASSERT_EQ(std::uint64_t{12345}, httpServerSettings().maxMessageBodySize);
+}
+
+TEST_F(HttpServerSettings, maxHeadersSize_defaults_to_a_safe_non_zero_value)
+{
+    loadSettings();
+
+    ASSERT_EQ(Settings::kDefaultMaxHeadersSize, httpServerSettings().maxHeadersSize);
+}
+
+TEST_F(HttpServerSettings, load_maxHeadersSize)
+{
+    addArg("-http/maxHeadersSize", "4096");
+
+    loadSettings();
+
+    ASSERT_EQ(std::uint64_t{4096}, httpServerSettings().maxHeadersSize);
+}
+
 } // namespace nx::network::http::server::test

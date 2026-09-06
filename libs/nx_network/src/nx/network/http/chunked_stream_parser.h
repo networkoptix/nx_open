@@ -133,6 +133,11 @@ public:
                         &lineBuffer,
                         &bytesRead);
                     currentOffset += bytesRead;
+                    if (m_lineSplitter.lineLengthExceeded())
+                    {
+                        // Trailer header line grew past the cap with no terminator (ANAS-323).
+                        return size_t(-1);
+                    }
                     if (!lineFound)
                         break;
                     if (lineBuffer.empty())
@@ -182,6 +187,7 @@ public:
         m_currentChunkSize = 0;
         m_currentChunkBytesRead = 0;
         m_prevChar = 0;
+        m_lineSplitter.reset();
     }
 
 private:

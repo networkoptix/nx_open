@@ -176,6 +176,8 @@ bool Builder::applySettings(
 
     ctx->server->setTcpBackLogSize(ctx->settings.tcpBacklogSize);
     ctx->server->setExtraSuccessResponseHeaders(ctx->settings.extraSuccessResponseHeaders);
+    ctx->server->setMaxMessageBodySize(ctx->settings.maxMessageBodySize);
+    ctx->server->setMaxHeadersSize(ctx->settings.maxHeadersSize);
 
     return true;
 }

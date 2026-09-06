@@ -80,6 +80,18 @@ void HttpServerConnection::setPersistentConnectionEnabled(bool value)
     m_persistentConnectionEnabled = value;
 }
 
+void HttpServerConnection::setMaxMessageBodySize(std::uint64_t value)
+{
+    parser().streamReader().setMaxMessageBodySize(
+        value > 0 ? std::optional<std::uint64_t>(value) : std::nullopt);
+}
+
+void HttpServerConnection::setMaxHeadersSize(std::uint64_t value)
+{
+    parser().streamReader().setMaxHeadersSize(
+        value > 0 ? std::optional<std::uint64_t>(value) : std::nullopt);
+}
+
 void HttpServerConnection::setExtraSuccessResponseHeaders(HttpHeaders responseHeaders)
 {
     m_extraSuccessResponseHeaders = std::move(responseHeaders);

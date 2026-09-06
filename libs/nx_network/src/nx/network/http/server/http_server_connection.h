@@ -103,6 +103,18 @@ public:
     void setPersistentConnectionEnabled(bool value);
 
     /**
+     * Caps the size of an inbound request body this connection will buffer. 0 means no limit.
+     * See server::Settings::maxMessageBodySize (ANAS-323).
+     */
+    void setMaxMessageBodySize(std::uint64_t value);
+
+    /**
+     * Caps the total bytes of the request line plus headers this connection will buffer.
+     * 0 means no limit. See server::Settings::maxHeadersSize (ANAS-323).
+     */
+    void setMaxHeadersSize(std::uint64_t value);
+
+    /**
      * Set some HTTP headers to be sent in every response.
      */
     void setExtraSuccessResponseHeaders(HttpHeaders responseheaders);

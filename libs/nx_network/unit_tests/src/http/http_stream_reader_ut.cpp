@@ -828,4 +828,197 @@ TEST_F(HttpStreamReader, parsing_can_be_resumed_after_failure)
     ASSERT_EQ(2, messages[0].request->headers.size());
 }
 
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(HttpStreamReader, message_body_size_cap_is_enforced_for_identity_encoding)
+{
+    static const nx::Buffer kHeaders =
+        "POST / HTTP/1.1\r\n"
+        "Content-Length: 1000\r\n"
+        "\r\n";
+
+    http::HttpStreamReader reader;
+    reader.setMaxMessageBodySize(10);
+
+    size_t bytesParsed = 0;
+    ASSERT_TRUE(reader.parseBytes(kHeaders, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::readingMessageBody, reader.state());
+
+    const nx::Buffer body = nx::utils::buildString<nx::Buffer>(std::string(20, 'x'));
+    ASSERT_FALSE(reader.parseBytes(body, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::parseError, reader.state());
+}
+
+TEST_F(HttpStreamReader, message_body_size_cap_is_enforced_for_chunked_encoding)
+{
+    static const nx::Buffer kHeaders =
+        "POST / HTTP/1.1\r\n"
+        "Transfer-Encoding: chunked\r\n"
+        "\r\n";
+
+    http::HttpStreamReader reader;
+    reader.setMaxMessageBodySize(10);
+
+    size_t bytesParsed = 0;
+    ASSERT_TRUE(reader.parseBytes(kHeaders, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::readingMessageBody, reader.state());
+
+    // Chunk size 0x14 == 20 bytes, which already exceeds the 10-byte cap set above.
+    static const nx::Buffer kChunk =
+        nx::utils::buildString<nx::Buffer>("14\r\n", std::string(20, 'x'), "\r\n");
+
+    ASSERT_FALSE(reader.parseBytes(kChunk, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::parseError, reader.state());
+}
+
+TEST_F(HttpStreamReader, chunked_trailer_line_with_no_terminator_fails_parsing)
+{
+    static const nx::Buffer kHeaders =
+        "POST / HTTP/1.1\r\n"
+        "Transfer-Encoding: chunked\r\n"
+        "\r\n";
+
+    http::HttpStreamReader reader;
+
+    size_t bytesParsed = 0;
+    ASSERT_TRUE(reader.parseBytes(kHeaders, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::readingMessageBody, reader.state());
+
+    // Terminating (zero-size) chunk, immediately followed by a trailer header line with no
+    // CR/LF that grows past LineSplitter::kDefaultMaxLineLength.
+    const nx::Buffer trailer =
+        nx::utils::buildString<nx::Buffer>("0\r\n", std::string(20 * 1024, 'a'));
+
+    ASSERT_FALSE(reader.parseBytes(trailer, &bytesParsed));
+}
+
+TEST_F(HttpStreamReader, header_line_with_no_terminator_fails_parsing_once_it_grows_too_long)
+{
+    // No CR/LF anywhere, far exceeding LineSplitter::kDefaultMaxLineLength.
+    const nx::Buffer garbage = nx::utils::buildString<nx::Buffer>(std::string(200 * 1024, 'a'));
+
+    http::HttpStreamReader reader;
+    size_t bytesParsed = 0;
+    ASSERT_FALSE(reader.parseBytes(garbage, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::parseError, reader.state());
+}
+
+TEST_F(HttpStreamReader, headers_size_cap_is_enforced_for_many_short_headers)
+{
+    http::HttpStreamReader reader;
+    reader.setMaxHeadersSize(100);
+
+    // Each line is far below the per-line cap, so only the aggregate budget can catch this.
+    nx::Buffer request = "POST / HTTP/1.1\r\n";
+    for (int i = 0; i < 50; ++i)
+        request += "a: b\r\n";
+
+    size_t bytesParsed = 0;
+    ASSERT_FALSE(reader.parseBytes(request, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::parseError, reader.state());
+}
+
+TEST_F(HttpStreamReader, headers_size_cap_counts_a_line_still_being_accumulated)
+{
+    http::HttpStreamReader reader;
+    reader.setMaxHeadersSize(100);
+
+    // Unterminated, yet short enough that the per-line cap cannot fire.
+    const nx::Buffer data = nx::utils::buildString<nx::Buffer>(std::string(200, 'a'));
+
+    size_t bytesParsed = 0;
+    ASSERT_FALSE(reader.parseBytes(data, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::parseError, reader.state());
+}
+
+TEST_F(HttpStreamReader, headers_size_cap_does_not_reject_a_large_but_legal_header_block)
+{
+    http::HttpStreamReader reader;
+    reader.setMaxHeadersSize(64 * 1024);
+
+    // ~33 KiB of headers: well under the cap, every line well under the per-line cap.
+    nx::Buffer request = "GET / HTTP/1.1\r\n";
+    for (int i = 0; i < 1000; ++i)
+        request += "X-Padding: " + std::string(20, 'p') + "\r\n";
+    request += "Content-Length: 0\r\n\r\n";
+
+    size_t bytesParsed = 0;
+    ASSERT_TRUE(reader.parseBytes(request, &bytesParsed));
+    ASSERT_EQ(http::HttpStreamReader::ReadState::messageDone, reader.state());
+}
+
+TEST_F(HttpStreamReader, parsing_recovers_after_an_over_long_chunked_trailer_line)
+{
+    static const nx::Buffer kHeaders =
+        "POST / HTTP/1.1\r\n"
+        "Transfer-Encoding: chunked\r\n"
+        "\r\n";
+
+    http::HttpStreamReader reader;
+
+    size_t bytesParsed = 0;
+    ASSERT_TRUE(reader.parseBytes(kHeaders, &bytesParsed));
+
+    const nx::Buffer badTrailer =
+        nx::utils::buildString<nx::Buffer>("0\r\n", std::string(20 * 1024, 'a'));
+    ASSERT_FALSE(reader.parseBytes(badTrailer, &bytesParsed));
+
+    // resetState() MUST clear the chunked parser's line splitter, or every subsequent chunked
+    // message stays poisoned by the sticky overflow flag.
+    reader.resetState();
+
+    static const nx::Buffer kValidMessage =
+        "POST / HTTP/1.1\r\n"
+        "Transfer-Encoding: chunked\r\n"
+        "\r\n"
+        "4\r\n"
+        "test\r\n"
+        "0\r\n"
+        "\r\n";
+
+    nx::ConstBufferRefType data(kValidMessage);
+    for (int i = 0; !data.empty() && i < 100; ++i) //< Protecting from a dead loop.
+    {
+        ASSERT_TRUE(reader.parseBytes(data, &bytesParsed));
+        data.remove_prefix(bytesParsed);
+        if (reader.state() == http::HttpStreamReader::ReadState::messageDone)
+            break;
+    }
+
+    ASSERT_EQ(http::HttpStreamReader::ReadState::messageDone, reader.state());
+}
+
+TEST_F(HttpStreamReader, headers_size_cap_is_reset_for_each_message_of_a_persistent_connection)
+{
+    static const nx::Buffer kRequest =
+        "GET / HTTP/1.1\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n";
+
+    static constexpr int kRequestCount = 5;
+
+    // Fits a single request's header block, but not several of them combined.
+    http::HttpStreamReader reader;
+    reader.setMaxHeadersSize(kRequest.size() + 4);
+
+    nx::Buffer stream;
+    for (int i = 0; i < kRequestCount; ++i)
+        stream += kRequest;
+
+    int messagesRead = 0;
+    nx::ConstBufferRefType data(stream);
+    for (int i = 0; !data.empty() && i < 1000; ++i) //< Protecting from a dead loop.
+    {
+        size_t bytesParsed = 0;
+        ASSERT_TRUE(reader.parseBytes(data, &bytesParsed));
+        ASSERT_GT(bytesParsed, 0u);
+        data.remove_prefix(bytesParsed);
+
+        if (reader.state() == http::HttpStreamReader::ReadState::messageDone)
+            ++messagesRead;
+    }
+
+    ASSERT_EQ(kRequestCount, messagesRead);
+}
+
 } // namespace nx::network::http::test

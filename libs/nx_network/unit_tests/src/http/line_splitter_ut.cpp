@@ -148,6 +148,47 @@ TEST_F(LineSplitter, common)
     ASSERT_EQ("line3", lineBuffer);
 }
 
+// ANAS-323: LineSplitter must not buffer an unterminated line without bound.
+
+TEST_F(LineSplitter, caps_unterminated_line_length)
+{
+    nx::network::http::LineSplitter lineSplitter;
+    lineSplitter.setMaxLineLength(8);
+
+    ConstBufferRefType lineBuffer;
+    size_t bytesRead = 0;
+    ASSERT_FALSE(lineSplitter.parseByLines("12345678", &lineBuffer, &bytesRead));
+    ASSERT_FALSE(lineSplitter.lineLengthExceeded());
+
+    ASSERT_FALSE(lineSplitter.parseByLines("9", &lineBuffer, &bytesRead));
+    ASSERT_TRUE(lineSplitter.lineLengthExceeded());
+}
+
+TEST_F(LineSplitter, caps_line_length_even_when_terminator_arrives_in_the_same_call)
+{
+    nx::network::http::LineSplitter lineSplitter;
+    lineSplitter.setMaxLineLength(4);
+
+    ConstBufferRefType lineBuffer;
+    size_t bytesRead = 0;
+    ASSERT_FALSE(lineSplitter.parseByLines("123456789\r\n", &lineBuffer, &bytesRead));
+    ASSERT_TRUE(lineSplitter.lineLengthExceeded());
+}
+
+TEST_F(LineSplitter, reset_clears_line_length_exceeded_flag)
+{
+    nx::network::http::LineSplitter lineSplitter;
+    lineSplitter.setMaxLineLength(4);
+
+    ConstBufferRefType lineBuffer;
+    size_t bytesRead = 0;
+    lineSplitter.parseByLines("12345", &lineBuffer, &bytesRead);
+    ASSERT_TRUE(lineSplitter.lineLengthExceeded());
+
+    lineSplitter.reset();
+    ASSERT_FALSE(lineSplitter.lineLengthExceeded());
+}
+
 //-------------------------------------------------------------------------------------------------
 
 class StringLineIterator:

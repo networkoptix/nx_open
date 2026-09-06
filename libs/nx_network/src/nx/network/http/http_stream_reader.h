@@ -109,6 +109,23 @@ public:
     /** If true, then parseBytes skips invalid HTTP headers instead of failing. */
     void setParseHeadersStrict(bool enabled);
 
+    /**
+     * Caps total message body bytes read off the wire, regardless of what Content-Length
+     * declares or chunked framing implies. Once exceeded, parsing fails (state() becomes
+     * parseError) instead of buffering an unbounded body (ANAS-323).
+     * std::nullopt (the default) means no limit, preserving behavior for callers (e.g.
+     * AsyncHttpClient) that intentionally read large messages.
+     */
+    void setMaxMessageBodySize(std::optional<std::uint64_t> maxSize);
+
+    /**
+     * Caps the total bytes consumed while reading the request/status line and the headers,
+     * including a line still being accumulated. This bounds header memory against both an
+     * endless unterminated line and an endless stream of short headers (ANAS-323).
+     * std::nullopt (the default) means no limit. See setMaxMessageBodySize.
+     */
+    void setMaxHeadersSize(std::optional<std::uint64_t> maxSize);
+
     static bool isEncodingSupported(std::string_view encoding);
 
 private:
@@ -128,6 +145,9 @@ private:
     int m_currentMessageNumber = 0;
     bool m_breakAfterReadingHeaders = false;
     bool m_parseHeadersStrict = true;
+    std::optional<std::uint64_t> m_maxMessageBodySize;
+    std::optional<std::uint64_t> m_maxHeadersSize;
+    std::uint64_t m_headerBytesRead = 0;
 
     LineSplitter m_lineSplitter;
     mutable nx::Mutex m_mutex;

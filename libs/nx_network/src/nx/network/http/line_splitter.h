@@ -14,7 +14,22 @@ namespace nx::network::http {
 class NX_NETWORK_API LineSplitter
 {
 public:
+    /**
+     * A single line is not allowed to grow past this many bytes. Protects against unbounded
+     * memory growth from a header/request line sent with no CR/LF (ANAS-323). Matches the
+     * request line allowance of the production edge (ALB), so we are never stricter than it.
+     */
+    static constexpr std::size_t kDefaultMaxLineLength = 16 * 1024;
+
     virtual ~LineSplitter() = default;
+
+    /** See kDefaultMaxLineLength. */
+    void setMaxLineLength(std::size_t maxLineLength);
+
+    std::size_t maxLineLength() const;
+
+    /** True once an unterminated line has grown past the configured max length. */
+    bool lineLengthExceeded() const;
 
     /**
      * If a line is found then true is returned and lineBuffer contains reference to the line.
@@ -58,6 +73,8 @@ private:
     nx::Buffer m_currentLine;
     bool m_clearCurrentLineBuf = false;
     char m_prevLineEnding = 0;
+    std::size_t m_maxLineLength = kDefaultMaxLineLength;
+    bool m_lineLengthExceeded = false;
 };
 
 //-------------------------------------------------------------------------------------------------

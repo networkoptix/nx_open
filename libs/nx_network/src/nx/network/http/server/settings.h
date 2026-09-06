@@ -45,6 +45,8 @@ public:
     static constexpr int kDefaultTcpBacklogSize = 128;
     static constexpr std::chrono::milliseconds kDefaultConnectionInactivityPeriod =
         std::chrono::hours(2);
+    static constexpr std::uint64_t kDefaultMaxMessageBodySize = 16 * 1024 * 1024;
+    static constexpr std::uint64_t kDefaultMaxHeadersSize = 96 * 1024;
 
     /**
      * Backlog value to pass to tcpServerSocket->listen call.
@@ -74,6 +76,19 @@ public:
      */
     unsigned int listeningConcurrency = 1;
 
+    /**
+     * Caps the size of an inbound HTTP request body the server will buffer, regardless of
+     * Content-Length or chunked encoding, closing unauthenticated memory-exhaustion DoS
+     * vectors (ANAS-323). 0 disables the cap.
+     */
+    std::uint64_t maxMessageBodySize = kDefaultMaxMessageBodySize;
+
+    /**
+     * Caps the total bytes of the request line plus headers the server will buffer. Sized above
+     * 0 disables the cap (ANAS-323).
+     */
+    std::uint64_t maxHeadersSize = kDefaultMaxHeadersSize;
+
     Ssl ssl;
 
     /**
@@ -100,6 +115,7 @@ NX_REFLECTION_INSTRUMENT(Settings::Ssl,
 
 NX_REFLECTION_INSTRUMENT(Settings,
     (tcpBacklogSize)(connectionInactivityPeriod)(endpoints)(serverName)\
-    (redirectHttpToHttps)(reusePort)(listeningConcurrency)(ssl))
+    (redirectHttpToHttps)(reusePort)(listeningConcurrency)(maxMessageBodySize)\
+    (maxHeadersSize)(ssl))
 
 } // namespace nx::network::http::server

@@ -20,6 +20,16 @@ void HttpStreamSocketServer::setExtraSuccessResponseHeaders(HttpHeaders response
     m_extraSuccessResponseHeaders = std::move(responseHeaders);
 }
 
+void HttpStreamSocketServer::setMaxMessageBodySize(std::uint64_t value)
+{
+    m_maxMessageBodySize = value;
+}
+
+void HttpStreamSocketServer::setMaxHeadersSize(std::uint64_t value)
+{
+    m_maxHeadersSize = value;
+}
+
 void HttpStreamSocketServer::redirectAllRequestsTo(SocketAddress addressToRedirect)
 {
     m_addressToRedirect = std::move(addressToRedirect);
@@ -59,6 +69,8 @@ std::shared_ptr<HttpServerConnection> HttpStreamSocketServer::createConnection(
         m_addressToRedirect);
     result->setPersistentConnectionEnabled(m_persistentConnectionEnabled);
     result->setExtraSuccessResponseHeaders(m_extraSuccessResponseHeaders);
+    result->setMaxMessageBodySize(m_maxMessageBodySize);
+    result->setMaxHeadersSize(m_maxHeadersSize);
     result->setOnResponseSent(
         [this](const auto& requestProcessingTime, auto statusCode)
         {

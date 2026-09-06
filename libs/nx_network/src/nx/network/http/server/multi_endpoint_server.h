@@ -54,6 +54,10 @@ public:
         m_extraSuccessResponseHeaders = std::move(responseHeaders);
     }
 
+    void setMaxMessageBodySize(std::uint64_t value) { m_maxMessageBodySize = value; }
+
+    void setMaxHeadersSize(std::uint64_t value) { m_maxHeadersSize = value; }
+
     /**
      * Takes ownership of the objects behind the golden-signal metrics wiring created by
      * Builder. They must outlive the request handling, hence live here.
@@ -70,6 +74,8 @@ public:
     {
         initializeHttpStatisticsProvider();
         propagateExtraResponseHeaders();
+        propagateMaxMessageBodySize();
+        propagateMaxHeadersSize();
 
         return base_type::listen(m_tcpBackLogSize);
     }
@@ -112,6 +118,8 @@ private:
     std::vector<nx::Url> m_urls;
     std::unique_ptr<SummingStatisticsProvider> m_httpStatsProvider;
     HttpHeaders m_extraSuccessResponseHeaders;
+    std::uint64_t m_maxMessageBodySize = Settings::kDefaultMaxMessageBodySize;
+    std::uint64_t m_maxHeadersSize = Settings::kDefaultMaxHeadersSize;
     std::unique_ptr<HttpRequestMetrics> m_httpRequestMetrics;
     std::unique_ptr<AbstractRequestHandler> m_metricsRequestHandler;
 
@@ -134,6 +142,18 @@ private:
             {
                 server->setExtraSuccessResponseHeaders(m_extraSuccessResponseHeaders);
             });
+    }
+
+    void propagateMaxMessageBodySize()
+    {
+        forEachListener([this](HttpStreamSocketServer* server)
+            { server->setMaxMessageBodySize(m_maxMessageBodySize); });
+    }
+
+    void propagateMaxHeadersSize()
+    {
+        forEachListener([this](HttpStreamSocketServer* server)
+            { server->setMaxHeadersSize(m_maxHeadersSize); });
     }
 };
 

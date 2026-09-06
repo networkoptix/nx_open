@@ -17,6 +17,8 @@ static constexpr char kServerName[] = "serverName";
 static constexpr char kRedirectHttpToHttps[] = "redirectHttpToHttps";
 static constexpr char kReusePort[] = "reusePort";
 static constexpr char kListeningConcurrency[] = "listeningConcurrency";
+static constexpr char kMaxMessageBodySize[] = "maxMessageBodySize";
+static constexpr char kMaxHeadersSize[] = "maxHeadersSize";
 
 static constexpr char kLegacySslEndpointsToListen[] = "sslEndpoints";
 static constexpr char kSslCertificatePath[] = "certificatePath";
@@ -45,6 +47,9 @@ void Settings::load(const SettingsReader& settings0, const char * groupName)
     redirectHttpToHttps = settings.value(kRedirectHttpToHttps, redirectHttpToHttps).toBool();
     reusePort = settings.value(kReusePort, reusePort).toBool();
     listeningConcurrency = settings.value(kListeningConcurrency, listeningConcurrency).toInt();
+    maxMessageBodySize =
+        settings.value(kMaxMessageBodySize, (qulonglong) maxMessageBodySize).toULongLong();
+    maxHeadersSize = settings.value(kMaxHeadersSize, (qulonglong) maxHeadersSize).toULongLong();
 
     loadSsl(settings);
     loadHeaders(settings);
