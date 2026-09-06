@@ -1557,12 +1557,12 @@ Licensnøgle: %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Kan ikke oprette forbindelse til Server %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Server %1 kan ikke oprette forbindelse til %2. Sørg for at adressen er korrekt og destinations sitet er online og kan nås fra %1.</translation>
     </message>
   </context>
   <context>
