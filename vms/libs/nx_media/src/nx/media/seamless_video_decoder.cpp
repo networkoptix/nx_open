@@ -384,6 +384,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
 
         d->decoderFrameOffset = d->frameNumber;
         d->sar = 1.0;
+        d->hardwareDecoderErrorCount = 0;
 
         {
             NX_MUTEX_LOCKER lock(&d->mutex);
@@ -427,8 +428,11 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
                 VideoFramePtr decodedFrame;
                 if (!d->videoDecoder->receiveFrame(&decodedFrame))
                 {
-                    NX_DEBUG(this, "Failed to receive video from decoder");
-                    return false;
+                    // Count the hardware failure toward the software fallback instead of just
+                    // dropping the frame; otherwise playback stalls on cameras it cannot handle.
+                    if (!d->swallowErrorAndContinue())
+                        return false;
+                    break;
                 }
                 if (!decodedFrame)
                     break; //< Decoder's buffer is flushed.

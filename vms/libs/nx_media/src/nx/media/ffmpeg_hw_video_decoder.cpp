@@ -14,6 +14,7 @@
 #include <nx/media/ffmpeg/hw_video_api.h>
 #include <nx/media/ffmpeg/hw_video_decoder.h>
 #include <nx/media/h264_utils.h>
+#include <nx/media/pixel_format_converter.h>
 #include <nx/media/utils.h>
 #include <nx/media/video_frame.h>
 #include <nx/utils/log/log.h>
@@ -184,6 +185,9 @@ public:
 
     QRhi* rhi = nullptr;
     VideoApiRegistry::Entry* videoApi = nullptr;
+
+    /** Converts software output Qt cannot display directly to a supported format. */
+    PixelFormatConverter converter;
 };
 
 FfmpegHwVideoDecoder::FfmpegHwVideoDecoder(
@@ -293,8 +297,13 @@ bool FfmpegHwVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
     if (isHW)
     {
         *decodedFrame = d->videoApi->makeFrame(frameFromDecoder.get(), d->decoderData);
-        if (*decodedFrame)
+        if (*decodedFrame && (*decodedFrame)->isValid())
             return true;
+
+        // An invalid hardware frame must be reported as failure so the caller can fall back.
+        NX_DEBUG(this, "Hardware decoder produced an unusable frame");
+        decodedFrame->reset();
+        return false;
     }
     else if (AvFrameMemoryBuffer::toQtPixelFormat(pixelFormat) != QVideoFrameFormat::Format_Invalid)
     {
@@ -307,7 +316,16 @@ bool FfmpegHwVideoDecoder::receiveFrame(VideoFramePtr* decodedFrame)
         return true;
     }
 
-    return false;
+    // Software frame in a format Qt cannot display directly: convert it instead of dropping it.
+    AVFrame* converted = d->converter.toYuv420p(frameFromDecoder.get());
+    if (!converted)
+        return false;
+
+    auto videoFrame = std::make_shared<VideoFrame>(
+        std::make_unique<AvFrameMemoryBuffer>(converted, /*ownsFrame*/ true));
+    videoFrame->setStartTime(startTimeMs);
+    *decodedFrame = videoFrame;
+    return true;
 }
 
 int FfmpegHwVideoDecoder::currentFrameNumber() const
