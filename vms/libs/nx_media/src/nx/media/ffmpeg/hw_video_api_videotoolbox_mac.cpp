@@ -34,6 +34,9 @@ QVideoFrameFormat::PixelFormat toQtPixelFormat(OSType pixFormat)
         case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
         case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
             return QVideoFrameFormat::Format_NV12;
+        case kCVPixelFormatType_420YpCbCr10BiPlanarVideoRange:
+        case kCVPixelFormatType_420YpCbCr10BiPlanarFullRange:
+            return QVideoFrameFormat::Format_P010;
         default:
             return QVideoFrameFormat::Format_Invalid;
     }

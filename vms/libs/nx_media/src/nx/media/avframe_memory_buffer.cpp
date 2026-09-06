@@ -34,8 +34,14 @@ AvFrameMemoryBuffer::MapData AvFrameMemoryBuffer::map(QVideoFrame::MapMode mode)
         data.bytesPerLine[i] = m_frame->linesize[i];
         int bytesPerPlane = data.bytesPerLine[i] * m_frame->height;
 
-        if (i > 0 && pixelFormat == QVideoFrameFormat::Format_YUV420P)
+        // Secondary planes of 4:2:0 formats (8- and 10-bit) are half-height.
+        if (i > 0
+            && (pixelFormat == QVideoFrameFormat::Format_YUV420P
+                || pixelFormat == QVideoFrameFormat::Format_YUV420P10
+                || pixelFormat == QVideoFrameFormat::Format_P010))
+        {
             bytesPerPlane /= 2;
+        }
 
         data.dataSize[i] = bytesPerPlane;
     }
@@ -65,6 +71,10 @@ QVideoFrameFormat::PixelFormat AvFrameMemoryBuffer::toQtPixelFormat(AVPixelForma
             return QVideoFrameFormat::Format_BGRA8888;
         case AV_PIX_FMT_NV12:
             return QVideoFrameFormat::Format_NV12;
+        case AV_PIX_FMT_YUV420P10LE:
+            return QVideoFrameFormat::Format_YUV420P10;
+        case AV_PIX_FMT_P010LE:
+            return QVideoFrameFormat::Format_P010;
         default:
             return QVideoFrameFormat::Format_Invalid;
     }
