@@ -97,6 +97,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
 
         bookmark.share = backupShareParams;
         emit q->bookmarkChanged();
+        emit q->sharingChanged();
 
         executeLater([this]() { emit q->sharingFailed(); }, q);
 
@@ -131,6 +132,7 @@ bool ShareBookmarkBackend::Private::updateShareParams(
                 shareBookmarkLink(bookmarkV3->id);
 
             emit q->bookmarkChanged();
+            emit q->sharingChanged();
         });
 
     return handleResult(manager->submitBookmarkOperation(operation, request, std::move(callback)));

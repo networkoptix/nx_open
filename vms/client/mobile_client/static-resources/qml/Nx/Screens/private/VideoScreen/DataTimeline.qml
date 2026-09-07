@@ -152,6 +152,11 @@ Rectangle
             timeScale.zoom(factor)
     }
 
+    function invalidateData(timestampMs)
+    {
+        objects.invalidateData(timestampMs)
+    }
+
     // Header bar with the current view date range.
     Rectangle
     {

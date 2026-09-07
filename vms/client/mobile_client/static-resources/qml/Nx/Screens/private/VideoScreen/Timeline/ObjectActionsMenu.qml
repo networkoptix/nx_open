@@ -30,7 +30,8 @@ Menu
     // letting the timeline suspend its gestures while that sheet is on screen.
     readonly property bool actionSheetOpened: shareAction.sheetOpened
 
-    signal seekRequested(real positionMs)
+    signal seekRequested(real timestampMs)
+    signal invalidateRequested(real timestampMs)
 
     function adjustPosition(invokerRect /*in parent coords*/, indentFromInvoker)
     {
@@ -52,7 +53,7 @@ Menu
     {
         id: shareMenuItem
 
-        text: qsTr("Share")
+        text: shareAction.isShared ? qsTr("Edit sharing") : qsTr("Share")
 
         enabled: shareAction.enabled && d.objectsData?.length > 0
             && menu.objectsType !== Timeline.ObjectsLoader.ObjectsType.motion
@@ -120,6 +121,12 @@ Menu
             objectsType: menu.objectsType
             objectData: d.singleObjectData ?? null
             preferredSheetEdge: StyleHints.preferredSheetEdge
+
+            backend.onSharingChanged:
+            {
+                if (objectData && objectsType === Timeline.ObjectsLoader.ObjectsType.bookmarks)
+                    menu.invalidateRequested(objectData.startTimeMs)
+            }
         }
 
         DownloadMediaAction

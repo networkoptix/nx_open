@@ -672,6 +672,127 @@ TEST_F(TimelineDataListsCacheTest, expirationAddOverlappingMiddle)
 }
 
 // ------------------------------------------------------------------------------------------------
+// Instant invalidation of a time period.
+
+TEST_F(TimelineDataListsCacheTest, invalidateEmptyCache)
+{
+    cache->invalidate(interval(9ms, 1ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(0);
+    EXPECT_CACHE_SIZE(0);
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateNotIntersecting)
+{
+    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    cache->invalidate(interval(3ms, 1ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(2);
+    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateTouching)
+{
+    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    cache->invalidate(interval(4ms, 1ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(2);
+    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateEntireBlock)
+{
+    cache->add(interval(9ms, 5ms), kUnlimited, {9ms, 5ms});
+    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    cache->invalidate(interval(9ms, 5ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(2);
+    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateSeveralBlocks)
+{
+    cache->add(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
+    cache->add(interval(6ms, 5ms), kUnlimited, {5ms});
+    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    cache->invalidate(interval(9ms, 5ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(2);
+    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({4ms, 1ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateEarlierPartOfBlock)
+{
+    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    cache->invalidate(interval(4ms, 1ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(2);
+    CHECK_BLOCK(firstBlock(), interval(9ms, 5ms), TimestampList({9ms, 5ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateLaterPartOfBlock)
+{
+    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    cache->invalidate(interval(9ms, 5ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(1);
+    EXPECT_CACHE_SIZE(1);
+    CHECK_BLOCK(firstBlock(), interval(4ms, 1ms), TimestampList({1ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateMiddleOfBlock)
+{
+    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    cache->invalidate(interval(6ms, 4ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(2);
+    EXPECT_CACHE_SIZE(2);
+    auto it = cache->cache().begin();
+    CHECK_BLOCK(*it, interval(9ms, 7ms), TimestampList({9ms}));
+    ++it;
+    CHECK_BLOCK(*it, interval(3ms, 1ms), TimestampList({1ms}));
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateIncompleteBlock)
+{
+    cache->add(interval(5ms, 1ms), /*limit*/ 2, {5ms, 5ms});
+    ASSERT_BLOCK_COUNT(1);
+    cache->invalidate(interval(5ms, 5ms));
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(0);
+    EXPECT_CACHE_SIZE(0);
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidateEverything)
+{
+    cache->add(interval(9ms, 7ms), kUnlimited, {9ms, 7ms});
+    cache->add(interval(4ms, 1ms), kUnlimited, {4ms, 1ms});
+    cache->invalidate(QnTimePeriod::anytime());
+    CHECK_INTEGRITY;
+    ASSERT_BLOCK_COUNT(0);
+    EXPECT_CACHE_SIZE(0);
+}
+
+TEST_F(TimelineDataListsCacheTest, invalidatedPeriodIsNotReturnedByGet)
+{
+    cache->add(interval(9ms, 1ms), kUnlimited, {9ms, 5ms, 1ms});
+    cache->invalidate(interval(6ms, 4ms));
+    CHECK_INTEGRITY;
+
+    // The invalidated period is not in the cache anymore, thus the whole period is not covered.
+    EXPECT_EQ(cache->get(interval(9ms, 1ms), kUnlimited), std::nullopt);
+
+    // The remaining parts are still cached.
+    EXPECT_EQ(cache->get(interval(9ms, 7ms), kUnlimited), TimestampList({9ms}));
+    EXPECT_EQ(cache->get(interval(3ms, 1ms), kUnlimited), TimestampList({1ms}));
+}
+
+// ------------------------------------------------------------------------------------------------
 // Other.
 
 TEST_F(TimelineDataListsCacheTest, touchByGet)

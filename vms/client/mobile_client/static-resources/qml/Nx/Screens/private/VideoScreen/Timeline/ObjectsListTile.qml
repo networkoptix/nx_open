@@ -22,6 +22,7 @@ Item
     property alias description: descriptionText.text
     property var imagePaths: []
     property var iconPaths: []
+    property bool shared: false
 
     property int objectsType: Timeline.ObjectsLoader.ObjectsType.motion //< Determines icon color.
     property bool highlighted: false
@@ -225,8 +226,8 @@ Item
             {
                 id: iconRow
 
-                readonly property bool showIcons:
-                    tile.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
+                readonly property bool showIcons: tile.shared
+                    || tile.objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
 
                 LayoutMirroring.enabled: false
 
@@ -236,7 +237,9 @@ Item
                 Repeater
                 {
                     // Up to 3 icons are drawn.
-                    model: iconRow.showIcons ? (tile.iconPaths ?? []).slice(0, 3) : []
+                    model: tile.shared
+                        ? ["image://skin/20x20/Solid/shared.svg?secondary=attention.green"]
+                        : (iconRow.showIcons ? (tile.iconPaths ?? []).slice(0, 3) : [])
 
                     ColoredImage
                     {
@@ -245,6 +248,9 @@ Item
 
                         primaryColor:
                         {
+                            if (tile.shared)
+                                return ColorTheme.colors.light10
+
                             switch (tile.objectsType)
                             {
                                 case Timeline.ObjectsLoader.ObjectsType.motion:

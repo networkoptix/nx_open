@@ -103,6 +103,10 @@ signals:
     void isAvailableChanged();
     void sharingFailed();
 
+    // Sent only when the sharing params are changed by user (on contrary, `bookmarkChanged()` is
+    // also sent when a new bookmark is loaded into the backend).
+    void sharingChanged();
+
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;

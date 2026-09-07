@@ -1177,6 +1177,12 @@ Page
                 if (timestampMs > 0)
                     timeline.setPosition(timestampMs)
             }
+
+            onInvalidateRequested: (timestampMs) =>
+            {
+                if (timestampMs > 0)
+                    timeline.invalidateData(timestampMs)
+            }
         }
 
         Rectangle

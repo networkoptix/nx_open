@@ -182,6 +182,86 @@ TYPED_TEST(TimelineCachingProxyBackendTest, expirabilityByAge)
     ASSERT_EQ(LOG().pop(), (Request{underThresholdPeriod, kUnlimited}));
 }
 
+TYPED_TEST(TimelineCachingProxyBackendTest, invalidateCachedPeriod)
+{
+    waitForCompletion(LOAD(interval(9ms, 0ms), kUnlimited));
+    LOG().clear();
+
+    this->backend->invalidate(interval(9ms, 0ms));
+
+    const auto future = LOAD(interval(9ms, 0ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDEFGHIJKLM");
+    ASSERT_EQ(LOG().size(), 1);
+    ASSERT_EQ(LOG().pop(), (Request{interval(9ms, 0ms), kUnlimited}));
+}
+
+TYPED_TEST(TimelineCachingProxyBackendTest, invalidateEncompassingPeriod)
+{
+    waitForCompletion(LOAD(interval(6ms, 3ms), kUnlimited));
+    LOG().clear();
+
+    this->backend->invalidate(interval(9ms, 0ms));
+
+    const auto future = LOAD(interval(6ms, 3ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDEFGHIJ");
+    ASSERT_EQ(LOG().size(), 1);
+    ASSERT_EQ(LOG().pop(), (Request{interval(6ms, 3ms), kUnlimited}));
+}
+
+TYPED_TEST(TimelineCachingProxyBackendTest, invalidateNotIntersectingPeriod)
+{
+    waitForCompletion(LOAD(interval(9ms, 5ms), kUnlimited));
+    LOG().clear();
+
+    this->backend->invalidate(interval(4ms, 0ms));
+
+    const auto future = LOAD(interval(9ms, 5ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDE");
+    ASSERT_TRUE(LOG().empty());
+}
+
+TYPED_TEST(TimelineCachingProxyBackendTest, invalidatePartOfCachedPeriod)
+{
+    waitForCompletion(LOAD(interval(9ms, 0ms), kUnlimited));
+    LOG().clear();
+
+    this->backend->invalidate(interval(2ms, 0ms));
+
+    // The rest of the cached period is still served from the cache.
+    auto future = LOAD(interval(9ms, 3ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDEFGHIJ");
+    ASSERT_TRUE(LOG().empty());
+
+    // A period intersecting the invalidated one is requested from the source backend.
+    future = LOAD(interval(9ms, 0ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDEFGHIJKLM");
+    ASSERT_EQ(LOG().size(), 1);
+    ASSERT_EQ(LOG().pop(), (Request{interval(9ms, 0ms), kUnlimited}));
+}
+
+TYPED_TEST(TimelineCachingProxyBackendTest, invalidateMiddleOfCachedPeriod)
+{
+    waitForCompletion(LOAD(interval(9ms, 0ms), kUnlimited));
+    LOG().clear();
+
+    this->backend->invalidate(interval(5ms, 4ms));
+
+    // Both parts around the invalidated period are still served from the cache.
+    auto future = LOAD(interval(9ms, 6ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABC");
+    ASSERT_TRUE(LOG().empty());
+
+    future = LOAD(interval(3ms, 0ms), kUnlimited);
+    WAIT_AND_CHECK(future, "HIJKLM");
+    ASSERT_TRUE(LOG().empty());
+
+    // A period intersecting the invalidated one is requested from the source backend.
+    future = LOAD(interval(9ms, 0ms), kUnlimited);
+    WAIT_AND_CHECK(future, "ABCDEFGHIJKLM");
+    ASSERT_EQ(LOG().size(), 1);
+    ASSERT_EQ(LOG().pop(), (Request{interval(9ms, 0ms), kUnlimited}));
+}
+
 TYPED_TEST(TimelineCachingProxyBackendTest, sourceFailed)
 {
     this->source->setFailureMode(true);
