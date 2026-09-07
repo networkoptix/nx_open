@@ -27,7 +27,6 @@ Menu
         radius: 6
     }
 
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
     modal: true
     dim: false
     clip: true

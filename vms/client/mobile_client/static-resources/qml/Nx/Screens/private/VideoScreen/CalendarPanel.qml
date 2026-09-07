@@ -19,7 +19,6 @@ Popup
 
     readonly property int _animationDuration: 200
 
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
     modal: true
 
     implicitWidth: contentItem.implicitWidth
