@@ -150,6 +150,13 @@ public:
         const std::optional<seconds>& expiration = std::nullopt);
 
     /**
+     * Instantly drop the specified period from the cache. Blocks fully covered by the period are
+     * erased, partially overlapped blocks are cut or split in two, so any subsequent `get` call
+     * for a period intersecting the invalidated one will fail until the data is added again.
+     */
+    void invalidate(const QnTimePeriod& period);
+
+    /**
      * Clear the entire cache.
      */
     void clear();
@@ -175,6 +182,14 @@ private:
      * both blocks are empty, and both blocks never expire. Doesn't invalidate `it`.
      */
     void consumeNextEmptyBlock(BlockMap::iterator it);
+
+    /**
+     * Free up the specified period in the cache: blocks fully covered by the period are erased,
+     * partially overlapped blocks are cut or split in two. Expired blocks encountered in the
+     * process are dropped as well.
+     * Returns a position hint in `m_lookup` for a block with the specified period.
+     */
+    BlockMap::iterator subtractPeriod(const QnTimePeriod& period);
 
     /**
      * Add normal (complete) block into the cache.
@@ -418,10 +433,20 @@ void DataListsCache<DataList>::add(const QnTimePeriod& period, int limit, DataLi
 }
 
 template<typename DataList>
-void DataListsCache<DataList>::addNormalBlock(QnTimePeriod period, DataList data,
-    const std::optional<seconds>& expiration)
+void DataListsCache<DataList>::invalidate(const QnTimePeriod& period)
 {
-    // Find the first block in the cache that ends in or beyond the updating range (earlier in time).
+    if (!NX_ASSERT(period.isValid()))
+        return;
+
+    NX_VERBOSE(this, "Invalidating the period [%1, %2)", period.startTimeMs, period.endTimeMs());
+    subtractPeriod(period);
+}
+
+template<typename DataList>
+DataListsCache<DataList>::BlockMap::iterator DataListsCache<DataList>::subtractPeriod(
+    const QnTimePeriod& period)
+{
+    // Find the first block in the cache that ends in or beyond the period (earlier in time).
     auto firstInIt = m_lookup.lower_bound(period.endTime());
 
     // Clip first overlapping block in the cache, if present.
@@ -478,7 +503,7 @@ void DataListsCache<DataList>::addNormalBlock(QnTimePeriod period, DataList data
         }
     }
 
-    // Find the first block in the cache that ends beyond the updating range (earlier in time).
+    // Find the first block in the cache that ends beyond the period (earlier in time).
     auto firstOutIt = m_lookup.lower_bound(period.startTime());
 
     // Clip last overlapping block in the cache, if present.
@@ -530,8 +555,16 @@ void DataListsCache<DataList>::addNormalBlock(QnTimePeriod period, DataList data
             buildBlockInfoList(), period.startTimeMs, period.endTimeMs());
     }
 
-    // Erase all blocks that are completely inside the updating period, if any.
-    const auto nextPosIt = eraseBlocks(firstInIt, firstOutIt);
+    // Erase all blocks that are completely inside the period, if any.
+    return eraseBlocks(firstInIt, firstOutIt);
+}
+
+template<typename DataList>
+void DataListsCache<DataList>::addNormalBlock(
+    QnTimePeriod period, DataList data, const std::optional<seconds>& expiration)
+{
+    // Free up the period in the cache, cutting, splitting or erasing the overlapping blocks.
+    const auto nextPosIt = subtractPeriod(period);
 
     // Construct and insert the new block.
     NX_VERBOSE(this, "Inserting block [%1, %2) (%3 items) into the cache (expirationTime=%4)",

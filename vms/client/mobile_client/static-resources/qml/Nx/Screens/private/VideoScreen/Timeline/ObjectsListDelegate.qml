@@ -19,6 +19,7 @@ ObjectsListTile
     description: modelData?.description ?? ""
     imagePaths: modelData?.imagePaths ?? []
     iconPaths: modelData?.iconPaths ?? []
+    shared: modelData?.count === 1 && modelData.perObjectData[0].shared
     objectsType: objectsList.objectsType
 
     highlighted: !!modelData

@@ -100,7 +100,7 @@ struct ObjectsLoader::Private
 
     QPointer<core::ChunkProvider> chunkProvider;
     BackendPtr<ObjectTrackList> analyticsBackend;
-    BackendPtr<QnCameraBookmarkList> bookmarksBackend;
+    std::shared_ptr<CachingProxyBackend<QnCameraBookmarkList>> bookmarksBackend;
     std::unique_ptr<AbstractLoaderDelegate> loaderDelegate;
 
     std::unique_ptr<AbstractContentWatcher> contentWatcher;
@@ -422,6 +422,34 @@ struct ObjectsLoader::Private
         forceUpdate = false;
     }
 
+    void invalidateBackendCache(qint64 timestampMs)
+    {
+        if (objectsType == ObjectsType::bookmarks && bookmarksBackend)
+            bookmarksBackend->invalidate(milliseconds(timestampMs));
+    }
+
+    void invalidateData(qint64 timestampMs)
+    {
+        const auto bucketIt = findBucketContaining(cache, timestampMs, bucketSize.count());
+        if (bucketIt != cache.end())
+        {
+            bucketIt->runningLoadingTask.reset();
+            bucketIt->isLoading = false;
+        }
+
+        invalidateBackendCache(timestampMs);
+
+        if (bucketIt == cache.end() || !loaderDelegate)
+            return;
+
+        const int index = (int) std::distance(cache.begin(), bucketIt) - firstLoadedBucket;
+        if (index >= 0 && index < loadedBucketCount)
+        {
+            const QnTimePeriod period{milliseconds(bucketIt->startTimeMs), bucketSize};
+            update(bucketIt, loaderDelegate->load(period, minimumStackDuration));
+        }
+    }
+
     void update(BucketList::iterator bucketIt, QFuture<MultiObjectData>&& future)
     {
         if (future.isCanceled())
@@ -486,27 +514,45 @@ struct ObjectsLoader::Private
             updateTopBound();
     }
 
-    static auto findBucket(auto&& sortedBuckets, qint64 startTimeMs)
+    static auto findBucketStartingWith(auto&& sortedBuckets, qint64 startTimeMs)
+        -> decltype(sortedBuckets.end())
     {
-        const auto it = std::lower_bound(sortedBuckets.begin(), sortedBuckets.end(), startTimeMs,
-            [](const InternalBucket& bucket, qint64 startTimeMs)
-            {
-                return bucket.startTimeMs < startTimeMs;
-            });
+        const auto it = std::lower_bound(sortedBuckets.begin(),
+            sortedBuckets.end(),
+            startTimeMs,
+            [](const InternalBucket& leftBucket, qint64 rightMs)
+            { return leftBucket.startTimeMs < rightMs; });
 
         return (it != sortedBuckets.end() && it->startTimeMs == startTimeMs)
             ? it
             : sortedBuckets.end();
     }
 
+    static auto findBucketContaining(auto&& sortedBuckets, qint64 timestampMs, qint64 bucketSizeMs)
+        -> decltype(sortedBuckets.end())
+    {
+        const auto it = std::upper_bound(sortedBuckets.begin(),
+            sortedBuckets.end(),
+            timestampMs,
+            [](qint64 leftMs, const InternalBucket& rightBucket)
+            { return leftMs < rightBucket.startTimeMs; });
+
+        if (it == sortedBuckets.begin())
+            return sortedBuckets.end();
+
+        const auto bucketIt = std::prev(it);
+        return timestampMs < (bucketIt->startTimeMs + bucketSizeMs) ? bucketIt
+                                                                    : sortedBuckets.end();
+    }
+
     BucketList::iterator find(qint64 startTimeMs)
     {
-        return findBucket(cache, startTimeMs);
+        return findBucketStartingWith(cache, startTimeMs);
     }
 
     BucketList::const_iterator find(qint64 startTimeMs) const
     {
-        return findBucket(cache, startTimeMs);
+        return findBucketStartingWith(cache, startTimeMs);
     }
 
     void initializeLoaderDelegate()
@@ -615,7 +661,7 @@ struct ObjectsLoader::Private
         return analyticsBackend;
     }
 
-    const BackendPtr<QnCameraBookmarkList>& ensureBookmarksBackend()
+    const std::shared_ptr<CachingProxyBackend<QnCameraBookmarkList>>& ensureBookmarksBackend()
     {
         if (bookmarksBackend || !NX_ASSERT(chunkProvider))
             return bookmarksBackend;
@@ -1024,6 +1070,11 @@ void ObjectsLoader::endBatchUpdate()
     }
 
     d->handleWindowChanged();
+}
+
+void ObjectsLoader::invalidateData(qint64 timestampMs)
+{
+    d->invalidateData(timestampMs);
 }
 
 void ObjectsLoader::registerQmlTypes()

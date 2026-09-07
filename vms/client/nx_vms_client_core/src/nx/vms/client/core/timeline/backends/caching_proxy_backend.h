@@ -43,6 +43,9 @@ namespace timeline {
  *  3) `expirationTime` is set, `ageThreshold` is set: blocks younger than `ageThreshold` are
  *     expirable, blocks older than `ageThreshold` are not expirable. See `ageThreshold` notes.
  *
+ * Regardless of the expiration policy, a time period can be invalidated instantly via
+ * `invalidate`.
+ *
  * See `DataListsCache<DataList>` notes for more details of the current cache implementation.
  */
 template<typename DataList>
@@ -56,6 +59,24 @@ public:
      * Request asynchronous data load.
      */
     virtual QFuture<DataList> load(const QnTimePeriod& period, int limit) override;
+
+    /**
+     * Instantly invalidate the specified period in the cache.
+     *
+     * The cached data for the period is dropped immediately, so a subsequent load of any
+     * intersecting period is requested from the source backend.
+     *
+     * Known issue: a load request that is already running is not affected: its result is added to
+     * the cache as usual, even if it was obtained before the change that caused the invalidation.
+     */
+    // TODO: MOBILE-3442 #vkutin All running requests intersecting with the invalidated period
+    // must be cancelled.
+    void invalidate(const QnTimePeriod& period);
+
+    /**
+     * Invalidate 1-millisecond period starting at `timestampMs`.
+     */
+    void invalidate(std::chrono::milliseconds timestampMs);
 
     /**
      * A maximum total number of data items the cache is allowed to hold.
@@ -158,6 +179,24 @@ QFuture<DataList> CachingProxyBackend<DataList>::load(const QnTimePeriod& period
             m_cache.add(period, limit, result, expirationTime);
             return result;
         });
+}
+
+template<typename DataList>
+void CachingProxyBackend<DataList>::invalidate(const QnTimePeriod& period)
+{
+    if (!NX_ASSERT(period.isValid()))
+        return;
+
+    NX_VERBOSE(this, "Invalidating [%1, %2) in the cache", period.startTimeMs, period.endTimeMs());
+
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    m_cache.invalidate(period);
+}
+
+template<typename DataList>
+void CachingProxyBackend<DataList>::invalidate(std::chrono::milliseconds timestampMs)
+{
+    invalidate(QnTimePeriod{timestampMs, std::chrono::milliseconds(1)});
 }
 
 template<typename DataList>

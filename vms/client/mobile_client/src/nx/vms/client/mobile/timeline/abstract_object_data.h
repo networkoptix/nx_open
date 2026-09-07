@@ -34,6 +34,7 @@ class AbstractObjectData: public QObject
     Q_PROPERTY(QString iconPath READ iconPath NOTIFY changed)
     Q_PROPERTY(QVariant tags READ tags NOTIFY changed)
     Q_PROPERTY(QVariant attributes READ attributes NOTIFY changed)
+    Q_PROPERTY(bool shared READ shared NOTIFY changed)
     Q_PROPERTY(QnResource* resource READ getResource CONSTANT)
 
 public:
@@ -50,6 +51,8 @@ public:
     virtual QVariant tags() const = 0;
     virtual QVariant attributes() const = 0;
     virtual QnResourcePtr resource() const = 0;
+
+    virtual bool shared() const { return false; }
 
     virtual common::CameraBookmark convertToBookmark() const;
 

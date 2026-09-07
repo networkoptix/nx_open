@@ -7,6 +7,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
+#include <nx/vms/client/core/watchers/feature_access_watcher.h>
+#include <nx/vms/client/mobile/system_context.h>
 
 namespace nx::vms::client::mobile {
 namespace timeline {
@@ -26,6 +28,15 @@ BookmarkData::BookmarkData(
     m_resource(resource)
 {
     update(bookmark);
+
+    const auto systemContext = SystemContext::fromResource(m_resource);
+    if (!systemContext || !systemContext->featureAccess())
+        return;
+
+    connect(systemContext->featureAccess(),
+        &core::FeatureAccessWatcher::canUseShareBookmarkChanged,
+        this,
+        &BookmarkData::changed);
 }
 
 nx::Uuid BookmarkData::id() const
@@ -81,6 +92,19 @@ QnResourcePtr BookmarkData::resource() const
 common::CameraBookmark BookmarkData::convertToBookmark() const
 {
     return m_bookmark;
+}
+
+bool BookmarkData::shared() const
+{
+    const auto systemContext = SystemContext::fromResource(m_resource);
+    if (!systemContext || !systemContext->featureAccess())
+        return false;
+
+    constexpr api::BookmarkShareFilters kSharedBookmarkFilters =
+        api::BookmarkShareFilter::shared | api::BookmarkShareFilter::accessible;
+
+    return m_bookmark.shareable() && m_bookmark.bookmarkMatchesFilter(kSharedBookmarkFilters)
+        && systemContext->featureAccess()->canUseShareBookmark();
 }
 
 void BookmarkData::update(common::CameraBookmark bookmark)

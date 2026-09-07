@@ -57,6 +57,7 @@ AdaptiveSheet
                 description: modelData?.description ?? ""
                 imagePaths: modelData?.imagePath ? [modelData.imagePath] : []
                 iconPaths: modelData?.iconPath ? [modelData.iconPath] : []
+                shared: modelData?.shared ?? false
                 objectsType: sheet.objectsType
 
                 MouseArea

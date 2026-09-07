@@ -63,6 +63,11 @@ Item
         return direction === ObjectsList.Upward ? (height - pos) : pos
     }
 
+    function invalidateData(timestampMs)
+    {
+        loader.invalidateData(timestampMs)
+    }
+
     /**
      * A bracket of functions to temporarily freeze/unfreeze object list updates.
      * Useful if a complex repositioning is required and it might not require the full reset.

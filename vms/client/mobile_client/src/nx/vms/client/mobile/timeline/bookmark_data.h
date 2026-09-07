@@ -29,6 +29,8 @@ public:
     virtual common::CameraBookmark convertToBookmark() const override;
     void update(common::CameraBookmark bookmark);
 
+    virtual bool shared() const override;
+
     static MultiObjectData merge(
         std::span<const common::CameraBookmark> bookmarks,
         const QnTimePeriod& period,

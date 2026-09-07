@@ -224,6 +224,9 @@ public:
     /** Unfreeze pan/zoom updates. */
     Q_INVOKABLE void endBatchUpdate();
 
+    /** Invalidate the bucket containing `timestampMs` and force its reload. */
+    Q_INVOKABLE void invalidateData(qint64 timestampMs);
+
     static void registerQmlTypes();
 
 signals:
