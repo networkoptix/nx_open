@@ -858,6 +858,14 @@ distrib_setPermissionsInStageDir()
     find "${STAGE}" -type f -print0 | xargs -0 chmod 644
     chmod -R 755 "${STAGE}/${BIN_INSTALL_PATH}"
 
+    # The root-tool is made setuid root by the package installation scripts, thus it must not be
+    # executable by anyone except its owner and the VMS server group; otherwise any local user
+    # would be able to execute its commands as the super user. NOTE: This has to be done after the
+    # recursive chmod above, which would otherwise make the binary world-executable.
+    if [[ -f "${STAGE}/${BIN_INSTALL_PATH}/root-tool" ]]; then
+        chmod 750 "${STAGE}/${BIN_INSTALL_PATH}/root-tool"
+    fi
+
     if [[ "${SERVER_SCRIPTS_DIR-}" ]]; then
         chmod 755 "${STAGE}/${SERVER_SCRIPTS_DIR}"/*
     fi
