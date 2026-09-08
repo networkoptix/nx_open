@@ -61,9 +61,11 @@ bool Consumer::startStream(Streamer* streamer)
 
 void Consumer::stopUnsafe()
 {
-    NX_ASSERT(m_pollable.isInSelfAioThread());
-
     m_needStop = true;
+
+    if (!m_pollable.isInSelfAioThread())
+        return; // Nothing was started on this thread, m_pollable is bound elsewhere
+
     m_renegotiationTimer.pleaseStopSync();
     m_pollable.pleaseStopSync();
 }
