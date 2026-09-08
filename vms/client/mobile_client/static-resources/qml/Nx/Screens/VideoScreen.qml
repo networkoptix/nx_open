@@ -865,10 +865,9 @@ Page
                     + (overflowButton.visible ? overflowButton.width : 0)
 
                 property real centerOffset:
-                    (navigationBarContent.leftInset - navigationBarContent.rightInset) / 2
-                        + (speedControl.expanded
-                            ? (rightControlsWidth - leftControlsWidth) / 2
-                            : 0)
+                    (LayoutMirroring.enabled ? -1 : 1)
+                        * (navigationBarContent.leftInset - navigationBarContent.rightInset) / 2
+                    + (speedControl.expanded ? (rightControlsWidth - leftControlsWidth) / 2 : 0)
 
                 Behavior on centerOffset { ExpandCollapseAnimation {} }
 
