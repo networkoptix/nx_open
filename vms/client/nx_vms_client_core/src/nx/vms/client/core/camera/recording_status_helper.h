@@ -32,6 +32,7 @@ class NX_VMS_CLIENT_CORE_API RecordingStatusHelper: public QObject
     Q_PROPERTY(QString shortTooltip READ shortTooltip NOTIFY recordingModeChanged)
     Q_PROPERTY(QString qmlIconName READ qmlIconName NOTIFY recordingModeChanged)
     Q_PROPERTY(QString qmlSmallIconName READ qmlSmallIconName NOTIFY recordingModeChanged)
+    Q_PROPERTY(bool recordingEnabled READ recordingEnabled NOTIFY recordingModeChanged)
     Q_PROPERTY(QSize smallIconSize READ smallIconSize CONSTANT)
     Q_PROPERTY(QSize normalIconSize READ normalIconSize CONSTANT)
 
@@ -46,6 +47,7 @@ public:
     QString qmlIconName() const;
     QString qmlSmallIconName() const;
     QIcon smallIcon() const;
+    bool recordingEnabled() const;
 
     QSize smallIconSize() const;
     QSize normalIconSize() const;
