@@ -1036,7 +1036,7 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>مسجل فيديو شبكي</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
@@ -1861,7 +1861,7 @@
     </message>
     <message>
       <source>OS time change check period.</source>
-      <translation type="unfinished">OS time change check period.</translation>
+      <translation>فترة التحقق من التغيير الزمني لنظام التشغيل.</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
@@ -2101,7 +2101,7 @@
     </message>
     <message>
       <source>Low quality screen video codec.</source>
-      <translation type="unfinished">Low quality screen video codec.</translation>
+      <translation>ترميز فيديو شاشة منخفضة الجودة.</translation>
     </message>
     <message>
       <source>License server.</source>
@@ -2113,7 +2113,7 @@
     </message>
     <message>
       <source>Meta data storage change policy.</source>
-      <translation type="unfinished">Meta data storage change policy.</translation>
+      <translation>سياسة تغيير تخزين البيانات الوصفية.</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
@@ -2213,7 +2213,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>الحد الأقصى لعناصر المشهد (0 يعني الوضع الافتراضي)</translation>
     </message>
   </context>
 </TS>
