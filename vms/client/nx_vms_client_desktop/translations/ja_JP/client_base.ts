@@ -1543,12 +1543,12 @@ License Key: %2</source>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>サーバー %1 に接続できません。</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>サーバー %1 は %2 に接続できません。アドレスが正しいこと、ターゲットサイトがオンラインであること、および %1 から到達可能であることをご確認ください。</translation>
     </message>
   </context>
   <context>

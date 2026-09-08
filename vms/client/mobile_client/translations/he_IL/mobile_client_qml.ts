@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he_IL" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>מושבת לפי לוח זמנים</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>אין נתוני תנועה עבור מצלמה זו</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>לא נמצאה תנועה באזור הגילוי הנבחר</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>לא נמצאה תנועה באזור הגלוי</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>ללא ארכיון</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>חי</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>אזור</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>הגדרות מצלמה</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>סימניות</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>אובייקטים</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>הקש והחזק כדי לבחור אזור</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>אפשר גילוי תנועה תחילה כדי לבחור אזור גילוי</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>האזור שסומן לא תקין. נא לסמן אזור מחדש.</translation>
     </message>
   </context>
   <context>
@@ -730,17 +669,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>הקש על התמונה כדי למקם את המצלמה</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ביטול</translation>
     </message>
   </context>
   <context>

@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fi_FI" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Ei käytössä aikataulun mukaan</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Tässä kamerassa ei ole liiketietoja</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Valitulta alueelta ei löytynyt liikettä</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Näkyvältä alueelta ei löytynyt liikettä</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Ei arkistoa</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>Reaaliaikainen</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Alue</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Kameran asetukset</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Kirjanmerkit</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objektit</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Valitse alue valitsemalla ja pitämällä sitä alhaalla</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Ota ensin käyttöön liikkeenhaku ja valitse alue</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Virheellinen mukautettu alue. Piirrä oikea.</translation>
     </message>
   </context>
   <context>
@@ -729,17 +668,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Napauta kuvaa kameran sijoittamiseksi</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>PERUUTA</translation>
     </message>
   </context>
   <context>

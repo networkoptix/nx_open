@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="mn_MN" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Талбар хоосон байж болохгүй</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Архив байхгүй</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>ШУУД</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Бүсчлэл</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Камерын тохиргоо</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Тэмдэглэгээнүүд</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Объектууд</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
     </message>
   </context>
   <context>
@@ -729,17 +668,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ЦУЦЛАХ</translation>
     </message>
   </context>
   <context>

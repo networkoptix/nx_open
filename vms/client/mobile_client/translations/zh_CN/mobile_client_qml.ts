@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>已按计划禁用</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>此相机没有移动数据</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>在选定区域内未发现任何移动</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>在可见区域内未发现任何移动</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>未存档</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>实时</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>区域</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>摄像机设置</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>书签</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>物件</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>点击并按住以选择一个区域</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>请先启用移动侦测以选择侦测区域</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>自定义区域无效。请重新绘制正确的区域。</translation>
     </message>
   </context>
   <context>
@@ -728,17 +667,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>点击图像放置摄像机</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>取消</translation>
     </message>
   </context>
   <context>

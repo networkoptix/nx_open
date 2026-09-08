@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>已依據排程設定而停用</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>密碼欄位不能為空</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>此攝影機沒有移動偵測資料</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>在所選區域中沒有移動偵測結果</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>在可見區域中沒有移動偵測結果</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>無影像可供回放</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>即時影像</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>區域</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>攝影機設定</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>書籤</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>物件</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>點選畫面並拖曳來選擇範圍</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>選擇搜尋範圍前請先啟用移動偵測功能</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>圈選的區域無效，請重新選擇正確的範圍。</translation>
     </message>
   </context>
   <context>
@@ -728,17 +667,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation>點擊影片中任意位置即可將該處置中</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>輕點圖像可協助找到該攝影機</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>取消</translation>
     </message>
   </context>
   <context>

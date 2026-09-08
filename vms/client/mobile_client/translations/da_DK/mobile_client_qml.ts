@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="da_DK" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Deaktiveret efter tidsplan</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Feltet til adgangskode må ikke være tomt</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Ingen bevægelsesdata for dette kamera</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Ingen bevægelse fundet i det valgte område</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Ingen bevægelse fundet i det synlige område</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Intet arkiv</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Område</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Kamera Indstillinger</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Bogmærker</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objekter</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Tryk og hold nede for at vælge et område</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Aktivér først bevægelsessøgning for at vælge et område</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Ugyldigt brugerdefineret område. Venligst tegn et korrekt.</translation>
     </message>
   </context>
   <context>
@@ -729,17 +668,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation>Tryk hvor som helst på videoen for at centrere visningen der</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Tryk på billedet for at placere dit kamera</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ANNULLER</translation>
     </message>
   </context>
   <context>

@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr_TR" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Takvim dışı</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Şifre alanı boş bırakılamaz</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Bu kamera için hareket verisi yok</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Seçilen alanda hareket bulunamadı</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Görünür alanda hareket bulunamadı</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Arşiv yok</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>CANLI</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Alan</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Kamera Ayarları</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Yer işaretleri</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Nesneler</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Bir alan seçmek için dokunun ve basılı tutun</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Bir alan seçmek için önce hareket aramayı etkinleştirin</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Geçersiz özel alan. Lütfen doğru bir tane çizin.</translation>
     </message>
   </context>
   <context>
@@ -729,17 +668,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Kameranızı konumlandırmak için görüntüye dokunun</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>İptal</translation>
     </message>
   </context>
   <context>

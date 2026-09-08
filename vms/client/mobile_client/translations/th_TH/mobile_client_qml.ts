@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th_TH" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>ปิดใช้งานตามกำหนดเวลา</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>ต้องระบุช่องรหัสผ่าน</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>ไม่มีข้อมูลการเคลื่อนไหวสำหรับกล้องนี้</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>ไม่พบการเคลื่อนไหวในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>ไม่พบการเคลื่อนไหวในพื้นที่ที่มองเห็นได้</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>ไม่มีที่เก็บถาวร</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>สด</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>พื้นที่</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>การตั้งค่ากล้อง</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>บุ๊คมาร์ค</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>วัตถุ</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>แตะ ค้างไว้เพื่อเลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>เปิดใช้งานการค้นหาการเคลื่อนไหวก่อนเพื่อเลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>พื้นที่ที่กำหนดไม่ถูกต้อง โปรดวาดที่ถูกต้อง</translation>
     </message>
   </context>
   <context>
@@ -728,17 +667,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>แตะที่ภาพเพื่อวางตำแหน่งกล้องของคุณ</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ยกเลิก</translation>
     </message>
   </context>
   <context>

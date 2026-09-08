@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu_HU" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Ütemezés alapján letiltva</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Nem tartozik mozgásérzékelési adat ehhez a kamerához</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Nem található mozgás a kiválasztott területen</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Nem található mozgás a látható területen</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Nincs rögzítés</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>ÉLŐ</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Terület</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Kamera beállítások</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Könyjelzők</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objektumok</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Kattintson és tartsa nyomva egy terület kiválasztásához</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>A terület kiválasztásához először engedélyezze a mozgáskeresést</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Érvénytelen egyéni terület. Kérjük, rajzoljon egy megfelelőt.</translation>
     </message>
   </context>
   <context>
@@ -729,17 +668,6 @@
     <message>
       <source>Tap anywhere on video to center view there</source>
       <translation type="unfinished">Tap anywhere on video to center view there</translation>
-    </message>
-  </context>
-  <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>A kamera mozgatásához érintse meg a kijelzőt</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>MÉGSE</translation>
     </message>
   </context>
   <context>
