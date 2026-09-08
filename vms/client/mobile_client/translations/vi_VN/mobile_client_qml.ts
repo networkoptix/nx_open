@@ -16,7 +16,7 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Lịch trình bị vô hiêu hóa</translation>
+      <translation>Tắt theo lịch trình</translation>
     </message>
     <message>
       <source>Cancel</source>

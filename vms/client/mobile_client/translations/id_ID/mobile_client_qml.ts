@@ -270,7 +270,7 @@
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Camera Settings</translation>
+      <translation>Pengaturan Kamera</translation>
     </message>
     <message>
       <source>Bookmarks</source>

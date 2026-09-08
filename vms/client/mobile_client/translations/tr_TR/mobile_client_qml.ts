@@ -274,7 +274,7 @@
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation>Yer işaretleri</translation>
+      <translation>Yer İmleri</translation>
     </message>
     <message>
       <source>Objects</source>

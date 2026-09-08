@@ -16,7 +16,7 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Désactivé selon l'horaire</translation>
+      <translation>Désactivé par l'horaire</translation>
     </message>
     <message>
       <source>Cancel</source>

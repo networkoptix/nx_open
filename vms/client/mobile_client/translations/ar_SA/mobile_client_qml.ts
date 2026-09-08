@@ -16,7 +16,7 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>Disabled by schedule</translation>
+      <translation>معطل حسب الجدول</translation>
     </message>
     <message>
       <source>Cancel</source>

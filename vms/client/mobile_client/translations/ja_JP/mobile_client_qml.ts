@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation>アーカイブがありません</translation>
+      <translation>アーカイブなし</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>

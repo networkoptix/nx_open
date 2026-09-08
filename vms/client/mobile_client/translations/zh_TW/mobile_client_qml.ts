@@ -16,7 +16,7 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation>已依據排程停用</translation>
+      <translation>已依據排程設定而停用</translation>
     </message>
     <message>
       <source>Cancel</source>

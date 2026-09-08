@@ -266,11 +266,11 @@
     <name>DeprecatedVideoScreen</name>
     <message>
       <source>Area</source>
-      <translation>Área</translation>
+      <translation>Area</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Configuración de la cámara</translation>
+      <translation>Ajustes de la cámara</translation>
     </message>
     <message>
       <source>Bookmarks</source>
