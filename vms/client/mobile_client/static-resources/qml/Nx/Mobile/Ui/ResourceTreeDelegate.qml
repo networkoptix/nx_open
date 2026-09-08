@@ -29,7 +29,6 @@ TreeViewDelegate
     readonly property bool isFolder: model.nodeType === ResourceTree.NodeType.customResourceGroup
     readonly property bool isMultisensorGroup: model.nodeType === ResourceTree.NodeType.recorder
 
-    readonly property int flags: (model && model.resourceExtraStatus) || 0
     readonly property string iconSource:
     {
         if (!model)
@@ -128,10 +127,6 @@ TreeViewDelegate
             height: 20
             id: recordingIcon
             resource: delegateItem.resource
-            color: (delegateItem.flags & ResourceTree.ResourceExtraStatusFlag.recording
-                || delegateItem.flags & ResourceTree.ResourceExtraStatusFlag.scheduled)
-                ? ColorTheme.colors.red_l
-                : ColorTheme.colors.dark17
         }
     }
 

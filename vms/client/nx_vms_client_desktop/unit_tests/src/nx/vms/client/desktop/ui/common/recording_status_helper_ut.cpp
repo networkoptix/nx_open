@@ -35,8 +35,7 @@ class RecordingStatusHelperTest: public ContextBasedTest
 public:
     RecordingStatusHelperTest()
     {
-        m_camera = createCamera();
-        m_camera->addToSystemContext(appContext()->currentSystemContext());
+        m_camera = addCamera();
         m_camera->setStatus(api::ResourceStatus::recording);
 
         m_recordingStatusHelper.setCamera(m_camera);
@@ -60,17 +59,19 @@ public:
         ASSERT_EQ(m_recordingStatusHelper.qmlIconName(), path);
     }
 
-    void whenRecordingEnabled()
+    void thenRecordingEnabledIs(bool value)
     {
-        api::CameraAttributesData attributes;
-        attributes.scheduleEnabled = true;
-        m_camera->setUserAttributesAndNotify(attributes);
+        ASSERT_EQ(m_recordingStatusHelper.recordingEnabled(), value);
     }
+
+    void whenRecordingEnabled() { m_camera->setScheduleEnabled(true); }
 
     void whenStorageDisabled()
     {
         m_camera->setStatus(api::ResourceStatus::online);
     }
+
+    void whenRecordingDisabled() { m_camera->setScheduleEnabled(false); }
 
     void whenRecordingTodayIs(nx::vms::api::RecordingType recordingType)
     {
@@ -106,6 +107,7 @@ TEST_F(RecordingStatusHelperTest, noIcon)
 {
     thenIconIs(QIcon());
     thenIconPathIs(QString());
+    thenRecordingEnabledIs(false);
 }
 
 TEST_F(RecordingStatusHelperTest, recordingIconNotEnabled)
@@ -121,6 +123,7 @@ TEST_F(RecordingStatusHelperTest, recordingIcon)
     givenRecordingIsSet(nx::vms::api::RecordingType::always);
     thenIconIs(qnSkin->icon(kRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_on.svg"));
+    thenRecordingEnabledIs(true);
 }
 
 TEST_F(RecordingStatusHelperTest, storageDisabled)
@@ -156,6 +159,7 @@ TEST_F(RecordingStatusHelperTest, recordingScheduled)
     whenStorageDisabled(); //< If never, status should be online.
     thenIconIs(qnSkin->icon(kNotRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_part.svg"));
+    thenRecordingEnabledIs(true);
 }
 
 TEST_F(RecordingStatusHelperTest, archiveIcon)
@@ -164,6 +168,7 @@ TEST_F(RecordingStatusHelperTest, archiveIcon)
     givenRecordingIsSet(nx::vms::api::RecordingType::never);
     thenIconIs(qnSkin->icon(kArchiveIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/archive.svg"));
+    thenRecordingEnabledIs(false);
 }
 
 TEST_F(RecordingStatusHelperTest, archiveIconAndRecording)
@@ -185,6 +190,25 @@ TEST_F(RecordingStatusHelperTest, archiveIconAndScheduled)
     whenStorageDisabled(); //< If never, status should be online.
     thenIconIs(qnSkin->icon(kNotRecordingIcon));
     thenIconPathIs(QString("image://skin/20x20/Solid/record_part.svg"));
+}
+
+TEST_F(RecordingStatusHelperTest, archiveAppearanceUpdatesIcon)
+{
+    givenRecordingIsSet(nx::vms::api::RecordingType::never);
+    thenIconIs(QIcon());
+    givenArchiveExists();
+    thenIconIs(qnSkin->icon(kArchiveIcon));
+    thenIconPathIs(QString("image://skin/20x20/Solid/archive.svg"));
+}
+
+TEST_F(RecordingStatusHelperTest, scheduleDisablingUpdatesIcon)
+{
+    whenRecordingEnabled();
+    givenRecordingIsSet(nx::vms::api::RecordingType::always);
+    thenIconIs(qnSkin->icon(kRecordingIcon));
+    whenRecordingDisabled();
+    thenIconIs(QIcon());
+    thenIconPathIs(QString());
 }
 
 } // namespace test

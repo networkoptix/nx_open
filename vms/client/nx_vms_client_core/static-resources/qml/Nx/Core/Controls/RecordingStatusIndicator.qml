@@ -23,7 +23,9 @@ ColoredImage
         ? statusHelper.qmlSmallIconName
         : statusHelper.qmlIconName
 
-    primaryColor: ColorTheme.colors.red
+    primaryColor: statusHelper.recordingEnabled
+        ? ColorTheme.colors.red_l
+        : ColorTheme.colors.dark17
 
     RecordingStatusHelper
     {

@@ -151,6 +151,10 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
             &QnVirtualCameraResource::scheduleTasksChanged,
             this,
             &RecordingStatusHelper::updateRecordingMode);
+        m_connections << connect(m_camera.data(),
+            &QnVirtualCameraResource::scheduleEnabledChanged,
+            this,
+            &RecordingStatusHelper::updateRecordingMode);
 
         if (auto systemContext = SystemContext::fromResource(m_camera); NX_ASSERT(systemContext))
         {
@@ -159,6 +163,14 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
                 &ServerTimeWatcher::timeZoneChanged,
                 this,
                 &RecordingStatusHelper::updateRecordingMode);
+            m_connections << connect(systemContext->cameraHistoryPool(),
+                &QnCameraHistoryPool::cameraFootageChanged,
+                this,
+                [this](const QnVirtualCameraResourcePtr& changedCamera)
+                {
+                    if (changedCamera == m_camera)
+                        updateRecordingMode();
+                });
         }
     }
 
@@ -189,6 +201,12 @@ QString RecordingStatusHelper::qmlSmallIconName() const
 QIcon RecordingStatusHelper::smallIcon() const
 {
     return smallIcon(m_recordingStatus, m_metadataTypes);
+}
+
+bool RecordingStatusHelper::recordingEnabled() const
+{
+    return m_recordingStatus != RecordingStatus::noRecordingOnlyArchive
+        && m_recordingStatus != RecordingStatus::noRecordingNoArchive;
 }
 
 QSize RecordingStatusHelper::smallIconSize() const
