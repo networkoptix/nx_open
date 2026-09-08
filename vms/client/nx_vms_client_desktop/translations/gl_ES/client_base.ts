@@ -1553,12 +1553,12 @@ Clave de licenza: %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Non se pode conectar co servidor %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>O servidor %1 non pode conectarse a %2. Asegúrate de que o enderezo sexa correcto e que o sitio de destino estea en liña e sexa accesible dende %1.</translation>
     </message>
   </context>
   <context>

@@ -1553,12 +1553,12 @@ License Key: %2</source>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Δεν είναι δυνατή η σύνδεση με τον διακομιστή %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Ο διακομιστής %1 δεν μπορεί να συνδεθεί στον %2. Βεβαιωθείτε ότι η διεύθυνση είναι σωστή και ότι ο τοποθεσία-στόχος είναι συνδεδεμένη στο διαδίκτυο και προσβάσιμη από %1.</translation>
     </message>
   </context>
   <context>
