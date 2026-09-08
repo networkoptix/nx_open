@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
-    <name>ActionButtonsHint</name>
-    <message>
-        <source>Disabled by schedule</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>ActionSheet</name>
     <message>
         <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
         <source>Password field cannot be empty</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-        <source>No motion data for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No motion found in the selected area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No motion found in the visible area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No Archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LIVE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-        <source>Area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Objects</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tap and hold to select an area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable motion search first to select an area</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid custom area. Please draw a correct one.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -729,17 +668,6 @@
     <message>
         <source>Tap anywhere on video to center view there</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-        <source>Tap on the image to position your camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>CANCEL</source>
-        <translation></translation>
     </message>
 </context>
 <context>
