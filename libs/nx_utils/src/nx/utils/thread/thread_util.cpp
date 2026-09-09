@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/log/log.h>
+
 #if _WIN32
     #include <Windows.h>
 #else
@@ -41,15 +43,31 @@ namespace nx::utils {
 void setCurrentThreadName(std::string name)
 {
     #if defined(_WIN32)
-    using SetThreadDescription = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
-    HMODULE handle = GetModuleHandleA("kernel32.dll");
-    if (handle == NULL)
-        return;
-
-    if (const auto setThreadDescription = reinterpret_cast<SetThreadDescription>(
-        reinterpret_cast<void*>(GetProcAddress(handle, "SetThreadDescription"))))
+    using SetThreadDescriptionFunction = std::add_pointer_t<HRESULT WINAPI(HANDLE, PCWSTR)>;
+    const auto resolveSetThreadDescription =
+        [](const char* moduleName) -> SetThreadDescriptionFunction
     {
-        setThreadDescription(GetCurrentThread(), qUtf16Printable(QString::fromStdString(name)));
+        const HMODULE handle = GetModuleHandleA(moduleName);
+        if (handle == NULL)
+            return nullptr;
+
+        return reinterpret_cast<SetThreadDescriptionFunction>(
+            reinterpret_cast<void*>(GetProcAddress(handle, "SetThreadDescription")));
+    };
+
+    auto setThreadDescription = resolveSetThreadDescription("kernel32.dll");
+    if (!setThreadDescription)
+    {
+        // Windows 10 1607 and Windows Server 2016 export this function only from KernelBase.dll.
+        setThreadDescription = resolveSetThreadDescription("KernelBase.dll");
+    }
+
+    if (setThreadDescription)
+    {
+        const HRESULT result = setThreadDescription(
+            GetCurrentThread(), qUtf16Printable(QString::fromStdString(name)));
+        if (FAILED(result))
+            NX_DEBUG(NX_SCOPE_TAG, "SetThreadDescription failed with HRESULT %1", result);
     }
     #elif defined(__APPLE__)
         pthread_setname_np(name.c_str());
