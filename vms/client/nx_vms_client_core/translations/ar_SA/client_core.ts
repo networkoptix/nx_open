@@ -54,7 +54,7 @@
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>أعد الاتصال بـ %1 وحاول مرة أخرى</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -309,7 +309,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>الموقع</translation>
     </message>
     <message>
       <source>Site (%1)</source>
@@ -397,7 +397,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>المواقع</translation>
     </message>
     <message>
       <source>Partners</source>
