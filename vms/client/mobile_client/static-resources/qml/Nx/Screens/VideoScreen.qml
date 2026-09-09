@@ -1361,6 +1361,11 @@ Page
     {
         id: calendarPanel
 
+        parent: mainWindow.contentItem
+        leftMargin: LayoutController.isCompact || LayoutController.isHorizontalCompact
+            ? 0
+            : StyleHints.navigationBarSize
+
         horizontal: true
         position: timeline.startTimeMs
         timeZone: controller.resourceHelper.timeZone

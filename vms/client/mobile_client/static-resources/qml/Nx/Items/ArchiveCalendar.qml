@@ -211,8 +211,8 @@ Pane
             id: calendarMonth
 
             position: control.position
-            width: d.ui.monthsList.width
-            height: d.ui.monthsList.height
+            width: d.ui?.monthsList.width ?? 0
+            height: d.ui?.monthsList.height ?? 0
             year: model.year
             month: model.month
             onPicked: position => control.picked(position)
