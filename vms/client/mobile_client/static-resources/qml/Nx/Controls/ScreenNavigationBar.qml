@@ -16,15 +16,14 @@ Rectangle
     id: control
 
     color: ColorTheme.colors.dark4
-    implicitHeight: d.kBarSize
-    implicitWidth: d.kBarSize
+    implicitHeight: StyleHints.navigationBarSize
+    implicitWidth: StyleHints.navigationBarSize
 
     QtObject
     {
         id: d
 
-        readonly property real kBarSize: 72
-        readonly property size buttonSize: Qt.size(kBarSize, kBarSize)
+        readonly property size buttonSize: Qt.size(StyleHints.navigationBarSize, StyleHints.navigationBarSize)
         readonly property bool hasObjectsOrBookmarkPermissions:
         {
             if (!windowContext.mainSystemContext)

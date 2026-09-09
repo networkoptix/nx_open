@@ -40,4 +40,7 @@ QtObject
 
     // Preferred preview height.
     readonly property int previewHeight: 270
+
+    // Navigation bar height or width depending on the location.
+    readonly property int navigationBarSize: 72
 }
