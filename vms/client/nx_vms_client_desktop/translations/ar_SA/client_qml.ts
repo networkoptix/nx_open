@@ -547,7 +547,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>معلق</translation>
     </message>
     <message>
       <source>Suspended</source>
@@ -1088,7 +1088,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>مجموعات الصلاحيات</translation>
     </message>
   </context>
   <context>
@@ -1146,7 +1146,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>مجموعات الصلاحيات</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
@@ -1394,7 +1394,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>السابق</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1958,7 +1958,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>كلمة مرور جديدة</translation>
     </message>
     <message>
       <source>Confirm password</source>
@@ -2034,7 +2034,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
   </context>
   <context>
@@ -2513,7 +2513,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
   </context>
   <context>
@@ -2809,7 +2809,7 @@ Press Alt + Click to follow object</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>لاشيء موجود</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
@@ -2972,7 +2972,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>مجموعات الصلاحيات</translation>
     </message>
     <message>
       <source>Access</source>
@@ -3082,7 +3082,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>مجموعات الصلاحيات</translation>
     </message>
     <message>
       <source>Access expires</source>

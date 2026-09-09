@@ -1890,7 +1890,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>جارٍ النقل...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
@@ -1975,7 +1975,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>الهواتف</translation>
     </message>
     <message>
       <source>Emails</source>
@@ -4493,7 +4493,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>كلمة المرور مطلوبة</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
@@ -4521,7 +4521,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>لا يوجد بث مباشر</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -4858,7 +4858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>مسار</translation>
     </message>
     <message>
       <source>Type</source>
@@ -5547,7 +5547,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>جارٍ النقل...</translation>
     </message>
     <message>
       <source>Focusing...</source>
@@ -7115,7 +7115,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>تم تعطيل خاصية كشف الحركة</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -7147,7 +7147,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>غير مدعُوم</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
@@ -8792,7 +8792,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
   </context>
   <context>
@@ -9974,7 +9974,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>دمج المواقع...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
@@ -10665,7 +10665,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>غير مدعُوم</translation>
     </message>
   </context>
   <context>
@@ -11709,7 +11709,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>الرسالة</translation>
     </message>
     <message>
       <source>Store Update Files</source>
@@ -12975,7 +12975,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -13072,7 +13072,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>مواقع أخرى</translation>
     </message>
   </context>
   <context>
@@ -13183,7 +13183,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>متعدد</translation>
     </message>
   </context>
   <context>
@@ -13298,7 +13298,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>Regions of Interest</source>

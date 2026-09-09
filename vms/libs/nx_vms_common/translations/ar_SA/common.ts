@@ -1928,7 +1928,7 @@
     </message>
     <message>
       <source>Send plain-text emails.</source>
-      <translation type="unfinished">Send plain-text emails.</translation>
+      <translation>أرسل رسائل بريد إلكتروني بنص عادي.</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
@@ -2016,7 +2016,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation type="unfinished">RTP timeout (milliseconds).</translation>
+      <translation>مهلة بروتوكول النقل في الوقت الحقيقيٌ RTP (بالمللي ثانية).</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>

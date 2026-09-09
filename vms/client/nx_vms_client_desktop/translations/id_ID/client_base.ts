@@ -1539,12 +1539,12 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Tidak dapat terkoneksi ke Server %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Server %1 tidak dapat terkoneksi ke %2. Pastikan alamatnya benar dan Site target sedang online dan dapat dijangkau dari %1.</translation>
     </message>
   </context>
   <context>
