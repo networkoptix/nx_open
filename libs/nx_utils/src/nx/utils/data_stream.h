@@ -8,8 +8,7 @@
 
 namespace nx::utils {
 
-class NX_UTILS_API DataStream:
-    public QDataStream
+class DataStream: public QDataStream
 {
     using base_type = QDataStream;
 
@@ -20,7 +19,9 @@ public:
      * Creates a read-only data stream that reads from buf.
      * NOTE: The contents of buf are not copied.
      */
-    DataStream(std::string_view buf);
+    // Exported per-member rather than on the class: dllexport of the class force-emits the
+    // inherited QDataStream constructors, which crashes clang-cl 23 in codegen.
+    NX_UTILS_API DataStream(std::string_view buf);
 };
 
 } // namespace nx::utils

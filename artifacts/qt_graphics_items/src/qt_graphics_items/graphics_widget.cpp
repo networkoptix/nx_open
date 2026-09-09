@@ -220,13 +220,13 @@ void GraphicsWidget::setHandlingFlags(HandlingFlags handlingFlags) {
 
     if(d->handlingFlags == handlingFlags)
         return;
-    handlingFlags = static_cast<HandlingFlags>(itemChange(ItemHandlingFlagsChange, static_cast<quint32>(handlingFlags)).toUInt());
+    handlingFlags = static_cast<HandlingFlags>(itemChange(static_cast<GraphicsItemChange>(ItemHandlingFlagsChange), static_cast<quint32>(handlingFlags)).toUInt());
     if(d->handlingFlags == handlingFlags)
         return;
 
     d->handlingFlags = handlingFlags;
 
-    itemChange(ItemHandlingFlagsHaveChanged, static_cast<quint32>(handlingFlags));
+    itemChange(static_cast<GraphicsItemChange>(ItemHandlingFlagsHaveChanged), static_cast<quint32>(handlingFlags));
 }
 
 void GraphicsWidget::setHandlingFlag(HandlingFlag flag, bool value) {

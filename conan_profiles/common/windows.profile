@@ -21,4 +21,4 @@ qt/*:psql=True
 [tool_requires]
 opencv-static/*:cuda-toolkit/12.8.1
 openssl/*:strawberryperl/5.30.0.1,nasm/2.16.01
-qt*:patch-windows/0.1,strawberryperl/5.30.0.1,clang/20.1.2,ninja/1.12.1
+qt*:patch-windows/0.1,strawberryperl/5.30.0.1,clang/23.1.0,ninja/1.12.1

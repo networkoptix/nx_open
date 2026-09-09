@@ -89,9 +89,11 @@ public:
         BottomRight
     };
 
-    /* Note that it is important for these values to fit into unsigned char as sizeof(GraphicsItemChange) may equal 1. */
-    static const GraphicsItemChange ItemHandlingFlagsChange = static_cast<GraphicsItemChange>(0x80u);
-    static const GraphicsItemChange ItemHandlingFlagsHaveChanged = static_cast<GraphicsItemChange>(0x81u);
+    /* Private extensions to GraphicsItemChange, must not collide with its enumerators. Being
+     * outside the enum's value range, they cannot be cast to it in a constant expression, so the
+     * call sites cast instead. */
+    static constexpr unsigned char ItemHandlingFlagsChange = 0x80u;
+    static constexpr unsigned char ItemHandlingFlagsHaveChanged = 0x81u;
 
     /* Get basic syntax highlighting. */
 #define ItemHandlingFlagsChange ItemHandlingFlagsChange

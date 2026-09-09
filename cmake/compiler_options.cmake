@@ -88,6 +88,10 @@ if(compilerClangCl)
     # moc-generated files. Eventually these issues are to be resolved, so define will help us to
     # find all such workarounds quickly.
     add_definitions(-DNX_CLANG_CL)
+
+    # clang 23 flags char8_t->char32_t in googletest's gtest-printers.h; only triggers with the
+    # MSVC STL, so restrict to clang-cl.
+    add_compile_options(-Wno-character-conversion)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT MSVC)
@@ -495,6 +499,7 @@ if(NOT compilerMsvc)
             -Wno-undefined-var-template #< Avoid multiple warnings with Singleton implementation.
             -Wno-c++14-extensions
             -Wno-inconsistent-missing-override
+            -Wno-unused-template #< clang 23 flags the static template-helper-in-header idiom.
             -Werror=mismatched-tags
             # TODO: #tszelei Replace with -Wno-missing-designated-field-initializers when that flag
             # becomes available. See: VMS-55191.
