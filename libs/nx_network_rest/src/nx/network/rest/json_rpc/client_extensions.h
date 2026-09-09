@@ -20,12 +20,16 @@ struct SubscriptionExtensions: ClientExtensions
     std::optional<std::chrono::milliseconds> updateMs;
 
     /**%apidoc[opt]
-     * If `true`, each subscription notification is sent as a request and the next notification is
-     * sent only after the response to the previous one is received.
+     * Flow control for subscription notifications: at most this many may be unacknowledged in
+     * flight. Every ackWindow-th notification is sent as a request; acknowledging it releases the
+     * window for the next ackWindow. The notifications in between carry no id and need no
+     * acknowledgement, and a run shorter than ackWindow carries no request. `0` (the default)
+     * disables gating; `1` delivers one notification at a time.
+     * %example 1
      */
-    bool sequentialSub = false;
+    int ackWindow = 0;
 };
-NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs)(sequentialSub))
+NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs)(ackWindow))
 
 template<typename T, typename Extensions = ClientExtensions>
 struct Payload

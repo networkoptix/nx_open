@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <nx/json_rpc/messages.h>
 #include <nx/reflect/json.h>
 #include <nx/reflect/merge.h>
@@ -62,7 +64,8 @@ struct Context
     // Next fields are filled by Request constructor.
     std::optional<Crud> crud;
     std::optional<Subs> subs;
-    bool sequentialSub = false;
+    int ackWindow = 0;
+    std::optional<std::chrono::milliseconds> updateMs;
 };
 
 } // namespace json_rpc
