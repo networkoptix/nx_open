@@ -756,7 +756,7 @@
     <name>CloudManagementWidget</name>
     <message>
       <source>No connection</source>
-      <translation type="unfinished">No connection</translation>
+      <translation>لا يوجد اتصال</translation>
     </message>
     <message>
       <source>This site is connected to</source>
@@ -1305,7 +1305,7 @@
     </message>
     <message>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>الحد الأدنى لحجم الشبكة</translation>
     </message>
   </context>
   <context>
@@ -2131,7 +2131,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>

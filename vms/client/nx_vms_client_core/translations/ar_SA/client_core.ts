@@ -389,7 +389,7 @@
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>المؤسسات</translation>
     </message>
     <message>
       <source>Folders</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>الشركاء</translation>
     </message>
   </context>
   <context>
