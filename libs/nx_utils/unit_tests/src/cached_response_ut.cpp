@@ -42,6 +42,13 @@ private:
 const std::chrono::milliseconds kProtectiveShift{ 1 };
 const nx::CachedResponseTimeouts kDefaultTimeouts;
 
+using Clock = std::chrono::steady_clock;
+
+std::chrono::milliseconds elapsedSince(Clock::time_point start)
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now() - start);
+}
+
 struct TrackedValue
 {
     static int s_copies;
@@ -429,7 +436,7 @@ TEST(ParameterizedCachedResponse, Concurrency)
         Request{ delay },
         keyGenerator);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    const auto start = Clock::now();
 
     std::array<std::thread, 32> threads;
     for (int i = 0; i < (int)threads.size(); ++i)
@@ -451,14 +458,58 @@ TEST(ParameterizedCachedResponse, Concurrency)
     for (auto& t: threads)
         t.join();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    const auto duration = elapsedSince(start);
 
     // Verify that long-running computation functions with different parameters can execute in parallel.
     const std::chrono::milliseconds maxDuration{
         static_cast<std::chrono::milliseconds::rep>(2.5 * delay.count())};
     ASSERT_TRUE(duration < maxDuration)
         << "duration " << duration.count() << "ms exceeded limit " << maxDuration.count() << "ms";
+}
+
+TEST(ParameterizedCachedResponse, InvalidateAllDoesNotWaitForOngoingUpdate)
+{
+    const auto delay = std::chrono::milliseconds(500);
+    const auto protectiveDelay = std::chrono::milliseconds(50);
+
+    ParameterizedCachedResponse<int, std::optional<int>(int)> response(
+        [delay](int param) -> std::optional<int>
+        {
+            if (param == 0)
+                std::this_thread::sleep_for(delay);
+            return param;
+        },
+        [](int param) { return param; });
+
+    std::thread slowUpdate([&response]() { EXPECT_TRUE(response(0)); });
+    std::this_thread::sleep_for(protectiveDelay);
+
+    std::chrono::milliseconds invalidationDuration{};
+    std::thread invalidator(
+        [&]()
+        {
+            const auto start = Clock::now();
+            response.invalidate();
+            invalidationDuration = elapsedSince(start);
+        });
+    std::this_thread::sleep_for(protectiveDelay);
+
+    const auto start = Clock::now();
+    EXPECT_TRUE(response(1));
+    const auto unrelatedKeyDuration = elapsedSince(start);
+
+    slowUpdate.join();
+    invalidator.join();
+
+    // Verify that invalidation neither waits for an ongoing update nor blocks unrelated keys.
+    const std::chrono::milliseconds maxDuration{
+        static_cast<std::chrono::milliseconds::rep>(0.5 * delay.count())};
+    EXPECT_LT(invalidationDuration, maxDuration)
+        << "invalidation " << invalidationDuration.count() << "ms exceeded limit "
+        << maxDuration.count() << "ms";
+    EXPECT_LT(unrelatedKeyDuration, maxDuration)
+        << "unrelated key " << unrelatedKeyDuration.count() << "ms exceeded limit "
+        << maxDuration.count() << "ms";
 }
 
 TEST(CachedResponse, CheckCopyCount)

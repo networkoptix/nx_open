@@ -124,19 +124,13 @@ public:
     CachedValue operator()(CallArgs&&... args)
     {
         auto cache = tryEmplace(std::invoke(m_keyGenerator, args...));
-
-        // Mutex is used only for search and adding elements to map. Here it->second can be called
-        // without lock because we never delete any element from map.
-        // Adding some methods that delete elements will lead to necessity to use lock here
-        // and it could decrease performance and reduce benefits of using shared context.
         return (*cache)(std::forward<CallArgs>(args)...);
     }
 
     void invalidate()
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        for ([[maybe_unused]] auto& [_, val]: m_values)
-            val->invalidate();
+        m_values.clear();
     }
 
     template<typename... CallArgs>
@@ -144,9 +138,9 @@ public:
     void invalidate(CallArgs&&... args)
     {
         auto key = std::invoke(m_keyGenerator, std::forward<CallArgs>(args)...);
+
         NX_MUTEX_LOCKER lock(&m_mutex);
-        if (auto it = m_values.find(key); it != m_values.end())
-            return it->second->invalidate();
+        m_values.erase(key);
     }
 
 private:
