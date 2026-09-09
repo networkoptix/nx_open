@@ -69,7 +69,10 @@ static std::tuple<http::Method, QString> methodAndPath(json_rpc::Context* contex
             {
                 json_rpc::SubscriptionExtensions extensions;
                 if (nx::reflect::json::deserialize({*context->request.extensions}, &extensions))
-                    context->sequentialSub = extensions.sequentialSub;
+                {
+                    context->ackWindow = extensions.ackWindow;
+                    context->updateMs = extensions.updateMs;
+                }
             }
             method.remove_suffix(tail.size());
             break;

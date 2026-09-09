@@ -26,7 +26,8 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
                     NX_FMT("Connection closed with error %1: %2", error, SystemError::toString(error))
                         .toStdString());
         };
-    for (const auto& [id, handler]: m_awaitingResponses)
+    auto awaiting = std::exchange(m_awaitingResponses, {});
+    for (const auto& [id, handler]: awaiting)
     {
         NX_DEBUG(this, "Terminating response with %1 id", id);
         if (!handler)
@@ -34,8 +35,8 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
 
         handler(response(id));
     }
-    m_awaitingResponses.clear();
-    for (auto& [key, batchResponse]: m_awaitingBatchResponseHolder)
+    auto awaitingBatch = std::exchange(m_awaitingBatchResponseHolder, {});
+    for (auto& [key, batchResponse]: awaitingBatch)
     {
         NX_DEBUG(this, "Terminating batch response %1 with %2 ids", key, batchResponse.ids);
         if (!batchResponse.handler)
@@ -49,7 +50,6 @@ void OutgoingProcessor::clear(SystemError::ErrorCode error)
             std::make_move_iterator(batchResponse.errors.end()));
         batchResponse.handler(std::move(responses));
     }
-    m_awaitingBatchResponseHolder.clear();
 }
 
 void OutgoingProcessor::processRequest(

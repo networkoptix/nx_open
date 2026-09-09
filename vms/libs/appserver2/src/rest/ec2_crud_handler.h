@@ -225,7 +225,7 @@ public:
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
         auto etag = calculateCollectionEtag(&list, request, &responseAttributes);
-        if (const auto& context = request.jsonRpcContext(); context && context->sequentialSub)
+        if (const auto& context = request.jsonRpcContext(); context && context->ackWindow > 0)
         {
             nx::network::http::insertOrReplaceHeader(
                 &responseAttributes.httpHeaders, {"ETag", nx::utils::toBase64Url(etag)});
@@ -315,7 +315,7 @@ protected:
         }
         Hash etags{std::move(data)};
         auto result = etags.combinedHash();
-        if (const auto& context = request.jsonRpcContext(); context && context->sequentialSub)
+        if (const auto& context = request.jsonRpcContext(); context && context->ackWindow > 0)
         {
             const bool render = !matchesRequestEtag(request, Hash::Check::list, result);
             auto postProcess = render ? makePostProcessContext(request) : PostProcessContext{};
