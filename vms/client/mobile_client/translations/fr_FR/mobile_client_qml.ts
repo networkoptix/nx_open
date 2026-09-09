@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr_FR" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Désactivé par l'horaire</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Le champ mot de passe ne peut pas être vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Aucune donnée de mouvement pour cette caméra</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Aucun mouvement trouvé dans la zone sélectionnée</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Aucun mouvement trouvé dans la zone visible</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Aucune Archive</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>DIRECT</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Zone</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Paramètres Caméra</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Signets</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objets</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Appuyez et maintenez enfoncé pour sélectionner une zone</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Activez d'abord la recherche de mouvement pour sélectionner une zone</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Zone personnalisée invalide. Veuillez dessiner une zone correcte.</translation>
     </message>
   </context>
   <context>
@@ -732,17 +671,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Appuyez sur l’image pour positionner votre caméra</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ANNULER</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -788,6 +716,10 @@
     <message>
       <source>Select what to download</source>
       <translation type="unfinished">Select what to download</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>

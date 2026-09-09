@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="el_GR" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Απενεργοποιήθηκε από το χρονοδιάγραμμα</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Το πεδίο κωδικού πρόσβασης δεν μπορεί να είναι κενό</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Δεν υπάρχουν δεδομένα κίνησης για αυτήν την κάμερα</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Δεν βρέθηκε κίνηση στην επιλεγμένη περιοχή</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Δεν βρέθηκε κίνηση στην ορατή περιοχή</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Χωρίς Αρχειοθέτηση</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>ΖΩΝΤΑΝΑ</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Περιοχή</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Ρυθμίσεις Κάμερας</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Σελιδοδείκτες</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Αντικείμενα</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Πατήστε παρατεταμένα για να επιλέξετε μια περιοχή</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Ενεργοποιήστε πρώτα την αναζήτηση κίνησης για να επιλέξετε μια περιοχή</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Μη έγκυρη προσαρμοσμένη περιοχή. Παρακαλώ σχεδιάστε μια σωστή.</translation>
     </message>
   </context>
   <context>
@@ -732,17 +671,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Πατήστε στην εικόνα για να τοποθετήσετε την κάμερά σας</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>ΑΚΥΡΩΣΗ</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -788,6 +716,10 @@
     <message>
       <source>Select what to download</source>
       <translation>Επιλέξτε τι θα κατεβάσετε</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>

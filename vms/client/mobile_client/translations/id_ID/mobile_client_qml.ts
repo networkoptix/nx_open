@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="id_ID" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Dinonaktifkan berdasarkan jadwal</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -115,7 +108,7 @@
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Balikkan timeline untuk penggunaan tangan kiri. Hanya berlaku untuk layar seukuran ponsel.</translation>
     </message>
   </context>
   <context>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Bidang kata sandi tidak boleh kosong</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Tidak ada data gerakan untuk kamera ini</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Tidak ada gerakan yang ditemukan di area yang dipilih</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Tidak ditemukan gerakan pada area yang terlihat</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Tidak Ada Archive</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>LIVE</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Area</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Pengaturan Kamera</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Bookmark</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Objek</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Tap dan tahan untuk memilih area</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Aktifkan pencarian gerak terlebih dahulu untuk memilih area</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Area kustom tidak valid. Tolong gambarkan yang benar.</translation>
     </message>
   </context>
   <context>
@@ -731,17 +670,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Tap gambar untuk memposisikan kamera Anda</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>BATAL</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -787,6 +715,10 @@
     <message>
       <source>Select what to download</source>
       <translation>Pilih apa yang ingin didownload</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>
@@ -1525,7 +1457,7 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>Oke, saya mengerti</translation>
     </message>
   </context>
   <context>

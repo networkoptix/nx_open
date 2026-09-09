@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk_UA" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Відключено за розкладом</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation type="unfinished">Password field cannot be empty</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Немає даних руху для цієї камери</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>У вибраній області не виявлено жодного руху</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>У видимій області не виявлено жодного руху</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Немає архіву</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>ОН-ЛАЙН</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Площа</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Налаштування камери</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Закладки</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Об'єкти</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Натисніть і утримуйте, щоб вибрати область</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Увімкніть спочатку пошук руху, щоб вибрати область</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Неприпустима обрана область. Будь ласка, намалюйте правильну.</translation>
     </message>
   </context>
   <context>
@@ -734,17 +673,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Натисніть на зображення для розміщення камери</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>СКАСУВАТИ</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -790,6 +718,10 @@
     <message>
       <source>Select what to download</source>
       <translation type="unfinished">Select what to download</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>

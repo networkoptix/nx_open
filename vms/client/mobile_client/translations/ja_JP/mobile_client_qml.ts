@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja_JP" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>スケジュールにより無効</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>パスワード欄に入力してください</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>このカメラのモーションデータはありません</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>指定領域内にモーションは検出されませんでした</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>表示領域内にモーションは検出されませんでした</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>アーカイブなし</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>ライブ</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>エリア</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>カメラ設定</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>ブックマーク</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>オブジェクト</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>タップ &amp; ホールドで領域選択</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>モーション検索を有効にしてから領域を選択してください</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>カスタムエリアが無効です。正しく指定してください。</translation>
     </message>
   </context>
   <context>
@@ -731,17 +670,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>画像をタップしてカメラの位置を指定してください</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>キャンセル</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -787,6 +715,10 @@
     <message>
       <source>Select what to download</source>
       <translation>ダウンロードする項目を選択してください</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>

@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi_VN" sourcelanguage="en">
   <context>
-    <name>ActionButtonsHint</name>
-    <message>
-      <source>Disabled by schedule</source>
-      <translation>Tắt theo lịch trình</translation>
-    </message>
-  </context>
-  <context>
     <name>ActionSheet</name>
     <message>
       <source>Actions</source>
@@ -237,60 +230,6 @@
     <message>
       <source>Password field cannot be empty</source>
       <translation>Mật khẩu không được để trống</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoNavigation</name>
-    <message>
-      <source>No motion data for this camera</source>
-      <translation>Không có dữ liệu chuyển động cho camera này</translation>
-    </message>
-    <message>
-      <source>No motion found in the selected area</source>
-      <translation>Không tìm thấy chuyển động trong khu vực được chọn</translation>
-    </message>
-    <message>
-      <source>No motion found in the visible area</source>
-      <translation>Không tìm thấy chuyển động nào trong vùng nhìn thấy được</translation>
-    </message>
-    <message>
-      <source>No Archive</source>
-      <translation>Không Lưu Trữ</translation>
-    </message>
-    <message>
-      <source>LIVE</source>
-      <translation>Trực tiếp</translation>
-    </message>
-  </context>
-  <context>
-    <name>DeprecatedVideoScreen</name>
-    <message>
-      <source>Area</source>
-      <translation>Khu vực</translation>
-    </message>
-    <message>
-      <source>Camera Settings</source>
-      <translation>Cài đặt Camera</translation>
-    </message>
-    <message>
-      <source>Bookmarks</source>
-      <translation>Dấu trang</translation>
-    </message>
-    <message>
-      <source>Objects</source>
-      <translation>Đối tượng</translation>
-    </message>
-    <message>
-      <source>Tap and hold to select an area</source>
-      <translation>Nhấn và giữ để chọn một khu vực</translation>
-    </message>
-    <message>
-      <source>Enable motion search first to select an area</source>
-      <translation>Trước tiên hãy bật tìm kiếm chuyển động để chọn khu vực</translation>
-    </message>
-    <message>
-      <source>Invalid custom area. Please draw a correct one.</source>
-      <translation>Khu vực tùy chỉnh không hợp lệ. Vui lòng vẽ lại.</translation>
     </message>
   </context>
   <context>
@@ -731,17 +670,6 @@
     </message>
   </context>
   <context>
-    <name>MoveOnTapOverlay</name>
-    <message>
-      <source>Tap on the image to position your camera</source>
-      <translation>Chạm vào hình ảnh để định vị camera của bạn</translation>
-    </message>
-    <message>
-      <source>CANCEL</source>
-      <translation>HỦY BỎ</translation>
-    </message>
-  </context>
-  <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
@@ -787,6 +715,10 @@
     <message>
       <source>Select what to download</source>
       <translation type="unfinished">Select what to download</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>

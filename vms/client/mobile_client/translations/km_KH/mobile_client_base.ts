@@ -46,13 +46,6 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::PtzCameraButtonController</name>
-    <message>
-      <source>Control PTZ</source>
-      <translation type="unfinished">Control PTZ</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::mobile::PushNotificationManager</name>
     <message>
       <source>Cannot enable push notifications</source>
