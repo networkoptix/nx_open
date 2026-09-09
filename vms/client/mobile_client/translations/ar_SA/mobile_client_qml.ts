@@ -362,14 +362,14 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
   </context>
   <context>
     <name>EventSearchScreen</name>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -721,6 +721,10 @@
       <source>Select what to download</source>
       <translation type="unfinished">Select what to download</translation>
     </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
+    </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>
@@ -741,7 +745,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -994,7 +998,7 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>لاشيء موجود</translation>
     </message>
   </context>
   <context>
@@ -1132,7 +1136,7 @@
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>المؤسسات</translation>
     </message>
     <message>
       <source>Sites</source>
@@ -1144,7 +1148,7 @@
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>لا توجد مؤسسات</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -1152,11 +1156,11 @@
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>الشركاء</translation>
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>لا توجد مواقع</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -1273,7 +1277,7 @@
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>غير منتهية صلاحيته</translation>
     </message>
     <message>
       <source>Shared link options</source>
@@ -1339,7 +1343,7 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>لاشيء موجود</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1577,7 +1581,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>العناصر</translation>
     </message>
     <message>
       <source>PTZ Mode</source>

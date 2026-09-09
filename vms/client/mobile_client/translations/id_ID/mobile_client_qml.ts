@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Balikkan timeline untuk penggunaan tangan kiri. Hanya berlaku untuk layar seukuran ponsel.</translation>
     </message>
   </context>
   <context>
@@ -715,6 +715,10 @@
     <message>
       <source>Select what to download</source>
       <translation>Pilih apa yang ingin didownload</translation>
+    </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
     </message>
   </context>
   <context>
@@ -1453,7 +1457,7 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>Oke, saya mengerti</translation>
     </message>
   </context>
   <context>

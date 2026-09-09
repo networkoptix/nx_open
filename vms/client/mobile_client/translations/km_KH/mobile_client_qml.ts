@@ -716,6 +716,10 @@
       <source>Select what to download</source>
       <translation type="unfinished">Select what to download</translation>
     </message>
+    <message>
+      <source>Edit sharing</source>
+      <translation type="unfinished">Edit sharing</translation>
+    </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>

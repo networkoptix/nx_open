@@ -1543,12 +1543,12 @@ Kunci Lisensi: %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Tidak dapat terkoneksi ke Server %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Server %1 tidak dapat terkoneksi ke %2. Pastikan alamatnya benar dan Site target sedang online dan dapat dijangkau dari %1.</translation>
     </message>
   </context>
   <context>
@@ -5108,7 +5108,7 @@ Jika Anda bermaksud memindahkan data analitik ke lokasi penyimpanan lain, harap 
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Dapatkan fitur eksklusif untuk intelijen video yang dapat ditindaklanjuti dan operasi berbasis data dalam skala besar</translation>
     </message>
   </context>
   <context>
