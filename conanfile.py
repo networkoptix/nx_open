@@ -196,11 +196,14 @@ class NxOpenConan(ConanFile):
 
         if self.isLinux or self.isWindows:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
-            if self.options.useClang or self.options.withClangFormat:
-                # clang-format (used by the pre-commit hook) ships as part of this package.
-                self.tool_requires("clang/23.1.0" "#09ad34259266cd76c5e95614e6b34b44")
             if self.options.useClang:
+                self.tool_requires("clang/23.1.0" "#09ad34259266cd76c5e95614e6b34b44")
                 self.tool_requires("ninja/1.12.1" "#3755ec3c6188d69458474b5353305265")
+            if self.options.withClangFormat:
+                # Standalone clang-format for the pre-commit hook / format check, kept separate
+                # from the large clang compiler package so it can be installed and versioned on
+                # its own.
+                self.tool_requires("clang-format/23.1.0" "#7432e9ac2a590346448a4225a2d28946")
             if self.isLinux:
                 self.tool_requires("sdk-gcc/9.5" "#54cc3c576f5d9f324caaf23152b4074e")
 
