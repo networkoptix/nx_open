@@ -415,14 +415,6 @@ if(IOS)
         TRANSLATIONS ${translation_files}
     )
 
-    #TODO: Assigning dependencies between generated targets does not look good. We need to find a
-    # better way to make Xcode generator happy.
-    # The issue happens when two targets depend on the same generated file. Xcode generator does
-    # not allow this unless these targets depend on each other. This workaround adds such
-    # dependencies.
-    add_dependencies(mobile_client_copy_assets mobile_client_external_resources)
-    add_dependencies(mobile_client_copy_translations mobile_client_translations)
-
     # Used by ios/extension.
     add_library(push_notification_storage STATIC
         src/nx/vms/client/mobile/push_notification/details/push_notification_storage.cpp)
@@ -456,12 +448,6 @@ if(IOS)
         COMMAND ${CMAKE_COMMAND}
             -E copy_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/fonts ${app_dir}/fonts
         COMMENT "Copying fonts"
-    )
-
-    add_custom_command(TARGET mobile_client PRE_LINK
-        COMMAND ${CMAKE_COMMAND}
-            -E copy ${common_assets} ${app_dir}
-        COMMENT "Copying common assets files"
     )
 
     add_custom_command(TARGET mobile_client
