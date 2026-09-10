@@ -99,34 +99,51 @@ void SessionManager::Private::startSession(
     connect(session.get(), &Session::restored,
         q, &SessionManager::sessionRestored);
 
-    connect(session.get(), &Session::userNameChanged, q,
-        [this](const QString& name)
+    // Used to make sure the signal came from the session which is still current, otherwise we
+    // would stop the new one.
+    const auto isCurrentSession = [this, weakSession = std::weak_ptr<Session>(session)]()
+    {
+        const auto current = weakSession.lock();
+        return current && current == session;
+    };
+
+    connect(
+        session.get(),
+        &Session::userNameChanged,
+        q,
+        [this, isCurrentSession](const QString& name)
         {
+            if (!isCurrentSession())
+                return;
+
             if (name.isEmpty() && q->hasSession())
             {
                 NX_DEBUG(this, "User name changed to empty, stopping session");
                 q->stopSessionByUser();
             }
-        }, Qt::QueuedConnection);
+        },
+        Qt::QueuedConnection);
 
-    connect(session.get(), &Session::expired, q,
-        [this]()
+    connect(
+        session.get(),
+        &Session::expired,
+        q,
+        [this, isCurrentSession]()
         {
-            if (!q->hasSession())
-            {
-                NX_DEBUG(this, "Session::expired ignored: session was already stopped");
+            if (!isCurrentSession())
                 return;
-            }
 
             q->stopSessionByUser();
 
-            const auto error = core::errorDescription(
-                core::RemoteConnectionErrorCode::sessionExpired,
-                /*moduleInformation*/ {}, /*engineVersion*/ {});
+            const auto error =
+                core::errorDescription(core::RemoteConnectionErrorCode::sessionExpired,
+                    /*moduleInformation*/ {},
+                    /*engineVersion*/ {});
 
             emit q->windowContext()->deprecatedUiController()->genericError(
                 error.shortText, error.longText);
-        }, Qt::QueuedConnection);
+        },
+        Qt::QueuedConnection);
 
     connect(session.get(), &Session::finishedWithError, this,
         [this](
