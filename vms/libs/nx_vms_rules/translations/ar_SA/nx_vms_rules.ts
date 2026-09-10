@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>الحالة</translation>
     </message>
     <message>
       <source>Volume</source>

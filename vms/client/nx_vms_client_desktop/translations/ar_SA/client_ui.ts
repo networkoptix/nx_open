@@ -251,7 +251,7 @@
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>مجدول</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
@@ -389,7 +389,7 @@
     </message>
     <message>
       <source>Stop Sharing</source>
-      <translation type="unfinished">Stop Sharing</translation>
+      <translation>إيقاف المشاركة</translation>
     </message>
     <message>
       <source>Close</source>
@@ -1229,7 +1229,7 @@
     <name>GeneralSystemAdministrationWidget</name>
     <message>
       <source>Site Settings</source>
-      <translation type="unfinished">Site Settings</translation>
+      <translation>إعدادات الموقع</translation>
     </message>
   </context>
   <context>
@@ -1558,7 +1558,7 @@
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>إعادة التعيين إلى الافتراضي</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2127,7 +2127,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>RepeatedPasswordDialog</name>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>كرر كلمة المرور</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
