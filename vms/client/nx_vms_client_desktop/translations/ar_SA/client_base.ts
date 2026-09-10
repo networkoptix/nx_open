@@ -2733,7 +2733,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>كرر كلمة المرور</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2823,7 +2823,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>سيتوقف التسجيل وسيتم إلغاء جميع اشتراكات الخدمة</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
@@ -3098,7 +3098,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>إستعادة</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -4414,7 +4414,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>تَعيين</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -4658,7 +4658,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>مشترك</translation>
     </message>
     <message>
       <source>Isolated</source>
@@ -4770,7 +4770,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>محجوزة</translation>
     </message>
     <message>
       <source>local</source>
@@ -4834,7 +4834,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>مشترك</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -4858,7 +4858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>سياسة القراءة والكتابة</translation>
     </message>
     <message>
       <source>Adaptive</source>
@@ -6255,7 +6255,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>اختر</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6647,7 +6647,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>جارٍ حفظ التخطيط</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -8053,7 +8053,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>اختر</translation>
     </message>
   </context>
   <context>
@@ -9113,7 +9113,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>حفظ</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -9514,7 +9514,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>إعادة التعيين إلى الافتراضي</translation>
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
@@ -11077,7 +11077,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>تم التعليق</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -12278,7 +12278,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>حفظ</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -13128,7 +13128,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>التخطيط المحدد</translation>
     </message>
   </context>
   <context>
@@ -13532,7 +13532,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>الموقع</translation>
     </message>
   </context>
   <context>
