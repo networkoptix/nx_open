@@ -4,6 +4,7 @@
 
 #include <exception>
 #include <list>
+#include <ranges>
 #include <set>
 
 #include <QtCore/QElapsedTimer>
@@ -192,6 +193,20 @@ void QnResourceDiscoveryManager::run()
 
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
 
+namespace {
+
+bool isDiscoveryEnabled(QnAbstractResourceSearcher* searcher)
+{
+    return searcher->discoveryMode() != DiscoveryMode::disabled;
+}
+
+bool isLocal(QnAbstractResourceSearcher* searcher)
+{
+    return searcher->isLocal();
+}
+
+} // namespace
+
 void QnResourceDiscoveryManager::doInitialSearch()
 {
     ResourceSearcherList searchersList;
@@ -200,20 +215,24 @@ void QnResourceDiscoveryManager::doInitialSearch()
         searchersList = m_searchersList;
     }
 
-    for (QnAbstractResourceSearcher* searcher: searchersList)
+    for (QnAbstractResourceSearcher* searcher: searchersList
+            | std::views::take_while([this](auto*) { return !needToStop(); })
+            | std::views::filter(isDiscoveryEnabled) | std::views::filter(isLocal))
     {
-        if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
-        {
-            QnResourceList lst = searcher->search();
-            lst = remapPhysicalIdIfNeed(lst); //< Used in case of device replacement.
-            m_resourceProcessor->processResources(lst);
-        }
+        const QnResourceList lst = remapPhysicalIdIfNeed(searcher->search());
+        m_resourceProcessor->processResources(lst);
     }
     emit localSearchDone();
 }
 
 void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 {
+    if (needToStop())
+    {
+        NX_DEBUG(this, "Skipping the discovery iteration, the stop has been requested");
+        return;
+    }
+
     QElapsedTimer discoveryTime;
     discoveryTime.restart();
     int delayForNextSearch = 0;
@@ -326,7 +345,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     auto searchType = SearchType::Full;
     for (QnAbstractResourceSearcher *searcher: searchersList)
     {
-        if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
+        if (isDiscoveryEnabled(searcher) && !needToStop())
         {
             QElapsedTimer timer;
             timer.restart();
@@ -374,6 +393,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             searchType = SearchType::Partial;
         }
     }
+
+    if (needToStop())
+        return QnResourceList();
+
     const auto& resPool = resourcePool();
     //filtering discovered resources by discovery mode
     QnResourceList resources;
