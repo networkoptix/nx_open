@@ -543,7 +543,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>تم التعليق</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -1188,7 +1188,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>اختر</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1290,7 +1290,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>جارٍ التحديث…</translation>
     </message>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
@@ -1382,7 +1382,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>حفظ</translation>
     </message>
     <message>
       <source>Previous</source>
@@ -1421,7 +1421,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>إعادة التعيين إلى الافتراضي</translation>
     </message>
   </context>
   <context>
@@ -1745,7 +1745,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>MultiSelectionComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>اختر</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -1876,7 +1876,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>رفض</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
@@ -2571,7 +2571,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>اختر</translation>
     </message>
     <message>
       <source>Cancel</source>

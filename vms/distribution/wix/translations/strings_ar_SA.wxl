@@ -15,7 +15,7 @@
   <String Id="ClientAndServer">العميل والخادم</String>
   <String Id="ClientOnly">العميل فقط</String>
   <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
+  <String Id="ServerOnly">الخادم فقط</String>
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Close</String>
