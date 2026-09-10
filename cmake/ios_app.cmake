@@ -28,38 +28,35 @@ function(setup_ios_application target)
 
     set(app_dir "$<TARGET_FILE_DIR:${target}>")
 
-    if(NOT developerBuild)
+    # PRE_BUILD is supported by the Xcode generator only. Other generators (e.g. Ninja) run it
+    # as PRE_LINK
+    if(NOT developerBuild AND CMAKE_GENERATOR STREQUAL "Xcode")
         add_custom_command(TARGET ${target} PRE_BUILD
             COMMAND ${CMAKE_COMMAND} -E remove_directory ${app_dir})
     endif()
 
-    if (APP_ASSETS)
-        add_custom_target(${target}_copy_assets
-            DEPENDS ${APP_ASSETS}
+
+    if(APP_ASSETS)
+        add_custom_command(TARGET ${target} PRE_LINK
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${app_dir}
             COMMAND ${CMAKE_COMMAND} -E copy ${APP_ASSETS} ${app_dir}
             COMMENT "Copying assets for ${target}"
         )
-        add_dependencies(${target} ${target}_copy_assets)
     endif()
 
     if(APP_TRANSLATIONS)
         set(translations_dir ${app_dir}/translations)
-        add_custom_target(${target}_copy_translations
-            DEPENDS ${APP_TRANSLATIONS}
+        add_custom_command(TARGET ${target} PRE_LINK
             COMMAND ${CMAKE_COMMAND} -E make_directory ${translations_dir}
             COMMAND ${CMAKE_COMMAND} -E copy ${APP_TRANSLATIONS} ${translations_dir}
             COMMENT "Copying translations for ${target}"
         )
-        add_dependencies(${target} ${target}_copy_translations)
     endif()
 
     # Copies Info.plist related translations to the bundle sources.
     set(source_plist_translations_dir ${CMAKE_CURRENT_LIST_DIR}/ios/translations)
-    file(GLOB_RECURSE plist_source_translation_files "${source_plist_translations_dir}/*" )
-    add_custom_target(${target}_copy_plist_translations
-        DEPENDS ${plist_source_translation_files}
+    add_custom_command(TARGET ${target} PRE_LINK
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${source_plist_translations_dir} ${app_dir}
         COMMENT "Copying plist translations for ${target}"
     )
-    add_dependencies(${target} ${target}_copy_plist_translations)
 endfunction()
