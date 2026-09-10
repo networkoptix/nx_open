@@ -80,7 +80,7 @@ Item
             ? Math.min(parent.width, control.overlayStyle ? 360 : 640)
             : StyleHints.sheetWidth
 
-        interactive: !panel.joystick.active
+        interactive: opened && !panel.joystick.active //< Interactive close is only allowed.
         modal: false
 
         onClosed:
