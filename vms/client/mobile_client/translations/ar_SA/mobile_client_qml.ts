@@ -599,7 +599,7 @@
     </message>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>إظهار المزيد</translation>
     </message>
   </context>
   <context>
@@ -699,7 +699,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>المواقع</translation>
     </message>
     <message>
       <source>All Sites</source>
@@ -898,7 +898,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>المواقع</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1048,7 +1048,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>المشاركة</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1145,11 +1145,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>معلق</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>إغلاق</translation>
     </message>
     <message>
       <source>PENDING</source>
