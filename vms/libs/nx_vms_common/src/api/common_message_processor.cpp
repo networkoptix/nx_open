@@ -2,7 +2,9 @@
 
 #include "common_message_processor.h"
 
+#include <optional>
 #include <unordered_map>
+#include <utility>
 
 #include <QtCore/QElapsedTimer>
 
@@ -27,6 +29,7 @@
 #include <nx/network/rest/user_access_data.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/lockable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/api/data/access_rights_data_deprecated.h>
@@ -69,10 +72,39 @@ using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::common;
 
+namespace {
+
+template<typename Map>
+void store(nx::Lockable<Map>& cache, const nx::Uuid& id, typename Map::mapped_type attributes)
+{
+    cache.visit([&](Map& map) { map[id] = std::move(attributes); });
+}
+
+template<typename Map>
+std::optional<typename Map::mapped_type> take(nx::Lockable<Map>& cache, const nx::Uuid& id)
+{
+    return cache.visit(
+        [&](Map& map) -> std::optional<typename Map::mapped_type>
+        {
+            const auto iter = map.find(id);
+            if (iter == map.cend())
+                return std::nullopt;
+
+            auto attributes = std::move(iter->second);
+            map.erase(iter);
+            return attributes;
+        });
+}
+
+} // namespace
+
 struct QnCommonMessageProcessor::Private
 {
-    std::unordered_map<nx::Uuid, CameraAttributesData> cameraUserAttributesCache;
-    std::unordered_map<nx::Uuid, MediaServerUserAttributesData> serverUserAttributesCache;
+    // Reached from every thread that delivers a transaction: on the Server the handlers are
+    // bound with Qt::DirectConnection.
+    nx::Lockable<std::unordered_map<nx::Uuid, CameraAttributesData>> cameraUserAttributesCache;
+    nx::Lockable<std::unordered_map<nx::Uuid, MediaServerUserAttributesData>>
+        serverUserAttributesCache;
 };
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(
@@ -559,6 +591,10 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->discoveryNotificationManager()->disconnect(this);
     connection->miscNotificationManager()->disconnect(this);
     connection->showreelNotificationManager()->disconnect(this);
+
+    // Stale on the next connection, which resends the full lists.
+    d->cameraUserAttributesCache.visit([](auto& cache) { cache.clear(); });
+    d->serverUserAttributesCache.visit([](auto& cache) { cache.clear(); });
 }
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(
@@ -806,17 +842,19 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
             NX_INFO(this, "Recording was turned off for camera %1", userAttributes.cameraId);
 
         camera->setUserAttributesAndNotify(userAttributes);
+        return;
     }
-    else
-    {
-        // It is possible that user attributes will be passed before Camera Resource is created,
-        // so we need to cache them and assign to the Camera when it is created.
-        d->cameraUserAttributesCache[userAttributes.cameraId] = userAttributes;
-    }
+
+    // It is possible that user attributes will be passed before Camera Resource is created,
+    // so we need to cache them and assign to the Camera when it is created.
+    cacheCameraAttributes(userAttributes);
 }
 
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const nx::Uuid& cameraId)
 {
+    // Otherwise updateResource() would apply them once the Camera arrives.
+    take(d->cameraUserAttributesCache, cameraId);
+
     // It is OK if the Camera is missing.
     if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
     {
@@ -829,15 +867,19 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const nx::Uuid& ca
 void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
     const MediaServerUserAttributesData& attrs)
 {
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(attrs.serverId);
-    if (server)
+    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(attrs.serverId))
+    {
         server->setUserAttributesAndNotify(attrs);
-    else
-        d->serverUserAttributesCache[attrs.serverId] = attrs;
+        return;
+    }
+
+    cacheServerAttributes(attrs);
 }
 
 void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const nx::Uuid& serverId)
 {
+    take(d->serverUserAttributesCache, serverId);
+
     // It is OK if the Server is missing.
     if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
     {
@@ -992,30 +1034,63 @@ void QnCommonMessageProcessor::handleRemotePeerLost(nx::Uuid id, PeerType peerTy
     NX_VERBOSE(this, "Remote peer lost, id: %1, type: %2", id, peerType);
 }
 
+void QnCommonMessageProcessor::cacheCameraAttributes(const CameraAttributesData& attributes)
+{
+    store(d->cameraUserAttributesCache, attributes.cameraId, attributes);
+
+    // Whoever adds the Camera to the Resource pool takes the attributes first, so caching before
+    // looking again leaves no order in which the two sides miss each other.
+    applyCachedCameraAttributes(attributes.cameraId);
+}
+
+void QnCommonMessageProcessor::applyCachedCameraAttributes(const nx::Uuid& cameraId)
+{
+    if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+    {
+        if (const auto attributes = take(d->cameraUserAttributesCache, cameraId))
+            camera->setUserAttributesAndNotify(*attributes);
+    }
+}
+
+void QnCommonMessageProcessor::cacheServerAttributes(
+    const MediaServerUserAttributesData& attributes)
+{
+    store(d->serverUserAttributesCache, attributes.serverId, attributes);
+    applyCachedServerAttributes(attributes.serverId);
+}
+
+void QnCommonMessageProcessor::applyCachedServerAttributes(const nx::Uuid& serverId)
+{
+    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
+    {
+        if (const auto attributes = take(d->serverUserAttributesCache, serverId))
+            server->setUserAttributesAndNotify(*attributes);
+    }
+}
+
 void QnCommonMessageProcessor::resetServerUserAttributesList(
     const MediaServerUserAttributesDataList& serverUserAttributesList)
 {
-    auto pool = resourcePool();
+    const auto pool = resourcePool();
     for (const auto& serverAttrs: serverUserAttributesList)
     {
-        auto server = pool->getResourceById<QnMediaServerResource>(serverAttrs.serverId);
-        if (server)
+        if (auto server = pool->getResourceById<QnMediaServerResource>(serverAttrs.serverId))
             server->setUserAttributes(serverAttrs);
         else
-            d->serverUserAttributesCache[serverAttrs.serverId] = serverAttrs;
+            cacheServerAttributes(serverAttrs);
     }
 }
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList(
     const CameraAttributesDataList& cameraUserAttributesList)
 {
-    auto pool = resourcePool();
+    const auto pool = resourcePool();
     for (const auto& cameraAttrs: cameraUserAttributesList)
     {
         if (auto camera = pool->getResourceById<QnVirtualCameraResource>(cameraAttrs.cameraId))
             camera->setUserAttributes(cameraAttrs);
         else
-            d->cameraUserAttributesCache[cameraAttrs.cameraId] = cameraAttrs;
+            cacheCameraAttributes(cameraAttrs);
     }
 }
 
@@ -1219,14 +1294,14 @@ void QnCommonMessageProcessor::updateResource(const CameraData& camera, ec2::Not
         NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getPhysicalId()),
             "You must fill camera ID as md5 hash of unique id");
 
-        auto iter = d->cameraUserAttributesCache.find(camera.id);
-        if (iter != d->cameraUserAttributesCache.cend())
-        {
-            qnCamera->setUserAttributes(iter->second);
-            d->cameraUserAttributesCache.erase(iter);
-        }
+        if (const auto attributes = take(d->cameraUserAttributesCache, camera.id))
+            qnCamera->setUserAttributes(*attributes);
 
         updateResource(qnCamera, source);
+
+        // The take() above misses attributes cached while the Camera was being added, so look
+        // again now that it is in the pool.
+        applyCachedCameraAttributes(camera.id);
     }
 }
 
@@ -1235,13 +1310,11 @@ void QnCommonMessageProcessor::updateResource(
 {
     QnMediaServerResourcePtr server = getResourceFactory()->createServer();
     ec2::fromApiToResource(serverData, server);
-    auto iter = d->serverUserAttributesCache.find(serverData.id);
-    if (iter != d->serverUserAttributesCache.cend())
-    {
-        server->setUserAttributes(iter->second);
-        d->serverUserAttributesCache.erase(iter);
-    }
+    if (const auto attributes = take(d->serverUserAttributesCache, serverData.id))
+        server->setUserAttributes(*attributes);
+
     updateResource(server, source);
+    applyCachedServerAttributes(serverData.id);
 }
 
 void QnCommonMessageProcessor::updateResource(
