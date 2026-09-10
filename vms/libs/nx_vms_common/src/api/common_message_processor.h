@@ -189,6 +189,11 @@ private:
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 
+    void cacheCameraAttributes(const nx::vms::api::CameraAttributesData& attributes);
+    void applyCachedCameraAttributes(const nx::Uuid& cameraId);
+    void cacheServerAttributes(const nx::vms::api::MediaServerUserAttributesData& attributes);
+    void applyCachedServerAttributes(const nx::Uuid& serverId);
+
 protected:
     ec2::AbstractECConnectionPtr m_connection;
 
