@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>共有を編集</translation>
     </message>
   </context>
   <context>

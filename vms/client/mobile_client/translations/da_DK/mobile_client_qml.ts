@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Rediger deling</translation>
     </message>
   </context>
   <context>

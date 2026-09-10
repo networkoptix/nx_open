@@ -671,21 +671,21 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>انقر في أي مكان على الفيديو لتوسيط العرض.</translation>
     </message>
   </context>
   <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>انقر في أي مكان على الفيديو لتوسيط العرض.</translation>
     </message>
   </context>
   <context>
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>إظهار المزيد</translation>
     </message>
     <message>
       <source>No data</source>
@@ -707,7 +707,7 @@
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>مشاركة</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -846,14 +846,14 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>حدّد ضبط مُسبق</translation>
     </message>
   </context>
   <context>
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>حدّد ضبط مُسبق</translation>
     </message>
   </context>
   <context>
@@ -883,7 +883,7 @@
     </message>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>انقر في أي مكان على الفيديو لتوسيط العرض.</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -894,7 +894,7 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>المواقع</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -1140,7 +1140,7 @@
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>المواقع</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
@@ -1214,11 +1214,11 @@
     <name>ShareAction</name>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>مشترك</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>مشاركة</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
@@ -1285,7 +1285,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>المشاركة</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1382,11 +1382,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>معلق</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>إغلاق</translation>
     </message>
     <message>
       <source>PENDING</source>

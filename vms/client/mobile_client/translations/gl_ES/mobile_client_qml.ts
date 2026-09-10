@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Editar o uso compartido</translation>
     </message>
   </context>
   <context>
