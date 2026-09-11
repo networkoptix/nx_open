@@ -150,6 +150,11 @@ StreamSocket::StreamSocket(
 
 StreamSocket::~StreamSocket()
 {
+    // m_asyncTransformingChannel reads through m_proxyConverter, which delegates to m_sslPipeline.
+    // Both are destroyed before the channel, so the channel has to be stopped here, while every
+    // member it points at is still alive.
+    pleaseStopSync();
+
     --nx::network::SocketGlobals::instance().debugCounters().sslSocketCount;
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }

@@ -668,13 +668,6 @@ class SslSocketSpecificHandshake:
 {
     using base_type = network::test::StreamSocketAcceptance<BothEndsNotEncryptedTypeSet>;
 
-public:
-    ~SslSocketSpecificHandshake()
-    {
-        if (m_encryptedConnection)
-            m_encryptedConnection->pleaseStopSync();
-    }
-
 protected:
     void whenDoHandshake()
     {
@@ -721,12 +714,6 @@ public:
     SslSocketCertificateVerification()
         : m_useAsyncCallback(Param::kUseAsyncCallback)
     {
-    }
-
-    ~SslSocketCertificateVerification()
-    {
-        if (connection())
-            connection()->pleaseStopSync();
     }
 
 protected:
@@ -1161,13 +1148,6 @@ TEST_F(
 class SslSocketCustomSslContext:
     public ::testing::Test
 {
-public:
-    ~SslSocketCustomSslContext()
-    {
-        for (auto& ctx: m_servers)
-            ctx.socket->pleaseStopSync();
-    }
-
 protected:
     void givenSslServers(int count)
     {
@@ -1222,7 +1202,6 @@ protected:
         const auto code = done.get_future().get();
 
         ASSERT_EQ(SystemError::sslHandshakeError, code);
-        client.pleaseStopSync();
     }
 
     void assertSyncConnectFails()
