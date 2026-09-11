@@ -1263,7 +1263,7 @@ void Player::preview()
     d->updateAudio();
 }
 
-void Player::stop()
+void Player::stop(bool clearVideoOutput)
 {
     NX_DEBUG(this, "stop() BEGIN");
 
@@ -1286,10 +1286,12 @@ void Player::stop()
     if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
         d->setMediaStatus(MediaStatus::NoMedia);
 
-    d->clearVideoOutput();
-
-    d->displayedPositionMs.reset();
-    emit displayedPositionChanged();
+    if (clearVideoOutput)
+    {
+        d->clearVideoOutput();
+        d->displayedPositionMs.reset();
+        emit displayedPositionChanged();
+    }
 
     NX_DEBUG(this, "stop() END");
 }
