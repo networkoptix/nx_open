@@ -17,84 +17,111 @@ NxObject
 
     property MediaPlayer player: null
 
+    property bool applicationActive: Qt.application.state === Qt.ApplicationActive
+
     function setInterruptedPosition(timestamp)
     {
         d.interruptedPosition = timestamp
     }
 
-    onPlayerChanged: setInterruptedPosition(-1)
+    onPlayerChanged:
+    {
+        setInterruptedPosition(-1)
+        d.interruptedState = MediaPlayer.Stopped //< Meaning there's no active interruption.
+    }
 
     onForceStopWhenNotPlayableChanged:
     {
-        if (forceStopWhenNotPlayable
-            && d.interrupted
-            && player.playbackState === MediaPlayer.Paused)
-        {
-            // Handle current interruption with non-forced-stop state.
-            player.stop()
-        }
+        if (forceStopWhenNotPlayable)
+            d.forceStopIfInterrupted()
     }
 
     QtObject
     {
         id: d
 
-        readonly property bool interruptedOnInactivity: interruptOnInactivity
-            && (Qt.application.state !== Qt.ApplicationActive)
+        readonly property bool interruptedOnInactivity:
+            interruptOnInactivity && !interruptor.applicationActive
+
         readonly property bool canPlay: interruptor.playable && !interruptedOnInactivity
+
         property real interruptedPosition: -1
-        property bool interrupted: false
+
+        property int interruptedState: MediaPlayer.Stopped
+        readonly property bool interrupted: interruptedState !== MediaPlayer.Stopped
 
         onInterruptedOnInactivityChanged:
         {
             // As we have problems on iOS that after application awake stream can jump forward to
-            // the next I frame, we need to forcibly stop media player on app moving to background.
-            if (interruptOnInactivity)
-                interrupt(/*forceStop*/ true)
+            // the next I-frame, we need to forcibly stop media player on app moving to background.
+            // Playback which is already interrupted is only escalated to the stopped state here,
+            // the interruption itself is always started by the canPlay handler below.
+            if (interruptedOnInactivity)
+                forceStopIfInterrupted()
         }
 
         onCanPlayChanged:
         {
             if (canPlay)
-                tryResumePlaying()
+                tryRestorePlayback()
             else
-                tryInterrupt()
+                tryInterrupt(interruptedOnInactivity || forceStopWhenNotPlayable)
         }
 
-        function tryResumePlaying()
+        function tryInterrupt(forceStop)
+        {
+            if (!player || d.interrupted)
+                return
+
+            if (player.playbackState === MediaPlayer.Stopped)
+                return
+
+            d.interruptedPosition = currentPosition()
+            d.interruptedState = player.playbackState
+
+            if (forceStop)
+                player.stop(/*clearVideoOutput*/ false)
+            else if (player.playbackState === MediaPlayer.Playing)
+                player.pause()
+        }
+
+        function tryRestorePlayback()
         {
             if (!player || !d.interrupted)
                 return
 
-            d.interrupted = false
-            player.position = interruptedPosition
-            player.play()
+            const resume = d.interruptedState === MediaPlayer.Playing
+            d.interruptedState = MediaPlayer.Stopped
+
+            if (player.playbackState === MediaPlayer.Stopped)
+                player.position = interruptedPosition
+            else if (player.playbackState === MediaPlayer.Playing)
+                return //< Playback was externally restarted.
+
+            if (resume)
+            {
+                player.play()
+            }
+            else if (player.playbackState === MediaPlayer.Stopped)
+            {
+                // We have to emulate paused state with previewing in current implementation.
+                player.preview()
+            }
         }
 
-        function tryInterrupt()
+        function forceStopIfInterrupted()
         {
-            if (player && player.playbackState === MediaPlayer.Playing && !d.interrupted)
-                interrupt(forceStopWhenNotPlayable)
-        }
-
-        function interrupt(forceStop)
-        {
-            // Store interrupted position only once per interruption cycle.
-            if (!d.interrupted)
-                d.interruptedPosition = currentPosition()
-
-            d.interrupted = true
-            if (forceStop)
-                player.stop()
-            else
-                player.pause()
+            if (player && d.interrupted && player.playbackState !== MediaPlayer.Stopped)
+                player.stop(/*clearVideoOutput*/ false)
         }
 
         function currentPosition()
         {
-            return player && !player.liveMode
-                ? player.position
-                : -1
+            // MediaPlayer keeps the live mode while being paused, so the live position may only
+            // be stored for actually running playback.
+            return player.liveMode && player.playbackState === MediaPlayer.Playing
+                ? -1
+                : player.position
         }
     }
 }

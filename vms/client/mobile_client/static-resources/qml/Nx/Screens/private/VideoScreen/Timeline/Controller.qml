@@ -93,6 +93,8 @@ AbstractTimelineController
                 controller.playLive()
             else if (controller.playing)
                 controller.play()
+            else
+                controller.pause()
         }
     }
 }

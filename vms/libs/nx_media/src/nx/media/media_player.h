@@ -322,7 +322,7 @@ public slots:
      * Preview mode similar to pause mode but optimized for fast seek.
      */
     void preview();
-    void stop();
+    void stop(bool clearVideoOutput = true);
 
 signals:
     void playbackStateChanged();
