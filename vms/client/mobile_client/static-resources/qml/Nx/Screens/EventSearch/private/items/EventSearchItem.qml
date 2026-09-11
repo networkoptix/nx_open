@@ -58,8 +58,10 @@ Control
                 ? 16.0 / 9.0
                 : 1.0
 
+            Layout.fillWidth: true
             Layout.preferredWidth: LayoutController.isExpanded ? 300 : 120
-            Layout.alignment: Qt.AlignTop
+            Layout.maximumWidth: Layout.preferredWidth
+            Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
             backgroundColor: ColorTheme.colors.dark6
             borderColor: backgroundColor
@@ -92,6 +94,8 @@ Control
             spacing: LayoutController.isExpanded ? 12 : 4
 
             Layout.fillWidth: true
+            Layout.minimumWidth: LayoutController.isExpanded ? 180 : 0
+            Layout.preferredWidth: Layout.minimumWidth
             Layout.alignment: Qt.AlignTop | Qt.AlignLeft
 
             Text

@@ -399,8 +399,22 @@ AdaptiveScreen
                     Rectangle
                     {
                         Layout.fillWidth: true
-                        // Keep in sync with EventSearchItem height.
-                        Layout.preferredHeight: LayoutController.isExpanded ? 209 : 92
+                        // Keep in sync with EventSearchItem height: padding + 16:9 preview,
+                        // which in the expanded mode is limited by the description block
+                        // minimum width.
+                        Layout.preferredHeight:
+                        {
+                            if (!LayoutController.isExpanded)
+                                return 92
+
+                            const padding = 20
+                            const spacing = 20
+                            const descriptionMinimumWidth = 180
+                            const previewWidth = Math.max(0, Math.min(300,
+                                width - padding * 2 - spacing - descriptionMinimumWidth))
+
+                            return previewWidth * 9 / 16 + padding * 2
+                        }
 
                         radius: 8
                         color: "white"
