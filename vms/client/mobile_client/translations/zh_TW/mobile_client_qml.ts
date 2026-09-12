@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>翻轉時間軸以方便左手使用，僅適用於手機尺寸的螢幕。</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>編輯分享</translation>
     </message>
   </context>
   <context>
@@ -868,21 +868,6 @@
     <message>
       <source>Close</source>
       <translation>關閉​​​</translation>
-    </message>
-  </context>
-  <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>點擊影片中任意位置即可將該處置中</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation>取消返回中心</translation>
     </message>
   </context>
   <context>
@@ -1457,7 +1442,7 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>好的，了解！</translation>
     </message>
   </context>
   <context>

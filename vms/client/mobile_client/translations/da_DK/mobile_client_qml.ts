@@ -872,21 +872,6 @@
     </message>
   </context>
   <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>Tryk hvor som helst på videoen for at centrere visningen der</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation>Annuller gencentrering</translation>
-    </message>
-  </context>
-  <context>
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>

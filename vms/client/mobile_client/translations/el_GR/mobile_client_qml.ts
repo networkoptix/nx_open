@@ -872,21 +872,6 @@
     </message>
   </context>
   <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>Πατήστε οπουδήποτε στο βίντεο για να κεντράρετε την προβολή εκεί</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation>Ακύρωση επανακεντραρίσματος</translation>
-    </message>
-  </context>
-  <context>
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>

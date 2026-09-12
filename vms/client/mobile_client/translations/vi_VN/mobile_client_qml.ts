@@ -871,21 +871,6 @@
     </message>
   </context>
   <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>Chạm vào bất kỳ đâu trên video để căn giữa khung hình tại vị trí đó</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
-    </message>
-  </context>
-  <context>
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
