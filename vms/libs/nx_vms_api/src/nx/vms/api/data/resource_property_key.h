@@ -220,9 +220,6 @@ inline const QString kGroupPlayParamName = "groupplay";
 /// Only used internally in `axis_resource.cpp`
 inline const QString kIoDisplayName = "ioDisplayName";
 
-/// Used via `QnVirtualCameraResource`, internally and in `onvif_resource.cpp`
-inline const QString kIsAudioSupported = "isAudioSupported";
-
 /// Used via `QnVirtualCameraResource`, internally
 inline const QString kKeepCameraTimeSettings = "keepCameraTimeSettings";
 

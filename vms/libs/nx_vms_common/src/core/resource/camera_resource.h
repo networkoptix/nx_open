@@ -202,7 +202,10 @@ public:
     virtual QString idForToStringFromPtr() const override;
 
     static QString mediaPortKey();
+
+    void setAudioSupported(bool isSupported);
     bool isAudioSupported() const;
+
     bool isIOModule() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;

@@ -1177,9 +1177,8 @@ std::optional<nx::vms::api::CameraStreamCapability> QnVirtualCameraResource::str
 
 void QnVirtualCameraResource::setCameraMediaCapability(const nx::vms::api::CameraMediaCapability& value)
 {
-    setProperty(
-        nx::vms::api::device_properties::kMediaCapabilities, QString::fromLatin1(QJson::serialized(value)));
-    m_cachedCameraMediaCapabilities.reset();
+    setProperty(nx::vms::api::device_properties::kMediaCapabilities,
+        QString::fromLatin1(QJson::serialized(value)));
 }
 
 void QnVirtualCameraResource::updateCameraMediaCapability(
@@ -1196,7 +1195,6 @@ void QnVirtualCameraResource::updateCameraMediaCapability(
             updater(capability);
             return QString::fromLatin1(QJson::serialized(capability));
         });
-    m_cachedCameraMediaCapabilities.reset();
 }
 
 bool QnVirtualCameraResource::isDtsBased() const
@@ -1460,15 +1458,15 @@ bool QnVirtualCameraResource::canSwitchPtzPresetTypes() const
         && (capabilities & Ptz::Capability::positioningDeviceLogical);
 }
 
+void QnVirtualCameraResource::setAudioSupported(bool isSupported)
+{
+    updateCameraMediaCapability([isSupported](nx::vms::api::CameraMediaCapability& capability)
+        { capability.hasAudio = isSupported; });
+}
+
 bool QnVirtualCameraResource::isAudioSupported() const
 {
-    const auto capabilities = cameraMediaCapability();
-    if (capabilities.hasAudio)
-        return true;
-
-    // Compatibility with version < 3.1.2
-    QString val = getProperty(nx::vms::api::device_properties::kIsAudioSupported);
-    return val.toInt() > 0;
+    return cameraMediaCapability().hasAudio;
 }
 
 nx::vms::api::MotionType QnVirtualCameraResource::getDefaultMotionType() const
