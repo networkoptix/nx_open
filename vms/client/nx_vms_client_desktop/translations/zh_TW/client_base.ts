@@ -1543,12 +1543,12 @@ License Key: %2</source>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>無法連線至伺服器%1。</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>伺服器 %1 無法連線到 %2。請確認位址正確、目標站點在線上且可從 %1 存取。</translation>
     </message>
   </context>
   <context>
@@ -5108,7 +5108,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>解鎖專屬功能，實現可操作的影像智慧和大規模的數據導向營運</translation>
     </message>
   </context>
   <context>

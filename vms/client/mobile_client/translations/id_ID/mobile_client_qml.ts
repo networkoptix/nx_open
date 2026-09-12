@@ -871,21 +871,6 @@
     </message>
   </context>
   <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>Ketuk di mana saja pada video untuk memusatkan tampilan di sana.</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation>Batalkan Pemusatan Ulang</translation>
-    </message>
-  </context>
-  <context>
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>

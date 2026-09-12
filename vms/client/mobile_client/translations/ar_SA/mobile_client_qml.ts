@@ -876,21 +876,6 @@
     </message>
   </context>
   <context>
-    <name>PtzSheet</name>
-    <message>
-      <source>PTZ</source>
-      <translation>PTZ</translation>
-    </message>
-    <message>
-      <source>Tap anywhere on video to center view there</source>
-      <translation>انقر في أي مكان على الفيديو لتوسيط العرض.</translation>
-    </message>
-    <message>
-      <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
-    </message>
-  </context>
-  <context>
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
