@@ -58,6 +58,11 @@ size_t QnWritableCompressedVideoData::dataSize() const
     return m_data.size();
 }
 
+size_t QnWritableCompressedVideoData::paddingSize() const
+{
+    return m_data.paddingSize();
+}
+
 void QnWritableCompressedVideoData::setData(nx::utils::ByteArray&& buffer)
 {
     m_data = std::move(buffer);

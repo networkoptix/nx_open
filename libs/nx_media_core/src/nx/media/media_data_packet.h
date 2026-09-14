@@ -134,6 +134,13 @@ public:
     virtual const char* data() const = 0;
     virtual size_t dataSize() const = 0;
 
+    /**
+     * Number of bytes which are allocated after the packet data and are filled with zeros. Ffmpeg
+     * requires AV_INPUT_BUFFER_PADDING_SIZE such bytes, so a packet with a smaller padding is
+     * copied before it is passed to ffmpeg. See nx::media::ffmpeg::AvPacket.
+     */
+    virtual size_t paddingSize() const { return 0; }
+
     virtual void setData(nx::utils::ByteArray&& buffer) = 0;
 
     bool isLQ() const { return flags & MediaFlags_LowQuality; }

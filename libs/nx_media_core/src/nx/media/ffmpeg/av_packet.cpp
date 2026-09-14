@@ -3,10 +3,14 @@
 #include "av_packet.h"
 
 extern "C" {
+#include <libavcodec/defs.h>
 #include <libavcodec/packet.h>
 } // extern "C"
 
+#include <cstring>
+
 #include <nx/media/media_data_packet.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::media::ffmpeg {
 
@@ -26,17 +30,29 @@ AvPacket::AvPacket(const QnAbstractMediaData* data)
     if (!data)
         return;
 
-    m_packet->data = (unsigned char*)data->data();
-    m_packet->size = static_cast<int>(data->dataSize());
+    const int size = static_cast<int>(data->dataSize());
+
+    // Ffmpeg documentation requires AV_INPUT_BUFFER_PADDING_SIZE zero bytes after the data,
+    // because some optimized bitstream readers read 32 or 64 bits at once and could read over the
+    // end of the buffer. Packets which store the data in nx::utils::ByteArray provide such a
+    // padding, the others have to be copied: the memory behind their buffer is not ours to write.
+    if (!data->data() || size <= 0 || data->paddingSize() >= AV_INPUT_BUFFER_PADDING_SIZE)
+    {
+        m_packet->data = (unsigned char*) data->data();
+        m_packet->size = size;
+    }
+    else if (av_new_packet(m_packet, size) == 0) //< Allocates and zeroes the padding as well.
+    {
+        memcpy(m_packet->data, data->data(), size);
+    }
+    else
+    {
+        NX_WARNING(this, "Failed to allocate a packet of %1 bytes", size);
+    }
+
     m_packet->dts = m_packet->pts = data->timestamp;
     if (data->isKeyFrame())
         m_packet->flags = AV_PKT_FLAG_KEY;
-
-    // TODO: Check is it really necessary
-    // It's already guaranteed by nx::utils::ByteArray that there is an extra space reserved. We must
-    // fill the padding bytes according to ffmpeg documentation.
-    if (m_packet->data)
-        memset(m_packet->data + m_packet->size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 }
 
 AvPacket::~AvPacket()

@@ -29,6 +29,7 @@ void ByteArray::clear()
 {
     m_size = 0;
     m_ignore = 0;
+    zeroPadding();
 }
 
 char* ByteArray::data()
@@ -53,6 +54,7 @@ size_t ByteArray::write(const char* data, size_t size)
     memcpy(m_data + m_size, data, size);
 
     m_size += size;
+    zeroPadding();
 
     return size;
 }
@@ -62,6 +64,7 @@ void ByteArray::uncheckedWrite(const char* data, size_t size)
     NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!");
     memcpy(m_data + m_size, data, size); // 1s
     m_size += size;
+    zeroPadding();
 }
 
 size_t ByteArray::write(quint8 value)
@@ -70,6 +73,7 @@ size_t ByteArray::write(quint8 value)
     memcpy(m_data + m_size, &value, 1);
 
     m_size += 1;
+    zeroPadding();
 
     return 1;
 }
@@ -81,7 +85,10 @@ size_t ByteArray::writeAt(const char* data, size_t size, int pos)
     memcpy(m_data + pos, data, size);
 
     if (size + pos > m_size)
+    {
         m_size = size + pos;
+        zeroPadding();
+    }
 
     return size;
 }
@@ -91,6 +98,7 @@ void ByteArray::writeFiller(quint8 filler, int size)
     reserve(m_size + size);
     memset(m_data + m_size, filler, size);
     m_size += size;
+    zeroPadding();
 }
 
 char* ByteArray::startWriting(size_t size)
@@ -104,6 +112,7 @@ void ByteArray::resize(size_t size)
     reserve(size);
 
     m_size = size;
+    zeroPadding();
 }
 
 void ByteArray::reserve(size_t size)
@@ -123,6 +132,7 @@ void ByteArray::removeTrailingZeros(int maxBytesToRemove)
         --m_size;
         --maxBytesToRemove;
     }
+    zeroPadding();
 }
 
 ByteArray::ByteArray(const ByteArray& other)
@@ -151,6 +161,7 @@ ByteArray& ByteArray::operator=(const ByteArray& right)
 
     memcpy(m_data, right.constData(), right.size());
     m_ignore = 0;
+    zeroPadding();
 
     return *this;
 }
@@ -175,15 +186,17 @@ ByteArray& ByteArray::operator=(ByteArray&& right) noexcept
     return *this;
 }
 
+void ByteArray::zeroPadding()
+{
+    // If the padding bytes are not zeros, then damaged MPEG bitstreams could cause overread and
+    // segfault in the optimized bitstream readers.
+    if (m_data && m_padding)
+        memset(m_data + m_size, 0, m_padding);
+}
+
 char* ByteArray::allocateBuffer(size_t capacity)
 {
-    char* data = (char*) nx::kit::utils::mallocAligned((size_t) capacity + m_padding, m_alignment);
-
-    // If the first 23 bits of the additional bytes are not 0, then damaged MPEG bitstreams could
-    // cause overread and segfault.
-    if (data)
-        memset(data + capacity, 0, m_padding);
-    return data;
+    return (char*) nx::kit::utils::mallocAligned((size_t) capacity + m_padding, m_alignment);
 }
 
 bool ByteArray::reallocate(size_t capacity)
@@ -210,6 +223,7 @@ bool ByteArray::reallocate(size_t capacity)
 
     m_capacity = capacity;
     m_data = data;
+    zeroPadding();
 
     return true;
 }

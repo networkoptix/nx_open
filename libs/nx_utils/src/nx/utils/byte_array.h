@@ -16,8 +16,9 @@ public:
     /**
      * @param alignment Alignment of the array data.
      * @param capacity Initial array capacity.
-     * @param padding Additional data beyond the array capacity, which will be filled with zeros.
-     *     Used to prevent overread and segfault for damaged MPEG bitstreams.
+     * @param padding Number of extra bytes allocated beyond the array capacity. The padding
+     *     which follows the array data is always kept filled with zeros. Used to prevent overread
+     *     and segfault for damaged MPEG bitstreams.
      */
     explicit ByteArray(
         size_t alignment,
@@ -60,6 +61,12 @@ public:
      * Capacity of this array.
      */
     size_t capacity() const { return m_capacity; }
+
+    /**
+     * Number of bytes which are allocated after the array data and are guaranteed to be filled
+     * with zeros, as requested in the constructor.
+     */
+    size_t paddingSize() const { return m_padding; }
 
     /**
      * \param data                      Pointer to the data to append to this array
@@ -124,7 +131,11 @@ public:
      * \param size                      Number of bytes that were appended to this
      *                                  array using external mechanisms.
      */
-    void finishWriting(size_t size) { m_size += size; }
+    void finishWriting(size_t size)
+    {
+        m_size += size;
+        zeroPadding();
+    }
 
     /**
      * Removes trailing zero bytes from this array.
@@ -153,6 +164,9 @@ public:
 private:
     bool reallocate(size_t capacity);
     char* allocateBuffer(size_t capacity);
+
+    /** Fills the padding which follows the array data with zeros. */
+    void zeroPadding();
 
 private:
     size_t m_alignment = 1;
