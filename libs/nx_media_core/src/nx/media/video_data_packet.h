@@ -53,6 +53,7 @@ public:
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
     virtual size_t dataSize() const override;
+    virtual size_t paddingSize() const override;
 
     virtual void setData(nx::utils::ByteArray&& buffer) override;
 

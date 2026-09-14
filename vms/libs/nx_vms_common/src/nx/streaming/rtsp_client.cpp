@@ -6,6 +6,10 @@
     #include <sys/ioctl.h>
 #endif
 
+extern "C" {
+#include <libavcodec/defs.h>
+} // extern "C"
+
 #include <algorithm>
 #include <cstring>
 #include <string_view>
@@ -1480,7 +1484,7 @@ quint8* QnRtspClient::prepareDemuxedData(std::vector<nx::utils::ByteArray*>& dem
     if (channel >= 0 && demuxedData.size() <= (size_t)channel)
         demuxedData.resize(channel+1, nullptr);
     if (demuxedData[channel] == 0)
-        demuxedData[channel] = new nx::utils::ByteArray(16, 32, /*AV_INPUT_BUFFER_PADDING_SIZE*/ 32);
+        demuxedData[channel] = new nx::utils::ByteArray(16, 32, AV_INPUT_BUFFER_PADDING_SIZE);
     nx::utils::ByteArray* dataVect = demuxedData[channel];
     //dataVect->resize(dataVect->size() + reserve);
     dataVect->reserve(dataVect->size() + reserve);

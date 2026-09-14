@@ -65,6 +65,11 @@ size_t QnWritableCompressedAudioData::dataSize() const
     return m_data.size();
 }
 
+size_t QnWritableCompressedAudioData::paddingSize() const
+{
+    return m_data.paddingSize();
+}
+
 void QnWritableCompressedAudioData::setData(nx::utils::ByteArray&& buffer)
 {
     m_data = std::move(buffer);
