@@ -11,6 +11,8 @@ import Nx.Mobile.Controls
 import Nx.Mobile.Ui
 import Nx.Ui
 
+import nx.vms.client.mobile
+
 FocusScope
 {
     id: root
@@ -330,6 +332,8 @@ FocusScope
             z: 1
             visible: false
         }
+
+        InteractiveItem.name: "panelButton"
     }
 
     NxControls.Button
@@ -370,6 +374,8 @@ FocusScope
             z: 1
             visible: false
         }
+
+        InteractiveItem.name: "panelButton"
     }
 
     Popup
