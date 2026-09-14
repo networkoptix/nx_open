@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>الى</translation>
     </message>
     <message>
       <source>Occurs At</source>
