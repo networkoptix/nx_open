@@ -659,6 +659,9 @@ Page
         interactive: !video.roiController.drawingRoi
             && !(d.ptzMode && LayoutController.fullscreen)
             && video.zoomedOut
+            && camerasModel.count > 1
+
+        InteractiveItem.name: "cameraSwitcher"
     }
 
     Item
@@ -1157,6 +1160,8 @@ Page
                 objectActionsMenu.adjustPosition(invokerRect, objectActionsMenu.indent)
                 objectActionsMenu.openOrTrigger()
             }
+
+            InteractiveItem.name: "timeline"
         }
 
         Timeline.ObjectSelectionSheet
@@ -1275,6 +1280,8 @@ Page
 
                         onClicked:
                             objectsTypeSheet.open()
+
+                        InteractiveItem.name: "objectTypeButton"
                     }
 
                     ControlButton
