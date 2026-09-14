@@ -277,6 +277,8 @@ AdaptiveSheet
                 else
                     sheet.unavailableAction()
             }
+
+            InteractiveItem.name: "softTriggersButton"
         }
     }
 }

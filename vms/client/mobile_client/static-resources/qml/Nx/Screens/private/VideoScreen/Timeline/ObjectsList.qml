@@ -8,6 +8,7 @@ import Nx.Core
 import Nx.Core.Controls
 import Nx.Items
 
+import nx.vms.client.mobile
 import nx.vms.client.mobile.timeline as Timeline
 
 Item
@@ -258,6 +259,13 @@ Item
                         ScriptAction { script: Qt.callLater(() => delegateHolder.fadeOutFinished()) }
                     }
                 ]
+
+                InteractiveItem.name: delegateHolder.bucket?.state === Timeline.ObjectBucket.Ready
+                    && !delegateHolder.fadingOut && modelData?.count === 1
+                        ? "timelineObject"
+                        : ""
+
+                InteractiveItem.interactionSource: tapHandler
             }
 
             Loader
