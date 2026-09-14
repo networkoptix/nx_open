@@ -60,6 +60,13 @@ private:
     /** Save common remote layout as a cloud one. */
     void saveLayoutAsCloud(const core::LayoutResourcePtr& layout);
 
+    /**
+     * Replace the layout on the workbench with its cloud copy and make it current. The original
+     * layout is left intact.
+     * @return Created cloud layout, or null if the layout cannot be reopened as a cloud one.
+     */
+    core::LayoutResourcePtr reopenLayoutAsCloud(const core::LayoutResourcePtr& layout);
+
     /** Save existing cloud layout under another name. */
     void saveCloudLayoutAs(const core::LayoutResourcePtr& layout);
 

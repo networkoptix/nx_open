@@ -88,6 +88,18 @@ Error Tab::saveLayout()
     return ensureSupported() ? d->saveLayout() : Error{};
 }
 
+Error Tab::reopenAsCloudLayout()
+{
+    // Unlike the other methods, return an error if the operation is not supported, as the caller
+    // expects the web page to be reloaded on success.
+    return ensureSupported() ? d->reopenAsCloudLayout() : Error::failed();
+}
+
+bool Tab::isCloudLayout() const
+{
+    return d->isCloudLayout();
+}
+
 QString Tab::id() const
 {
     // Do not check ensureSupported, because property values may be requested by qt during

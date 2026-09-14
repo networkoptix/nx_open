@@ -64,8 +64,8 @@ enum IDType
     OpenSessionInNewWindowAction,
 
     /**
-    * Switches mode to browse resources/show welcome screen
-    */
+     * Switches mode to browse resources/show welcome screen
+     */
     ResourcesModeAction,
 
     /**
@@ -82,7 +82,7 @@ enum IDType
     /**
      * Opens saas services tab.
      */
-     PreferencesServicesTabAction,
+    PreferencesServicesTabAction,
 
     /**
      * Opens smtp settings preferences tab.
@@ -90,8 +90,8 @@ enum IDType
     PreferencesSmtpTabAction,
 
     /**
-    * Opens notifications settings preferences tab.
-    */
+     * Opens notifications settings preferences tab.
+     */
     PreferencesCloudTabAction,
 
     /**
@@ -108,6 +108,13 @@ enum IDType
      * Drops provided resources on the workbench.
      */
     DropResourcesAction,
+
+    /**
+     * Replaces the provided Layout with its cloud copy on the workbench and makes it current.
+     * The original Layout is left intact. All Layout item widgets are recreated, so any web page
+     * on the Layout is reloaded.
+     */
+    ReopenLayoutAsCloudAction,
 
     /**
      * Handle resources passed to the client.
@@ -227,8 +234,8 @@ enum IDType
     /**
      * Tries to restart the application as soon as all modal dialogs are closed.
      * Parameters:
-     * <tt>QUrl UrlRole</tt>                            --- url the application should connect to.
-     *                                                      If not provided, current connection info will be used.
+     * <tt>QUrl UrlRole</tt> Url the application should connect to. If not provided, current
+     * connection info will be used.
      */
     QueueAppRestartAction,
 
@@ -285,11 +292,11 @@ enum IDType
     ObjectSearchModeAction,
 
     /**
-      * Some right panel tabs filters should be reset to default state on another action
-      * checked state changed (for example, ObjectSearchModeAction).
-      * After that, current right panel's tab should be switched to Notifications tab.
-      * Due to connection of this behavior, the action do both things.
-      */
+     * Some right panel tabs filters should be reset to default state on another action
+     * checked state changed (for example, ObjectSearchModeAction).
+     * After that, current right panel's tab should be switched to Notifications tab.
+     * Due to connection of this behavior, the action do both things.
+     */
     ResetCurrenTabFiltersAndSelectNotificationsTabAction,
 
     /* Main menu actions. */
@@ -364,7 +371,8 @@ enum IDType
     EffectiveMaximizeAction,
 
     /**
-     * Just triggers EffectiveMaximizeAction which should be alias to FullscreenAction or MaximizeAction.
+     * Just triggers EffectiveMaximizeAction which should be alias to FullscreenAction or
+     * MaximizeAction.
      */
     FullscreenMaximizeHotkeyAction,
 
@@ -633,8 +641,8 @@ enum IDType
     SaveLayoutAsCloudAction,
 
     /**
-    * Forgets password for encrypted layout.
-    */
+     * Forgets password for encrypted layout.
+     */
     ForgetLayoutPasswordAction,
 
     /**
@@ -1031,13 +1039,13 @@ enum IDType
     RenameResourceAction,
 
     /**
-    * Changes resource name.
-    *
-    * Parameters:
-    *
-    * <tt>QString ResourceNameRole</tt> --- new name for the entity. If not
-    * supplied, name dialog will pop up.
-    */
+     * Changes resource name.
+     *
+     * Parameters:
+     *
+     * <tt>QString ResourceNameRole</tt> --- new name for the entity. If not
+     * supplied, name dialog will pop up.
+     */
     RenameVideowallEntityAction,
 
     /**
@@ -1302,8 +1310,8 @@ enum IDType
     PinTimelineAction,
 
     /**
-    * Shows/hides notification panel.
-    */
+     * Shows/hides notification panel.
+     */
     ToggleNotificationsAction,
 
     /* Playback actions. */
@@ -1377,8 +1385,8 @@ enum IDType
     OpenCloudAccountSecurityUrl,
 
     /**
-    * Opens cloud portal in the browser at register page.
-    */
+     * Opens cloud portal in the browser at register page.
+     */
     OpenCloudRegisterUrl,
 
     /**

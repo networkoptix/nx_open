@@ -51,6 +51,9 @@ public:
     Error stopSyncPlay();
     Error setLayoutProperties(const LayoutProperties& properties);
     Error saveLayout();
+    Error reopenAsCloudLayout();
+
+    bool isCloudLayout() const;
 
     QnWorkbenchLayout* layout() const;
 

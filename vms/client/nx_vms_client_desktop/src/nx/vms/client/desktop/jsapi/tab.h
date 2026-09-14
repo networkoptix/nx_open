@@ -45,6 +45,11 @@ class Tab: public QObject
      */
     Q_PROPERTY(QString id READ id CONSTANT)
 
+    /**
+     * Whether the Layout on the tab is a Cloud Layout.
+     */
+    Q_PROPERTY(bool cloudLayout READ isCloudLayout CONSTANT)
+
 public:
     /** @private */
     Tab(
@@ -96,11 +101,22 @@ public:
     /** Saves the Layout. */
     Q_INVOKABLE Error saveLayout();
 
+    /**
+     * Reopens the Layout on the tab as a Cloud Layout, replacing it with its cloud copy, so the
+     * calling web page is reloaded. See @ref cloud-layouts "Cloud Layouts".
+     * @return Success if the Layout is going to be reopened. The replacement itself is performed
+     *     after the call is completed.
+     */
+    Q_INVOKABLE Error reopenAsCloudLayout();
+
     /** @private */
     QString id() const;
 
     /** @private */
     QString name() const;
+
+    /** @private */
+    bool isCloudLayout() const;
 
     /** @private */
     QnWorkbenchLayout* layout() const;

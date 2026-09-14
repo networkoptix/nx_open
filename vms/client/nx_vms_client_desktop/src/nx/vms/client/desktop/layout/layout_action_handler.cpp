@@ -27,7 +27,6 @@
 #include <nx/vms/client/core/cross_system/cross_system_layout_resource.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
-#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
@@ -52,7 +51,6 @@
 #include <nx/vms/client/desktop/workbench/handlers/notification_action_handler.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
 #include <nx/vms/common/intercom/utils.h>
-#include <nx/vms/common/system_settings.h>
 #include <nx/vms/common/user_management/user_management_helpers.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -138,21 +136,6 @@ QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
 QSet<QnResourcePtr> localLayoutResources(const core::LayoutResourcePtr& layout)
 {
     return localLayoutResources(layout->resourcePool(), layout->getItems());
-}
-
-bool hasCrossSystemItems(const core::LayoutResourcePtr& layout)
-{
-    const auto currentCloudSystemId = appContext()->currentSystemContext()->globalSettings()
-        ->cloudSystemId();
-
-    auto items = layout->getItems();
-    return std::ranges::any_of(
-        items,
-        [currentCloudSystemId](const common::LayoutItemData& item)
-        {
-            return core::isCrossSystemResource(item.resource)
-                && core::crossSystemResourceSystemId(item.resource) != currentCloudSystemId;
-        });
 }
 
 void saveCloudLayoutRetryCallback(bool success, const core::LayoutResourcePtr& layout)
@@ -254,6 +237,11 @@ LayoutActionHandler::LayoutActionHandler(WindowContext* windowContext, QObject* 
 
     connect(action(menu::SaveCurrentLayoutAsCloudAction), &QAction::triggered, this,
         [this, getCurrentLayout]() { saveLayoutAsCloud(getCurrentLayout());});
+
+    connect(action(menu::ReopenLayoutAsCloudAction),
+        &QAction::triggered,
+        this,
+        [this, getLayoutFromParameters]() { reopenLayoutAsCloud(getLayoutFromParameters()); });
 
     connect(action(menu::SaveLayoutAsAction), &QAction::triggered, this,
         [this, getLayoutFromParameters]() { saveLayoutAs(getLayoutFromParameters()); });
@@ -403,14 +391,6 @@ void LayoutActionHandler::saveLayout(const core::LayoutResourcePtr& layout)
 {
     if (!layout)
         return;
-
-    // This scenario is not very actual as it can be caused only if user places cross-system
-    // cameras on a local layout using api.
-    if (!layout->isCrossSystem() && hasCrossSystemItems(layout))
-    {
-        convertLayoutToCloud(layout);
-        return;
-    }
 
     auto systemContext = SystemContext::fromResource(layout);
     if (!NX_ASSERT(systemContext))
@@ -644,6 +624,30 @@ void LayoutActionHandler::saveLayoutAsCloud(const core::LayoutResourcePtr& layou
         });
 
     dialog->show();
+}
+
+core::LayoutResourcePtr LayoutActionHandler::reopenLayoutAsCloud(
+    const core::LayoutResourcePtr& layout)
+{
+    if (!NX_ASSERT(layout) || !NX_ASSERT(!layout->isCrossSystem()))
+        return {};
+
+    core::LayoutResource::ItemsRemapHash itemsRemapHash;
+    const auto cloudLayout = convertLayoutToCloud(layout, &itemsRemapHash);
+    if (!cloudLayout)
+        return {};
+
+    cloneRadassModes(system()->radassResourceManager(), layout, cloudLayout, itemsRemapHash);
+
+    auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
+    if (!targetLayout)
+        targetLayout = workbench()->addLayout(cloudLayout);
+
+    if (!NX_ASSERT(targetLayout))
+        return {};
+
+    workbench()->setCurrentLayout(targetLayout);
+    return cloudLayout;
 }
 
 void LayoutActionHandler::saveCloudLayoutAs(const core::LayoutResourcePtr& layout)

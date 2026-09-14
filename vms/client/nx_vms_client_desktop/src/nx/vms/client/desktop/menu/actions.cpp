@@ -127,6 +127,13 @@ void initialize(Manager* manager, Action* root)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
         .mode(DesktopMode);
 
+    factory(ReopenLayoutAsCloudAction)
+        .flags(ResourceTarget | SingleTarget)
+        .mode(DesktopMode)
+        .condition(condition::isLoggedInAsCloudUser() && condition::hasDocDBService()
+            && condition::canSaveLayoutAs()
+            && condition::hasFlags(Qn::cross_system, MatchMode::none));
+
     factory(DelayedOpenVideoWallItemAction)
         .flags(NoTarget);
 

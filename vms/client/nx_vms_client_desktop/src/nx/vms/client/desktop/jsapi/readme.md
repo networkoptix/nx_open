@@ -37,6 +37,26 @@ used to check whether the API is enabled and will be initialized.
             }
     }
 
+## Cloud Layouts {#cloud-layouts}
+
+Resources from other Sites can be placed on a Cloud Layout only. An attempt to add such a Resource
+to a regular Layout with @ref vms-tab `addItem()` fails.
+
+A Layout cannot be converted into a Cloud one in place. Instead, it is replaced with its cloud copy
+and reopened, so all Layout items, including the web page which requests the operation, are
+recreated. Any state of the web page which is not stored by the page itself is lost.
+
+Thus, an integration which is going to use Resources from other Sites should check the Layout type
+when it is loaded, and ask the user whether the Layout may be reopened as a Cloud one:
+
+    if (!vms.tab.cloudLayout && confirm("The Layout is to be reopened as a Cloud one. Continue?"))
+        await vms.tab.reopenAsCloudLayout()
+
+The reopened Layout is not saved automatically, use @ref vms-tab `saveLayout()` if it is required.
+
+Only cloud users can use Cloud Layouts, so for a local user the check should be omitted along with
+any functionality which relies on Resources from other Sites.
+
 ## Signals
 
 The API supports **signals**. These objects are used like event handlers and have the

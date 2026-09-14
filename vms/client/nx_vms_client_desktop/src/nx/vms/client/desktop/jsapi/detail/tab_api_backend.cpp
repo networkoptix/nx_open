@@ -8,6 +8,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/resource/layout_resource.h>
+#include <nx/vms/client/core/resource/resource_descriptor_helpers.h>
 #include <nx/vms/client/core/resource/unified_resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
@@ -73,6 +74,15 @@ Error cantFindWidgetResult()
 {
     return Error::failed(TabApiBackend::tr(
         "Cannot find a widget corresponding to the specified item"));
+}
+
+Error crossSystemResourceOnRegularLayoutResult()
+{
+    return Error::failed(
+        TabApiBackend::tr("Cannot add a resource from another Site to a regular Layout. "
+                          "Use %1 to reopen the Layout as a cross-site one.",
+            "%1 is the JS API method name")
+            .arg("reopenAsCloudLayout()"));
 }
 
 } // namespace
@@ -751,6 +761,11 @@ ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const Item
             tr("Cannot specify a media parameters for the resource without media stream.")));
     }
 
+    const bool isCloudLayout = d->layout->resource()->isCrossSystem();
+
+    if (!isCloudLayout && core::isCrossSystemResource(core::descriptor(resource)))
+        return d->itemOperationResult(crossSystemResourceOnRegularLayoutResult());
+
     if (!d->hasPermissions(resource, Qn::ViewContentPermission))
         return d->itemOperationResult(Error::denied());
 
@@ -775,7 +790,7 @@ ItemResult TabApiBackend::addItem(const ResourceUniqueId& resourceId, const Item
     }
 
     common::LayoutItemData itemData = layoutItemFromResource(resource,
-        /*forceCloud*/ d->layout->resource()->hasFlags(Qn::cross_system));
+        /*forceCloud*/ isCloudLayout);
     itemData.flags = Qn::PendingGeometryAdjustment;
 
     const auto itemId = itemData.uuid.toQUuid();
@@ -922,6 +937,37 @@ Error TabApiBackend::saveLayout()
     return success
         ? Error::success()
         : Error::failed();
+}
+
+Error TabApiBackend::reopenAsCloudLayout()
+{
+    if (!NX_ASSERT(d->layout))
+        return Error::failed();
+
+    const auto layoutResource = d->layout->resource();
+    if (!NX_ASSERT(layoutResource))
+        return Error::failed();
+
+    if (layoutResource->isCrossSystem())
+        return Error::failed(tr("The layout is already a cross-site layout"));
+
+    const auto menu = d->context->menu();
+    if (!menu->canTrigger(menu::ReopenLayoutAsCloudAction, layoutResource))
+        return Error::denied();
+
+    const auto reopenLayout = [menu, layoutResource]
+    {
+        menu->triggerIfPossible(menu::ReopenLayoutAsCloudAction, layoutResource);
+    };
+
+    executeLater(reopenLayout, menu);
+
+    return Error::success();
+}
+
+bool TabApiBackend::isCloudLayout() const
+{
+    return d->layout && d->layout->resource()->isCrossSystem();
 }
 
 QnWorkbenchLayout* TabApiBackend::layout() const

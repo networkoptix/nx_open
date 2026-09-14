@@ -74,7 +74,6 @@
 #include <nx/vms/client/core/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/utils/geometry.h>
-#include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/access/caching_access_controller.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -968,21 +967,8 @@ void ActionHandler::at_openInLayoutAction_triggered()
     {
         NX_ASSERT(parameters.widgets().empty());
 
-        if (!appContext()->cloudServiceChecker()->hasService(
-            nx::vms::client::core::CloudService::docdb))
-        {
+        if (!menu()->triggerIfPossible(menu::ReopenLayoutAsCloudAction, layout))
             return;
-        }
-
-        // Convert common layout to cloud one.
-        auto cloudLayout = convertLayoutToCloud(layout);
-        // Replace opened layout with the cloud one.
-        auto targetLayout = workbench()->replaceLayout(layout, cloudLayout);
-        if (!targetLayout)
-            targetLayout = workbench()->addLayout(cloudLayout);
-
-        if (NX_ASSERT(targetLayout))
-            workbench()->setCurrentLayout(targetLayout);
 
         menu()->trigger(menu::OpenInCurrentLayoutAction, parameters);
 
