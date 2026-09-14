@@ -197,7 +197,7 @@ AdaptiveScreen
         title: qsTr("Resources")
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/resource_tree.svg?primary=dark1"
-        interactive: true
+        interactive: !loadingDummy.visible
         item: resourceTreeSheet
 
         onVisibleChanged:
@@ -227,7 +227,7 @@ AdaptiveScreen
         }
         color: ColorTheme.colors.dark5
         iconSource: "image://skin/24x24/Outline/timeline.svg?primary=dark1"
-        interactive: true
+        interactive: !loadingDummy.visible
 
         // The timeline goes into this panel only where there is one. Complementary to
         // `ownsNavigator` below, which lets the video screen keep the timeline under the video.
