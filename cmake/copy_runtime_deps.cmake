@@ -1,57 +1,51 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# Invoked via `cmake -P` from nx_add_functional_test.
+include_guard(GLOBAL)
+
+# Dependencies the FT base images install from the distro instead of staging from the build.
+set(nx_allowed_unresolved_runtime_deps "libOpenGL.so.0")
+
 # Walks BINARY's runtime deps, drops system libs, copies the rest (with symlink chains) into DEST.
 #
-# Required:
-#   BINARY  - absolute path to the ELF to inspect
-#   DEST    - absolute path to the directory to populate (created if missing)
-# Optional:
-#   EXTRA_PRE_EXCLUDE   - extra name regexes (matched before path resolution)
-#   EXTRA_POST_EXCLUDE  - extra path regexes (matched after path resolution)
+# ALLOWED_UNRESOLVED - names allowed to stay unresolved; anything else is an error. Defaults to
+# nx_allowed_unresolved_runtime_deps.
+function(nx_copy_runtime_deps binary dest)
+    cmake_parse_arguments(ARG "" "" "ALLOWED_UNRESOLVED" ${ARGN})
 
-if(NOT BINARY)
-    message(FATAL_ERROR "copy_runtime_deps: BINARY is not set")
-endif()
-if(NOT DEST)
-    message(FATAL_ERROR "copy_runtime_deps: DEST is not set")
-endif()
-if(NOT EXISTS "${BINARY}")
-    message(FATAL_ERROR "copy_runtime_deps: BINARY does not exist: ${BINARY}")
-endif()
+    if(ARG_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "nx_copy_runtime_deps: unknown arguments: ${ARG_UNPARSED_ARGUMENTS}")
+    endif()
 
-set(pre_exclude "")
-if(EXTRA_PRE_EXCLUDE)
-    list(APPEND pre_exclude ${EXTRA_PRE_EXCLUDE})
-endif()
+    if(NOT EXISTS "${binary}")
+        message(FATAL_ERROR "nx_copy_runtime_deps: binary does not exist: ${binary}")
+    endif()
 
-# Drop anything that resolved to a system path. Build-tree and Conan-cache libs are kept.
-set(post_exclude
-    "^/lib(32|64|x32)?/"
-    "^/usr/lib(32|64|x32)?/"
-    "^/usr/local/lib(32|64|x32)?/"
-)
-if(EXTRA_POST_EXCLUDE)
-    list(APPEND post_exclude ${EXTRA_POST_EXCLUDE})
-endif()
+    if(NOT DEFINED ARG_ALLOWED_UNRESOLVED)
+        set(ARG_ALLOWED_UNRESOLVED ${nx_allowed_unresolved_runtime_deps})
+    endif()
 
-file(GET_RUNTIME_DEPENDENCIES
-    EXECUTABLES "${BINARY}"
-    RESOLVED_DEPENDENCIES_VAR resolved
-    UNRESOLVED_DEPENDENCIES_VAR unresolved
-    PRE_EXCLUDE_REGEXES ${pre_exclude}
-    POST_EXCLUDE_REGEXES ${post_exclude}
-)
+    # Drop anything that resolved to a system path. Build-tree and Conan-cache libs are kept.
+    file(GET_RUNTIME_DEPENDENCIES
+        EXECUTABLES "${binary}"
+        RESOLVED_DEPENDENCIES_VAR resolved
+        UNRESOLVED_DEPENDENCIES_VAR unresolved
+        POST_EXCLUDE_REGEXES
+            "^/lib(32|64|x32)?/"
+            "^/usr/lib(32|64|x32)?/"
+            "^/usr/local/lib(32|64|x32)?/"
+    )
 
-file(MAKE_DIRECTORY "${DEST}")
+    if(unresolved AND ARG_ALLOWED_UNRESOLVED)
+        list(REMOVE_ITEM unresolved ${ARG_ALLOWED_UNRESOLVED})
+    endif()
+    if(unresolved)
+        string(REPLACE ";" "\n  " unresolved_text "${unresolved}")
+        message(FATAL_ERROR
+            "nx_copy_runtime_deps: unresolved dependencies of ${binary}:\n  ${unresolved_text}")
+    endif()
 
-foreach(lib IN LISTS resolved)
-    file(COPY "${lib}" DESTINATION "${DEST}" FOLLOW_SYMLINK_CHAIN)
-endforeach()
-
-if(unresolved)
-    message(STATUS "copy_runtime_deps: unresolved dependencies for ${BINARY}:")
-    foreach(u IN LISTS unresolved)
-        message(STATUS "  ${u}")
+    file(MAKE_DIRECTORY "${dest}")
+    foreach(lib IN LISTS resolved)
+        file(COPY "${lib}" DESTINATION "${dest}" FOLLOW_SYMLINK_CHAIN)
     endforeach()
-endif()
+endfunction()

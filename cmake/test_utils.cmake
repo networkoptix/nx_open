@@ -129,51 +129,57 @@ function(nx_add_functional_test target)
     endif()
 
     set(one_value_args FOLDER)
-    set(multi_value_args DEPENDS FILES BINARIES)
+    set(multi_value_args
+        DEPENDS FILES BINARIES QT_PLUGIN_GROUPS EXTRA_LIBS ALLOWED_UNRESOLVED)
     cmake_parse_arguments(FT_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+    if(FT_TEST_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR
+            "nx_add_functional_test(${target}): unknown arguments:"
+            " ${FT_TEST_UNPARSED_ARGUMENTS}")
+    endif()
 
     set(dest_dir "${functional_tests_output_dir}/${target}")
     set(stamp_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.stamp")
 
-    # Create list of dependencies (input files)
-    set(copy_deps ${FT_TEST_FILES})
+    # Never created, so the staging command stays out of date and re-verifies dest_dir on every
+    # build. The stamp is touched only when something actually changed, so its mtime stays a
+    # meaningful "staged content differs" signal for anything depending on it directly.
+    set(always_run_file "${CMAKE_CURRENT_BINARY_DIR}/${target}.always_run")
 
-    set(copy_cmds "")
+    set(binaries "")
     set(dest_generated_files "")
 
     foreach(src IN LISTS FT_TEST_FILES)
         get_filename_component(name "${src}" NAME)
-        list(APPEND copy_cmds
-            COMMAND ${CMAKE_COMMAND} -E copy "${src}" "${dest_dir}/${name}"
-        )
         list(APPEND dest_generated_files "${dest_dir}/${name}")
     endforeach()
 
     foreach(src IN LISTS FT_TEST_BINARIES)
-        list(APPEND copy_cmds
-            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}" "${dest_dir}/${src}"
-            COMMAND ${CMAKE_COMMAND}
-            -DBINARY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}
-            -DDEST=${dest_dir}/lib
-            -P ${open_source_root}/cmake/copy_runtime_deps.cmake
-        )
-        list(APPEND copy_deps "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}")
+        list(APPEND binaries "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${src}")
         list(APPEND dest_generated_files "${dest_dir}/${src}")
     endforeach()
 
-    # Add a final step that creates/updates the stamp file
-    list(APPEND copy_cmds
-        COMMAND ${CMAKE_COMMAND} -E touch "${stamp_file}"
-    )
+    # Qt plugins are opened at runtime so they are not revealed by the dependency walk.
+    set(qt_plugin_dirs "")
+    foreach(group IN LISTS FT_TEST_QT_PLUGIN_GROUPS)
+        list(APPEND qt_plugin_dirs "${QT_DIR}/plugins/${group}")
+    endforeach()
 
-    # Custom command that produces the stamp file and depends on all input files
     add_custom_command(
-        OUTPUT "${stamp_file}"
+        OUTPUT "${stamp_file}" "${always_run_file}"
         BYPRODUCTS ${dest_generated_files}
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${dest_dir}"
-        ${copy_cmds}
-        DEPENDS ${copy_deps} ${FT_TEST_DEPENDS}
-        COMMENT "Copying functional test files into ${dest_dir}"
+        COMMAND ${CMAKE_COMMAND}
+            "-DDEST_DIR=${dest_dir}"
+            "-DSTAMP_FILE=${stamp_file}"
+            "-DFILES=${FT_TEST_FILES}"
+            "-DBINARIES=${binaries}"
+            "-DQT_PLUGIN_DIRS=${qt_plugin_dirs}"
+            "-DEXTRA_LIBS=${FT_TEST_EXTRA_LIBS}"
+            "-DALLOWED_UNRESOLVED=${FT_TEST_ALLOWED_UNRESOLVED}"
+            -P "${open_source_root}/cmake/stage_functional_test.cmake"
+        DEPENDS ${FT_TEST_FILES} ${binaries} ${FT_TEST_DEPENDS}
+        COMMENT "Staging functional test files into ${dest_dir}"
         VERBATIM
     )
 
