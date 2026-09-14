@@ -1849,7 +1849,7 @@
     </message>
     <message>
       <source>Time synchronization enabled.</source>
-      <translation type="unfinished">Time synchronization enabled.</translation>
+      <translation>تم تفعيل مزامنة الوقت.</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
@@ -1921,7 +1921,7 @@
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
-      <translation type="unfinished">Use Windows line feed in emails.</translation>
+      <translation>استخدم خاصية تغذية السطر في نظام ويندوز في رسائل البريد الإلكتروني.</translation>
     </message>
     <message>
       <source>Enable audit trail.</source>
@@ -2061,7 +2061,7 @@
     </message>
     <message>
       <source>Watermark settings.</source>
-      <translation type="unfinished">Watermark settings.</translation>
+      <translation>إعدادات العلامة المائية.</translation>
     </message>
     <message>
       <source>Pixelation settings.</source>
