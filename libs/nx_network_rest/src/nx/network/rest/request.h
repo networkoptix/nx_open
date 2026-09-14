@@ -3,6 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <map>
+#include <string>
 
 #include <nx/json_rpc/messages.h>
 #include <nx/reflect/json.h>
@@ -66,6 +68,7 @@ struct Context
     std::optional<Subs> subs;
     int ackWindow = 0;
     std::optional<std::chrono::milliseconds> updateMs;
+    std::map<std::string, std::string> itemEtags;
 };
 
 } // namespace json_rpc

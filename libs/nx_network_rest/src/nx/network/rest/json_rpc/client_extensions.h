@@ -3,6 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <map>
+#include <string>
 
 #include <nx/json_rpc/messages.h>
 #include <nx/network/rest/response.h>
@@ -28,8 +30,16 @@ struct SubscriptionExtensions: ClientExtensions
      * %example 1
      */
     int ackWindow = 0;
+
+    /**%apidoc[opt]
+     * Per-item ETags the client already holds, keyed by subscription item id. On a collection
+     * `etag` mismatch, only items whose ETag differs (or new ids) are streamed; the id-list body
+     * reports full membership so the client can reconcile deletions. An empty or absent map
+     * streams the whole collection on mismatch.
+     */
+    std::map<std::string, std::string> itemEtags;
 };
-NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs)(ackWindow))
+NX_REFLECTION_INSTRUMENT(SubscriptionExtensions, (etag)(updateMs)(ackWindow)(itemEtags))
 
 template<typename T, typename Extensions = ClientExtensions>
 struct Payload

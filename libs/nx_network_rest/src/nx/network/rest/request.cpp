@@ -72,6 +72,7 @@ static std::tuple<http::Method, QString> methodAndPath(json_rpc::Context* contex
                 {
                     context->ackWindow = extensions.ackWindow;
                     context->updateMs = extensions.updateMs;
+                    context->itemEtags = std::move(extensions.itemEtags);
                 }
             }
             method.remove_suffix(tail.size());

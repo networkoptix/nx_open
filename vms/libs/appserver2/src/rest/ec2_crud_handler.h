@@ -224,20 +224,33 @@ public:
         nx::network::rest::json::DefaultValueAction defaultValueAction =
             nx::network::rest::json::DefaultValueAction::appendMissing)
     {
+        auto d = static_cast<Derived*>(this);
+        const auto& context = request.jsonRpcContext();
+        const bool subscriptionStream = context && context->ackWindow > 0;
+
+        // Full membership captured before calculateCollectionEtag renders (moves) changed items
+        // out of `list`; the client reconciles deletions against this id-list.
+        std::vector<DeleteInput> ids;
+        if (subscriptionStream)
+        {
+            ids.reserve(list.size());
+            for (const auto& item: list)
+            {
+                ids.emplace_back(
+                    DeleteInput{d->subscriptionIdFromId(nx::utils::model::getId(item))});
+            }
+        }
+
         auto etag = calculateCollectionEtag(&list, request, &responseAttributes);
-        if (const auto& context = request.jsonRpcContext(); context && context->ackWindow > 0)
+        if (subscriptionStream)
         {
             nx::network::http::insertOrReplaceHeader(
                 &responseAttributes.httpHeaders, {"ETag", nx::utils::toBase64Url(etag)});
             if (matchesRequestEtag(request, Hash::Check::list, etag))
+            {
                 return base_type::response(
                     nx::utils::Void{}, request, std::move(responseAttributes));
-            std::vector<DeleteInput> ids;
-            const auto& items = std::get<std::vector<nx::network::rest::SubscriptionItem>>(
-                responseAttributes.subscription);
-            ids.reserve(items.size());
-            for (const auto& item: items)
-                ids.emplace_back(DeleteInput{item.id});
+            }
             return base_type::response(ids, request, std::move(responseAttributes));
         }
         return responseWithEtag(Hash::Check::list,
@@ -273,6 +286,15 @@ public:
         const auto etagIn =
             nx::network::http::getHeaderValue(request.httpHeaders(), "If-None-Match");
         return !etagIn.empty() && Hash::check(check, nx::utils::fromBase64Url(etagIn), etag);
+    }
+
+    static bool itemChanged(const std::map<std::string, std::string>& itemEtags,
+        const QString& id,
+        Hash::ValueView serverEtag)
+    {
+        const auto it = itemEtags.find(id.toStdString());
+        return it == itemEtags.end()
+            || !Hash::check(Hash::Check::item, nx::utils::fromBase64Url(it->second), serverEtag);
     }
 
     template<typename Data>
@@ -319,6 +341,7 @@ protected:
         {
             const bool render = !matchesRequestEtag(request, Hash::Check::list, result);
             auto postProcess = render ? makePostProcessContext(request) : PostProcessContext{};
+            const auto& itemEtags = context->itemEtags;
             std::vector<nx::network::rest::SubscriptionItem> items;
             if (render)
                 items.reserve(list->size());
@@ -328,7 +351,7 @@ protected:
                 auto etag = etags.hash(id);
                 if constexpr (requires { Data::etag; })
                     item.etag = nx::utils::toBase64Url(etag);
-                if (render)
+                if (render && itemChanged(itemEtags, id, etag))
                 {
                     items.push_back({std::move(id),
                         std::move(etag),
