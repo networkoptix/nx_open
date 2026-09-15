@@ -183,7 +183,7 @@ class NxOpenConan(ConanFile):
         self.install_system_requirements(packages)
 
     def build_requirements(self):
-        self.tool_requires("qt-host/6.11.1" "#c722220adaed5864c9b7a60ad8a57436")
+        self.tool_requires("qt-host/6.11.1" "#7a3afd05696cd10e405f0bd38a7c4a09")
         self.tool_requires("protobuf/5.27.0" "#56d591557e0fc6a4356fc1dbc6ffbe56")
         self.tool_requires("grpc/1.67.1" "#af343deb43728d9f31d2a7c9fc0728f5")
         self.tool_requires("abseil/20240116.2" "#129b9a5c87da55d656811cb53e915b41")
@@ -238,7 +238,7 @@ class NxOpenConan(ConanFile):
         self.requires("boost/1.89.0" "#130a884f1529433238f4f2dc98d94ac8")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
-        self.requires("qt/6.11.1" "#da3a7b8bd3801ae9ae91c298baac8ad2")
+        self.requires("qt/6.11.1" "#d63b7fd8e0115790df7c3b34483d7212")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
         self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
 
@@ -247,7 +247,7 @@ class NxOpenConan(ConanFile):
             self.requires("libmp3lame/3.100" "#da13ecbaf0d06421ae586b7226d985ad")
             self.requires("roboto-fonts/1.0" "#1bff09c31c4d334f27795653e0f4b2bb")
             self.requires("perfetto/47.0" "#fefcb910df242e7dca2a309cac9396cb")
-            self.requires("crashpad/cci.20250729" "#b49360b710de1716da8e0b886704adbc")
+            self.requires("crashpad/cci.20250729" "#9858832f924a8a2391757fb3045dd2d6")
 
         if self.settings.os not in ("Android", "iOS", "Emscripten"):
             # Qt dependency.
