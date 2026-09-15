@@ -608,6 +608,44 @@ TEST_F(LayoutItemAccessResolverTest, videowallLayoutRemovedFromThePoolFirst)
     ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
 }
 
+TEST_F(LayoutItemAccessResolverTest, videowallRemovedWithItsLayout)
+{
+    auto camera = addCamera();
+    auto videowall = addVideoWall();
+    auto layout = addLayoutForVideoWall(videowall);
+    addToLayout(layout, camera);
+
+    manager->setOwnResourceAccessMap(
+        kTestSubjectId, {{videowall->getId(), kVideoWallControlAccessRights}});
+
+    NX_ASSERT_TEST_SUBJECT_CHANGED();
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kViewAccessRights);
+
+    const QWeakPointer<QnLayoutResource> layoutRef = layout.toWeakRef();
+    resourcePool()->removeResources({videowall, layout});
+
+    // The videowall has already left the pool, so it cannot be resolved as the layout parent.
+    ASSERT_TRUE(layout->getParentResource().isNull());
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, camera), kNoAccessRights);
+
+    // Removals of both the videowall and the layout affect the subject, so drop the accumulated
+    // notifications instead of expecting an exact number of them.
+    resourceAccessChanged->clear();
+
+    // Layout changes are not tracked now.
+    auto healthMonitor = addServer();
+    addToLayout(layout, healthMonitor);
+    NX_ASSERT_NO_SIGNAL(resourceAccessChanged);
+    ASSERT_EQ(resolver->accessRights(kTestSubjectId, healthMonitor), kNoAccessRights);
+
+    // The resolver must not keep the removed layout alive. On the Client such a layout keeps its
+    // stored layout alive as well, while the stored layout references the layout itself weakly,
+    // and any further access resolution over it asserts in `transientLayout()`.
+    videowall.clear();
+    layout.clear();
+    ASSERT_TRUE(layoutRef.isNull());
+}
+
 TEST_F(LayoutItemAccessResolverTest, videowallMatrixLayouts)
 {
     manager->setOwnResourceAccessMap(kTestSubjectId, {{kAllVideoWallsGroupId, AccessRight::edit}});

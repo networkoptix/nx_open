@@ -456,7 +456,9 @@ void LayoutItemAccessResolver::Private::handleLayoutRemoved(const QnLayoutResour
 
     layout->disconnect(this);
 
-    if (isRelevantLayout(layout))
+    // Checking watch status instead of relevance because layout parent may be already removed on
+    // resource pool clearing.
+    if (sharedLayoutItemsWatcher.isWatched(layout->storedLayout()))
         handleLayoutUnshared(layout);
 }
 
