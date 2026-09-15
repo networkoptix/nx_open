@@ -31,6 +31,7 @@ Item
     readonly property var currentEngineId: viewModel.currentEngineId
     property Resource resource: null
     property bool initialized: false
+    property var displayedEngineId: null
     property alias viewModel: viewModel
 
     Connections
@@ -43,30 +44,52 @@ Item
             if (!resource)
                 return
 
-            loading = store.analyticsSettingsLoading()
-            if (loading)
-                return
+            const resourceChanged = analyticsSettings.resource !== resource
+            if (resourceChanged)
+            {
+                analyticsSettings.resource = resource
+                analyticsSettings.initialized = false
+            }
 
+            loading = store.analyticsSettingsLoading()
             supportsDualStreaming = store.dualStreamingEnabled()
-            analyticsSettings.resource = resource
-            const isInitial = !store.hasChanges()
-                || !analyticsSettings.initialized
-                || analyticsSettings.resource !== resource
 
             const currentEngineId = store.currentAnalyticsEngineId()
             const userEnabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
             const licenseSummary = engineLicenseSummaryProvider.licenseSummary(
                 currentEngineId, resource, userEnabledAnalyticsEngines)
             viewModel.enabledEngines = userEnabledAnalyticsEngines
-            viewModel.updateState(
-                store.analyticsEngines(),
-                licenseSummary,
-                store.deviceAgentSettingsModel(currentEngineId),
-                store.deviceAgentSettingsValues(currentEngineId),
-                store.deviceAgentSettingsErrors(currentEngineId),
-                isInitial)
 
-            analyticsSettings.initialized = true
+            const isInitial = !store.hasChanges() || !analyticsSettings.initialized
+
+            if (loading)
+            {
+                const keepSettingsView = !resourceChanged
+                    && analyticsSettings.displayedEngineId === currentEngineId
+                if (!keepSettingsView)
+                    analyticsSettings.displayedEngineId = null
+
+                viewModel.updateState(
+                    store.analyticsEngines(),
+                    licenseSummary,
+                    keepSettingsView ? undefined : null, //< Keep or clear the current model.
+                    /*values*/ null,
+                    store.deviceAgentSettingsErrors(currentEngineId),
+                    isInitial)
+            }
+            else
+            {
+                viewModel.updateState(
+                    store.analyticsEngines(),
+                    licenseSummary,
+                    store.deviceAgentSettingsModel(currentEngineId),
+                    store.deviceAgentSettingsValues(currentEngineId),
+                    store.deviceAgentSettingsErrors(currentEngineId),
+                    isInitial)
+
+                analyticsSettings.initialized = true
+                analyticsSettings.displayedEngineId = currentEngineId
+            }
 
             if (currentEngineId)
             {
