@@ -220,7 +220,7 @@ public:
      */
     public: std::optional<std::string> sharedContextValue(const char* id, const char* key) const
     {
-        IString* value = getSharedContextValue(id, key);
+        const auto value = Ptr(getSharedContextValue(id, key));
         return value ? std::optional<std::string>(value->str()) : std::nullopt;
     }
 
