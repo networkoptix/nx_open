@@ -651,7 +651,7 @@ Page
         controller: controller
 
         interactive: !video.roiController.drawingRoi
-            && !(d.ptzMode && d.fullscreen)
+            && !(d.ptzMode && LayoutController.fullscreen)
             && video.zoomedOut
     }
 
