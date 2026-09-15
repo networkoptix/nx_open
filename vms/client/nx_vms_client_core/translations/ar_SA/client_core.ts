@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>مطلوب المصادقة الثنائية.</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -163,7 +163,7 @@
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>تم تعطيل هذا المستخدم من قبل مسؤول الموقع.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
@@ -385,7 +385,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>حاول تغيير معايير البحث</translation>
     </message>
   </context>
   <context>

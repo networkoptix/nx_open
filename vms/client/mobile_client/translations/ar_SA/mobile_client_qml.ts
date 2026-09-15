@@ -400,7 +400,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>حاول تغيير معايير البحث</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -753,7 +753,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>الى</translation>
     </message>
   </context>
   <context>
@@ -902,7 +902,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>حاول تغيير معايير البحث</translation>
     </message>
     <message>
       <source>No Organizations</source>
@@ -1114,7 +1114,7 @@
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>حاول تغيير معايير البحث</translation>
     </message>
     <message>
       <source>Cloud</source>
