@@ -680,7 +680,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -788,7 +788,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -1307,7 +1307,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>الإصدار</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -1323,7 +1323,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>الإستخدام</translation>
     </message>
   </context>
   <context>
@@ -1587,7 +1587,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -2380,7 +2380,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>حاول البحث عن شيء آخر</translation>
     </message>
   </context>
   <context>

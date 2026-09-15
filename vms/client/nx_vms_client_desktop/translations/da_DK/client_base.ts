@@ -12613,6 +12613,15 @@ Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan d
       <source>Cannot remove item from the layout</source>
       <translation>Kan ikke fjerne elementet fra layoutet</translation>
     </message>
+    <message>
+      <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
+      <comment>%1 is the JS API method name</comment>
+      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+    </message>
+    <message>
+      <source>The layout is already a cross-site layout</source>
+      <translation type="unfinished">The layout is already a cross-site layout</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::menu::ChunksFilterActionFactory</name>

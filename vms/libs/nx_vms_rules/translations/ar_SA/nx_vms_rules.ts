@@ -133,7 +133,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>الى</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -360,7 +360,7 @@
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
