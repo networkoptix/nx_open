@@ -283,6 +283,7 @@ copyQtLibs()
         Core5Compat
         DBus
         Gui
+        LabsFolderListModel
         LabsPlatform
         LabsQmlModels
         Multimedia
@@ -300,6 +301,9 @@ copyQtLibs()
         QuickControls2Basic
         QuickControls2BasicStyleImpl
         QuickControls2Impl
+        QuickDialogs2
+        QuickDialogs2QuickImpl
+        QuickDialogs2Utils
         QuickEffects
         QuickLayouts
         QuickShapes
@@ -312,6 +316,7 @@ copyQtLibs()
         WebChannelQuick
         WebEngineCore
         WebEngineQuick
+        WebEngineQuickDelegatesQml
         WebEngineWidgets
         WebView
         Widgets
