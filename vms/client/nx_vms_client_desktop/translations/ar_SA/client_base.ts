@@ -3630,7 +3630,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>كتم الصوت</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
@@ -4608,7 +4608,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>ماذا نفعل مع بيانات التحليلات الحالية؟</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4850,7 +4850,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>للتخزين سياسات مختلفة للقراءة والكتابة عبر مختلف الخوادم في الموقع</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
@@ -9588,7 +9588,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>مطوَّل</translation>
     </message>
     <message>
       <source>Default Logging level</source>
@@ -9778,7 +9778,7 @@ Site performance is degraded.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -10167,7 +10167,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>أعد المحاولة</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -12389,7 +12389,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>المستخدم الذي يحمل البريد الإلكتروني المحدد لديه بالفعل صلاحيات المسؤول عبر شريك القناة</translation>
     </message>
   </context>
   <context>
@@ -12882,7 +12882,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>العنوان</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -13406,7 +13406,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -13432,7 +13432,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>القيمة</translation>
     </message>
   </context>
   <context>
@@ -13660,7 +13660,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>المجموع</translation>
     </message>
     <message>
       <source>Used</source>
