@@ -60,17 +60,9 @@ Page
     property bool leftPanelButtonWanted: false
     property bool rightPanelButtonWanted: false
 
-    customBackHandler: () =>
-    {
-        if (!modernVideoScreen.StackView.view) //< The screen is embedded into another one.
-        {
-            modernVideoScreen.backClicked()
-            return
-        }
+    signal closeRequested()
 
-        Workflow.popCurrentScreen()
-    }
-
+    customBackHandler: d.closeVideoScreen
     backgroundColor: "black"
     clip: false
 
@@ -282,8 +274,7 @@ Page
 
         resourceHelper.onResourceRemoved:
         {
-            if (modernVideoScreen.activePage)
-                Workflow.popCurrentScreen()
+            d.closeVideoScreen()
         }
 
         resourceHelper.onResourceChanged:
@@ -372,6 +363,21 @@ Page
         onCameraWarningVisibleChanged:
         {
             d.controlsVisible = !(d.cameraWarningVisible && controller.serverOffline)
+        }
+
+        function closeVideoScreen()
+        {
+            const screenStack = modernVideoScreen.StackView.view
+            if (screenStack)
+            {
+                if (screenStack.currentItem === modernVideoScreen)
+                    Workflow.popCurrentScreen()
+            }
+            else
+            {
+                // VideoScreen is embedded in another screen.
+                modernVideoScreen.closeRequested()
+            }
         }
     }
 

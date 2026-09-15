@@ -363,6 +363,12 @@ AdaptiveScreen
                     selectedObjectsType = appContext.settings.selectedObjectsType
                         ?? Timeline.ObjectsLoader.ObjectsType.motion
                 }
+
+                onCloseRequested: () =>
+                {
+                    if (resourcesScreen.showsVideoScreen)
+                        resourcesScreen.closeVideoScreen()
+                }
             }
         }
     }
