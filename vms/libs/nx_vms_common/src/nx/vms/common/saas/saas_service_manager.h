@@ -7,9 +7,9 @@
 #include <licensing/license_fwd.h>
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/qt_direct_connect.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/value_cache.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/vms/api/data/saas_data.h>
 #include <nx/vms/common/system_context_aware.h>
 
@@ -225,8 +225,6 @@ public:
 signals:
     void saasStateChanged();
     void dataChanged();
-    void saasShutDownChanged();
-    void saasSuspendedChanged();
 
 private:
     QnLicensePtr localRecordingLicenseV1Unsafe() const;
@@ -264,4 +262,4 @@ private:
     nx::utils::AsyncOperationGuard m_guard;
 };
 
-} // nx::vms::common::saas
+} // namespace nx::vms::common::saas
