@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include <nx/concepts/ranges.h>
 #include <nx/ranges/closure.h>
 
@@ -24,6 +26,15 @@ constexpr std::ranges::range_value_t<R>::second_type valueOr(
     if (std::ranges::end(keyValueRange) != it)
         return it->second;
     return orValue;
+}
+
+/**
+ * Views an element of a std::string_view split (std::views::split) as a std::string_view.
+ */
+constexpr std::string_view asStringView(
+    std::ranges::subrange<std::string_view::const_iterator> range)
+{
+    return std::string_view(range.begin(), range.end());
 }
 
 constexpr Closure trim =

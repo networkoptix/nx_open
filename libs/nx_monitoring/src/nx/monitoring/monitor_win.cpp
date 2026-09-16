@@ -7,18 +7,19 @@
 #include <thread>
 
 #include <windows.h>
-#include <winioctl.h>
-#include <tlhelp32.h>
-#include <psapi.h>
+
 #include <iphlpapi.h>
+#include <psapi.h>
+#include <tlhelp32.h>
+#include <winioctl.h>
 
 #include <QtCore/QElapsedTimer>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 
-#include "private/pdh_monitor_win.h"
 #include "private/disk_utils_win.h"
+#include "private/pdh_monitor_win.h"
 
 // -------------------------------------------------------------------------- //
 // WindowsMonitorPrivate
@@ -85,6 +86,12 @@ public:
     {
         pdhMonitor.collectMonitoringData();
         return pdhMonitor.getTotalHddLoad();
+    }
+
+    std::vector<nx::monitoring::ActivityMonitor::DiskIo> getTotalDiskIo()
+    {
+        pdhMonitor.collectMonitoringData();
+        return pdhMonitor.getTotalDiskIo();
     }
 
     void recalcNetworkStatistics()
@@ -363,6 +370,12 @@ std::vector<nx::monitoring::ActivityMonitor::HddLoad> WindowsMonitor::totalHddLo
 {
     Q_D(WindowsMonitor);
     return d->getTotalHddLoad();
+}
+
+std::vector<nx::monitoring::ActivityMonitor::DiskIo> WindowsMonitor::totalDiskIo()
+{
+    Q_D(WindowsMonitor);
+    return d->getTotalDiskIo();
 }
 
 std::vector<nx::monitoring::ActivityMonitor::NetworkLoad> WindowsMonitor::totalNetworkLoad()

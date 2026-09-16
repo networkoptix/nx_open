@@ -2,24 +2,50 @@
 
 #include "monitor_p_linux.h"
 
+#include <array>
+#include <chrono>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <expected>
+#include <filesystem>
+#include <fstream>
+#include <functional>
 #include <map>
+#include <memory>
+#include <ranges>
+#include <sstream>
 #include <string>
+#include <string_view>
+#include <system_error>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QStringList>
 
-#include <time.h>
-#include <signal.h>
 #include <errno.h>
-#include <net/if_arp.h>
-#include <sys/statvfs.h>
-#include <sys/time.h>
+#include <signal.h>
 #include <sys/resource.h>
+#include <sys/stat.h>
+#include <sys/statvfs.h>
+#include <sys/sysmacros.h>
+#include <sys/time.h>
+#include <time.h>
+#include <net/if_arp.h>
 
-#include <nx/utils/log/log.h>
+#include <nx/ranges.h>
 #include <nx/utils/concurrent.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/format.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/mac_address.h>
-
+#include <nx/utils/std_string_utils.h>
+#include <nx/utils/system_error.h>
 
 namespace nx::monitoring {
 
@@ -83,6 +109,103 @@ public:
         memset(&prevSysStat, 0, sizeof(prevSysStat));
     }
 };
+
+std::uint64_t diskId(unsigned int majorNumber, unsigned int minorNumber)
+{
+    return (static_cast<std::uint64_t>(majorNumber) << 32) | minorNumber;
+}
+
+std::error_code streamError(const int errorCode)
+{
+    return errorCode != 0 ? std::error_code(errorCode, std::generic_category())
+                          : std::make_error_code(std::io_errc::stream);
+}
+
+// TODO: #skolesnik Move this helper to shared file utilities.
+std::expected<std::string, std::error_code> readTextFile(const std::filesystem::path& path)
+{
+    errno = 0;
+    std::ifstream file(path, std::ios::binary);
+    // libstdc++ leaves the underlying POSIX error in errno.
+    const int openError = errno;
+    if (!file.is_open())
+        return std::unexpected(streamError(openError));
+
+    std::array<char, 64 * 1024> buffer{};
+    std::string contents;
+    while (file)
+    {
+        errno = 0;
+        file.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const int readError = errno;
+        contents.append(buffer.data(), static_cast<std::size_t>(file.gcount()));
+        if (file.bad())
+            return std::unexpected(streamError(readError));
+    }
+
+    return contents;
+}
+
+// Leading fields of one line in the Linux /proc/diskstats file. Extraction is positional, so the
+// fields between readsCompleted and writesCompleted are parsed only to reach the latter.
+struct DiskStatsFields
+{
+    unsigned int majorNumber;
+    unsigned int minorNumber;
+    std::string deviceName;
+    std::uint64_t readsCompleted;
+    std::uint64_t readsMerged;
+    std::uint64_t sectorsRead;
+    std::uint64_t readMilliseconds;
+    std::uint64_t writesCompleted;
+
+    static std::expected<DiskStatsFields, std::string_view> parse(std::string_view line)
+    {
+        std::istringstream fields{std::string(line)};
+        DiskStatsFields result{};
+        if (fields >> result.majorNumber >> result.minorNumber >> result.deviceName
+            >> result.readsCompleted >> result.readsMerged >> result.sectorsRead
+            >> result.readMilliseconds >> result.writesCompleted)
+        {
+            return result;
+        }
+
+        return std::unexpected(line);
+    }
+};
+
+double operationsPerSecond(const std::uint64_t current,
+    const std::uint64_t previous,
+    const std::chrono::milliseconds elapsed)
+{
+    if (elapsed <= std::chrono::milliseconds::zero() || current < previous)
+        return 0.0;
+
+    return (current - previous) / std::chrono::duration<double>(elapsed).count();
+}
+
+ActivityMonitor::DiskIo makeDiskIo(
+    const std::map<std::uint64_t, ActivityMonitor::DiskIo>& diskIoById,
+    const std::unordered_map<std::uint64_t, std::pair<std::uint64_t, std::uint64_t>>&
+        previousOperationsById,
+    const std::chrono::milliseconds elapsed,
+    const DiskStatsFields& fields)
+{
+    const auto id = diskId(fields.majorNumber, fields.minorNumber);
+    const auto previous = previousOperationsById.find(id);
+    const auto [readOperationsPerSecond, writeOperationsPerSecond] =
+        previous == previousOperationsById.end()
+        ? std::pair{0.0, 0.0}
+        : std::pair{operationsPerSecond(fields.readsCompleted, previous->second.first, elapsed),
+              operationsPerSecond(fields.writesCompleted, previous->second.second, elapsed)};
+
+    return {
+        .device = fields.deviceName,
+        .mountPoints = diskIoById.at(id).mountPoints,
+        .readOperationsPerSecond = readOperationsPerSecond,
+        .writeOperationsPerSecond = writeOperationsPerSecond,
+    };
+}
 
 } // namespace
 
@@ -160,6 +283,7 @@ LinuxMonitor::Private::Private():
     prevCPUTimeIdle(-1),
     m_networkStatCalcTimer(nx::utils::ElapsedTimerState::started),
     m_hddStatCalcTimer(nx::utils::ElapsedTimerState::started),
+    m_diskIoStatCalcTimer(nx::utils::ElapsedTimerState::started),
     m_lastPartitionsUpdateTime(0),
     m_previousProcessElapsedClocks(-1)
 {
@@ -260,6 +384,80 @@ std::vector<LinuxMonitor::Private::HddLoad> LinuxMonitor::Private::totalHddLoad(
     m_lastDiskTimeById = diskTimeById;
 
     m_hddStatCalcTimer.restart();
+
+    return result;
+}
+
+std::vector<ActivityMonitor::DiskIo> LinuxMonitor::Private::totalDiskIo()
+{
+    if (!partitionsInfoProvider)
+        return {};
+
+    const std::map diskIoById = nx::ranges::fold_left(partitionsInfoProvider->partitionInfo(),
+        std::map<std::uint64_t, DiskIo>{},
+        [](auto result, const PartitionSpace& partition)
+        {
+            struct stat info{};
+            const std::filesystem::path& path = partition.path;
+            if (::stat(path.c_str(), &info) != 0)
+            {
+                const auto errorCode = errno; //< Preserve it before logging can alter it.
+                NX_WARNING(NX_SCOPE_TAG,
+                    "Unable to identify the block device for %1: %2",
+                    path.string(),
+                    SystemError::toString(errorCode));
+                return result;
+            }
+
+            result[diskId(major(info.st_dev), minor(info.st_dev))].mountPoints.emplace_back(path);
+            return result;
+        });
+
+    const std::expected contents = readTextFile("/proc/diskstats");
+    if (!contents)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Unable to read /proc/diskstats: %1", contents.error().message());
+        return {};
+    }
+
+    // One line per block device.
+    const auto [diskStats, invalidLines] = std::string_view(*contents) | std::views::split('\n')
+        | std::views::filter([](const auto& line) { return !std::ranges::empty(line); })
+        | std::views::transform(nx::ranges::asStringView)
+        | std::views::transform(DiskStatsFields::parse) | nx::actions::partitionSums;
+
+    if (!invalidLines.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Unable to parse %1 lines from /proc/diskstats: %2",
+            invalidLines.size(),
+            nx::utils::join(invalidLines, " | "));
+    }
+
+    // /proc/diskstats also lists devices without mount points, which are not reported.
+    // TODO: #skolesnik Derive the mapping from /proc/self/mountinfo instead; the provider may be
+    // stale.
+    const std::vector reported = diskStats
+        | std::views::filter([&diskIoById](const DiskStatsFields& fields)
+            { return diskIoById.contains(diskId(fields.majorNumber, fields.minorNumber)); })
+        | nx::ranges::to<std::vector>();
+
+    const std::vector result = reported
+        | std::views::transform(std::bind_front(makeDiskIo,
+            std::cref(diskIoById),
+            std::cref(m_lastDiskOperationsById),
+            m_diskIoStatCalcTimer.elapsed()))
+        | nx::ranges::to<std::vector>();
+
+    m_lastDiskOperationsById = reported
+        | std::views::transform(
+            [](const DiskStatsFields& fields)
+            {
+                return std::pair{diskId(fields.majorNumber, fields.minorNumber),
+                    std::pair{fields.readsCompleted, fields.writesCompleted}};
+            })
+        | nx::ranges::to<std::unordered_map>();
+    m_diskIoStatCalcTimer.restart();
 
     return result;
 }

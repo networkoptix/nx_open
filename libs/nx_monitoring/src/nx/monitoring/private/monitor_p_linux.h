@@ -2,12 +2,14 @@
 
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
-#include <nx/utils/elapsed_timer.h>
 #include <sys/times.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "../monitor_linux.h"
 
@@ -42,6 +44,7 @@ public:
 
     double thisProcessCpuUsage();
     std::vector<HddLoad> totalHddLoad();
+    std::vector<ActivityMonitor::DiskIo> totalDiskIo();
     std::vector<ActivityMonitor::NetworkLoad> totalNetworkLoad();
     void updatePartitions();
 
@@ -55,9 +58,12 @@ protected:
 private:
     std::unordered_map<int, Hdd> m_diskById;
     std::unordered_map<int, unsigned int> m_lastDiskTimeById;
+    std::unordered_map<std::uint64_t, std::pair<std::uint64_t, std::uint64_t>>
+        m_lastDiskOperationsById;
     std::map<QString, InterfaceStatisticsContext> m_ifNameToStatistics;
     nx::utils::ElapsedTimer m_networkStatCalcTimer;
     nx::utils::ElapsedTimer m_hddStatCalcTimer;
+    nx::utils::ElapsedTimer m_diskIoStatCalcTimer;
 
     time_t m_lastPartitionsUpdateTime;
     struct timespec m_lastDiskUsageUpdateTime;

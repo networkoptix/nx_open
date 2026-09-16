@@ -55,6 +55,30 @@ public:
     };
 
     /**
+     * Disk I/O operation rate entry.
+     *
+     * Not merged into HddLoad because on Linux the two describe different devices: HddLoad
+     * enumerates whole drives, while DiskIo stat()s each mount point and so identifies the
+     * partition behind it, whose major:minor never matches its parent drive. Merging them would
+     * require mapping partitions to parent drives via sysfs. On Windows and macOS the two already
+     * cover the same devices.
+     */
+    struct DiskIo
+    {
+        /** System-dependent name of the device. */
+        std::string device;
+
+        /** Root paths of the partitions on this device. */
+        std::vector<std::filesystem::path> mountPoints;
+
+        /** Read operations per second since the last call. */
+        double readOperationsPerSecond = 0.0;
+
+        /** Write operations per second since the last call. */
+        double writeOperationsPerSecond = 0.0;
+    };
+
+    /**
      * Type of a partition.
      */
     enum class PartitionType : std::uint32_t
@@ -241,6 +265,9 @@ public:
     {}
 
     virtual void logStatistics() {}
+
+    /** @returns I/O operation rates for all locally monitored disks on this PC. */
+    virtual std::vector<DiskIo> totalDiskIo() { return {}; }
 
     /** Create platform specific implementation. */
     static std::unique_ptr<ActivityMonitor> createForCurrentPlatform();

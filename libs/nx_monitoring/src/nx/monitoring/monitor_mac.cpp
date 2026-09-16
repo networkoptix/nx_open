@@ -2,29 +2,33 @@
 
 #include "monitor_mac.h"
 
-#include <sys/param.h>
-#include <sys/ucred.h>
 #include <sys/mount.h>
-#include <sys/sysctl.h>
+#include <sys/param.h>
 #include <sys/resource.h>
-#include <net/if.h>
-#include <net/route.h>
+#include <sys/sysctl.h>
+#include <sys/ucred.h>
 #include <mach/mach.h>
 #include <mach/mach_vm.h>
+#include <net/if.h>
+#include <net/route.h>
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOBSD.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOBlockStorageDriver.h>
-#include <IOKit/IOBSD.h>
 
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <cstring>
+#include <filesystem>
+#include <functional>
 #include <map>
 #include <string>
 #include <string_view>
 #include <thread>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <QtNetwork/QNetworkInterface>
@@ -61,6 +65,15 @@ static QString dictionaryGetString(CFDictionaryRef properties, CFStringRef name)
         return QString::fromCFString(value);
 
     return {};
+}
+
+static double operationsPerSecond(
+    const std::uint64_t current, const std::uint64_t previous, const nanoseconds elapsed)
+{
+    if (elapsed <= nanoseconds::zero() || current < previous)
+        return 0.0;
+
+    return (current - previous) / duration<double>(elapsed).count();
 }
 
 static int64_t dictionaryGetInt(CFDictionaryRef properties, CFStringRef name)
@@ -167,6 +180,41 @@ static PropertiesPtr getIOProperties(io_registry_entry_t entry)
     }
 
     return PropertiesPtr(properties);
+}
+
+/**
+ * Walks up the IOService plane from a BSD device to the block storage driver backing it and
+ * returns that driver's BSD name, or an empty string if there is none.
+ */
+static std::string physicalDriveName(const std::string& bsdName)
+{
+    io_registry_entry_t entry = IOServiceGetMatchingService(
+        kIOPortDefault, IOBSDNameMatching(kIOPortDefault, /*options*/ 0, bsdName.c_str()));
+    while (entry != 0 && !IOObjectConformsTo(entry, kIOBlockStorageDriverClass))
+    {
+        io_registry_entry_t parent = 0;
+        if (IORegistryEntryGetParentEntry(entry, kIOServicePlane, &parent) != KERN_SUCCESS)
+            parent = 0;
+
+        IOObjectRelease(entry);
+        entry = parent;
+    }
+
+    if (entry == 0)
+        return {};
+
+    const auto entryGuard = nx::utils::makeScopeGuard([entry]() { IOObjectRelease(entry); });
+    io_registry_entry_t driveMedia = 0;
+    if (IORegistryEntryGetChildEntry(entry, kIOServicePlane, &driveMedia) != KERN_SUCCESS)
+        return {};
+
+    const auto driveMediaGuard =
+        nx::utils::makeScopeGuard([driveMedia]() { IOObjectRelease(driveMedia); });
+    const auto properties = getIOProperties(driveMedia);
+    if (!properties)
+        return {};
+
+    return dictionaryGetString(properties.get(), CFSTR(kIOBSDNameKey)).toStdString();
 }
 
 } // namespace
@@ -590,8 +638,15 @@ public:
     virtual ~HddLoadMonitor() {}
 
     std::vector<ActivityMonitor::HddLoad> getTotalHddLoad();
+    std::vector<ActivityMonitor::DiskIo> getTotalDiskIo();
 
 private:
+    // Rates are deltas against the previous sample, so re-sampling immediately would divide by a
+    // near-zero interval.
+    static constexpr milliseconds kMinimalSamplingInterval{500};
+
+    void updateIfStale();
+    void update();
     static QString getDriveName(io_registry_entry_t drive);
     static nanoseconds getGetDriveReadWriteTime(io_registry_entry_t drive);
     double computeHddLoad(
@@ -600,6 +655,9 @@ private:
     nx::Mutex m_hddLoadMutex;
 
     std::unordered_map<std::string, nanoseconds> m_readWriteTotalByHddName;
+    std::unordered_map<std::string, std::pair<std::uint64_t, std::uint64_t>> m_operationsByHddName;
+    std::vector<ActivityMonitor::HddLoad> m_totalHddLoad;
+    std::vector<ActivityMonitor::DiskIo> m_totalDiskIo;
     time_point<steady_clock> m_timeStamp{};
 };
 
@@ -666,7 +724,18 @@ nanoseconds MacMonitor::HddLoadMonitor::getGetDriveReadWriteTime(io_registry_ent
 std::vector<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoad()
 {
     NX_MUTEX_LOCKER lock(&m_hddLoadMutex);
+    updateIfStale();
+    return m_totalHddLoad;
+}
 
+void MacMonitor::HddLoadMonitor::updateIfStale()
+{
+    if (steady_clock::now() - m_timeStamp >= kMinimalSamplingInterval)
+        update();
+}
+
+void MacMonitor::HddLoadMonitor::update()
+{
     io_iterator_t driveList;
     static constexpr auto kServiceName = "IOBlockStorageDriver";
 
@@ -676,12 +745,15 @@ std::vector<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoa
     if (ret != KERN_SUCCESS)
     {
         NX_WARNING(this, "Failed IOServiceGetMatchingServices : %1", ret);
-        return {};
+        m_totalHddLoad.clear();
+        m_totalDiskIo.clear();
+        return;
     }
     const auto driveListGuard =
         nx::utils::makeScopeGuard([&driveList]() { IOObjectRelease(driveList); });
 
     std::vector<ActivityMonitor::HddLoad> result;
+    std::vector<ActivityMonitor::DiskIo> diskIo;
 
     const auto timeStamp = std::chrono::steady_clock::now();
     const auto timeDiff = duration_cast<nanoseconds>(timeStamp - m_timeStamp);
@@ -705,14 +777,80 @@ std::vector<ActivityMonitor::HddLoad> MacMonitor::HddLoadMonitor::getTotalHddLoa
             .hdd = hdd,
             .load = computeHddLoad(hdd, driveReadWriteTime, timeDiff),
         });
+
+        const auto [reads, writes] = std::invoke(
+            [&drive]
+            {
+                constexpr std::pair<std::uint64_t, std::uint64_t> kNoOperations{};
+
+                const auto properties = getIOProperties(drive);
+                if (!properties)
+                    return kNoOperations;
+
+                const auto statistics = static_cast<CFDictionaryRef>(CFDictionaryGetValue(
+                    properties.get(), CFSTR(kIOBlockStorageDriverStatisticsKey)));
+                if (!statistics)
+                    return kNoOperations;
+
+                return std::pair{static_cast<std::uint64_t>(dictionaryGetInt(
+                                     statistics, CFSTR(kIOBlockStorageDriverStatisticsReadsKey))),
+                    static_cast<std::uint64_t>(dictionaryGetInt(
+                        statistics, CFSTR(kIOBlockStorageDriverStatisticsWritesKey)))};
+            });
+
+        const auto baseline = m_operationsByHddName.find(hdd.name);
+        const auto [readOperationsPerSecond, writeOperationsPerSecond] = std::invoke(
+            [&]
+            {
+                if (baseline == m_operationsByHddName.end())
+                    return std::pair{0.0, 0.0}; //< No previous sample to compare against.
+
+                const auto [previousReads, previousWrites] = baseline->second;
+                return std::pair{operationsPerSecond(reads, previousReads, timeDiff),
+                    operationsPerSecond(writes, previousWrites, timeDiff)};
+            });
+        m_operationsByHddName[hdd.name] = {reads, writes};
+        diskIo.push_back({
+            .device = hdd.name,
+            .readOperationsPerSecond = readOperationsPerSecond,
+            .writeOperationsPerSecond = writeOperationsPerSecond,
+        });
     }
 
-    return result;
+    m_totalHddLoad = std::move(result);
+    m_totalDiskIo = std::move(diskIo);
+}
+
+std::vector<ActivityMonitor::DiskIo> MacMonitor::HddLoadMonitor::getTotalDiskIo()
+{
+    NX_MUTEX_LOCKER lock(&m_hddLoadMutex);
+    updateIfStale();
+    return m_totalDiskIo;
 }
 
 std::vector<ActivityMonitor::HddLoad> MacMonitor::totalHddLoad()
 {
     return m_hddLoadMonitor->getTotalHddLoad();
+}
+
+std::vector<ActivityMonitor::DiskIo> MacMonitor::totalDiskIo()
+{
+    std::vector result = m_hddLoadMonitor->getTotalDiskIo();
+    for (const auto& partition: totalPartitionSpaceInfo())
+    {
+        const std::string device = std::filesystem::path(partition.devName).filename().string();
+        const std::string physicalDrive = physicalDriveName(device);
+
+        for (auto& diskIo: result)
+        {
+            if ((!physicalDrive.empty() && physicalDrive == diskIo.device)
+                || device == diskIo.device || device.starts_with(diskIo.device + "s"))
+            {
+                diskIo.mountPoints.emplace_back(partition.path);
+            }
+        }
+    }
+    return result;
 }
 
 MacMonitor::MacMonitor():
