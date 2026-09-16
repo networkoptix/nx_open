@@ -12443,11 +12443,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>通常のレイアウトに別のサイトのリソースを追加することはできません。 %1 を使用して、レイアウトをクロスサイトレイアウトとして再度開いてください。</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>レイアウトはすでにクロスサイトレイアウトになっています</translation>
     </message>
   </context>
   <context>

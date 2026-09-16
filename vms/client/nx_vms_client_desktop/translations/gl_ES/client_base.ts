@@ -12619,11 +12619,11 @@ Recomendámosche que non abras esta páxina web. Se comprendes os riscos, podes 
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>Non se pode engadir un recurso doutro sitio a un deseño normal. Usa %1 para volver abrir o deseño como un deseño válido para varios sitios.</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>O deseño xa é un deseño válido para varios sitios</translation>
     </message>
   </context>
   <context>

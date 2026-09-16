@@ -12616,11 +12616,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>Δεν είναι δυνατή η προσθήκη πόρου από άλλη τοποθεσία σε μια κανονική διάταξη. Χρησιμοποιήστε την εντολή %1 για να ανοίξετε ξανά τη διάταξη ως διάταξη μεταξύ τοποθεσιών.</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>Η διάταξη είναι ήδη μια διάταξη μεταξύ τοποθεσιών</translation>
     </message>
   </context>
   <context>
