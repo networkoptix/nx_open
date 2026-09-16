@@ -225,8 +225,6 @@ public:
 signals:
     void saasStateChanged();
     void dataChanged();
-    void saasShutDownChanged();
-    void saasSuspendedChanged();
 
 private:
     QnLicensePtr localRecordingLicenseV1Unsafe() const;
@@ -264,4 +262,4 @@ private:
     nx::utils::AsyncOperationGuard m_guard;
 };
 
-} // nx::vms::common::saas
+} // namespace nx::vms::common::saas
