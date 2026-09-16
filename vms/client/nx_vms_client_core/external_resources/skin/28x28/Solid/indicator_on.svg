@@ -1,18 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 28 28">
-  <g class="28x28/Solid/indicator_on" clip-path="url(#a)">
-    <g class="Secondary" filter="url(#b)">
-      <circle cx="14" cy="14" r="8.167" fill="#4FC627"/>
-    </g>
-    <circle cx="14" cy="14" r="9.333" fill="#4FC627" class="Primary"/>
-  </g>
-  <defs>
-    <clipPath id="a" class="a">
-      <path fill="#ffffff" d="M0 0h28v28H0z"/>
-    </clipPath>
-    <filter id="b" width="35" height="35" x="-3.5" y="-3.5" class="b" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
-      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
-      <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
-      <feGaussianBlur result="effect1_foregroundBlur_7429_89" stdDeviation="4.667"/>
-    </filter>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
+<g clip-path="url(#clip0_7429_89)">
+<g filter="url(#filter0_f_7429_89)">
+<circle cx="14" cy="14" r="8.16667" fill="#4FC627" class="Primary"/>
+</g>
+<circle id="Primary" cx="14" cy="14" r="9.33333" fill="#4FC627" class="Primary"/>
+</g>
+<defs>
+<filter id="filter0_f_7429_89" x="-3.5" y="-3.5" width="35" height="35" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.66667" result="effect1_foregroundBlur_7429_89"/>
+</filter>
+<clipPath id="clip0_7429_89">
+<rect width="28" height="28" fill="#ffffff"/>
+</clipPath>
+</defs>
 </svg>

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
-  <g class="64x64/Solid/user">
-    <circle cx="32" cy="32" r="32" fill="#212A2F" class="Primary"/>
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M32 18a6 6 0 0 0-6 6v2a6 6 0 0 0 12 0v-2a6 6 0 0 0-6-6Zm-5.56 18c-3.502 0-6.522 2.476-7.23 5.927l-.172.84A1.854 1.854 0 0 0 20.846 45h21.308a1.854 1.854 0 0 0 1.807-2.233l-.172-.84C43.081 38.476 40.061 36 36.559 36H26.441Z" class="Secondary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+<g>
+<circle id="Primary" cx="32" cy="32" r="32" fill="#212A2F" class="Primary"/>
+<path id="Secondary" fill-rule="evenodd" clip-rule="evenodd" d="M31.9999 18C28.6862 18 26 20.6862 26 23.9999V25.9998C26 29.3134 28.6862 31.9997 31.9999 31.9997C35.3135 31.9997 37.9997 29.3134 37.9997 25.9998V23.9999C37.9997 20.6862 35.3135 18 31.9999 18ZM26.441 36C22.9389 36 19.9188 38.476 19.211 41.9273L19.0387 42.7675C18.8024 43.9198 19.677 45 20.8462 45H42.1538C43.323 45 44.1976 43.9198 43.9613 42.7675L43.789 41.9273C43.0812 38.476 40.0611 36 36.559 36H26.441Z" fill="#A5B7C0" class="Secondary"/>
+</g>
 </svg>

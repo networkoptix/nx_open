@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="52" height="24" fill="none" viewBox="0 0 52 24">
-  <g class="52x24/Solid/calendar">
-    <rect width="52" height="24" fill="#212A2F" class="Secondary" rx="2"/>
-    <path fill="#171C1F" d="M2 8h2v8H2z" class="Tertiary"/>
-    <path fill="#ffffff" fill-rule="evenodd" d="M24 6h-1v.7h-2.25a.75.75 0 0 0-.75.75v9.75c0 .414.336.75.75.75h10.5a.75.75 0 0 0 .75-.75V7.45a.75.75 0 0 0-.75-.75H30v1h1v1.75H21V7.7h2v.55h1V6Zm1 .7v1h3v.55h1V6h-1v.7h-3Zm-4 10.25v-6.5h10v6.5H21Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="24" viewBox="0 0 52 24" fill="none">
+<g>
+<rect id="Secondary" width="52" height="24" rx="2" fill="#212A2F" class="Secondary"/>
+<rect id="Tertiary" x="2" y="8" width="2" height="8" fill="#171C1F" class="Tertiary"/>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M24 6H23V6.7H20.75C20.3358 6.7 20 7.03579 20 7.45V17.2C20 17.6142 20.3358 17.95 20.75 17.95H31.25C31.6642 17.95 32 17.6142 32 17.2V7.45C32 7.03579 31.6642 6.7 31.25 6.7H30V7.7H31V9.45H21V7.7H23V8.25H24V7.7V6.7V6ZM25 6.7V7.7H28V8.25H29V7.7V6.7V6H28V6.7H25ZM21 16.95V10.45H31V16.95H21Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

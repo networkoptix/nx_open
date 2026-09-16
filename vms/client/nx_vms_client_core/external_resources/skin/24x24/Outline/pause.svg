@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Outline/pause">
-    <path fill="#B0B9C4" d="M9 6a2 2 0 0 1 2 2v8a2 2 0 1 1-4 0V8a2 2 0 0 1 2-2Zm6 0a2 2 0 0 1 2 2v8a2 2 0 1 1-4 0V8a2 2 0 0 1 2-2Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M9 6C10.1046 6 11 6.89543 11 8V16C11 17.1046 10.1046 18 9 18C7.89543 18 7 17.1046 7 16V8C7 6.89543 7.89543 6 9 6ZM15 6C16.1046 6 17 6.89543 17 8V16C17 17.1046 16.1046 18 15 18C13.8954 18 13 17.1046 13 16V8C13 6.89543 13.8954 6 15 6Z" fill="#B0B9C4" class="Primary"/>
+</g>
 </svg>

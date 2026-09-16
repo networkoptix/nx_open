@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Outline/expand">
-    <path fill="#ffffff" fill-rule="evenodd" d="M10 3.25H3.25V10h1.5V5.81l3.72 3.72 1.06-1.06-3.72-3.72H10v-1.5Zm-6 17.5h6v-1.5H5.81l3.72-3.72-1.06-1.06-3.72 3.72V14h-1.5v6.75H4Zm16 0h-6v-1.5h4.19l-3.72-3.72 1.06-1.06 3.72 3.72V14h1.5v6.75H20Zm0-17.5h-6v1.5h4.19l-3.72 3.72 1.06 1.06 3.72-3.72V10h1.5V3.25H20Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M10 3.25H4H3.25V4V10H4.75L4.75 5.81066L8.46967 9.53033L9.53033 8.46967L5.81066 4.75L10 4.75V3.25ZM4 20.75H10V19.25H5.81066L9.53033 15.5303L8.46967 14.4697L4.75 18.1893L4.75 14L3.25 14V20V20.75H4ZM20 20.75L14 20.75V19.25H18.1893L14.4697 15.5303L15.5303 14.4697L19.25 18.1893L19.25 14H20.75L20.75 20V20.75H20ZM20 3.25H14V4.75H18.1893L14.4697 8.46967L15.5303 9.53033L19.25 5.81066V10H20.75V4V3.25H20Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

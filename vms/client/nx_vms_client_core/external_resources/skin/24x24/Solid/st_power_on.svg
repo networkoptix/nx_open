@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/st_power_on">
-    <path fill="#ffffff" d="M10 22v-8H7V2h10l-2 7h4l-9 13Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M10 22V14H7V2H17L15 9H19L10 22Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

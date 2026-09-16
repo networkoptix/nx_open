@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Outline/filter_list_dot">
-    <path fill="#B0B9C4" d="M11 18a1 1 0 1 1 0-2h2a1 1 0 1 1 0 2h-2Zm-4-5a1 1 0 1 1 0-2h10a1 1 0 1 1 0 2H7ZM4 8a1 1 0 0 1 0-2h16a1 1 0 1 1 0 2H4Z" class="Primary"/>
-    <circle cx="19" cy="6" r="3" fill="#EF5350" class="Secondary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M11 18C10.4477 18 10 17.5523 10 17C10 16.4477 10.4477 16 11 16H13C13.5523 16 14 16.4477 14 17C14 17.5523 13.5523 18 13 18H11ZM7 13C6.44772 13 6 12.5523 6 12C6 11.4477 6.44772 11 7 11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H7ZM4 8C3.44772 8 3 7.55228 3 7C3 6.44772 3.44772 6 4 6H20C20.5523 6 21 6.44772 21 7C21 7.55228 20.5523 8 20 8H4Z" fill="#B0B9C4" class="Primary"/>
+<circle id="Secondary" cx="19" cy="6" r="3" fill="#EF5350" class="Secondary"/>
+</g>
 </svg>

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Outline/virtual_camera">
-    <path fill="#698796" fill-rule="evenodd" d="M3.2 5.2v9.6h13.6V5.2H3.2ZM3 4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H3Zm10 7.8a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Zm0 1.2a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM7 7H5v2h2V7Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M3.2 5.2V14.8H16.8V5.2H3.2ZM3 4C2.44772 4 2 4.44772 2 5V15C2 15.5523 2.44772 16 3 16H17C17.5523 16 18 15.5523 18 15V5C18 4.44772 17.5523 4 17 4H3ZM13 11.8C13.9941 11.8 14.8 10.9941 14.8 10C14.8 9.00589 13.9941 8.2 13 8.2C12.0059 8.2 11.2 9.00589 11.2 10C11.2 10.9941 12.0059 11.8 13 11.8ZM13 13C14.6569 13 16 11.6569 16 10C16 8.34315 14.6569 7 13 7C11.3431 7 10 8.34315 10 10C10 11.6569 11.3431 13 13 13ZM7 7H5V9H7V7Z" fill="#698796" class="Primary"/>
+</g>
 </svg>

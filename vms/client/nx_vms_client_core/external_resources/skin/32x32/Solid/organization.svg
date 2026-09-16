@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-  <g class="32x32/Solid/organization">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M2 13.495a1 1 0 0 1 .794-.978l6-1.263a1 1 0 0 1 1.206.978V29H2V13.495ZM9 15H3v1h6v-1Zm0 2H3v1h6v-1Zm-6 2h6v1H3v-1Zm3 2H3v1h3v-1Zm24 .883a1 1 0 0 0-.876-.992l-6-.75a1 1 0 0 0-1.124.992V29h8v-7.117ZM29 23h-6v1h6v-1Zm-1 2h-5v1h5v-1Z" class="Secondary" clip-rule="evenodd"/>
-    <path fill="#CDD7DC" fill-rule="evenodd" d="M12 3a1 1 0 0 0-1 1v25h10V4a1 1 0 0 0-1-1h-8Zm0 1.996h8v1h-8v-1ZM12 7h8v1h-8V7Zm8 2h-8v1h8V9Zm-8 2h5v1h-5v-1Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+<g>
+<path id="Secondary" fill-rule="evenodd" clip-rule="evenodd" d="M2 13.4954C2 13.0225 2.33126 12.6143 2.79401 12.5169L8.79402 11.2539C9.41556 11.123 10 11.5973 10 12.2324V28.9998H2V13.4954ZM9 15H3V16H9V15ZM9 17H3V18H9V17ZM3 19H9V20H3V19ZM6 21H3V22H6V21ZM30 21.8828C30 21.3785 29.6245 20.9531 29.124 20.8905L23.124 20.1405C22.5272 20.0659 22 20.5313 22 21.1328V28.9998H30V21.8828ZM29 23H23V24H29V23ZM28 25H23V26H28V25Z" fill="#A5B7C0" class="Secondary"/>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M12 3C11.4477 3 11 3.44771 11 4V28.9998H21V4C21 3.44772 20.5523 3 20 3H12ZM12 4.99563H20V5.99563H12V4.99563ZM12 7H20V8H12V7ZM20 9H12V10H20V9ZM12 11H17V12H12V11Z" fill="#CDD7DC" class="Primary"/>
+</g>
 </svg>

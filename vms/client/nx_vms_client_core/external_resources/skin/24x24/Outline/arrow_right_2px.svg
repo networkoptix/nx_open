@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Outline/arrow_right_2px">
-    <path fill="#B0B9C4" d="M8.293 5.293a1 1 0 0 1 1.414 0L16.414 12l-6.707 6.707a1 1 0 1 1-1.414-1.414L13.586 12 8.293 6.707a1 1 0 0 1 0-1.414Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M8.29302 5.29297C8.68354 4.90245 9.31655 4.90245 9.70708 5.29297L16.4141 12L9.70708 18.707C9.31655 19.0976 8.68354 19.0976 8.29302 18.707C7.90249 18.3165 7.90249 17.6835 8.29302 17.293L13.586 12L8.29302 6.70703C7.90249 6.31651 7.90249 5.68349 8.29302 5.29297Z" fill="#B0B9C4" class="Primary"/>
+</g>
 </svg>

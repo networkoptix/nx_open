@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/ws_folder_open">
-    <path fill="#698796" fill-rule="evenodd" d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4.4l-1.148-1.315A2 2 0 0 0 8.945 3H4Z" class="Secondary" clip-rule="evenodd"/>
-    <path fill="#879FAB" d="M3.678 8.608A2 2 0 0 1 5.64 7h13.14a1 1 0 0 1 .98 1.196l-1.438 7.196A2 2 0 0 1 16.36 17H3.952a1.6 1.6 0 0 1-1.57-1.914L2.5 14.5 3 12l.678-3.392Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Secondary" fill-rule="evenodd" clip-rule="evenodd" d="M4 3C2.89543 3 2 3.89543 2 5V15C2 16.1046 2.89543 17 4 17H16C17.1046 17 18 16.1046 18 15V7C18 5.89543 17.1046 5 16 5H11.6L10.4523 3.68493C10.0725 3.24973 9.52308 3 8.94546 3H4Z" fill="#698796" class="Secondary"/>
+<path id="Primary" d="M3.67845 8.60777C3.86542 7.67292 4.68625 7 5.63961 7H18.7802C19.4112 7 19.8845 7.57732 19.7608 8.19612L18.3216 15.3922C18.1346 16.3271 17.3138 17 16.3604 17H3.95169C2.94201 17 2.18474 16.0763 2.38276 15.0862L2.5 14.5L3 12L3.67845 8.60777Z" fill="#879FAB" class="Primary"/>
+</g>
 </svg>

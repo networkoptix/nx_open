@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/st_power_off">
-    <path fill="#ffffff" d="M7 2h10l-2 7h4l-2.925 4.225L7 4.15V2Zm3 20v-8H7V9.85L1.375 4.225 2.8 2.8l18.4 18.4-1.425 1.425L13.75 16.6 10 22Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M7 2H17L15 9H19L16.075 13.225L7 4.15V2ZM10 22V14H7V9.85L1.375 4.225L2.8 2.8L21.2 21.2L19.775 22.625L13.75 16.6L10 22Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

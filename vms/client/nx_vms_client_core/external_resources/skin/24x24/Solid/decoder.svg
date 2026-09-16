@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/decoder">
-    <path fill="#B0B9C4" fill-rule="evenodd" d="M11 3.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v17a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-17ZM18 8h-3V6h3a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-3v-2h3a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1ZM5 6a2 2 0 0 0-2 2h2V6Zm-2 5h2v2H3v-2Zm2 5H3a2 2 0 0 0 2 2v-2Zm2 0h2v2H7v-2ZM9 6H7v2h2V6Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M11 3.5C11 3.22386 11.2239 3 11.5 3H12.5C12.7761 3 13 3.22386 13 3.5V20.5C13 20.7761 12.7761 21 12.5 21H11.5C11.2239 21 11 20.7761 11 20.5V3.5ZM18 8H15V6H18C19.6569 6 21 7.34315 21 9V15C21 16.6569 19.6569 18 18 18H15V16H18C18.5523 16 19 15.5523 19 15V9C19 8.44771 18.5523 8 18 8ZM5 6C3.89543 6 3 6.89543 3 8H5V6ZM3 11H5V13H3V11ZM5 16H3C3 17.1046 3.89543 18 5 18V16ZM7 16H9V18H7V16ZM9 6H7V8H9V6Z" fill="#B0B9C4" class="Primary"/>
+</g>
 </svg>

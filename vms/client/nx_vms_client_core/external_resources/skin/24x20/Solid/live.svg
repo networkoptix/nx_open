@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" fill="none" viewBox="0 0 24 20">
-  <g class="24x20/Solid/live">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4Zm2 3H5v8h3v-1H6V6Zm10 0h3v1h-2v2.5h2v1h-2V13h2v1h-3V6ZM9 6h1v8H9V6Zm3 0h-1l1.5 8h1L15 6h-1l-1 5.333L12 6Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="20" viewBox="0 0 24 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M4 3C2.89543 3 2 3.89543 2 5V15C2 16.1046 2.89543 17 4 17H20C21.1046 17 22 16.1046 22 15V5C22 3.89543 21.1046 3 20 3H4ZM6 6H5V14H8V13H6V6ZM16 6H19V7H17V9.5H19V10.5H17V13H19V14H16V6ZM9 6H10V14H9V6ZM12 6H11L12.5 14H13.5L15 6H14L13 11.3333L12 6Z" fill="#A5B7C0" class="Primary"/>
+</g>
 </svg>

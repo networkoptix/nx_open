@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-  <g class="32x32/Solid/step_backward">
-    <rect width="32" height="32" fill="#212A2F" class="Secondary" rx="2"/>
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M22.2 19.928v-8.127a.8.8 0 0 0-1.259-.655l-5.805 4.063a.8.8 0 0 0 0 1.311l5.805 4.064a.8.8 0 0 0 1.259-.656Zm-10.4-8.863a.8.8 0 0 0-.8.8v8a.8.8 0 0 0 .8.8h1.6a.8.8 0 0 0 .8-.8v-8a.8.8 0 0 0-.8-.8h-1.6Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+<g>
+<rect id="Secondary" width="32" height="32" rx="2" fill="#212A2F" class="Secondary"/>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M22.2 19.9283V11.8014C22.2 11.1542 21.4715 10.7749 20.9412 11.146L15.1363 15.2095C14.6813 15.528 14.6813 16.2018 15.1363 16.5203L20.9412 20.5837C21.4715 20.9549 22.2 20.5756 22.2 19.9283ZM11.8 11.0649C11.3582 11.0649 11 11.423 11 11.8649V19.8649C11 20.3067 11.3582 20.6649 11.8 20.6649H13.4C13.8418 20.6649 14.2 20.3067 14.2 19.8649V11.8649C14.2 11.423 13.8418 11.0649 13.4 11.0649H11.8Z" fill="#E1E7EA" class="Primary"/>
+</g>
 </svg>

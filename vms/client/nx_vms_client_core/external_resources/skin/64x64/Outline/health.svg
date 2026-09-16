@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
-  <g class="64x64/Outline/health">
-    <path fill="#53707F" fill-rule="evenodd" d="M19 11h-8v42h8V11Zm-8-2a2 2 0 0 0-2 2v42a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-8Zm25 14h-8v30h8V23Zm-8-2a2 2 0 0 0-2 2v30a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V23a2 2 0 0 0-2-2h-8Zm17 12h8v20h-8V33Zm-2 0a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v20a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V33Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M19 11H11L11 53H19V11ZM11 9C9.89543 9 9 9.89543 9 11V53C9 54.1046 9.89543 55 11 55H19C20.1046 55 21 54.1046 21 53V11C21 9.89543 20.1046 9 19 9H11ZM36 23H28V53H36V23ZM28 21C26.8954 21 26 21.8954 26 23V53C26 54.1046 26.8954 55 28 55H36C37.1046 55 38 54.1046 38 53V23C38 21.8954 37.1046 21 36 21H28ZM45 33H53V53H45V33ZM43 33C43 31.8954 43.8954 31 45 31H53C54.1046 31 55 31.8954 55 33V53C55 54.1046 54.1046 55 53 55H45C43.8954 55 43 54.1046 43 53V33Z" fill="#53707F" class="Primary"/>
+</g>
 </svg>

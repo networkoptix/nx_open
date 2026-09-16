@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/license_solid">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M19 5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h18Zm-5 8h1V7h-2v1h1v5Zm-9 0h3V7H5v6Zm4 0h3V7H9v6ZM6 8h1v4H6V8Zm4 0h1v4h-1V8Zm-6 2a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm14 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M19 5C19.5523 5 20 5.44772 20 6V14C20 14.5523 19.5523 15 19 15H1C0.447715 15 0 14.5523 0 14V6C0 5.44772 0.447715 5 1 5H19ZM14 13H15V7H13V8H14V13ZM5 13H8V7H5V13ZM9 13H12V7H9V13ZM6 8H7V12H6V8ZM10 8H11V12H10V8ZM4 10C4 9.44772 3.55228 9 3 9C2.44772 9 2 9.44772 2 10C2 10.5523 2.44772 11 3 11C3.55228 11 4 10.5523 4 10ZM18 10C18 9.44772 17.5523 9 17 9C16.4477 9 16 9.44772 16 10C16 10.5523 16.4477 11 17 11C17.5523 11 18 10.5523 18 10Z" fill="#A5B7C0" class="Primary"/>
+</g>
 </svg>

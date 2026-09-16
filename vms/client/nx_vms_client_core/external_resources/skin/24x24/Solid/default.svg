@@ -1,5 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/default">
-    <path fill="#B0B9C4" d="M9 21v-2.4H7.8V21H9Zm2.4 0v-2.4h-1.2V21h1.2Zm2.4 0v-2.4h-1.2V21h1.2Zm2.4 0v-2.4H15V21h1.2Zm1.2-13.2a1.2 1.2 0 0 0-1.2-1.2H7.8a1.2 1.2 0 0 0-1.2 1.2v8.4a1.2 1.2 0 0 0 1.2 1.2h8.4a1.2 1.2 0 0 0 1.2-1.2V7.8Zm3.6 8.4V15h-2.4v1.2H21Zm-15.6 0V15H3v1.2h2.4ZM21 13.8v-1.2h-2.4v1.2H21Zm-15.6 0v-1.2H3v1.2h2.4ZM21 11.4v-1.2h-2.4v1.2H21Zm-15.6 0v-1.2H3v1.2h2.4ZM21 9V7.8h-2.4V9H21ZM5.4 9V7.8H3V9h2.4ZM9 5.4V3H7.8v2.4H9Zm2.4 0V3h-1.2v2.4h1.2Zm2.4 0V3h-1.2v2.4h1.2Zm2.4 0V3H15v2.4h1.2Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<g>
+<path d="M9 21V18.6H7.8V21H9Z" fill="#B0B9C4" class="Primary"/>
+<path d="M11.4 21V18.6H10.2V21H11.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M13.8 21V18.6H12.6V21H13.8Z" fill="#B0B9C4" class="Primary"/>
+<path d="M16.2 21V18.6H15V21H16.2Z" fill="#B0B9C4" class="Primary"/>
+<path d="M17.4 7.8C17.4 7.13726 16.8627 6.6 16.2 6.6H7.8C7.13726 6.6 6.6 7.13726 6.6 7.8V16.2C6.6 16.8627 7.13726 17.4 7.8 17.4H16.2C16.8627 17.4 17.4 16.8627 17.4 16.2V7.8Z" fill="#B0B9C4" class="Primary"/>
+<path d="M21 16.2V15H18.6V16.2H21Z" fill="#B0B9C4" class="Primary"/>
+<path d="M5.4 16.2V15H3V16.2H5.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M21 13.8V12.6H18.6V13.8H21Z" fill="#B0B9C4" class="Primary"/>
+<path d="M5.4 13.8V12.6H3V13.8H5.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M21 11.4V10.2H18.6V11.4H21Z" fill="#B0B9C4" class="Primary"/>
+<path d="M5.4 11.4V10.2H3V11.4H5.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M21 9V7.8H18.6V9H21Z" fill="#B0B9C4" class="Primary"/>
+<path d="M5.4 9V7.8H3V9H5.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M9 5.4V3H7.8V5.4H9Z" fill="#B0B9C4" class="Primary"/>
+<path d="M11.4 5.4V3H10.2V5.4H11.4Z" fill="#B0B9C4" class="Primary"/>
+<path d="M13.8 5.4V3H12.6V5.4H13.8Z" fill="#B0B9C4" class="Primary"/>
+<path d="M16.2 5.4V3H15V5.4H16.2Z" fill="#B0B9C4" class="Primary"/>
+</g>
+</g>
 </svg>

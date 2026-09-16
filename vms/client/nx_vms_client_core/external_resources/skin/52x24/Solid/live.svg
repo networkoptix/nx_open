@@ -1,7 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="52" height="24" fill="none" viewBox="0 0 52 24">
-  <g class="52x24/Solid/live">
-    <rect width="52" height="24" fill="#212A2F" class="Secondary" rx="2"/>
-    <path fill="#171C1F" d="M2 8h2v8H2z" class="Tertiary"/>
-    <path fill="#ffffff" d="M19.344 15.365v1.166H15.06v-1.166h4.284ZM15.47 8v8.531H14V8h1.47Zm6.58 0v8.531h-1.47V8h1.47Zm4.753 6.973L29.047 8h1.623l-3.059 8.531h-1.095l.287-1.558ZM24.728 8l2.227 6.973.305 1.558h-1.102L23.111 8h1.617Zm12.481 7.365v1.166h-4.53v-1.166h4.53ZM33.096 8v8.531h-1.471V8h1.47Zm3.521 3.563v1.148H32.68v-1.149h3.937ZM37.18 8v1.172h-4.5V8h4.5Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="24" viewBox="0 0 52 24" fill="none">
+<g>
+<rect id="Secondary" width="52" height="24" rx="2" fill="#212A2F" class="Secondary"/>
+<rect id="Tertiary" x="2" y="8" width="2" height="8" fill="#171C1F" class="Tertiary"/>
+<g>
+<path d="M19.3438 15.3652V16.5312H15.0605V15.3652H19.3438ZM15.4707 8V16.5312H14V8H15.4707Z" fill="#ffffff" class="Primary"/>
+<path d="M22.0508 8V16.5312H20.5801V8H22.0508Z" fill="#ffffff" class="Primary"/>
+<path d="M26.8027 14.9727L29.0469 8H30.6699L27.6113 16.5312H26.5156L26.8027 14.9727ZM24.7285 8L26.9551 14.9727L27.2598 16.5312H26.1582L23.1113 8H24.7285Z" fill="#ffffff" class="Primary"/>
+<path d="M37.209 15.3652V16.5312H32.6797V15.3652H37.209ZM33.0957 8V16.5312H31.625V8H33.0957ZM36.6172 11.5625V12.7109H32.6797V11.5625H36.6172ZM37.1797 8V9.17188H32.6797V8H37.1797Z" fill="#ffffff" class="Primary"/>
+</g>
+</g>
 </svg>

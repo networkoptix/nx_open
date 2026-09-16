@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none" viewBox="0 0 64 64">
-  <g class="64x64/Solid/folder">
-    <path fill="#2FA2DB" d="M10 15a4 4 0 0 1 4-4h14.928a6.4 6.4 0 0 1 4.134 1.514L36 15H10Z" class="Tertiary"/>
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M4 11a4 4 0 0 0-4 4v27.6A6.4 6.4 0 0 0 6.4 49h35.2a6.4 6.4 0 0 0 6.4-6.4V21.4a6.4 6.4 0 0 0-6.4-6.4H26l-2.938-2.486A6.4 6.4 0 0 0 18.928 11H4Z" class="Secondary" clip-rule="evenodd"/>
-    <path fill="#CDD7DC" d="M0 15h50a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H6a6 6 0 0 1-6-6V15Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+<g>
+<path id="Tertiary" d="M9.99954 15C9.99954 12.7909 11.7904 11 13.9995 11H28.9279C30.4416 11 31.9064 11.5365 33.0619 12.5143L35.9995 15H9.99954Z" fill="#2FA2DB" class="Tertiary"/>
+<path id="Secondary" fill-rule="evenodd" clip-rule="evenodd" d="M4 11C1.79086 11 0 12.7909 0 15V42.6C0 46.1346 2.86538 49 6.4 49H41.6C45.1346 49 48 46.1346 48 42.6V21.4C48 17.8654 45.1346 15 41.6 15H26L23.0624 12.5143C21.9068 11.5365 20.4421 11 18.9284 11H4Z" fill="#A5B7C0" class="Secondary"/>
+<path id="Primary" d="M0 15H50C53.3137 15 56 17.6863 56 21V47C56 50.3137 53.3137 53 50 53H6C2.68629 53 0 50.3137 0 47V15Z" fill="#CDD7DC" class="Primary"/>
+</g>
 </svg>

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/st_elevator_doors_close">
-    <path fill="#ffffff" d="M3 21v-6h2v4h4v2H3Zm12 0v-2h4v-4h2v6h-6Zm-7.825-5.175-1.425-1.4L7.175 13H2v-2h5.175L5.75 9.575l1.425-1.4L11 12l-3.825 3.825Zm9.65 0L13 12l3.825-3.825 1.425 1.4L16.825 11H22v2h-5.175l1.425 1.425-1.425 1.4ZM3 9V3h6v2H5v4H3Zm16 0V5h-4V3h6v6h-2Z" class="Primary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" d="M3 21V15H5V19H9V21H3ZM15 21V19H19V15H21V21H15ZM7.175 15.825L5.75 14.425L7.175 13H2V11H7.175L5.75 9.575L7.175 8.175L11 12L7.175 15.825ZM16.825 15.825L13 12L16.825 8.175L18.25 9.575L16.825 11H22V13H16.825L18.25 14.425L16.825 15.825ZM3 9V3H9V5H5V9H3ZM19 9V5H15V3H21V9H19Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

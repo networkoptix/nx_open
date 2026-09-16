@@ -1,12 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/api_error" clip-path="url(#a)">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M2.108 6.01a.368.368 0 0 1 0-.52L5.49 2.108a.368.368 0 0 1 .52 0L9.392 5.49a.368.368 0 0 1 0 .52L6.01 9.392a.368.368 0 0 1-.52 0L2.108 6.01ZM17.998 2h-7.5v7.5h2.655l.208-.208a1 1 0 0 1 1.414 0l.208.208h2.402l.208-.208a.995.995 0 0 1 .405-.246V2Zm-5.845 8.5-.56.56a1 1 0 0 0 0 1.414l1.409 1.409-1.409 1.409a1 1 0 0 0 0 1.414L12.887 18h-2.389v-7.5h1.655ZM2 10.5h7.5V18H2v-7.5Z" class="Primary" clip-rule="evenodd"/>
-    <path class="Secondary" fill="#EF5350" fill-rule="evenodd" d="m14.068 10.099 6 6-1.768 1.768-6-6 1.768-1.768Z" clip-rule="evenodd"/>
-    <path class="Secondary" fill="#EF5350" fill-rule="evenodd" d="m18.3 10.099-6 6 1.768 1.768 6-6-1.768-1.768Z" clip-rule="evenodd"/>
-  </g>
-  <defs>
-    <clipPath id="a">
-      <path fill="#ffffff" d="M0 0h20v20H0z"/>
-    </clipPath>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g clip-path="url(#clip0_7742_38)">
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M2.10776 6.01016C1.96408 5.86648 1.96408 5.63352 2.10776 5.48984L5.48984 2.10776C5.63352 1.96408 5.86648 1.96408 6.01016 2.10776L9.39224 5.48984C9.53592 5.63352 9.53592 5.86648 9.39224 6.01016L6.01016 9.39224C5.86648 9.53592 5.63352 9.53592 5.48984 9.39224L2.10776 6.01016ZM17.998 2H10.498V9.5H13.1526L13.3607 9.29192C13.7513 8.90139 14.3844 8.90139 14.7749 9.29192L14.983 9.5H17.3849L17.593 9.29192C17.7104 9.17444 17.8499 9.0923 17.998 9.04551V2ZM12.1528 10.4999L11.593 11.0597C11.2024 11.4502 11.2024 12.0834 11.593 12.4739L13.002 13.8829L11.593 15.2919C11.2024 15.6824 11.2024 16.3156 11.593 16.7061L12.8867 17.9999H10.498V10.4999H12.1528ZM2 10.4999H9.5V17.9999H2V10.4999Z" fill="#A5B7C0" class="Primary"/>
+<g>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M14.0678 10.099L20.0678 16.099L18.3001 17.8668L12.3001 11.8668L14.0678 10.099Z" fill="#EF5350" class="Secondary"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M18.3 10.099L12.3 16.099L14.0678 17.8668L20.0678 11.8668L18.3 10.099Z" fill="#EF5350" class="Secondary"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_7742_38">
+<rect width="20" height="20" fill="#ffffff"/>
+</clipPath>
+</defs>
 </svg>

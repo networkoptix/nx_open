@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Outline/organization">
-    <path fill="#698796" fill-rule="evenodd" d="M4.5 15.5v-11h8V9H12a1 1 0 0 0-1 1v5.5H4.5ZM16 9h-2V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1Zm-3.5 1.5v5h3v-5h-3ZM7 6.25h-.75v1.5h4.5v-1.5H7Zm-.75 3h3.5v1.5h-3.5v-1.5Zm.75 3h-.75v1.5h3.5v-1.5H7Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M4.5 15.5V4.5H12.5V9H12C11.4477 9 11 9.44772 11 10V15.5H4.5ZM16 9H14V4C14 3.44772 13.5523 3 13 3H4C3.44772 3 3 3.44772 3 4V16C3 16.5523 3.44771 17 4 17H12H16C16.5523 17 17 16.5523 17 16V10C17 9.44772 16.5523 9 16 9ZM12.5 10.5V15.5H15.5V10.5H12.5ZM7 6.25H6.25V7.75H7H10H10.75V6.25H10H7ZM6.25 9.25H7H9H9.75V10.75H9H7H6.25V9.25ZM7 12.25H6.25V13.75H7H9H9.75V12.25H9H7Z" fill="#698796" class="Primary"/>
+</g>
 </svg>

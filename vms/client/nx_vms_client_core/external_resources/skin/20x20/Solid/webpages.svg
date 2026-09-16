@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/webpages">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M.5 2a.5.5 0 0 0-.5.5V5h14V2.5a.5.5 0 0 0-.5-.5H.5ZM14 6H0v7.5a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V6ZM5 3h1v1H5V3ZM2 3H1v1h1V3Zm1 0h1v1H3V3Zm12 12H2v1h14V8h-1v7Zm0-8h1V4h-1v3ZM4 17h13v-7h1v8H4v-1Zm14-8V6h-1v3h1Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M0.5 2C0.223858 2 0 2.22386 0 2.5V5H14V2.5C14 2.22386 13.7761 2 13.5 2H0.5ZM14 6H0V13.5C0 13.7761 0.223857 14 0.5 14H13.5C13.7761 14 14 13.7761 14 13.5V6ZM5 3H6V4H5V3ZM2 3H1V4H2V3ZM3 3H4V4H3V3ZM15 15H2V16H15H16V15V8H15V15ZM15 7H16V4H15V7ZM4 17H17V10H18V17V18H17H4V17ZM18 9V6H17V9H18Z" fill="#A5B7C0" class="Primary"/>
+</g>
 </svg>

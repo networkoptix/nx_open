@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/watertransport_solid">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M3 3h6v2H3V3Zm0 3h9a2 2 0 0 1 2 2H3V6Zm8 3H1v4a3 3 0 0 0 3 3h10.362a4 4 0 0 0 3.677-2.424L20 9h-9Zm5 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M3 3.00024H9V5.00024H3V3.00024ZM3 6.00024H12C13.1046 6.00024 14 6.89567 14 8.00024H3V6.00024ZM11 9H9H3H1V13C1 14.6569 2.34315 16 4 16H14.3624C15.9625 16 17.4087 15.0464 18.039 13.5757L20 9H14H11ZM16 11.5C16 11.7761 15.7761 12 15.5 12C15.2239 12 15 11.7761 15 11.5C15 11.2239 15.2239 11 15.5 11C15.7761 11 16 11.2239 16 11.5Z" fill="#A5B7C0" class="Primary"/>
+</g>
 </svg>

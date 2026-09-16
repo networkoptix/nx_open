@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/videowalls">
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M1 8.5V13h6V8.5H1Zm7 0V13h6V8.5H8ZM8 14H.5a.5.5 0 0 1-.5-.5v-11A.5.5 0 0 1 .5 2h14a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5H8ZM8 3h6v4.5H8V3ZM7 3v4.5H1V3h6Zm9 1h1v12H2v-1h14V4Zm2 13H4v1h15V6h-1v11ZM2 9.5h4V12H2V9.5Zm7 0h4V12H9V9.5ZM6 4H2v2.5h4V4Zm3 0h4v2.5H9V4Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M1 8.5V13H7V8.5H1ZM8 8.5V13H14V8.5H8ZM8 14H7H0.5C0.223858 14 0 13.7761 0 13.5V2.5C0 2.22386 0.223858 2 0.5 2H7H8H14.5C14.7761 2 15 2.22386 15 2.5V13.5C15 13.7761 14.7761 14 14.5 14H8ZM8 3H14V7.5H8V3ZM7 3V7.5H1V3H7ZM16 4H17V15V16H16H2V15H16V4ZM18 17H4V18H18H19V17V6H18V17ZM2 9.5H6V12H2V9.5ZM9 9.5H13V12H9V9.5ZM6 4H2V6.5H6V4ZM9 4H13V6.5H9V4Z" fill="#A5B7C0" class="Primary"/>
+</g>
 </svg>

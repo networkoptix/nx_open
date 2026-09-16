@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Solid/folder_error">
-    <path fill="#7E92A9" fill-rule="evenodd" d="M2 5a2 2 0 0 1 2-2h4.945a2 2 0 0 1 1.507.685L11.6 5H16a2 2 0 0 1 2 2v4.535A4 4 0 0 0 12.535 17H4a2 2 0 0 1-2-2V5Z" class="Secondary" clip-rule="evenodd"/>
-    <path fill="#A5B7C0" fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8.535A4 4 0 0 1 18 11.535V7a2 2 0 0 0-2-2H4Z" class="Primary" clip-rule="evenodd"/>
-    <circle cx="16" cy="15" r="3" fill="#EF5350" class="Tertiary"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Secondary" fill-rule="evenodd" clip-rule="evenodd" d="M2 5C2 3.89543 2.89543 3 4 3H8.94546C9.52308 3 10.0725 3.24973 10.4523 3.68493L11.6 5H16C17.1046 5 18 5.89543 18 7V11.5351C17.4117 11.1948 16.7286 11 16 11C13.7909 11 12 12.7909 12 15C12 15.7286 12.1948 16.4117 12.5351 17H4C2.89543 17 2 16.1046 2 15V5Z" fill="#7E92A9" class="Secondary"/>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M4 5C2.89543 5 2 5.89543 2 7V15C2 16.1046 2.89543 17 4 17H12.5351C12.1948 16.4117 12 15.7286 12 15C12 12.7909 13.7909 11 16 11C16.7286 11 17.4117 11.1948 18 11.5351V7C18 5.89543 17.1046 5 16 5H4Z" fill="#A5B7C0" class="Primary"/>
+<circle id="Tertiary" cx="16" cy="15" r="3" fill="#EF5350" class="Tertiary"/>
+</g>
 </svg>

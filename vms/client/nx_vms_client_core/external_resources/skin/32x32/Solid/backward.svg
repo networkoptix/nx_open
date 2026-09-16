@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-  <g class="32x32/Solid/backward">
-    <rect width="32" height="32" fill="#212A2F" class="Secondary" rx="2"/>
-    <path fill="#E1E7EA" fill-rule="evenodd" d="M15.405 19.928v-8.127a.8.8 0 0 0-1.259-.655l-5.805 4.063a.8.8 0 0 0 0 1.311l5.805 4.064a.8.8 0 0 0 1.259-.656Zm8 0v-8.127a.8.8 0 0 0-1.259-.655l-5.805 4.063a.8.8 0 0 0 0 1.311l5.805 4.064a.8.8 0 0 0 1.259-.656Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+<g>
+<rect id="Secondary" width="32" height="32" rx="2" fill="#212A2F" class="Secondary"/>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M15.405 19.9283V11.8014C15.405 11.1542 14.6764 10.7749 14.1462 11.146L8.34123 15.2095C7.88626 15.528 7.88626 16.2018 8.34123 16.5203L14.1462 20.5837C14.6764 20.9549 15.405 20.5756 15.405 19.9283ZM23.405 19.9283V11.8014C23.405 11.1542 22.6764 10.7749 22.1462 11.146L16.3412 15.2095C15.8863 15.528 15.8863 16.2018 16.3412 16.5203L22.1462 20.5837C22.6764 20.9549 23.405 20.5756 23.405 19.9283Z" fill="#E1E7EA" class="Primary"/>
+</g>
 </svg>

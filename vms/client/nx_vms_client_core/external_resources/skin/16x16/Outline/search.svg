@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-  <g class="16x16/Outline/search">
-    <path fill="#ffffff" fill-rule="evenodd" d="M11 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-.836 3.871a5 5 0 1 1 .707-.707l3.482 3.482-.707.708-3.482-3.482Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M11 7C11 9.20914 9.20914 11 7 11C4.79086 11 3 9.20914 3 7C3 4.79086 4.79086 3 7 3C9.20914 3 11 4.79086 11 7ZM10.1644 10.8715C9.30242 11.5768 8.20063 12 7 12C4.23858 12 2 9.76142 2 7C2 4.23858 4.23858 2 7 2C9.76142 2 12 4.23858 12 7C12 8.20064 11.5768 9.30244 10.8715 10.1644L14.3535 13.6464L13.6464 14.3536L10.1644 10.8715Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

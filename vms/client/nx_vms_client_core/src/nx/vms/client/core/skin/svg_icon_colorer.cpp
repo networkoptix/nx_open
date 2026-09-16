@@ -22,7 +22,8 @@ namespace nx::vms::client::core {
 
 namespace {
 
-static constexpr int kColorValueStringLength = 7;
+static constexpr int kColorValueStringLength = 7; //< Length of "#rrggbb".
+static constexpr int kShortColorValueStringLength = 4; //< Length of "#rgb".
 
 static const QColor kBasePrimaryColor = "#a5b7c0"; //< Value of light10 in default customization.
 static const QColor kBaseSecondaryColor = "#e1e7ea"; //< Value of light4 in default customization.
@@ -67,17 +68,22 @@ QByteArray substituteColors(
             {
                 int length = kColorValueStringLength;
                 QString currentColor = QString::fromLatin1(data.begin() + pos, length).toLower();
-                if (auto pos = std::find(currentColor.begin(), currentColor.end(), '\"');
-                    pos != currentColor.end())
+                if (auto quotePos = std::find(currentColor.begin(), currentColor.end(), '\"');
+                    quotePos != currentColor.end())
                 {
-                    length = pos - currentColor.begin();
+                    length = quotePos - currentColor.begin();
                     currentColor = currentColor.left(length);
                 }
 
-                if (length < kColorValueStringLength)
+                if (length != kColorValueStringLength && length != kShortColorValueStringLength)
                 {
                     pos += length + 1;
                     continue;
+                }
+
+                if (length == kShortColorValueStringLength)
+                {
+                    currentColor = QColor::fromString(currentColor).name(QColor::HexRgb);
                 }
 
                 if (colorSubstitutions.contains(currentColor))

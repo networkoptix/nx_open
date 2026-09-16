@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-  <g class="24x24/Solid/st_x_number_four">
-    <path fill="#fff" fill-rule="evenodd" d="M8 18a4 4 0 0 1-4-4V2h4v12h8V2h4v20h-4v-4H8Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M8 18C5.79086 18 4 16.2091 4 14V2H8V14H16V2H20V22H16V18H8Z" fill="#ffffff" class="Primary"/>
+</g>
 </svg>

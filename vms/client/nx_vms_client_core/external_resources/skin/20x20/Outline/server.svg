@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 20 20">
-  <g class="20x20/Outline/server">
-    <path fill="#698796" fill-rule="evenodd" d="M4 6V4h12v2H4Zm-1.5.757V16.5a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-13a1 1 0 0 0-1-1h-13a1 1 0 0 0-1 1v3.257ZM4 16v-5h12v5H4Zm0-6.5h12v-2H4v2Zm2.25 3a.75.75 0 0 0 0 1.5h2.5a.75.75 0 0 0 0-1.5h-2.5Z" class="Primary" clip-rule="evenodd"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+<g>
+<path id="Primary" fill-rule="evenodd" clip-rule="evenodd" d="M4 6V4H16V6H4ZM2.5 6.75684V10.2432L2.49997 10.25L2.5 10.2568V16.5C2.5 17.0523 2.94772 17.5 3.5 17.5H16.5C17.0523 17.5 17.5 17.0523 17.5 16.5V3.5C17.5 2.94772 17.0523 2.5 16.5 2.5H3.5C2.94772 2.5 2.5 2.94772 2.5 3.5V6.74316L2.49997 6.75L2.5 6.75684ZM4 16V11H16V16H4ZM4 9.5H16V7.5H4V9.5ZM6.24999 12.4999C5.83578 12.4999 5.49999 12.8357 5.49999 13.2499C5.49999 13.6641 5.83578 13.9999 6.24999 13.9999H8.74999C9.16421 13.9999 9.49999 13.6641 9.49999 13.2499C9.49999 12.8357 9.16421 12.4999 8.74999 12.4999H6.24999Z" fill="#698796" class="Primary"/>
+</g>
 </svg>
