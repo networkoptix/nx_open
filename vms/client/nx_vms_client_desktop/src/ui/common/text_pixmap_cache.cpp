@@ -139,7 +139,7 @@ public:
         {
         }
 
-        friend size_t qHash(const Key& key, uint seed = 0)
+        friend size_t qHash(const Key& key, size_t seed = 0)
         {
             return qHashMulti(seed, key.text, key.font, key.color, key.devicePixelRatio);
         }

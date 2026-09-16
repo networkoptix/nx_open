@@ -88,6 +88,6 @@ private:
     const Key m_key;
 };
 
-size_t qHash(const MediaOutputShaderProgram::Key& key, uint seed = 0);
+size_t qHash(const MediaOutputShaderProgram::Key& key, size_t seed = 0);
 
 } // namespace nx::vms::client::desktop

@@ -2,8 +2,7 @@
 
 #include "joystick_button_action_choice_model.h"
 
-#include <QtCore/qhashfunctions.h>
-#include <QtGui/QAction>
+#include <QtCore/QHashFunctions>
 
 #include <nx/utils/math/math.h>
 
@@ -25,12 +24,9 @@ struct ButtonInfo
     bool operator==(const ButtonInfo& other) const = default;
 };
 
-size_t qHash(ButtonInfo key, size_t seed = 0) noexcept
+size_t qHash(const ButtonInfo& key, size_t seed = 0) noexcept
 {
-    QtPrivate::QHashCombine hash;
-
-    seed = hash(seed, key.name);
-    return hash(seed, key.withModifier);
+    return qHashMulti(seed, key.name, key.withModifier);
 }
 
 struct JoystickButtonActionChoiceModel::Private

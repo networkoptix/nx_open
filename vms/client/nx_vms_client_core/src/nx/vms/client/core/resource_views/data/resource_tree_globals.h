@@ -154,16 +154,14 @@ struct ExpandedNodeId
     QString id;
     QString parentId;
 
-    operator bool() const { return type != NodeType{}; }
+    explicit operator bool() const { return type != NodeType{}; }
+
+    bool operator==(const ExpandedNodeId& other) const = default;
 };
 
-inline size_t qHash(const ExpandedNodeId& value, uint seed = 0)
+inline size_t qHash(const ExpandedNodeId& value, size_t seed = 0)
 {
-    const auto combine = QtPrivate::QHashCombine();
-    return combine(combine(combine(seed,
-        qHash(value.type)),
-        qHash(value.id)),
-        qHash(value.parentId));
+    return qHashMulti(seed, value.type, value.id, value.parentId);
 }
 
 NX_VMS_CLIENT_CORE_API void registerQmlType();

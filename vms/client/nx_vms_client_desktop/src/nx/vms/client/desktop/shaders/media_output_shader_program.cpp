@@ -138,19 +138,12 @@ bool MediaOutputShaderProgram::Key::operator==(const Key& other) const
             || (viewProjection == other.viewProjection && cameraProjection == other.cameraProjection));
 }
 
-size_t qHash(const MediaOutputShaderProgram::Key& key, uint seed)
+size_t qHash(const MediaOutputShaderProgram::Key& key, size_t seed)
 {
-    const auto combine = QtPrivate::QHashCombine();
-
-    const int lp = key.dewarping ? int(key.viewProjection) : 0;
+    const int cp = key.dewarping ? int(key.cameraProjection) : 0;
     const int vp = key.dewarping ? int(key.viewProjection) : 0;
 
-    return combine(combine(combine(combine(combine(seed,
-        ::qHash(int(key.format))),
-        ::qHash(int(key.imageCorrection))),
-        ::qHash(key.dewarping)),
-        ::qHash(lp)),
-        ::qHash(vp));
+    return qHashMulti(seed, key.format, key.imageCorrection, key.dewarping, cp, vp);
 }
 
 size_t MediaOutputShaderProgram::planeCount(AVPixelFormat format)
