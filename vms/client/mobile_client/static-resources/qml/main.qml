@@ -19,14 +19,27 @@ Controls.ApplicationWindow
 
     objectName: "mainWindow"
 
-    readonly property bool hasNavigationBar:
-        !!windowContext.ui.windowHelpers.navigationBarSize()
+    readonly property bool hasNavigationBar: !!windowContext.ui.windowHelpers.navigationBarSize()
 
     property alias windowParams: windowParams
     property alias uiContainer: uiContainer
     property alias banner: windowBanner
 
     visible: true
+
+    function backHandler()
+    {
+        if (d.closeOnBack)
+        {
+            mainWindow.close()
+            return
+        }
+
+        d.closeOnBack = true
+
+        snackBar.text = qsTr("Press back again to exit")
+        snackBar.open()
+    }
 
     // The desktop build exists to try the layouts out, and its title bar is the only place that
     // is always visible regardless of the screen. Mobile platforms never show the window title.
@@ -106,9 +119,15 @@ Controls.ApplicationWindow
         id: snackBar
 
         parent: Controls.Overlay.overlay
-        y: LayoutController.hasSidePanels
-            ? uiContainer.navigationBar.y - height - 16
-            : mainWindow.height - height - 16
+        y: mainWindow.height
+            - windowParams.bottomMargin
+            - 16
+            - (!uiContainer.navigationBar.visible || LayoutController.hasSidePanels
+                ? 0
+                : StyleHints.navigationBarSize)
+            - height
+
+        onClosed: d.closeOnBack = false
     }
 
     WindowBanner
@@ -153,6 +172,8 @@ Controls.ApplicationWindow
         property bool showCloudOfflineWarning: uiContainer.stackView.currentItem
             && uiContainer.stackView.currentItem.objectName === "sessionsScreen"
             && cloudOfflineDelayed
+
+        property bool closeOnBack: false
 
         BannerSource
         {

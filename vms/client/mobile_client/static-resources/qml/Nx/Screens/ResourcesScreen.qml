@@ -500,8 +500,8 @@ AdaptiveScreen
 
         if (loadingDummy.visible)
             windowContext.sessionManager.stopSessionByUser()
-        else if (!isEscKeyPressed)
-            mainWindow.close()
+        else
+            Workflow.goBack(isEscKeyPressed)
     }
 
     Component.onCompleted:
