@@ -23,6 +23,25 @@ function popCurrentScreen()
     popScreens(1)
 }
 
+function goBack(isEscKeyPressed)
+{
+    if (stackView.depth > 1)
+    {
+        popCurrentScreen()
+        return
+    }
+
+    if (windowContext.sessionManager.hasActiveSession
+        && stackView.currentItem?.objectName !== "resourcesScreen")
+    {
+        openResourcesScreen(windowContext.sessionManager.systemName)
+        return
+    }
+
+    if (!isEscKeyPressed)
+        mainWindow.backHandler()
+}
+
 function popScreens(count)
 {
     while (stackView.depth > 1 && count-- > 0)

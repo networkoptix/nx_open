@@ -156,7 +156,7 @@ AdaptiveScreen
         (isEscKeyPressed) =>
         {
             if (rootIndex === NxGlobals.invalidModelIndex() && !searching && !isEscKeyPressed)
-                mainWindow.close()
+                Workflow.goBack(isEscKeyPressed)
             else
                 goBack()
         }

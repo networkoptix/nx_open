@@ -380,6 +380,7 @@ FocusScope
         width: Overlay.overlay ? Overlay.overlay.width : 0
         height: Overlay.overlay ? Overlay.overlay.height : 0
         modal: true
+        focus: true
         visible: false
         topPadding: SafeArea.margins.top
         leftPadding: SafeArea.margins.left
@@ -423,10 +424,11 @@ FocusScope
 
         event.accepted = true
 
+        const isEscKeyPressed = event.key === Qt.Key_Escape
         if (root.customBackHandler)
-            root.customBackHandler(event.key === Qt.Key_Escape)
-        else if (stackView.depth > 1)
-            Workflow.popCurrentScreen()
+            root.customBackHandler(isEscKeyPressed)
+        else
+            Workflow.goBack(isEscKeyPressed)
     }
 
     QtObject

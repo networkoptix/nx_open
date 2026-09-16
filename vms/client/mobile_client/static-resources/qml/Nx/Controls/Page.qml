@@ -100,10 +100,11 @@ QuickControls.Page
 
         event.accepted = true
 
+        const isEscKeyPressed = event.key === Qt.Key_Escape
         if (control.customBackHandler)
-            control.customBackHandler(event.key === Qt.Key_Escape)
-        else if (leftButtonIcon.source === d.kBackButtonIconSource && stackView.depth > 1)
-            Workflow.popCurrentScreen()
+            control.customBackHandler(isEscKeyPressed)
+        else if (leftButtonIcon.source === d.kBackButtonIconSource || stackView.depth === 1)
+            Workflow.goBack(isEscKeyPressed)
     }
 
     QtObject

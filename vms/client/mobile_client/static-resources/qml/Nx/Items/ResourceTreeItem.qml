@@ -30,7 +30,9 @@ Item
     function cancelSearch()
     {
         searchEdit.clear()
-        treeView.forceActiveFocus()
+
+        if (control.visible)
+            treeView.forceActiveFocus()
     }
 
     ColumnLayout

@@ -107,7 +107,7 @@ Item
 
         function restoreActiveFocus()
         {
-            if (activeFocusItem == Window.contentItem)
+            if (activeFocusItem === mainWindow.contentItem)
                 Workflow.focusCurrentScreen()
         }
 
