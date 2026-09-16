@@ -24,6 +24,7 @@ public:
     virtual double thisProcessGpuUsage() override;
     virtual std::vector<PartitionSpace> totalPartitionSpaceInfo() override;
     virtual std::vector<HddLoad> totalHddLoad() override;
+    virtual std::vector<DiskIo> totalDiskIo() override;
     virtual std::vector<NetworkLoad> totalNetworkLoad() override;
     virtual int thisProcessThreads() override;
     virtual std::uint64_t thisProcessRamUsageBytes() override;

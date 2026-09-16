@@ -26,6 +26,7 @@ public:
     virtual double thisProcessCpuUsage() override;
     virtual double thisProcessGpuUsage() override;
     virtual std::vector<HddLoad> totalHddLoad() override;
+    virtual std::vector<DiskIo> totalDiskIo() override;
 
 private:
     class NetworkLoadMonitor;

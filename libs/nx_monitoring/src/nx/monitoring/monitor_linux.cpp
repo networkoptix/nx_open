@@ -184,6 +184,11 @@ std::vector<ActivityMonitor::HddLoad> LinuxMonitor::totalHddLoad()
     return d->totalHddLoad();
 }
 
+std::vector<ActivityMonitor::DiskIo> LinuxMonitor::totalDiskIo()
+{
+    return d->totalDiskIo();
+}
+
 std::vector<ActivityMonitor::NetworkLoad> LinuxMonitor::totalNetworkLoad()
 {
     return d->totalNetworkLoad();

@@ -3,7 +3,10 @@
 #pragma once
 
 #include <chrono>
-#include <tuple>
+#include <cstdint>
+#include <filesystem>
+#include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -17,11 +20,6 @@ class PdhMonitor
 {
     struct HddItem
     {
-        HddItem() {}
-        HddItem(const ActivityMonitor::Hdd& hdd, const PDH_RAW_COUNTER& counter):
-            hdd(hdd), counter(counter)
-        {}
-
         ActivityMonitor::Hdd hdd;
         PDH_RAW_COUNTER counter;
     };
@@ -38,6 +36,7 @@ public:
     double getTotalCpuLoad();
     double getThisProcessGpuUsage();
     std::vector<ActivityMonitor::HddLoad> getTotalHddLoad();
+    std::vector<ActivityMonitor::DiskIo> getTotalDiskIo();
 
 private:
     void addTotalCpuLoadCounter();
@@ -46,16 +45,18 @@ private:
     void readTotalCpuLoad();
     void readGpuTimeCounterValues(std::chrono::milliseconds delta);
     void readDiskCounterValues();
+    std::optional<std::unordered_map<DWORD, PDH_RAW_COUNTER>> readDiskCountersByDiskId(
+        PDH_HCOUNTER counter);
     double diskCounterValue(const PDH_RAW_COUNTER& last, const PDH_RAW_COUNTER& current);
     void calculateTotalHddLoad();
+    std::optional<std::vector<ActivityMonitor::DiskIo>> calculateTotalDiskIo();
     // It is needed for query, containing wildcard.
-    bool checkCountersExist(const QString& query) const;
-
-    std::tuple<QByteArray, int> getRawCounterArray(PDH_HCOUNTER counter);
+    bool checkCountersExist(const std::string& query) const;
 
     const PdhMonitor* d_func() const;
     DWORD checkError(const char* expression, DWORD status) const;
-    QString perfName(DWORD index);
+    /** Localized performance object name in the system ANSI code page, as PDH expects it. */
+    std::string perfName(DWORD index);
 
 private:
     /** Handle to PHD dll. Used to query error messages via <tt>FormatMessage</tt>. */
@@ -79,12 +80,21 @@ private:
 
     /** Disk time counter, <tt>'\PhysicalDisk(*)\% Disk Time'</tt>. */
     PDH_HCOUNTER m_diskTimeCounter = INVALID_HANDLE_VALUE;
+    PDH_HCOUNTER m_diskReadCounter = INVALID_HANDLE_VALUE;
+    PDH_HCOUNTER m_diskWriteCounter = INVALID_HANDLE_VALUE;
 
     /** Data collected from the disk time counter, in a sane format. */
-    std::unordered_map<int, HddItem> m_itemByDiskId;
+    std::unordered_map<DWORD, HddItem> m_itemByDiskId;
 
     /** Data collected from the disk time counter during the last collect operation. */
-    std::unordered_map<int, HddItem> m_lastItemByDiskId;
+    std::unordered_map<DWORD, HddItem> m_lastItemByDiskId;
+
+    std::unordered_map<DWORD, PDH_RAW_COUNTER> m_lastDiskReadCountersById;
+    std::unordered_map<DWORD, PDH_RAW_COUNTER> m_lastDiskWriteCountersById;
+
+    static constexpr std::chrono::minutes kMountPointsRefreshInterval{1};
+    std::unordered_map<DWORD, std::vector<std::filesystem::path>> m_mountPointsByDiskId;
+    std::chrono::steady_clock::time_point m_mountPointsReadAt{};
 
     /** Previous value for GPU running time for this process. */
     std::int64_t m_lastGpuRunningTime = 0;
@@ -93,6 +103,7 @@ private:
     double m_totalCpuLoad = 0.0;
     double m_thisProcessGpuUsage = 0.0;
     std::vector<ActivityMonitor::HddLoad> m_totalHddLoad;
+    std::vector<ActivityMonitor::DiskIo> m_totalDiskIo;
     bool m_initialized = false;
 };
 

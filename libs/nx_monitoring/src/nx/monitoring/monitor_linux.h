@@ -24,6 +24,7 @@ public:
     virtual std::uint64_t thisProcessPrivateRamUsageBytes() override;
     virtual double thisProcessCpuUsage() override;
     virtual std::vector<HddLoad> totalHddLoad() override;
+    virtual std::vector<DiskIo> totalDiskIo() override;
     virtual std::vector<NetworkLoad> totalNetworkLoad() override;
     virtual std::vector<PartitionSpace> totalPartitionSpaceInfo() override;
 
