@@ -3,6 +3,7 @@
 #include "cloud_system_finder.h"
 
 #include <QtCore/QPointer>
+#include <QtCore/QThread>
 #include <QtCore/QTimer>
 
 #include <api/http_client_pool.h>
@@ -16,7 +17,6 @@
 #include <nx/utils/async_handler_executor.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/qt_helpers.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
@@ -97,7 +97,6 @@ struct CloudSystemFinder::Private
 {
     CloudSystemFinder* const q;
     AbstractCloudStatusWatcher* watcher = nullptr;
-    mutable nx::Mutex mutex{nx::Mutex::Recursive};
     std::unique_ptr<ClientPool> clientPool = std::make_unique<ClientPool>();
     using SystemsHash = QHash<QString, QnCloudSystemDescriptionPtr>;
     SystemsHash systems;
@@ -106,9 +105,10 @@ struct CloudSystemFinder::Private
     uint64_t lastPingId = 0;
     QHash<QString, uint64_t> lastPingIds;
 
+    bool inOwnThread() const { return q->thread() == QThread::currentThread(); }
+
     void pingAllSystems()
     {
-        NX_MUTEX_LOCKER lock(&mutex);
         for (auto it = systems.begin(); it != systems.end(); ++it)
             pingSystem(it.key());
     }
@@ -158,7 +158,7 @@ struct CloudSystemFinder::Private
         clientPool->sendRequest(context);
     }
 
-    void clearServersUnderLock(QnCloudSystemDescriptionPtr systemDescription)
+    void clearServers(QnCloudSystemDescriptionPtr systemDescription)
     {
         const auto currentServers = systemDescription->servers();
         NX_ASSERT(currentServers.size() <= 1, "There should be one or zero servers");
@@ -192,7 +192,8 @@ struct CloudSystemFinder::Private
         bool success,
         const QByteArray& messageBody)
     {
-        const NX_MUTEX_LOCKER lock(&mutex);
+        NX_ASSERT(inOwnThread());
+
         if (pingId <= lastPingIds.value(cloudSystemId))
         {
             NX_VERBOSE(this,
@@ -211,9 +212,7 @@ struct CloudSystemFinder::Private
         const auto systemDescription = it.value();
         nx::vms::api::ModuleInformationWithAddresses moduleInformation;
 
-        if (!success
-            || !parseModuleInformation(
-                messageBody, &moduleInformation)
+        if (!success || !parseModuleInformation(messageBody, &moduleInformation)
             || cloudSystemId != moduleInformation.cloudSystemId)
         {
             // A system reachable just before and just after a sleep still fails here, and the
@@ -228,7 +227,7 @@ struct CloudSystemFinder::Private
                 return;
             }
 
-            clearServersUnderLock(systemDescription);
+            clearServers(systemDescription);
             return;
         }
 
@@ -259,7 +258,7 @@ struct CloudSystemFinder::Private
             cloudSystemId, serverId, url.toString(QUrl::RemovePassword));
     }
 
-    void updateStateUnderLock(const QnCloudSystemList& targetSystems)
+    void updateState(const QnCloudSystemList& targetSystems)
     {
         for (const auto& system: targetSystems)
         {
@@ -323,43 +322,39 @@ struct CloudSystemFinder::Private
 
         QHash<QString, nx::Uuid> removedTargetIds;
 
+        const auto oldIds = nx::utils::toQSet(systems.keys());
+
+        const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
+        NX_DEBUG(this, "Add systems: %1", newIds);
+        for (const auto& addedCloudId: addedCloudIds)
         {
-            NX_MUTEX_LOCKER lock(&mutex);
+            NX_DEBUG(this, "Found cloud system %1", addedCloudId);
 
-            const auto oldIds = nx::utils::toQSet(systems.keys());
+            const auto system = updatedSystems[addedCloudId];
+            emit q->systemDiscovered(system);
 
-            const auto addedCloudIds = IdsSet(newIds).subtract(oldIds);
-            NX_DEBUG(this, "Add systems: %1", newIds);
-            for (const auto& addedCloudId: addedCloudIds)
-            {
-                NX_DEBUG(this, "Found cloud system %1", addedCloudId);
-
-                const auto system = updatedSystems[addedCloudId];
-                emit q->systemDiscovered(system);
-
-                systems.insert(addedCloudId, system);
-                pingSystem(addedCloudId);
-            }
-
-            const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
-            NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
-            // Supersede the pings already sent: if a system comes back, it gets a fresh
-            // description, and an answer about the old one must not be applied to it.
-            const auto barrier = ++lastPingId; //< Belongs to no ping, so it discards them all.
-            for (const auto& removedCloudId: removedCloudIds)
-            {
-                NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
-
-                const auto system = systems[removedCloudId];
-                NX_ASSERT(removedCloudId == system->id());
-
-                removedTargetIds.insert(system->id(), system->localId());
-                systems.remove(removedCloudId);
-                lastPingIds[removedCloudId] = barrier;
-            }
-
-            updateStateUnderLock(value);
+            systems.insert(addedCloudId, system);
+            pingSystem(addedCloudId);
         }
+
+        const auto removedCloudIds = IdsSet(oldIds).subtract(newIds);
+        NX_DEBUG(this, "Remove systems: %1", removedCloudIds);
+        // Supersede the pings already sent: if a system comes back, it gets a fresh
+        // description, and an answer about the old one must not be applied to it.
+        const auto barrier = ++lastPingId; //< Belongs to no ping, so it discards them all.
+        for (const auto& removedCloudId: removedCloudIds)
+        {
+            NX_DEBUG(this, "Lost cloud system %1", removedCloudId);
+
+            const auto system = systems[removedCloudId];
+            NX_ASSERT(removedCloudId == system->id());
+
+            removedTargetIds.insert(system->id(), system->localId());
+            systems.remove(removedCloudId);
+            lastPingIds[removedCloudId] = barrier;
+        }
+
+        updateState(value);
 
         for (const auto& id: removedTargetIds.keys())
         {
@@ -393,13 +388,14 @@ CloudSystemFinder::CloudSystemFinder(AbstractCloudStatusWatcher* watcher, QObjec
     updateSystemsTimer->setInterval(kCloudSystemsRefreshPeriod);
     updateSystemsTimer->start();
 
-    connect(appContext()->applicationWakeNotifier(), &ApplicationWakeNotifier::wokeUp, this,
+    connect(appContext()->applicationWakeNotifier(),
+        &ApplicationWakeNotifier::wokeUp,
+        this,
         [this]()
         {
             // Answers to pings sent before the wake-up are stale: a failure among them would
             // drop the server and mark the tile unreachable, so discard them. No re-ping here -
             // the periodic round is usually already in flight and a second one only competes.
-            const NX_MUTEX_LOCKER lock(&d->mutex);
             const auto barrier = ++d->lastPingId; //< Belongs to no ping, so it discards them all.
             for (const auto& cloudSystemId: d->systems.keys())
                 d->lastPingIds[cloudSystemId] = barrier;
@@ -415,9 +411,9 @@ CloudSystemFinder::~CloudSystemFinder()
 
 SystemDescriptionList CloudSystemFinder::systems() const
 {
-    SystemDescriptionList result;
+    NX_ASSERT(d->inOwnThread());
 
-    const NX_MUTEX_LOCKER lock(&d->mutex);
+    SystemDescriptionList result;
     for (const auto& system: d->systems)
         result.append(system.dynamicCast<SystemDescription>());
 
@@ -426,7 +422,7 @@ SystemDescriptionList CloudSystemFinder::systems() const
 
 SystemDescriptionPtr CloudSystemFinder::getSystem(const QString &id) const
 {
-    const NX_MUTEX_LOCKER lock(&d->mutex);
+    NX_ASSERT(d->inOwnThread());
 
     const auto systemDescriptions = d->systems.values();
     const auto predicate =
