@@ -161,8 +161,7 @@ public:
     QAuthenticator getAuth() const;
     QAuthenticator getDefaultAuth() const;
 
-    virtual std::uint16_t httpPort() const;
-    virtual void setHttpPort(std::uint16_t newPort);
+    std::uint16_t httpPort() const;
 
     /* By default, it is rtsp port (554). */
     virtual int mediaPort() const;
@@ -949,9 +948,6 @@ private:
     QString m_physicalId;
 
     unsigned int m_networkTimeout = 1000 * 10;
-
-    // Initialized in cpp to avoid transitional includes.
-    std::uint16_t m_httpPort;
 
     QDateTime m_lastDiscoveredTime;
 
