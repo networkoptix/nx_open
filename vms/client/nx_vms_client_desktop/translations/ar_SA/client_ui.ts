@@ -1587,7 +1587,7 @@
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation type="unfinished">Take system name and settings from</translation>
+      <translation>خذ اسم النظام والإعدادات من</translation>
     </message>
   </context>
   <context>
