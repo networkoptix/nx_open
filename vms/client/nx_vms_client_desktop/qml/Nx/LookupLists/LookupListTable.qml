@@ -25,12 +25,27 @@ CheckableTableView
 
     columnWidthProvider: function (column)
     {
-        return column ? Math.max(100, columnWidth(column)) : 35
+        if (!column)
+            return 35
+
+        if (control.model && control.model.rowCount() === 0)
+        {
+            // With 0 rows no column width is loaded yet, so use the header text width instead.
+            return Math.max(100, headerTextWidth(column))
+        }
+
+        return Math.max(100, columnWidth(column))
     }
 
     horizontalHeaderVisible: true
     horizontalHeaderView.resizableColumns: false
     horizontalHeaderEnabled: !editing
+
+    function headerTextWidth(column)
+    {
+        const text = control.model.headerData(column, Qt.Horizontal) ?? ""
+        return headerFontMetrics.advanceWidth(text)
+    }
 
     function rowContainsCorrectData(row)
     {
@@ -45,6 +60,29 @@ CheckableTableView
     function sortTable()
     {
         control.model.sort(1)
+    }
+
+    FontMetrics
+    {
+        id: headerFontMetrics
+        font.pixelSize: 14
+        font.weight: Font.Medium
+    }
+
+    Binding
+    {
+        target: control
+        property: "contentWidth"
+        when: control.model && control.model.rowCount() === 0
+
+        // With 0 rows, contentWidth is never computed automatically, so calculate it here.
+        value:
+        {
+            let totalWidth = 0
+            for (let column = 0; column < control.columns; ++column)
+                totalWidth += control.columnWidthProvider(column)
+            return totalWidth
+        }
     }
 
     delegate: DelegateChooser
