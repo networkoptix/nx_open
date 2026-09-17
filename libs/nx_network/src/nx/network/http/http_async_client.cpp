@@ -324,6 +324,10 @@ AsyncClient::AsyncClient(
 AsyncClient::~AsyncClient()
 {
     NX_VERBOSE(this, "Deleting the instance...");
+    // A close handler may be invoked after the connection is destroyed, so it has to be removed
+    // even when the client is deleted without a preceding pleaseStopSync().
+    if (m_messagePipeline)
+        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
     --SocketGlobals::instance().debugCounters().httpClientConnectionCount;
     SocketGlobals::instance().allocationAnalyzer().recordObjectDestruction(this);
 }
