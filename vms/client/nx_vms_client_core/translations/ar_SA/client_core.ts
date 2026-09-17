@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>موقعك</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>انتهت صلاحية جلسة الدخول</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
