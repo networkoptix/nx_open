@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Mengedit berbagi</translation>
     </message>
   </context>
   <context>

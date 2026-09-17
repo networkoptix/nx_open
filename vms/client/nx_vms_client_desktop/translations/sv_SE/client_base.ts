@@ -12618,11 +12618,11 @@ Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskern
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>Det går inte att lägga till en resurs från en annan webbplats till en vanlig layout. Använd %1 för att öppna layouten igen som en webbplatsöverskridande layout.</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>Layouten är redan en layout för flera webbplatser</translation>
     </message>
   </context>
   <context>

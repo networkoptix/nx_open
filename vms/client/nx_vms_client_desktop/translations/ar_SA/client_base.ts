@@ -1890,7 +1890,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>التصغير...</translation>
     </message>
     <message>
       <source>Moving...</source>
@@ -1898,7 +1898,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>تكبير الصورة...</translation>
     </message>
     <message>
       <source>Focusing...</source>
@@ -3090,7 +3090,7 @@ License Key: %2</source>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>انتهت صلاحية جلسة الدخول</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -4853,7 +4853,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>شبكة</translation>
     </message>
     <message>
       <source>smb</source>
@@ -4905,7 +4905,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>قابل للإزالة</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -5566,11 +5566,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>تكبير الصورة...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>التصغير...</translation>
     </message>
     <message>
       <source>Moving...</source>
@@ -12052,7 +12052,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>و</translation>
     </message>
     <message>
       <source>Your access to the Site expires %1</source>
@@ -12534,7 +12534,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>و</translation>
     </message>
     <message>
       <source>New User</source>
@@ -12836,7 +12836,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 من %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>

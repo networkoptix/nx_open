@@ -12440,11 +12440,11 @@ Kami menyarankan Anda untuk tidak membuka halaman web ini. Jika Anda memahami ri
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>Tidak dapat menambahkan resource dari Site lain ke Layout reguler. Gunakan %1 untuk membuka kembali Layout sebagai layout lintas site.</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>Layoutnya sudah merupakan layout lintas site</translation>
     </message>
   </context>
   <context>
