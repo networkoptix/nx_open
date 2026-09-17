@@ -252,7 +252,6 @@ const QString QnVirtualCameraResource::kUsingOnvifMedia2Type(
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     base_type(),
-    m_httpPort(nx::network::http::DEFAULT_HTTP_PORT),
     m_cachedHostAddress([this] { return calculateHostAddress(getUrl()); }),
     m_manuallyAdded(false),
     m_cachedAudioRequired(
@@ -269,11 +268,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
 
             return false;
         }),
-    m_cachedRtspMetadataDisabled(
-        [this]
-        {
-            return resourceData().value(ResourceDataKey::kDisableRtspMetadataStream, false);
-        }),
+    m_cachedRtspMetadataDisabled([this]
+        { return resourceData().value(ResourceDataKey::kDisableRtspMetadataStream, false); }),
     m_cachedLicenseType([this] { return calculateLicenseType(); }),
     m_cachedHasDualStreaming(
         [this] { return hasDualStreamingInternal() && !isDualStreamingDisabled(); }),
@@ -301,7 +297,7 @@ QnVirtualCameraResource::QnVirtualCameraResource():
 
             return result;
         }),
-        m_cachedCameraCapabilities(
+    m_cachedCameraCapabilities(
         [this]
         {
             return static_cast<nx::vms::api::DeviceCapabilities>(
@@ -324,8 +320,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
 
             return m_userAttributes.motionType;
         }),
-    m_cachedIsIOModule(
-        [this] { return getProperty(nx::vms::api::device_properties::kIoConfigCapability).toInt() > 0; }),
+    m_cachedIsIOModule([this]
+        { return getProperty(nx::vms::api::device_properties::kIoConfigCapability).toInt() > 0; }),
     m_cachedCameraMediaCapabilities(
         [this]
         {
@@ -776,12 +772,11 @@ QAuthenticator QnVirtualCameraResource::parseAuth(const QString& value)
 
 std::uint16_t QnVirtualCameraResource::httpPort() const
 {
-    return m_httpPort;
-}
-
-void QnVirtualCameraResource::setHttpPort(std::uint16_t newPort)
-{
-    m_httpPort = newPort;
+    const nx::Url url(getUrl());
+    const std::string scheme = url.scheme().toStdString();
+    const int schemePort = nx::network::http::defaultPortForScheme(scheme);
+    const int backupPort = schemePort > 0 ? schemePort : nx::network::http::DEFAULT_HTTP_PORT;
+    return static_cast<std::uint16_t>(url.port(backupPort));
 }
 
 QString QnVirtualCameraResource::mediaPortKey()
