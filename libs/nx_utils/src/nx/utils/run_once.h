@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <nx/utils/lockable.h>
+#include <nx/utils/log/log.h>
 
 namespace nx::utils {
 
@@ -64,24 +65,33 @@ private:
         return true;
     }
 
-    Future startTaskInternal(std::function<void()> task, const T& key)
+    std::optional<Future> startTaskInternal(std::function<void()> task, const T& key)
     {
-        return std::async(std::launch::async,
-            [this, task = std::move(task), key]()
-            {
-                while (true)
+        try
+        {
+            return std::async(std::launch::async,
+                [this, task = std::move(task), key]()
                 {
-                    task();
-                    auto state = m_state.lock();
-                    auto& value = (*state)[key];
-                    if (value == State::inProgress)
+                    while (true)
                     {
-                        state->erase(key);
-                        break;
+                        task();
+                        auto state = m_state.lock();
+                        auto& value = (*state)[key];
+                        if (value == State::inProgress)
+                        {
+                            state->erase(key);
+                            break;
+                        }
+                        value = State::inProgress;
                     }
-                    value = State::inProgress;
-                }
-            });
+                });
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Failed to start an async task for %1: %2", key, e.what());
+            m_state.visit([&key](auto& state) { state.erase(key); });
+            return std::nullopt;
+        }
     }
 };
 
@@ -123,19 +133,28 @@ private:
         return m_state.compare_exchange_strong(from, to);
     }
 
-    Future startTaskInternal(std::function<void()> task)
+    std::optional<Future> startTaskInternal(std::function<void()> task)
     {
-        return std::async(std::launch::async,
-            [this, task = std::move(task)]()
-            {
-                while (true)
+        try
+        {
+            return std::async(std::launch::async,
+                [this, task = std::move(task)]()
                 {
-                    task();
-                    if (switchState(State::inProgress, State::idle))
-                        break;
-                    m_state = State::inProgress;
-                }
-            });
+                    while (true)
+                    {
+                        task();
+                        if (switchState(State::inProgress, State::idle))
+                            break;
+                        m_state = State::inProgress;
+                    }
+                });
+        }
+        catch (const std::exception& e)
+        {
+            NX_WARNING(this, "Failed to start an async task: %1", e.what());
+            m_state = State::idle;
+            return std::nullopt;
+        }
     }
 };
 
