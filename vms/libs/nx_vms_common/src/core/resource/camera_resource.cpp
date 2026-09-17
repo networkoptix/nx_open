@@ -25,6 +25,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/nettools.h>
 #include <nx/network/rest/user_access_data.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/reflect/string_conversion.h>
@@ -3349,11 +3350,11 @@ nx::Url QnVirtualCameraResource::vmsCloudUrl() const
     if (systemId.isEmpty())
         return result;
 
-    result.setScheme("rtsp");
+    result.setScheme(nx::network::rtsp::kUrlSchemeName);
     result.setHost(nx::format("%1.%2", systemId, kRelayHost));
 
     result.setPath("/" + getId().toSimpleString());
-    result.setPort(443);
+    result.setPort(nx::network::http::DEFAULT_HTTPS_PORT);
     result.setQuery(QUrlQuery("stream=primary"));
 
     return result;
