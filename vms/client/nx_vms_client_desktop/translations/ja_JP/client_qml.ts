@@ -215,8 +215,8 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 件の新しい結果</numerusform>
       </translation>
     </message>
     <message>
