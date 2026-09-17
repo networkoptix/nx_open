@@ -6329,13 +6329,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n Groups</source>
-      <translation type="unfinished">
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
-        <numerusform>%n Groups</numerusform>
+      <translation>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
       </translation>
     </message>
     <message>
