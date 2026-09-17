@@ -894,7 +894,7 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
         <numerusform>%n/%1 Time Licenses</numerusform>
         <numerusform>%n/%1 Time Licenses</numerusform>
         <numerusform>%n/%1 Time Licenses</numerusform>
@@ -906,7 +906,7 @@
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
         <numerusform>%n/%1 Analog Licenses</numerusform>
         <numerusform>%n/%1 Analog Licenses</numerusform>
         <numerusform>%n/%1 Analog Licenses</numerusform>
@@ -918,7 +918,7 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
         <numerusform>%n/%1 Professional Licenses</numerusform>
         <numerusform>%n/%1 Professional Licenses</numerusform>
         <numerusform>%n/%1 Professional Licenses</numerusform>
@@ -930,7 +930,7 @@
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص الحافة</numerusform>
         <numerusform>%n/%1 Edge Licenses</numerusform>
         <numerusform>%n/%1 Edge Licenses</numerusform>
         <numerusform>%n/%1 Edge Licenses</numerusform>
@@ -942,7 +942,7 @@
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
         <numerusform>%n/%1 Vmax Licenses</numerusform>
         <numerusform>%n/%1 Vmax Licenses</numerusform>
         <numerusform>%n/%1 Vmax Licenses</numerusform>
@@ -954,7 +954,7 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
         <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
         <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
         <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
@@ -966,7 +966,7 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص حائط الفيديو</numerusform>
         <numerusform>%n/%1 Video Wall Licenses</numerusform>
         <numerusform>%n/%1 Video Wall Licenses</numerusform>
         <numerusform>%n/%1 Video Wall Licenses</numerusform>
@@ -978,7 +978,7 @@
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
         <numerusform>%n/%1 I/O Module Licenses</numerusform>
         <numerusform>%n/%1 I/O Module Licenses</numerusform>
         <numerusform>%n/%1 I/O Module Licenses</numerusform>
@@ -990,7 +990,7 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص البدء</numerusform>
         <numerusform>%n/%1 Start Licenses</numerusform>
         <numerusform>%n/%1 Start Licenses</numerusform>
         <numerusform>%n/%1 Start Licenses</numerusform>
@@ -1002,7 +1002,7 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
@@ -1014,7 +1014,7 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
         <numerusform>%n/%1 Bridge Licenses</numerusform>
         <numerusform>%n/%1 Bridge Licenses</numerusform>
         <numerusform>%n/%1 Bridge Licenses</numerusform>
@@ -1026,7 +1026,7 @@
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص غير صالحة</numerusform>
         <numerusform>%n/%1 Invalid Licenses</numerusform>
         <numerusform>%n/%1 Invalid Licenses</numerusform>
         <numerusform>%n/%1 Invalid Licenses</numerusform>
@@ -1040,12 +1040,12 @@
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>تراخيص NVR</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
         <numerusform>%n NVR Licenses</numerusform>
@@ -1057,7 +1057,7 @@
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
         <numerusform>%n/%1 NVR Licenses</numerusform>
@@ -1072,7 +1072,7 @@
     <message numerus="yes">
       <source>%n Local recording services</source>
       <translation type="unfinished">
-        <numerusform>%n Local recording services</numerusform>
+        <numerusform> %n خدمات التسجيل المحلية</numerusform>
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
         <numerusform>%n Local recording services</numerusform>
@@ -1084,7 +1084,7 @@
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 خدمات التسجيل المحلية</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
@@ -1094,14 +1094,14 @@
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>خدمات التسجيل المحلية</translation>
     </message>
   </context>
   <context>
     <name>QnOnlineServerPolicy</name>
     <message>
       <source>Online servers</source>
-      <translation type="unfinished">Online servers</translation>
+      <translation>الخوادم المتصلة</translation>
     </message>
   </context>
   <context>
@@ -1116,7 +1116,7 @@
     <message numerus="yes">
       <source>%n groups</source>
       <translation type="unfinished">
-        <numerusform>%n groups</numerusform>
+        <numerusform>%n مجموعات</numerusform>
         <numerusform>%n groups</numerusform>
         <numerusform>%n groups</numerusform>
         <numerusform>%n groups</numerusform>
@@ -1138,13 +1138,13 @@
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 و %2 ليس لديهم إذن %3 لبعض الكاميرات المحددة</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
@@ -1155,7 +1155,7 @@
     <message>
       <source>%1 group does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of selected user group, %2 is the permission name</comment>
-      <translation type="unfinished">%1 group does not have %2 permission for some of selected cameras</translation>
+      <translation>مجموعة %1 ليس لديها إذن %2 لبعض الكاميرات المحددة</translation>
     </message>
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
