@@ -33,6 +33,9 @@ public:
 
     bool collectMonitoringData();
 
+    // True once a fault below PDH has latched monitoring off for this process.
+    static bool faulted();
+
     double getTotalCpuLoad();
     double getThisProcessGpuUsage();
     std::vector<ActivityMonitor::HddLoad> getTotalHddLoad();

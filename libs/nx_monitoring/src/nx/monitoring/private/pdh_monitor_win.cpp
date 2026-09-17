@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <charconv>
 #include <cstdio>
 #include <cwchar>
@@ -43,6 +44,55 @@ std::string formatStatus(const DWORD status)
     std::array<char, 11> buffer{}; //< "0x" + 8 hex digits + NUL.
     std::snprintf(buffer.data(), buffer.size(), "0x%08lX", static_cast<unsigned long>(status));
     return buffer.data();
+}
+
+// Querying performance counters makes advapi32 load foreign provider DLLs into this process and
+// run them on the calling thread, so a fault below PDH is usually not ours. Unwinding out of one
+// leaves PDH internals locked, hence the latch: after the first fault PDH is never called again.
+std::atomic<bool> pdhFaulted{false};
+
+// A C++ exception (0xE06D7363) is not a provider fault, let it keep unwinding.
+DWORD sehFilter(DWORD code, DWORD* faultCode)
+{
+    if (code == 0xE06D7363)
+        return EXCEPTION_CONTINUE_SEARCH;
+
+    *faultCode = code;
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+template<typename Func>
+PDH_STATUS callWithSehGuard(const Func& call, DWORD* exceptionCode)
+{
+    __try
+    {
+        return call();
+    }
+    __except (sehFilter(GetExceptionCode(), exceptionCode))
+    {
+        return PDH_CSTATUS_NO_OBJECT;
+    }
+}
+
+template<typename Func>
+PDH_STATUS guardedPdhCall(const char* expression, const Func& call)
+{
+    if (pdhFaulted)
+        return PDH_CSTATUS_NO_OBJECT;
+
+    DWORD exceptionCode = 0;
+    const PDH_STATUS status = callWithSehGuard(call, &exceptionCode);
+    if (exceptionCode != 0)
+    {
+        pdhFaulted = true;
+        NX_ERROR(NX_SCOPE_TAG,
+            "%1 faulted with %2, most likely inside a performance counter provider of other "
+            "software. System monitoring is disabled until restart.",
+            expression,
+            formatStatus(exceptionCode));
+    }
+
+    return status;
 }
 
 // The A entry points return localized names in the system ANSI code page; logs are UTF-8.
@@ -130,12 +180,14 @@ std::string pdhErrorMessage(const HMODULE pdhLibrary, const DWORD status)
     return result;
 }
 
+#define SEH_GUARD(expression) (guardedPdhCall(#expression, [&] { return (expression); }))
+
 std::optional<PDH_HCOUNTER> addPdhCounterToQuery(
     const HMODULE pdhLibrary, const PDH_HQUERY query, const std::string& counterPath)
 {
     PDH_HCOUNTER counter = INVALID_HANDLE_VALUE;
     // English PDH counter paths are ASCII, so UTF-8 needs no conversion here.
-    const auto status = PdhAddEnglishCounterA(query, counterPath.c_str(), 0, &counter);
+    const auto status = SEH_GUARD(PdhAddEnglishCounterA(query, counterPath.c_str(), 0, &counter));
     if (ERROR_SUCCESS != status)
     {
         NX_WARNING(NX_SCOPE_TAG,
@@ -164,7 +216,8 @@ std::optional<std::vector<RawCounterItem>> readRawCounterItems(
 
     DWORD bufferSize = 0;
     DWORD itemCount = 0;
-    const auto sizeStatus = PdhGetRawCounterArrayA(counter, &bufferSize, &itemCount, nullptr);
+    const auto sizeStatus =
+        SEH_GUARD(PdhGetRawCounterArrayA(counter, &bufferSize, &itemCount, nullptr));
     if (sizeStatus != static_cast<PDH_STATUS>(PDH_MORE_DATA) && sizeStatus != ERROR_SUCCESS)
     {
         NX_WARNING(NX_SCOPE_TAG,
@@ -182,7 +235,7 @@ std::optional<std::vector<RawCounterItem>> readRawCounterItems(
     bufferSize = static_cast<DWORD>(buffer.size() * sizeof(PDH_RAW_COUNTER_ITEM_A));
     itemCount = 0;
     const auto readStatus =
-        PdhGetRawCounterArrayA(counter, &bufferSize, &itemCount, buffer.data());
+        SEH_GUARD(PdhGetRawCounterArrayA(counter, &bufferSize, &itemCount, buffer.data()));
     if (ERROR_SUCCESS != readStatus)
     {
         NX_WARNING(NX_SCOPE_TAG,
@@ -274,7 +327,7 @@ std::unordered_map<DWORD, std::vector<std::filesystem::path>> readMountPointsByD
 
 } // namespace
 
-#define INVOKE(expression) (d_func()->checkError(#expression, expression))
+#define INVOKE(expression) (d_func()->checkError(#expression, SEH_GUARD(expression)))
 
 PdhMonitor::PdhMonitor()
 {
@@ -289,8 +342,16 @@ PdhMonitor::~PdhMonitor()
         FreeLibrary(m_pdhLibrary);
 }
 
+bool PdhMonitor::faulted()
+{
+    return pdhFaulted;
+}
+
 bool PdhMonitor::collectMonitoringData()
 {
+    if (pdhFaulted)
+        return false;
+
     if (!m_initialized)
     {
         m_initialized = true;
@@ -475,8 +536,8 @@ void PdhMonitor::readGpuTimeCounterValues(std::chrono::milliseconds interval)
     {
         PDH_FMT_COUNTERVALUE result;
         PDH_RAW_COUNTER rawValue = item.value;
-        const PDH_STATUS status = PdhCalculateCounterFromRawValue(
-            m_gpuRunningTimeCounter, PDH_FMT_LARGE, &rawValue, nullptr, &result);
+        const PDH_STATUS status = SEH_GUARD(PdhCalculateCounterFromRawValue(
+            m_gpuRunningTimeCounter, PDH_FMT_LARGE, &rawValue, nullptr, &result));
         if (status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS)
         {
             checkError("PdhCalculateCounterFromRawValue", status);
@@ -612,13 +673,11 @@ double PdhMonitor::diskCounterValue(
         return 0.0;
 
     PDH_FMT_COUNTERVALUE result;
-    const PDH_STATUS status = PdhCalculateCounterFromRawValue(m_diskTimeCounter,
-        PDH_FMT_DOUBLE /*| PDH_FMT_NOCAP100*/, // TODO #akolesnikov disk usage can be greater then
-                                               // 100% somehow. Maybe, disk can do some I/O
-                                               // concurrently
+    const PDH_STATUS status = SEH_GUARD(PdhCalculateCounterFromRawValue(m_diskTimeCounter,
+        PDH_FMT_DOUBLE,
         const_cast<PDH_RAW_COUNTER*>(&current),
         const_cast<PDH_RAW_COUNTER*>(&last_counter_value),
-        &result);
+        &result));
     if (status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS)
     {
         checkError("PdhCalculateCounterFromRawValue", status);
@@ -639,11 +698,11 @@ double diskOperationsPerSecond(const HMODULE pdhLibrary,
         return 0.0;
 
     PDH_FMT_COUNTERVALUE result{};
-    const PDH_STATUS status = PdhCalculateCounterFromRawValue(counter,
+    const PDH_STATUS status = SEH_GUARD(PdhCalculateCounterFromRawValue(counter,
         PDH_FMT_DOUBLE | PDH_FMT_NOCAP100,
         const_cast<PDH_RAW_COUNTER*>(&current),
         const_cast<PDH_RAW_COUNTER*>(&last),
-        &result);
+        &result));
     if (status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS)
     {
         NX_WARNING(NX_SCOPE_TAG,
@@ -748,12 +807,12 @@ std::optional<std::vector<ActivityMonitor::DiskIo>> PdhMonitor::calculateTotalDi
 bool PdhMonitor::checkCountersExist(const std::string& query) const
 {
     DWORD countersNumber = 0;
-    const auto status = PdhExpandWildCardPathA(
+    const auto status = SEH_GUARD(PdhExpandWildCardPathA(
         /* Do not use log file */ NULL,
         query.c_str(),
         /* Result counter paths */ NULL,
         &countersNumber,
-        /* Expand all wildcards */ 0);
+        /* Expand all wildcards */ 0));
 
     if (status != ERROR_SUCCESS && status != PDH_MORE_DATA)
     {
@@ -802,7 +861,7 @@ DWORD PdhMonitor::checkError(const char* expression, DWORD status) const
 std::string PdhMonitor::perfName(DWORD index)
 {
     DWORD size = 0;
-    const PDH_STATUS status = PdhLookupPerfNameByIndexA(nullptr, index, nullptr, &size);
+    const PDH_STATUS status = SEH_GUARD(PdhLookupPerfNameByIndexA(nullptr, index, nullptr, &size));
     if (status != (PDH_STATUS) PDH_MORE_DATA && status != ERROR_SUCCESS)
     {
         checkError("PdhLookupPerfNameByIndexA", status);
