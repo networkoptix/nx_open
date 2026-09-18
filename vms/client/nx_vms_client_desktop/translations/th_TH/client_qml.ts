@@ -212,6 +212,16 @@
       <source>In selected area</source>
       <translation>ในพื้นที่ที่เลือก</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To the top</source>
+      <translation type="unfinished">To the top</translation>
+    </message>
     <message>
       <source>No objects</source>
       <translation>วัตถุ</translation>
