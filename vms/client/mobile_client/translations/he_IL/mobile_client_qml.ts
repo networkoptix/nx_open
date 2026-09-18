@@ -1621,5 +1621,9 @@
       <source>Log out</source>
       <translation>להתנתק</translation>
     </message>
+    <message>
+      <source>Press back again to exit</source>
+      <translation type="unfinished">Press back again to exit</translation>
+    </message>
   </context>
 </TS>

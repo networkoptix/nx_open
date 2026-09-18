@@ -1619,5 +1619,9 @@
       <source>Log out</source>
       <translation>Đăng xuất</translation>
     </message>
+    <message>
+      <source>Press back again to exit</source>
+      <translation type="unfinished">Press back again to exit</translation>
+    </message>
   </context>
 </TS>
