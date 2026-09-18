@@ -109,7 +109,11 @@ SpinBox
 
         onTextEdited:
         {
-            const newValue = text ? control.valueFromText(text, control.locale) : 0
+            const parsedValue = text ? control.valueFromText(text, control.locale) : 0
+            if (isNaN(parsedValue))
+                return
+
+            const newValue = MathUtils.bound(control.from, parsedValue, control.to)
             if (newValue === control.value)
                 return
 
