@@ -1622,7 +1622,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Tryk tilbage igen for at afslutte</translation>
     </message>
   </context>
 </TS>
