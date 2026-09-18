@@ -220,16 +220,6 @@
       <source>In selected area</source>
       <translation>Di area yang dipilih</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n hasil baru</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Tidak ada objek</translation>

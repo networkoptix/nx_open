@@ -220,16 +220,6 @@
       <source>In selected area</source>
       <translation>선택된 영역에서</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n 개의 새로운 결과</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>객체가 없습니다</translation>
