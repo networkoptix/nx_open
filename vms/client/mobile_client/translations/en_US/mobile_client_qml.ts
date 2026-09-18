@@ -1620,5 +1620,9 @@
         <source>Log out</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Press back again to exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
