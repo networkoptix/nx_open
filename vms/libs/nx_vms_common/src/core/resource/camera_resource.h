@@ -203,7 +203,7 @@ public:
     static QString mediaPortKey();
 
     void setAudioSupported(bool isSupported);
-    bool isAudioSupported() const;
+    virtual bool isAudioSupported() const;
 
     bool isIOModule() const;
     int motionWindowCount() const;

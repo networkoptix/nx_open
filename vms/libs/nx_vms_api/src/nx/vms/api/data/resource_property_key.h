@@ -203,6 +203,9 @@ inline const QString kForcedAudioStream = "forcedAudioStream";
 /// Only used via `QnVirtualCameraResource`
 inline const QString kForcedIsAudioSupported = "forcedIsAudioSupported";
 
+/// Deprecated. Old servers (5.1-6.2) use this instead of `kMediaCapabilities`.
+inline const QString kIsAudioSupported = "isAudioSupported";
+
 /// Only used via `QnVirtualCameraResource` and `Camera`, internally
 inline const QString kForcedLicenseType = "forcedLicenseType";
 

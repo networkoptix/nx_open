@@ -7,6 +7,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/api/data/resource_property_key.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
@@ -90,6 +91,12 @@ bool CameraResource::hasAudio() const
     // If we don't have PlayAudioPermission for this camera then it effectively doesn't have audio.
     return base_type::hasAudio()
         && context->accessController()->hasPermissions(toSharedPointer(), Qn::PlayAudioPermission);
+}
+
+bool CameraResource::isAudioSupported() const
+{
+    return getProperty(nx::vms::api::device_properties::kIsAudioSupported).toInt() > 0
+        || base_type::isAudioSupported();
 }
 
 QnAbstractStreamDataProvider* CameraResource::createDataProvider(Qn::ConnectionRole role)

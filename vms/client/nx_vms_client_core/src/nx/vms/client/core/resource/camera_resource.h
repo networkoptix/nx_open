@@ -37,6 +37,9 @@ public:
     /** Improved check which includes current user permissions validation. */
     virtual bool hasAudio() const override;
 
+    /** Old servers (5.1-6.2) send the old 'isAudioSupported' property instead. */
+    virtual bool isAudioSupported() const override;
+
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 
     bool isPtzSupported() const;
