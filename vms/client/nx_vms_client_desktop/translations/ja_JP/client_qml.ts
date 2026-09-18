@@ -213,16 +213,6 @@
       <source>In selected area</source>
       <translation>指定領域内</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n 件の新しい結果</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>オブジェクトはありません</translation>
