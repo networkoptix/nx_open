@@ -31,8 +31,13 @@ AdaptiveSheet
 
     onAboutToShow:
     {
+        // A workaround for aboutToShow() called for already opened sheet when it's resized.
+        if (d.populated)
+            return
+
         d.updating = true
         d.hasChanges = false
+        d.populated = true
 
         const animationDuration = enableSharingToggle.animationDuration
         enableSharingToggle.animationDuration = 0
@@ -75,6 +80,9 @@ AdaptiveSheet
 
         d.updating = false
     }
+
+    onClosed:
+        d.populated = false
 
     IconButton
     {
@@ -262,6 +270,7 @@ AdaptiveSheet
     {
         id: d
 
+        property bool populated: false
         property bool hasChanges: false
         property bool updating: false
         property bool enabled: newBookmarkMode
