@@ -81,6 +81,10 @@ public:
     int registerCloseHandler(OnConnectionClosedHandler handler);
 
     /**
+     * Cancels the handler, and takes effect even while the close handlers are being invoked. The
+     * registrar MUST call this before it is destroyed, since a handler may be invoked after the
+     * connection object is gone. For the same reason it MUST NOT be called once the connection
+     * itself is destroyed (see the connectionDestroyed argument of the handler).
      * @param id returned by BaseServerConnection::registerCloseHandler.
      */
     void removeCloseHandler(int id);
@@ -113,10 +117,16 @@ protected:
     SocketAddress getForeignAddress() const;
 
 private:
+    using ConnectionClosedHandlers = std::map<int /*id*/, OnConnectionClosedHandler>;
+
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend = 0;
-    std::map<int /*id*/, OnConnectionClosedHandler> m_connectionClosedHandlers;
+
+    // Shared with triggerConnectionClosedEvent() so that the dispatch outlives this connection
+    // while removeCloseHandler() still cancels the handlers it has not invoked yet.
+    std::shared_ptr<ConnectionClosedHandlers> m_connectionClosedHandlers =
+        std::make_shared<ConnectionClosedHandlers>();
     std::atomic<int> m_lastConnectionClosedHandlerId = 0;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
     std::size_t m_totalBytesReceived = 0;

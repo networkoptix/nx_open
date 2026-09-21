@@ -236,10 +236,12 @@ protected:
         m_connection->setAuxiliaryMessageHandler(std::move(handler));
     }
 
-    void registerCloseHandler(BaseServerConnection::OnConnectionClosedHandler handler)
+    int registerCloseHandler(BaseServerConnection::OnConnectionClosedHandler handler)
     {
-        m_connection->registerCloseHandler(std::move(handler));
+        return m_connection->registerCloseHandler(std::move(handler));
     }
+
+    void removeCloseHandler(int id) { m_connection->removeCloseHandler(id); }
 
     void resetConnection()
     {
@@ -374,6 +376,37 @@ TEST_F(ConnectionServerBaseServerConnection, close_handler_tells_if_connection_i
     whenCloseConnection();
 
     ASSERT_TRUE(destroyed.get_future().get());
+}
+
+TEST_F(ConnectionServerBaseServerConnection, close_handler_removed_by_another_one_is_not_invoked)
+{
+    std::promise<void> lastHandlerInvoked;
+    std::atomic<bool> removedHandlerInvoked = false;
+    int idToRemove = 0;
+
+    givenStartedConnection();
+
+    // The handlers are invoked in the registration order.
+    registerCloseHandler(
+        [this, &idToRemove](auto... /*args*/)
+        {
+            removeCloseHandler(idToRemove);
+        });
+    idToRemove = registerCloseHandler(
+        [&removedHandlerInvoked](auto... /*args*/)
+        {
+            removedHandlerInvoked = true;
+        });
+    registerCloseHandler(
+        [&lastHandlerInvoked](auto... /*args*/)
+        {
+            lastHandlerInvoked.set_value();
+        });
+
+    whenCloseConnection();
+
+    lastHandlerInvoked.get_future().wait();
+    ASSERT_FALSE(removedHandlerInvoked);
 }
 
 } // namespace nx::network::server::test

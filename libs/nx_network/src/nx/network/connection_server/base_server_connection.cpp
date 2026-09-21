@@ -119,13 +119,13 @@ void BaseServerConnection::closeConnection(SystemError::ErrorCode closeReason)
 int BaseServerConnection::registerCloseHandler(OnConnectionClosedHandler handler)
 {
     auto id = ++m_lastConnectionClosedHandlerId;
-    m_connectionClosedHandlers.emplace(id, std::move(handler));
+    m_connectionClosedHandlers->emplace(id, std::move(handler));
     return id;
 }
 
 void BaseServerConnection::removeCloseHandler(int id)
 {
-    m_connectionClosedHandlers.erase(id);
+    m_connectionClosedHandlers->erase(id);
 }
 
 bool BaseServerConnection::isSsl() const
@@ -251,10 +251,21 @@ void BaseServerConnection::handleSocketError(SystemError::ErrorCode errorCode)
 
 void BaseServerConnection::triggerConnectionClosedEvent(SystemError::ErrorCode closeReason)
 {
-    auto connectionClosedHandlers = std::exchange(m_connectionClosedHandlers, {});
+    // The local copy keeps the handlers alive if one of them destroys this connection. Extracting
+    // each one before invoking it makes removeCloseHandler() work from within a handler.
+    const auto handlers = m_connectionClosedHandlers;
+    if (handlers->empty())
+        return;
+
+    // Handlers registered while this loop is running are left to the next close event.
+    const int lastId = handlers->rbegin()->first;
+
     nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
-    for (auto& [id, connectionCloseHandler]: connectionClosedHandlers)
-        connectionCloseHandler(closeReason, watcher.interrupted());
+    while (!handlers->empty() && handlers->begin()->first <= lastId)
+    {
+        auto node = handlers->extract(handlers->begin());
+        node.mapped()(closeReason, watcher.interrupted());
+    }
 }
 
 void BaseServerConnection::resetInactivityTimer()
