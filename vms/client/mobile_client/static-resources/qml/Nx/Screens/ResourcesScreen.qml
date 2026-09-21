@@ -31,11 +31,33 @@ AdaptiveScreen
 
     property alias filterIds: camerasGrid.filterIds
 
+    function openVideoScreen(resource, camerasModel)
+    {
+        camerasGrid.stopMediaPlayers()
+
+        videoScreenLoader.active = true
+
+        const videoScreen = videoScreenLoader.item
+        if (camerasModel)
+        {
+            videoScreen.camerasModel = camerasModel
+        }
+        else
+        {
+            videoScreen.defaultCamerasModel.filterIds = [resource.id]
+            videoScreen.camerasModel = videoScreen.defaultCamerasModel
+        }
+
+        videoScreen.controller.start(resource, -1)
+
+        resourcesScreen.showsVideoScreen = true
+    }
+
     function closeVideoScreen()
     {
         LayoutController.exitFullscreen()
 
-        videoScreenLoader.item?.controller.stop()
+        videoScreenLoader.active = false
 
         if (!resourceHelper.isLayout)
             windowContext.deprecatedUiController.resource = null
@@ -256,9 +278,8 @@ AdaptiveScreen
         onLayoutSelected: (layoutResource) =>
         {
             resourcesScreen.filterIds = []
-            videoScreenLoader.item?.controller.stop()
+            resourcesScreen.closeVideoScreen()
             windowContext.deprecatedUiController.resource = layoutResource
-            resourcesScreen.showsVideoScreen = false
 
             if (!LayoutController.hasSidePanels)
                 splash.close()
@@ -272,14 +293,7 @@ AdaptiveScreen
             camerasGrid.stopMediaPlayers()
 
             windowContext.deprecatedUiController.resource = cameraResource
-
-            // Filter out all the cameras except selected to prevent ability to swipe between
-            // cameras.
-            videoScreenLoader.item.defaultCamerasModel.filterIds = [cameraResource.id]
-            videoScreenLoader.item.camerasModel = videoScreenLoader.item.defaultCamerasModel
-            videoScreenLoader.item.controller.start(cameraResource, -1)
-
-            resourcesScreen.showsVideoScreen = true
+            resourcesScreen.openVideoScreen(cameraResource)
         }
 
         onVisibleChanged:
@@ -304,14 +318,7 @@ AdaptiveScreen
         topMargin : LayoutController.hasSidePanels ? 20 : 0
 
         onOpenVideoScreen: (resource, camerasModel) =>
-        {
-            stopMediaPlayers()
-
-            videoScreenLoader.item.camerasModel = camerasModel
-            videoScreenLoader.item.controller.start(resource, -1)
-
-            resourcesScreen.showsVideoScreen = true
-        }
+            resourcesScreen.openVideoScreen(resource, camerasModel)
 
         DummyMessage
         {
@@ -339,6 +346,7 @@ AdaptiveScreen
         id: videoScreenLoader
 
         clip: true
+        active: false
 
         sourceComponent: Component
         {
@@ -506,10 +514,7 @@ AdaptiveScreen
 
     Component.onCompleted:
     {
-        if (!resourceHelper.isCamera)
-            return
-
-        showsVideoScreen = true
-        videoScreenLoader.item.controller.start(resourceHelper.resource, -1)
+        if (resourceHelper.isCamera)
+            openVideoScreen(resourceHelper.resource)
     }
 }
