@@ -184,8 +184,10 @@ bool QnMobileClientUriHandler::Private::loginToCloud(const SystemUri& uri)
         NX_DEBUG(this, "loginToCloud(): uri username is empty, decoded from token: %1", username);
     }
 
-    const bool loggedInWithSameCredentials =
-        username == cloudStatusWatcher->cloudLogin().toStdString()
+    const bool loggedInWithSameCredentials = QString::compare(QString::fromStdString(username),
+                                                 cloudStatusWatcher->cloudLogin(),
+                                                 Qt::CaseInsensitive)
+            == 0
         && cloudStatusWatcher->status() != CloudStatusWatcher::LoggedOut;
 
     if (loggedInWithSameCredentials)
