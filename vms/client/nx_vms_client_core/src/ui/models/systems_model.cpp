@@ -236,7 +236,11 @@ QVariant QnSystemsModel::data(const QModelIndex& index, int role) const
 
             const bool isLoggedIn =
                 (d->controller->cloudStatus() != CloudStatusWatcher::LoggedOut);
-            if (isLoggedIn && (d->controller->cloudLogin() == system->ownerAccountEmail()))
+            const bool ownSystem =
+                QString::compare(
+                    d->controller->cloudLogin(), system->ownerAccountEmail(), Qt::CaseInsensitive)
+                == 0;
+            if (isLoggedIn && ownSystem)
                 return QString();
 
             const auto fullName = system->ownerFullName();

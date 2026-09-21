@@ -21,6 +21,7 @@
 #include "details/push_permission_manager.h"
 #include "details/push_platform_helpers.h"
 #include "details/push_subscription_state_controller.h"
+#include "details/user_push_settings_helpers.h"
 
 namespace nx::vms::client::mobile {
 
@@ -36,17 +37,9 @@ OptionalLocalPushSettings settingsForUser(
     if (user.isEmpty())
         return OptionalLocalPushSettings();
 
-    const auto settings = qnSettings->userPushSettings();
-    const auto it = settings.find(user);
-
-    if (it == settings.cend())
-        NX_DEBUG(manager, "Loading empty settings for %1", user);
-    else
-        NX_DEBUG(manager, "Loading settings for %1", user);
-
-    return it == settings.cend()
-        ? OptionalLocalPushSettings()
-        : OptionalLocalPushSettings(it->second);
+    const auto result = findUserPushSettings(qnSettings->userPushSettings(), user);
+    NX_DEBUG(manager, "Loading %1 settings for %2", result ? "" : "empty ", user);
+    return result;
 }
 
 void updateUserSettings(
@@ -58,15 +51,8 @@ void updateUserSettings(
         return;
 
     auto settings = qnSettings->userPushSettings();
-    if (value)
-    {
-        NX_DEBUG(manager, "Storing settings for %1", user);
-        settings[user] = *value;
-    }
-    else if (settings.erase(user))
-    {
-        NX_DEBUG(manager, "Removing settings for %1", user);
-    }
+    if (updateUserPushSettings(settings, user, value))
+        NX_DEBUG(manager, "%1 settings for %2", value ? "Storing" : "Removing", user);
 
     qnSettings->setUserPushSettings(settings);
     qnSettings->save();

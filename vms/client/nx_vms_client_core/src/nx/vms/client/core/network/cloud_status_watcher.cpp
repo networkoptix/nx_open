@@ -22,6 +22,7 @@
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/utils/string.h>
 #include <nx/vms/api/data/cloud_system_data.h>
 #include <nx/vms/api/data/peer_data.h>
@@ -143,7 +144,7 @@ struct CloudStatusWatcher::Private: public QObject
     bool checkSuppressed();
 
     const CloudAuthData& authData() const;
-    bool setAuthData(const CloudAuthData& authData, AuthMode mode, bool removeExistingTokens = true);
+    bool setAuthData(CloudAuthData authData, AuthMode mode, bool removeExistingTokens = true);
     void removeCloudTokens(
         const CloudAuthData& authData, const std::shared_ptr<Connection>& connection);
     void logoutWithSsoSessionTermination();
@@ -707,8 +708,9 @@ void CloudStatusWatcher::Private::validateAccessToken()
                 return;
             }
 
-            const bool loginChanged = (m_authData.credentials.username != response.username);
-            m_authData.credentials.username = std::move(response.username);
+            const auto username = nx::utils::toLower(response.username);
+            const bool loginChanged = (m_authData.credentials.username != username);
+            m_authData.credentials.username = username;
             const auto isRefreshTokenChanged =
                 appContext()->coreSettings()->cloudAuthData().refreshToken
                     != m_authData.refreshToken;
@@ -904,9 +906,11 @@ void CloudStatusWatcher::Private::removeCloudTokens(
 }
 
 bool CloudStatusWatcher::Private::setAuthData(
-    const CloudAuthData& authData, AuthMode mode, bool removeExistingTokens)
+    CloudAuthData authData, AuthMode mode, bool removeExistingTokens)
 {
     NX_ASSERT(!authData.credentials.authToken.isPassword());
+
+    nx::utils::toLower(&authData.credentials.username);
 
     const bool userChanged = (m_authData.credentials.username != authData.credentials.username);
     const bool credentialsChanged = (m_authData.credentials != authData.credentials);

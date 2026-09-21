@@ -118,7 +118,9 @@ QString QnCloudSystemInformationWatcher::ownerDescription() const
     if (d->ownerEmail.isEmpty() || d->ownerFullName.isEmpty())
         return QString();
 
-    const bool yourSystem = qnCloudStatusWatcher->cloudLogin() == d->ownerEmail;
+    const bool yourSystem =
+        QString::compare(qnCloudStatusWatcher->cloudLogin(), d->ownerEmail, Qt::CaseInsensitive)
+        == 0;
 
     return yourSystem ? "" : d->ownerFullName;
 }

@@ -6,6 +6,7 @@
 
 #include <nx/cloud/db/client/data/access_scope.h>
 #include <nx/network/jose/jwt.h>
+#include <nx/utils/std_string_utils.h>
 
 namespace nx::vms::client::core {
 
@@ -31,7 +32,7 @@ std::optional<nx::network::jwt::ClaimSet> decodeClaims(const std::string& value)
 std::string usernameFromToken(const std::string& value)
 {
     if (const auto claims = decodeClaims(value))
-        return claims->sub().value_or("");
+        return nx::utils::toLower(claims->sub().value_or(""));
 
     return {};
 }
