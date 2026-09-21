@@ -8,26 +8,30 @@
 
 #ifdef ENABLE_SSL
 
-#include <fstream>
+    #include <array>
+    #include <fstream>
+    #include <ranges>
+    #include <span>
 
-#include <openssl/err.h>
-#include <openssl/x509v3.h>
+    #include <openssl/err.h>
+    #include <openssl/x509v3.h>
 
-#include <QtCore/QDir>
-#include <QtNetwork/QSslCertificate>
-#include <QtNetwork/QSslConfiguration>
-#include <QtNetwork/QSslKey>
+    #include <QtCore/QDir>
+    #include <QtNetwork/QSslCertificate>
+    #include <QtNetwork/QSslConfiguration>
+    #include <QtNetwork/QSslKey>
 
-#include <nx/utils/log/log.h>
-#include <nx/utils/random.h>
-#include <nx/utils/std/cppnx.h>
+    #include <nx/ranges.h>
+    #include <nx/utils/log/log.h>
+    #include <nx/utils/random.h>
+    #include <nx/utils/std/cppnx.h>
 
-#include <nx/utils/std_string_utils.h>
-#include "context.h"
+    #include <nx/utils/std_string_utils.h>
+    #include "context.h"
 
-#if defined(Q_OS_IOS)
-    #include "certificate_mac.h"
-#endif
+    #if defined(Q_OS_IOS)
+        #include "certificate_mac.h"
+    #endif
 
 namespace {
 
@@ -133,15 +137,13 @@ static std::string bioToString(BIO* bio)
     return mem ? std::string(mem->data, mem->length) : std::string();
 }
 
-static QByteArray pemByteArray(X509* x509)
+static QByteArray pemAsByteArray(X509* x509)
 {
     const auto bio = nx::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
-    if (NX_ASSERT(PEM_write_bio_X509(bio.get(), x509) == 1))
-    {
-        if (auto mem = bioBuffer(bio.get()))
-            return QByteArray(mem->data, mem->length);
-    }
-    return QByteArray();
+    NX_ASSERT(PEM_write_bio_X509(bio.get(), x509) == 1, "%1", lastError());
+
+    const auto mem = bioBuffer(bio.get());
+    return QByteArray(mem->data, mem->length);
 }
 
 static std::chrono::system_clock::time_point timePoint(const ASN1_TIME* asn1Time)
@@ -699,11 +701,25 @@ std::string X509Certificate::pemString() const
 
 std::vector<Certificate> X509Certificate::certificates() const
 {
-    std::vector<Certificate> result;
-    result.push_back(m_x509.get());
-    for (const auto& x509: m_extraChainCerts)
-        result.push_back(x509.get());
-    return result;
+    // FIXME: #skolesnik Ad hoc: m_x509 should never be left without a certificate. Preventing
+    // that means rewriting the class, so it is caught here instead.
+    //
+    // The class can be built without a certificate, and parsePem() leaves it that way when it
+    // fails. A caller that does not check the parse result keeps using it.
+    //
+    // Without this check the missing certificate leaves the class as a null X509*. Nothing after
+    // that looks at it, and QSslCertificate::verify() dereferences it.
+    //
+    // The rewrite is a factory returning std::expected, so the empty state cannot be built.
+    if (!m_x509)
+    {
+        NX_ERROR(this, "The certificate has not been parsed");
+        return {};
+    }
+
+    return std::array{std::span(&m_x509, 1), std::span(m_extraChainCerts)} | std::views::join
+        | std::views::transform([](const X509Ptr& x509) -> Certificate { return x509.get(); })
+        | nx::ranges::to<std::vector>();
 }
 
 std::set<std::string> X509Certificate::hosts() const
@@ -1380,7 +1396,29 @@ bool verifyBySystemCertificates(
     const int chainSize = sk_X509_num(chain);
     QList<QSslCertificate> certificates;
     for (int i = 0; i < chainSize; ++i)
-        certificates << QSslCertificate(pemByteArray(sk_X509_value(chain, i)));
+    {
+        const QSslCertificate certificate(pemAsByteArray(sk_X509_value(chain, i)));
+        if (!certificate.isNull())
+        {
+            certificates << certificate;
+            continue;
+        }
+
+        // QSslCertificate::verify() gives handle() of every certificate past the first to
+        // OpenSSL without checking it, and one that did not convert has none.
+        const auto message =
+            NX_FMT("Verify certificate for host `%1`: certificate %2 of %3 could not be converted",
+                hostName,
+                i,
+                chainSize);
+
+        NX_ERROR(NX_SCOPE_TAG, message);
+        if (outErrorMessage)
+            *outErrorMessage = message.toStdString();
+
+        return false;
+    }
+
     const auto errorList =
         QSslCertificate::verify(certificates, QString::fromStdString(trimmedHost));
     if (errorList.isEmpty())
@@ -1458,8 +1496,17 @@ std::vector<Certificate> completeCertificateChain(STACK_OF(X509)* chain, bool* o
 
 void addTrustedRootCertificate(const CertificateView& cert)
 {
+    // Asserted rather than reported: the function returns void, so there is nothing to report
+    // through, and it is public API - handing it a certificate that converts is the caller's part
+    // of the contract. The early return stays because QSslConfiguration::addCaCertificate() takes
+    // a null certificate without complaining, and turns off on-demand loading of the system ones
+    // with it.
+    const QSslCertificate certificate(pemAsByteArray(cert.x509()));
+    if (!NX_ASSERT(!certificate.isNull(), "Failed to convert a trusted root certificate"))
+        return;
+
     QSslConfiguration conf = QSslConfiguration::defaultConfiguration();
-    conf.addCaCertificate(QSslCertificate(pemByteArray(cert.x509())));
+    conf.addCaCertificate(certificate);
     QSslConfiguration::setDefaultConfiguration(std::move(conf));
 
     NX_ASSERT(CaStore::instance().isX509StoreUnused(),
