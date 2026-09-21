@@ -119,6 +119,37 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
         "statusWatcher",
         [](auto value) { return !value.isNull(); });
 
+    connect(m_statusWatcher,
+        &CloudStatusWatcher::statusChanged,
+        this,
+        [this](CloudStatusWatcher::Status status)
+        {
+            if (status == CloudStatusWatcher::LoggedOut)
+                resetProfile();
+            else if (status == CloudStatusWatcher::Online)
+                startPolling();
+        });
+
+    if (m_statusWatcher->status() == CloudStatusWatcher::Online)
+        startPolling();
+}
+
+void CloudUserProfileWatcher::resetProfile()
+{
+    m_fullName.clear();
+    m_accountBelongsToOrganization = false;
+
+    emit fullNameChanged();
+    emit avatarUrlChanged();
+    emit accountBelongsToOrganizationChanged();
+}
+
+nx::coro::FireAndForget CloudUserProfileWatcher::startPolling()
+{
+    const auto revision = ++m_revision;
+    co_await nx::coro::cancelIf(
+        [self = QPointer(this), revision] { return !self || revision != self->m_revision; });
+
     for (;;)
     {
         co_await nx::coro::whenProperty(
@@ -158,4 +189,4 @@ nx::coro::FireAndForget CloudUserProfileWatcher::run()
     }
 }
 
-} // nx::vms::client::core
+} // namespace nx::vms::client::core

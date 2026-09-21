@@ -39,6 +39,10 @@ public:
 protected:
     coro::FireAndForget run();
 
+private:
+    coro::FireAndForget startPolling();
+    void resetProfile();
+
 signals:
     void fullNameChanged();
     void avatarUrlChanged();
@@ -48,8 +52,9 @@ signals:
 
 private:
     QPointer<CloudStatusWatcher> m_statusWatcher;
+    uint64_t m_revision = 0;
     QString m_fullName;
     bool m_accountBelongsToOrganization = false;
 };
 
-} // nx::vms::client::core
+} // namespace nx::vms::client::core
