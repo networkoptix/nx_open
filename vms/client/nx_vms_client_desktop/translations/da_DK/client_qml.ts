@@ -212,17 +212,6 @@
       <source>In selected area</source>
       <translation>I det valgte område</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nye resultater</numerusform>
-        <numerusform>%n nye resultater</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Ingen objekter</translation>

@@ -212,17 +212,6 @@
       <source>In selected area</source>
       <translation>I markerat område</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nya resultat</numerusform>
-        <numerusform>%n nya resultat</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation>Till toppen</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Inga objekt</translation>
