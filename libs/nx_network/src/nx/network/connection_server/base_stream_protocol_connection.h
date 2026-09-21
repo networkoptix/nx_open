@@ -180,15 +180,43 @@ protected:
 
     virtual void bytesReceived(const nx::Buffer& buf) override
     {
+        // An empty buffer reports end of file to the parser. A message truncated by it is
+        // reported as a parse failure, but that is an ordinary connection closure, not a broken
+        // stream. Leaving it to BaseServerConnection keeps it reported as connectionReset.
+        const bool isEof = buf.empty();
+
         m_dataToParse = buf;
 
-        do
+        for (;;)
         {
-            // If m_dataToParse is empty we report end of file to the parser.
-            if (!invokeMessageParser())
-                return; //< TODO: #akolesnikov Ignore all following data and close the connection?
+            const auto result = invokeMessageParser();
+
+            if (result == ParseResult::connectionDestroyed)
+                return; //< MUST NOT touch anything: a handler has freed this object.
+
+            if (result == ParseResult::failed)
+            {
+                if (isEof)
+                    break;
+
+                // The parser cannot resynchronize on a broken stream: it would restart from
+                // scratch and treat the rest of the current message as new messages. Dropping
+                // the connection is the only way to stop reading the data that is left.
+                NX_DEBUG(this,
+                    "Closing connection from %1 due to an unrecoverable parse error",
+                    base_type::getForeignAddress());
+
+                m_dataToParse = {};
+                base_type::closeConnection(SystemError::invalidData);
+                return; //< closeConnection may have freed this object.
+            }
+
+            if (m_dataToParse.empty())
+                break;
+
+            if (!base_type::socket())
+                break; //< A handler has closed the connection or taken the socket over.
         }
-        while (!m_dataToParse.empty());
 
         m_dataToParse = {};
     }
@@ -242,13 +270,26 @@ private:
     nx::ConstBufferRefType m_dataToParse;
     std::chrono::steady_clock::time_point m_creationTimestamp;
 
+    enum class ParseResult
+    {
+        /** Parsing may continue. */
+        ok,
+
+        /**
+         * The message stream is broken and the parser cannot be resumed on it.
+         * The connection is still alive.
+         */
+        failed,
+
+        /** A handler has freed the connection. Nothing of this object may be touched. */
+        connectionDestroyed,
+    };
+
     /**
-     * @param buf Source buffer.
-     * @param pos Position inside source buffer. Moved by number of bytes read.
-     * @return false in case of parsing is stopped and cannot be resumed.
-     *   This method should not be called anymore since parser can be in undefined state.
+     * Parses as much of m_dataToParse as possible, reporting the result to the handlers.
+     * The parsed bytes are removed from m_dataToParse.
      */
-    bool invokeMessageParser()
+    ParseResult invokeMessageParser()
     {
         size_t bytesProcessed = 0;
         const auto parserState = m_parser.parse(m_dataToParse, &bytesProcessed);
@@ -263,9 +304,9 @@ private:
             case ParserState::readingBody:
             {
                 if (!reportMessageIfNeeded())
-                    return false;
+                    return ParseResult::connectionDestroyed;
                 if (!reportMsgBodyIfHaveSome())
-                    return false;
+                    return ParseResult::connectionDestroyed;
                 break;
             }
 
@@ -274,22 +315,21 @@ private:
                 connectionStatistics.messageReceived();
 
                 if (!reportMessageIfNeeded())
-                    return false;
+                    return ParseResult::connectionDestroyed;
                 if (!reportMsgBodyIfHaveSome())
-                    return false;
+                    return ParseResult::connectionDestroyed;
                 if (!reportMessageEnd())
-                    return false;
+                    return ParseResult::connectionDestroyed;
 
                 resetParserState();
                 break;
             }
 
             case ParserState::failed:
-                // TODO: #akolesnikov Ignore all further data and close connection?
-                return false;
+                return ParseResult::failed;
         }
 
-        return true;
+        return ParseResult::ok;
     }
 
     bool reportMessageIfNeeded()

@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <cstdint>
 #include <future>
 #include <memory>
 
@@ -130,6 +131,16 @@ static const HttpMessageWithoutBody kHttpMessageWithoutBody;
 
 //-------------------------------------------------------------------------------------------------
 
+// "invalid header" has no ":", so the reader reports a parse error while reading headers.
+static const nx::Buffer kMalformedHttpMessage =
+    "HTTP/1.1 200 OK\r\n"
+    "invalid header\r\n"
+    "Content-Length: 4\r\n"
+    "\r\n"
+    "test";
+
+//-------------------------------------------------------------------------------------------------
+
 using TestHttpConnection = nx::network::http::AsyncMessagePipeline;
 
 } // namespace
@@ -206,6 +217,38 @@ protected:
         sendMessages();
     }
 
+    void givenMessageBodySizeLimit(std::uint64_t limit)
+    {
+        m_connection->parser().streamReader().setMaxMessageBodySize(limit);
+    }
+
+    // ANAS-323: the reader aborts the message when the body exceeds the cap. The bytes that are
+    // left MUST NOT be picked up as a new message with a fresh budget.
+    void whenReadMessageWithBodyOverTheLimit()
+    {
+        nx::Buffer data =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Length: 1000\r\n"
+            "\r\n";
+        data.append(nx::Buffer(100, 'x'));
+        data.append(kHttpMessageWithoutBody.fullMessage);
+
+        m_input.write(data.data(), data.size());
+    }
+
+    void whenReadMalformedMessage()
+    {
+        m_input.write(kMalformedHttpMessage.data(), kMalformedHttpMessage.size());
+    }
+
+    void whenReadMalformedMessageFollowedByValidOne()
+    {
+        nx::Buffer data = kMalformedHttpMessage;
+        data.append(kHttpMessageWithoutBody.fullMessage);
+
+        m_input.write(data.data(), data.size());
+    }
+
     void whenCloseConnection()
     {
         m_connection->closeConnection(SystemError::connectionAbort);
@@ -270,6 +313,14 @@ protected:
     void andConnectionClosureIsReported()
     {
         ASSERT_NE(SystemError::noError, m_connectionClosedEvents.pop().first);
+    }
+
+    void andNoMessageHasBeenReported() { ASSERT_TRUE(m_receivedMessageQueue.isEmpty()); }
+
+    void andTrailingMessageHasNotBeenParsed()
+    {
+        m_receivedMessageQueue.pop(); //< The message whose body the limit cut off.
+        ASSERT_TRUE(m_receivedMessageQueue.isEmpty());
     }
 
     virtual void saveMessage(nx::network::http::Message message)
@@ -423,7 +474,30 @@ TEST_F(BaseStreamProtocolConnection, send_via_closed_connection_is_a_failure)
     thenMessageSendFailed();
 }
 
-// TEST_F(BaseStreamProtocolConnection, message_parse_error)
+TEST_F(BaseStreamProtocolConnection, message_parse_error_closes_the_connection)
+{
+    whenReadMalformedMessage();
+
+    andConnectionClosureIsReported();
+}
+
+TEST_F(BaseStreamProtocolConnection, data_following_a_parse_error_is_not_parsed)
+{
+    whenReadMalformedMessageFollowedByValidOne();
+
+    andConnectionClosureIsReported();
+    andNoMessageHasBeenReported();
+}
+
+TEST_F(BaseStreamProtocolConnection, message_body_over_the_limit_closes_the_connection)
+{
+    givenMessageBodySizeLimit(10);
+
+    whenReadMessageWithBodyOverTheLimit();
+
+    andConnectionClosureIsReported();
+    andTrailingMessageHasNotBeenParsed();
+}
 
 //-------------------------------------------------------------------------------------------------
 
