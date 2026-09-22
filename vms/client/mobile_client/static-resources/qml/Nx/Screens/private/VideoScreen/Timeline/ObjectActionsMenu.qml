@@ -38,6 +38,23 @@ Menu
         d.adjustPosition(invokerRect, indentFromInvoker ?? 8)
     }
 
+    // Triggers the only available action or opens sheet with available actions.
+    function openOrTrigger()
+    {
+        const availableItems = []
+        for (let i = 0; i < menu.count; ++i)
+        {
+            const item = menu.itemAt(i)
+            if (item.enabled)
+                availableItems.push(item)
+        }
+
+        if (availableItems.length === 1)
+            availableItems[0].triggered()
+        else
+            open()
+    }
+
     MenuItem
     {
         id: detailsMenuItem

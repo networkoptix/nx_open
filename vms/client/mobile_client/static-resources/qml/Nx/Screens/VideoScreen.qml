@@ -1155,7 +1155,7 @@ Page
                 objectActionsMenu.objectsType = timeline.objectsType
                 objectActionsMenu.multiObjectData = data
                 objectActionsMenu.adjustPosition(invokerRect, objectActionsMenu.indent)
-                objectActionsMenu.open()
+                objectActionsMenu.openOrTrigger()
             }
         }
 
