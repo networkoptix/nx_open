@@ -7,13 +7,11 @@
 #include <QtCore/QSettings>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/media_resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/compat_poll.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/reflect/string_conversion.h>
 #include <nx/rtp/parsers/aac_rtp_parser.h>
 #include <nx/rtp/parsers/av1_rtp_parser.h>
 #include <nx/rtp/parsers/h264_rtp_parser.h>
@@ -1129,16 +1127,9 @@ void RtspResourceStreamProvider::updateTimePolicy()
 
 nx::vms::api::RtpTransportType RtspResourceStreamProvider::getRtpTransport() const
 {
-    // Client defined settings for resource.
     if (m_resource)
     {
-        const auto rtpTransportString =
-            m_resource->getProperty(QnMediaResource::rtpTransportKey());
-
-        const auto transport = nx::reflect::fromString<nx::vms::api::RtpTransportType>(
-            rtpTransportString.toStdString(),
-            nx::vms::api::RtpTransportType::automatic);
-
+        const auto transport = m_resource->preferredRtpTransport();
         if (transport != nx::vms::api::RtpTransportType::automatic)
             return transport;
     }

@@ -11,6 +11,7 @@
 #include <core/resource/resource_data_structures.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/vms/api/data/credentials.h>
+#include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/common/ptz/override.h>
 
 #include "resource_data.h"
@@ -27,6 +28,7 @@ public:
         registerEnumKey<Ptz::Traits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(ResourceDataKey::kIoSettings);
+        registerEnumKey<nx::vms::api::RtpTransportType>(ResourceDataKey::kDesiredTransport);
         registerKey<QList<nx::vms::api::Credentials>>(
             ResourceDataKey::kPossibleDefaultCredentials);
         registerKey<QList<QnResourceChannelMapping>>(
