@@ -2761,9 +2761,15 @@ void QnVirtualCameraResource::setVirtualCameraIgnoreTimeZone(bool value)
 
 nx::vms::api::RtpTransportType QnVirtualCameraResource::preferredRtpTransport() const
 {
-    return nx::reflect::fromString(
-        getProperty(QnMediaResource::rtpTransportKey()).toStdString(),
-        nx::vms::api::RtpTransportType::automatic);
+    const auto transport =
+        nx::reflect::fromString(getProperty(QnMediaResource::rtpTransportKey()).toStdString(),
+            nx::vms::api::RtpTransportType::automatic);
+
+    if (transport != nx::vms::api::RtpTransportType::automatic)
+        return transport;
+
+    return resourceData().value<nx::vms::api::RtpTransportType>(
+        ResourceDataKey::kDesiredTransport, nx::vms::api::RtpTransportType::automatic);
 }
 
 CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
