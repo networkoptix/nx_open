@@ -3,19 +3,77 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 USER_APPLAUNCHER_DIR="$HOME/Library/Application Support/@customization.companyName@/applauncher/@customization@/Contents/MacOS"
+BUNDLED_APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ -x "$USER_APPLAUNCHER_DIR/applauncher-bin" ]
+LOG_DIR="$HOME/Library/Application Support/@customization.companyName@/applauncher/@customization@/log"
+LOG_FILE="$LOG_DIR/applauncher-wrapper.log"
+
+log_message()
+{
+    mkdir -p "$LOG_DIR" 2>/dev/null || return
+    printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$LOG_FILE" 2>/dev/null
+}
+
+binary_archs()
+{
+    /usr/bin/lipo -archs "$1" 2>/dev/null
+}
+
+binary_has_arch()
+{
+    /usr/bin/lipo "$1" -verify_arch "$2" >/dev/null 2>&1
+}
+
+rosetta_available()
+{
+    /usr/bin/arch -x86_64 /usr/bin/true >/dev/null 2>&1
+}
+
+is_usable_applauncher_bin()
+{
+    local bin="$1"
+    local host_arch
+
+    [ -x "$bin" ] || return 1
+
+    host_arch="$(/usr/bin/uname -m)"
+
+    if binary_has_arch "$bin" "$host_arch"; then
+        return 0
+    fi
+
+    # arm64e binaries are native-compatible on Apple Silicon, while uname reports arm64.
+    if [ "$host_arch" = "arm64" ] && binary_has_arch "$bin" "arm64e"; then
+        return 0
+    fi
+
+    # On Apple Silicon, allow an Intel-only cached applauncher only when Rosetta is available.
+    if [ "$host_arch" = "arm64" ] && binary_has_arch "$bin" "x86_64" && rosetta_available; then
+        return 0
+    fi
+
+    return 1
+}
+
+if is_usable_applauncher_bin "$USER_APPLAUNCHER_DIR/applauncher-bin"
 then
-    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/"
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR"
 else
-    APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
+    if [ -x "$USER_APPLAUNCHER_DIR/applauncher-bin" ]; then
+        log_message "Ignoring incompatible user-level applauncher-bin: $USER_APPLAUNCHER_DIR/applauncher-bin; archs=$(binary_archs "$USER_APPLAUNCHER_DIR/applauncher-bin")"
+    fi
+
+    APPLAUNCHER_DIR="$BUNDLED_APPLAUNCHER_DIR"
+
+    if ! is_usable_applauncher_bin "$APPLAUNCHER_DIR/applauncher-bin"
     then
-        echo "Error: applauncher-bin is not found."
+        echo "Error: usable applauncher-bin is not found."
+        log_message "Error: usable bundled applauncher-bin is not found: $APPLAUNCHER_DIR/applauncher-bin; archs=$(binary_archs "$APPLAUNCHER_DIR/applauncher-bin")"
         exit 1
     fi
 fi
 
 # Looks like script uses environment of the bundle when started from launchpad. Thus, script became
 # visible at the Dock panel. To prevent this behaviour we run applauncher-bin in background
+log_message "Starting applauncher-bin: $APPLAUNCHER_DIR/applauncher-bin; archs=$(binary_archs "$APPLAUNCHER_DIR/applauncher-bin")"
 "$APPLAUNCHER_DIR/applauncher-bin" "$@" &
