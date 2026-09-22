@@ -26,6 +26,8 @@ TextField
     color: showError ? ColorTheme.colors.red_core : ColorTheme.colors.light1
     selectionColor: ColorTheme.colors.brand_core
 
+    ContextMenu.menu: null //< Drop the Basic style text editing context menu.
+
     leftPadding: 8
     rightPadding: 8
     height: 48

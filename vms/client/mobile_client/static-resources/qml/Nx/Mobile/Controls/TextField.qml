@@ -16,6 +16,9 @@ QuickControls.TextField
 
     color: ColorTheme.colors.light4
     font.pixelSize: 16
+
+    QuickControls.ContextMenu.menu: null //< Drop the Basic style text editing context menu.
+
     implicitHeight: 56
     topPadding: 30
     leftPadding: 16

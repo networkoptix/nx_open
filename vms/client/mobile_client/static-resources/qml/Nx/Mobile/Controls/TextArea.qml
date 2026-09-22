@@ -41,6 +41,8 @@ Flickable
             : ColorTheme.transparent(ColorTheme.colors.light4, 0.3)
         selectionColor: ColorTheme.colors.brand_core
 
+        ContextMenu.menu: null //< Drop the Basic style text editing context menu.
+
         background: FieldBackground
         {
             id: fieldBackground
