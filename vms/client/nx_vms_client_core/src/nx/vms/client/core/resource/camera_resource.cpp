@@ -95,7 +95,7 @@ bool CameraResource::hasAudio() const
 
 bool CameraResource::isAudioSupported() const
 {
-    return getProperty(nx::vms::api::device_properties::kIsAudioSupported).toInt() > 0
+    return QnResource::getProperty(nx::vms::api::device_properties::kIsAudioSupported).toInt() > 0
         || base_type::isAudioSupported();
 }
 
