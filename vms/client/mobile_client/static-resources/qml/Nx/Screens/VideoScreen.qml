@@ -1424,13 +1424,12 @@ Page
         onUnavailableAction: actionBanner.trigger()
         onAvailableChanged: actionBanner.reset()
 
-        // A single action is shown as a button of its own, but there is no place for such a button
-        // in the fullscreen controls and in the narrow navigation bar, where the overflow menu
-        // opens this sheet instead: it has to list the action even when there is just one.
+        // A single action is shown as a button of its own, in the navigation bar or in the
+        // fullscreen controls. Only the narrow navigation bar has no place for it: the overflow
+        // menu opens this sheet instead, so it has to list the action even when there is just one.
         Binding on externalMode
         {
-            when: modernVideoScreen.state === "fullscreen"
-                || navigationBarContent.overflow
+            when: modernVideoScreen.state !== "fullscreen" && navigationBarContent.overflow
             value: false
         }
 

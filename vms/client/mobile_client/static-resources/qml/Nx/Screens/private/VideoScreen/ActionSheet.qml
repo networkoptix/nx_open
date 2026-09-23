@@ -44,6 +44,16 @@ AdaptiveSheet
         externalMode: sheet.externalMode
     }
 
+    component ActionButton: Button
+    {
+        property bool overlay: false
+
+        foregroundColor: overlay ? ColorTheme.colors.light4 : parameters.textColors[state]
+        backgroundColor: overlay
+            ? ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+            : parameters.colors[state]
+    }
+
     Instantiator
     {
         id: actionButtons
@@ -55,7 +65,7 @@ AdaptiveSheet
             controller: CameraButtonController { id: controller }
         }
 
-        delegate: Button
+        delegate: ActionButton
         {
             id: delegate
 
@@ -74,6 +84,7 @@ AdaptiveSheet
                 prolonged ? qsTr("Press and hold") : model.name
 
             parent: externalMode ? externalButtonContainer : sheetLayout
+            anchors.fill: externalMode ? parent : undefined
 
             text: externalMode ? "" : model.name
             icon.width: 24
@@ -81,6 +92,7 @@ AdaptiveSheet
             icon.source: iconSource
             opacity: available ? 1.0 : 0.3
             type: externalMode ? Button.Type.Interface : Button.LightInterface
+            overlay: externalMode && sheet.overlayStyle
             down: instantActionHandler.pressed || prolongedActionHandler.pressed
             textElide: Qt.ElideRight
             textMaximumLineCount: 1
@@ -247,7 +259,7 @@ AdaptiveSheet
 
     NxObject
     {
-        Button
+        ActionButton
         {
             id: defaultActionButton
 
@@ -257,14 +269,7 @@ AdaptiveSheet
             anchors.fill: parent
 
             opacity: sheet.available ? 1.0 : 0.3
-
-            foregroundColor: overlayStyle
-                ? ColorTheme.colors.light4
-                : parameters.textColors[state]
-
-            backgroundColor: overlayStyle
-                ? ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
-                : parameters.colors[state]
+            overlay: sheet.overlayStyle
 
             icon.source: "image://skin/24x24/Outline/grid_view.svg"
             icon.width: 24
