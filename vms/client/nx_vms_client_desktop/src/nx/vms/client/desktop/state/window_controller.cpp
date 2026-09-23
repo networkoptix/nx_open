@@ -53,12 +53,17 @@ void WindowController::setWindowState(Qt::WindowStates state)
     // with slow Vulkan device enumeration (multi-ICD hosts, NVIDIA hybrid GPUs) that produced a
     // null QRhi at QQuickWindow::beforeSynchronizing and crashed RhiRenderingItem.
     // Setting the desired state before the first show lets Qt apply it natively when the
-    // window is realized.
+    // window is realized except fullscreen on macOS, see below.
     if (m_window->windowState().testFlag(Qt::WindowFullScreen)
         != state.testFlag(Qt::WindowFullScreen))
     {
         m_window->action(menu::FullscreenAction)->setChecked(state.testFlag(Qt::WindowFullScreen));
     }
+
+    // On macOS, fullscreen is turned on only by FullscreenAction, and only when the window is
+    // visible. So we do not pass the fullscreen flag to Qt here.
+    if (nx::build_info::isMacOsX() && !m_window->isVisible())
+        state.setFlag(Qt::WindowFullScreen, false);
 
     m_window->setWindowState(state);
 }

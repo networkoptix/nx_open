@@ -90,6 +90,7 @@ protected:
     virtual bool event(QEvent *event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void changeEvent(QEvent *event) override;
+    virtual void showEvent(QShowEvent* event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
@@ -148,6 +149,12 @@ private:
 
     bool m_inFullscreen = false;
     bool m_inFullscreenTransition = false;
+
+#if defined(Q_OS_MACOS)
+    // On macOS, a hidden window can't go fullscreen, so we wait until it is shown.
+    bool m_pendingFullscreen = false;
+#endif
+
     bool m_initialized = false;
 };
 

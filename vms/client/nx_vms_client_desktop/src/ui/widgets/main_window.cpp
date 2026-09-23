@@ -8,6 +8,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QFileOpenEvent>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QShowEvent>
 #include <QtGui/QWindowStateChangeEvent>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -622,6 +623,11 @@ bool MainWindow::isFullScreenMode() const
 
 void MainWindow::setFullScreen(bool fullScreen)
 {
+#if defined(Q_OS_MACOS)
+    if (!fullScreen)
+        m_pendingFullscreen = false;
+#endif
+
     if(fullScreen == isFullScreenMode())
         return;
 
@@ -649,6 +655,12 @@ void MainWindow::setAnimationsEnabled(bool enabled) {
 
 void MainWindow::showFullScreen() {
 #if defined Q_OS_MACOS
+    if (!isVisible())
+    {
+        m_pendingFullscreen = true;
+        return;
+    }
+
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
 
@@ -741,7 +753,7 @@ void MainWindow::setOptions(Options options) {
 void MainWindow::updateDecorationsState()
 {
 #ifdef Q_OS_MACOS
-    bool fullScreen = mac_isFullscreen((void*)winId());
+    bool fullScreen = mac_isFullscreen((void*) winId()) || m_pendingFullscreen;
 #else
     bool fullScreen = isFullScreen();
 #endif
@@ -887,6 +899,29 @@ void MainWindow::changeEvent(QEvent* event)
     }
 
     base_type::changeEvent(event);
+}
+
+void MainWindow::showEvent(QShowEvent* event)
+{
+    base_type::showEvent(event);
+
+#if defined(Q_OS_MACOS)
+    if (m_pendingFullscreen)
+    {
+        // Wait until the window is on the screen.
+        executeDelayedParented(
+            [this]()
+            {
+                // The request may be cancelled already.
+                if (!m_pendingFullscreen)
+                    return;
+
+                m_pendingFullscreen = false;
+                showFullScreen();
+            },
+            this);
+    }
+#endif
 }
 
 void MainWindow::paintEvent(QPaintEvent* event)
