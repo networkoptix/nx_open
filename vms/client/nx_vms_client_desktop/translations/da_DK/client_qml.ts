@@ -221,7 +221,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
+      <translation>Til toppen</translation>
     </message>
     <message>
       <source>No objects</source>

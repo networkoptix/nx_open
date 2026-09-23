@@ -1154,9 +1154,9 @@
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
       <translation type="unfinished">
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform/>
+        <numerusform/>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
         <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
@@ -1165,7 +1165,7 @@
     <message>
       <source>%1 user does not have %2 permission for some of selected cameras</source>
       <comment>%1 is the name of the selected user, %2 is the permission name</comment>
-      <translation type="unfinished">%1 user does not have %2 permission for some of selected cameras</translation>
+      <translation>المستخدم %1 ليس لديه إذن %2 لبعض الكاميرات المحددة</translation>
     </message>
   </context>
   <context>
@@ -1173,7 +1173,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n كاميرات</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
@@ -1184,7 +1184,7 @@
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n كاميرات</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
@@ -1195,7 +1195,7 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform> %n وحدات الإدخال/الإخراج</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
@@ -1206,7 +1206,7 @@
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform> %n وحدات الإدخال/الإخراج</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
@@ -1217,7 +1217,7 @@
     <message numerus="yes">
       <source>%n Devices</source>
       <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
         <numerusform>%n Devices</numerusform>
         <numerusform>%n Devices</numerusform>
         <numerusform>%n Devices</numerusform>
@@ -1228,11 +1228,11 @@
     <message numerus="yes">
       <source>%n devices</source>
       <translation type="unfinished">
+        <numerusform>%n الأجهزة </numerusform>
+        <numerusform> </numerusform>
         <numerusform>%n devices</numerusform>
         <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
+        <numerusform> </numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
     </message>
@@ -1245,15 +1245,15 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation type="unfinished">FREE License</translation>
+      <translation>رخصة مجانية</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>مرخص لـ: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>العلامة المائية: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
@@ -1768,20 +1768,20 @@
     </message>
     <message>
       <source>Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</source>
-      <translation type="unfinished">Max amount of HTTP connections using transcoding for the Server. Chrome opens 2 connections at once, then closes the first one. We recommend setting this parameter&apos;s value to 2 or more.</translation>
+      <translation>الحد الأقصى لعدد اتصالات HTTP التي تستخدم إعادة الترميز للخادم. يفتح متصفح Chrome اتصالين في وقت واحد، ثم يغلق الأول. نوصي بتعيين قيمة هذا المعامل&apos;إلى 2 أو أكثر.</translation>
     </message>
     <message>
       <source>Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</source>
-      <translation type="unfinished">Semicolon-separated list of Servers designated to connect to the Cloud. Servers at the top of the list have higher priority. If the list is empty a Server for the Cloud connection is selected automatically.</translation>
+      <translation>قائمة بالخوادم المخصصة للاتصال بالسحابة، مفصولة بفواصل منقوطة. الخوادم الموجودة في أعلى القائمة لها أولوية أعلى. في حال كانت القائمة فارغة، يتم اختيار خادم للاتصال بالسحابة تلقائيًا.</translation>
     </message>
     <message>
       <source>Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</source>
-      <translation type="unfinished">Maximum number of consecutive RTP errors before the server reconnects the RTSP session.</translation>
+      <translation>الحد الأقصى لعدد أخطاء RTP المتتالية قبل أن يعيد الخادم الاتصال بجلسة RTSP.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions currently used by %1 software (insecure)</source>
       <comment>%1 is a company name</comment>
-      <translation type="unfinished">Enable deprecated API functions currently used by %1 software (insecure)</translation>
+      <translation>تمكين وظائف API المهجورة المستخدمة حاليا من قبل برنامج %1 (غير آمن)</translation>
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
@@ -1853,7 +1853,7 @@
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
-      <translation type="unfinished">Primary time synchronization Server ID.</translation>
+      <translation>معرف خادم مزامنة الوقت الأساسي.</translation>
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
