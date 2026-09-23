@@ -76,11 +76,11 @@
     </message>
     <message>
         <source>User ID Attribute</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Group ID Attribute</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -222,14 +222,14 @@
     </message>
     <message numerus="yes">
         <source>%n new results</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n new result</numerusform>
+            <numerusform>%n new results</numerusform>
         </translation>
     </message>
     <message>
         <source>To the top</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No objects</source>
@@ -692,19 +692,19 @@ Select an Integration to begin configuring its parameters.</source>
     <name>EditContextMenu</name>
     <message>
         <source>Cut</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -774,18 +774,18 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>EventTestDialog</name>
     <message>
         <source>Event Test</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1377,7 +1377,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Joystick Investigation</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1561,7 +1561,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>value</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1729,7 +1729,7 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
         <source>%n more</source>
         <comment>Numerus: %n is the number of remaining groups</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n more</numerusform>
             <numerusform>%n more</numerusform>
         </translation>
@@ -1798,15 +1798,15 @@ Select an Integration to begin configuring its parameters.</source>
     <name>ObjectTypeSelectionDialog</name>
     <message>
         <source>Select Objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>All Objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Objects</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2086,7 +2086,7 @@ Select an Integration to begin configuring its parameters.</source>
     </message>
     <message>
         <source>Find similar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2328,11 +2328,11 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>Nothing found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Try searching for something else</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2371,7 +2371,7 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
         <source>...and %n more</source>
         <comment>Numerus: placeholder for more items</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>...and %n more</numerusform>
             <numerusform>...and %n more</numerusform>
         </translation>
@@ -2556,8 +2556,8 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
-        <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-        <translation type="unfinished"></translation>
+        <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2828,7 +2828,7 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
         <source>... and %n more</source>
         <comment>Numerus: placeholder for more items</comment>
-        <translation type="unfinished">
+        <translation>
             <numerusform>... and %n more</numerusform>
             <numerusform>... and %n more</numerusform>
         </translation>
@@ -3122,6 +3122,10 @@ Press Alt + Click to follow object</source>
         <translation></translation>
     </message>
     <message>
+        <source>Test Events...</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Event Rules</source>
         <translation></translation>
     </message>
@@ -3135,15 +3139,11 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test events...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

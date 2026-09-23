@@ -32,10 +32,10 @@ ColumnLayout
         visible: !closed && !!store && store.isNewRequestsEnabled
         watchToReopen: !!store && store.isNewRequestsEnabled
         closeable: true
-        text: qsTr("Enabling API Integrations registration requests allows third parties to "
-            + "submit approval requests through integration. While safeguards exist, prolonged "
-            + "usage is not recommended. Monitor usage closely and disable this option after all "
-            + "necessary Integrations are installed.")
+
+        text: qsTr("Enabling this option lets third parties request approval to register an "
+            + "Integration. Safeguards are in place, but disable it once all necessary "
+            + "Integrations are installed - extended use is not recommended.")
 
         Layout.fillWidth: true
     }
