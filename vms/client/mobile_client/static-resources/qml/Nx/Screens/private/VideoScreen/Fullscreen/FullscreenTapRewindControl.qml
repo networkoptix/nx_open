@@ -14,7 +14,10 @@ Item
     property alias hintText: indicatorHint.text
     property bool rewindAnimationEnabled: true
 
-    implicitWidth: height * 2 / 3
+    // Width-to-height ratio of the rewind indicator.
+    readonly property real indicatorAspectRatio: 2 / 3
+
+    implicitWidth: height * indicatorAspectRatio
 
     signal activated()
     signal tapped()
@@ -23,7 +26,12 @@ Item
     {
         id: indicatorBody
 
-        anchors.fill: parent
+        // Keep the indicator proportions when the control is much taller than wide (portrait
+        // fullscreen): a lobe at the screen edge instead of a full-height slab.
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        height: Math.min(parent.height, width / control.indicatorAspectRatio)
         opacity: 0
 
         Behavior on opacity
@@ -43,15 +51,15 @@ Item
             startX: 0
             startY: 0
 
-            PathLine { x: width / 3; y: 0 }
+            PathLine { x: indicatorBody.width / 3; y: 0 }
             PathArc
             {
-                x: width / 3
-                y: height
-                radiusX: height / 2
-                radiusY: height / 2
+                x: indicatorBody.width / 3
+                y: indicatorBody.height
+                radiusX: indicatorBody.height / 2
+                radiusY: indicatorBody.height / 2
             }
-            PathLine { x: 0; y: height }
+            PathLine { x: 0; y: indicatorBody.height }
             PathLine { x: 0; y: 0 }
         }
 
@@ -112,7 +120,7 @@ Item
 
         transform: Scale
         {
-            origin: Qt.point(width / 2, height / 2);
+            origin: Qt.point(indicatorBody.width / 2, indicatorBody.height / 2)
             xScale: control.alignment === Qt.AlignLeft ? 1 : -1
         }
     }
@@ -121,7 +129,7 @@ Item
     {
         id: indicatorHint
 
-        anchors.centerIn: parent
+        anchors.centerIn: indicatorBody
         anchors.verticalCenterOffset: 24
 
         color: ColorTheme.colors.light4
@@ -133,11 +141,50 @@ Item
     TapHandler
     {
         gesturePolicy: TapHandler.WithinBounds
-        exclusiveSignals: TapHandler.SingleTap | TapHandler.DoubleTap
 
-        onSingleTapped: control.tapped()
-        onDoubleTapped:
+        // Taps are counted manually: TapHandler.doubleTapped requires the taps to be close to
+        // each other, fires only after the double click interval and gives up on the third quick
+        // tap. Here any two quick taps inside the control count, each further quick tap rewinds
+        // again, and a single tap is reported once the interval has passed. This lets the user
+        // rapidly tap several steps back or forward without pauses between the taps.
+        onTapped: (eventPoint) =>
         {
+            // WithinBounds does not cancel the gesture on drag, so a swipe inside the control
+            // also ends up here. A finger that slid away from the press point is not a tap.
+            const dx = eventPoint.position.x - eventPoint.pressPosition.x
+            const dy = eventPoint.position.y - eventPoint.pressPosition.y
+            if (Math.hypot(dx, dy) > Application.styleHints.startDragDistance)
+                return
+
+            tapSequenceTimer.registerTap()
+        }
+    }
+
+    Timer
+    {
+        id: tapSequenceTimer
+
+        property int taps: 0
+
+        interval: Application.styleHints.mouseDoubleClickInterval
+        repeat: false
+
+        onTriggered:
+        {
+            if (taps === 1)
+                control.tapped()
+
+            taps = 0
+        }
+
+        function registerTap()
+        {
+            ++taps
+            restart()
+
+            if (taps < 2)
+                return
+
             control.activated()
             control.showIndicator()
         }

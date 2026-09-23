@@ -134,6 +134,8 @@ Item
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.top: parent.top
+        // At most half of the overlay, so the zones never overlap in portrait fullscreen.
+        width: Math.min(implicitWidth, control.width / 2)
         alignment: Qt.AlignLeft
         hintText: "-%1".arg(Duration.toString(tapRewindDistanceMs, Duration.Seconds, Duration.Long))
 
@@ -155,6 +157,8 @@ Item
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.top: parent.top
+        // At most half of the overlay, so the zones never overlap in portrait fullscreen.
+        width: Math.min(implicitWidth, control.width / 2)
         alignment: Qt.AlignRight
         hintText: controller.playingLive
             ? qsTr("You are in Live Mode")
