@@ -95,6 +95,17 @@ AdaptiveScreen
         [
             State
             {
+                name: "returnToParentPage"
+                when: !!settingsScreen.contentItem?.parentPage
+
+                PropertyChanges
+                {
+                    settingsScreen.customBackHandler: () =>
+                        settingsScreen.setContentItem(settingsScreen.contentItem.parentPage)
+                }
+            },
+            State
+            {
                 name: "returnToPreviousScreen"
                 when: stackView.depth > 1
                     && (settingsScreen.initialPage
@@ -195,6 +206,7 @@ AdaptiveScreen
                 font.pixelSize: LayoutController.hasSidePanels ? 14 : 18
 
                 checked: settingsScreen.contentItem === page
+                    || settingsScreen.contentItem?.parentPage === page
 
                 backgroundColor: LayoutController.hasSidePanels
                     ? (checked ? ColorTheme.colors.dark8 : "transparent")
@@ -281,6 +293,16 @@ AdaptiveScreen
     {
         id: interfaceSettingsPage
         objectName: "interfaceSettingsPage"
+
+        onTutorialsRequested: settingsScreen.setContentItem(tutorialsSettingsPage)
+    }
+
+    TutorialsSettingsPage
+    {
+        id: tutorialsSettingsPage
+
+        objectName: "tutorialsSettingsPage"
+        parentPage: interfaceSettingsPage
     }
 
     SecuritySettingsPage

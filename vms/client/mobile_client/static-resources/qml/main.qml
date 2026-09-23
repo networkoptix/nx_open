@@ -25,6 +25,7 @@ Controls.ApplicationWindow
     property alias windowParams: windowParams
     property alias uiContainer: uiContainer
     property alias banner: windowBanner
+    property alias tutorials: tutorialsLoader.item
 
     visible: true
 
@@ -242,6 +243,8 @@ Controls.ApplicationWindow
 
     Loader
     {
+        id: tutorialsLoader
+
         active: appContext.settings.enableTutorials
         sourceComponent: Tutorials {}
     }
