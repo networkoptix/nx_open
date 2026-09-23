@@ -368,7 +368,7 @@ Dialog
 
             TextButton
             {
-                text: qsTr("Test events...")
+                text: qsTr("Test Events...")
                 icon.source: "image://skin/20x20/Outline/event_rules.svg"
                 visible: developerMode
 
