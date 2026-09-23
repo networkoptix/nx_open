@@ -5,6 +5,7 @@
 #include <deque>
 #include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 #include <nx/network/aio/aio_service.h>
@@ -46,6 +47,9 @@ public:
     // 24 seconds is a default TCP handshake timeout in Linux.
     constexpr static std::chrono::seconds kDefaultHandshakeTimeout =
         std::chrono::seconds(24);
+    // Only there to keep a stalled AIO thread from exhausting the file descriptor limit, so well
+    // above any plausible burst of concurrent handshakes.
+    constexpr static std::size_t kDefaultMaxConnectionsBeingHandshakedCount = 1024;
 
     CustomHandshakeConnectionAcceptor(
         std::unique_ptr<AcceptorDelegate> delegate,
@@ -88,6 +92,30 @@ public:
     std::size_t readyConnectionQueueSize() const
     {
         return m_maxReadyConnectionCount;
+    }
+
+    /**
+     * When this many connections are in the handshake, accepting pauses until some of them
+     * complete it. Zero means no limit.
+     */
+    void setMaxConnectionsBeingHandshakedCount(std::size_t count)
+    {
+        m_maxConnectionsBeingHandshakedCount = count;
+    }
+
+    std::size_t maxConnectionsBeingHandshakedCount() const
+    {
+        return m_maxConnectionsBeingHandshakedCount;
+    }
+
+    /**
+     * Accepted connections still in the handshake. Not given to the user yet, so not counted by
+     * any connection metric.
+     */
+    std::size_t connectionsBeingHandshakedCount() const
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return m_connectionsBeingHandshaked.size();
     }
 
     void setHandshakeTimeout(std::chrono::milliseconds timeout)
@@ -227,12 +255,14 @@ private:
     AcceptCompletionHandler m_acceptHandler;
     std::deque<AcceptResult> m_acceptedConnections;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
+    std::size_t m_maxConnectionsBeingHandshakedCount = kDefaultMaxConnectionsBeingHandshakedCount;
     std::chrono::milliseconds m_handshakeTimeout = kDefaultHandshakeTimeout;
     aio::BasicPollable m_acceptCallScheduler;
     mutable nx::Mutex m_mutex;
     bool m_isDelegateAccepting = false;
     CustomHandshakeConnectionFactory m_customHandshakeConnectionFactory;
     bool m_acceptSuspended = false;
+    bool m_handshakeLimitReached = false;
     std::atomic<int> m_connectionSequence = 0;
     nx::utils::Counter m_startedAsyncHandshakeCancellationsCounter;
 
@@ -251,6 +281,34 @@ private:
                 m_acceptSuspended = true;
             }
             return;
+        }
+
+        // A connection in the handshake holds a descriptor until the handshake completes or times
+        // out, and both are posted calls on the AIO thread it is bound to. If that thread stalls,
+        // neither runs and the descriptor is never released; unbounded, that exhausts the process
+        // limit and aborts the whole process instead of degrading this listener. See VMS-62752.
+        if (m_maxConnectionsBeingHandshakedCount > 0
+            && m_connectionsBeingHandshaked.size() >= m_maxConnectionsBeingHandshakedCount)
+        {
+            // Logged once per episode: while pinned at the limit, every completed handshake
+            // resumes accepting for exactly one connection, so the suspension itself repeats.
+            if (!std::exchange(m_handshakeLimitReached, true))
+            {
+                NX_WARNING(this,
+                    "Suspending accepting new connections since %1 connections are "
+                    "still performing the handshake",
+                    m_connectionsBeingHandshaked.size());
+            }
+            return;
+        }
+
+        if (m_handshakeLimitReached
+            && m_connectionsBeingHandshaked.size() < m_maxConnectionsBeingHandshakedCount / 2)
+        {
+            NX_INFO(this,
+                "Connections performing the handshake are down to %1, no longer at the limit",
+                m_connectionsBeingHandshaked.size());
+            m_handshakeLimitReached = false;
         }
 
         if (m_acceptSuspended)
@@ -391,7 +449,12 @@ private:
         NX_ASSERT(isInSelfAioThread());
 
         if (!m_acceptHandler)
+        {
+            // The completed handshake freed a slot, so accepting may have to be re-armed even
+            // though there is nobody to hand the connection to yet.
+            openConnections(lock);
             return;
+        }
 
         auto acceptResult = takeNextAcceptedConnection(lock);
         openConnections(lock);
