@@ -289,7 +289,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
                 d->hardwareRetryDelay = std::chrono::milliseconds::zero();
             }
         }
-        else if (FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable())
+        else if (FfmpegHwVideoDecoder::isTemporarilyUnavailable())
         {
             if (!d->pendingHardwareRetry)
             {
@@ -313,8 +313,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
 
     if (!isSimilarParams || (d->resetDecoder && frame->flags & QnAbstractMediaData::MediaFlags_AVKey))
     {
-        const bool hwUnavailableBeforeRecreate =
-            FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable();
+        const bool hwUnavailableBeforeRecreate = FfmpegHwVideoDecoder::isTemporarilyUnavailable();
 
         if (!isSimilarParams && d->isSoftwareFallbackMode)
         {
@@ -362,6 +361,10 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
             d->rhi);
         if (!d->videoDecoder)
         {
+            // The hardware decoder may be temporarily unavailable while no software decoder
+            // accepts the stream: keep retrying, from the next key frame if the stream parameters
+            // have not changed.
+            d->resetDecoder = true;
             NX_WARNING(this, "Failed to create video decoder, codec: %1, size: %2",
                 frame->compressionType, frameInfo.size);
             return false;
@@ -374,8 +377,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
         d->pendingHardwareRetry = d->allowHardwareAcceleration
             && !d->videoDecoder->capabilities().testFlag(
                 AbstractVideoDecoder::Capability::hardwareAccelerated)
-            && (hwUnavailableBeforeRecreate
-                || FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable());
+            && (hwUnavailableBeforeRecreate || FfmpegHwVideoDecoder::isTemporarilyUnavailable());
         if (d->pendingHardwareRetry)
         {
             NX_DEBUG(this, "Created a software decoder because hardware is temporarily"

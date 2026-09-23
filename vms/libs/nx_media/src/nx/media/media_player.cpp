@@ -893,7 +893,13 @@ bool Player::Private::initDataProvider()
         return false;
 
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
-    dataConsumer->setRhi(videoSurfaces.empty() ? nullptr : videoSurfaces[0]->rhi());
+
+    // The hardware decoder needs the video output's RHI on most platforms, and the output has
+    // it only while attached to a window.
+    const auto videoSurface = videoSurfaces.value(0);
+    const auto rhi = videoSurface ? videoSurface->rhi() : nullptr;
+    NX_DEBUG(q, "initDataProvider(): video surface rhi is %1", rhi ? "available" : "null");
+    dataConsumer->setRhi(rhi);
     dataConsumer->setPlaySpeed(speed);
     dataConsumer->setAllowHardwareAcceleration(allowHardwareAcceleration);
     dataConsumer->setAllowSoftwareDecoderFallback(allowSoftwareDecoderFallback);

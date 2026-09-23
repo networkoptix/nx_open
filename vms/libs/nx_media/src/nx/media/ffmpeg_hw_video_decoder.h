@@ -33,10 +33,11 @@ public:
 
     /**
      * Whether the process-wide back-off armed by a recent hardware decoder resource failure
-     * is currently active. While active, isCompatible() returns false and newly created
-     * decoders fall back to software.
+     * is currently active. While active, the decoder registry does not create this decoder and
+     * routes new decoders to software; isCompatible() keeps reporting the device capability, so
+     * the stream quality choice is not degraded by a transient condition.
      */
-    static bool isHardwareTemporarilyUnavailable();
+    static bool isTemporarilyUnavailable();
 
     virtual bool sendPacket(const QnConstCompressedVideoDataPtr& packet) override;
     virtual bool receiveFrame(VideoFramePtr* decodedFrame) override;

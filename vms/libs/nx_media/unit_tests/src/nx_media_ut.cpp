@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <functional>
+#include <typeinfo>
 
 #include <gtest/gtest.h>
 
@@ -153,6 +154,30 @@ public:
 QSize MockVideoDecoder::s_maxResolution{};
 AVCodecID MockVideoDecoder::s_transcodingCodec{AV_CODEC_ID_NONE};
 QSize MockVideoDecoder::s_maxTranscodedResolution{};
+
+/** Preferred decoder which can be made temporarily unavailable, like the hardware one. */
+class MockHwVideoDecoder: public MockVideoDecoder
+{
+public:
+    using MockVideoDecoder::MockVideoDecoder;
+
+    virtual Capabilities capabilities() const override { return Capability::hardwareAccelerated; }
+
+    static bool isCompatible(
+        const AVCodecID /*codec*/, const QSize& /*resolution*/, bool /*allowHW*/)
+    {
+        return true;
+    }
+
+    static QSize maxResolution(const AVCodecID /*codec*/) { return QSize(); }
+
+    static bool isTemporarilyUnavailable() { return s_temporarilyUnavailable; }
+
+public:
+    // Should be assigned externally.
+    static bool s_temporarilyUnavailable;
+};
+bool MockHwVideoDecoder::s_temporarilyUnavailable = false;
 
 class MockServer: public QnMediaServerResource
 {
@@ -523,6 +548,36 @@ protected:
     }
 };
 
+class VideoDecoderRegistryTest: public ::testing::Test
+{
+protected:
+    virtual void SetUp() override
+    {
+        MockVideoDecoder::s_maxResolution = QSize(800, 600);
+        MockHwVideoDecoder::s_temporarilyUnavailable = false;
+
+        const auto registry = VideoDecoderRegistry::instance();
+        registry->reinitialize(); //< Just in case.
+        registry->addPlugin<MockHwVideoDecoder>("MockHwVideoDecoder");
+        registry->addPlugin<MockVideoDecoder>("MockVideoDecoder");
+    }
+
+    virtual void TearDown() override
+    {
+        VideoDecoderRegistry::instance()->reinitialize();
+        MockVideoDecoder::s_maxResolution = QSize();
+    }
+
+    template<typename Decoder>
+    static bool isInstanceOf(const VideoDecoderPtr& decoder)
+    {
+        if (!decoder)
+            return false;
+
+        const AbstractVideoDecoder& instance = *decoder;
+        return typeid(instance) == typeid(Decoder);
+    }
+};
 
 double calculateMSE(const float* r1, const float* g1, const float* b1,
     const float* r2, const float* g2, const float* b2, int width, int height)
@@ -658,6 +713,32 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     T                        .high(4096, 2160).max(1920, 1080).req(1080) >> QSize(1920, 1012);
 
 #undef T
+}
+
+TEST_F(VideoDecoderRegistryTest, TemporaryUnavailabilityAffectsCreationOnly)
+{
+    static const QSize kHighResolution(1920, 1080);
+    static const QSize kLowResolution(640, 480);
+    static const std::vector<AbstractVideoDecoder*> kNoDecoders;
+    const auto registry = VideoDecoderRegistry::instance();
+
+    MockHwVideoDecoder::s_temporarilyUnavailable = true;
+
+    // The capability check still reports the preferred decoder, so the stream quality choice is
+    // not degraded by a transient condition.
+    ASSERT_TRUE(registry->hasCompatibleDecoder(
+        AV_CODEC_ID_H265, kHighResolution, /*allowHardwareAcceleration*/ true, kNoDecoders));
+
+    // Creation skips the unavailable decoder and falls back to the next compatible one.
+    ASSERT_FALSE(registry->createCompatibleDecoder(
+        AV_CODEC_ID_H265, kHighResolution, /*allowHardwareAcceleration*/ true, /*rhi*/ nullptr));
+    ASSERT_TRUE(isInstanceOf<MockVideoDecoder>(registry->createCompatibleDecoder(
+        AV_CODEC_ID_H265, kLowResolution, /*allowHardwareAcceleration*/ true, /*rhi*/ nullptr)));
+
+    MockHwVideoDecoder::s_temporarilyUnavailable = false;
+
+    ASSERT_TRUE(isInstanceOf<MockHwVideoDecoder>(registry->createCompatibleDecoder(
+        AV_CODEC_ID_H265, kHighResolution, /*allowHardwareAcceleration*/ true, /*rhi*/ nullptr)));
 }
 
 TEST(yuvConvert, yuv420ToRgbPlanarNoScale)

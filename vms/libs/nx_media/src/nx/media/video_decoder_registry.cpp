@@ -47,6 +47,12 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     for (auto& plugin: m_plugins)
     {
         NX_DEBUG(this, "Checking video decoder: %1 with codec: %2", plugin.name, codecString());
+        if (plugin.isTemporarilyUnavailable && plugin.isTemporarilyUnavailable())
+        {
+            NX_DEBUG(this, "Video decoder %1 is temporarily unavailable", plugin.name);
+            continue;
+        }
+
         if (plugin.useCount < plugin.maxUseCount
             && plugin.isCompatible(codec, resolution, allowHardwareAcceleration))
         {
