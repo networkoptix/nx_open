@@ -719,7 +719,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Modifier le partage</translation>
     </message>
   </context>
   <context>
@@ -1622,7 +1622,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Appuyez de nouveau sur retour pour quitter</translation>
     </message>
   </context>
 </TS>

@@ -1621,7 +1621,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Tekan tombol kembali lagi untuk keluar</translation>
     </message>
   </context>
 </TS>
