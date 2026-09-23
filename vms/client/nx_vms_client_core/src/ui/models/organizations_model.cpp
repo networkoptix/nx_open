@@ -1682,8 +1682,6 @@ bool OrganizationsSortModel::lessThan(const QModelIndex& left, const QModelIndex
 
 OrganizationsFilterModel::OrganizationsFilterModel(QObject* parent): base_type(parent)
 {
-    m_collator.setCaseSensitivity(Qt::CaseInsensitive);
-    m_collator.setNumericMode(true);
     sort(0);
 
     connect(this, &OrganizationsFilterModel::rowsInserted, this, &OrganizationsFilterModel::updateSummary);
@@ -1760,7 +1758,9 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
         const QString leftSection = left.data(OrganizationsModel::PathFromRootRole).toString();
         const QString rightSection = right.data(OrganizationsModel::PathFromRootRole).toString();
 
-        const int sectionsOrder = m_collator.compare(leftSection, rightSection);
+        const int sectionsOrder =
+            nx::utils::naturalStringCompare(leftSection, rightSection, Qt::CaseInsensitive);
+
         if (sectionsOrder != 0)
             return sectionsOrder < 0;
     }
@@ -1768,18 +1768,7 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
     if (leftType != rightType)
         return leftType < rightType;
 
-    if (leftType == OrganizationsModel::System)
-        return QnSystemsModel::lessThan(left, right, /*cloudFirstSorting*/ true);
-
-    const QString leftName = left.data(Qt::DisplayRole).toString();
-    const QString rightName = right.data(Qt::DisplayRole).toString();
-
-    const int namesOrder = m_collator.compare(leftName, rightName);
-    if (namesOrder != 0)
-        return namesOrder < 0;
-
-    return left.data(OrganizationsModel::IdRole).value<nx::Uuid>()
-        < right.data(OrganizationsModel::IdRole).value<nx::Uuid>();
+    return QnSystemsModel::lessThan(left, right, /*cloudFirstSorting*/ true);
 }
 
 void OrganizationsFilterModel::setHideOrgSystemsFromSites(bool value)

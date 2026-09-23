@@ -4,7 +4,6 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QAbstractProxyModel>
-#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/utils/impl_ptr.h>
@@ -249,7 +248,6 @@ private:
     int m_partnerCount{};
     int m_organizationCount{};
     int m_siteCount{};
-    QCollator m_collator;
 };
 
 } // namespace nx::vms::client::core
