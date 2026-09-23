@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -12,6 +14,8 @@
 #include <nx/vms/client/mobile/system_context_aware.h>
 #include <utils/common/id.h>
 
+class QImage;
+
 class QnCameraThumbnailCache:
     public QnThumbnailCacheBase,
     public nx::vms::client::mobile::SystemContextAware
@@ -19,18 +23,6 @@ class QnCameraThumbnailCache:
     Q_OBJECT
 
 public:
-    struct ThumbnailData
-    {
-        QString thumbnailId;
-        qint64 time;
-        bool loading;
-
-        ThumbnailData() :
-            time(0),
-            loading(false)
-        {}
-    };
-
     explicit QnCameraThumbnailCache(nx::vms::client::mobile::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~QnCameraThumbnailCache() override;
@@ -49,10 +41,13 @@ private:
     void start();
     void stop();
 
+    void handleImageLoaded(const nx::Uuid& id, const QImage& image);
+
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
+    struct ThumbnailData;
     mutable nx::Mutex m_mutex;
     QElapsedTimer m_elapsedTimer;
     QHash<nx::Uuid, ThumbnailData> m_thumbnailByResourceId;

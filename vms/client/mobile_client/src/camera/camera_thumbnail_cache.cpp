@@ -2,10 +2,13 @@
 
 #include "camera_thumbnail_cache.h"
 
+#include <memory>
+
+#include <QtCore/QScopedPointerDeleteLater>
+
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/vms/client/core/thumbnails/camera_async_image_request.h>
 #include <nx/vms/client/core/thumbnails/proxy_image_result.h>
 #include <nx/vms/client/mobile/system_context.h>
@@ -14,8 +17,8 @@ namespace {
 
 using namespace nx::vms::client::core;
 
-const int refreshInterval = 30000;
-const int maxImageHeight = 200;
+const int kMinRefreshIntervalMs = 30000;
+const int kMaxImageHeight = 200;
 
 QString getThumbnailId(const nx::Uuid& id, const qint64 time)
 {
@@ -27,37 +30,44 @@ QString getThumbnailId(const nx::Uuid& id, const qint64 time)
 class CameraRequestManager: public QObject
 {
     using Key = QPair<QnVirtualCameraResourcePtr, int>;
-    QHash<Key, std::shared_ptr<CameraAsyncImageRequest>> m_requests;
+    QHash<Key, std::shared_ptr<AsyncImageResult>> m_requests;
 
 public:
+    /**
+     * Requests a camera thumbnail. If the same image is already being loaded, the pending request
+     * is reused instead of sending a duplicate one. The returned result may be ready already - for
+     * example when the request has failed to be sent - in which case there will be no `ready`
+     * signal, so the caller must check AsyncImageResult::isReady() first.
+     */
     std::unique_ptr<AsyncImageResult> request(
-        const QnVirtualCameraResourcePtr& camera,
-        std::function<void(const QImage& image)> callback,
-        int maximumSize)
+        const QnVirtualCameraResourcePtr& camera, int maximumSize)
     {
         if (!NX_ASSERT(camera && camera->resourcePool()))
             return {};
 
         const auto key = Key(camera, maximumSize);
-        if (m_requests.contains(key))
-            return std::make_unique<ProxyImageResult>(m_requests.value(key));
 
-        const auto request = std::make_shared<CameraAsyncImageRequest>(camera, maximumSize);
+        if (const auto pendingRequest = m_requests.value(key))
+            return std::make_unique<ProxyImageResult>(pendingRequest);
+
+        const auto request = std::shared_ptr<AsyncImageResult>(
+            new CameraAsyncImageRequest(camera, maximumSize), QScopedPointerDeleteLater{});
 
         if (request->isReady())
             return std::make_unique<ProxyImageResult>(request);
 
-        const std::function<void()> onReady = nx::utils::guarded(this,
-            [this, key, callback]()
+        connect(request.get(),
+            &AsyncImageResult::ready,
+            this,
+            [this, key, source = request.get()]()
             {
-                if (callback) {
-                    callback(m_requests.value(key)->image());
-                }
-                m_requests.remove(key);
-                NX_VERBOSE(this, "Camera requests count: %1", m_requests.size());
-            });
+                const auto it = m_requests.find(key);
 
-        connect(request.get(), &AsyncImageResult::ready, this, onReady);
+                if (it == m_requests.cend() || it->get() != source)
+                    return;
+
+                m_requests.remove(key);
+            });
 
         connect(camera->resourcePool(), &QnResourcePool::resourcesRemoved,
             this, &CameraRequestManager::handleResourcesRemoved, Qt::UniqueConnection);
@@ -99,6 +109,20 @@ static CameraRequestManager* cameraRequestManager()
 
 } // namespace
 
+struct QnCameraThumbnailCache::ThumbnailData
+{
+    QString thumbnailId;
+
+    /**
+     * While the image is being loaded - the moment the request has been sent, otherwise the
+     * moment the last image has been obtained.
+     */
+    qint64 time = 0;
+
+    /** Not null while the image is being loaded. */
+    std::shared_ptr<nx::vms::client::core::AsyncImageResult> request;
+};
+
 QnCameraThumbnailCache::QnCameraThumbnailCache(
     nx::vms::client::mobile::SystemContext* context,
     QObject* parent)
@@ -130,6 +154,7 @@ void QnCameraThumbnailCache::start()
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &QnCameraThumbnailCache::at_resourcePool_resourceAdded);
+
     connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &QnCameraThumbnailCache::at_resourcePool_resourceRemoved);
 
@@ -214,58 +239,87 @@ void QnCameraThumbnailCache::refreshThumbnail(const nx::Uuid& id)
     if (!api)
         return;
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    ThumbnailData& thumbnailData = m_thumbnailByResourceId[id];
-
-    if (thumbnailData.loading)
-        return;
-
-    if (thumbnailData.time > 0 && thumbnailData.time + refreshInterval > m_elapsedTimer.elapsed())
-        return;
-
-    auto callback = [this, id](const QImage& image)
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
         ThumbnailData& thumbnailData = m_thumbnailByResourceId[id];
-        if (image.isNull())
+
+        if (thumbnailData.request)
+            return; //< The image is already being loaded.
+
+        if (thumbnailData.time > 0
+            && thumbnailData.time + kMinRefreshIntervalMs > m_elapsedTimer.elapsed())
         {
-            thumbnailData.loading = false;
             return;
         }
 
-        bool thumbnailLoaded = false;
-        QString thumbnailId;
-
-        auto pixmap = QPixmap::fromImage(image);
-
-        if (!pixmap.isNull())
-        {
-            thumbnailId = getThumbnailId(id, thumbnailData.time);
-            m_pixmaps.remove(thumbnailData.thumbnailId);
-            m_pixmaps.insert(thumbnailId, pixmap);
-            thumbnailLoaded = true;
-        }
-        thumbnailData.thumbnailId = thumbnailId;
         thumbnailData.time = m_elapsedTimer.elapsed();
-        thumbnailData.loading = false;
+    }
 
-        lock.unlock();
+    auto request = cameraRequestManager()->request(camera, kMaxImageHeight);
+    if (!NX_ASSERT(request))
+        return;
 
-        if (thumbnailLoaded)
-            emit thumbnailUpdated(id, thumbnailId);
-    };
-
-    auto request = cameraRequestManager()->request(
-        camera, nx::utils::guarded(this, std::move(callback)), maxImageHeight);
-
-    if (!request)
+    // AsyncImageResult is not thread-safe, so it is only accessed in this thread.
+    if (request->isReady())
     {
-        thumbnailData.loading = false;
+        handleImageLoaded(id, request->image());
         return;
     }
 
-    thumbnailData.time = m_elapsedTimer.elapsed();
-    thumbnailData.loading = true;
+    connect(request.get(),
+        &AsyncImageResult::ready,
+        this,
+        [this, id, source = request.get()]()
+        {
+            QImage image;
+            {
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                const auto it = m_thumbnailByResourceId.find(id);
+
+                if (it == m_thumbnailByResourceId.cend() || it->request.get() != source)
+                    return;
+
+                image = it->request->image();
+                it->request.reset();
+            }
+
+            handleImageLoaded(id, image);
+        });
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    m_thumbnailByResourceId[id].request =
+        std::shared_ptr<AsyncImageResult>(request.release(), QScopedPointerDeleteLater{});
+}
+
+void QnCameraThumbnailCache::handleImageLoaded(const nx::Uuid& id, const QImage& image)
+{
+    QString thumbnailId;
+
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+
+        const auto it = m_thumbnailByResourceId.find(id);
+        if (it == m_thumbnailByResourceId.end())
+            return;
+
+        const auto pixmap = QPixmap::fromImage(image);
+        if (pixmap.isNull())
+        {
+            // The request has failed or the image cannot be used. The previously loaded thumbnail
+            // is kept, and `time` is intentionally left at the moment the failed request has been
+            // sent, so that the next attempt is made in kMinRefreshIntervalMs.
+            return;
+        }
+
+        thumbnailId = getThumbnailId(id, it->time);
+        m_pixmaps.remove(it->thumbnailId);
+        m_pixmaps.insert(thumbnailId, pixmap);
+
+        it->thumbnailId = thumbnailId;
+        it->time = m_elapsedTimer.elapsed();
+    }
+
+    emit thumbnailUpdated(id, thumbnailId);
 }

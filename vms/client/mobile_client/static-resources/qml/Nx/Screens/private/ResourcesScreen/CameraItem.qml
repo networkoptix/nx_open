@@ -343,25 +343,26 @@ Control
     {
         id: refreshTimer
 
-        readonly property int initialLoadDelay: 400
-        readonly property int reloadDelay: 60 * 1000
+        readonly property int initialLoadDelayMs: 400
+        readonly property int reloadDelayMs: 60 * 1000
 
-        interval: initialLoadDelay
+        interval: initialLoadDelayMs
         repeat: true
+
         running: active
             && windowContext.sessionManager.hasConnectedSession
             && thumbnailContentLoader.state !== "dummyContent"
 
         onTriggered:
         {
-            interval = reloadDelay
+            interval = reloadDelayMs
             cameraItem.thumbnailRefreshRequested()
         }
 
         onRunningChanged:
         {
             if (!running)
-                interval = initialLoadDelay
+                interval = initialLoadDelayMs
         }
     }
 
