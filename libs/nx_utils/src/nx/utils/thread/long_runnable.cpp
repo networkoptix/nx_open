@@ -2,6 +2,7 @@
 
 #include "long_runnable.h"
 
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 
 //-------------------------------------------------------------------------------------------------
@@ -63,6 +64,8 @@ public:
         NX_ASSERT(runnable && m_created.contains(runnable));
 
         m_created.remove(runnable);
+        m_running.remove(runnable);
+
         m_waitCondition.wakeAll();
     }
 
@@ -73,27 +76,33 @@ public:
             NX_WARNING(this, "Still created: %1", nx::containerString(m_created));
     }
 
+    void setStopTimeout(std::chrono::milliseconds timeout)
+    {
+        NX_MUTEX_LOCKER locker(&m_mutex);
+        m_stopTimeout = timeout;
+    }
+
 private:
     void waitAllLocked()
     {
         using namespace std::chrono;
-        static const seconds kStopTimeout(60);
         const auto start = system_clock::now();
 
         while (!m_running.isEmpty())
         {
             const auto timeFromStart = duration_cast<milliseconds>((system_clock::now() - start));
-            const milliseconds timeToWait = kStopTimeout - timeFromStart;
+            const milliseconds timeToWait = m_stopTimeout - timeFromStart;
             if (timeToWait.count() > 0)
                 m_waitCondition.wait(&m_mutex, timeToWait);
 
-            if (system_clock::now() - start >= kStopTimeout)
+            if (system_clock::now() - start >= m_stopTimeout)
             {
                 for (const auto runnable: m_running)
                 {
-                    NX_WARNING(
-                        this, "A long runnable %1 hasn't stopped in %2 seconds", runnable,
-                        kStopTimeout);
+                    NX_WARNING(this,
+                        "A long runnable %1 hasn't stopped in %2 seconds",
+                        runnable,
+                        m_stopTimeout);
                 }
 
                 return;
@@ -106,6 +115,8 @@ private:
     nx::WaitCondition m_waitCondition;
     QSet<QnLongRunnable*> m_created;
     QSet<QnLongRunnable*> m_running;
+    std::chrono::milliseconds m_stopTimeout{
+        (nx::build_info::isMacOsX() || nx::build_info::isIos()) ? 500 : 60 * 1000};
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -179,4 +190,9 @@ void QnLongRunnablePool::stopAll()
 void QnLongRunnablePool::waitAll()
 {
     d->waitAll();
+}
+
+void QnLongRunnablePool::setStopTimeout(std::chrono::milliseconds timeout)
+{
+    d->setStopTimeout(timeout);
 }

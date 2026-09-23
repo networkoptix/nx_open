@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QSharedPointer>
 
 #include "thread.h"
@@ -43,6 +45,12 @@ public:
      * pool are stopped.
      */
     void waitAll();
+
+    /**
+     * Overrides the default timeout stopAll()/waitAll() wait for the registered threads to
+     * stop before giving up. Intended for tests that need to bound their own runtime.
+     */
+    void setStopTimeout(std::chrono::milliseconds timeout);
 
 private:
     friend class QnLongRunnable;
