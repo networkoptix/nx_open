@@ -13,6 +13,7 @@ QuickControls.Page
     default property alias pageData: contentColumn.data
 
     property Item rightControl
+    property Item parentPage
 
     function saveSettings()
     {
