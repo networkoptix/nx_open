@@ -48,9 +48,11 @@ AdaptiveScreen
             videoScreen.camerasModel = videoScreen.defaultCamerasModel
         }
 
-        videoScreen.controller.start(resource, -1)
-
+        // Show the video screen before starting playback: the player selects a hardware
+        // decoder using the video output's RHI, which is available only while the output is
+        // attached to the window.
         resourcesScreen.showsVideoScreen = true
+        videoScreen.controller.start(resource, -1)
     }
 
     function closeVideoScreen()

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <concepts>
 #include <functional>
 #include <typeindex>
 
@@ -27,6 +28,15 @@ concept HasDecoderStaticMethods = requires(T a) //< 'a' is a dummy variable, not
 };
 
 /**
+ * Optional static decoder method: whether the decoder must not be created right now although it
+ * is compatible with the stream, e.g. its hardware is temporarily exhausted.
+ */
+template<typename T>
+concept HasTemporaryUnavailability = requires {
+    { T::isTemporarilyUnavailable() } -> std::same_as<bool>;
+};
+
+/**
  * Singleton. Allows to register various implementations for video decoders. The exact list of
  * decoders can be registered in runtime.
  */
@@ -36,8 +46,8 @@ public:
     static VideoDecoderRegistry* instance();
 
     /**
-     * @return Optimal video decoder (in case of any) compatible with such frame. Return null
-     * pointer if no compatible decoder is found.
+     * @return Optimal video decoder (in case of any) compatible with such frame. Temporarily
+     * unavailable decoders are skipped. Return null pointer if no compatible decoder is found.
      */
     VideoDecoderPtr createCompatibleDecoder(
         const AVCodecID codec,
@@ -46,7 +56,9 @@ public:
         QRhi* rhi);
 
     /**
-     * @return Whether a compatible video decoder is found.
+     * @return Whether a compatible video decoder is found. Temporary unavailability is ignored:
+     * the answer describes the device capability and drives long-living decisions like the
+     * stream quality choice.
      */
     bool hasCompatibleDecoder(
         const AVCodecID codec,
@@ -81,6 +93,7 @@ private:
             const QSize& resolution,
             bool allowHardwareAcceleration)> isCompatible;
         std::function<QSize(const AVCodecID codec)> maxResolution;
+        std::function<bool()> isTemporarilyUnavailable;
         int useCount = 0;
         int maxUseCount = std::numeric_limits<int>::max();
         QString name;
@@ -99,6 +112,8 @@ private:
                 };
             isCompatible = &Decoder::isCompatible;
             maxResolution = &Decoder::maxResolution;
+            if constexpr (HasTemporaryUnavailability<Decoder>)
+                isTemporarilyUnavailable = &Decoder::isTemporarilyUnavailable;
             this->maxUseCount = maxUseCount;
             typeIndex = std::type_index(typeid(Decoder));
             this->name = name;

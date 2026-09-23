@@ -40,11 +40,16 @@ namespace {
 //     with HW enabled. Without a back-off every new camera spends time failing HW init before
 //     reaching SW, introducing per-camera latency that accumulates into visible jank.
 //
-// While the back-off is armed, isCompatible() returns false so the decoder registry routes all
-// new and retrying decoders directly to SW. The cooldown is short enough that HW is re-probed
-// once the load drops - no fixed per-device codec limit is required.
+// While armed, isTemporarilyUnavailable() makes the registry route new decoders to SW; it does
+// not affect isCompatible(), i.e. the one-shot stream quality choice. The cooldown is short, so
+// HW is re-probed once the load drops; releasing the last live HW decoder ends it immediately.
 constexpr std::chrono::milliseconds kHardwareExhaustionCooldown(5000);
+
+/** Steady clock time (ms) until which HW decoders are not created; 0 means no back-off. */
 std::atomic<int64_t> g_hardwareAvailableAtMs{0};
+
+/** Decoders currently holding a HW codec; the back-off ends when the last one is released. */
+std::atomic<int> g_liveHardwareDecoders{0};
 
 int64_t steadyNowMs()
 {
@@ -58,9 +63,16 @@ void noteHardwareDecoderFailure()
         steadyNowMs() + kHardwareExhaustionCooldown.count(), std::memory_order_relaxed);
 }
 
-void noteHardwareDecoderSuccess()
+void noteHardwareDecoderAcquired()
 {
+    ++g_liveHardwareDecoders;
     g_hardwareAvailableAtMs.store(0, std::memory_order_relaxed);
+}
+
+void noteHardwareDecoderReleased()
+{
+    if (--g_liveHardwareDecoders == 0)
+        g_hardwareAvailableAtMs.store(0, std::memory_order_relaxed);
 }
 
 AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
@@ -112,6 +124,8 @@ public:
     {
         if (decoder)
             closeCodecContext();
+        if (countedAsHardware)
+            noteHardwareDecoderReleased();
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -183,6 +197,9 @@ public:
     bool initialized = false;
     QSize frameSize;
 
+    /** Set once the decoder has proven to hold a HW codec, see noteHardwareDecoderAcquired(). */
+    bool countedAsHardware = false;
+
     QRhi* rhi = nullptr;
     VideoApiRegistry::Entry* videoApi = nullptr;
 
@@ -211,9 +228,6 @@ bool FfmpegHwVideoDecoder::isCompatible(
     if (!allowHardwareAcceleration)
         return false;
 
-    if (isHardwareTemporarilyUnavailable())
-        return false;
-
     const auto maxSize = FfmpegHwVideoDecoder::maxResolution(codec);
     if (!maxSize.isEmpty()
         && (resolution.width() > maxSize.width() || resolution.height() > maxSize.height()))
@@ -229,7 +243,7 @@ QSize FfmpegHwVideoDecoder::maxResolution(const AVCodecID /*codec*/)
     return {8192, 8192};
 }
 
-bool FfmpegHwVideoDecoder::isHardwareTemporarilyUnavailable()
+bool FfmpegHwVideoDecoder::isTemporarilyUnavailable()
 {
     return steadyNowMs() < g_hardwareAvailableAtMs.load(std::memory_order_relaxed);
 }
@@ -260,9 +274,14 @@ bool FfmpegHwVideoDecoder::sendPacket(const QnConstCompressedVideoDataPtr& packe
     if (d->videoApi)
     {
         if (d->decoder->consumeHardwareResourceFailed())
+        {
             noteHardwareDecoderFailure();
+        }
         else if (firstPacket && ok && d->decoder->hardwareDecoder())
-            noteHardwareDecoderSuccess();
+        {
+            d->countedAsHardware = true;
+            noteHardwareDecoderAcquired();
+        }
         // Natural SW fallback (codec has no HW path on this platform) does not arm the back-off.
     }
 
