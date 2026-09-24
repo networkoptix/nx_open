@@ -11509,13 +11509,13 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
       </translation>
     </message>
     <message>
