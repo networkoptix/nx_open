@@ -134,9 +134,16 @@ NxObject
             return
 
         if (CoreUtils.isMobilePlatform())
-            windowContext.ui.windowHelpers.setScreenOrientation(orientation)
+        {
+            // The device may have been rotated while in fullscreen: where the system is allowed
+            // to rotate the screen it chooses the orientation, otherwise the previous one is
+            // restored, see releaseScreenOrientation().
+            windowContext.ui.windowHelpers.releaseScreenOrientation(orientation)
+        }
         else
+        {
             d.swapWindowSize()
+        }
     }
 
     function toggleFullscreen(orientation = Qt.LandscapeOrientation)
@@ -165,8 +172,9 @@ NxObject
 
         property bool fullscreen: false
 
-        // The orientation to restore on exitFullscreen() when enterFullscreen() forced it
-        // away; 0 while nothing is forced.
+        // The orientation enterFullscreen() forced the screen away from; 0 while nothing is
+        // forced. Restored on exitFullscreen() unless the system is allowed to rotate the screen
+        // by itself.
         property int orientationToRestore: 0
 
         function setFullscreen(value)

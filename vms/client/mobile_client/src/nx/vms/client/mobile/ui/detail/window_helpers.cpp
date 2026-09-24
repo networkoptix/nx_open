@@ -68,6 +68,11 @@ void WindowHelpers::setScreenOrientation(Qt::ScreenOrientation orientation) cons
     ::setScreenOrientation(orientation);
 }
 
+void WindowHelpers::releaseScreenOrientation(Qt::ScreenOrientation orientation) const
+{
+    ::releaseScreenOrientation(orientation);
+}
+
 void WindowHelpers::setGestureExclusionArea(int y, int height) const
 {
     ::setAndroidGestureExclusionArea(y, height);

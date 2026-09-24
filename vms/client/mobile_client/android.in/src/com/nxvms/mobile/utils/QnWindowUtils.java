@@ -382,6 +382,13 @@ public class QnWindowUtils
             });
     }
 
+    /** Whether the system rotates the screen after the device (the "Auto-rotate" setting). */
+    public static boolean isAutoRotationEnabled()
+    {
+        return Settings.System.getInt(activity().getContentResolver(),
+            Settings.System.ACCELEROMETER_ROTATION, /*def*/ 0) == 1;
+    }
+
     private static final int kVibrationDurationMs = 20;
     public static void makeShortVibration()
     {

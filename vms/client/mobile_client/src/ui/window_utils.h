@@ -20,6 +20,13 @@ void setKeepScreenOn(bool keepScreenOn);
 
 void setScreenOrientation(Qt::ScreenOrientation orientation);
 
+/**
+ * Ends the orientation forced by setScreenOrientation(). The system chooses the orientation again
+ * by the physical orientation of the device where it is allowed to rotate the screen; the given
+ * orientation is restored otherwise.
+ */
+void releaseScreenOrientation(Qt::ScreenOrientation orientation);
+
 void makeShortVibration();
 
 bool is24HoursTimeFormat();

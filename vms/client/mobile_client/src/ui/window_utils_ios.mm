@@ -34,6 +34,16 @@ void applyWebViewBackgroundColor(UIView* view, UIColor* color)
         webView.underPageBackgroundColor = color;
 }
 
+void requestInterfaceOrientations(UIInterfaceOrientationMask mask)
+{
+    UIWindowScene* windowScene = (UIWindowScene*)
+        [[[UIApplication sharedApplication] connectedScenes] allObjects].firstObject;
+    UIWindowSceneGeometryPreferencesIOS* preferences =
+        [[[UIWindowSceneGeometryPreferencesIOS alloc] initWithInterfaceOrientations:mask]
+            autorelease];
+    [windowScene requestGeometryUpdateWithPreferences:preferences errorHandler:nil];
+}
+
 } // namespace
 
 void prepareWindow()
@@ -76,14 +86,9 @@ void setScreenOrientation(Qt::ScreenOrientation orientation)
 
     if (@available(iOS 16.0, *))
     {
-        const int orientationValue = portrait
+        requestInterfaceOrientations(portrait
             ? UIInterfaceOrientationMaskPortrait
-            : UIInterfaceOrientationMaskLandscapeRight;
-        UIWindowScene * windowScene = (UIWindowScene *)
-                                     [[[UIApplication sharedApplication] connectedScenes] allObjects].firstObject;
-        UIWindowSceneGeometryPreferencesIOS* perference = [[ UIWindowSceneGeometryPreferencesIOS alloc]
-            initWithInterfaceOrientations: orientationValue];
-        [windowScene requestGeometryUpdateWithPreferences:perference errorHandler: nil];
+            : UIInterfaceOrientationMaskLandscapeRight);
     }
     else
     {
@@ -94,6 +99,15 @@ void setScreenOrientation(Qt::ScreenOrientation orientation)
         [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
         [UIViewController attemptRotationToDeviceOrientation];
     }
+}
+
+void releaseScreenOrientation(Qt::ScreenOrientation /*orientation*/)
+{
+    // All the orientations at once: "the system automatically chooses an orientation from the
+    // intersection of these preferred orientations and the supported orientations"
+    // (UIWindowSceneGeometryPreferencesIOS.interfaceOrientations). The choice follows the
+    // rotation lock, so nothing has to be restored here (checked on a device).
+    requestInterfaceOrientations(UIInterfaceOrientationMaskAll);
 }
 
 bool isPhone() {

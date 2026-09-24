@@ -39,6 +39,8 @@ public:
 
     Q_INVOKABLE void setScreenOrientation(Qt::ScreenOrientation orientation) const;
 
+    Q_INVOKABLE void releaseScreenOrientation(Qt::ScreenOrientation orientation) const;
+
     Q_INVOKABLE void setGestureExclusionArea(int y, int height) const;
 
     Q_INVOKABLE void makeShortVibration() const;
