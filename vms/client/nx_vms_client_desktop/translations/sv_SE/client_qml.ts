@@ -2567,8 +2567,8 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <translation>Acceptera registreringsförfrågningar för API-integrationer</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Genom att aktivera registreringsförfrågningar för API Integrationer kan tredje part skicka in godkännandeförfrågningar genom integration. Även om det finns skyddsåtgärder, rekommenderas inte långvarig användning. Övervaka användning nära och inaktivera detta alternativ när alla nödvändiga Integrationer är installerade.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3133,6 +3133,10 @@ Tryck på Alt + Klicka för att följa objektet</translation>
       <translation>Återställ till standard...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Händelsesregler</translation>
     </message>
@@ -3151,10 +3155,6 @@ Tryck på Alt + Klicka för att följa objektet</translation>
     <message>
       <source>Disable</source>
       <translation>Inaktivera</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Testa händelser...</translation>
     </message>
   </context>
   <context>

@@ -2595,8 +2595,8 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
       <translation>Akceptuj prośby o rejestrację integracji API</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Włączenie żądań rejestracji integracji API pozwala stronom trzecim na wysyłanie próśb o zatwierdzenie poprzez integrację. Chociaż istnieją zabezpieczenia, przedłużone użycie nie jest zalecane. Monitoruj to użycie i wyłącz tę opcję po zainstalowaniu wszystkich niezbędnych integracji.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3165,6 +3165,10 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
       <translation type="unfinished">Reset To Defaults...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Reguły zdarzeń</translation>
     </message>
@@ -3183,10 +3187,6 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <message>
       <source>Disable</source>
       <translation>Wyłącz</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Testowe wydarzenia...</translation>
     </message>
   </context>
   <context>

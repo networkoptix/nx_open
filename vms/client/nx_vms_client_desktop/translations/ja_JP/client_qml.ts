@@ -2557,8 +2557,8 @@ Alt + クリックを使用してください。</translation>
       <translation>API インテグレーション登録リクエストを許可する</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>API インテグレーションの登録リクエストを有効化すると、サードパーティがインテグレーションを通じて承認リクエストを送信できるようになります。安全策は講じられていますが、長時間の使用は推奨されません。使用状況を注意深く監視し、すべての必要なインテグレーションのインストール完了後、このオプションを無効化してください。</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3121,6 +3121,10 @@ Alt + クリックを使用してください。</translation>
       <translation>デフォルトにリセット...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>イベントルール</translation>
     </message>
@@ -3139,10 +3143,6 @@ Alt + クリックを使用してください。</translation>
     <message>
       <source>Disable</source>
       <translation>無効化</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>イベントをテスト...</translation>
     </message>
   </context>
   <context>

@@ -2550,8 +2550,8 @@ Press Alt + Click to follow object</source>
       <translation>接受 API 整合註冊請求</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>啟用API 整合登錄請求會允許第三方透過整合發送核准請求。雖然有安全防護，但不建議長期使用。請監控使用量，並於安裝所須的整合後停用此選項。</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3114,6 +3114,10 @@ Press Alt + Click to follow object</source>
       <translation>還原為預設值...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>事件規則</translation>
     </message>
@@ -3132,10 +3136,6 @@ Press Alt + Click to follow object</source>
     <message>
       <source>Disable</source>
       <translation>停用</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>測試事件...</translation>
     </message>
   </context>
   <context>

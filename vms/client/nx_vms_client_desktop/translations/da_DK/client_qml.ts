@@ -2566,8 +2566,8 @@ Tryk på Alt + klik for at følge objektet</translation>
       <translation>Accepter anmodninger om registrering af API-integrationer</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Aktivering af registreringsanmodninger for API-integrationer giver tredjeparter mulighed for at indsende godkendelsesanmodninger via integration. Selvom der findes sikkerhedsforanstaltninger, anbefales langvarig brug ikke. Overvåg brugen nøje, og deaktiver denne indstilling, når alle nødvendige integrationer er installeret.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3132,6 +3132,10 @@ Tryk på Alt + klik for at følge objektet</translation>
       <translation>Nulstil Til Standard...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Regler For Begivenhed</translation>
     </message>
@@ -3150,10 +3154,6 @@ Tryk på Alt + klik for at følge objektet</translation>
     <message>
       <source>Disable</source>
       <translation>Deaktivér</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Test hændelser...</translation>
     </message>
   </context>
   <context>

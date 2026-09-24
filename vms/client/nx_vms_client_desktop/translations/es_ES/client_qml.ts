@@ -2567,8 +2567,8 @@ Presione Alt + Clic para seguir el objeto</translation>
       <translation type="unfinished">Accept API Integrations registration requests</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation type="unfinished">Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3133,6 +3133,10 @@ Presione Alt + Clic para seguir el objeto</translation>
       <translation type="unfinished">Reset To Defaults...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Reglas de evento</translation>
     </message>
@@ -3151,10 +3155,6 @@ Presione Alt + Clic para seguir el objeto</translation>
     <message>
       <source>Disable</source>
       <translation>Desactivar</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation type="unfinished">Test events...</translation>
     </message>
   </context>
   <context>

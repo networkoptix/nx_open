@@ -2553,8 +2553,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <translation>Terima permintaan pendaftaran Integrasi API</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Mengaktifkan permintaan pendaftaran Integrasi API memungkinkan pihak ketiga untuk mengirimkan permintaan persetujuan melalui integrasi. Meskipun ada perlindungan, penggunaan jangka panjang tidak disarankan. Pantau penggunaan secara seksama dan nonaktifkan opsi ini setelah semua Integrasi yang diperlukan diinstal.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3117,6 +3117,10 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
       <translation>Reset Ke Default...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Aturan Event</translation>
     </message>
@@ -3135,10 +3139,6 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message>
       <source>Disable</source>
       <translation>Disable</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Tes event...</translation>
     </message>
   </context>
   <context>
