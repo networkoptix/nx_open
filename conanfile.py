@@ -241,9 +241,12 @@ class NxOpenConan(ConanFile):
         self.requires("boost/1.89.0" "#130a884f1529433238f4f2dc98d94ac8")
         self.requires(f"ffmpeg/{self.ffmpeg_version_and_revision}")
         self.requires("openssl/1.1.1q" "#3e617c7677392516b6e617f698692fc4")
-        self.requires("qt/6.11.1" "#d63b7fd8e0115790df7c3b34483d7212")
+        self.requires("qt/6.11.1" "#dbd923f60172633fe0a40e29ef660c6e")
         self.requires("rapidjson/cci.20230929" "#9d79a3f161df66fa32001bb500c0898d")
         self.requires("zlib/1.3.1" "#a5b1285cce3a94ea5d51b5d60c1a1fbe")
+
+        # Qt dependency.
+        self.requires("icu/74.2" "#315644e74c8c74b8bea95ed5611673a5")
 
         if not self.isEmscripten:
             self.requires("libsrtp/2.6.0" "#248ee72d7d91db948f5651b7fe4905ea")
@@ -253,8 +256,6 @@ class NxOpenConan(ConanFile):
             self.requires("crashpad/cci.20250729" "#9858832f924a8a2391757fb3045dd2d6")
 
         if self.settings.os not in ("Android", "iOS", "Emscripten"):
-            # Qt dependency.
-            self.requires("icu/74.2" "#a0ffc2036da25e5dbe72dc941074a6c4")
             # FFmpeg dependencies.
             self.requires("ogg/1.3.5" "#00fb0bd978d034d12af5efd5d6921364")
             self.requires("vorbis/1.3.7" "#0400cbb550b491521361a41c889d5c48")

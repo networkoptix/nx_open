@@ -12,6 +12,8 @@ compiler.cppstd=20
 [options]
 openssl/*:shared=False
 qt/*:shared=False
+icu/*:shared=False
+icu/*:data_packaging=static
 
 qt/*:qtwebengine=False
 qt/*:qtwebview=False

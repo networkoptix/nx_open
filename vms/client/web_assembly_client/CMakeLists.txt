@@ -11,7 +11,7 @@ qt6_import_qml_plugins(nx_vms_web_assembly_client)
 include("${QT_DIR}/lib/cmake/Qt6/QtWasmHelpers.cmake")
 qt_internal_setup_wasm_target_properties(nx_vms_web_assembly_client)
 
-target_link_options(nx_vms_web_assembly_client PRIVATE "SHELL:-s INITIAL_MEMORY=50MB")
+target_link_options(nx_vms_web_assembly_client PRIVATE "SHELL:-s INITIAL_MEMORY=100MB")
 target_link_options(nx_vms_web_assembly_client PRIVATE "SHELL:-s MAXIMUM_MEMORY=4GB")
 target_link_options(nx_vms_web_assembly_client PRIVATE "SHELL:-s PTHREAD_POOL_SIZE=4")
 target_link_options(nx_vms_web_assembly_client PRIVATE "SHELL:-s MODULARIZE=1")

@@ -1,4 +1,3 @@
-include(default)
 include(common.profile)
 
 [settings]
@@ -12,6 +11,8 @@ os=Android
 os.api_level=28
 
 [options]
+icu/*:shared=False
+icu/*:data_packaging=static
 qt/*:qtwebengine=False
 qt/*:qtserialport=False
 ffmpeg/*:vorbis=False

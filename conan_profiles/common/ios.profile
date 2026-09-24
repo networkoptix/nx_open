@@ -10,6 +10,8 @@ compiler.cppstd=20
 build_type=RelWithDebInfo
 
 [options]
+icu/*:shared=False
+icu/*:data_packaging=static
 zlib/*:shared=False
 openssl/*:shared=False
 lsquic/*:shared=False
