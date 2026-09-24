@@ -341,13 +341,13 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <comment>%n is a number of cameras</comment>
-      <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+      <translation>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
       </translation>
     </message>
   </context>
