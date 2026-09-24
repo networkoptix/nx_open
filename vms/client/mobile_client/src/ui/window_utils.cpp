@@ -54,6 +54,11 @@ QWindow *getMainWindow()
         window->reportContentOrientationChange(orientation);
     }
 
+    void releaseScreenOrientation(Qt::ScreenOrientation orientation)
+    {
+        setScreenOrientation(orientation);
+    }
+
     void setWebViewBackgroundColor(const QColor& /*color*/)
     {
     }

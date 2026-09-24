@@ -79,6 +79,17 @@ void setScreenOrientation(Qt::ScreenOrientation orientation)
         androidOrientationFromQtOrientation(orientation));
 }
 
+void releaseScreenOrientation(Qt::ScreenOrientation orientation)
+{
+    // With the auto-rotation on, SCREEN_ORIENTATION_UNSPECIFIED makes the system apply the
+    // physical orientation of the device. With it off, UNSPECIFIED left the screen in the
+    // orientation forced for the fullscreen mode rather than in the locked one (checked on a
+    // device), so the given orientation is requested explicitly.
+    const bool autoRotation =
+        QJniObject::callStaticMethod<jboolean>(kUtilsClass, "isAutoRotationEnabled");
+    setScreenOrientation(autoRotation ? Qt::PrimaryOrientation : orientation);
+}
+
 void makeShortVibration()
 {
     QJniObject::callStaticMethod<void>(kUtilsClass, "makeShortVibration");
