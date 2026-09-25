@@ -2558,7 +2558,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>このオプションを有効にすると、第三者がインテグレーションの登録承認を要求できるようになります。安全対策は講じられていますが、必要なインテグレーションがすべてインストールされ次第無効化してください。有効状態の長期化は推奨されません。</translation>
     </message>
   </context>
   <context>
@@ -3122,7 +3122,7 @@ Alt + クリックを使用してください。</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>イベントをテスト...</translation>
     </message>
     <message>
       <source>Event Rules</source>

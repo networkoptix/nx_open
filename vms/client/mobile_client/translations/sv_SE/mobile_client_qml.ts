@@ -146,11 +146,11 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Svep mellan resurser</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Svep åt höger för att växla till nästa kamera</translation>
     </message>
   </context>
   <context>
@@ -744,11 +744,11 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Visningsläge</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Tryck för att välja önskad datatyp</translation>
     </message>
   </context>
   <context>
@@ -785,11 +785,11 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Flytande panelknapp</translation>
     </message>
     <message>
       <source>Tap the floating button to restore the panel</source>
-      <translation type="unfinished">Tap the floating button to restore the panel</translation>
+      <translation>Tryck på den flytande knappen för att återställa panelen</translation>
     </message>
   </context>
   <context>
@@ -1422,11 +1422,11 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Mjuka utlösare</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Tryck för att öppna panelen för mjuka utlösare</translation>
     </message>
   </context>
   <context>
@@ -1483,22 +1483,22 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Tidslinjekort och spelare</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Långtryck för att åberopa förhandsgranskning med mer detaljer</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Zooma tidslinjen in/ut</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Nyp för att zooma ut och isär för att zooma in</translation>
     </message>
   </context>
   <context>

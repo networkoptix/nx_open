@@ -2566,7 +2566,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Η ενεργοποίηση αυτής της επιλογής επιτρέπει σε τρίτα μέρη να ζητήσουν έγκριση για την καταχώριση μιας Ενσωμάτωσης. Υπάρχουν μέτρα ασφαλείας, αλλά απενεργοποιήστε τα μόλις εγκατασταθούν όλες οι απαραίτητες Ενσωματώσεις- δεν συνιστάται η παρατεταμένη χρήση.</translation>
     </message>
   </context>
   <context>
@@ -3132,7 +3132,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Δοκιμή συμβάντων...</translation>
     </message>
     <message>
       <source>Event Rules</source>

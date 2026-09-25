@@ -146,11 +146,11 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>リソース間のスワイプ</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>右にスワイプすると次のカメラに切り替わります</translation>
     </message>
   </context>
   <context>
@@ -743,11 +743,11 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>ビューモード</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>希望のデータタイプを選択するにはここをタップ</translation>
     </message>
   </context>
   <context>
@@ -784,11 +784,11 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>フローティングパネルボタン</translation>
     </message>
     <message>
       <source>Tap the floating button to restore the panel</source>
-      <translation type="unfinished">Tap the floating button to restore the panel</translation>
+      <translation>パネルを復元するにはフローティングボタンをタップ</translation>
     </message>
   </context>
   <context>
@@ -1421,11 +1421,11 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>ソフトトリガー</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>ソフトトリガーパネルを起動するにはここをタップ</translation>
     </message>
   </context>
   <context>
@@ -1482,22 +1482,22 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>タイムラインのカードとプレイヤー</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>長押しすると、より詳細なプレビューが表示されます</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>タイムラインのズームイン/ズームアウト</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>ピンチオープンでズームイン、ピンチクローズでズームアウト</translation>
     </message>
   </context>
   <context>

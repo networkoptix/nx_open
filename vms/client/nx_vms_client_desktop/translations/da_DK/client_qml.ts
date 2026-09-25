@@ -2567,7 +2567,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Hvis denne indstilling aktiveres, kan tredjeparter anmode om godkendelse til at registrere en integration. Der er sikkerhedsforanstaltninger på plads, men deaktiver den, når alle nødvendige integrationer er installeret - længerevarende brug anbefales ikke.</translation>
     </message>
   </context>
   <context>
@@ -3133,7 +3133,7 @@ Tryk på Alt + klik for at følge objektet</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Test hændelser...</translation>
     </message>
     <message>
       <source>Event Rules</source>
