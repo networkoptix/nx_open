@@ -17,6 +17,8 @@
 #include <nx/utils/string.h>
 #include <nx/utils/test_support/utils.h>
 
+// clang-format off
+
 namespace nx::utils::test {
 
 TEST(GTestNameString, normalizesNonAlphanumericCharacters)
@@ -205,6 +207,188 @@ TEST(String, truncateToNul)
     nx::utils::truncateToNul(&testQString4);
     ASSERT_EQ(testQString1.size(), 6);
     ASSERT_EQ(testQString1, QString("abcdef"));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+static int sign(int value)
+{
+    return (value > 0) - (value < 0);
+}
+
+// Strings exercising all token kinds (numbers, ASCII letters, runs of other characters) and
+// their combinations, including cases that used to break the ordering.
+static const QStringList kNaturalCompareSamples = {
+    "", " ", "  ", "-", "- ", "_", "~", ".", "!", "+",
+    "0", "00", "01", "1", "2", "9", "10", "11", "100",
+    "1a", "1b", "2a", "10a", "a1", "a2", "a10", "a01",
+    "a", "A", "b", "B", "z", "Z", "ab", "aB", "Ab",
+    "-1", "-2", "-x", "-X", "- 1", "- x", "-_", "-~", "-1a",
+    "1.5", "1.25", "1.", ".5", "1.5a", "1..2",
+    "a b", "a-b", "a_b", "a 1", "a-1", "a_1", "a1b", "a1-b",
+    "test", "test1", "test2", "test10", "test_1", "test_a", "test+a", "test!1",
+    "Camera 1", "Camera 2", "Camera 10", "Camera 1a", "Camera 1-a", "Camera-1", "Camera - 1",
+    "12345678901234567890", "12345678901234567891",
+    QString("9").repeated(400), QString("9").repeated(401),
+    QString::fromUtf16(u"\u041a\u0430\u043c\u0435\u0440\u0430 1"), //< Cyrillic "Kamera 1".
+    QString::fromUtf16(u"\u041a\u0430\u043c\u0435\u0440\u0430 10"),
+    QString::fromUtf16(u"\u0430\u0431\u0432"),
+    QString::fromUtf16(u"\u0410\u0411\u0412"),
+    QString::fromUtf16(u"\u0662"), //< Arabic-Indic digit two.
+    QString::fromUtf16(u"1\u0661"), //< ASCII one followed by Arabic-Indic digit one.
+    QString::fromUtf16(u"a\u00e9"),
+    QString::fromUtf16(u"a\u00c9"),
+};
+
+static void checkStrictWeakOrdering(Qt::CaseSensitivity caseSensitivity, bool enableFloat)
+{
+    const auto& samples = kNaturalCompareSamples;
+    const int n = (int) samples.size();
+
+    std::vector<std::vector<int>> cmp(n, std::vector<int>(n));
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            cmp[i][j] = sign(
+                naturalStringCompare(samples[i], samples[j], caseSensitivity, enableFloat));
+        }
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        ASSERT_EQ(0, cmp[i][i]) << "Irreflexivity: \"" << samples[i].toStdString() << "\"";
+
+        for (int j = 0; j < n; ++j)
+        {
+            ASSERT_EQ(cmp[i][j], -cmp[j][i]) << "Antisymmetry: \""
+                << samples[i].toStdString() << "\" vs \"" << samples[j].toStdString() << "\"";
+        }
+    }
+
+    // Transitivity of both "less" and "equivalent": cmp(a, b) == cmp(b, c) implies
+    // cmp(a, c) is the same.
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            for (int k = 0; k < n; ++k)
+            {
+                if (cmp[i][j] != cmp[j][k])
+                    continue;
+
+                ASSERT_EQ(cmp[i][j], cmp[i][k]) << "Transitivity: \""
+                    << samples[i].toStdString() << "\", \""
+                    << samples[j].toStdString() << "\", \""
+                    << samples[k].toStdString() << "\"";
+            }
+        }
+    }
+
+    // Incomparability of a and b, and b being less than c, implies a is less than c.
+    for (int i = 0; i < n; ++i)
+    {
+        for (int j = 0; j < n; ++j)
+        {
+            if (cmp[i][j] != 0)
+                continue;
+
+            for (int k = 0; k < n; ++k)
+            {
+                ASSERT_EQ(cmp[j][k], cmp[i][k]) << "Equivalence consistency: \""
+                    << samples[i].toStdString() << "\" ~ \""
+                    << samples[j].toStdString() << "\" vs \""
+                    << samples[k].toStdString() << "\"";
+            }
+        }
+    }
+}
+
+static QString naturalSorted(QStringList list, Qt::CaseSensitivity caseSensitivity)
+{
+    return naturalStringSort(list, caseSensitivity).join(", ");
+}
+
+} // namespace
+
+TEST(NaturalStringCompare, strictWeakOrderingCaseSensitive)
+{
+    checkStrictWeakOrdering(Qt::CaseSensitive, /*enableFloat*/ false);
+}
+
+TEST(NaturalStringCompare, strictWeakOrderingCaseInsensitive)
+{
+    checkStrictWeakOrdering(Qt::CaseInsensitive, /*enableFloat*/ false);
+}
+
+TEST(NaturalStringCompare, strictWeakOrderingCaseSensitiveFloat)
+{
+    checkStrictWeakOrdering(Qt::CaseSensitive, /*enableFloat*/ true);
+}
+
+TEST(NaturalStringCompare, strictWeakOrderingCaseInsensitiveFloat)
+{
+    checkStrictWeakOrdering(Qt::CaseInsensitive, /*enableFloat*/ true);
+}
+
+TEST(NaturalStringCompare, numbersAreComparedByValue)
+{
+    ASSERT_LT(naturalStringCompare(u"a2", u"a10"), 0);
+    ASSERT_GT(naturalStringCompare(u"a10", u"a9"), 0);
+    ASSERT_EQ(naturalStringCompare(u"a01", u"a1"), 0);
+    ASSERT_LT(naturalStringCompare(u"a1b2", u"a1b10"), 0);
+    ASSERT_EQ("Camera 1, Camera 2, Camera 10, Camera 100",
+        naturalSorted({"Camera 100", "Camera 10", "Camera 2", "Camera 1"}, Qt::CaseSensitive));
+}
+
+TEST(NaturalStringCompare, numberFollowedByLetter)
+{
+    // Used to be a cycle: "1a" < "2" < "10" < "1a".
+    ASSERT_LT(naturalStringCompare(u"1a", u"2"), 0);
+    ASSERT_LT(naturalStringCompare(u"2", u"10"), 0);
+    ASSERT_LT(naturalStringCompare(u"1a", u"10"), 0);
+    ASSERT_EQ("Camera 1, Camera 1a, Camera 1b, Camera 2, Camera 10, Camera 10a",
+        naturalSorted({"Camera 10a", "Camera 2", "Camera 1b", "Camera 10", "Camera 1a",
+            "Camera 1"}, Qt::CaseSensitive));
+}
+
+TEST(NaturalStringCompare, separatorPrefix)
+{
+    // Used to be a cycle: "- 1" < "-1" < "-x" < "- 1".
+    ASSERT_LT(naturalStringCompare(u"-1", u"-x"), 0);
+    ASSERT_LT(naturalStringCompare(u"-x", u"- 1"), 0);
+    ASSERT_LT(naturalStringCompare(u"-1", u"- 1"), 0);
+}
+
+TEST(NaturalStringCompare, numbersGoBeforeOtherCharacters)
+{
+    ASSERT_EQ("test, test1, test2, test10, test!1, test+a, test_1, test_a, test_b",
+        naturalSorted({"test", "test2", "test1", "test10", "test_1", "test_a", "test_b", "test+a",
+            "test!1"}, Qt::CaseInsensitive));
+}
+
+TEST(NaturalStringCompare, caseSensitivity)
+{
+    ASSERT_EQ(naturalStringCompare(u"abc", u"ABC", Qt::CaseInsensitive), 0);
+    ASSERT_NE(naturalStringCompare(u"abc", u"ABC", Qt::CaseSensitive), 0);
+    ASSERT_LT(naturalStringCompare(u"a2", u"A10", Qt::CaseInsensitive), 0);
+}
+
+TEST(NaturalStringCompare, floatNumbers)
+{
+    ASSERT_GT(
+        naturalStringCompare(u"a1.5", u"a1.25", Qt::CaseSensitive, /*enableFloat*/ true), 0);
+    ASSERT_LT(
+        naturalStringCompare(u"a1.5", u"a1.25", Qt::CaseSensitive, /*enableFloat*/ false), 0);
+}
+
+TEST(NaturalStringCompare, hugeNumbers)
+{
+    const QString huge = QString("9").repeated(400);
+    ASSERT_GT(naturalStringCompare(huge, u"10"), 0);
+    ASSERT_LT(naturalStringCompare(u"10", huge), 0);
 }
 
 //-------------------------------------------------------------------------------------------------

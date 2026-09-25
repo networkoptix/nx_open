@@ -5,6 +5,7 @@
 #include <array>
 #include <cmath>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -182,15 +183,12 @@ QString generateUniqueString(
 
 bool isNumberStart(const QChar &c)
 {
-/* We don't want to handle negative numbers as this leads to very strange
- * results. Think how "1-1" and "1-2" are going to be compared in this
- * case. */
+    // We don't want to handle negative numbers as this leads to very strange
+    // results. Think how "1-1" and "1-2" are going to be compared in this
+    // case.
 
-    return
-#if 0
-        c == L'-' || c == L'+' ||
-#endif
-        c.isDigit();
+    // Only ASCII digits: numeric tokens must always be convertible by QStringView::toDouble.
+    return QtMiscUtils::isAsciiDigit(c.unicode());
 }
 
 void ExtractTokenView(
@@ -219,10 +217,10 @@ void ExtractTokenView(
             INCBUFVIEW();
 #endif
 
-        if (!curr.isNull() && curr.isDigit())
+        if (!curr.isNull() && isNumberStart(curr))
         {
             isNumber = true;
-            while (curr.isDigit())
+            while (isNumberStart(curr))
                 INCBUFVIEW();
 
             if (curr == '.')
@@ -230,7 +228,7 @@ void ExtractTokenView(
                 if (enableFloat)
                 {
                     INCBUFVIEW();
-                    while (curr.isDigit())
+                    while (isNumberStart(curr))
                         INCBUFVIEW();
                 }
                 else
@@ -262,8 +260,10 @@ void ExtractTokenView(
         }
     }
 
-    if (QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1()))
+    else if (QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1()))
     {
+        // Never glue a letter to a preceding number: a number token must stay a number, otherwise
+        // numeric and lexicographic token comparisons get mixed and break transitivity.
         isSpecial = true;
         INCBUFVIEW();
     }
@@ -313,36 +313,24 @@ int naturalStringCompare(
 
         if (!lhsNumber && !rhsNumber)
         {
-            // both strings curr val is a simple strcmp
+            // Both tokens are non-numeric: a simple strcmp. No special handling of the case when
+            // one token is a prefix of another: it must depend on these two tokens only, looking
+            // at the characters after them breaks transitivity.
             retVal = lhsBufferQStr.compare(rhsBufferQStr, caseSensitive);
-
-            int maxLen = qMin(lhsBufferQStr.length(), rhsBufferQStr.length());
-            const auto tmpRight = rhsBufferQStr.left(maxLen);
-            const auto tmpLeft = lhsBufferQStr.left(maxLen);
-            if (tmpLeft.compare(tmpRight, caseSensitive) == 0)
-            {
-                retVal = lhsBufferQStr.length() - rhsBufferQStr.length();
-
-                if (retVal < 0)
-                {
-                    if (ii < lhs.length() && isNumberStart(lhs[ii]))
-                        retVal *= -1;
-                }
-                else if (retVal > 0)
-                {
-                    if (jj < rhs.length() && isNumberStart(rhs[jj]))
-                        retVal *= -1;
-                }
-            }
         }
         else if (lhsNumber && rhsNumber)
         {
-            // both numbers, convert and compare
+            // Both numbers, convert and compare. A conversion of a digit sequence can fail only
+            // on overflow; treat it as infinity rather than falling back to a lexicographic
+            // comparison, which would be inconsistent with the numeric one.
             lhsValue = lhsBufferQStr.toDouble(&ok1);
             rhsValue = rhsBufferQStr.toDouble(&ok2);
-            if (!ok1 || !ok2)
-                retVal = lhsBufferQStr.compare(rhsBufferQStr, caseSensitive);
-            else if (lhsValue > rhsValue)
+            if (!ok1)
+                lhsValue = std::numeric_limits<double>::infinity();
+            if (!ok2)
+                rhsValue = std::numeric_limits<double>::infinity();
+
+            if (lhsValue > rhsValue)
                 retVal = 1;
             else if (lhsValue < rhsValue)
                 retVal = -1;

@@ -2,10 +2,9 @@
 
 #include "item_order.h"
 
-#include <QtCore/QCollator>
-
-#include <nx/vms/client/core/client_core_globals.h>
 #include <core/resource/resource.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/core/client_core_globals.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::core {
@@ -20,17 +19,14 @@ ItemOrder numericOrder(
     Qt::SortOrder sortOrder /*= Qt::AscendingOrder*/,
     Qt::CaseSensitivity caseSensitivity /*= Qt::CaseInsensitive*/)
 {
-    QCollator collator;
-    collator.setNumericMode(true);
-    collator.setCaseSensitivity(caseSensitivity);
-
-    return {
-        [collator, sortOrder](const AbstractItem* lhs, const AbstractItem* rhs)
+    return {[caseSensitivity, sortOrder](const AbstractItem* lhs, const AbstractItem* rhs)
         {
-            const auto collatorCompareResult = collator.compare(
-                lhs->data(Qt::DisplayRole).toString(), rhs->data(Qt::DisplayRole).toString());
+            const auto compareResult =
+                nx::utils::naturalStringCompare(lhs->data(Qt::DisplayRole).toString(),
+                    rhs->data(Qt::DisplayRole).toString(),
+                    caseSensitivity);
 
-            if (collatorCompareResult == 0)
+            if (compareResult == 0)
             {
                 const auto lResourceData = lhs->data(core::ResourceRole);
                 const auto rResourceData = rhs->data(core::ResourceRole);
@@ -46,12 +42,9 @@ ItemOrder numericOrder(
                 return sortOrder == Qt::AscendingOrder ? (lhs < rhs) : (lhs > rhs);
             }
 
-            return sortOrder == Qt::AscendingOrder
-                ? (collatorCompareResult < 0)
-                : (collatorCompareResult > 0);
+            return sortOrder == Qt::AscendingOrder ? (compareResult < 0) : (compareResult > 0);
         },
-        {Qt::DisplayRole}
-    };
+        {Qt::DisplayRole}};
 }
 
 } // namespace entity_item_model

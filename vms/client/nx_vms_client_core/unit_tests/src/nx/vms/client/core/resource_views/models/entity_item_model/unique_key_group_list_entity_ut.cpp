@@ -1,7 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <QtCore/QCollator>
-
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_group_list_entity.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
 #include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
@@ -59,17 +58,13 @@ TEST_F(EntityItemModelTest, groupListRemainSorted)
     // Rename items randomly, check if list remains sorted.
     auto nameGenerator = randomNameGenerator("Item", -500, 500);
     auto keyGenerator = randomIntegerGenerator(0, kListSize - 1);
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setNumericMode(true);
-    auto pred =
-        [&collator](const auto& lhs, const auto& rhs) { return collator.compare(lhs, rhs) < 0; };
 
     for (int i = 0; i < kModificationRounds; ++i)
     {
         auto itemNames = getItemNames(sortedList.get());
         itemPool.setItemName(keyGenerator(), nameGenerator());
-        ASSERT_TRUE(std::is_sorted(std::begin(itemNames), std::end(itemNames), pred));
+        ASSERT_TRUE(std::is_sorted(
+            std::begin(itemNames), std::end(itemNames), &nx::utils::naturalStringLess));
     }
 
     // Check if list actually contains different named items.

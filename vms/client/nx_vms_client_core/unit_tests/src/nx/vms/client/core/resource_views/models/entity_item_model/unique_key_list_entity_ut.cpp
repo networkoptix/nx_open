@@ -4,13 +4,13 @@
 #include "entity_logging_notification_listener.h"
 #include "test_item_pool.h"
 
-#include <QtCore/QCollator>
-
-#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
-#include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
 #include <iomanip>
+
+#include <nx/utils/string.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity/unique_key_list_entity.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/entity_item_model.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item/generic_item/generic_item_builder.h>
+#include <nx/vms/client/core/resource_views/entity_item_model/item_order/item_order.h>
 
 namespace {
 
@@ -253,17 +253,13 @@ TEST_F(EntityItemModelTest, listRemainSorted)
     // Rename items randomly, check if list remains sorted.
     auto nameGenerator = randomNameGenerator("Item", -500, 500);
     auto keyGenerator = randomIntegerGenerator(0, kListSize - 1);
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setNumericMode(true);
-    auto pred =
-        [&collator](const auto& lhs, const auto& rhs) { return collator.compare(lhs, rhs) < 0; };
 
     for (int i = 0; i < kModificationRounds; ++i)
     {
         auto itemNames = getItemNames(sortedList.get());
         itemPool.setItemName(keyGenerator(), nameGenerator());
-        ASSERT_TRUE(std::is_sorted(std::begin(itemNames), std::end(itemNames), pred));
+        ASSERT_TRUE(std::is_sorted(
+            std::begin(itemNames), std::end(itemNames), &nx::utils::naturalStringLess));
     }
 
     // Check if list actually contains different named items.
