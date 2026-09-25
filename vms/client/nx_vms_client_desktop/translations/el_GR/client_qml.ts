@@ -2568,8 +2568,8 @@ Press Alt + Click to follow object</source>
       <translation>Αποδοχή αιτημάτων εγγραφής για ενσωματώσεις API</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Η ενεργοποίηση των αιτημάτων εγγραφής για Ενσωματώσεις API επιτρέπει σε τρίτους να υποβάλλουν αιτήματα έγκρισης μέσω της ενσωμάτωσης. Παρόλο που υπάρχουν μέτρα ασφαλείας, δεν συνιστάται η παρατεταμένη χρήση. Παρακολουθήστε στενά τη χρήση και απενεργοποιήστε αυτήν την επιλογή αφού εγκατασταθούν όλες οι απαραίτητες Ενσωματώσεις.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation>Η ενεργοποίηση αυτής της επιλογής επιτρέπει σε τρίτα μέρη να ζητήσουν έγκριση για την καταχώριση μιας Ενσωμάτωσης. Υπάρχουν μέτρα ασφαλείας, αλλά απενεργοποιήστε τα μόλις εγκατασταθούν όλες οι απαραίτητες Ενσωματώσεις- δεν συνιστάται η παρατεταμένη χρήση.</translation>
     </message>
   </context>
   <context>
@@ -3134,6 +3134,10 @@ Press Alt + Click to follow object</source>
       <translation>Επαναφορά Προεπιλογών...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation>Δοκιμή συμβάντων...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Κανόνες Συμβάντος</translation>
     </message>
@@ -3152,10 +3156,6 @@ Press Alt + Click to follow object</source>
     <message>
       <source>Disable</source>
       <translation>Απενεργοποίηση</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Δοκιμή συμβάντων...</translation>
     </message>
   </context>
   <context>

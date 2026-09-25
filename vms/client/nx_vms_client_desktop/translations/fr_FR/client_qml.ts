@@ -2570,8 +2570,8 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
       <translation>Accepter les demandes d’enregistrement d’intégration d’API</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>L'activation des demandes d'enregistrement d'intégrations API permet à des tiers de soumettre des demandes d'approbation via l'intégration. Malgré des mesures de sécurité, une utilisation prolongée est déconseillée. Surveillez attentivement l'utilisation et désactivez cette option une fois toutes les intégrations nécessaires installées.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3136,6 +3136,10 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
       <translation>Rétablir aux valeurs par défaut...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Règles d'événement</translation>
     </message>
@@ -3154,10 +3158,6 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     <message>
       <source>Disable</source>
       <translation>Désactiver</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Évènements de test...</translation>
     </message>
   </context>
   <context>

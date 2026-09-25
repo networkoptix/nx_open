@@ -2551,8 +2551,8 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
       <translation>API 통합 등록 요청 수락</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>API 통합 등록 요청을 활성화하면 제3자가 통합을 통해 승인 요청을 제출할 수 있습니다. 안전 장치가 있지만 장시간 사용하는 것은 권장하지 않습니다. 사용량을 면밀히 모니터링하고 필요한 모든 통합을 설치한 후에는 이 옵션을 비활성화하세요.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3115,6 +3115,10 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
       <translation>기본값으로 재설정...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>이벤트 규칙</translation>
     </message>
@@ -3133,10 +3137,6 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <message>
       <source>Disable</source>
       <translation>비활성화</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>테스트 이벤트...</translation>
     </message>
   </context>
   <context>

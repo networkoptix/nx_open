@@ -2570,8 +2570,8 @@ prema Alt + Clic para seguir o obxecto</translation>
       <translation>Aceptar solicitudes de rexistro de integracións de API</translation>
     </message>
     <message>
-      <source>Enabling API Integrations registration requests allows third parties to submit approval requests through integration. While safeguards exist, prolonged usage is not recommended. Monitor usage closely and disable this option after all necessary Integrations are installed.</source>
-      <translation>Activar as solicitudes de rexistro de integracións da API permite que terceiros envíen solicitudes de aprobación a través da integración. Aínda que existen garantías, non se recomenda o uso prolongado. Supervisa o uso con coidadiño e desactiva esta opción despois de instalar todas as integracións necesarias.</translation>
+      <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
+      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
     </message>
   </context>
   <context>
@@ -3136,6 +3136,10 @@ prema Alt + Clic para seguir o obxecto</translation>
       <translation>Restablecer os valores predeterminados...</translation>
     </message>
     <message>
+      <source>Test Events...</source>
+      <translation type="unfinished">Test Events...</translation>
+    </message>
+    <message>
       <source>Event Rules</source>
       <translation>Regras do evento</translation>
     </message>
@@ -3154,10 +3158,6 @@ prema Alt + Clic para seguir o obxecto</translation>
     <message>
       <source>Disable</source>
       <translation>Desactivar</translation>
-    </message>
-    <message>
-      <source>Test events...</source>
-      <translation>Eventos de proba...</translation>
     </message>
   </context>
   <context>
