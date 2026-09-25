@@ -11,6 +11,6 @@ Tutorial
     TutorialStep
     {
         title: qsTr("Floating Panel Button")
-        description: qsTr("Tap the floating button to restore the panel")
+        description: qsTr("Tap the floating button to open the panel")
     }
 }
