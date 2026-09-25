@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation>カメラのネイティブプリセットを使用</translation>
+      <translation>カメラのネイティブプリセットを使用する</translation>
     </message>
     <message>
       <source>Time Settings</source>
@@ -508,7 +508,7 @@
     </message>
     <message>
       <source>Web Page Port</source>
-      <translation>Webページポート</translation>
+      <translation>Webページのポート</translation>
     </message>
     <message>
       <source>Do not send Stop PTZ command</source>
@@ -520,15 +520,15 @@
     </message>
     <message>
       <source>Import from Device</source>
-      <translation>デバイスからインポート</translation>
+      <translation>デバイスからのインポート</translation>
     </message>
     <message>
       <source>Import video automatically</source>
-      <translation>映像を自動的にインポート</translation>
+      <translation>映像を自動的にインポートする</translation>
     </message>
     <message>
       <source>Use site presets</source>
-      <translation>サイトプリセットを使用</translation>
+      <translation>サイトのプリセットを使用する</translation>
     </message>
     <message>
       <source>Native camera presets will not be available.</source>
