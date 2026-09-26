@@ -186,15 +186,16 @@
     <message>
       <source>Field %1 value must be provided for the given validation policy</source>
       <comment>API error message when event rule cannot be created due to incomplete fields set</comment>
-      <translation type="unfinished">Field %1 value must be provided for the given validation policy</translation>
+      <translation>Se debe proporcionar un valor para el campo %1 según la política de validación dada
+</translation>
     </message>
     <message>
       <source>Chosen local layout can only be shown to its owner %1</source>
-      <translation type="unfinished">Chosen local layout can only be shown to its owner %1</translation>
+      <translation>El diseño local seleccionado solo se puede mostrar a su propietario %1</translation>
     </message>
     <message>
       <source>None of selected users have access to the selected layout</source>
-      <translation type="unfinished">None of selected users have access to the selected layout</translation>
+      <translation>Ninguno de los usuarios seleccionados tiene acceso al diseño seleccionado</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout</source>
@@ -206,23 +207,23 @@
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
-      <translation type="unfinished">Time value cannot be less than zero</translation>
+      <translation>El valor del tiempo no puede ser menor que cero</translation>
     </message>
     <message>
       <source>Duration cannot be less than zero</source>
-      <translation type="unfinished">Duration cannot be less than zero</translation>
+      <translation>La duración no puede ser menor que cero</translation>
     </message>
     <message>
       <source>Value cannot be less than %1</source>
-      <translation type="unfinished">Value cannot be less than %1</translation>
+      <translation>El valor no puede ser menor que %1</translation>
     </message>
     <message>
       <source>Value cannot be more than %1</source>
-      <translation type="unfinished">Value cannot be more than %1</translation>
+      <translation>El valor no puede ser mayor que %1</translation>
     </message>
     <message>
       <source>To Users</source>
-      <translation type="unfinished">To Users</translation>
+      <translation>Para los usuarios</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
