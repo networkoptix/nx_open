@@ -1263,7 +1263,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Proteger con contraseña (opcional)</translation>
     </message>
     <message>
       <source>Cancel</source>
