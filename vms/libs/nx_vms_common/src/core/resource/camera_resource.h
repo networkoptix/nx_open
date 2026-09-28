@@ -178,18 +178,12 @@ public:
 
     virtual int getChannel() const;
 
-    /**
-     * Returns true if camera is accessible
-     * Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
-     * TODO: #akolesnikov This method is used in diagnostics only. Throw it away and use \a
-     *     QnVirtualCameraResource::checkIfOnlineAsync instead.
-     */
-    virtual bool ping();
+    /** Synchronous version of \a checkIfOnlineAsync(). */
+    bool ping();
 
     /**
      * Checks if camera is online
      * \param completionHandler Invoked on check completion. Check result is passed to the functor
-     * \return true if async operation has been started. false otherwise
      * \note Implementation MUST check not only camera address:port accessibility, but also check
      * some unique parameters of camera
      * \note Default implementation returns false

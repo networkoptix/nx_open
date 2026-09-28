@@ -26,7 +26,6 @@
 #include <nx/network/nettools.h>
 #include <nx/network/rest/user_access_data.h>
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/crypt/symmetrical.h>
@@ -35,6 +34,7 @@
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std_helpers.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/sync_queue.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/camera_data.h>
 #include <nx/vms/common/intercom/utils.h>
@@ -819,10 +819,13 @@ int QnVirtualCameraResource::getChannel() const
 
 bool QnVirtualCameraResource::ping()
 {
-    auto sock =
-        nx::network::SocketFactory::createStreamSocket(nx::network::ssl::kAcceptAnyCertificate);
+    NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
+        "ping() blocks waiting for a completion that is delivered in an aio thread");
 
-    return sock->connect({getHostAddress(), httpPort()}, getNetworkTimeout());
+    const auto result = std::make_shared<nx::utils::SyncQueue<bool>>();
+    checkIfOnlineAsync([result](bool isOnline) { result->push(isOnline); });
+
+    return result->pop(getNetworkTimeout() * 3).value_or(false);
 }
 
 void QnVirtualCameraResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
