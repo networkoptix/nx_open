@@ -3,6 +3,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 
 #include <QtCore/QByteArray>
 
@@ -12,21 +13,19 @@
 
 namespace nx::streaming::rtsp {
 
-struct ClientManagedMikeyData
+struct MikeyData
 {
     nx::rtsp::EncryptionData encryptionData = {};
     QByteArray keyMgmtHeader;
 };
 
-enum class MikeyPolicyMode
-{
-    rfc,
-    gstreamerCompatibility,
-};
+NX_VMS_COMMON_API std::optional<std::string> getMikeyPayload(
+    const nx::rtp::Sdp::Media& media, const std::vector<std::string>& sessionSdpAttributes);
 
-bool isClientManagedMikeyMedia(const nx::rtp::Sdp::Media& media);
+NX_VMS_COMMON_API std::optional<MikeyData> makeStandardMikey(
+    const std::string& mikeyPayload, const nx::Url& setupUrl);
 
-std::optional<ClientManagedMikeyData> makeClientManagedMikey(const nx::rtp::Sdp::Media& media,
-    const nx::Url& setupUrl, MikeyPolicyMode policyMode = MikeyPolicyMode::rfc);
+NX_VMS_COMMON_API std::optional<MikeyData> makeClientManagedMikey(
+    const nx::Url& setupUrl, nx::rtsp::SrtpCryptoPolicy cryptoPolicy = {});
 
 } // namespace nx::streaming::rtsp

@@ -69,6 +69,7 @@ struct NX_RTP_API Sdp
 
     QString controlUrl;
     std::string range;
+    std::vector<std::string> sdpAttributes;
     std::vector<Media> media;
     RtpMap preferredMap;
 

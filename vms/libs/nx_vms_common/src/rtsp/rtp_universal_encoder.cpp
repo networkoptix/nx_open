@@ -613,7 +613,7 @@ bool QnUniversalRtpEncoder::isEof() const
 void QnUniversalRtpEncoder::setSrtpEncryptionData(const EncryptionData& data)
 {
     m_encryptor = std::make_unique<SrtpEncryptor>();
-    if (!m_encryptor->init(data))
+    if (!m_encryptor->init(data.server))
     {
         NX_WARNING(this, "Failure to init SRTP encryptor");
         m_encryptor.reset();

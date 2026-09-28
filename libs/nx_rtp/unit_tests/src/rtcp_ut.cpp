@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <QtCore/QtEndian>
+
 #include <nx/rtp/rtcp.h>
 
 TEST(RtcpSenderReport, readWrite)
@@ -31,4 +33,38 @@ TEST(RtcpSenderReport, readWrite)
         ASSERT_TRUE(report.read(data, sizeof(data)));
         ASSERT_EQ(report.ntpTimestamp, 947663189552650);
     }
+}
+
+TEST(RtcpReceiverReport, usesProvidedSsrc)
+{
+    using namespace nx::rtp;
+
+    for (const uint32_t ssrc: {0u, 0x12345678u})
+    {
+        uint8_t buffer[64];
+        const int size = buildClientRtcpReport(buffer, sizeof(buffer), ssrc);
+        ASSERT_GT(size, kRtcpReceiverReportLength);
+
+        const uint32_t receiverReportSsrc = qFromBigEndian<uint32_t>(buffer + 4);
+        EXPECT_EQ(receiverReportSsrc, ssrc);
+        EXPECT_EQ(
+            getRtcpSsrc(buffer + kRtcpReceiverReportLength, size - kRtcpReceiverReportLength),
+            ssrc);
+    }
+}
+
+TEST(RtcpReceiverReport, usesProvidedCname)
+{
+    using namespace nx::rtp;
+
+    constexpr uint32_t kSsrc = 0x12345678;
+    const std::string cname = "rtsp-client";
+    uint8_t buffer[64];
+    const int size = buildClientRtcpReport(buffer, sizeof(buffer), kSsrc, cname);
+    const int cnameOffset = kRtcpReceiverReportLength + 8;
+    ASSERT_GE(size, cnameOffset + 2 + (int) cname.size());
+    EXPECT_EQ(buffer[cnameOffset], 1); //< CNAME SDES item.
+    EXPECT_EQ(buffer[cnameOffset + 1], cname.size());
+    EXPECT_EQ(
+        std::string(reinterpret_cast<const char*>(buffer + cnameOffset + 2), cname.size()), cname);
 }

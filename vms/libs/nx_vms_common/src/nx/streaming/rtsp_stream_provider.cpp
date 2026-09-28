@@ -2,6 +2,7 @@
 
 #include "rtsp_stream_provider.h"
 
+#include <cstdint>
 #include <set>
 
 #include <QtCore/QSettings>
@@ -32,6 +33,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/system_settings.h>
 #include <nx/vms/rules/network_issue_info.h>
+#include <rtsp/srtp_encryptor.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
@@ -182,10 +184,14 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextData()
         return nullptr;
     }
 
+    const auto actualTransport = m_RtpSession.getActualTransport();
+    if (!NX_ASSERT(actualTransport, "RTP transport is not selected"))
+        return nullptr;
+
     do
     {
         m_dataTimer.restart();
-        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
+        if (*actualTransport == nx::vms::api::RtpTransportType::tcp)
             result = getNextDataTCP();
         else
             result = getNextDataUDP();
@@ -251,11 +257,14 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextData()
     return result;
 }
 
-void RtspStreamProvider::processTcpRtcp(quint8* buffer, int bufferSize, int bufferCapacity)
+void RtspStreamProvider::processTcpRtcp(
+    quint8* buffer, int bufferSize, int bufferCapacity, std::optional<std::uint32_t> clientSsrc)
 {
     if (!m_RtpSession.processTcpRtcpData(buffer, bufferSize))
         NX_VERBOSE(this, "Can't parse RTCP report");
-    int outBufSize = nx::rtp::buildClientRtcpReport(buffer+4, bufferCapacity-4);
+    const int outBufSize = clientSsrc
+        ? nx::rtp::buildClientRtcpReport(buffer + 4, bufferCapacity - 4, *clientSsrc)
+        : nx::rtp::buildClientRtcpReport(buffer + 4, bufferCapacity - 4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
@@ -265,18 +274,32 @@ void RtspStreamProvider::processTcpRtcp(quint8* buffer, int bufferSize, int buff
     m_rtcpReportTimer.restart();
 }
 
-void RtspStreamProvider::buildClientRTCPReport(quint8 chNumber)
+void RtspStreamProvider::buildClientRTCPReport(
+    quint8 chNumber, std::optional<std::uint32_t> clientSsrc)
 {
     quint8 buffer[1024*4];
     buffer[0] = '$';
     buffer[1] = chNumber;
-    int outBufSize = nx::rtp::buildClientRtcpReport(buffer+4, sizeof(buffer)-4);
+    const int outBufSize = clientSsrc
+        ? nx::rtp::buildClientRtcpReport(buffer + 4, sizeof(buffer) - 4, *clientSsrc)
+        : nx::rtp::buildClientRtcpReport(buffer + 4, sizeof(buffer) - 4);
     if (outBufSize > 0)
     {
         quint16* sizeField = (quint16*) (buffer+2);
         *sizeField = htons(outBufSize);
         m_RtpSession.sendBinaryResponse(buffer, outBufSize+4);
     }
+}
+
+std::optional<std::uint32_t> RtspStreamProvider::clientSsrcForRtcpChannel(int channelNumber) const
+{
+    const auto track = std::find_if(m_tracks.cbegin(),
+        m_tracks.cend(),
+        [channelNumber](const TrackInfo& value)
+        { return value.rtcpChannelNumber == channelNumber; });
+    return track != m_tracks.cend() && track->ioDevice //
+        ? track->ioDevice->clientSsrc()
+        : std::nullopt;
 }
 
 QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
@@ -431,7 +454,9 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
             for (const TrackInfo& track: m_tracks)
             {
                 if (track.ioDevice)
-                    buildClientRTCPReport(track.rtcpChannelNumber);
+                {
+                    buildClientRTCPReport(track.rtcpChannelNumber, track.ioDevice->clientSsrc());
+                }
             }
             m_rtcpReportTimer.restart();
         }
@@ -497,7 +522,10 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataTCP()
         }
         else if (m_RtpSession.isRtcp(rtpChannelNum))
         {
-            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(), bytesRead, m_demuxedData[rtpChannelNum]->capacity());
+            processTcpRtcp((quint8*) m_demuxedData[rtpChannelNum]->data(),
+                bytesRead,
+                m_demuxedData[rtpChannelNum]->capacity(),
+                clientSsrcForRtcpChannel(rtpChannelNum));
             m_demuxedData[rtpChannelNum]->clear();
         }
         else {
@@ -580,6 +608,23 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataUDP()
                     break;
                 }
                 NX_VERBOSE(this, "%1: %2 bytes read form UDP socket", m_logName, bytesRead);
+                const auto decryptResult = track.srtpDecryptor
+                    ? track.srtpDecryptor->decryptPacket(rtpBuffer, &bytesRead)
+                    : nx::rtsp::SrtpDecryptor::Result::success;
+                if (decryptResult != nx::rtsp::SrtpDecryptor::Result::success)
+                {
+                    if (decryptResult == nx::rtsp::SrtpDecryptor::Result::packetRejected)
+                    {
+                        NX_VERBOSE(this, "%1: Discard rejected SRTP UDP packet", m_logName);
+                        continue;
+                    }
+
+                    m_demuxedData[rtpChannelNum]->clear();
+                    m_lastRtpParseResult = {false, "SRTP decrypt error"};
+                    NX_WARNING(this, "%1: Failed to decrypt SRTP UDP packet", m_logName);
+                    return QnAbstractMediaDataPtr();
+                }
+
                 m_demuxedData[rtpChannelNum]->finishWriting(bytesRead);
                 quint8* bufferBase = (quint8*) m_demuxedData[rtpChannelNum]->data();
                 int offset = rtpBuffer - bufferBase;
@@ -869,6 +914,10 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
 
 void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
 {
+    const auto actualTransport = m_RtpSession.getActualTransport();
+    if (!NX_ASSERT(actualTransport, "RTP transport is not selected"))
+        return;
+
     const int channelNumber = rtpChannelNumber / 2;
     auto codecParser = channelNumber == nx::rtp::kMetadataChannelNumber
         ? createParser("FFMPEG-METADATA")
@@ -881,17 +930,21 @@ void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
     trackInfo.rtpParsers.emplace(
         payloadType, std::make_unique<nx::rtp::RtpParser>(payloadType, std::move(codecParser)));
 
-        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
-            m_trackIndices[rtpChannelNumber] = channelNumber;
+    if (*actualTransport == nx::vms::api::RtpTransportType::tcp)
+        m_trackIndices[rtpChannelNumber] = channelNumber;
 
-        NX_MUTEX_LOCKER lock(&m_tracksMutex);
-        m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
-        m_tracks[channelNumber] = std::move(trackInfo);
+    NX_MUTEX_LOCKER lock(&m_tracksMutex);
+    m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
+    m_tracks[channelNumber] = std::move(trackInfo);
 }
 
 void RtspStreamProvider::createTrackParsers()
 {
     using namespace nx::streaming;
+    const auto actualTransport = m_RtpSession.getActualTransport();
+    if (!NX_ASSERT(actualTransport, "RTP transport is not selected"))
+        return;
+
     auto& trackInfo = m_RtpSession.getTrackInfo();
     int logicalVideoNum = 0;
 
@@ -935,6 +988,7 @@ void RtspStreamProvider::createTrackParsers()
         }
 
         trackInfo.ioDevice = track.ioDevice.get();
+        trackInfo.srtpDecryptor = track.srtpDecryptor;
         trackInfo.rtcpChannelNumber = track.interleaved.second;
         trackInfo.ioDevice->setForceRtcpReports(isRtcpReportsForced());
         if (!m_forceCameraTime)
@@ -954,7 +1008,7 @@ void RtspStreamProvider::createTrackParsers()
         else
             trackInfo.logicalChannelNum = m_numberOfVideoChannels;
 
-        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
+        if (*actualTransport == nx::vms::api::RtpTransportType::tcp)
             m_trackIndices[track.interleaved.first] = m_tracks.size();
 
         NX_MUTEX_LOCKER lock(&m_tracksMutex);

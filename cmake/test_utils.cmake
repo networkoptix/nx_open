@@ -37,11 +37,6 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
         )
     endif()
 
-    if(targetDevice STREQUAL "linux_arm32")
-        # Linux for ARM32 expects ffmpeg to be located in "../lib/ffmpeg" directory.
-        string(JOIN ":" CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_RPATH} "$ORIGIN/../lib/ffmpeg")
-    endif()
-
     if(NX_ADD_TEST_FOLDER)
         set(folder "${NX_ADD_TEST_FOLDER}")
     else()
@@ -130,7 +125,7 @@ function(nx_add_functional_test target)
 
     set(one_value_args FOLDER)
     set(multi_value_args
-        DEPENDS FILES BINARIES QT_PLUGIN_GROUPS EXTRA_LIBS ALLOWED_UNRESOLVED)
+        DEPENDS FILES BINARIES QT_PLUGIN_GROUPS EXTRA_LIBS)
     cmake_parse_arguments(FT_TEST "" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
     if(FT_TEST_UNPARSED_ARGUMENTS)
@@ -166,6 +161,14 @@ function(nx_add_functional_test target)
         list(APPEND qt_plugin_dirs "${QT_DIR}/plugins/${group}")
     endforeach()
 
+    set(system_roots "")
+    if(nx_target_sysroot)
+        list(APPEND system_roots "${nx_target_sysroot}")
+    endif()
+    if(OS_DEPS_ROOT)
+        list(APPEND system_roots "${OS_DEPS_ROOT}")
+    endif()
+
     add_custom_command(
         OUTPUT "${stamp_file}" "${always_run_file}"
         BYPRODUCTS ${dest_generated_files}
@@ -176,7 +179,7 @@ function(nx_add_functional_test target)
             "-DBINARIES=${binaries}"
             "-DQT_PLUGIN_DIRS=${qt_plugin_dirs}"
             "-DEXTRA_LIBS=${FT_TEST_EXTRA_LIBS}"
-            "-DALLOWED_UNRESOLVED=${FT_TEST_ALLOWED_UNRESOLVED}"
+            "-DSYSTEM_ROOTS=${system_roots}"
             -P "${open_source_root}/cmake/stage_functional_test.cmake"
         DEPENDS ${FT_TEST_FILES} ${binaries} ${FT_TEST_DEPENDS}
         COMMENT "Staging functional test files into ${dest_dir}"

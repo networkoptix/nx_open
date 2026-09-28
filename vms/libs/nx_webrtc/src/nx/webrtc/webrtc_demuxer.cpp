@@ -89,10 +89,12 @@ Demuxer::~Demuxer()
 void Demuxer::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 {
     m_encryptor = std::make_unique<rtsp::SrtpEncryptor>();
-    if (!m_encryptor->init(data))
+    m_decryptor = std::make_unique<rtsp::SrtpDecryptor>();
+    if (!m_encryptor->init(data.server) || !m_decryptor->init(data.client))
     {
-        NX_WARNING(this, "Failure to init SRTP encryptor");
+        NX_WARNING(this, "Failure to init SRTP encryptor/decryptor");
         m_encryptor.reset();
+        m_decryptor.reset();
     }
 }
 
@@ -206,10 +208,22 @@ bool Demuxer::processData(const char* data, size_t size)
     nx::utils::ByteArray array(/*alignment*/ 1, size, /*padding*/ 1);
     array.write(data, size);
 
-    if (m_encryptor)
+    if (m_decryptor)
     {
         int newSize = (int) size;
-        m_encryptor->decryptPacket((uint8_t*) array.data(), &newSize);
+        const auto decryptResult = m_decryptor->decryptPacket((uint8_t*) array.data(), &newSize);
+        if (decryptResult == rtsp::SrtpDecryptor::Result::packetRejected)
+        {
+            NX_VERBOSE(this, "Discard rejected SRTP/SRTCP packet");
+            return true;
+        }
+
+        if (decryptResult != rtsp::SrtpDecryptor::Result::success)
+        {
+            NX_WARNING(this, "Failed to decrypt SRTP/SRTCP packet");
+            return false;
+        }
+
         if (!NX_ASSERT(newSize <= (int) size))
             return false;
         array.resize(newSize);

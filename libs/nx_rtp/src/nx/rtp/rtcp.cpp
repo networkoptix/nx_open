@@ -121,6 +121,19 @@ int buildClientRtcpReport(
     return size + size2;
 }
 
+int buildClientRtcpReport(
+    uint8_t* dstBuffer, int bufferLen, uint32_t ssrc, const std::optional<std::string>& cname)
+{
+    const std::string esDescr = cname.value_or("nx");
+
+    NX_ASSERT((size_t) bufferLen >= 20 + esDescr.size());
+
+    const int size = buildReceiverReport(dstBuffer, bufferLen, ssrc);
+    const int size2 =
+        buildSourceDescriptionReport(dstBuffer + size, bufferLen - size, ssrc, cname);
+    return size + size2;
+}
+
 uint64_t unixTimestampToNtpTimestamp(std::chrono::microseconds timestamp)
 {
     const auto fraction = makeFraction(

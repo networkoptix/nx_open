@@ -213,19 +213,18 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
 void Transcoder::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 {
     m_encryptionData = data;
+    m_decryptor = std::make_unique<rtsp::SrtpDecryptor>();
+    if (!m_decryptor->init(data.client))
+        m_decryptor.reset();
     for (auto& [_, encoder]: m_videoEncoders)
         encoder->setSrtpEncryptionData(data);
     for (auto& [_, encoder]:  m_audioEncoders)
         encoder->setSrtpEncryptionData(data);
 }
 
-rtsp::SrtpEncryptor* Transcoder::getEncryptor() const
+rtsp::SrtpDecryptor* Transcoder::getDecryptor() const
 {
-    if (!m_videoEncoders.empty())
-        return m_videoEncoders.begin()->second->encryptor();
-    if (!m_audioEncoders.empty())
-        return m_audioEncoders.begin()->second->encryptor();
-    return nullptr;
+    return m_decryptor.get();
 }
 
 QnUniversalRtpEncoder* Transcoder::videoEncoder(nx::Uuid deviceId) const

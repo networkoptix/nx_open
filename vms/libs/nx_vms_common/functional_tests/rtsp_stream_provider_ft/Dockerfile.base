@@ -1,0 +1,28 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+ARG UBUNTU_IMAGE_ID=ubuntu:24.04
+FROM ${UBUNTU_IMAGE_ID}
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GSTREAMER_RESTRICTED_PLUGIN_PREFIX=ug
+
+RUN apt-get update \
+    && apt-get install --no-install-recommends --yes \
+        ca-certificates \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-${GSTREAMER_RESTRICTED_PLUGIN_PREFIX}ly \
+        gir1.2-gst-rtsp-server-1.0 \
+        python3 \
+        python3-gi \
+        python3-gst-1.0 \
+        libegl1 \
+        libfontconfig1 \
+        libfreetype6 \
+        libgl1 \
+        libglib2.0-0 \
+        libopengl0 \
+        libxkbcommon0 \
+    && rm -rf /var/lib/apt/lists/*

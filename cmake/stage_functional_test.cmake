@@ -13,7 +13,7 @@
 #   BINARIES           - executables to copy into DEST_DIR, runtime deps into DEST_DIR/lib
 #   QT_PLUGIN_DIRS     - plugin group directories to copy into DEST_DIR/plugins
 #   EXTRA_LIBS         - libraries to copy into DEST_DIR/lib
-#   ALLOWED_UNRESOLVED - runtime deps of BINARIES allowed to stay unresolved
+#   SYSTEM_ROOTS       - roots providing the target system libs
 
 include("${CMAKE_CURRENT_LIST_DIR}/copy_runtime_deps.cmake")
 
@@ -52,15 +52,14 @@ foreach(file IN LISTS FILES)
     copy_into("${file}" "${DEST_DIR}")
 endforeach()
 
-# Passing the keyword with an empty value would drop the default allowlist, not extend it.
-set(allowed_unresolved "")
-if(ALLOWED_UNRESOLVED)
-    set(allowed_unresolved ALLOWED_UNRESOLVED ${ALLOWED_UNRESOLVED})
+set(system_roots "")
+if(SYSTEM_ROOTS)
+    set(system_roots SYSTEM_ROOTS ${SYSTEM_ROOTS})
 endif()
 
 foreach(binary IN LISTS BINARIES)
     copy_into("${binary}" "${DEST_DIR}")
-    nx_copy_runtime_deps("${binary}" "${DEST_DIR}/lib" ${allowed_unresolved})
+    nx_copy_runtime_deps("${binary}" "${DEST_DIR}/lib" ${system_roots})
 endforeach()
 
 foreach(plugin_dir IN LISTS QT_PLUGIN_DIRS)

@@ -21,9 +21,11 @@ if("$ENV{USE_CLANG}")
 
     include($ENV{CLANG_DIR}/toolchains/${COMPILE_TARGET}.cmake)
 
+    set(nx_target_sysroot "$ENV{TOOLCHAIN_DIR}/${NX_SYSROOT_TARGET}/sysroot" CACHE INTERNAL "")
+
     set(flags "--gcc-toolchain=$ENV{TOOLCHAIN_DIR}")
     string(APPEND flags " --prefix=$ENV{TOOLCHAIN_DIR}/${NX_SYSROOT_TARGET}/bin")
-    string(APPEND flags " --sysroot=$ENV{TOOLCHAIN_DIR}/${NX_SYSROOT_TARGET}/sysroot")
+    string(APPEND flags " --sysroot=${nx_target_sysroot}")
     set(CMAKE_C_FLAGS ${flags})
     set(CMAKE_CXX_FLAGS ${flags})
     set(CMAKE_SHARED_LINKER_FLAGS ${flags})

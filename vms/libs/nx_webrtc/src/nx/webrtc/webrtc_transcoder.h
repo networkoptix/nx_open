@@ -29,7 +29,7 @@ public:
         AVCodecParameters* videoParameters,
         AVCodecParameters* audioParameters);
     void setSrtpEncryptionData(const rtsp::EncryptionData& data);
-    rtsp::SrtpEncryptor* getEncryptor() const;
+    rtsp::SrtpDecryptor* getDecryptor() const;
     nx::vms::api::WebRtcMethod method() const { return m_method; }
     bool isVideoCodecSupported(AVCodecID codecId);
     bool isAudioCodecSupported(AVCodecID codecId);
@@ -87,6 +87,7 @@ private:
     nx::vms::api::WebRtcTrackerSettings::MseFormat m_mseFormat;
     int64_t m_lastTimestampMs = 0;
     std::optional<rtsp::EncryptionData> m_encryptionData;
+    std::unique_ptr<rtsp::SrtpDecryptor> m_decryptor;
 };
 
 } // namespace nx::webrtc

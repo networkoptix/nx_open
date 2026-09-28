@@ -270,9 +270,17 @@ bool Consumer::handleSrtp(std::vector<uint8_t> buffer)
 void Consumer::handleRtcp(uint8_t* data, int size)
 {
     // Should decrypt packet first, due to 'ssrc' field is in encrypted part of packet.
-    auto encryptor = m_session->muxer()->getEncryptor();
-    if (encryptor)
-        encryptor->decryptPacket(data, &size);
+    auto decryptor = m_session->muxer()->getDecryptor();
+    const auto decryptResult =
+        decryptor ? decryptor->decryptPacket(data, &size) : rtsp::SrtpDecryptor::Result::success;
+    if (decryptResult != rtsp::SrtpDecryptor::Result::success)
+    {
+        if (decryptResult == rtsp::SrtpDecryptor::Result::packetRejected)
+            NX_VERBOSE(this, "Discard rejected SRTCP packet");
+        else
+            NX_WARNING(this, "Failed to decrypt SRTCP packet");
+        return;
+    }
 
     // Several RTCP packets can be glued into one lower level packet.
     while (size >= nx::rtp::kRtcpHeaderSize)

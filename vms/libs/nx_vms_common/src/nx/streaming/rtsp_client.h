@@ -29,12 +29,20 @@ extern "C" {
 #include <nx/utils/byte_array.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/vms/api/types/rtp_types.h>
+#include <rtsp/srtp_encryptor.h>
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/threadqueue.h>
 
 class QnRtspClient;
 
-namespace nx::rtsp { class SrtpEncryptor; }
+namespace nx::rtsp {
+
+class SrtpDecryptor;
+class SrtpEncryptor;
+
+} // namespace nx::rtsp
+
+namespace nx::streaming::rtsp { struct MikeyData; }
 
 static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
@@ -82,6 +90,9 @@ public:
     bool updateRemotePorts(quint16 mediaPort, quint16 rtcpPort);
     void setHostAddress(const nx::network::HostAddress& hostAddress) {m_hostAddress = hostAddress;};
     void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
+    void setSrtpSessions(std::shared_ptr<nx::rtsp::SrtpDecryptor> decryptor,
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> encryptor);
+    std::optional<std::uint32_t> clientSsrc() const;
 
     void bindToMulticastAddress(const QHostAddress& address, const nx::String& interfaceAddress);
     void sendDummy();
@@ -92,6 +103,7 @@ public:
 private:
     AddressInfo addressInfo(int port) const;
     void processRtcpData();
+    bool sendRtcpReport();
     bool updateSockets();
     std::unique_ptr<nx::network::AbstractDatagramSocket> createMulticastSocket(int port);
     bool createMulticastSockets();
@@ -102,6 +114,8 @@ private:
 
     nx::streaming::rtsp::UdpSocketPair m_udpSockets;
     nx::rtp::RtcpSenderReport m_senderReport;
+    std::shared_ptr<nx::rtsp::SrtpDecryptor> m_srtpDecryptor;
+    std::shared_ptr<nx::rtsp::SrtpEncryptor> m_srtpEncryptor;
 
     quint16 m_remoteMediaPort = 0;
     quint16 m_remoteRtcpPort = 0;
@@ -176,7 +190,8 @@ public:
         nx::rtp::Sdp::Media sdpMedia;
         QPair<int, int> interleaved{ -1, -1 };
         std::shared_ptr<QnRtspIoDevice> ioDevice;
-        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpDecryptor;
+        std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptor;
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptor;
     };
     QnRtspClient(const Config& config);
 
@@ -245,10 +260,11 @@ public:
     // RTP transport configured by user
     nx::vms::api::RtpTransportType getTransport() const { return m_transport; }
 
-    /* Actual session RTP transport. If user set 'automatic', it can be 'tcp' or 'udp',
-     * otherwise it should be equal to result of getTransport().
-     */
-    nx::vms::api::RtpTransportType getActualTransport() const { return m_actualTransport; }
+    // Selected session RTP transport, or nullopt until it is selected. Never automatic.
+    std::optional<nx::vms::api::RtpTransportType> getActualTransport() const
+    {
+        return m_actualTransport;
+    }
 
     const std::vector<SDPTrackInfo>& getTrackInfo() const;
     QString getTrackCodec(int rtpChannelNum);
@@ -362,17 +378,38 @@ public:
     std::chrono::milliseconds connectionTimeout() const;
 
 private:
+    struct SetupRequest
+    {
+        nx::network::http::Request request;
+        std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptor;
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptor;
+    };
+
+    struct SetupResult
+    {
+        QByteArray response;
+        std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptor;
+        std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptor;
+    };
+
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
+    std::optional<SetupRequest> createSetupRequest(const nx::Url& setupUrl,
+        SDPTrackInfo& track,
+        int trackIndex,
+        const nx::streaming::rtsp::MikeyData* mikey,
+        nx::vms::api::RtpTransportType transport);
+    std::optional<SetupResult> sendSetupWithTransport(const nx::Url& setupUrl,
+        SDPTrackInfo& track,
+        int trackIndex,
+        nx::vms::api::RtpTransportType transport);
     CameraDiagnostics::Result sendOptions();
     CameraDiagnostics::Result sendDescribe();
     bool sendKeepAlive();
-    std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptorForChannel(
-        int channelNumber) const;
-    bool decryptPacketIfNeeded(
-        nx::rtsp::SrtpEncryptor* srtpDecryptor,
-        quint8* data,
-        int* inOutSize);
+    std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptorForChannel(int channelNumber) const;
+    std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptorForChannel(int channelNumber) const;
+    nx::rtsp::SrtpDecryptor::Result decryptPacketIfNeeded(
+        nx::rtsp::SrtpDecryptor* srtpDecryptor, quint8* data, int* inOutSize);
 
     bool readTextResponse(QByteArray &response);
     void fillRequestAuthorization(nx::network::http::Request* request);
@@ -431,7 +468,8 @@ private:
     nx::network::http::Credentials m_credentials;
     std::optional<nx::network::SocketAddress> m_proxyAddress;
     QString m_contentBase;
-    nx::vms::api::RtpTransportType m_actualTransport;
+    // Empty until SETUP selects a concrete RTP transport; never contains automatic.
+    std::optional<nx::vms::api::RtpTransportType> m_actualTransport;
     bool m_doSendOptions = true;
 
     struct RtpChannel

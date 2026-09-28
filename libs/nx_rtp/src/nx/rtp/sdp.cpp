@@ -130,13 +130,13 @@ Sdp::Media parseMedia(QStringList& lines, const Sdp::RtpMap& preferredMap)
         media.payloadType = trackParams[3].toInt();
 
     lines.pop_front();
-    for (; !lines.empty() && !lines.front().startsWith("m=", Qt::CaseInsensitive); lines.pop_front())
+    for (; !lines.empty() && !lines.front().startsWith("m="); lines.pop_front())
     {
         line = lines.front().trimmed();
-        if (line.startsWith("a=", Qt::CaseInsensitive))
+        if (line.startsWith("a="))
             media.sdpAttributes << line; // save sdp for codec parser
 
-        if (line.startsWith("a=rtpmap", Qt::CaseInsensitive))
+        if (line.startsWith("a=rtpmap"))
         {
             int payloadType = 0;
             Sdp::RtpMap rtpmap;
@@ -150,26 +150,26 @@ Sdp::Media parseMedia(QStringList& lines, const Sdp::RtpMap& preferredMap)
                     rtpmap.codecName = findCodecById(payloadType);
             }
         }
-        else if (line.startsWith("a=fmtp", Qt::CaseInsensitive))
+        else if (line.startsWith("a=fmtp"))
         {
             int payloadType = 0;
             Sdp::Fmtp fmtp;
             if (parseFmtp(line, &fmtp, &payloadType) && payloadType == media.payloadType)
                 media.fmtp = fmtp;
         }
-        else if (line.startsWith("a=control:", Qt::CaseInsensitive))
+        else if (line.startsWith("a=control:"))
         {
             media.control = line.mid(QString("a=control:").length());
         }
-        else if (line.startsWith("a=sendonly", Qt::CaseInsensitive))
+        else if (line.startsWith("a=sendonly"))
         {
             media.sendOnly = true;
         }
-        else if (line.startsWith("c=", Qt::CaseInsensitive))
+        else if (line.startsWith("c="))
         {
             media.connectionAddress = parseConnectionAddress(line);
         }
-        else if (line.startsWith("a=ssrc:", Qt::CaseInsensitive))
+        else if (line.startsWith("a=ssrc:"))
         {
             media.ssrc = parseSsrc(line);
         }
@@ -181,13 +181,14 @@ void Sdp::parse(const QString& sdpData)
 {
     controlUrl.clear();
     range.clear();
+    sdpAttributes.clear();
     media.clear();
     QHostAddress sessionConnectionAddress;
     QStringList lines = sdpData.split('\n');
     while(!lines.isEmpty())
     {
         QString line = lines.front().trimmed();
-        if (line.startsWith("m=", Qt::CaseInsensitive))
+        if (line.startsWith("m="))
         {
             media.push_back(parseMedia(lines, preferredMap));
         }
@@ -195,12 +196,14 @@ void Sdp::parse(const QString& sdpData)
         {
             const static QString kControlUrlPrefix = "a=control:";
             const static QString kRangePrefix = "a=range:";
-            if (line.startsWith("c=", Qt::CaseInsensitive))
+            if (line.startsWith("c="))
                 sessionConnectionAddress = parseConnectionAddress(line);
-            else if (line.startsWith(kControlUrlPrefix, Qt::CaseInsensitive))
+            else if (line.startsWith(kControlUrlPrefix))
                 controlUrl = line.mid(kControlUrlPrefix.length());
-            else if (line.startsWith(kRangePrefix, Qt::CaseInsensitive))
+            else if (line.startsWith(kRangePrefix))
                 range = line.mid(kRangePrefix.length()).toStdString();
+            if (line.startsWith("a="))
+                sdpAttributes.push_back(line.toStdString());
             lines.pop_front();
         }
     }

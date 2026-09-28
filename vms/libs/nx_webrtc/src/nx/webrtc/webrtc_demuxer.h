@@ -75,6 +75,7 @@ private:
     std::map<uint32_t, nx::rtp::ReorderingCache> m_reorderers; //< ssrc ->reorderer.
     std::map<uint32_t, ParserContext> m_parsers; //< ssrc -> parser.
     std::unique_ptr<rtsp::SrtpEncryptor> m_encryptor;
+    std::unique_ptr<rtsp::SrtpDecryptor> m_decryptor;
     std::deque<QnAbstractMediaDataPtr> m_frames;
     std::deque<nx::Buffer> m_feedbacks;
     bool m_hasVideo = false;

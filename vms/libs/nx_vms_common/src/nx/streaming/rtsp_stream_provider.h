@@ -3,6 +3,8 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
+#include <optional>
 #include <vector>
 
 #include <QtCore/QElapsedTimer>
@@ -177,6 +179,7 @@ private:
     struct TrackInfo
     {
         QnRtspIoDevice* ioDevice = nullptr; //< External reference; do not delete.
+        std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptor;
         // Separate parsers for different payloads
         // Usually there will be only one
         std::map<int, std::unique_ptr<nx::rtp::RtpParser>> rtpParsers;
@@ -195,9 +198,12 @@ private:
     void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
-    void processTcpRtcp(
-        quint8* buffer, int bufferSize, int bufferCapacity);
-    void buildClientRTCPReport(quint8 chNumber);
+    void processTcpRtcp(quint8* buffer,
+        int bufferSize,
+        int bufferCapacity,
+        std::optional<std::uint32_t> clientSsrc);
+    void buildClientRTCPReport(quint8 chNumber, std::optional<std::uint32_t> clientSsrc);
+    std::optional<std::uint32_t> clientSsrcForRtcpChannel(int channelNumber) const;
     QnAbstractMediaDataPtr getNextDataInternal();
     virtual void processCameraTimeHelperEvent(nx::streaming::rtp::CameraTimeHelper::EventType) {}
 

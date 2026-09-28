@@ -6,6 +6,43 @@
 
 using namespace nx::rtp;
 
+TEST(Sdp, sessionAttributes)
+{
+    const QString sdpString =
+        "v=0\r\n"
+        "a=key-mgmt:mikey session-key\r\n"
+        "m=video 0 RTP/SAVP 96\r\n"
+        "a=key-mgmt:mikey media-key\r\n";
+
+    Sdp sdp;
+    sdp.parse(sdpString);
+
+    ASSERT_EQ(sdp.sdpAttributes, std::vector<std::string>({"a=key-mgmt:mikey session-key"}));
+    ASSERT_EQ(sdp.media.size(), 1);
+    ASSERT_EQ(sdp.media[0].sdpAttributes, QStringList({"a=key-mgmt:mikey media-key"}));
+}
+
+TEST(Sdp, lineTypesAreCaseSensitive)
+{
+    const QString sdpString =
+        "v=0\r\n"
+        "A=key-mgmt:mikey ignored-session-key\r\n"
+        "C=IN IP4 192.0.2.1\r\n"
+        "M=audio 0 RTP/AVP 0\r\n"
+        "m=video 0 RTP/SAVP 96\r\n"
+        "A=key-mgmt:mikey ignored-media-key\r\n"
+        "C=IN IP4 192.0.2.2\r\n"
+        "a=key-mgmt:mikey media-key\r\n";
+
+    Sdp sdp;
+    sdp.parse(sdpString);
+
+    ASSERT_TRUE(sdp.sdpAttributes.empty());
+    ASSERT_EQ(sdp.media.size(), 1);
+    ASSERT_TRUE(sdp.media[0].connectionAddress.isNull());
+    ASSERT_EQ(sdp.media[0].sdpAttributes, QStringList({"a=key-mgmt:mikey media-key"}));
+}
+
 TEST(Sdp, h264AndMpa)
 {
     QString sdpString =

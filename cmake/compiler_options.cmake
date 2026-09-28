@@ -550,6 +550,9 @@ endif()
 
 if(LINUX)
     list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+    if(targetDevice STREQUAL "linux_arm32")
+        list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/../lib/ffmpeg")
+    endif()
 endif()
 
 if(MACOSX)
