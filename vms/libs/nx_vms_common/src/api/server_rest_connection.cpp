@@ -844,10 +844,21 @@ Handle ServerConnection::executeAnalyticsAction(
     JsonResultCallback callback,
     nx::utils::AsyncHandlerExecutor executor)
 {
-    return executePost(
-        "/api/executeAnalyticsAction",
+    using Result = ResultWithData<QJsonValue>;
+
+    // The server reports errors with a non-200 status. Parse the result as ResultWithData to
+    // keep the error from the message body.
+    return executePost<Result>("/api/executeAnalyticsAction",
         QJson::serialized(action),
-        std::move(callback),
+        Callback<Result>(
+            [callback = std::move(callback)](Status status, Handle requestId, Result result)
+            {
+                nx::network::rest::JsonResult jsonResult;
+                jsonResult.errorId = result.error;
+                jsonResult.errorString = result.errorString;
+                jsonResult.reply = std::move(result.data);
+                callback(status, requestId, std::move(jsonResult));
+            }),
         executor);
 }
 
