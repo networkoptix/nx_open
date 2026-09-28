@@ -1202,7 +1202,7 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform> %n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
@@ -1213,7 +1213,7 @@
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform> %n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
@@ -1237,9 +1237,9 @@
       <translation type="unfinished">
         <numerusform>%n الأجهزة </numerusform>
         <numerusform> </numerusform>
-        <numerusform>%n devices</numerusform>
-        <numerusform>%n devices</numerusform>
         <numerusform> </numerusform>
+        <numerusform> </numerusform>
+        <numerusform>  </numerusform>
         <numerusform>%n devices</numerusform>
       </translation>
     </message>
@@ -1860,67 +1860,67 @@
     </message>
     <message>
       <source>Interval between the Cloud polling HTTP requests to synchronize the data.</source>
-      <translation type="unfinished">Interval between the Cloud polling HTTP requests to synchronize the data.</translation>
+      <translation>الفاصل الزمني بين طلبات HTTP التي يقوم بها السحابة لمزامنة البيانات.</translation>
     </message>
     <message>
       <source>Local Site ID, null means the Site is not set up yet.</source>
-      <translation type="unfinished">Local Site ID, null means the Site is not set up yet.</translation>
+      <translation>معرف الموقع المحلي، فارغ يعني أن الموقع لم يتم إعداده بعد.</translation>
     </message>
     <message>
       <source>Enable or disable the creation of new Integration registration requests</source>
-      <translation type="unfinished">Enable or disable the creation of new Integration registration requests</translation>
+      <translation>تفعيل أو تعطيل إنشاء طلبات تسجيل التكامل الجديدة</translation>
     </message>
     <message>
       <source>Anonymous statistics report allowed.</source>
-      <translation type="unfinished">Anonymous statistics report allowed.</translation>
+      <translation>يُسمح بنشر التقارير الإحصائية بشكل مجهول.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last time.</source>
-      <translation type="unfinished">Anonymous statistics report last time.</translation>
+      <translation>تقرير إحصائي مجهول المصدر في المرة الأخيرة.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last version.</source>
-      <translation type="unfinished">Anonymous statistics report last version.</translation>
+      <translation>تقرير إحصائي مجهول المصدر، الإصدار الأخير.</translation>
     </message>
     <message>
       <source>Anonymous statistics report last number.</source>
-      <translation type="unfinished">Anonymous statistics report last number.</translation>
+      <translation>تقرير إحصائي مجهول المصدر، العدد الأخير.</translation>
     </message>
     <message>
       <source>Anonymous statistics time cycle.</source>
-      <translation type="unfinished">Anonymous statistics time cycle.</translation>
+      <translation>الدورة الزمنية للإحصاءات المجهولة.</translation>
     </message>
     <message>
       <source>Anonymous statistics report delay after update.</source>
-      <translation type="unfinished">Anonymous statistics report delay after update.</translation>
+      <translation>تأخر تقرير الإحصائيات المجهولة المصدر بعد التحديث.</translation>
     </message>
     <message>
       <source>Anonymous Statistics Report Server URL.</source>
-      <translation type="unfinished">Anonymous Statistics Report Server URL.</translation>
+      <translation>عنوان URL لخادم تقارير الإحصائيات المجهولة.</translation>
     </message>
     <message>
       <source>Anonymous Crash Report Server API URL.</source>
-      <translation type="unfinished">Anonymous Crash Report Server API URL.</translation>
+      <translation>رابط API الخاص بخادم تقرير الأعطال المجهول.</translation>
     </message>
     <message>
       <source>Anonymous statistics report Client settings.</source>
-      <translation type="unfinished">Anonymous statistics report Client settings.</translation>
+      <translation>تقرير الإحصائيات المجهولة عن إعدادات العميل.</translation>
     </message>
     <message>
       <source>Device storage information update interval.</source>
-      <translation type="unfinished">Device storage information update interval.</translation>
+      <translation>فترة تحديث معلومات تخزين الجهاز.</translation>
     </message>
     <message>
       <source>Site alive update interval (seconds, 1s-1h).</source>
-      <translation type="unfinished">Site alive update interval (seconds, 1s-1h).</translation>
+      <translation>الفاصل الزمني للتحديث المباشر للموقع (ثواني، 1s-1ساعة).</translation>
     </message>
     <message>
       <source>Proxy connection timeout (seconds, 1s-1h).</source>
-      <translation type="unfinished">Proxy connection timeout (seconds, 1s-1h).</translation>
+      <translation>مهلة اتصال الوكيل (ثواني، 1s-1ساعة).</translation>
     </message>
     <message>
       <source>Proxy connection access policy.</source>
-      <translation type="unfinished">Proxy connection access policy.</translation>
+      <translation>سياسة الوصول إلى اتصال الوكيل.</translation>
     </message>
     <message>
       <source>Time synchronization enabled.</source>
@@ -1932,7 +1932,7 @@
     </message>
     <message>
       <source>Max difference between local and source time (milliseconds).</source>
-      <translation type="unfinished">Max difference between local and source time (milliseconds).</translation>
+      <translation>أقصى فرق بين التوقيت المحلي وتوقيت المصدر (بالمللي ثانية).</translation>
     </message>
     <message>
       <source>OS time change check period.</source>
@@ -1944,7 +1944,7 @@
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
-      <translation type="unfinished">Sync time epsilon. New value is not applied if time delta less than epsilon.</translation>
+      <translation>مزامنة الوقت (إبسيلون). لا يتم تطبيق القيمة الجديدة إذا كان فرق الوقت أقل من إبسيلون.</translation>
     </message>
     <message>
       <source>Cloud owner account.</source>
@@ -1952,43 +1952,43 @@
     </message>
     <message>
       <source>Organization Id.</source>
-      <translation type="unfinished">Organization Id.</translation>
+      <translation>رمز المؤسسة.</translation>
     </message>
     <message>
       <source>Cloud Site ID.</source>
-      <translation type="unfinished">Cloud Site ID.</translation>
+      <translation>معرف موقع السحابة.</translation>
     </message>
     <message>
       <source>Cloud authorization key.</source>
-      <translation type="unfinished">Cloud authorization key.</translation>
+      <translation>مفتاح تفويض السحابة.</translation>
     </message>
     <message>
       <source>Enable 2FA for the Site.</source>
-      <translation type="unfinished">Enable 2FA for the Site.</translation>
+      <translation>قم بتفعيل المصادقة الثنائية للموقع.</translation>
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>اسم الموقع.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
-      <translation type="unfinished">Last master Site merge ID.</translation>
+      <translation>معرّف دمج الموقع الرئيسي الأخير.</translation>
     </message>
     <message>
       <source>Last slave Site merge ID.</source>
-      <translation type="unfinished">Last slave Site merge ID.</translation>
+      <translation>معرف دمج الموقع الفرعي الأخير.</translation>
     </message>
     <message>
       <source>Disable Device vendors.</source>
-      <translation type="unfinished">Disable Device vendors.</translation>
+      <translation>إلغاء تفعيل الشركة المصنعة</translation>
     </message>
     <message>
       <source>Optimize Camera settings.</source>
-      <translation type="unfinished">Optimize Camera settings.</translation>
+      <translation>تحسين إعدادات الكاميرا.</translation>
     </message>
     <message>
       <source>Thumbnails auto-update.</source>
-      <translation type="unfinished">Thumbnails auto-update.</translation>
+      <translation>تحديث الصور المصغرة تلقائياً.</translation>
     </message>
     <message>
       <source>Send plain-text emails.</source>
@@ -2004,7 +2004,7 @@
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
-      <translation type="unfinished">Audit trail period (days, 14-730).</translation>
+      <translation>فترة سجل التدقيق (أيام، 14-730).</translation>
     </message>
     <message>
       <source>Event log period (days).</source>
@@ -2012,51 +2012,51 @@
     </message>
     <message>
       <source>Maximum number of bookmarks. Value less than or equal to 0 is infinite.</source>
-      <translation type="unfinished">Maximum number of bookmarks. Value less than or equal to 0 is infinite.</translation>
+      <translation>الحد الأقصى لعدد الإشارات المرجعية. قيمة أقل من أو تساوي 0 غير محدودة.</translation>
     </message>
     <message>
       <source>Enforce HTTPS (data traffic encryption).</source>
-      <translation type="unfinished">Enforce HTTPS (data traffic encryption).</translation>
+      <translation>فرض استخدام بروتوكول HTTPS (تشفير حركة البيانات).</translation>
     </message>
     <message>
       <source>Enforce RTSPS (video traffic encryption).</source>
-      <translation type="unfinished">Enforce RTSPS (video traffic encryption).</translation>
+      <translation>فرض  استخدام بروتوكول RTSPS (تشفير حركة مرور الفيديو).</translation>
     </message>
     <message>
       <source>Expose device passwords stored in VMS for administrators (for web pages).</source>
-      <translation type="unfinished">Expose device passwords stored in VMS for administrators (for web pages).</translation>
+      <translation>عرض كلمات مرور الجهاز المخزنة في نظام إدارة الفيديو للمسؤولين (لصفحات الويب).</translation>
     </message>
     <message>
       <source>Enable auto-discovery.</source>
-      <translation type="unfinished">Enable auto-discovery.</translation>
+      <translation>تفعيل خاصية الاكتشاف التلقائي للأجهزة.</translation>
     </message>
     <message>
       <source>Enable auto-update notifications.</source>
-      <translation type="unfinished">Enable auto-update notifications.</translation>
+      <translation>قم بتفعيل إشعارات التحديث التلقائي.</translation>
     </message>
     <message>
       <source>Enable update notifications.</source>
-      <translation type="unfinished">Enable update notifications.</translation>
+      <translation>تمكين إشعارات التحديث</translation>
     </message>
     <message>
       <source>Enable UPNP port-mapping.</source>
-      <translation type="unfinished">Enable UPNP port-mapping.</translation>
+      <translation>تمكين تعيين منفذ UPNP.</translation>
     </message>
     <message>
       <source>Backup settings.</source>
-      <translation type="unfinished">Backup settings.</translation>
+      <translation>إعدادات النسخ الاحتياطي</translation>
     </message>
     <message>
       <source>Cloud host override.</source>
-      <translation type="unfinished">Cloud host override.</translation>
+      <translation>تجاوز مضيف السحابة.</translation>
     </message>
     <message>
       <source>Enable cross-domain policy.</source>
-      <translation type="unfinished">Enable cross-domain policy.</translation>
+      <translation>تفعيل سياسة النطاقات المتعددة.</translation>
     </message>
     <message>
       <source>Enable RTSP for Arecont.</source>
-      <translation type="unfinished">Enable RTSP for Arecont.</translation>
+      <translation>قم بتفعيل بروتوكول RTSP لـ Arecont.</translation>
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
