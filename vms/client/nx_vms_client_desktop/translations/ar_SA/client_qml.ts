@@ -3106,7 +3106,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>نسخ الرابط</translation>
     </message>
     <message>
       <source>Terminate</source>
