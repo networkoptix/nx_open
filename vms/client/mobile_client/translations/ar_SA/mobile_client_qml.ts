@@ -1012,7 +1012,7 @@
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>الحماية بكلمة مرور (اختياري)</translation>
     </message>
     <message>
       <source>Cancel</source>
