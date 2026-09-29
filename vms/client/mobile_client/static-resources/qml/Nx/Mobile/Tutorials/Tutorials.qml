@@ -31,9 +31,21 @@ NxObject
 
             function onActivated(item)
             {
-                if (!player.tutorial)
-                    player.start(tutorial, item)
+                d.pendingTutorials.push({tutorial: tutorial, item: item})
             }
+        }
+    }
+
+    Timer
+    {
+        running: !player.tutorial && d.pendingTutorials.length > 0
+        interval: 0
+
+        onTriggered:
+        {
+            const {tutorial, item} = d.pendingTutorials.shift()
+            if (!appContext.settings.completedTutorials.includes(tutorial.name))
+                player.start(tutorial, item)
         }
     }
 
@@ -46,5 +58,12 @@ NxObject
             appContext.settings.completedTutorials =
                 [...appContext.settings.completedTutorials, tutorialName]
         }
+    }
+
+    NxObject
+    {
+        id: d
+
+        property list<var> pendingTutorials: []
     }
 }
