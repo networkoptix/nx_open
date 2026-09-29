@@ -597,7 +597,6 @@ Page
 
         resourceHelper: controller.resourceHelper
         mediaPlayer: controller.mediaPlayer
-        videoCenterHeightOffsetFactor: 1 / 3
 
         showMotion: !d.ptzMode
             && modernVideoScreen.selectedObjectsType === Timeline.ObjectsLoader.ObjectsType.motion
