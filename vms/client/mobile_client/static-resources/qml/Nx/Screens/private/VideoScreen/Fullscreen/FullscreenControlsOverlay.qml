@@ -20,6 +20,7 @@ Item
     property VideoScreenController controller
     property bool showPlaybackControls: true
     property bool hasChunkNavigation: true
+    property bool showCalendarControl: true
 
     // Whether the action button container should take place in the layouts. Cannot be replaced
     // with the `actionButtonContainer.visible` binding, since the container visibility is
@@ -36,6 +37,7 @@ Item
     signal backButtonClicked()
     signal menuButtonClicked()
     signal exitFullscreenButtonClicked()
+    signal calendarButtonClicked()
 
     property alias scrubbingActive: speedControl.pressed
 
@@ -413,6 +415,12 @@ Item
 
             LayoutItemProxy
             {
+                target: calendarButton
+                visible: control.showCalendarControl
+            }
+
+            LayoutItemProxy
+            {
                 target: overlayActionButtonContainer
                 visible: control.hasActionButton
             }
@@ -504,6 +512,12 @@ Item
 
                 LayoutItemProxy
                 {
+                    target: calendarButton
+                    visible: control.showCalendarControl
+                }
+
+                LayoutItemProxy
+                {
                     target: overlayActionButtonContainer
                     visible: control.hasActionButton
                 }
@@ -558,6 +572,18 @@ Item
             else
                 controller.playLive()
         }
+    }
+
+    OverlayControlButton
+    {
+        id: calendarButton
+
+        icon.source: "image://skin/24x24/Solid/calendar.svg"
+
+        opacity: opacityController.defaultControlsOpacity
+        enabled: opacity > 0
+
+        onClicked: control.calendarButtonClicked()
     }
 
     OverlayControlButton

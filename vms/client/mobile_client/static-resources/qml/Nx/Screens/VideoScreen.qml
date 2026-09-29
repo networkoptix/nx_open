@@ -716,12 +716,15 @@ Page
 
         showPlaybackControls: d.hasArchive
         hasChunkNavigation: d.hasChunkNavigation
+        showCalendarControl: d.hasArchive
 
         hasActionButton: actionSheet.hasActions
 
         onBackButtonClicked: LayoutController.exitFullscreen()
 
         onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
+
+        onCalendarButtonClicked: calendarPanel.open()
 
         onMenuButtonClicked:
         {
