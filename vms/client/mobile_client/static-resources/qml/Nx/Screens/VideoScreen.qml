@@ -1418,7 +1418,9 @@ Page
         resource: controller.resource
         preferredEdge: StyleHints.preferredSheetEdge
         overlayStyle: modernVideoScreen.state === "fullscreen"
-        externalVisualizerContainer: actionVisualizerContainer
+        externalVisualizerContainer: fullscreenControlsOverlay.visible
+            ? fullscreenControlsOverlay.actionVisualizerContainer
+            : actionVisualizerContainer
         externalButtonContainer: modernVideoScreen.state === "fullscreen"
             ? fullscreenControlsOverlay.actionButtonContainer
             : actionButtonContainer
