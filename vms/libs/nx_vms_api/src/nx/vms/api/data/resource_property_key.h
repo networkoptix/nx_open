@@ -177,6 +177,13 @@ inline const QString kCameraHotspotsData = "cameraHotspotsData";
 /// Only used via `QnVirtualCameraResource`
 inline const QString kCameraSerialNumber = "serialNumber";
 
+/// Used via `QnVirtualCameraResource`, and in Desktop via `Camera`
+/**
+ * Port of the Device web page, shown as the "Web Page Port" Expert setting. Empty or 0 means the
+ * port of the Device URL is used.
+ */
+inline const QString kCustomWebPagePort = "http_port";
+
 /// This key already has a mapping to `DeviceModelV1Base`, but it is not directly fetched/removed from `parameters`
 inline const QString kDeviceType = "deviceType";
 

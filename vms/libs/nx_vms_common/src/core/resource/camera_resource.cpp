@@ -241,9 +241,6 @@ const QString QnVirtualCameraResource::kAnalyzedStreamIndexes(
 const QString QnVirtualCameraResource::kVirtualCameraIgnoreTimeZone(
     "virtualCameraIgnoreTimeZone");
 
-const QString QnVirtualCameraResource::kHttpPortParameterName(
-    "http_port");
-
 const QString QnVirtualCameraResource::kCameraNameParameterName(
     "name");
 
@@ -3148,7 +3145,7 @@ bool QnVirtualCameraResource::isWebPageSupported() const
 
 int QnVirtualCameraResource::customWebPagePort() const
 {
-    return getProperty(QnVirtualCameraResource::kHttpPortParameterName).toInt();
+    return getProperty(nx::vms::api::device_properties::kCustomWebPagePort).toInt();
 }
 
 void QnVirtualCameraResource::setCustomWebPagePort(int value)
@@ -3157,7 +3154,7 @@ void QnVirtualCameraResource::setCustomWebPagePort(int value)
         return;
 
     const QString propertyValue = value > 0 ? QString::number(value) : QString();
-    setProperty(QnVirtualCameraResource::kHttpPortParameterName, propertyValue);
+    setProperty(nx::vms::api::device_properties::kCustomWebPagePort, propertyValue);
 }
 
 bool QnVirtualCameraResource::isMotionDetectionActive() const

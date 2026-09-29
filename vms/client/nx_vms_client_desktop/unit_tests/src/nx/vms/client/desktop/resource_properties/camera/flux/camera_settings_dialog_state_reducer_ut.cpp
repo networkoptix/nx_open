@@ -861,8 +861,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, qualityLimitsChangeKeepsBrush)
 // Camera web page address is basically a camera API url without query and path. Also there are
 // some options that affect it:
 // - System Settings -> useHttpsOnlyForCameras option forces using https protocol
-// - http_port property defines custom port (high priority)
-// - http_port query parameter defines custom port (low priority)
+// - the "http_port" property (Web Page Port Expert setting) defines a custom port
 // - default ports (80 for http and 443 for https) are omitted
 TEST_F(CameraSettingsDialogStateReducerTest, webPageAddress)
 {
@@ -897,19 +896,10 @@ TEST_F(CameraSettingsDialogStateReducerTest, webPageForceHttpsSubstitution)
     ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com/"));
 }
 
-TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressQueryCustomPort)
-{
-    auto camera = createCamera();
-    camera->setUrl("https://example.com/path?query=true&http_port=277");
-    State state = Reducer::loadCameras({}, {camera});
-    EXPECT_TRUE(state.expert.customWebPagePort.equals(0));
-    ASSERT_EQ(state.singleCameraProperties.settingsUrl, QString("https://example.com:277/"));
-}
-
 TEST_F(CameraSettingsDialogStateReducerTest, webPageAddressPropertyCustomPort)
 {
     auto camera = createCamera();
-    camera->setUrl("https://example.com/path?query=true&http_port=277");
+    camera->setUrl("https://example.com/path?query=true");
     camera->setCustomWebPagePort(555);
     State state = Reducer::loadCameras({}, {camera});
     EXPECT_TRUE(state.expert.customWebPagePort.equals(555));

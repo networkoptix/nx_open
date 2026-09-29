@@ -63,7 +63,6 @@ public:
     // This property kept here only because of statistics filtering.
     static const QString kAnalyzedStreamIndexes;
     static const QString kVirtualCameraIgnoreTimeZone;
-    static const QString kHttpPortParameterName;
     static const QString kCameraNameParameterName;
     static const QString kUsingOnvifMedia2Type;
 

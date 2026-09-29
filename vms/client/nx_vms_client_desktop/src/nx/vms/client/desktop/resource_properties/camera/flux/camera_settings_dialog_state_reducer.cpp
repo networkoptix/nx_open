@@ -6,7 +6,6 @@
 #include <chrono>
 #include <limits>
 
-#include <QtCore/QUrlQuery>
 #include <QtNetwork/QAuthenticator>
 
 #include <camera/fps_calculator.h>
@@ -146,13 +145,6 @@ nx::Url getBaseCameraUrl(const Camera& camera)
         || (nx::utils::stricmp(scheme, nx::network::http::kSecureUrlSchemeName) == 0);
 
     url.setScheme(nx::network::http::urlScheme(useSecureScheme));
-
-    // Port number may be passed in query parameter "http_port".
-    const QUrlQuery query(url.query());
-    const int port =
-        query.queryItemValue(QnVirtualCameraResource::kHttpPortParameterName).toInt();
-    if (port > 0)
-        url.setPort(port);
 
     return url;
 }
