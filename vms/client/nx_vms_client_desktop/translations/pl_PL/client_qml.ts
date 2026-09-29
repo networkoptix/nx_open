@@ -220,19 +220,6 @@
       <source>In selected area</source>
       <translation>W zaznaczonym obszarze</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-        <numerusform>%n nowych wyników</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Brak obiektów</translation>
