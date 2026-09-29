@@ -1475,16 +1475,16 @@
     </message>
     <message numerus="yes">
       <source>%n hours ago</source>
-      <translation type="unfinished">
-        <numerusform>hace %n horas</numerusform>
-        <numerusform>%n hours ago</numerusform>
+      <translation>
+        <numerusform>Hace %n horas</numerusform>
+        <numerusform>%n horas atrás</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days ago</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Hace %n días</numerusform>
-        <numerusform>%n days ago</numerusform>
+        <numerusform>hace %@ días</numerusform>
       </translation>
     </message>
   </context>
@@ -1988,19 +1988,19 @@
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery.</translation>
+      <translation>Exponer direcciones IP para autodescubrimiento.</translation>
     </message>
     <message>
       <source>Show mouse timeline preview.</source>
-      <translation type="unfinished">Show mouse timeline preview.</translation>
+      <translation>Mostrar vista previa de la línea de tiempo del ratón.</translation>
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation type="unfinished">LDAP settings.</translation>
+      <translation>Configuración LDAP.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>Configuración SMTP. Esta configuración solo es visible para usuarios avanzados.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
@@ -2008,7 +2008,7 @@
     </message>
     <message>
       <source>Encryption key used to encode secure cookie values.</source>
-      <translation type="unfinished">Encryption key used to encode secure cookie values.</translation>
+      <translation>Clave de cifrado utilizada para codificar los valores seguros de las cookies.</translation>
     </message>
     <message>
       <source>Update interval for public keys from the Cloud.</source>
