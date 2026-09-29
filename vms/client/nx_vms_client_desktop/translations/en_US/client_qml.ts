@@ -220,17 +220,6 @@
         <source>In selected area</source>
         <translation></translation>
     </message>
-    <message numerus="yes">
-        <source>%n new results</source>
-        <translation>
-            <numerusform>%n new result</numerusform>
-            <numerusform>%n new results</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To the top</source>
-        <translation></translation>
-    </message>
     <message>
         <source>No objects</source>
         <translation></translation>
