@@ -80,6 +80,10 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) = 0;
 
+    virtual void issueServiceAccountToken(const api::IssueServiceAccountTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) = 0;
+
     virtual void createServiceAccount(
         const api::CreateServiceAccountRequest& request,
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)>
@@ -170,6 +174,10 @@ public:
 
     virtual void issueServiceToken(
         const api::IssueServiceTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
+    void issueServiceAccountToken(const api::IssueServiceAccountTokenRequest& request,
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) override;
 

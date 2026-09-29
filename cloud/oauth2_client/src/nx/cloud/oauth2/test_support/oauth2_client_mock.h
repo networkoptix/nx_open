@@ -119,6 +119,10 @@ public:
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
             completionHandler) override;
 
+    void issueServiceAccountToken(const api::IssueServiceAccountTokenRequest& request,
+        nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)>
+            completionHandler) override;
+
     void createServiceAccount(
         const api::CreateServiceAccountRequest& request,
         nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)>

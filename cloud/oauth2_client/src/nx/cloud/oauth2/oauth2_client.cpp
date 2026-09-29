@@ -156,6 +156,17 @@ void Oauth2Client::issueServiceToken(
         std::move(completionHandler));
 }
 
+void Oauth2Client::issueServiceAccountToken(const api::IssueServiceAccountTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
+{
+    base_type::template makeAsyncCall<api::IssueServiceTokenResponse>(
+        nx::network::http::Method::post,
+        api::kServiceAccountTokenPath,
+        {}, // query
+        std::move(request),
+        std::move(completionHandler));
+}
+
 void Oauth2Client::createServiceAccount(
     const api::CreateServiceAccountRequest& request,
     nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)> handler)

@@ -100,4 +100,21 @@ struct UpdateServiceAccountKeyResponse
 
 NX_REFLECTION_INSTRUMENT(UpdateServiceAccountKeyResponse, (privateKey))
 
+// The only grant type supported by POST /oauth2/v1/serviceToken. Defined by RFC 7523.
+static constexpr char kJwtBearerGrantType[] = "urn:ietf:params:oauth:grant-type:jwt-bearer";
+
+struct IssueServiceAccountTokenRequest
+{
+    /**%apidoc Must be "urn:ietf:params:oauth:grant-type:jwt-bearer". */
+    std::string grant_type;
+
+    /**%apidoc A JWT signed with the service account private key. */
+    std::string assertion;
+
+    /**%apidoc[opt] Desired token access scope. Restricted by the service account scopes. */
+    std::optional<std::string> scope;
+};
+
+NX_REFLECTION_INSTRUMENT(IssueServiceAccountTokenRequest, (grant_type)(assertion)(scope))
+
 } // namespace nx::cloud::oauth2::api

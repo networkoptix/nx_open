@@ -313,6 +313,11 @@ public:
     // For internal purpose only. The AWS region the user account belongs to.
     std::optional<std::string> region() const;
     void setRegion(const std::string& val);
+
+    // Email of the account that owns the service account. Set for subjectTyp=ServiceAccount only:
+    // such a token acts on behalf of its owner, bounded by the token access scope.
+    std::optional<std::string> ownerEmail() const;
+    void setOwnerEmail(const std::string& val);
 };
 
 using Token = nx::network::jws::Token<ClaimSet>;

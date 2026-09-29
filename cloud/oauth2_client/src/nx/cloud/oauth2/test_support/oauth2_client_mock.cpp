@@ -173,6 +173,19 @@ void Oauth2ClientMock::issueServiceToken(
         path, request, std::move(completionHandler));
 }
 
+void Oauth2ClientMock::issueServiceAccountToken(
+    const api::IssueServiceAccountTokenRequest& request,
+    nx::MoveOnlyFunc<void(db::api::ResultCode, api::IssueServiceTokenResponse)> completionHandler)
+{
+    if (m_dummyMode)
+        return completionHandler(db::api::ResultCode::ok, api::IssueServiceTokenResponse{});
+
+    Oauth2ClientMockManager::RequestPath path = {
+        api::kServiceAccountTokenPath, nx::network::http::Method::post};
+    processRequest<api::IssueServiceAccountTokenRequest, api::IssueServiceTokenResponse>(
+        path, request, std::move(completionHandler));
+}
+
 void Oauth2ClientMock::createServiceAccount(
     const api::CreateServiceAccountRequest& request,
     nx::MoveOnlyFunc<void(db::api::ResultCode, api::CreateServiceAccountResponse)> completionHandler)

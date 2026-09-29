@@ -28,6 +28,8 @@ static constexpr char kInternalApiDocPrefix[] = "/oauth2/docs/internal-api";
 
 static constexpr char kOauthServiceToken[] = "/oauth2/v1/internal/serviceToken";
 
+static constexpr char kServiceAccountTokenPath[] = "/oauth2/v1/serviceToken";
+
 static constexpr char kServiceAccountsPath[]    = "/oauth2/v1/serviceAccounts";
 static constexpr char kServiceAccountByIdPath[] = "/oauth2/v1/serviceAccounts/{serviceAccountId}";
 static constexpr char kServiceAccountUpdateKeyPath[] =

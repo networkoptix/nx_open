@@ -76,4 +76,14 @@ void ClaimSet::setRegion(const std::string& val)
     set("region", val);
 }
 
+std::optional<std::string> ClaimSet::ownerEmail() const
+{
+    return get<std::string>("ownerEmail");
+}
+
+void ClaimSet::setOwnerEmail(const std::string& val)
+{
+    set("ownerEmail", val);
+}
+
 } // namespace nx::cloud::db::api
