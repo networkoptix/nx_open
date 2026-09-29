@@ -212,17 +212,6 @@
       <source>In selected area</source>
       <translation>Στην επιλεγμένη περιοχή</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n νέο αποτελέσμα</numerusform>
-        <numerusform>%n νέα αποτελέσματα</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation>Στην κορυφή</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Δεν υπάρχουν αντικείμενα</translation>

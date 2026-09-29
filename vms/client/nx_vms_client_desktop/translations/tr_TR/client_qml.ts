@@ -212,17 +212,6 @@
       <source>In selected area</source>
       <translation>Seçilen alanda</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation>
-        <numerusform>%n yeni sonuç</numerusform>
-        <numerusform>%n yeni sonuç</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>Nesne yok</translation>
