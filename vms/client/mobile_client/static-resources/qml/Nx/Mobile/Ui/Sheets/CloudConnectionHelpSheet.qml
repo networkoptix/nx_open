@@ -24,7 +24,7 @@ BaseAdaptiveSheet
         lineHeightMode: Text.FixedHeight
         wrapMode: Text.Wrap
 
-        width: parent.width
+        width: parent?.width ?? implicitWidth
     }
 
     component Step: RowLayout
@@ -71,6 +71,12 @@ BaseAdaptiveSheet
             verticalAlignment: Text.AlignVCenter
             Layout.fillWidth: true
         }
+    }
+
+    header: Header
+    {
+        text: qsTr("How to Connect?")
+        font.pixelSize: 18
     }
 
     Column
