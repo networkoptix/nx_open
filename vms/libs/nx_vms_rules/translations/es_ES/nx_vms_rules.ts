@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Unknown event</source>
-      <translation type="unfinished">Unknown event</translation>
+      <translation>Evento desconocido</translation>
     </message>
     <message>
       <source>Unknown action</source>
-      <translation type="unfinished">Unknown action</translation>
+      <translation>Acción desconocida</translation>
     </message>
     <message>
       <source>Any event</source>
@@ -85,11 +85,11 @@
     </message>
     <message>
       <source>Invalid field type is provided</source>
-      <translation type="unfinished">Invalid field type is provided</translation>
+      <translation>Se ha proporcionado un tipo de campo no válido</translation>
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Política de validación inesperada</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
