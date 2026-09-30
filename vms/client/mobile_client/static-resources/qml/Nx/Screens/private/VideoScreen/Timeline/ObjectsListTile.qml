@@ -265,6 +265,11 @@ Item
 
                             return undefined
                         }
+
+                        // Motion, analytics and bookmarks icons require secondary and
+                        // tertiary colors.
+                        secondaryColor: tile.shared ? undefined : primaryColor
+                        tertiaryColor: tile.shared ? undefined : primaryColor
                     }
                 }
             }
