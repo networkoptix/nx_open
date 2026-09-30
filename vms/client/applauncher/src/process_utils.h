@@ -3,6 +3,8 @@
 #ifndef PROCESS_UTILS_H
 #define PROCESS_UTILS_H
 
+#include <optional>
+
 #include <QtCore/QStringList>
 
 class ProcessUtils
@@ -14,6 +16,13 @@ public:
             const QStringList &environment = QStringList());
 
     static void initialize();
+
+#if defined(Q_OS_MACOS)
+    /**
+     * @return Whether process is running, nullopt if the process list is unavailable.
+     */
+    static std::optional<bool> isProcessRunning(const QString& executableName);
+#endif
 };
 
 #endif // PROCESS_UTILS_H

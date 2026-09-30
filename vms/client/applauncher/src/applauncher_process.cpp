@@ -2,6 +2,11 @@
 
 #include "applauncher_process.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <thread>
+#include <utility>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
@@ -16,6 +21,19 @@
 #include "process_utils.h"
 
 namespace {
+
+#if defined(Q_OS_MACOS)
+constexpr auto kBusyPollInterval = std::chrono::seconds(3);
+
+// Timeout for the client restart case.
+constexpr auto kKeepAliveAfterClientExit = std::chrono::seconds(10);
+
+// Extended timeout since Gatekeeper may delay the first start of a freshly installed client.
+constexpr auto kKeepAliveAfterClientLaunch = std::chrono::seconds(60);
+
+// An exiting instance closes its pipe before releasing its single instance lock.
+constexpr auto kLockReleaseDelay = std::chrono::milliseconds(500);
+#endif
 
 struct RunParameters
 {
@@ -98,6 +116,16 @@ void ApplauncherProcess::initChannels()
     m_taskServer.subscribeSimple(QByteArray::fromStdString(nx::reflect::toString(TaskType::quit)),
         [this]() -> bool
         {
+#if defined(Q_OS_MACOS)
+            {
+                std::lock_guard<std::mutex> lk(m_mutex);
+                if (std::exchange(m_selfQuitRequested, false)
+                    && std::chrono::steady_clock::now() < m_keepAliveUntil)
+                {
+                    return true; //< The own request was outrun by a client launch.
+                }
+            }
+#endif
             NX_INFO(this, "processRequest() - received a command to stop. Exiting.");
             m_taskServer.pleaseStop();
             pleaseStop();
@@ -170,17 +198,15 @@ void ApplauncherProcess::initChannels()
 
 void ApplauncherProcess::launchClient()
 {
-    nx::utils::SoftwareVersion versionToLaunch = getVersionToLaunch();
-    if (versionToLaunch.isNull())
+    const auto task = clientLaunchTask();
+    if (!task)
         return;
 
     Response response;
     enum { kTriesCount = 2 };
     for (int i = 0; i < kTriesCount; ++i)
     {
-        StartApplicationTask startAppTask(versionToLaunch,
-            m_startupParameters.clientCommandLineParameters);
-        if (startApplication(startAppTask, response))
+        if (startApplication(*task, response))
             break;
     }
 }
@@ -197,11 +223,23 @@ int ApplauncherProcess::run()
             return sendCommandToApplauncher(QuitTask()) == ResultType::ok;
         }
 
-        // Run the client (e.g. by shortcut click).
-        if (m_startupParameters.mode == StartupParameters::Mode::Default)
-            launchClient();
+        if (m_startupParameters.mode != StartupParameters::Mode::Default)
+            return 0;
 
+        // Run the client (e.g. by shortcut click).
+#if defined(Q_OS_MACOS)
+        // The running instance launches the client so that it knows to stay alive.
+        if (delegateClientLaunch())
+            return 0;
+
+        // The running instance is exiting, take its place.
+        std::this_thread::sleep_for(kLockReleaseDelay);
+        if (!m_taskServer.listen(launcherPipeName()))
+            return 0;
+#else
+        launchClient();
         return 0;
+#endif
     }
 
     // We are the only running applauncher instance.
@@ -211,8 +249,7 @@ int ApplauncherProcess::run()
     if (m_startupParameters.mode == StartupParameters::Mode::Default)
         launchClient();
 
-    std::unique_lock<std::mutex> lk(m_mutex);
-    m_cond.wait(lk, [this]() { return m_terminated; });
+    waitForTermination();
 
     // Waiting for all running tasks to stop.
     m_taskServer.pleaseStop();
@@ -222,9 +259,86 @@ int ApplauncherProcess::run()
     return 0;
 }
 
-nx::utils::SoftwareVersion ApplauncherProcess::getVersionToLaunch() const
+void ApplauncherProcess::waitForTermination()
 {
-    return m_installationManager->latestVersion(m_startupParameters.targetProtoVersion);
+    std::unique_lock<std::mutex> lk(m_mutex);
+#if defined(Q_OS_MACOS)
+    m_keepAliveUntil =
+        std::max(m_keepAliveUntil, std::chrono::steady_clock::now() + kKeepAliveAfterClientExit);
+    while (!m_cond.wait_for(lk, kBusyPollInterval, [this]() { return m_terminated; }))
+    {
+        lk.unlock();
+        const bool busy = isBusy();
+        lk.lock();
+        if (m_terminated)
+            break;
+
+        const auto now = std::chrono::steady_clock::now();
+        if (busy)
+            m_keepAliveUntil = std::max(m_keepAliveUntil, now + kKeepAliveAfterClientExit);
+        if (busy || now < m_keepAliveUntil)
+            continue;
+
+        m_selfQuitRequested = true;
+        lk.unlock();
+        requestQuit();
+        lk.lock();
+    }
+#else
+    m_cond.wait(lk, [this]() { return m_terminated; });
+#endif
+}
+
+#if defined(Q_OS_MACOS)
+
+bool ApplauncherProcess::isBusy() const
+{
+    if (!m_process.getFile().isEmpty())
+        return true; //< Installation is in progress.
+
+    return ProcessUtils::isProcessRunning(nx::branding::desktopClientBinaryName()).value_or(true);
+}
+
+bool ApplauncherProcess::delegateClientLaunch()
+{
+    const auto task = clientLaunchTask();
+    if (!task)
+        return true;
+
+    Response response;
+    const auto result = sendCommandToApplauncher(*task, &response);
+    if (result != ResultType::ok)
+    {
+        NX_WARNING(this, "Failed to send the client launch request: %1", result);
+        return false;
+    }
+
+    if (response.result != ResultType::ok)
+        NX_WARNING(this, "Running applauncher failed to launch the client: %1", response.result);
+    return true;
+}
+
+void ApplauncherProcess::requestQuit()
+{
+    NX_INFO(this, "No client is running. Requesting exit.");
+    const auto result = sendCommandToApplauncher(QuitTask());
+    if (result == ResultType::ok)
+        return;
+
+    NX_ERROR(this, "Failed to request exit via the task server: %1. Terminating.", result);
+    std::_Exit(1);
+}
+
+#endif // defined(Q_OS_MACOS)
+
+std::optional<StartApplicationTask> ApplauncherProcess::clientLaunchTask() const
+{
+    const auto version =
+        m_installationManager->latestVersion(m_startupParameters.targetProtoVersion);
+    if (version.isNull())
+        return std::nullopt;
+
+    return StartApplicationTask(version, m_startupParameters.clientCommandLineParameters);
 }
 
 bool ApplauncherProcess::startApplication(
@@ -276,6 +390,13 @@ bool ApplauncherProcess::startApplication(
         NX_DEBUG(this, "Successfully launched version %1 (path %2)", targetVersion, binPath);
         m_settings->sync();
         installation->updateLastExecutionTime();
+#if defined(Q_OS_MACOS)
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            m_keepAliveUntil = std::max(
+                m_keepAliveUntil, std::chrono::steady_clock::now() + kKeepAliveAfterClientLaunch);
+        }
+#endif
         response.result = ResultType::ok;
         return true;
     }
