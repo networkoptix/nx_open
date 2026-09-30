@@ -4,6 +4,14 @@
 
 #include <nx/utils/platform/process.h>
 
+#if defined(Q_OS_MACOS)
+    #include <libproc.h>
+
+    #include <vector>
+
+    #include <QtCore/QFileInfo>
+#endif
+
 #ifdef Q_OS_LINUX
     #include <signal.h>
     #include <unistd.h>
@@ -92,3 +100,35 @@ bool ProcessUtils::startProcessDetached(const QString& program,
 void ProcessUtils::initialize() {}
 
 #endif
+
+#if defined(Q_OS_MACOS)
+
+std::optional<bool> ProcessUtils::isProcessRunning(const QString& executableName)
+{
+    const auto requiredSizeBytes = proc_listpids(PROC_ALL_PIDS, 0, nullptr, 0);
+    if (requiredSizeBytes <= 0)
+        return std::nullopt;
+
+    static constexpr auto kPidsHeadroom = 64; //< For processes started after the size was queried.
+    std::vector<pid_t> pids(requiredSizeBytes / sizeof(pid_t) + kPidsHeadroom);
+
+    const auto filledSizeBytes = proc_listpids(
+        PROC_ALL_PIDS, 0, pids.data(), static_cast<int>(pids.size() * sizeof(pid_t)));
+    if (filledSizeBytes <= 0)
+        return std::nullopt;
+
+    pids.resize(filledSizeBytes / sizeof(pid_t));
+
+    char path[PROC_PIDPATHINFO_MAXSIZE];
+    for (const auto pid: pids)
+    {
+        if (pid <= 0 || proc_pidpath(pid, path, sizeof(path)) <= 0)
+            continue;
+
+        if (QFileInfo(QString::fromUtf8(path)).fileName() == executableName)
+            return true;
+    }
+    return false;
+}
+
+#endif // defined(Q_OS_MACOS)

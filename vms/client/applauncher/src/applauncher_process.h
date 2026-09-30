@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <future>
-#include <memory>
 #include <mutex>
+#include <optional>
 
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
@@ -59,13 +59,10 @@ private:
     void launchClient();
 
     /**
-     * Find client version which should be launched right after applauncher start.
-     * Logic is the following:
-     *  * if version was provided and it exists, run it, otherwise:
-     *  * if protocol version was provided, run the latest installed version with this protocol
-     *  * otherwise run the latest installed version
+     * Task launching the version from the startup parameters if it is installed, otherwise the
+     * latest installed version with the requested protocol, otherwise the latest one at all.
      */
-    nx::utils::SoftwareVersion getVersionToLaunch() const;
+    std::optional<applauncher::api::StartApplicationTask> clientLaunchTask() const;
 
     bool startApplication(
         const applauncher::api::StartApplicationTask& task,
@@ -93,6 +90,26 @@ private:
         applauncher::api::AddProcessKillTimerResponse& response);
 
     virtual void onTimer(const quint64& timerId) override;
+
+    /**
+     * Blocks until a quit command arrives. On macOS also requests the own quit when no client has
+     * been running for a grace period to avoid "Running in Background" state.
+     */
+    void waitForTermination();
+
+#if defined(Q_OS_MACOS)
+    /** Whether a client is running or an installation is in progress. */
+    bool isBusy() const;
+
+    /** False if the request could not be delivered to the running instance. */
+    bool delegateClientLaunch();
+
+    /**
+     * Asks the own task server to quit, its thread is blocked in accept() and only a request
+     * wakes it up. Terminates the process if the request fails, since nothing else can stop it.
+     */
+    void requestQuit();
+#endif
 
     template<class CallbackType>
     bool subscribe(applauncher::api::TaskType task,
@@ -142,6 +159,12 @@ private:
 
     InstallationProcess m_process;
     nx::utils::TimerManager m_timerManager;
+
+#if defined(Q_OS_MACOS)
+    /** Applauncher must not exit before this time point even if no client is running. */
+    std::chrono::steady_clock::time_point m_keepAliveUntil;
+    bool m_selfQuitRequested = false;
+#endif
 };
 
 } // namespace nx::vms::applauncher
