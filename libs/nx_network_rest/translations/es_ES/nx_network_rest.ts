@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Unsupported charset.</source>
-      <translation type="unfinished">Unsupported charset.</translation>
+      <translation>Conjunto de caracteres no compatible.</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your Site administrator.</translation>
+      <translation>La contraseña ha caducado. Póngase en contacto con el administrador del sitio.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
@@ -40,7 +40,7 @@
     </message>
     <message>
       <source>This user has been disabled by a Site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a Site administrator.</translation>
+      <translation>Este usuario ha sido desactivado por un administrador del sitio.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your Site administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your Site administrator.</translation>
+      <translation>Este método de autorización está prohibido. Póngase en contacto con el administrador del sitio.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
@@ -68,15 +68,15 @@
     </message>
     <message>
       <source>Internal server error (%1). Please contact your Site administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your Site administrator.</translation>
+      <translation>Error interno del servidor (%1). Por favor, contacte con el administrador del sitio.</translation>
     </message>
     <message>
       <source>The request is unauthorized due to an unknown error.</source>
-      <translation type="unfinished">The request is unauthorized due to an unknown error.</translation>
+      <translation>La solicitud no está autorizada debido a un error desconocido.</translation>
     </message>
     <message>
       <source>The session key is too old for this Site.</source>
-      <translation type="unfinished">The session key is too old for this Site.</translation>
+      <translation>La clave de sesión es demasiado antigua para este sitio.</translation>
     </message>
     <message>
       <source>No credentials provided when required by endpoint.</source>
@@ -144,11 +144,11 @@
     </message>
     <message>
       <source>Session is too old according to the Site config.</source>
-      <translation type="unfinished">Session is too old according to the Site config.</translation>
+      <translation>La sesión es demasiado antigua según la configuración del sitio.</translation>
     </message>
     <message>
       <source>Resource no longer present on server.</source>
-      <translation type="unfinished">Resource no longer present on server.</translation>
+      <translation>El recurso ya no está presente en el servidor.</translation>
     </message>
     <message>
       <source>Not allowed.</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>Service unauthorized.</source>
-      <translation type="unfinished">Service unauthorized.</translation>
+      <translation>Servicio no autorizado.</translation>
     </message>
     <message>
       <source>Insufficient storage.</source>
