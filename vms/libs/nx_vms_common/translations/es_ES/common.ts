@@ -1952,7 +1952,7 @@
     </message>
     <message>
       <source>Socket sending timeout when Server streams media data (Seconds).</source>
-      <translation type="unfinished">Socket sending timeout when Server streams media data (Seconds).</translation>
+      <translation>Tiempo de espera de envío del socket cuando el servidor transmite datos multimedia (segundos).</translation>
     </message>
     <message>
       <source>HTTP header: Access-Control-Allow-Origin.</source>
@@ -1964,7 +1964,7 @@
     </message>
     <message>
       <source>JSON RPC subscription update interval (milliseconds, 0 = disabled).</source>
-      <translation type="unfinished">JSON RPC subscription update interval (milliseconds, 0 = disabled).</translation>
+      <translation>Intervalo de actualización de la suscripción RPC JSON (milisegundos, 0 = deshabilitado).</translation>
     </message>
   </context>
 </TS>
