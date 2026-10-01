@@ -38,6 +38,8 @@ Rectangle
     // - Checking: archive presence is still being resolved; controls and placeholder are hidden;
     // - NoData: no archive at the position; the "No data" placeholder is shown and every control
     //   except "Show on camera" is disabled.
+    // The player outcome is applied on top of it: a stream that ends before its first frame is
+    // shown as NoData as well.
     enum DataState { Available, Checking, NoData }
     property int dataState: Preview.DataState.Available
 
@@ -86,7 +88,7 @@ Rectangle
 
         audioEnabled: audioController.audioEnabled
         scalable: true
-        hasPreloader: root.dataState !== Preview.DataState.NoData
+        hasPreloader: d.effectiveDataState !== Preview.DataState.NoData
         preloaderColor: ColorTheme.colors.light10
         preloaderDotRadius: 6
         aspectRatio: 0 //< No forced aspect ratio.
@@ -104,8 +106,11 @@ Rectangle
         VideoDummy
         {
             anchors.fill: preview
-            visible: preview.cannotDecryptMedia || root.dataState === Preview.DataState.NoData
-            state: root.dataState === Preview.DataState.NoData ? "noData" : "cannotDecryptMedia"
+            visible: preview.cannotDecryptMedia
+                || d.effectiveDataState === Preview.DataState.NoData
+            state: d.effectiveDataState === Preview.DataState.NoData
+                ? "noData"
+                : "cannotDecryptMedia"
             minimumVerticalPadding: 19
         }
 
@@ -204,7 +209,8 @@ Rectangle
             anchors.bottomMargin: 16
 
             target: fullscreenButton
-            visible: !LayoutController.fullscreen && root.dataState === Preview.DataState.Available
+            visible: !LayoutController.fullscreen
+                && d.effectiveDataState === Preview.DataState.Available
         }
 
         LayoutItemProxy
@@ -234,7 +240,9 @@ Rectangle
 
         preview: preview
 
-        visible: opacity > 0 && root.dataState === Preview.DataState.Available && !preview.cannotDecryptMedia
+        visible: opacity > 0
+            && d.effectiveDataState === Preview.DataState.Available
+            && !preview.cannotDecryptMedia
         opacity: d.controlsOpacity
     }
 
@@ -333,7 +341,8 @@ Rectangle
         font.weight: Font.Medium
 
         color: ColorTheme.colors.light4
-        opacity: !preview.cannotDecryptMedia && root.dataState === Preview.DataState.Available
+        opacity: !preview.cannotDecryptMedia
+                && d.effectiveDataState === Preview.DataState.Available
             ? 1.0
             : 0.0
 
@@ -356,7 +365,7 @@ Rectangle
             ? 0.0
             : (LayoutController.fullscreen ? d.controlsOpacity : 1.0)
 
-        enabled: opacity > 0 && root.dataState === Preview.DataState.Available
+        enabled: opacity > 0 && d.effectiveDataState === Preview.DataState.Available
             && (LayoutController.fullscreen || preview.isReady)
 
         backgroundColor: LayoutController.fullscreen
@@ -374,7 +383,7 @@ Rectangle
         icon.source: "image://skin/24x24/Solid/repeat.svg"
 
         opacity: d.controlsOpacity
-        enabled: root.dataState === Preview.DataState.Available
+        enabled: d.effectiveDataState === Preview.DataState.Available
         checkable: true
         checked: preview.autoRepeat
 
@@ -408,7 +417,7 @@ Rectangle
         id: playPauseButton
 
         opacity: preview.cannotDecryptMedia ? 0.0 : d.controlsOpacity
-        enabled: opacity > 0 && root.dataState === Preview.DataState.Available
+        enabled: opacity > 0 && d.effectiveDataState === Preview.DataState.Available
         rounded: LayoutController.fullscreen
 
         implicitWidth: LayoutController.fullscreen ? 64 : 44
@@ -498,6 +507,11 @@ Rectangle
     QtObject
     {
         id: d
+
+        readonly property int effectiveDataState:
+            preview.previewState === EventSearch.PreviewState.missing && !preview.cannotDecryptMedia
+                ? Preview.DataState.NoData
+                : root.dataState
 
         property bool controlsVisible: true
 
