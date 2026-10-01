@@ -49,6 +49,7 @@ private:
 
     void addCamera(const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent = false);
     void removeCamera(const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent = false);
+    void removeEntry(int row, bool silent = false);
 
     void at_watcher_cameraAdded(const QnResourcePtr& resource);
     void at_watcher_cameraRemoved(const QnResourcePtr& resource);
@@ -83,7 +84,7 @@ QVariant QnAvailableCameraListModel::data(const QModelIndex& index, int role) co
 {
     Q_D(const QnAvailableCameraListModel);
 
-    if (index.row() > d->resources.size())
+    if (index.row() >= d->resources.size())
         return QVariant();
 
     const auto& resource = d->resources[index.row()].resource;
@@ -286,6 +287,25 @@ void QnAvailableCameraListModelPrivate::addCamera(
             q->refreshResource(changedResource, ResourceStatusRole);
         });
 
+    // Cameras of a lost cross-system context are removed from its pool right before the context
+    // is destroyed, while layout items still reference them.
+    connect(resource.get(),
+        &QnResource::flagsChanged,
+        this,
+        [this](const QnResourcePtr& changedResource)
+        {
+            if (!changedResource->hasFlags(Qn::removed))
+                return;
+
+            const auto resourceIter = std::find_if(resources.cbegin(),
+                resources.cend(),
+                [changedResource](const ResourceEntry& entry)
+                { return entry.resource == changedResource; });
+
+            if (resourceIter != resources.cend())
+                removeEntry(resourceIter - resources.cbegin());
+        });
+
     const auto row = resources.size();
 
     if (!silent)
@@ -307,8 +327,6 @@ void QnAvailableCameraListModelPrivate::addCamera(
 void QnAvailableCameraListModelPrivate::removeCamera(
     const QnResourcePtr& resource, const nx::Uuid& sourceId, bool silent)
 {
-    Q_Q(QnAvailableCameraListModel);
-
     const auto resourceIter = std::find_if(resources.begin(), resources.end(),
         [resource](const ResourceEntry& entry)
         {
@@ -328,10 +346,15 @@ void QnAvailableCameraListModelPrivate::removeCamera(
     }
 
     resourceIter->layoutItemSourceIds.erase(sourceId);
-    if (!resourceIter->layoutItemSourceIds.empty())
-        return;
+    if (resourceIter->layoutItemSourceIds.empty())
+        removeEntry(resourceIter - resources.begin(), silent);
+}
 
-    const int row = resourceIter - resources.begin();
+void QnAvailableCameraListModelPrivate::removeEntry(int row, bool silent)
+{
+    Q_Q(QnAvailableCameraListModel);
+
+    const auto resource = resources[row].resource;
 
     disconnect(resource.get(), nullptr, this, nullptr);
 
