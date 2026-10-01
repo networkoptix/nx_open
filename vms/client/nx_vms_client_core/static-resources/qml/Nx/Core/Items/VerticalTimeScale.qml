@@ -193,13 +193,27 @@ Item
                 Transition
                 {
                     to: "Added"
-                    OpacityAnimator { duration: item.fadeDurationMs }
+                    NumberAnimation { property: "opacity"; duration: item.fadeDurationMs }
                 },
 
                 Transition
                 {
                     to: "Removed"
-                    OpacityAnimator { duration: item.fadeDurationMs }
+                    SequentialAnimation
+                    {
+                        NumberAnimation { property: "opacity"; duration: item.fadeDurationMs }
+                        ScriptAction
+                        {
+                            script:
+                            {
+                                labelHolder.visible = false
+                                d.labels.delete(labelHolder.modelData.timestampMs)
+
+                                // Don't change state from a transition, delay it.
+                                Qt.callLater(() => d.poolLabel(labelHolder))
+                            }
+                        }
+                    }
                 }
             ]
         }
@@ -242,7 +256,8 @@ Item
                 }
                 else if (label.y >= item.height || label.y + label.height <= 0)
                 {
-                    d.releaseLabel(label)
+                    d.labels.delete(timeMs)
+                    d.poolLabel(label)
                 }
                 else
                 {
@@ -284,12 +299,14 @@ Item
             return labelHolder
         }
 
-        function releaseLabel(labelHolder)
+        function poolLabel(labelHolder)
         {
+            console.assert(d.labels.get(labelHolder.modelData?.timestampMs) !== labelHolder,
+                `Attempted to pool ${labelHolder} which is in use`)
+
             labelHolder.visible = false
             labelHolder.state = ""
             pooledLabels.push(labelHolder)
-            d.labels.delete(labelHolder.modelData.timestampMs)
         }
     }
 
