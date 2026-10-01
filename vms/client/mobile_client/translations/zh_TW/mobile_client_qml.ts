@@ -146,11 +146,11 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>滑動切換資源</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>向右滑動切換到下一個攝影機</translation>
     </message>
   </context>
   <context>
@@ -743,11 +743,11 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>檢視模式</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>點選選擇所需的資料類型</translation>
     </message>
   </context>
   <context>
@@ -784,11 +784,11 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>懸浮面板按鈕</translation>
     </message>
     <message>
       <source>Tap the floating button to restore the panel</source>
-      <translation type="unfinished">Tap the floating button to restore the panel</translation>
+      <translation>點擊懸浮按鈕還原面板</translation>
     </message>
   </context>
   <context>
@@ -1421,11 +1421,11 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>觸發按鈕</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>點擊即可叫出觸發按鈕面板</translation>
     </message>
   </context>
   <context>
@@ -1486,18 +1486,18 @@
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>長按即可叫出更多資訊的預覽</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>縮放時間軸</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>雙指捏合縮小、展張開放大</translation>
     </message>
   </context>
   <context>
@@ -1687,7 +1687,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>再按一次返回鍵以退出</translation>
     </message>
   </context>
 </TS>
