@@ -60,5 +60,7 @@
     <string>Please grant access to the microphone to send sound to the camera.</string>
     <key>NSCameraUsageDescription</key>
     <string>This app does not use camera.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Used to discover and connect to Servers on your local network.</string>
 </dict>
 </plist>
