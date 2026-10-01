@@ -4,9 +4,10 @@
 
 #include <core/resource/camera_resource.h>
 #include <nx/reflect/instrument.h>
-#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/device_data.h>
+#include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/log_strings_format.h>
 #include <nx/vms/event/action_parameters.h>
 
 namespace {
@@ -35,7 +36,7 @@ IoPortsCompatibilityInterface_5_1::~IoPortsCompatibilityInterface_5_1()
 }
 
 bool IoPortsCompatibilityInterface_5_1::setIoPortState(
-    const nx::vms::common::SessionTokenHelperPtr& /*tokenHelper*/,
+    const nx::vms::common::SessionTokenHelperPtr& tokenHelper,
     const QnVirtualCameraResourcePtr& camera,
     const QString& cameraOutputId,
     bool isActive,
@@ -65,27 +66,44 @@ bool IoPortsCompatibilityInterface_5_1::setIoPortState(
     actionData.resourceIds.push_back(camera->getId());
     actionData.params = QJson::serialized(actionParameters);
 
-    auto internalCallback =
-        [this, cameraOutputId, callback](
-            bool success,
-            rest::Handle /*requestId*/,
-            nx::network::rest::JsonResult result)
+    auto internalCallback = [this, cameraOutputId, callback](bool success,
+                                rest::Handle /*requestId*/,
+                                rest::ErrorOrData<QByteArray> response)
+    {
+        // Servers prior to 6.1 respond to a successful request with an empty body, which
+        // can't be parsed as nx::network::rest::Result. Non-empty body may contain an error.
+        if (success && response && !response->isEmpty())
         {
-            if (!success)
+            nx::network::rest::Result result;
+            if (QJson::deserialize(*response, &result)
+                && result.errorId != nx::network::rest::ErrorId::ok)
             {
-                NX_WARNING(this, "Extended camera output %1 operation was unsuccessful: %2",
-                    cameraOutputId, result.errorString);
+                response = std::unexpected(std::move(result));
+                success = false;
             }
+        }
 
-            if (callback)
-                callback(success);
-        };
+        NX_LOG_RESPONSE(this,
+            success,
+            response,
+            "Extended camera output %1 operation was unsuccessful.",
+            cameraOutputId);
+
+        if (callback)
+            callback(success);
+    };
 
     if (!systemContext()->connectedServerApi())
         return false;
 
-    return systemContext()->connectedServerApi()->executeEventAction(
-        actionData, internalCallback, this);
+    return systemContext()->connectedServerApi()->sendRequest<rest::ErrorOrData<QByteArray>>(
+        tokenHelper,
+        nx::network::http::Method::post,
+        "/api/executeEventAction",
+        nx::network::rest::Params{},
+        QJson::serialized(actionData),
+        internalCallback,
+        this);
 }
 
 } // namespace nx::vms::client::core

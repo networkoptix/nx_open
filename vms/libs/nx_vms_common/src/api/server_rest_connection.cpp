@@ -920,20 +920,6 @@ Handle ServerConnection::setOverlappedId(
         executor);
 }
 
-Handle ServerConnection::executeEventAction(
-    const nx::vms::api::EventActionData& action,
-    Callback<nx::network::rest::Result> callback,
-    nx::utils::AsyncHandlerExecutor executor,
-    std::optional<nx::Uuid> proxyToServer)
-{
-    return executePost(
-        "/api/executeEventAction",
-        QJson::serialized(action),
-        std::move(callback),
-        executor,
-        proxyToServer);
-}
-
 Handle ServerConnection::addFileUpload(
     const nx::Uuid& serverId,
     const QString& fileName,
