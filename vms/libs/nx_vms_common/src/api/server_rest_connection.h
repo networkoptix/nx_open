@@ -552,12 +552,6 @@ public: // Specific request methods.
         Callback<nx::vms::api::OverlappedIdResponse> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
 
-    Handle executeEventAction(
-        const nx::vms::api::EventActionData& action,
-        Callback<nx::network::rest::Result> callback,
-        nx::utils::AsyncHandlerExecutor executor = {},
-        std::optional<nx::Uuid> proxyToServer = {});
-
     Handle getModuleInformation(
         Callback<ResultWithData<nx::vms::api::ModuleInformation>> callback,
         nx::utils::AsyncHandlerExecutor executor = {});
