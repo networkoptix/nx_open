@@ -174,15 +174,13 @@ Item
                                     break
 
                                 case MediaPlayer.EndOfMedia:
-                                    if (loader.previewState !== EventSearch.PreviewState.loading)
-                                    {
-                                        if (control.autoRepeat && !control.forcePaused)
-                                            restartTimer.start()
-                                    }
-                                    else
-                                    {
+                                    // The stream ended before its first frame: the server has no
+                                    // playable data for the interval, whatever the recorded
+                                    // periods claim.
+                                    if (loader.previewState !== EventSearch.PreviewState.ready)
                                         loader.previewState = EventSearch.PreviewState.missing
-                                    }
+                                    else if (control.autoRepeat && !control.forcePaused)
+                                        restartTimer.start()
                                     break
 
                                 case MediaPlayer.NoVideoStreams:
@@ -259,6 +257,9 @@ Item
         visible:
         {
             if (!hasPreloader || cannotDecryptMedia)
+                return false
+
+            if (loader.previewState === EventSearch.PreviewState.missing)
                 return false
 
             if (loader.item && loader.item.content.mediaPlayer.loading)
