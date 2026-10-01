@@ -27,6 +27,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/math/math.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -172,6 +173,8 @@ public:
 
     // Resource to play.
     QnResourcePtr resource;
+
+    nx::utils::ScopedConnection resourceRemovedConnection;
 
     int maxTextureSize = kDefaultMaxTextureSize;
 
@@ -1047,6 +1050,19 @@ void Player::setResource(const QnResourcePtr& value)
     stop();
 
     setResourceInternal(value);
+
+    d->resourceRemovedConnection.reset();
+    if (d->resource)
+    {
+        d->resourceRemovedConnection.reset(connect(d->resource.get(),
+            &QnResource::flagsChanged,
+            this,
+            [this](const QnResourcePtr& resource)
+            {
+                if (resource->hasFlags(Qn::removed))
+                    setResource({});
+            }));
+    }
 
     if (d->isLocalFile)
         d->setLiveMode(false);
