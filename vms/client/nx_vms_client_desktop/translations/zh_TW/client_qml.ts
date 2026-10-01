@@ -220,16 +220,6 @@
       <source>In selected area</source>
       <translation>所選擇的區域</translation>
     </message>
-    <message numerus="yes">
-      <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
-    </message>
     <message>
       <source>No objects</source>
       <translation>沒有任何物件</translation>
@@ -2551,7 +2541,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>啟用此選項讓第三方可以送出登錄整合的核准請求。系統已採取安全措施，但請在安裝所有必要的整合後停用此選項 —不建議長時間使用。</translation>
     </message>
   </context>
   <context>
@@ -3115,7 +3105,7 @@ Press Alt + Click to follow object</source>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>測試事件…</translation>
     </message>
     <message>
       <source>Event Rules</source>

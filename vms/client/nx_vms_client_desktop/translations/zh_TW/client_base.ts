@@ -12435,11 +12435,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>無法將其他站點的資源新增至一般佈局。請使用 %1 將佈局以跨站點佈局開啟。</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>該佈局已經是跨站點佈局</translation>
     </message>
   </context>
   <context>
