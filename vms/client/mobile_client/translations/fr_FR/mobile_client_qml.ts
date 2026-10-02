@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Appuyez et maintenez enfoncés</translation>
     </message>
     <message>
       <source>Error</source>
@@ -50,15 +50,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Vous n'êtes pas autorisé à consulter les archives</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Vous n'avez aucune vidéo enregistrée dans les archives</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>La timeline est en cours de chargement...</translation>
     </message>
   </context>
   <context>
@@ -104,11 +104,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Chronologie miroir</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Inverser la chronologie pour une utilisation par les gauchers. Applicable uniquement aux écrans de type téléphone.</translation>
     </message>
   </context>
   <context>
@@ -181,6 +181,10 @@
       <translation>Si le site est &lt;font color=&apos;%2&apos;&gt;pas connecté&lt;/a&gt; à %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Cliquez sur &quot;Connecter le site à %1&quot; dans l'onglet %1 de l'administration du site.</translation>
@@ -251,7 +255,7 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Recherche par %1</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -408,7 +412,7 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>Tout réinitialiser</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -508,7 +512,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>Vous êtes en mode Live</translation>
     </message>
   </context>
   <context>
@@ -590,7 +594,7 @@
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
-      <translation type="unfinished">Allows to show server time for the camera</translation>
+      <translation>Permet d'afficher l'heure du serveur pour la caméra</translation>
     </message>
   </context>
   <context>
@@ -651,7 +655,7 @@
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Déconnecter %1 de %2?</translation>
     </message>
   </context>
   <context>
@@ -678,14 +682,14 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Appuyez n'importe où sur la vidéo pour centrer la vue</translation>
     </message>
   </context>
   <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Appuyez n'importe où sur la vidéo pour centrer la vue</translation>
     </message>
   </context>
   <context>
@@ -718,7 +722,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Sélectionnez ce que vous souhaitez partager</translation>
     </message>
     <message>
       <source>Download</source>
@@ -726,7 +730,7 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Sélectionnez ce que vous souhaitez télécharger</translation>
     </message>
     <message>
       <source>Edit sharing</source>
@@ -788,8 +792,8 @@
       <translation>Bouton du panneau flottant</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>Appuyez sur le bouton flottant pour restaurer le panneau</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>
@@ -815,42 +819,42 @@
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation type="unfinished">Can improve performance and battery life</translation>
+      <translation>Peut améliorer les performances et l'autonomie de la batterie</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
+      <translation>Solution de secours du décodeur logiciel</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
+      <translation>Peut décoder des formats vidéo rares à l'aide d'un logiciel</translation>
     </message>
   </context>
   <context>
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Aucun signet</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Aucun objet</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Aucun mouvement</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Aucun signet n'a été créé sur cette chronologie</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Aucun objet n'a été détecté sur cette chronologie</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Aucun mouvement n'a été détecté sur cette chronologie</translation>
     </message>
   </context>
   <context>
@@ -893,7 +897,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Annuler le recentrage</translation>
     </message>
     <message>
       <source>PTZ Presets</source>
@@ -920,7 +924,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Connectez-vous au cloud pour recevoir des notifications</translation>
     </message>
     <message>
       <source>Notifications are turned off in the device settings</source>
@@ -948,11 +952,11 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>SÉLECTIONNER %1/%2</translation>
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Veuillez sélectionner au moins un site</translation>
     </message>
   </context>
   <context>
@@ -1027,7 +1031,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>Arrêtez la connexion</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1035,19 +1039,19 @@
     </message>
     <message>
       <source>Timeline</source>
-      <translation type="unfinished">Timeline</translation>
+      <translation>Chronologie</translation>
     </message>
     <message>
       <source>No Devices</source>
-      <translation type="unfinished">No Devices</translation>
+      <translation>Aucun appareil</translation>
     </message>
     <message>
       <source>No devices were found on this layout</source>
-      <translation type="unfinished">No devices were found on this layout</translation>
+      <translation>Aucun appareil n'a été trouvé sur cette mise en page</translation>
     </message>
     <message>
       <source>No devices were found on this site. Add devices with the desktop client, or request access to existing devices</source>
-      <translation type="unfinished">No devices were found on this site. Add devices with the desktop client, or request access to existing devices</translation>
+      <translation>Aucun appareil n'a été trouvé sur ce site. Ajoutez des appareils via le client de bureau ou demandez l'accès aux appareils existants</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -1076,7 +1080,7 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Enregistrer les mots de passe</translation>
     </message>
     <message>
       <source>Automatically log in to servers</source>
@@ -1084,7 +1088,7 @@
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Comment gérer les mots de passe enregistrés ?</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -1096,7 +1100,7 @@
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Vérification du certificat du serveur</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -1178,7 +1182,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Comment se connecter ?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -1186,31 +1190,31 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Accès aux ressources refusé</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Créez une organisation dans le portail cloud pour y accéder ici</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Les ressources de cette organisation ne sont pas accessibles à votre groupe d'autorisation</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Connectez un site à l'organisation pour y accéder ici</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Aucun site accessible n'a été trouvé. Connectez-vous au compte cloud ou connectez-vous à un serveur local</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Aucun site accessible n'a été trouvé. Demander l'accès aux sites existants ou se connecter à un serveur local</translation>
     </message>
     <message>
       <source>Welcome, %1!</source>
-      <translation type="unfinished">Welcome, %1!</translation>
+      <translation>Bienvenue, %1!</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1303,11 +1307,11 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Partager le lien</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Sélectionner la date d'expiration</translation>
     </message>
     <message>
       <source>Expiration</source>
@@ -1350,7 +1354,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Hôte:Port</translation>
     </message>
   </context>
   <context>
@@ -1373,7 +1377,7 @@
     </message>
     <message>
       <source>Log In to Cloud</source>
-      <translation type="unfinished">Log In to Cloud</translation>
+      <translation>Se connecter au cloud</translation>
     </message>
   </context>
   <context>
@@ -1411,7 +1415,7 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Accès aux ressources refusé</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
@@ -1509,7 +1513,7 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>Ok, j'ai compris</translation>
     </message>
   </context>
   <context>
@@ -1589,7 +1593,7 @@
     </message>
     <message>
       <source>2FA disabled</source>
-      <translation type="unfinished">2FA disabled</translation>
+      <translation>2FA désactivée</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1597,7 +1601,7 @@
     </message>
     <message>
       <source>Unsupported</source>
-      <translation type="unfinished">Unsupported</translation>
+      <translation>Non pris en charge</translation>
     </message>
     <message>
       <source>No data</source>
@@ -1632,27 +1636,27 @@
     </message>
     <message>
       <source>PTZ Mode</source>
-      <translation type="unfinished">PTZ Mode</translation>
+      <translation>Mode PTZ</translation>
     </message>
     <message>
       <source>Export...</source>
-      <translation type="unfinished">Export...</translation>
+      <translation>Exporter...</translation>
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Mode Live uniquement</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Mode archive uniquement</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Informations sur la caméra</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Allez sur Live pour activer les déclencheurs de logiciels</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1660,7 +1664,7 @@
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Calendrier</translation>
     </message>
     <message>
       <source>Actions</source>
@@ -1680,7 +1684,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Retour à l'écran d'accueil</translation>
     </message>
     <message>
       <source>Log out</source>

@@ -181,6 +181,10 @@
       <translation>사이트가 &lt;font color=&apos;%2&apos;&gt;이고&lt;/a&gt; 에서 %1로 연결되지 않은 경우</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>사이트 관리의 %1 탭에서 &quot;사이트를 %1&quot; 에 연결하기를 클릭하세요</translation>
@@ -787,8 +791,8 @@
       <translation type="unfinished">Floating Panel Button</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation type="unfinished">Tap the floating button to restore the panel</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

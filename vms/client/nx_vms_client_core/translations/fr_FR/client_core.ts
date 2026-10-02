@@ -502,7 +502,7 @@
     <name>nx::vms::client::core::bookmarks::BookmarkUtilsStrings</name>
     <message>
       <source>Unknown Object</source>
-      <translation type="unfinished">Unknown Object</translation>
+      <translation>Objet inconnu</translation>
     </message>
     <message>
       <source>Camera</source>

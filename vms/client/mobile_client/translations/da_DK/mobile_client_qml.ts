@@ -181,6 +181,10 @@
       <translation>Hvis webstedet &lt;font color=&apos;%2&apos;&gt;ikke er forbundet&lt;/a&gt; til %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Klik på &quot;Forbind websted til %1&quot; i fanen %1 i Webstedsadministration</translation>
@@ -788,8 +792,8 @@
       <translation>Flydende Panel Knap</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>Tryk på den flydende knap for at gendanne panelet</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

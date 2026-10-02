@@ -181,6 +181,10 @@
       <translation>如果站點&lt;font color=&apos;%2&apos;&gt;未連接&lt;/a&gt;至 %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>在站點管理的 %1 分頁中按一下&quot;連接站點到%1&quot; </translation>
@@ -787,8 +791,8 @@
       <translation>懸浮面板按鈕</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>點擊懸浮按鈕還原面板</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

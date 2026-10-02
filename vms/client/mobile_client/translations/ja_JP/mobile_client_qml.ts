@@ -181,6 +181,10 @@
       <translation>サイトが %1 に &lt;font color=&apos;%2&apos;&gt;接続されていない&lt;/a&gt; 場合</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>サイト管理の %1 タブで、&quot;サイトを %1 に接続&quot; をクリックしてください。</translation>
@@ -787,8 +791,8 @@
       <translation>フローティングパネルボタン</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>パネルを復元するにはフローティングボタンをタップ</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

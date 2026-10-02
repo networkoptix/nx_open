@@ -181,6 +181,10 @@
       <translation>Εάν η τοποθεσία &lt;font color=&apos;%2&apos;&gt;δεν είναι συνδεδεμένη&lt;/a&gt; to %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Κάντε κλικ στην επιλογή &quot;Σύνδεση Τοποθεσίας με %1&quot; στην καρτέλα %1 στη Διαχείριση Τοποθεσίας</translation>
@@ -788,8 +792,8 @@
       <translation>Κουμπί πλωτού πλαισίου</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>Πατήστε το πλωτό κουμπί για να επαναφέρετε τον πίνακα</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

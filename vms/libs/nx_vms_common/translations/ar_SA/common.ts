@@ -893,145 +893,145 @@
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص زمنية</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
-        <numerusform>%n/%1 Time Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
+        <numerusform>%n/%1 تراخيص زمنية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص تناظرية</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
+        <numerusform>%n/%1 تراخيص تناظرية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
+        <numerusform>%n/%1 التراخيص الاحترافية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص الحافة</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص الحافَة</numerusform>
+        <numerusform>%n/%1 تراخيص الحافَة</numerusform>
+        <numerusform>%n/%1 تراخيص الحافَة</numerusform>
+        <numerusform>%n/%1 تراخيص الحافَة</numerusform>
+        <numerusform>%n/%1 تراخيص الحافَة</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1  تراخيص Vmax </numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
+        <numerusform>%n/%1  تراخيص Vmax </numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
+        <numerusform> %n/%1 تراخيص أجهزة التشفير التناظرية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 تراخيص حائط الفيديو</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n \ %1 تراخيص حائط الفيديو</numerusform>
+        <numerusform>%n/1 تراخيص حائط الفيديو</numerusform>
+        <numerusform>%n/1 تراخيص حائط الفيديو</numerusform>
+        <numerusform>%n/1 تراخيص حائط الفيديو</numerusform>
+        <numerusform>%n/1 تراخيص حائط الفيديو</numerusform>
+        <numerusform>%n/1 تراخيص حائط الفيديو</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n/%1 تراخيص وحدات الإدخال/الإخراج</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 تراخيص البدء</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
+        <numerusform>%n/%1 تراخيص البَدْء</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص مجانية</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
+        <numerusform>%n/%1 تراخيص مجانية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص جسر</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص غير صالحة</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
+        <numerusform>%n/%1 تراخيص جسر</numerusform>
       </translation>
     </message>
     <message>
@@ -1044,25 +1044,25 @@
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
+        <numerusform> %n تراخيص مسجلات الفيديو الشبكية (NVR)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
+        <numerusform>%n/%1 تراخيص مسجلات الفيديو الشبكية (NVR) </numerusform>
       </translation>
     </message>
     <message>
@@ -1071,25 +1071,25 @@
     </message>
     <message numerus="yes">
       <source>%n Local recording services</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform> %n خدمات التسجيل المحلية</numerusform>
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
-        <numerusform>%n Local recording services</numerusform>
+        <numerusform> %n خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform> %n خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform> %n خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform> %n خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform> %n خِدْمَات التسجيل المحلية</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 خدمات التسجيل المحلية</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
-        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform>%n/%1 خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform>%n/%1 خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform>%n/%1 خِدْمَات التسجيل المحلية</numerusform>
+        <numerusform>%n/%1 خِدْمَات التسجيل المحلية</numerusform>
       </translation>
     </message>
     <message>
@@ -1115,13 +1115,13 @@
     <name>QnRequiredAccessRightPolicy</name>
     <message numerus="yes">
       <source>%n groups</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n مجموعات</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
-        <numerusform>%n groups</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
+        <numerusform>%n مجموعات</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1143,13 +1143,13 @@
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n groups do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n مجموعات ليس لديها إذن %1 لبعض الكاميرات المحددة</numerusform>
       </translation>
     </message>
     <message>
@@ -1160,13 +1160,13 @@
     <message numerus="yes">
       <source>%n users do not have %1 permission for some of selected cameras</source>
       <comment>%1 is the permission name</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
-        <numerusform/>
-        <numerusform/>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
-        <numerusform>%n users do not have %1 permission for some of selected cameras</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
+        <numerusform>%n المستخدمين ليس لديهم إذن %1 لبعض الكاميرات المحددة</numerusform>
       </translation>
     </message>
     <message>
@@ -1179,68 +1179,68 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n كاميرات</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n كاميرات</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
+        <numerusform>%n كاميرات</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
+        <numerusform>%n وحدات الإدخال/الإخراج</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>الأجهزة %n</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
-        <numerusform>%n Devices</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
+        <numerusform>الأجهزة %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n الأجهزة </numerusform>
-        <numerusform> </numerusform>
-        <numerusform> </numerusform>
-        <numerusform> </numerusform>
-        <numerusform>  </numerusform>
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n الأجهزة</numerusform>
+        <numerusform>%n الأجهزة</numerusform>
+        <numerusform>%n الأجهزة</numerusform>
+        <numerusform> %n الأجهزة</numerusform>
+        <numerusform>%n الأجهزة</numerusform>
+        <numerusform>%n الأجهزة</numerusform>
       </translation>
     </message>
   </context>
@@ -2060,23 +2060,23 @@
     </message>
     <message>
       <source>Enable sequential Flir ONVIF searcher.</source>
-      <translation type="unfinished">Enable sequential Flir ONVIF searcher.</translation>
+      <translation>استخدم أداة البحث التسلسلي لبروتوكول Onvif من Flir.</translation>
     </message>
     <message>
       <source>Max P2P queue size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P queue size (bytes, 32-512MB).</translation>
+      <translation>الحد الأقصى لحجم قائمة انتظار P2P (بايت، 32-512 ميجابايت).</translation>
     </message>
     <message>
       <source>Max P2P all clients size (bytes, 32-512MB).</source>
-      <translation type="unfinished">Max P2P all clients size (bytes, 32-512MB).</translation>
+      <translation>الحد الأقصى لحجم جميع عملاء P2P (بايت، 32-512 ميجابايت).</translation>
     </message>
     <message>
       <source>Max record queue size (bytes, 6-96MB).</source>
-      <translation type="unfinished">Max record queue size (bytes, 6-96MB).</translation>
+      <translation>الحد الأقصى لحجم قائمة انتظار السجلات (بايت، 6-96 ميجابايت).</translation>
     </message>
     <message>
       <source>Max record queue size (elements, 250-4000).</source>
-      <translation type="unfinished">Max record queue size (elements, 250-4000).</translation>
+      <translation>الحد الأقصى لحجم قائمة انتظار السجلات (العناصر، 250-4000).</translation>
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
@@ -2084,55 +2084,55 @@
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
-      <translation type="unfinished">Max RTSP connection duration (seconds).</translation>
+      <translation>الحد الأقصى لمدة اتصال RTSP (ثواني).</translation>
     </message>
     <message>
       <source>Enable cloud-connect UDP hole-punching.</source>
-      <translation type="unfinished">Enable cloud-connect UDP hole-punching.</translation>
+      <translation>تفعيل خاصية اختراق ثقوب UDP في الاتصال السحابي.</translation>
     </message>
     <message>
       <source>Enable cloud-connect relays usage.</source>
-      <translation type="unfinished">Enable cloud-connect relays usage.</translation>
+      <translation>تفعيل استخدام خوادم الترحيل المتصلة بالسحابة.</translation>
     </message>
     <message>
       <source>Enforce SSL for cloud-connect relays.</source>
-      <translation type="unfinished">Enforce SSL for cloud-connect relays.</translation>
+      <translation>فرض استخدام بروتوكول SSL لخوادم الترحيل السحابية.</translation>
     </message>
     <message>
       <source>Enable recording on EDGE.</source>
-      <translation type="unfinished">Enable recording on EDGE.</translation>
+      <translation>تمكين التسجيل على EDGE.</translation>
     </message>
     <message>
       <source>Enable WebSocket for P2P.</source>
-      <translation type="unfinished">Enable WebSocket for P2P.</translation>
+      <translation>تمكين WebSocket لـ P2P.</translation>
     </message>
     <message>
       <source>Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</source>
-      <translation type="unfinished">Max thread count for remote archive synchronization (&lt;=0 - auto, max 32).</translation>
+      <translation>الحد الأقصى لعدد المواضيع لمزامنة الأرشيف عن بعد (&lt;=0 - تلقائي، الحد الأقصى 32).</translation>
     </message>
     <message>
       <source>Update releases.json file URL.</source>
-      <translation type="unfinished">Update releases.json file URL.</translation>
+      <translation>تحديث الإصدارات .json رابط الملف.</translation>
     </message>
     <message>
       <source>Target update information.</source>
-      <translation type="unfinished">Target update information.</translation>
+      <translation>معلومات تحديث الهدف.</translation>
     </message>
     <message>
       <source>Installed update information.</source>
-      <translation type="unfinished">Installed update information.</translation>
+      <translation>معلومات التحديث المثبت.</translation>
     </message>
     <message>
       <source>Downloader peers for files.</source>
-      <translation type="unfinished">Downloader peers for files.</translation>
+      <translation>أقران التنزيل للملفات.</translation>
     </message>
     <message>
       <source>Client update settings.</source>
-      <translation type="unfinished">Client update settings.</translation>
+      <translation>إعدادات تحديث العميل.</translation>
     </message>
     <message>
       <source>Thread count limit for camera archive synchronization.</source>
-      <translation type="unfinished">Thread count limit for camera archive synchronization.</translation>
+      <translation>الحد الأقصى لعدد المواضيع لمزامنة أرشيف الكاميرا.</translation>
     </message>
     <message>
       <source>Watermark settings.</source>
@@ -2140,23 +2140,23 @@
     </message>
     <message>
       <source>Pixelation settings.</source>
-      <translation type="unfinished">Pixelation settings.</translation>
+      <translation>إعدادات البكسلة.</translation>
     </message>
     <message>
       <source>Authorization Session token lifetime (seconds).</source>
-      <translation type="unfinished">Authorization Session token lifetime (seconds).</translation>
+      <translation>مدة صلاحية رمز جلسة التفويض (بالثواني).</translation>
     </message>
     <message>
       <source>Apply session limit for Cloud tokens.</source>
-      <translation type="unfinished">Apply session limit for Cloud tokens.</translation>
+      <translation>قم بتطبيق حد الجلسة لرموز السحابة.</translation>
     </message>
     <message>
       <source>Session token count limit on a single Server.</source>
-      <translation type="unfinished">Session token count limit on a single Server.</translation>
+      <translation>حد عدد رموز الجلسة على خادم واحد.</translation>
     </message>
     <message>
       <source>Max session token count per user on single Server.</source>
-      <translation type="unfinished">Max session token count per user on single Server.</translation>
+      <translation>الحد الأقصى لعدد رمز الجلسة لكل مستخدم على الخادم الواحد.</translation>
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>

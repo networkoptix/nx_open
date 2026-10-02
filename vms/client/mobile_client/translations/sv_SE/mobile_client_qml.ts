@@ -181,6 +181,10 @@
       <translation>Om webbplatsen &lt;font color=&apos;%2&apos;&gt;inte är ansluten&lt;/a&gt; till %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation>Klicka på &quot;Anslut webbplats till %1&quot; på fliken %1 i Webbplatsadministration</translation>
@@ -788,8 +792,8 @@
       <translation>Flytande panelknapp</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation>Tryck på den flytande knappen för att återställa panelen</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>
