@@ -212,6 +212,16 @@
       <source>In selected area</source>
       <translation>所選擇的區域</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n 筆新結果</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To the top</source>
+      <translation>回到頂部</translation>
+    </message>
     <message>
       <source>No objects</source>
       <translation>沒有任何物件</translation>
