@@ -1467,7 +1467,7 @@ bool QnVirtualCameraResource::isAudioSupported() const
         return true;
 
     // Compatibility with version < 3.1.2
-    QString val = getProperty(nx::vms::api::device_properties::kIsAudioSupported);
+    QString val = QnResource::getProperty(nx::vms::api::device_properties::kIsAudioSupported);
     return val.toInt() > 0;
 }
 
