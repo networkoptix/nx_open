@@ -181,6 +181,10 @@
       <translation type="unfinished">If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</translation>
     </message>
     <message>
+      <source>How to Connect?</source>
+      <translation type="unfinished">How to Connect?</translation>
+    </message>
+    <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
       <translation type="unfinished">Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</translation>
@@ -787,8 +791,8 @@
       <translation type="unfinished">Floating Panel Button</translation>
     </message>
     <message>
-      <source>Tap the floating button to restore the panel</source>
-      <translation type="unfinished">Tap the floating button to restore the panel</translation>
+      <source>Tap the floating button to open the panel</source>
+      <translation type="unfinished">Tap the floating button to open the panel</translation>
     </message>
   </context>
   <context>

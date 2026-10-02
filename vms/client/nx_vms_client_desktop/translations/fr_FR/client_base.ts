@@ -1557,12 +1557,12 @@ Clé de licence : %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Impossible de se connecter au serveur %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Le serveur %1 ne peut pas se connecter à %2. Assurez-vous que l'adresse est correcte et que le site cible est en ligne et accessible depuis %1.</translation>
     </message>
   </context>
   <context>
@@ -5159,7 +5159,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Débloquez des fonctionnalités exclusives pour une analyse vidéo exploitable et des opérations basées sur les données à grande échelle</translation>
     </message>
   </context>
   <context>
@@ -5817,11 +5817,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Failed to delete cloud layout</source>
-      <translation type="unfinished">Failed to delete cloud layout</translation>
+      <translation>Échec de la suppression de la mise en page cloud</translation>
     </message>
     <message>
       <source>Connection to the cloud has been lost. Please try again later.</source>
-      <translation type="unfinished">Connection to the cloud has been lost. Please try again later.</translation>
+      <translation>La connexion au cloud a été interrompue. Veuillez réessayer plus tard.</translation>
     </message>
   </context>
   <context>
@@ -12620,11 +12620,11 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <message>
       <source>Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</source>
       <comment>%1 is the JS API method name</comment>
-      <translation type="unfinished">Cannot add a resource from another Site to a regular Layout. Use %1 to reopen the Layout as a cross-site one.</translation>
+      <translation>Impossible d'ajouter une ressource d'un autre site à une mise en page standard. Utilisez %1 pour rouvrir la mise en page en tant que mise en page intersites.</translation>
     </message>
     <message>
       <source>The layout is already a cross-site layout</source>
-      <translation type="unfinished">The layout is already a cross-site layout</translation>
+      <translation>La mise en page est déjà une mise en page intersites</translation>
     </message>
   </context>
   <context>
