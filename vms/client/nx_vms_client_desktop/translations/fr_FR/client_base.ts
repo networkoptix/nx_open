@@ -1553,12 +1553,12 @@ Clé de licence : %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Impossible de se connecter au serveur %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Le serveur %1 ne peut pas se connecter à %2. Assurez-vous que l'adresse est correcte et que le site cible est en ligne et accessible depuis %1.</translation>
     </message>
   </context>
   <context>

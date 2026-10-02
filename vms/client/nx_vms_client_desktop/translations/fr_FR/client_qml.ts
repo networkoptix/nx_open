@@ -220,6 +220,17 @@
       <source>In selected area</source>
       <translation>Dans la zone sélectionnée</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>To the top</source>
+      <translation type="unfinished">To the top</translation>
+    </message>
     <message>
       <source>No objects</source>
       <translation>Aucun objet</translation>
@@ -2560,7 +2571,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>L'activation de cette option permet aux tiers de demander une autorisation pour enregistrer une intégration. Des mesures de sécurité sont en place, mais désactivez-la une fois toutes les intégrations nécessaires installées ; son utilisation prolongée est déconseillée.</translation>
     </message>
   </context>
   <context>
@@ -3126,7 +3137,7 @@ Appuyez sur Alt + Cliquez pour suivre l'objet</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Événements de test...</translation>
     </message>
     <message>
       <source>Event Rules</source>
