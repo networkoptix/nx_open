@@ -1,5 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <cstdlib>
+
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
@@ -350,6 +352,48 @@ TEST_F(QnTimeStepTest, sub_3h_acrossFallTransition)
 
     EXPECT_EQ(expected1st, result1st);
     EXPECT_EQ(expected2nd, result2nd);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Local time tests.
+
+TEST_F(QnTimeStepTest, add_1h_localTimeDisagreesWithSystemZone)
+{
+    // On Windows the local time backend (CRT) follows the TZ variable, but the system QTimeZone
+    // does not. Make the local time offset 1h behind the system zone, as it happens for
+    // historical dates in zones whose offset has changed.
+    // On Linux and macOS the system QTimeZone follows TZ too, so the test passes trivially there.
+    const QDate date(2025, 1, 1);
+    const int systemOffsetMinutes =
+        QTimeZone::systemTimeZone().offsetFromUtc(QDateTime(date, QTime(12, 0), QTimeZone::UTC))
+        / 60;
+    const int localOffsetMinutes = systemOffsetMinutes - 60;
+
+    // POSIX TZ offset has the inverted sign.
+    const int tzOffsetMinutes = -localOffsetMinutes;
+    const QByteArray tz = QString("XXX%1%2:%3")
+                              .arg(tzOffsetMinutes < 0 ? "-" : "")
+                              .arg(std::abs(tzOffsetMinutes) / 60)
+                              .arg(std::abs(tzOffsetMinutes) % 60, 2, 10, QChar('0'))
+                              .toLatin1();
+
+    const bool hadTz = qEnvironmentVariableIsSet("TZ");
+    const QByteArray oldTz = qgetenv("TZ");
+    qputenv("TZ", tz);
+
+    const QnTimeStep step_1h{QnTimeStep::Hours, 1h, 1, 24, {}, {}, /*relative*/ false};
+    const QTimeZone localTime(QTimeZone::LocalTime);
+
+    // Taken while TZ is set: a local QDateTime recomputes its UTC time on each call.
+    const milliseconds start(QDateTime(date, QTime(12, 0), localTime).toMSecsSinceEpoch());
+    const milliseconds result = add(start, step_1h, localTime);
+
+    if (hadTz)
+        qputenv("TZ", oldTz);
+    else
+        qunsetenv("TZ");
+
+    EXPECT_EQ(start + 1h, result);
 }
 
 } // namespace test
