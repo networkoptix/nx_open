@@ -181,6 +181,10 @@
         <translation></translation>
     </message>
     <message>
+        <source>How to Connect?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation></translation>
@@ -788,7 +792,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tap the floating button to restore the panel</source>
+        <source>Tap the floating button to open the panel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
