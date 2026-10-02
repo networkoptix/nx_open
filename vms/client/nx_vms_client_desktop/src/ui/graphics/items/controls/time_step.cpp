@@ -36,13 +36,12 @@ QDateTime addHours(const QDateTime& dateTime, int hours)
         newHours = qMod(newHours, 24);
     }
 
-    const QDateTime result(
-        dateTime.date().addDays(deltaDays),
-        QTime(newHours,
-            dateTime.time().minute(),
-            dateTime.time().second(),
-            dateTime.time().msec()),
-        dateTime.timeZone());
+    const QDateTime result(dateTime.date().addDays(deltaDays),
+        QTime(
+            newHours, dateTime.time().minute(), dateTime.time().second(), dateTime.time().msec()),
+        // Not timeZone(): for local time it returns the system zone, whose historical offsets
+        // may differ from the ones local time uses, so the result would not advance.
+        dateTime.timeRepresentation());
 
     if (result.isValid())
         return result;
