@@ -635,15 +635,15 @@
     </message>
     <message>
       <source>Can improve performance and battery life</source>
-      <translation type="unfinished">Can improve performance and battery life</translation>
+      <translation>Peut améliorer les performances et l'autonomie de la batterie</translation>
     </message>
     <message>
       <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
+      <translation>Solution de secours du décodeur logiciel</translation>
     </message>
     <message>
       <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
+      <translation>Peut décoder des formats vidéo rares à l'aide d'un logiciel</translation>
     </message>
   </context>
   <context>
@@ -798,7 +798,7 @@
     </message>
     <message>
       <source>Stop Connecting</source>
-      <translation type="unfinished">Stop Connecting</translation>
+      <translation>Arrêtez la connexion</translation>
     </message>
   </context>
   <context>
@@ -844,15 +844,15 @@
     </message>
     <message>
       <source>Save Passwords</source>
-      <translation type="unfinished">Save Passwords</translation>
+      <translation>Enregistrer les mots de passe</translation>
     </message>
     <message>
       <source>How to handle saved passwords?</source>
-      <translation type="unfinished">How to handle saved passwords?</translation>
+      <translation>Comment gérer les mots de passe enregistrés ?</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
-      <translation type="unfinished">Server Certificate Check</translation>
+      <translation>Vérification du certificat du serveur</translation>
     </message>
   </context>
   <context>
@@ -918,7 +918,7 @@
     </message>
     <message>
       <source>How to connect?</source>
-      <translation type="unfinished">How to connect?</translation>
+      <translation>Comment se connecter ?</translation>
     </message>
     <message>
       <source>Folder is empty</source>
@@ -926,27 +926,27 @@
     </message>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Accès aux ressources refusé</translation>
     </message>
     <message>
       <source>Create an organization in the Cloud Portal to access it here</source>
-      <translation type="unfinished">Create an organization in the Cloud Portal to access it here</translation>
+      <translation>Créez une organisation dans le portail cloud pour y accéder ici</translation>
     </message>
     <message>
       <source>The resources in this organization are not available to your permission group</source>
-      <translation type="unfinished">The resources in this organization are not available to your permission group</translation>
+      <translation>Les ressources de cette organisation ne sont pas accessibles à votre groupe d'autorisation</translation>
     </message>
     <message>
       <source>Connect a site to the organization to access it here</source>
-      <translation type="unfinished">Connect a site to the organization to access it here</translation>
+      <translation>Connectez un site à l'organisation pour y accéder ici</translation>
     </message>
     <message>
       <source>No accessible sites were found. Log in into the cloud account or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Log in into the cloud account or connect to a local server</translation>
+      <translation>Aucun site accessible n'a été trouvé. Connectez-vous au compte cloud ou connectez-vous à un serveur local</translation>
     </message>
     <message>
       <source>No accessible sites were found. Request access to existing sites or connect to a local server</source>
-      <translation type="unfinished">No accessible sites were found. Request access to existing sites or connect to a local server</translation>
+      <translation>Aucun site accessible n'a été trouvé. Demander l'accès aux sites existants ou se connecter à un serveur local</translation>
     </message>
   </context>
   <context>
@@ -985,7 +985,7 @@
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
-      <translation type="unfinished">Log in to the cloud to receive notifications</translation>
+      <translation>Connectez-vous au cloud pour recevoir des notifications</translation>
     </message>
     <message>
       <source>About</source>
@@ -1048,11 +1048,11 @@
     </message>
     <message>
       <source>Share Link</source>
-      <translation type="unfinished">Share Link</translation>
+      <translation>Partager le lien</translation>
     </message>
     <message>
       <source>Select Expiration</source>
-      <translation type="unfinished">Select Expiration</translation>
+      <translation>Sélectionner la date d'expiration</translation>
     </message>
     <message>
       <source>Expiration</source>
@@ -1099,7 +1099,7 @@
     </message>
     <message>
       <source>Host:Port</source>
-      <translation type="unfinished">Host:Port</translation>
+      <translation>Hôte:Port</translation>
     </message>
   </context>
   <context>
@@ -1156,7 +1156,7 @@
     <name>SitePlaceholderScreen</name>
     <message>
       <source>Access to Resources Denied</source>
-      <translation type="unfinished">Access to Resources Denied</translation>
+      <translation>Accès aux ressources refusé</translation>
     </message>
     <message>
       <source>Sites in the Suspended or Shutdown state are not available</source>
