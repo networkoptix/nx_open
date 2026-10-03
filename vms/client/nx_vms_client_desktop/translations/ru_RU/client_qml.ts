@@ -222,11 +222,11 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n новый результат</numerusform>
+        <numerusform>%n новых результата</numerusform>
+        <numerusform>%n новых результатов</numerusform>
+        <numerusform>%n новых результатов</numerusform>
       </translation>
     </message>
     <message>

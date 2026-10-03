@@ -222,8 +222,8 @@
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n 个新结果</numerusform>
       </translation>
     </message>
     <message>
