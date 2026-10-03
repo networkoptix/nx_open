@@ -7,7 +7,6 @@
 #include <core/resource/resource_property_key.h>
 #include <media/filters/h2645_prepend_parameter_sets.h>
 #include <media/filters/remove_aud_delimiter.h>
-#include <nx/media/config.h>
 #include <nx/media/utils.h>
 #include <nx/rtp/onvif_header_extension.h>
 #include <nx/utils/log/log_main.h>
@@ -244,7 +243,6 @@ QList<QString> getSdpAttributesFromCodecpar(
 }
 
 QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, nx::metric::Storage* metrics):
-    m_outputBuffer(CL_MEDIA_ALIGNMENT, 0, AV_INPUT_BUFFER_PADDING_SIZE),
     m_config(config),
     m_transcoder(config.transcoderConfig, metrics)
 {

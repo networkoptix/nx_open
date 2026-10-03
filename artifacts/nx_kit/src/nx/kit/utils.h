@@ -169,19 +169,23 @@ inline uint8_t* misalignedPtr(void* data)
     return (uint8_t*) (17 + alignUp((uintptr_t) data, 32));
 }
 
+/** Alignment which mallocAligned() guarantees even if a smaller one is requested. */
+constexpr size_t kMinAlignment = 16;
+
 /**
  * Allocates size bytes of data, aligned to alignment boundary.
  *
  * NOTE: Allocated memory must be freed with a call to freeAligned().
  * NOTE: This function is as safe as malloc().
  *
+ * @param alignment If less than kMinAlignment, kMinAlignment is used.
  * @param mallocFunc Function with the signature void*(size_t), which is called to allocate memory.
  */
 template<class MallocFunc>
 void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
 {
-    if (alignment == 0)
-        return nullptr;
+    if (alignment < kMinAlignment)
+        alignment = kMinAlignment;
     const auto ptr = (char*) mallocFunc(size + alignment + sizeof(alignment));
     if (!ptr) //< allocation error
         return ptr;

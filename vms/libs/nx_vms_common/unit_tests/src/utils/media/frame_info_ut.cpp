@@ -703,8 +703,8 @@ void decodeAndCheck(
 {
     // Set up a compressed frame.
     nx::utils::ByteArray data(
+        /*capacity*/ 0,
         CL_MEDIA_ALIGNMENT,
-        0,
         AV_INPUT_BUFFER_PADDING_SIZE); //< Memory will be corrupted by the decoder without padding.
     data.write(encodedData, encodedSize);
     QnCompressedVideoDataPtr video = std::make_shared<QnWritableCompressedVideoData>();

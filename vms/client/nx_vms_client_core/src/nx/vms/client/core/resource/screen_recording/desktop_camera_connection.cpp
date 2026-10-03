@@ -7,7 +7,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <network/tcp_connection_priv.h>
-#include <nx/media/config.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_client.h>
@@ -65,7 +64,7 @@ protected:
         if (m_needStop)
             return true;
 
-        nx::utils::ByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64, AV_INPUT_BUFFER_PADDING_SIZE);
+        nx::utils::ByteArray sendBuffer(1024 * 64);
 
         QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(packet);
         if (!media)
@@ -84,8 +83,8 @@ protected:
             header[1] = streamIndex;
             header[2] = sendBuffer.size() >> 8;
             header[3] = (quint8) sendBuffer.size();
-            m_owner->sendData((const char*) &header, 4);
-            m_owner->sendData(sendBuffer);
+            m_owner->sendData((const char*) header, sizeof(header));
+            m_owner->sendData(sendBuffer.constData(), sendBuffer.size());
             sendBuffer.clear();
         }
         m_owner->sendUnlock();
@@ -215,13 +214,6 @@ void DesktopCameraConnectionProcessor::sendUnlock()
 bool DesktopCameraConnectionProcessor::isConnected() const
 {
     return d->socket->isConnected();
-}
-
-void DesktopCameraConnectionProcessor::sendData(const nx::utils::ByteArray& data)
-{
-    int sent = d->socket->send(data.constData(), data.size());
-    if (sent < (int)data.size())
-        d->socket->close();
 }
 
 void DesktopCameraConnectionProcessor::sendData(const char* data, int len)

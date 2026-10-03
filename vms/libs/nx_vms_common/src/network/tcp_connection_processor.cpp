@@ -255,13 +255,6 @@ void QnTCPConnectionProcessor::parseRequest()
 }
 
 bool QnTCPConnectionProcessor::sendBuffer(
-    const nx::utils::ByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
-{
-    return sendBufferThreadSafe(
-        sendBuffer.constData(), (int) sendBuffer.size(), timestampForLogging);
-}
-
-bool QnTCPConnectionProcessor::sendBuffer(
     const QByteArray& sendBuffer, std::optional<int64_t> timestampForLogging)
 {
     return sendBufferThreadSafe(
@@ -519,11 +512,6 @@ void QnTCPConnectionProcessor::sendResponse(
         contentEncoding,
         multipartBoundary,
         isUndefinedContentLength));
-}
-
-bool QnTCPConnectionProcessor::sendChunk( const nx::utils::ByteArray& chunk )
-{
-    return sendChunk( chunk.data(), chunk.size() );
 }
 
 bool QnTCPConnectionProcessor::sendChunk( const QByteArray& chunk )

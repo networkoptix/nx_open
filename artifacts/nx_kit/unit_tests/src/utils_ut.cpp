@@ -93,6 +93,76 @@ TEST(utils, misalignedPtr)
     ASSERT_TRUE((intptr_t) misaligned % 32 != 0);
 }
 
+static void testMallocAligned(int line, size_t size, size_t alignment)
+{
+    const size_t expectedAlignment = std::max(alignment, kMinAlignment);
+
+    void* const ptr = mallocAligned(size, alignment);
+    ASSERT_TRUE_AT_LINE(line, ptr != nullptr);
+    ASSERT_EQ_AT_LINE(line, 0U, (uintptr_t) ptr % expectedAlignment);
+
+    // Make sure the whole requested area is writable - to be checked by sanitizers.
+    memset(ptr, 0xAB, size);
+
+    freeAligned(ptr);
+}
+
+TEST(utils, mallocAligned)
+{
+    // Alignments less than kMinAlignment, including 0, are silently raised to kMinAlignment.
+    for (const size_t alignment: {(size_t) 0, (size_t) 1, (size_t) 2, (size_t) 8, (size_t) 15})
+    {
+        testMallocAligned(__LINE__, 0, alignment);
+        testMallocAligned(__LINE__, 1, alignment);
+        testMallocAligned(__LINE__, 1000, alignment);
+    }
+
+    for (const size_t alignment: {(size_t) 16, (size_t) 32, (size_t) 64, (size_t) 4096})
+    {
+        testMallocAligned(__LINE__, 0, alignment);
+        testMallocAligned(__LINE__, 1, alignment);
+        testMallocAligned(__LINE__, 1000, alignment);
+        testMallocAligned(__LINE__, alignment, alignment);
+    }
+}
+
+TEST(utils, mallocAlignedCustomAllocator)
+{
+    size_t allocatedSize = 0;
+    void* allocatedPtr = nullptr;
+    void* freedPtr = nullptr;
+
+    static constexpr size_t kSize = 100;
+    static constexpr size_t kAlignment = 64;
+
+    void* const ptr = mallocAligned(kSize, kAlignment,
+        [&](size_t size)
+        {
+            allocatedSize = size;
+            allocatedPtr = ::malloc(size);
+            return allocatedPtr;
+        });
+
+    ASSERT_TRUE(ptr != nullptr);
+    ASSERT_EQ(0U, (uintptr_t) ptr % kAlignment);
+
+    // The returned area must fit into the allocated one.
+    ASSERT_TRUE((char*) ptr >= (char*) allocatedPtr);
+    ASSERT_TRUE((char*) ptr + kSize <= (char*) allocatedPtr + allocatedSize);
+
+    freeAligned(ptr, [&](void* ptrToFree) { freedPtr = ptrToFree; ::free(ptrToFree); });
+    ASSERT_EQ(allocatedPtr, freedPtr);
+}
+
+TEST(utils, freeAlignedNull)
+{
+    freeAligned(nullptr); //< Should not crash.
+
+    void* freedPtr = (void*) 1;
+    freeAligned(nullptr, [&](void* ptrToFree) { freedPtr = ptrToFree; });
+    ASSERT_EQ((void*) nullptr, freedPtr);
+}
+
 static void testDecodeEscapedString(
     int line,
     const std::string& expectedErrorMessage,

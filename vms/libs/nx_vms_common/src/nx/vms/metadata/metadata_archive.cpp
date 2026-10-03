@@ -656,7 +656,7 @@ void MetadataArchive::loadDataFromIndex(
     const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
-    nx::utils::ByteArray buffer(kAlignment, 0, 0);
+    nx::utils::ByteArray buffer(/*capacity*/ 0, kAlignment);
 
     int mediaRecordsLeft = 0;
     for (auto i = startItr; i < endItr; ++i)
@@ -747,7 +747,7 @@ void MetadataArchive::loadDataFromIndexDesc(
     const QList<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
-    nx::utils::ByteArray buffer(kAlignment, 0, 0);
+    nx::utils::ByteArray buffer(/*capacity*/ 0, kAlignment);
 
     const int baseRecordSize = recordMatcher->isNoGeometryMode()
         ? index.header.noGeometryRecordSize() : index.header.recordSize;

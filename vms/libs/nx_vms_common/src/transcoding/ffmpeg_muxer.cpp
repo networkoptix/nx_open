@@ -38,8 +38,9 @@ static AVPixelFormat getPixelFormatJpeg(const std::string_view container, AVPixe
 
 FfmpegMuxer::FfmpegMuxer(const Config& config):
     m_config(config),
-    m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE),
-    m_timestampCorrector(std::chrono::milliseconds(MAX_FRAME_DURATION_MS), std::chrono::milliseconds(1))
+    m_internalBuffer(1024 * 1024),
+    m_timestampCorrector(
+        std::chrono::milliseconds(MAX_FRAME_DURATION_MS), std::chrono::milliseconds(1))
 {
 }
 

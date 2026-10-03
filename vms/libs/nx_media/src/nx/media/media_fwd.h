@@ -17,9 +17,6 @@ class VideoFrame;
 using VideoFramePtr = std::shared_ptr<VideoFrame>;
 using ConstVideoFramePtr = std::shared_ptr<const VideoFrame>;
 
-// Media data alignment. We use 32 for compatibility with AVX instruction set.
-static const int kMediaAlignment = 32;
-
 // Initial duration for media buffer.
 static const int kInitialBufferMs = 256;
 

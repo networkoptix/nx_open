@@ -68,7 +68,7 @@ QString QnAbstractMediaData::idForToStringFromPtr() const
 
 QnEmptyMediaData::QnEmptyMediaData():
     QnAbstractMediaData(EMPTY_DATA),
-    m_data(CL_MEDIA_ALIGNMENT, 0, AV_INPUT_BUFFER_PADDING_SIZE)
+    m_data(/*capacity*/ 0, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE)
 {
 }
 
