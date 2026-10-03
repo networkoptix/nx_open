@@ -25,11 +25,9 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
-    size_t capacity,
-    CodecParametersConstPtr ctx)
-    :
+    size_t capacity, CodecParametersConstPtr ctx):
     QnCompressedVideoData(ctx),
-    m_data(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE)
+    m_data(capacity, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE)
 {
 }
 

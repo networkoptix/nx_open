@@ -7,11 +7,9 @@
 
 namespace nx::utils {
 
-ByteArray::ByteArray(
-    size_t alignment,
-    size_t capacity,
-    size_t padding)
-    :
+static_assert(ByteArray::kMinAlignment == nx::kit::utils::kMinAlignment);
+
+ByteArray::ByteArray(size_t capacity, size_t alignment, size_t padding):
     m_alignment(alignment),
     m_padding(padding)
 {
@@ -40,11 +38,6 @@ char* ByteArray::data()
 void ByteArray::ignore_first_bytes(size_t bytes_to_ignore)
 {
     m_ignore = bytes_to_ignore;
-}
-
-int ByteArray::getAlignment() const
-{
-    return m_alignment;
 }
 
 size_t ByteArray::write(const char* data, size_t size)

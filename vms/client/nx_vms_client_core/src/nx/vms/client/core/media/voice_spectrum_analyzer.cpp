@@ -6,9 +6,12 @@
 
 #include <QtCore/QtMath>
 
+extern "C" {
+#include <libavutil/mem.h>
+} // extern "C"
+
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
-#include <nx/media/media_fwd.h> //< for kMediaAlignment
 #include <nx/utils/math/math.h>
 
 namespace nx::vms::client::core {
@@ -63,7 +66,7 @@ VoiceSpectrumAnalyzer::VoiceSpectrumAnalyzer()
 
 VoiceSpectrumAnalyzer::~VoiceSpectrumAnalyzer()
 {
-    nx::kit::utils::freeAligned(m_fftData);
+    av_freep(&m_fftData);
     av_fft_end(m_fftContext);
 }
 
@@ -78,10 +81,10 @@ void VoiceSpectrumAnalyzer::initialize(int srcSampleRate, int channels)
     m_windowSize = toPowerOf2(srcSampleRate / kUpdatesPerSecond);
     m_bitCount = intLog2(m_windowSize);
 
-    nx::kit::utils::freeAligned(m_fftData);
-    m_fftData = static_cast<FFTComplex*>(nx::kit::utils::mallocAligned(
-        sizeof(FFTComplex) * m_windowSize, nx::media::kMediaAlignment));
-    memset(m_fftData, 0, m_windowSize * sizeof(m_fftData[0]));
+    // av_tx_fn() requires its arrays to be aligned to av_cpu_max_align(); av_malloc() family
+    // guarantees at least that.
+    av_freep(&m_fftData);
+    m_fftData = static_cast<FFTComplex*>(av_mallocz(sizeof(FFTComplex) * m_windowSize));
 
     av_fft_end(m_fftContext);
     m_fftContext = av_fft_init(m_bitCount, /*inverse*/ 0);

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
@@ -13,17 +14,17 @@ namespace nx::utils {
 class NX_UTILS_API ByteArray
 {
 public:
+    static constexpr size_t kMinAlignment = 16; //< Mirrors nx::kit::utils::kMinAlignment.
+
     /**
-     * @param alignment Alignment of the array data.
      * @param capacity Initial array capacity.
+     * @param alignment Alignment of the array data. Values less than kMinAlignment are silently
+     *     raised to it.
      * @param padding Number of extra bytes allocated beyond the array capacity. The padding
      *     which follows the array data is always kept filled with zeros. Used to prevent overread
      *     and segfault for damaged MPEG bitstreams.
      */
-    explicit ByteArray(
-        size_t alignment,
-        size_t capacity,
-        size_t padding);
+    explicit ByteArray(size_t capacity, size_t alignment = kMinAlignment, size_t padding = 0);
     ~ByteArray();
 
     ByteArray() = default;
@@ -159,8 +160,6 @@ public:
     // TODO: #sivanov This function breaks data alignment.
     void ignore_first_bytes(size_t bytes_to_ignore);
 
-    int getAlignment() const;
-
 private:
     bool reallocate(size_t capacity);
     char* allocateBuffer(size_t capacity);
@@ -169,7 +168,7 @@ private:
     void zeroPadding();
 
 private:
-    size_t m_alignment = 1;
+    size_t m_alignment = kMinAlignment;
     size_t m_capacity = 0;
     size_t m_size = 0;
     size_t m_padding = 0;

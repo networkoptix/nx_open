@@ -200,7 +200,7 @@ bool Demuxer::processData(const char* data, size_t size)
         NX_VERBOSE(this, "Too small RTP packet: %1", size);
         return false;
     }
-    nx::utils::ByteArray array(/*alignment*/ 1, size, /*padding*/ 1);
+    nx::utils::ByteArray array(size);
     array.write(data, size);
 
     if (m_encryptor)
@@ -444,7 +444,7 @@ void Demuxer::encryptPacket(nx::Buffer& buffer)
 {
     if (m_encryptor)
     {
-        nx::utils::ByteArray array(/*alignment*/ 1, buffer.size(), /*padding*/ 1);
+        nx::utils::ByteArray array(buffer.size());
         array.write(buffer.data(), buffer.size());
 
         m_encryptor->encryptPacket(&array, /*offset*/ 0);

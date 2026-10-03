@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include <QtCore/QRect>
 #include <QtCore/QVector>
 
-#include <nx/media/aligned_allocator.h>
 #include <nx/media/media_data_packet.h>
 #include <nx/media/motion_detection.h>
 #include <nx/media/sse_helper.h>
@@ -21,7 +23,7 @@ struct QnMetaDataV1Light;
 
 using QnMetaDataV1Ptr = std::shared_ptr<QnMetaDataV1>;
 using QnConstMetaDataV1Ptr = std::shared_ptr<const QnMetaDataV1>;
-using QnMetaDataLightVector = std::vector<QnMetaDataV1Light, QnAlignedAllocator<QnMetaDataV1Light>>;
+using QnMetaDataLightVector = std::vector<QnMetaDataV1Light>;
 using QnAbstractCompressedMetadataPtr = std::shared_ptr<QnAbstractCompressedMetadata>;
 using QnConstAbstractCompressedMetadataPtr = std::shared_ptr<const QnAbstractCompressedMetadata>;
 using QnCompressedMetadataPtr = std::shared_ptr<QnCompressedMetadata>;

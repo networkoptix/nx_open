@@ -25,7 +25,7 @@ void assertPaddingIsZeroed(const ByteArray& array)
 
 TEST(ByteArray, paddingIsZeroedAfterWrite)
 {
-    ByteArray array(/*alignment*/ 16, /*capacity*/ 0, kPadding);
+    ByteArray array(/*capacity*/ 0, /*alignment*/ 16, kPadding);
 
     // Every write grows the capacity with a reserve, so the padding does not coincide with the
     // zeroed tail of the allocated buffer.
@@ -47,7 +47,7 @@ TEST(ByteArray, paddingIsZeroedAfterWrite)
 
 TEST(ByteArray, paddingIsZeroedAfterDataIsReplaced)
 {
-    ByteArray array(/*alignment*/ 16, /*capacity*/ 1024, kPadding);
+    ByteArray array(/*capacity*/ 1024, /*alignment*/ 16, kPadding);
     array.write(std::string(1000, 'x').c_str(), 1000);
 
     // The stale data must not be visible in the padding after the array is reused or shrunk.
@@ -71,7 +71,7 @@ TEST(ByteArray, paddingIsZeroedAfterDataIsReplaced)
 
 TEST(ByteArray, paddingIsZeroedAfterCopy)
 {
-    ByteArray array(/*alignment*/ 16, /*capacity*/ 1024, kPadding);
+    ByteArray array(/*capacity*/ 1024, /*alignment*/ 16, kPadding);
     array.write(std::string(1000, 'x').c_str(), 1000);
 
     ByteArray copy(array);

@@ -40,11 +40,9 @@ quint64 QnCompressedAudioData::getDurationMs() const
 ////////////////////////////////////////////////////////////
 
 QnWritableCompressedAudioData::QnWritableCompressedAudioData(
-    size_t capacity,
-    CodecParametersConstPtr ctx)
-    :
+    size_t capacity, CodecParametersConstPtr ctx):
     QnCompressedAudioData(ctx),
-    m_data(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE)
+    m_data(capacity, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE)
 {
 }
 

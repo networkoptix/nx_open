@@ -5,7 +5,7 @@
 namespace nx {
 
 AudioFrame::AudioFrame():
-    data(CL_MEDIA_ALIGNMENT, 0, AV_INPUT_BUFFER_PADDING_SIZE),
+    data(/*capacity*/ 0, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE),
     timestampUsec(0)
 {
 }

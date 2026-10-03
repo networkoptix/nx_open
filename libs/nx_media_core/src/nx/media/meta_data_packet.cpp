@@ -6,6 +6,7 @@
 #include <QtCore/QtEndian>
 #include <QtGui/QRegion>
 
+#include <nx/media/config.h>
 #include <nx/utils/log/assert.h>
 
 static const QRect kMaxGridRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
@@ -528,7 +529,7 @@ QnAbstractCompressedMetadata::QnAbstractCompressedMetadata(MetadataType type, si
     QnAbstractMediaData(GENERIC_METADATA),
     metadataType(type),
     m_duration(0),
-    m_data(CL_MEDIA_ALIGNMENT, bufferSize, AV_INPUT_BUFFER_PADDING_SIZE)
+    m_data(bufferSize, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE)
 {
 }
 

@@ -19,10 +19,7 @@ static const int AVCODEC_MAX_AUDIO_FRAME_SIZE = 192 * 1000;
 }
 
 QnAudioStreamDisplay::QnAudioStreamDisplay(
-    int bufferMs,
-    int prebufferMs,
-    AudioDecodeMode decodeMode)
-    :
+    int bufferMs, int prebufferMs, AudioDecodeMode decodeMode):
     m_bufferMs(bufferMs),
     m_prebufferMs(prebufferMs),
     m_tooFewDataDetected(true),
@@ -34,9 +31,7 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(
     m_sampleConvertMethod(SampleConvertMethod::none),
     m_isConvertMethodInitialized(false),
     m_decodedAudioBuffer(
-        CL_MEDIA_ALIGNMENT,
-        AVCODEC_MAX_AUDIO_FRAME_SIZE,
-        AV_INPUT_BUFFER_PADDING_SIZE),
+        AVCODEC_MAX_AUDIO_FRAME_SIZE, CL_MEDIA_ALIGNMENT, AV_INPUT_BUFFER_PADDING_SIZE),
     m_startBufferingTime(AV_NOPTS_VALUE),
     m_lastAudioTime(AV_NOPTS_VALUE),
     m_audioQueueMutex(nx::Mutex::Recursive),
