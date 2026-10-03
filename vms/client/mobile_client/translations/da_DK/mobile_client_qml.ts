@@ -182,7 +182,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Hvordan opretter man forbindelse?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -793,7 +793,7 @@
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Tryk på den flydende knap for at åbne panelet</translation>
     </message>
   </context>
   <context>
