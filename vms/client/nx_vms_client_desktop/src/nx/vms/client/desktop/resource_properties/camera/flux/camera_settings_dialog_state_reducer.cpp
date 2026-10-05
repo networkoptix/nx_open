@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <limits>
 
 #include <QtCore/QUrlQuery>
@@ -241,6 +242,26 @@ State fillBitrateFromFixedQuality(State state)
         state.recording.brush.streamQuality);
 
     return state;
+}
+
+State fillBitrateFromCustomValue(State state, float mbps)
+{
+    auto& brush = state.recording.brush;
+    brush.bitrateMbitPerSec = mbps;
+    brush.streamQuality = calculateQualityForBitrateMbps(state, mbps);
+    if (qFuzzyEquals(calculateBitrateForQualityMbps(state, brush.streamQuality), mbps))
+    {
+        // Standard quality detected.
+        brush.bitrateMbitPerSec = RecordScheduleCellData::kAutoBitrateValue;
+    }
+    state.recording.bitrateMbps = mbps;
+
+    return state;
+}
+
+float bitrateMbpsFromNormalized(const State& state, float value)
+{
+    return std::lerp(state.recording.minBitrateMbps, state.recording.maxBitrateMpbs, value);
 }
 
 QString settingsUrlPath(const Camera& camera)
@@ -1866,7 +1887,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
 
     state = state.recording.brush.isAutoBitrate()
         ? fillBitrateFromFixedQuality(std::move(state))
-        : setRecordingBitrateMbps(std::move(state), brush.bitrateMbitPerSec);
+        : fillBitrateFromCustomValue(std::move(state), brush.bitrateMbitPerSec);
 
     state = setScheduleBrushFps(std::move(state), fps);
     state.recordingHint = State::RecordingHint::brushChanged;
@@ -1961,7 +1982,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
         // Lock normalized bitrate.
         const auto normalizedBitrate = state.recording.normalizedCustomBitrateMbps();
         state = loadMinMaxCustomBitrate(std::move(state));
-        state = setRecordingBitrateNormalized(std::move(state), normalizedBitrate);
+        const auto mbps = bitrateMbpsFromNormalized(state, normalizedBitrate);
+        state = fillBitrateFromCustomValue(std::move(state), mbps);
     }
     state.recordingHint = State::RecordingHint::brushChanged;
 
@@ -2056,12 +2078,7 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, flo
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, mbps);
 
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
-    state.recording.brush.bitrateMbitPerSec = mbps;
-    state.recording.brush.streamQuality = calculateQualityForBitrateMbps(state, mbps);
-    if (qFuzzyEquals(calculateBitrateForQualityMbps(state, state.recording.brush.streamQuality), mbps))
-        state.recording.brush.bitrateMbitPerSec = RecordScheduleCellData::kAutoBitrateValue; //< Standard quality detected.
-    state.recording.bitrateMbps = mbps;
-    return state;
+    return fillBitrateFromCustomValue(std::move(state), mbps);
 }
 
 State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
@@ -2070,8 +2087,7 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
 
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
-    const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
-    const auto mbps = state.recording.minBitrateMbps + value * spread;
+    const auto mbps = bitrateMbpsFromNormalized(state, value);
     return setRecordingBitrateMbps(std::move(state), mbps);
 }
 
