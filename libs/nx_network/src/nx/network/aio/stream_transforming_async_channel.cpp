@@ -364,8 +364,13 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         return;
     }
 
-    if (nx::network::socketCannotRecoverFromError(sysErrorCode))
+    // A clean EOF ends every task, not just the reads: a write waiting for the converter to be fed
+    // (an SSL handshake, for one) can never complete once the peer is gone.
+    if (sysErrorCode == SystemError::noError
+        || nx::network::socketCannotRecoverFromError(sysErrorCode))
+    {
         return reportFailureOfEveryUserTask(sysErrorCode);
+    }
 
     // Reporting failure to user task(s) that depend on this read.
     reportFailureToTasksFilteredByType(sysErrorCode, detail::UserTaskType::read);

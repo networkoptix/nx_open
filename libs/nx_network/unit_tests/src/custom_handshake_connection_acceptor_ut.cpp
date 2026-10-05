@@ -303,6 +303,8 @@ protected:
 
     void whenEstablishSilentConnections(std::size_t count) { openSilentConnections(count); }
 
+    void whenSilentConnectionsAreClosed() { m_silentConnections.clear(); }
+
     void thenConnectionsBeingHandshakedCountReaches(std::size_t expected)
     {
         const auto stopWaitingTime = std::chrono::steady_clock::now() + std::chrono::seconds(15);
@@ -475,6 +477,19 @@ TEST_F(CustomHandshakeConnectionAcceptor, accepting_resumes_once_stuck_handshake
     ASSERT_NO_FATAL_FAILURE(thenConnectionsBeingHandshakedCountReaches(kHandshakeLimit));
 
     thenNewConnectionIsAccepted();
+}
+
+// A peer that closes mid-handshake frees its slot at once, not after the handshake timeout.
+TEST_F(CustomHandshakeConnectionAcceptor, closing_a_connection_ends_its_handshake)
+{
+    givenLimitOnConnectionsBeingHandshaked(kHandshakeLimit);
+
+    // Exactly the limit, so closing them leaves nothing in the listen queue to take their place.
+    whenEstablishSilentConnections(kHandshakeLimit);
+    ASSERT_NO_FATAL_FAILURE(thenConnectionsBeingHandshakedCountStaysAt(kHandshakeLimit));
+
+    whenSilentConnectionsAreClosed();
+    thenConnectionsBeingHandshakedCountReaches(0);
 }
 
 // A freed slot has to re-arm accepting even with no accept call to hand the connection to,
