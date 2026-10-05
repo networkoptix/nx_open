@@ -211,7 +211,7 @@ State loadMinMaxCustomBitrate(State state)
 {
     State::RecordingSettings& settings = state.recording;
     settings.minBitrateMbps = calculateBitrateForQualityMbps(state, Qn::StreamQuality::lowest);
-    settings.maxBitrateMpbs = calculateBitrateForQualityMbps(state, Qn::StreamQuality::highest);
+    settings.maxBitrateMbps = calculateBitrateForQualityMbps(state, Qn::StreamQuality::highest);
 
     static const std::array<Qn::StreamQuality, 4> kUserVisibleQualities{{
         Qn::StreamQuality::low,
@@ -261,7 +261,7 @@ State fillBitrateFromCustomValue(State state, float mbps)
 
 float bitrateMbpsFromNormalized(const State& state, float value)
 {
-    return std::lerp(state.recording.minBitrateMbps, state.recording.maxBitrateMpbs, value);
+    return std::lerp(state.recording.minBitrateMbps, state.recording.maxBitrateMbps, value);
 }
 
 QString settingsUrlPath(const Camera& camera)
@@ -1978,7 +1978,7 @@ State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int val
     else
     {
         // Lock normalized bitrate.
-        const auto normalizedBitrate = state.recording.normalizedCustomBitrateMbps();
+        const auto normalizedBitrate = state.recording.normalizedBitrate();
         state = loadMinMaxCustomBitrate(std::move(state));
         const auto mbps = bitrateMbpsFromNormalized(state, normalizedBitrate);
         state = fillBitrateFromCustomValue(std::move(state), mbps);

@@ -339,7 +339,7 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     }
 
     const bool fpsLockedBitrate =
-        qFuzzyEquals(state.recording.maxBitrateMpbs, state.recording.minBitrateMbps);
+        qFuzzyEquals(state.recording.maxBitrateMbps, state.recording.minBitrateMbps);
 
     if (fpsLockedBitrate)
     {
@@ -368,11 +368,10 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     if (customBitrateAvailable)
     {
         ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled && !fpsLockedBitrate);
-        ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMpbs);
+        ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMbps);
         ui->bitrateSpinBox->setValue(recording.bitrateMbps);
         setReadOnly(ui->bitrateSpinBox, state.readOnly);
-        setNormalizedValue(ui->bitrateSlider,
-            fpsLockedBitrate ? 1.0 : recording.normalizedCustomBitrateMbps());
+        setNormalizedValue(ui->bitrateSlider, recording.normalizedBitrate());
         setReadOnly(ui->bitrateSlider, state.readOnly);
 
         const auto buttonText = recording.customBitrateVisible
