@@ -4,6 +4,10 @@ import QtQuick
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Mobile.Controls
+import Nx.Ui
+
+import nx.vms.client.core
 
 BaseSettingsPage
 {
@@ -20,89 +24,131 @@ BaseSettingsPage
 
     title: qsTr("About")
 
-    Rectangle
+    Column
     {
         width: parent.width
-        height: contentColumn.height
-        color: ColorTheme.colors.dark6
-        radius: 8
+        spacing: 8
 
-        Column
+        Rectangle
         {
-            id: contentColumn
-            spacing: 8
-
             width: parent.width
+            height: contentColumn.height
+            color: ColorTheme.colors.dark6
+            radius: 8
 
-            topPadding: 18
-            bottomPadding: 18
-
-            Image
+            Column
             {
-                anchors.horizontalCenter: parent.horizontalCenter
+                id: contentColumn
+                spacing: 8
 
-                source: "image://skin/logo.png"
-                width: 64
-                height: width
+                width: parent.width
 
-                MouseArea
+                topPadding: 18
+                bottomPadding: 18
+
+                Image
                 {
-                    id: developerSettingsClickArea
+                    anchors.horizontalCenter: parent.horizontalCenter
 
-                    property int clicksCount: 0
+                    source: "image://skin/logo.png"
+                    width: 64
+                    height: width
 
-                    anchors.fill: parent
-
-                    onClicksCountChanged:
+                    MouseArea
                     {
-                        if (clicksCount < 5)
-                            return
+                        id: developerSettingsClickArea
 
-                        clicksCount = 0
+                        property int clicksCount: 0
 
-                        appInfoPage.developerSettingsRequested()
-                    }
+                        anchors.fill: parent
 
-                    onClicked:
-                    {
-                        ++clicksCount
-                        clicksResetTimer.restart()
-                    }
+                        onClicksCountChanged:
+                        {
+                            if (clicksCount < 5)
+                                return
 
-                    Timer
-                    {
-                        id: clicksResetTimer
+                            clicksCount = 0
 
-                        interval: 1000
-                        onTriggered: developerSettingsClickArea.clicksCount = 0
+                            appInfoPage.developerSettingsRequested()
+                        }
+
+                        onClicked:
+                        {
+                            ++clicksCount
+                            clicksResetTimer.restart()
+                        }
+
+                        Timer
+                        {
+                            id: clicksResetTimer
+
+                            interval: 1000
+                            onTriggered: developerSettingsClickArea.clicksCount = 0
+                        }
                     }
                 }
+
+                Text
+                {
+                    id: companyNameText
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 18
+                    font.weight: 500
+                    lineHeight: 1.25
+                    color: ColorTheme.colors.light4
+                    text: appContext.appInfo.companyName();
+                }
+
+                Text
+                {
+                    id: versionText
+
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 14
+                    font.weight: 400
+                    lineHeight: 1.5
+                    color: ColorTheme.colors.light16
+                    text: appContext.appInfo.version();
+                }
             }
+        }
 
-            Text
+        Button
+        {
+            id: userManualButton
+
+            width: parent.width
+            height: 56
+
+            leftPadding: 16
+            rightPadding: 48
+            textHorizontalAlignment: Text.AlignLeft
+            textElide: Text.ElideRight
+            textMaximumLineCount: 1
+
+            text: qsTr("User Manual")
+            font.weight: Font.Normal
+            font.pixelSize: 18
+
+            backgroundColor: ColorTheme.colors.dark6
+            foregroundColor: StyleHints.foregroundColor
+            borderColor: backgroundColor
+            radius: 8
+
+            onClicked: Qt.openUrlExternally(CloudUrlHelper.mobileUserManualUrl())
+
+            ColoredImage
             {
-                id: companyNameText
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+                anchors.verticalCenter: parent.verticalCenter
 
-                anchors.horizontalCenter: parent.horizontalCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 18
-                font.weight: 500
-                lineHeight: 1.25
-                color: ColorTheme.colors.light4
-                text: appContext.appInfo.companyName();
-            }
-
-            Text
-            {
-                id: versionText
-
-                anchors.horizontalCenter: parent.horizontalCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 14
-                font.weight: 400
-                lineHeight: 1.5
-                color: ColorTheme.colors.light16
-                text: appContext.appInfo.version();
+                sourcePath: "image://skin/24x24/Outline/external_link.svg"
+                sourceSize: Qt.size(24, 24)
+                primaryColor: ColorTheme.colors.light16
             }
         }
     }
