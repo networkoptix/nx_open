@@ -21,7 +21,7 @@ public:
 
     virtual bool tryClose(bool force) override;
 
-private:
+private slots:
     Q_INVOKABLE void handleDoubleClick(int row);
     Q_INVOKABLE void updateFilter();
 
