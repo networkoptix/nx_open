@@ -2160,7 +2160,7 @@
     </message>
     <message>
       <source>Update interval for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Update interval for remote session token cache (other Servers and Cloud).</translation>
+      <translation>فترة تحديث ذاكرة التخزين المؤقت لرمز الجلسة البعيدة (الخوادم الأخرى والسحابة).</translation>
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
