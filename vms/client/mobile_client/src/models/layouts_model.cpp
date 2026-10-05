@@ -394,10 +394,11 @@ void QnLayoutsModelUnsorted::removeLayout(const QnLayoutResourcePtr& layout)
     disconnect(layout.get(), &QnLayoutResource::nameChanged, this, nullptr);
 }
 
-QnLayoutsModel::QnLayoutsModel(QObject* parent) :
+QnLayoutsModel::QnLayoutsModel(QObject* parent):
     base_type(parent),
     nx::vms::client::mobile::WindowContextAware(
-        nx::vms::client::mobile::WindowContext::fromQmlContext(this))
+        nx::vms::client::mobile::WindowContext::fromQmlContext(this)),
+    m_collator(nx::utils::createCollator())
 {
 }
 
@@ -418,7 +419,7 @@ bool QnLayoutsModel::lessThan(const QModelIndex& left, const QModelIndex& right)
     const auto leftName = leftResource->getName();
     const auto rightName = rightResource->getName();
 
-    auto cmp = nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
+    auto cmp = m_collator.compare(leftName, rightName);
     if (cmp != 0)
         return cmp < 0;
 

@@ -8,6 +8,7 @@
 #include <nx/utils/uuid.h>
 
 class AbstractSystemsController;
+class QCollator;
 class QnSystemsModelPrivate;
 
 class NX_VMS_CLIENT_CORE_API QnSystemsModel: public QAbstractListModel
@@ -71,7 +72,9 @@ public: // overrides
 
     // TODO: cloudFirstSorting would always be true when the desktop client switches to the new
     // welcome screen with organizations.
-    static bool lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight,
+    static bool lessThan(const QModelIndex& sourceLeft,
+        const QModelIndex& sourceRight,
+        const QCollator& collator,
         bool cloudFirstSorting = false);
 
 private:

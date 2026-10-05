@@ -99,8 +99,8 @@ struct ComparableMember
         }
 
         // Case Insensitive sort.
-        const int ret = nx::utils::naturalStringCompare(
-            self->name(), other.name(), Qt::CaseInsensitive);
+        static const QCollator collator = nx::utils::createCollator();
+        const int ret = collator.compare(self->name(), other.name());
 
         // Sort identical names by UUID.
         if (ret == 0)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
@@ -100,6 +101,7 @@ protected:
 
 private:
     FilterMode m_filterMode{FilterMode::noFilter};
+    QCollator m_collator;
 };
 
 } // namespace nx::vms::client::desktop

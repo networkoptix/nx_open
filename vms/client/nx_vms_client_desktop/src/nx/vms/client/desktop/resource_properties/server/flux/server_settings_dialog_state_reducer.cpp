@@ -94,16 +94,16 @@ State ServerSettingsDialogStateReducer::setPluginModules(
     }
 
     // Sort plugins by loaded state, then by name.
-    std::ranges::sort(
-        state.plugins.modules,
-        [](const PluginInfo& l, const PluginInfo& r)
+    const auto collator = nx::utils::createCollator();
+    std::ranges::sort(state.plugins.modules,
+        [&collator](const PluginInfo& l, const PluginInfo& r)
         {
             if (l.status == PluginInfo::Status::loaded && r.status != PluginInfo::Status::loaded)
                 return true;
             if (r.status == PluginInfo::Status::loaded && l.status != PluginInfo::Status::loaded)
                 return false;
 
-            const int code = nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive);
+            const int code = collator.compare(l.name, r.name);
             if (code < 0)
                 return true;
             if (code > 0)

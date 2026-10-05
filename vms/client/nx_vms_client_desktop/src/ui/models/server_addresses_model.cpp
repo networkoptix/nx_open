@@ -302,7 +302,11 @@ nx::Url QnServerAddressesModel::addressAtIndex(const QModelIndex &index, int def
     return url;
 }
 
-QnSortedServerAddressesModel::QnSortedServerAddressesModel(QObject *parent) : QSortFilterProxyModel(parent) {}
+QnSortedServerAddressesModel::QnSortedServerAddressesModel(QObject* parent):
+    QSortFilterProxyModel(parent),
+    m_collator(nx::utils::createCollator())
+{
+}
 
 bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
     QnServerAddressesModel *model = dynamic_cast<QnServerAddressesModel*>(sourceModel());
@@ -316,5 +320,5 @@ bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QMode
     if (lmanual != rmanual)
         return rmanual;
 
-    return nx::utils::naturalStringLess(left.data().toString(), right.data().toString());
+    return m_collator.compare(left.data().toString(), right.data().toString()) < 0;
 }

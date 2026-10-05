@@ -170,6 +170,9 @@ public:
 
 protected:
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+
+private:
+    QCollator m_collator;
 };
 
 // Hides 'SitesNode' root node and places its children last, optionally hiding SaaS systems.

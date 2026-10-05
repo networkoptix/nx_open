@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QCollator>
+
 #include <nx/vms/client/desktop/common/models/customizable_sort_filter_proxy_model.h>
 
 namespace nx::vms::client::desktop {
@@ -13,6 +15,9 @@ class NaturalStringSortProxyModel: public CustomizableSortFilterProxyModel
 
 public:
     NaturalStringSortProxyModel(QObject* parent = nullptr);
+
+private:
+    QCollator m_collator;
 };
 
 } // namespace nx::vms::client::desktop

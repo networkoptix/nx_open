@@ -59,6 +59,7 @@ struct QnCameraListModel::Private: public QObject
     std::map<mobile::SystemContext*, nx::utils::ScopedConnection> systemContextConnections;
     QSet<nx::Uuid> filterIds;
     QSet<nx::Uuid> selectedIds;
+    QCollator collator{nx::utils::createCollator()};
 };
 
 QnCameraListModel::Private::Private(QnCameraListModel* q):
@@ -346,14 +347,14 @@ bool QnCameraListModel::lessThan(const QModelIndex& left, const QModelIndex& rig
     const auto leftName = left.data(core::ResourceNameRole).toString();
     const auto rightName = right.data(core::ResourceNameRole).toString();
 
-    int res = nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
+    int res = d->collator.compare(leftName, rightName);
     if (res != 0)
         return res < 0;
 
     const auto leftAddress = left.data(core::IpAddressRole).toString();
     const auto rightAddress = right.data(core::IpAddressRole).toString();
 
-    res = nx::utils::naturalStringCompare(leftAddress, rightAddress);
+    res = d->collator.compare(leftAddress, rightAddress);
     if (res != 0)
         return res < 0;
 

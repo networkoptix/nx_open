@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QVariant>
 
 #include <api/model/recording_stats_reply.h>
 #include <client/client_globals.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 #include <ui/models/recording_stats_adapter.h>
 #include <utils/common/id.h>
@@ -20,6 +22,9 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+
+private:
+    QCollator m_collator{nx::utils::createCollator()};
 };
 
 class QnTotalRecordingStatsModel: public QSortFilterProxyModel

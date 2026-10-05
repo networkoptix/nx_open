@@ -191,15 +191,10 @@ void QnIoModuleOverlayWidgetPrivate::initIOModule(const QnVirtualCameraResourceP
 void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
 {
     ports = newPorts;
-    std::ranges::sort(
-        ports,
-        [](const QnIOPortData& left, const QnIOPortData& right)
-        {
-            return nx::utils::naturalStringCompare(
-                left.getName(),
-                right.getName(),
-                Qt::CaseInsensitive) < 0;
-        });
+    const auto collator = nx::utils::createCollator();
+    std::ranges::sort(ports,
+        [&collator](const QnIOPortData& left, const QnIOPortData& right)
+        { return collator.compare(left.getName(), right.getName()) < 0; });
 
     for (const auto& port : ports)
     {

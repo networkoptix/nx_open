@@ -18,10 +18,13 @@ using nx::vms::api::UserGroupDataList;
 
 namespace {
 
-bool lessRoleByName(const UserGroupData& r1, const UserGroupData& r2)
+auto lessRoleByName(const QCollator& collator)
 {
-    return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
-};
+    return [&collator](const UserGroupData& r1, const UserGroupData& r2)
+    {
+        return collator.compare(r1.name, r2.name) < 0;
+    };
+}
 
 } // namespace
 
@@ -42,7 +45,7 @@ QnUserRolesModel::Private::Private(
     {
         m_userRoles = systemContext()->userGroupManager()->groups();
 
-        std::ranges::sort(m_userRoles, lessRoleByName);
+        std::ranges::sort(m_userRoles, lessRoleByName(m_collator));
 
         connect(systemContext()->userGroupManager(), &UserGroupManager::addedOrUpdated,
             this, &QnUserRolesModel::Private::updateUserRole);
@@ -53,7 +56,7 @@ QnUserRolesModel::Private::Private(
 
 void QnUserRolesModel::Private::setUserRoles(UserGroupDataList value)
 {
-    std::ranges::sort(value, lessRoleByName);
+    std::ranges::sort(value, lessRoleByName(m_collator));
     if (m_userRoles == value)
         return;
 
@@ -72,8 +75,8 @@ bool QnUserRolesModel::Private::updateUserRole(const UserGroupData& userRole)
     // If added.
     if (roleIterator == m_userRoles.end())
     {
-        const auto insertionPosition = std::upper_bound(m_userRoles.begin(), m_userRoles.end(),
-            userRole, lessRoleByName);
+        const auto insertionPosition = std::upper_bound(
+            m_userRoles.begin(), m_userRoles.end(), userRole, lessRoleByName(m_collator));
 
         const int row = std::distance(m_userRoles.begin(), insertionPosition);
 
@@ -87,8 +90,8 @@ bool QnUserRolesModel::Private::updateUserRole(const UserGroupData& userRole)
 
     if (roleIterator->name != userRole.name)
     {
-        auto newPosition = std::upper_bound(m_userRoles.begin(), m_userRoles.end(),
-            userRole, lessRoleByName);
+        auto newPosition = std::upper_bound(
+            m_userRoles.begin(), m_userRoles.end(), userRole, lessRoleByName(m_collator));
 
         int destinationRow = std::distance(m_userRoles.begin(), newPosition);
 

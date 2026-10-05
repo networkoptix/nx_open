@@ -42,7 +42,8 @@ bool isCustomUser(const QnUserResourcePtr& user)
             user->getId()).isEmpty();
 }
 
-bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortColumn)
+bool userLessThan(
+    const QModelIndex& left, const QModelIndex& right, const QCollator& collator, int sortColumn)
 {
     const auto leftUser = left.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
     const auto rightUser = right.data(Qn::UserResourceRole).value<QnUserResourcePtr>();
@@ -63,7 +64,7 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             if (leftText != rightText)
                 return leftText < rightText;
 
-            return userLessThan(left, right, UserListModel::UserTypeColumn);
+            return userLessThan(left, right, collator, UserListModel::UserTypeColumn);
         }
 
         case UserListModel::UserTypeColumn:
@@ -77,7 +78,7 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             else if (leftUser->isChannelPartner() != rightUser->isChannelPartner())
                 return leftUser->isChannelPartner();
 
-            return userLessThan(left, right, UserListModel::LoginColumn);
+            return userLessThan(left, right, collator, UserListModel::LoginColumn);
         }
 
         case UserListModel::FullNameColumn:
@@ -88,9 +89,9 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             const QString rightText = right.data(Qt::DisplayRole).toString();
 
             if (leftText != rightText)
-                return nx::utils::naturalStringLess(leftText, rightText);
+                return collator.compare(leftText, rightText) < 0;
 
-            return userLessThan(left, right, UserListModel::UserTypeColumn);
+            return userLessThan(left, right, collator, UserListModel::UserTypeColumn);
         }
 
         case UserListModel::IsCustomColumn:
@@ -100,13 +101,13 @@ bool userLessThan(const QModelIndex& left, const QModelIndex& right, int sortCol
             if (leftCustom != rightCustom)
                 return rightCustom;
 
-            return userLessThan(left, right, UserListModel::UserTypeColumn);
+            return userLessThan(left, right, collator, UserListModel::UserTypeColumn);
         }
 
         default:
         {
             // Otherwise sort by login (which is unique):
-            return nx::utils::naturalStringLess(leftUser->getName(), rightUser->getName());
+            return collator.compare(leftUser->getName(), rightUser->getName()) < 0;
         }
     }
 }
@@ -1015,7 +1016,9 @@ qsizetype UserListModel::ldapUserCount() const
     return d->m_ldapUserCount;
 }
 
-SortedUserListModel::SortedUserListModel(QObject* parent): base_type(parent)
+SortedUserListModel::SortedUserListModel(QObject* parent):
+    base_type(parent),
+    m_collator(nx::utils::createCollator())
 {
 }
 
@@ -1027,7 +1030,7 @@ void SortedUserListModel::setFilterMode(FilterMode filterMode)
 
 bool SortedUserListModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    return userLessThan(left, right, sortColumn());
+    return userLessThan(left, right, m_collator, sortColumn());
 }
 
 bool SortedUserListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const

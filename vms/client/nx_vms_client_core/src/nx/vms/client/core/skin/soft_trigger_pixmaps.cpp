@@ -118,21 +118,24 @@ QString SoftTriggerPixmaps::effectivePixmapPath(const QString& name)
 
 const QStringList& SoftTriggerPixmaps::pixmapNames()
 {
-    static const auto pixmapNames =
-        []() -> QStringList
+    static const auto pixmapNames = []() -> QStringList
+    {
+        const auto collator = nx::utils::createCollator();
+        const auto less = [&collator](const QString& left, const QString& right)
         {
-            std::set<QString, decltype(&nx::utils::naturalStringLess)> names(
-                &nx::utils::naturalStringLess);
+            return collator.compare(left, right) < 0;
+        };
+        std::set<QString, decltype(less)> names(less);
 
-            for (const auto& [key, value]: kIconNameMapping)
-                names.insert(key);
+        for (const auto& [key, value]: kIconNameMapping)
+            names.insert(key);
 
-            QStringList result;
-            for (const auto& name: names)
-                result.emplace_back(name);
+        QStringList result;
+        for (const auto& name: names)
+            result.emplace_back(name);
 
-            return result;
-        }();
+        return result;
+    }();
 
     return pixmapNames;
 }

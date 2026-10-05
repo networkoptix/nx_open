@@ -4,8 +4,6 @@
 
 #include <ui/models/ioports_view_model.h>
 
-#include <nx/utils/string.h>
-
 namespace nx::vms::client::desktop {
 
 bool IoPortsSortModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
@@ -37,7 +35,7 @@ bool IoPortsSortModel::lessThan(const QModelIndex& left, const QModelIndex& righ
     if (leftStr.isEmpty() != rightStr.isEmpty())
         return rightStr.isEmpty();
 
-    return nx::utils::naturalStringCompare(leftStr, rightStr, Qt::CaseInsensitive) < 0;
+    return m_collator.compare(leftStr, rightStr) < 0;
 }
 
 } // namespace nx::vms::client::core

@@ -59,8 +59,11 @@ namespace {
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
             QString rightString = right.data(sortRole()).toString();
-            return nx::utils::naturalStringLess(leftString, rightString);
+            return m_collator.compare(leftString, rightString) < 0;
         }
+
+    private:
+        QCollator m_collator{nx::utils::createCollator()};
     };
 
     static void getAddresses(const QnMediaServerResourcePtr &server, QSet<nx::Url> &autoUrls, QSet<nx::Url> &additionalUrls, QSet<nx::Url> &ignoredUrls) {

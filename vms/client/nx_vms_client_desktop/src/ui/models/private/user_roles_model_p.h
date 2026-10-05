@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include <QtCore/QCollator>
 #include <QtCore/QPersistentModelIndex>
 #include <QtCore/QSet>
 
+#include <nx/utils/string.h>
 #include <ui/models/user_roles_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -43,4 +45,6 @@ private:
 
     QString m_customRoleName;
     QString m_customRoleDescription;
+
+    QCollator m_collator{nx::utils::createCollator()};
 };

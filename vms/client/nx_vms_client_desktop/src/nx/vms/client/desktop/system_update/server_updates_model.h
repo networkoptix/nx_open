@@ -5,6 +5,7 @@
 #include <memory> // for shared_ptr
 
 #include <QtCore/QAbstractTableModel>
+#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <client/client_globals.h>
@@ -81,6 +82,9 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
+
+private:
+    QCollator m_collator;
 };
 
 } // namespace nx::vms::client::desktop

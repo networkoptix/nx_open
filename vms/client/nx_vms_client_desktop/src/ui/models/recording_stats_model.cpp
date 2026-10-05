@@ -46,7 +46,9 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
     switch(left.column())
     {
         case QnRecordingStatsModel::CameraNameColumn:
-            return nx::utils::naturalStringLess(left.data(Qt::DisplayRole).toString(), right.data(Qt::DisplayRole).toString());
+            return m_collator.compare(left.data(Qt::DisplayRole).toString(),
+                       right.data(Qt::DisplayRole).toString())
+                < 0;
         case QnRecordingStatsModel::BytesColumn:
             return leftData.recordedBytes < rightData.recordedBytes;
         case QnRecordingStatsModel::DurationColumn:

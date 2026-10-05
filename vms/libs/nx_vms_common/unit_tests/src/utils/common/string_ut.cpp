@@ -109,31 +109,36 @@ TEST(String, serialized_as_a_string_not_buffer)
     ASSERT_EQ(foo, deserialized);
 }
 
-TEST(String, naturalStringLessCorrectOrder)
+TEST(String, createCollatorCorrectOrder)
 {
-    QStringList list = {"test", "test1"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test, test1", list.join(", "));
+    const auto collator = utils::createCollator(
+        Qt::CaseInsensitive, /*numericMode*/ true, QLocale(QLocale::English));
+    const auto sorted = [&collator](QStringList list)
+    {
+        std::ranges::sort(list,
+            [&collator](const QString& l, const QString& r)
+            { return collator.compare(l, r) < 0; });
+        return list.join(", ");
+    };
 
-    list = {"test", "test_1"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test, test_1", list.join(", "));
-
-    list = {"test_a", "test_1"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test_1, test_a", list.join(", "));
-
-    list = {"test!", "test!2"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test!, test!2", list.join(", "));
-
-    list = {"test+1", "test-1"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test+1, test-1", list.join(", "));
-
-    list = {"test", "test2", "test1", "test10", "test_1", "test_a", "test_b", "test+a", "test!1"};
-    std::ranges::sort(list, utils::naturalStringLess);
-    ASSERT_EQ("test, test1, test2, test10, test!1, test+a, test_1, test_a, test_b", list.join(", "));
+    ASSERT_EQ("test, test1", sorted({"test1", "test"}));
+    ASSERT_EQ("test, test_1", sorted({"test_1", "test"}));
+    ASSERT_EQ("test_1, test_a", sorted({"test_a", "test_1"}));
+    ASSERT_EQ("test!, test!2", sorted({"test!2", "test!"}));
+    ASSERT_EQ("test-1, test+1", sorted({"test+1", "test-1"}));
+    ASSERT_EQ("CAM1, cam2, Cam10", sorted({"Cam10", "cam2", "CAM1"}));
+    ASSERT_EQ("10.0.0.1, 192.168.0.9, 192.168.0.10",
+        sorted({"192.168.0.10", "192.168.0.9", "10.0.0.1"}));
+    ASSERT_EQ("test, test_1, test_a, test_b, test!1, test+a, test1, test2, test10",
+        sorted({"test",
+            "test2",
+            "test1",
+            "test10",
+            "test_1",
+            "test_a",
+            "test_b",
+            "test+a",
+            "test!1"}));
 }
 
 } // namespace nx::test

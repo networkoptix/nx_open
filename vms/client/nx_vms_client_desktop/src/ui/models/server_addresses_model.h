@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/utils/url.h>
@@ -81,4 +82,7 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+
+private:
+    QCollator m_collator;
 };

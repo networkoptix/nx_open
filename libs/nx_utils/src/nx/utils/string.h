@@ -9,6 +9,7 @@
 #include <string_view>
 #include <vector>
 
+#include <QtCore/QCollator>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
 #include <QtCore/QString>
@@ -51,15 +52,6 @@ NX_UTILS_API int parseInt(const QString& string, int base = 10);
 Like QString::toDouble, but throws on failure.
 */
 NX_UTILS_API double parseDouble(const QString& string);
-
-NX_UTILS_API int naturalStringCompare(
-    QStringView lhs,
-    QStringView rhs,
-    Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive,
-    bool enableFloat = false);
-NX_UTILS_API QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
-
-NX_UTILS_API bool naturalStringLess(const QString &lhs, const QString &rhs);
 
 NX_UTILS_API QString xorEncrypt(const QString &plaintext, const QString &key);
 NX_UTILS_API QString xorDecrypt(const QString &crypted, const QString &key);
@@ -307,5 +299,12 @@ NX_UTILS_API std::string half(const std::string& str);
 NX_UTILS_API QString quoteDelimitedTokens( const QString& input, const QStringList& delimiters);
 NX_UTILS_API QStringList quoteDelimitedTokenList(
     const QString& input, const QStringList& delimiters);
+
+/**
+ * Creates a collator with specified parameters.
+ */
+NX_UTILS_API QCollator createCollator(Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive,
+    bool numericMode = true,
+    QLocale locale = QLocale());
 
 } // namespace nx::utils

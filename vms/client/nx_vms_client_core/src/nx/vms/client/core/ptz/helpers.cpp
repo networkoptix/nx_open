@@ -55,14 +55,14 @@ QnPtzPresetList sortedPresets(const QnResourcePtr& resource, QnPtzPresetList pre
             return it == presetIdHotkeyHash.end() ? kNoPresetNumberValue : it.value();
         };
 
-    std::ranges::sort(
-        presets,
-        [getPtzPresetHotkeyNumber](const QnPtzPreset& left, const QnPtzPreset& right)
+    const auto collator = nx::utils::createCollator();
+    std::ranges::sort(presets,
+        [getPtzPresetHotkeyNumber, &collator](const QnPtzPreset& left, const QnPtzPreset& right)
         {
             const int leftPresetNumber = getPtzPresetHotkeyNumber(left.id);
             const int rightPresetNumber = getPtzPresetHotkeyNumber(right.id);
             return leftPresetNumber == rightPresetNumber
-                ? nx::utils::naturalStringLess(left.name, right.name)
+                ? collator.compare(left.name, right.name) < 0
                 : leftPresetNumber < rightPresetNumber;
         });
 

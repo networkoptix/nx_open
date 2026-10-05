@@ -263,12 +263,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data)
     const auto presets = nx::vms::client::core::ptz::helpers::sortedPresets(
         controller()->resource(), data.presets);
     QnPtzTourList tours = data.tours;
-    std::ranges::sort(
-        tours,
-        [](const QnPtzTour& l, const QnPtzTour& r)
-        {
-            return nx::utils::naturalStringLess(l.name, r.name);
-        });
+    const auto collator = nx::utils::createCollator();
+    std::ranges::sort(tours,
+        [&collator](const QnPtzTour& l, const QnPtzTour& r)
+        { return collator.compare(l.name, r.name) < 0; });
 
     m_model->setTours(tours);
     m_model->setPresets(presets);
@@ -441,10 +439,10 @@ void QnPtzManageDialog::updateFields(DataFields fields)
         QnPtzTourList tours;
         if (controller()->getTours(&tours))
         {
-            std::ranges::sort(tours, [](const QnPtzTour &l, const QnPtzTour &r)
-            {
-                return nx::utils::naturalStringLess(l.name, r.name);
-            });
+            const auto collator = nx::utils::createCollator();
+            std::ranges::sort(tours,
+                [&collator](const QnPtzTour& l, const QnPtzTour& r)
+                { return collator.compare(l.name, r.name) < 0; });
             m_model->setTours(tours);
         }
     }

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QCollator>
 #include <QtCore/QSortFilterProxyModel>
 
 #include <nx/vms/client/core/context_from_qml_handler.h>
@@ -30,4 +31,7 @@ public:
 
 private:
     virtual void onContextReady() override;
+
+private:
+    QCollator m_collator;
 };

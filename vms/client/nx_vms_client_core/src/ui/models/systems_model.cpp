@@ -2,6 +2,8 @@
 
 #include "systems_model.h"
 
+#include <QtCore/QCollator>
+
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/assert.h>
@@ -333,7 +335,9 @@ bool QnSystemsModel::setData(const QModelIndex& index, const QVariant& value, in
     return base_type::setData(index, value, role);
 }
 
-bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& sourceRight,
+bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft,
+    const QModelIndex& sourceRight,
+    const QCollator& collator,
     bool cloudFirstSorting)
 {
     using namespace nx::vms::client::core::welcome_screen;
@@ -424,10 +428,9 @@ bool QnSystemsModel::lessThan(const QModelIndex& sourceLeft, const QModelIndex& 
             return leftIsCloud;
     }
 
-    const int namesOrder = nx::utils::naturalStringCompare(
-        sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),
-        sourceRight.data(QnSystemsModel::SystemNameRoleId).toString(),
-        Qt::CaseInsensitive);
+    const int namesOrder =
+        collator.compare(sourceLeft.data(QnSystemsModel::SystemNameRoleId).toString(),
+            sourceRight.data(QnSystemsModel::SystemNameRoleId).toString());
 
     if (namesOrder != 0)
         return namesOrder < 0;

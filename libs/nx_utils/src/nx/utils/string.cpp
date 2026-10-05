@@ -10,7 +10,6 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
-#include <QtCore/private/qtools_p.h>
 
 #include <nx/kit/utils.h>
 #include <nx/utils/datetime.h>
@@ -160,232 +159,6 @@ QString generateUniqueString(
     }
 
     return templateString.arg(number);
-}
-
-// -------------------------------------------------------------------------- //
-// String comparison
-// -------------------------------------------------------------------------- //
-/*
- * This software was written by people from OnShore Consulting services LLC
- * <info@sabgroup.com> and placed in the public domain.
- *
- * We reserve no legal rights to any of this. You are free to do
- * whatever you want with it. And we make no guarantee or accept
- * any claims on damages as a result of this.
- *
- * If you change the software, please help us and others improve the
- * code by sending your modifications to us. If you choose to do so,
- * your changes will be included under this license, and we will add
- * your name to the list of contributors.
- */
-#define INCBUFVIEW() { ++pos; curr = ( pos < string.length() ) ? string[ pos ] : QChar(); }
-
-bool isNumberStart(const QChar &c)
-{
-/* We don't want to handle negative numbers as this leads to very strange
- * results. Think how "1-1" and "1-2" are going to be compared in this
- * case. */
-
-    return
-#if 0
-        c == L'-' || c == L'+' ||
-#endif
-        c.isDigit();
-}
-
-void ExtractTokenView(
-    QStringView& buffer,
-    QStringView string,
-    int& pos,
-    bool& isNumber,
-    bool enableFloat,
-    bool& isSpecial)
-{
-    buffer = {};
-    if (string.isNull() || pos >= string.length())
-        return;
-
-    int startPos = pos;
-
-    isNumber = false;
-    isSpecial = false;
-    QChar curr = string[pos];
-    // TODO:: Fix it
-    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed
-    if (isNumberStart(curr))
-    {
-#if 0
-        if (curr == L'-' || curr == L'+')
-            INCBUFVIEW();
-#endif
-
-        if (!curr.isNull() && curr.isDigit())
-        {
-            isNumber = true;
-            while (curr.isDigit())
-                INCBUFVIEW();
-
-            if (curr == '.')
-            {
-                if (enableFloat)
-                {
-                    INCBUFVIEW();
-                    while (curr.isDigit())
-                        INCBUFVIEW();
-                }
-                else
-                {
-                    // We are done since we meet first character that is not expected.
-                    const qsizetype count = std::min((qsizetype) pos, string.size()) - startPos;
-                    buffer = string.sliced(startPos, count);
-                    return;
-                }
-            }
-
-            /* We don't want to handle exponential notation.
-             * Besides, this implementation is buggy as it treats '14easd'
-             * as a number. */
-#if 0
-            if (!curr.isNull() && curr.toLower() == L'e')
-            {
-                INCBUFVIEW();
-                if (curr == L'-' || curr == L'+')
-                    INCBUFVIEW();
-
-                if (curr.isNull() || !curr.isDigit())
-                    isNumber = false;
-                else
-                    while (curr.isDigit())
-                        INCBUFVIEW();
-            }
-#endif
-        }
-    }
-
-    if (QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1()))
-    {
-        isSpecial = true;
-        INCBUFVIEW();
-    }
-
-    if (!isNumber && !isSpecial)
-    {
-        while (!isNumberStart(curr) && !QtMiscUtils::isAsciiLetterOrNumber(curr.toLatin1())
-            && pos < string.length())
-        {
-            INCBUFVIEW();
-        }
-    }
-
-    const qsizetype count = std::min((qsizetype) pos, string.size()) - startPos;
-    buffer = string.sliced(startPos, count);
-}
-
-int naturalStringCompare(
-    QStringView lhs,
-    QStringView rhs,
-    Qt::CaseSensitivity caseSensitive,
-    bool enableFloat)
-{
-    int ii = 0;
-    int jj = 0;
-
-    QStringView lhsBufferQStr;
-    QStringView rhsBufferQStr;
-
-    int retVal = 0;
-
-    // all status values are created on the stack outside the loop to make as fast as possible
-    bool lhsNumber = false;
-    bool rhsNumber = false;
-    bool lhsSpecial = false;
-    bool rhsSpecial = false;
-
-    double lhsValue = 0.0;
-    double rhsValue = 0.0;
-    bool ok1;
-    bool ok2;
-
-    while (retVal == 0 && ii < lhs.length() && jj < rhs.length())
-    {
-        ExtractTokenView(lhsBufferQStr, lhs, ii, lhsNumber, enableFloat, lhsSpecial);
-        ExtractTokenView(rhsBufferQStr, rhs, jj, rhsNumber, enableFloat, rhsSpecial);
-
-        if (!lhsNumber && !rhsNumber)
-        {
-            // both strings curr val is a simple strcmp
-            retVal = lhsBufferQStr.compare(rhsBufferQStr, caseSensitive);
-
-            int maxLen = qMin(lhsBufferQStr.length(), rhsBufferQStr.length());
-            const auto tmpRight = rhsBufferQStr.left(maxLen);
-            const auto tmpLeft = lhsBufferQStr.left(maxLen);
-            if (tmpLeft.compare(tmpRight, caseSensitive) == 0)
-            {
-                retVal = lhsBufferQStr.length() - rhsBufferQStr.length();
-
-                if (retVal < 0)
-                {
-                    if (ii < lhs.length() && isNumberStart(lhs[ii]))
-                        retVal *= -1;
-                }
-                else if (retVal > 0)
-                {
-                    if (jj < rhs.length() && isNumberStart(rhs[jj]))
-                        retVal *= -1;
-                }
-            }
-        }
-        else if (lhsNumber && rhsNumber)
-        {
-            // both numbers, convert and compare
-            lhsValue = lhsBufferQStr.toDouble(&ok1);
-            rhsValue = rhsBufferQStr.toDouble(&ok2);
-            if (!ok1 || !ok2)
-                retVal = lhsBufferQStr.compare(rhsBufferQStr, caseSensitive);
-            else if (lhsValue > rhsValue)
-                retVal = 1;
-            else if (lhsValue < rhsValue)
-                retVal = -1;
-        }
-        else
-        {
-            // completely arbitrary that a number comes before a string
-            retVal = lhsNumber ? -1 : 1;
-        }
-    }
-
-    if (retVal != 0)
-        return retVal;
-    if (ii < lhs.length())
-        return 1;
-    else if (jj < rhs.length())
-        return -1;
-    else
-        return 0;
-}
-
-bool naturalStringLess(const QString &lhs, const QString &rhs)
-{
-    return naturalStringCompare(lhs, rhs, Qt::CaseInsensitive) < 0;
-}
-
-QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive)
-{
-    QStringList result = list;
-    if (caseSensitive == Qt::CaseSensitive)
-    {
-        std::ranges::sort(
-            result,
-            [](const QString& left, const QString& right)
-            {
-                return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
-            });
-    }
-    else
-    {
-        std::ranges::sort(result, naturalStringLess);
-    }
-    return result;
 }
 
 void trimInPlace(QString* const str, const QString& symbols)
@@ -834,6 +607,14 @@ QString quoteDelimitedTokens(const QString& input, const QStringList& delimiters
     if (input.isEmpty())
         return input;
     return quoteDelimitedTokenList(input, delimiters).join(" ");
+}
+
+QCollator createCollator(Qt::CaseSensitivity caseSensitivity, bool numericMode, QLocale locale)
+{
+    QCollator collator(locale);
+    collator.setCaseSensitivity(caseSensitivity);
+    collator.setNumericMode(numericMode);
+    return collator;
 }
 
 } // namespace nx::utils

@@ -64,14 +64,13 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     m_sharedLayoutsModel->setHasCheckboxes(true);
     m_sharedLayoutsModel->setSinglePick(m_singlePick);
 
-    auto lessThanFunc =
-        [](const QModelIndex& left, const QModelIndex& right)
-        {
-            return nx::utils::naturalStringCompare(
-                left.data(Qt::DisplayRole).toString(),
-                right.data(Qt::DisplayRole).toString(),
-                Qt::CaseInsensitive) < 0;
-        };
+    const auto collator = nx::utils::createCollator();
+    auto lessThanFunc = [collator](const QModelIndex& left, const QModelIndex& right)
+    {
+        const QString leftName = left.data(Qt::DisplayRole).toString();
+        const QString rightName = right.data(Qt::DisplayRole).toString();
+        return collator.compare(leftName, rightName) < 0;
+    };
 
     // Making a filtered model for local layouts.
     auto filterLocalLayouts =

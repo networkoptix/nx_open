@@ -225,7 +225,8 @@ void ServerUpdatesModel::setUpdateTarget(const nx::utils::SoftwareVersion& versi
 }
 
 SortedPeerUpdatesModel::SortedPeerUpdatesModel(QObject* parent):
-    QSortFilterProxyModel(parent)
+    QSortFilterProxyModel(parent),
+    m_collator(nx::utils::createCollator())
 {
 }
 
@@ -246,7 +247,7 @@ bool SortedPeerUpdatesModel::lessThan(const QModelIndex& leftIndex, const QModel
     QString lname = leftIndex.data(Qt::DisplayRole).toString();
     QString rname = rightIndex.data(Qt::DisplayRole).toString();
 
-    int result = nx::utils::naturalStringCompare(lname, rname, Qt::CaseInsensitive);
+    int result = m_collator.compare(lname, rname);
     if (result != 0)
         return result < 0;
 

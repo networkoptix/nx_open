@@ -10,6 +10,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/std/algorithm.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/core/common/models/linearization_list_model.h>
 #include <nx/vms/client/core/network/cloud_api.h>
 
@@ -1648,7 +1649,9 @@ void OrganizationsModel::setSystemsModel(QAbstractItemModel* systemsModel)
 // ------------------------------------------------------------------------------------------------
 // OrganizationsSortModel
 
-OrganizationsSortModel::OrganizationsSortModel(QObject* parent): base_type(parent)
+OrganizationsSortModel::OrganizationsSortModel(QObject* parent):
+    base_type(parent),
+    m_collator(nx::utils::createCollator())
 {
     sort(0);
 }
@@ -1674,7 +1677,7 @@ bool OrganizationsSortModel::lessThan(const QModelIndex& left, const QModelIndex
     const QString leftName = left.data(Qt::DisplayRole).toString();
     const QString rightName = right.data(Qt::DisplayRole).toString();
 
-    return nx::utils::naturalStringCompare(leftName, rightName, Qt::CaseInsensitive) < 0;
+    return m_collator.compare(leftName, rightName) < 0;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1769,7 +1772,7 @@ bool OrganizationsFilterModel::lessThan(const QModelIndex& left, const QModelInd
         return leftType < rightType;
 
     if (leftType == OrganizationsModel::System)
-        return QnSystemsModel::lessThan(left, right, /*cloudFirstSorting*/ true);
+        return QnSystemsModel::lessThan(left, right, m_collator, /*cloudFirstSorting*/ true);
 
     const QString leftName = left.data(Qt::DisplayRole).toString();
     const QString rightName = right.data(Qt::DisplayRole).toString();

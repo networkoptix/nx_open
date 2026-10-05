@@ -75,12 +75,10 @@ Factory::ActionList OpenCurrentUserLayoutFactory::newActions(const Parameters& /
             .filtered<core::LayoutResource>());
     }
 
-    std::ranges::sort(
-        layouts,
-        [](const QnLayoutResourcePtr& l, const QnLayoutResourcePtr& r)
-        {
-            return nx::utils::naturalStringLess(l->getName(), r->getName());
-        });
+    const auto collator = nx::utils::createCollator();
+    std::ranges::sort(layouts,
+        [&collator](const QnLayoutResourcePtr& l, const QnLayoutResourcePtr& r)
+        { return collator.compare(l->getName(), r->getName()) < 0; });
 
     auto currentLayout = workbench()->currentLayout()->resource();
 
@@ -146,11 +144,10 @@ Factory::ActionList PtzPresetsToursFactory::newActions(const Parameters& paramet
     widget->ptzController()->getTours(&tours);
     widget->ptzController()->getActiveObject(&activeObject);
 
+    const auto collator = nx::utils::createCollator();
     std::ranges::sort(tours,
-        [](const QnPtzTour& l, const QnPtzTour& r)
-        {
-            return nx::utils::naturalStringLess(l.name, r.name);
-        });
+        [&collator](const QnPtzTour& l, const QnPtzTour& r)
+        { return collator.compare(l.name, r.name) < 0; });
 
     HotkeysResourcePropertyAdaptor adaptor;
     adaptor.setResource(widget->resource());

@@ -7,15 +7,18 @@
 namespace nx::vms::client::desktop {
 
 NaturalStringSortProxyModel::NaturalStringSortProxyModel(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    m_collator(nx::utils::createCollator(sortCaseSensitivity()))
 {
     setCustomLessThan(
         [this](const QModelIndex& left, const QModelIndex& right) -> bool
         {
-            return nx::utils::naturalStringCompare(
-                left.data(Qt::DisplayRole).toString(),
-                right.data(Qt::DisplayRole).toString(),
-                sortCaseSensitivity()) < 0;
+            if (m_collator.caseSensitivity() != sortCaseSensitivity())
+                m_collator.setCaseSensitivity(sortCaseSensitivity());
+
+            const QString leftName = left.data(Qt::DisplayRole).toString();
+            const QString rightName = right.data(Qt::DisplayRole).toString();
+            return m_collator.compare(leftName, rightName) < 0;
         });
 }
 

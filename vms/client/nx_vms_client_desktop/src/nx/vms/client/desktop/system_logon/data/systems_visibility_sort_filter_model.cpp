@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/scoped_connections.h>
+#include <nx/utils/string.h>
 #include <ui/models/systems_model.h>
 
 using namespace nx::vms::client::core::welcome_screen;
@@ -15,6 +16,7 @@ namespace nx::vms::client::desktop {
 struct SystemsVisibilitySortFilterModel::Private
 {
     nx::utils::ScopedConnections sourceModelConnections;
+    QCollator collator{nx::utils::createCollator()};
 
     VisibilityScopeGetter visibilityScopeFilterGetter =
         []()
@@ -183,7 +185,7 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     const QModelIndex& sourceLeft,
     const QModelIndex& sourceRight) const
 {
-    return QnSystemsModel::lessThan(sourceLeft, sourceRight);
+    return QnSystemsModel::lessThan(sourceLeft, sourceRight, d->collator);
 }
 
 bool SystemsVisibilitySortFilterModel::isHidden(const QModelIndex& sourceIndex) const
