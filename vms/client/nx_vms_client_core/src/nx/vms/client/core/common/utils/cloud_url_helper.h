@@ -32,6 +32,7 @@ public:
     Q_INVOKABLE QUrl createAccountUrl() const;
     Q_INVOKABLE QUrl restorePasswordUrl() const;
     Q_INVOKABLE QUrl faqUrl() const;
+    Q_INVOKABLE QUrl mobileUserManualUrl() const;
     Q_INVOKABLE QUrl viewSystemUrl(SystemContext* systemContext) const;
     Q_INVOKABLE QUrl cloudLinkUrl(bool withReferral) const;
 

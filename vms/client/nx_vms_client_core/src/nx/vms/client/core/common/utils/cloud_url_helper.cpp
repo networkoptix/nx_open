@@ -73,6 +73,11 @@ QUrl CloudUrlHelper::faqUrl() const
     return makeUrl("/content/faq");
 }
 
+QUrl CloudUrlHelper::mobileUserManualUrl() const
+{
+    return makeUrl("/documentation/mobile");
+}
+
 QUrl CloudUrlHelper::viewSystemUrl(SystemContext* systemContext) const
 {
     const auto systemId = systemContext->globalSettings()->cloudSystemId();
