@@ -1446,6 +1446,13 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
         return;
     }
 
+    if (m_widgetState == WidgetUpdateState::initial)
+    {
+        NX_DEBUG(
+            this, "atFinishUpdateComplete(%1, %2) - ignored in the initial state", success, error);
+        return;
+    }
+
     if (success)
     {
         m_stateTracker->processInstallTaskSet();
@@ -2164,8 +2171,10 @@ void MultiServerUpdatesWidget::processInstallingState()
 void MultiServerUpdatesWidget::completeClientInstallation(bool clientUpdated)
 {
     std::optional<nx::vms::client::core::LogonData> logonData;
-    if (const auto connection = this->connection(); NX_ASSERT(connection))
+    if (const auto connection = this->connection())
         logonData = connection->createLogonData();
+    else
+        NX_DEBUG(this, "completeClientInstallation(%1) - not connected", clientUpdated);
 
     // Client must be forcefully disconnected before restarting to make sure all components
     // are deinitialized correctly.
