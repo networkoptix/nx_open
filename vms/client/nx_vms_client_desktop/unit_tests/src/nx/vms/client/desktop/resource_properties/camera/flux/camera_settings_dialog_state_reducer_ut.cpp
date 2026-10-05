@@ -473,6 +473,114 @@ TEST_F(CameraSettingsDialogStateReducerTest, brushBitrateIsValidOnScheduleBrushC
     ASSERT_EQ(mediumBitrate, mediumAfterCustom.recording.bitrateMbps);
 }
 
+// Custom bitrate brush can be picked from the schedule while "More Settings" is collapsed.
+TEST_F(CameraSettingsDialogStateReducerTest, customBitrateBrushIsPickedWithCollapsedSettings)
+{
+    static constexpr int kDefaultFps = 30;
+
+    const auto camera = createCamera();
+    camera->setMaxFps(kDefaultFps);
+
+    State expanded = Reducer::toggleCustomBitrateVisible(Reducer::loadCameras({}, {camera}));
+    expanded = Reducer::setScheduleBrushQuality(std::move(expanded), Qn::StreamQuality::normal);
+    const auto mediumBitrate = expanded.recording.bitrateMbps;
+    expanded = Reducer::setScheduleBrushQuality(std::move(expanded), Qn::StreamQuality::high);
+    const auto highBitrate = expanded.recording.bitrateMbps;
+
+    const auto customBitrate = (mediumBitrate + highBitrate) * 0.5f;
+    expanded = Reducer::setRecordingBitrateMbps(std::move(expanded), customBitrate);
+    const auto customBrush = expanded.recording.brush;
+    ASSERT_FALSE(customBrush.isAutoBitrate());
+
+    State collapsed = Reducer::loadCameras({}, {camera});
+    ASSERT_FALSE(collapsed.recording.customBitrateVisible);
+
+    collapsed = Reducer::setScheduleBrush(std::move(collapsed), customBrush);
+    ASSERT_EQ(customBrush, collapsed.recording.brush);
+    ASSERT_EQ(customBitrate, collapsed.recording.bitrateMbps);
+}
+
+// Brush fps change keeps the normalized custom bitrate while "More Settings" is collapsed.
+TEST_F(CameraSettingsDialogStateReducerTest, brushFpsChangeKeepsCustomBitrateWithCollapsedSettings)
+{
+    static constexpr int kDefaultFps = 30;
+    static constexpr int kChangedFps = 15;
+    static constexpr float kNormalizedBitrate = 0.6f;
+
+    const auto camera = createCamera();
+    camera->setMaxFps(kDefaultFps);
+
+    State state = Reducer::toggleCustomBitrateVisible(Reducer::loadCameras({}, {camera}));
+    state = Reducer::setRecordingBitrateNormalized(std::move(state), kNormalizedBitrate);
+    ASSERT_FALSE(state.recording.brush.isAutoBitrate());
+
+    state = Reducer::toggleCustomBitrateVisible(std::move(state));
+    ASSERT_FALSE(state.recording.customBitrateVisible);
+
+    state = Reducer::setScheduleBrushFps(std::move(state), kChangedFps);
+    ASSERT_EQ(kChangedFps, state.recording.brush.fps);
+    ASSERT_FALSE(state.recording.brush.isAutoBitrate());
+    ASSERT_NEAR(kNormalizedBitrate, state.recording.normalizedBitrate(), 1e-4);
+}
+
+// Picked custom bitrate brush keeps its bitrate when its fps differs from the current brush fps.
+TEST_F(CameraSettingsDialogStateReducerTest, customBitrateBrushIsPickedWithDifferentFps)
+{
+    static constexpr int kDefaultFps = 30;
+    static constexpr int kCellFps = 15;
+
+    const auto camera = createCamera();
+    camera->setMaxFps(kDefaultFps);
+
+    State cellState = Reducer::setScheduleBrushFps(Reducer::loadCameras({}, {camera}), kCellFps);
+    cellState = Reducer::setScheduleBrushQuality(std::move(cellState), Qn::StreamQuality::normal);
+    const auto mediumBitrate = cellState.recording.bitrateMbps;
+    cellState = Reducer::setScheduleBrushQuality(std::move(cellState), Qn::StreamQuality::high);
+    const auto highBitrate = cellState.recording.bitrateMbps;
+
+    const auto customBitrate = (mediumBitrate + highBitrate) * 0.5f;
+    auto cellBrush = cellState.recording.brush;
+    cellBrush.bitrateMbitPerSec = customBitrate;
+
+    State state = Reducer::toggleCustomBitrateVisible(Reducer::loadCameras({}, {camera}));
+    ASSERT_EQ(kDefaultFps, state.recording.brush.fps);
+
+    state = Reducer::setScheduleBrush(std::move(state), cellBrush);
+    ASSERT_EQ(kCellFps, state.recording.brush.fps);
+    ASSERT_EQ(customBitrate, state.recording.brush.bitrateMbitPerSec);
+    ASSERT_EQ(customBitrate, state.recording.bitrateMbps);
+}
+
+// Custom bitrate brush gets the highest quality when its fps changes from one locking the bitrate.
+TEST_F(CameraSettingsDialogStateReducerTest, brushFpsChangeFromFpsLockedBitrate)
+{
+    static constexpr int kDefaultFps = 30;
+    static constexpr int kBitrateLockingFps = 5;
+    static constexpr float kCustomBitrate = 0.5f;
+
+    // At low resolution and fps all qualities get the minimal suggested bitrate.
+    const auto camera = CameraResourceStubPtr(new CameraResourceStub(QSize(320, 240)));
+    systemContext()->resourcePool()->addResource(camera);
+    camera->setMaxFps(kDefaultFps);
+
+    State state = Reducer::loadCameras({}, {camera});
+    ASSERT_GT(state.recording.maxBitrateMbps, state.recording.minBitrateMbps);
+
+    RecordScheduleCellData cellBrush;
+    cellBrush.fps = kBitrateLockingFps;
+    cellBrush.streamQuality = Qn::StreamQuality::highest;
+    cellBrush.bitrateMbitPerSec = kCustomBitrate;
+
+    state = Reducer::setScheduleBrush(std::move(state), cellBrush);
+    ASSERT_FLOAT_EQ(state.recording.maxBitrateMbps, state.recording.minBitrateMbps);
+    ASSERT_FALSE(state.recording.brush.isAutoBitrate());
+
+    state = Reducer::setScheduleBrushFps(std::move(state), kDefaultFps);
+    ASSERT_GT(state.recording.maxBitrateMbps, state.recording.minBitrateMbps);
+    ASSERT_EQ(Qn::StreamQuality::highest, state.recording.brush.streamQuality);
+    ASSERT_FLOAT_EQ(state.recording.maxBitrateMbps, state.recording.bitrateMbps);
+}
+
 // When a user enables recording with an empty schedule, special notification should appear.
 TEST_F(CameraSettingsDialogStateReducerTest, recordingAlertIfScheduleIsEmpty)
 {
