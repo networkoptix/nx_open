@@ -1880,16 +1880,14 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
     NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(brush));
 
     state.recording.brush = brush;
-    const auto fps = qBound(
-        kMinFps,
-        state.recording.brush.fps,
-        state.maxRecordingBrushFps());
+    state.recording.brush.fps = qBound(kMinFps, brush.fps, state.maxRecordingBrushFps());
 
-    state = state.recording.brush.isAutoBitrate()
+    // Bitrate range depends on fps.
+    state = loadMinMaxCustomBitrate(std::move(state));
+    state = (state.recording.brush.isAutoBitrate() || !state.recording.customBitrateAvailable)
         ? fillBitrateFromFixedQuality(std::move(state))
         : fillBitrateFromCustomValue(std::move(state), brush.bitrateMbitPerSec);
 
-    state = setScheduleBrushFps(std::move(state), fps);
     state.recordingHint = State::RecordingHint::brushChanged;
 
     return state;
