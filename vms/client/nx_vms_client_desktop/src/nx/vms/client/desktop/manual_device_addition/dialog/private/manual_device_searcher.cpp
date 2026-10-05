@@ -309,9 +309,12 @@ void ManualDeviceSearcher::updateStatus()
 
             NX_ASSERT(!m_searchProcessId.isEmpty());
 
+            // The status is set last. The owner may release the searcher from its statusChanged
+            // handler once the search is over (the Add Device dialogs do so with an interrupted
+            // search), so the searcher may already be destroyed when setStatus() returns.
+            updateDevices(result->devices.value_or(std::vector<api::DeviceModelForSearch>{}));
             setStatus(result->status.value_or(
                 api::DeviceSearchStatus{api::DeviceSearchStatus::Init, 0, 0}));
-            updateDevices(result->devices.value_or(std::vector<api::DeviceModelForSearch>{}));
         });
 
     connectedServerApi()->searchCameraStatus(m_server->getId(),
