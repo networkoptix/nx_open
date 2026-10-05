@@ -374,7 +374,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         bool customBitrateVisible = false;
 
         float minBitrateMbps = 0.0;
-        float maxBitrateMpbs = 0.0;
+        float maxBitrateMbps = 0.0;
 
         /** Value to be displayed in the dialog. */
         float bitrateMbps = 0.0;
@@ -397,12 +397,15 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
         RecordingPeriod minPeriod = RecordingPeriod::minPeriod();
         RecordingPeriod maxPeriod = RecordingPeriod::maxPeriod();
 
-        float normalizedCustomBitrateMbps() const
+        /**
+         * Bitrate position between the lowest (0) and the highest (1) quality bitrates at the
+         * brush fps. Shown by the bitrate slider and kept when the brush fps changes.
+         */
+        float normalizedBitrate() const
         {
-            const auto spread = maxBitrateMpbs - minBitrateMbps;
-            if (qFuzzyIsNull(spread))
-                return minBitrateMbps;
-            return (bitrateMbps - minBitrateMbps) / spread;
+            if (qFuzzyCompare(minBitrateMbps, maxBitrateMbps))
+                return 1.0f; //< FPS-locked bitrate matches the highest quality.
+            return (bitrateMbps - minBitrateMbps) / (maxBitrateMbps - minBitrateMbps);
         }
     };
     RecordingSettings recording;

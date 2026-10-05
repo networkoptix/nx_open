@@ -302,7 +302,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, motionScheduleBrushIsValidAfterLoad
     ASSERT_EQ(initial.recording.brush.recordingType, Qn::RecordingType::always);
     ASSERT_EQ(initial.recording.brush.metadataTypes, {});
     ASSERT_GT(initial.recording.minBitrateMbps, 0);
-    ASSERT_GT(initial.recording.maxBitrateMpbs, initial.recording.minBitrateMbps);
+    ASSERT_GT(initial.recording.maxBitrateMbps, initial.recording.minBitrateMbps);
 }
 
 // Schedule brush should be correctly initialized after loadCameras.
@@ -321,7 +321,7 @@ TEST_F(CameraSettingsDialogStateReducerTest, alwaysScheduleBrushIsValidAfterLoad
     ASSERT_EQ(initial.recording.brush.recordingType, Qn::RecordingType::always);
     ASSERT_EQ(initial.recording.brush.metadataTypes, Qn::RecordingMetadataTypes());
     ASSERT_GT(initial.recording.minBitrateMbps, 0);
-    ASSERT_GT(initial.recording.maxBitrateMpbs, initial.recording.minBitrateMbps);
+    ASSERT_GT(initial.recording.maxBitrateMbps, initial.recording.minBitrateMbps);
 }
 
 // If clean schedule, fps brush should be reset to a default value.
