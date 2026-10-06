@@ -8,6 +8,7 @@ NxObject
 {
     property string name: ""
     property string title: ""
+    property string description: ""
     property bool enabled: true
     property TutorialTrigger trigger: TutorialTrigger { }
     default property list<TutorialStep> steps

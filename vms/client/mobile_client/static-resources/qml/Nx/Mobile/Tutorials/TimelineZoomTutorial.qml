@@ -4,6 +4,7 @@ Tutorial
 {
     name: "timelineZoom"
     title: qsTr("Zoom Timeline In/Out")
+    description: qsTr("Pinch or spread to zoom the Timeline")
 
     trigger.name: "timeline"
     trigger.when: TutorialTrigger.Available

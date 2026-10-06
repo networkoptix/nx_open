@@ -11,18 +11,20 @@ BaseSettingsPage
 
     Repeater
     {
-        model: mainWindow.tutorials?.tutorials.filter(tutorial => tutorial.enabled) ?? []
+        model: mainWindow.tutorials?.tutorials
+            .filter(tutorial => tutorial.enabled)
+            .sort((left, right) => collator.compare(left.title, right.title)) ?? []
 
         delegate: StyledCheckBox
         {
             readonly property var tutorial: modelData
 
             width: parent.width
-            height: 56
-            topPadding: 16
-            bottomPadding: 16
+            topPadding: 12
+            bottomPadding: 12
 
             text: NxGlobals.toHtmlEscaped(tutorial.title)
+            description: tutorial.description
             checked: appContext.settings.completedTutorials.includes(tutorial.name)
 
             backgroundRadius: 8
@@ -37,4 +39,6 @@ BaseSettingsPage
             }
         }
     }
+
+    Collator { id: collator }
 }

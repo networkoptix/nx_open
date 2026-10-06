@@ -16,9 +16,10 @@ CheckBox
     property color backgroundColor: ColorTheme.colors.dark6
     property color checkedBackgroundColor: ColorTheme.colors.dark8
     property alias iconSource: icon.source
+    property alias description: description.text
 
     implicitWidth: leftPadding + rightPadding + indicator.implicitWidth + contentItem.implicitWidth
-    implicitHeight: topPadding + bottomPadding + textItem.implicitHeight
+    implicitHeight: topPadding + bottomPadding + textColumn.implicitHeight
 
     font.pixelSize: 16
 
@@ -80,17 +81,38 @@ CheckBox
             visible: status === Image.Ready
         }
 
-        Text
+        Column
         {
-            id: textItem
+            id: textColumn
 
             anchors.verticalCenter: parent.verticalCenter
-            text: control.text
-            font: control.font
-            textFormat: Text.StyledText
-            color: control.checked ? ColorTheme.colors.brand_core : ColorTheme.colors.light10
             width: parent.width - (icon.x + icon.width + indicator.width + 2 * control.spacing)
-            elide: Text.ElideRight
+            spacing: 4
+
+            Text
+            {
+                id: title
+
+                width: parent.width
+
+                text: control.text
+                font: control.font
+                textFormat: Text.StyledText
+                color: control.checked ? ColorTheme.colors.brand_core : ColorTheme.colors.light10
+                elide: Text.ElideRight
+            }
+
+            Text
+            {
+                id: description
+
+                width: parent.width
+
+                visible: !!text
+                font.pixelSize: 14
+                wrapMode: Text.Wrap
+                color: ColorTheme.colors.light12
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ Tutorial
 {
     name: "timelinePreview"
     title: qsTr("Timeline Cards and Player")
+    description: qsTr("View event details with a long tap")
 
     trigger.name: "timelineObject"
     trigger.when: TutorialTrigger.Activated

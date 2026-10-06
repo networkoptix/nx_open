@@ -47,6 +47,7 @@ BaseSettingsPage
 
         visible: appContext.settings.iniConfigValue("enableTutorials")
         text: qsTr("Tutorials")
+        extraText: qsTr("See the interface walkthrough")
         showIndicator: false
         showCustomArea: true
 

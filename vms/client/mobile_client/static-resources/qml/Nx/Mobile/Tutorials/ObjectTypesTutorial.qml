@@ -4,6 +4,7 @@ Tutorial
 {
     name: "objectTypes"
     title: qsTr("View Mode")
+    description: qsTr("Switch the Timeline between Motion, Objects, and Bookmarks")
 
     trigger.name: "objectTypeButton"
     trigger.when: TutorialTrigger.Available
