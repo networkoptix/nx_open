@@ -37,6 +37,10 @@
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>User Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchivePlaceholder</name>
@@ -596,6 +600,10 @@
         <source>Allows to show server time for the camera</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Tutorials</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1066,6 +1074,17 @@
     </message>
 </context>
 <context>
+    <name>SaasPromoBanner</name>
+    <message>
+        <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SearchEdit</name>
     <message>
         <source>Search</source>
@@ -1513,6 +1532,13 @@
     </message>
     <message>
         <source>Ok, I got it</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+        <source>Tutorials</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
