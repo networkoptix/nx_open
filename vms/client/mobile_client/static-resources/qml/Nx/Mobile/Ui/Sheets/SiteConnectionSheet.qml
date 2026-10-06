@@ -236,6 +236,14 @@ AdaptiveSheet
                                 case SessionManager.LocalSessionExiredStatus:
                                     appContext.credentialsHelper.removeSavedAuth(
                                         hostsModel.localSystemId, d.login)
+
+                                    // The stored token is rejected and removed, so make the
+                                    // password field editable to let the user enter a new
+                                    // password. Reset the state before setting the error text
+                                    // below, since resetting clears it.
+                                    if (passwordInput.hasSecretValue)
+                                        passwordInput.resetState(/*hasSecretValue*/ false)
+
                                     // Fallthrough.
                                 case SessionManager.UserTemporaryLockedOutConnectionStatus:
                                     // Fallthrough.

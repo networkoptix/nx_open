@@ -47,7 +47,8 @@ Rectangle
     border.color:
     {
         if (owner.errorText)
-            return ColorTheme.colors.red_core
+            return ColorTheme.colors.attention.red
+
         return owner.activeFocus
             ? ColorTheme.colors.brand_core
             : color
@@ -61,11 +62,9 @@ Rectangle
         y: compactLabelMode ? 8 : 18
         width: owner.width - x - owner.rightPadding
 
-        opacity: enabled ? 1 : 0.3
-
         font.pixelSize: compactLabelMode ? 12 : 16
         font.weight: 400
-        color: ColorTheme.colors.light16
+        color: ColorTheme.colors.light15
         elide: Text.ElideRight
     }
 
@@ -81,12 +80,10 @@ Rectangle
         y: parent.height + 4
         width: owner.width - 2 * x
 
-        opacity: enabled ? 1 : 0.3
-
         font.pixelSize: 12
         font.weight: 400
         color: control.errorText
-            ? ColorTheme.colors.red_core
+            ? ColorTheme.colors.attention.red
             : ColorTheme.colors.light10
         visible: !!text
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
