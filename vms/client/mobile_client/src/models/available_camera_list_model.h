@@ -29,6 +29,9 @@ public:
     QnLayoutResourcePtr layout() const;
     void setLayout(const QnLayoutResourcePtr& layout);
 
+    /** System contexts of the cameras currently present in the model. */
+    QList<nx::vms::client::mobile::SystemContext*> systemContexts() const;
+
 signals:
     void systemContextAdded(nx::vms::client::mobile::SystemContext* systemContext);
     void systemContextRemoved(nx::vms::client::mobile::SystemContext* systemContext);
