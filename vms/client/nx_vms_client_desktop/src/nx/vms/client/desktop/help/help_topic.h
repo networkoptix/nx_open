@@ -105,6 +105,7 @@ public:
         LocalSettings_Advanced_HardwareDecode,
         LocalSettings_Advanced_LiveBuffer,
         Login,
+        LookupLists,
         MainWindow_Calendar,
         MainWindow_ContextHelp,
         MainWindow_DayTimePicker,

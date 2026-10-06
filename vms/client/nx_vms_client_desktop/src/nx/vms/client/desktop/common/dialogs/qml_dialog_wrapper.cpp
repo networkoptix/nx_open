@@ -9,8 +9,40 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/help/help_topic.h>
+#include <nx/vms/client/desktop/help/help_topic_accessor.h>
 
 namespace nx::vms::client::desktop {
+
+namespace {
+
+/**
+ * Sets the default title bar hints the same way QWidget does (see QWidgetPrivate::adjustFlags()).
+ * QWindow keeps its flags as is, and the platform plugins add the default hints only when no hints
+ * are set at all, so adding a single hint later (e.g. the context help button one) would remove
+ * the title bar.
+ */
+void setDefaultWindowHints(QWindow* window)
+{
+    static constexpr Qt::WindowFlags kCustomizeHints = Qt::CustomizeWindowHint
+        | Qt::FramelessWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint
+        | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
+        | Qt::WindowContextHelpButtonHint;
+
+    auto flags = window->flags();
+    if (flags.testAnyFlags(kCustomizeHints))
+        return; //< The hints are set explicitly.
+
+    flags |= Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint;
+
+    const auto type = window->type();
+    if (type != Qt::Dialog && type != Qt::Sheet && type != Qt::Tool)
+        flags |= Qt::WindowMinMaxButtonsHint | Qt::WindowFullscreenButtonHint;
+
+    window->setFlags(flags);
+}
+
+} // namespace
 
 class QmlDialogWrapper::Private: public QObject
 {
@@ -32,6 +64,7 @@ public:
     void handleStatusChanged(QQmlComponent::Status status);
 
     void restoreGeometryIfNecessary();
+    void fixWindowFlags();
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 };
@@ -78,6 +111,7 @@ void QmlDialogWrapper::Private::handleStatusChanged(QQmlComponent::Status status
     }
 
     window->setProperty("qmlDialogWrapper_sourceUrl", source.toString()); //< For autotesting.
+    setDefaultWindowHints(window.get());
 
     if (object->metaObject()->indexOfSignal("accepted()") >= 0)
         connect(object, SIGNAL(accepted()), q, SLOT(accept()));
@@ -95,6 +129,16 @@ void QmlDialogWrapper::Private::restoreGeometryIfNecessary()
 {
     if (restoreLastPositionWhenOpened && !window->isVisible() && lastGeometry.isValid())
         window->setGeometry(lastGeometry);
+}
+
+void QmlDialogWrapper::Private::fixWindowFlags()
+{
+    auto flags = window->flags();
+
+    flags.setFlag(
+        Qt::WindowContextHelpButtonHint, HelpTopicAccessor::hasAnyHelpTopic(window.get()));
+
+    window->setFlags(flags);
 }
 
 bool QmlDialogWrapper::Private::eventFilter(QObject* /*object*/, QEvent* event)
@@ -258,6 +302,7 @@ void QmlDialogWrapper::open()
     d->done = false;
 
     d->restoreGeometryIfNecessary();
+    d->fixWindowFlags();
 
     if (d->shownMaximized)
         d->window->showMaximized();

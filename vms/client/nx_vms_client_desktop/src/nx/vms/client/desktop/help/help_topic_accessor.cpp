@@ -86,6 +86,12 @@ bool HelpTopicAccessor::hasAnyHelpTopic(const QDialog* dialog)
     return false;
 }
 
+bool HelpTopicAccessor::hasAnyHelpTopic(const QQuickWindow* window)
+{
+    const auto topicId = HelpTopicAccessor::helpTopic(window);
+    return topicId != HelpTopic::Id::Empty && topicId != HelpTopic::Id::Forced_Empty;
+}
+
 void HelpTopicAccessor::setHelpTopic(QObject* object, int helpTopic, bool enforceForChildren)
 {
     if (!NX_ASSERT(object))

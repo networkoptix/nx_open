@@ -31,7 +31,9 @@ public:
     static int helpTopicAt(QQuickWindow* window, const QPointF& pos); //< Always from parent down.
     static int helpTopic(const QObject* object);
     static int helpTopic(const QWidget* widget);
+
     static bool hasAnyHelpTopic(const QDialog* dialog);
+    static bool hasAnyHelpTopic(const QQuickWindow* window);
 };
 
 inline int helpTopic(QObject* object)

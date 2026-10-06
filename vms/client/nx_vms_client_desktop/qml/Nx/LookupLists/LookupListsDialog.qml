@@ -34,6 +34,8 @@ Dialog
 
     title: qsTr("Lookup Lists")
 
+    ContextHelp.topicId: HelpTopic.LookupLists
+
     minimumWidth: 800
     minimumHeight: 600
     leftPadding: 0

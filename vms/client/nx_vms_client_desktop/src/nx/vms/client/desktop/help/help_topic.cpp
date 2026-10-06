@@ -202,6 +202,8 @@ QString HelpTopic::relativeUrlForTopic(Id topic)
             return "configuring_live_buffer_size.html";
         case Id::Login:
             return "connecting_to_enterprise_contr.html";
+        case Id::LookupLists:
+            return "lookup_lists.html";
         case Id::MainWindow_Calendar:
             return "using_calendar.html";
         case Id::MainWindow_ContextHelp:
