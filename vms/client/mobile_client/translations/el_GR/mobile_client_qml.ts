@@ -602,7 +602,7 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Οδηγοί εκμάθησης</translation>
     </message>
   </context>
   <context>
@@ -828,14 +828,6 @@
     <message>
       <source>Can improve performance and battery life</source>
       <translation>Μπορεί να βελτιώσει την απόδοση και τη διάρκεια ζωής της μπαταρίας</translation>
-    </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>Εναλλακτική χρήση αποκωδικοποιητή λογισμικού</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>Μπορεί να αποκωδικοποιήσει σπάνιες μορφές βίντεο χρησιμοποιώντας λογισμικό</translation>
     </message>
   </context>
   <context>
@@ -1539,7 +1531,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Οδηγοί εκμάθησης</translation>
     </message>
   </context>
   <context>

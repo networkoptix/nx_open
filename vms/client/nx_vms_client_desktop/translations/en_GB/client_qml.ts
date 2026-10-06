@@ -223,7 +223,7 @@
     <message numerus="yes">
       <source>%n new results</source>
       <translation>
-        <numerusform>%n new results</numerusform>
+        <numerusform>%n new result</numerusform>
         <numerusform>%n new results</numerusform>
       </translation>
     </message>

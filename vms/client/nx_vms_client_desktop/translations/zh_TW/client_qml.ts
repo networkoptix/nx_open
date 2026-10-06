@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation>回到頂部</translation>
+      <translation type="unfinished">To the top</translation>
     </message>
     <message>
       <source>No objects</source>

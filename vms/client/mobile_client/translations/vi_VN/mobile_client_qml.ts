@@ -828,14 +828,6 @@
       <source>Can improve performance and battery life</source>
       <translation>Có thể cải thiện hiệu suất và tuổi thọ pin</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>Phần mềm giải mã dự phòng</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>Có thể giải mã các định dạng video hiếm bằng phần mềm</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>

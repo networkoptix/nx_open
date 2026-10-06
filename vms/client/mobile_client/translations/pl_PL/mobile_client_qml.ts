@@ -831,14 +831,6 @@
       <source>Can improve performance and battery life</source>
       <translation>Zwiększ wydajność i żywotność baterii</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>Dekoder programowy awaryjny</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>Możliwość dekodowania rzadkich formatów wideo za pomocą oprogramowania</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>
