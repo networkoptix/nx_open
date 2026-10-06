@@ -329,7 +329,11 @@ if(ANDROID)
         src/nx/vms/client/mobile/push_notification/details/android/push_notification_storage_android.cpp
         src/nx/vms/client/mobile/push_notification/details/android/jni_helpers_android.cpp)
 
-    target_include_directories(push_notification_storage PRIVATE src)
+    target_include_directories(push_notification_storage
+        PRIVATE
+            src
+            ${Qt6Core_PRIVATE_INCLUDE_DIRS}
+    )
     target_link_libraries(push_notification_storage PUBLIC nx_reflect Qt6::Core)
 
     get_android_extra_libs(extra_libs)
