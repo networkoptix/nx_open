@@ -81,6 +81,7 @@ FocusScope
             color: textInput.background.color
             width: 56
             height: 56
+            radius: 6
 
             ColoredImage
             {
