@@ -829,14 +829,6 @@
       <source>Can improve performance and battery life</source>
       <translation type="unfinished">Can improve performance and battery life</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation type="unfinished">Software Decoder Fallback</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation type="unfinished">Can decode rare video formats using software</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>

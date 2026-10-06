@@ -601,7 +601,7 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>チュートリアル</translation>
     </message>
   </context>
   <context>
@@ -827,14 +827,6 @@
     <message>
       <source>Can improve performance and battery life</source>
       <translation>パフォーマンスとバッテリー効率を改善できます。</translation>
-    </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>ソフトウェアデコーダーへのフォールバック</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>一般的でない映像フォーマットをソフトウェアでデコードします。</translation>
     </message>
   </context>
   <context>
@@ -1538,7 +1530,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>チュートリアル</translation>
     </message>
   </context>
   <context>

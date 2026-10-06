@@ -602,7 +602,7 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Handledningar</translation>
     </message>
   </context>
   <context>
@@ -828,14 +828,6 @@
     <message>
       <source>Can improve performance and battery life</source>
       <translation>Kan förbättra prestanda och batteritid</translation>
-    </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>Programvaruavkodare reserv</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>Kan avkoda sällsynta videoformat med hjälp av programvara</translation>
     </message>
   </context>
   <context>
@@ -1539,7 +1531,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Handledningar</translation>
     </message>
   </context>
   <context>

@@ -828,14 +828,6 @@
       <source>Can improve performance and battery life</source>
       <translation>Dapat meningkatkan kinerja dan masa pakai baterai</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>Fallback Dekoder Software</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>Dekode beberapa format video langka menggunakan dekoder software</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>

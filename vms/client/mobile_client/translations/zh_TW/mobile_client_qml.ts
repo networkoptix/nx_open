@@ -828,14 +828,6 @@
       <source>Can improve performance and battery life</source>
       <translation>可提高效能與電池壽命</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>回退軟體解碼器</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>使用軟體解碼器來解碼罕見的影像格式</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>

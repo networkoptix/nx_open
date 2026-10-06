@@ -828,14 +828,6 @@
       <source>Can improve performance and battery life</source>
       <translation>성능과 배터리 수명 증가</translation>
     </message>
-    <message>
-      <source>Software Decoder Fallback</source>
-      <translation>소프트웨어 디코더 대체 기능</translation>
-    </message>
-    <message>
-      <source>Can decode rare video formats using software</source>
-      <translation>소프트웨어를 사용하여 희귀한 비디오 형식을 디코딩할 수 있습니다</translation>
-    </message>
   </context>
   <context>
     <name>Placeholder</name>
