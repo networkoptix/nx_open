@@ -406,7 +406,7 @@ void Av1Parser::dropTemporalUnit()
 QnCompressedVideoDataPtr Av1Parser::createVideoData(uint32_t rtpTime)
 {
     auto result = std::make_shared<QnWritableCompressedVideoData>(m_temporalUnit.size());
-    result->m_data.uncheckedWrite((const char*) m_temporalUnit.data(), m_temporalUnit.size());
+    result->m_data.write((const char*) m_temporalUnit.data(), m_temporalUnit.size());
     result->compressionType = AV_CODEC_ID_AV1;
     result->width = m_context.width;
     result->height = m_context.height;

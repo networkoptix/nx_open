@@ -59,7 +59,7 @@ void assertRoundTrip(const SrtpCryptoPolicy& policy,
 
     const QByteArray plainPacket = QByteArray::fromHex("80600001000000011234567801020304");
     nx::utils::ByteArray packet;
-    packet.write(plainPacket);
+    packet.write(plainPacket.constData(), plainPacket.size());
 
     ASSERT_TRUE(server.encryptPacket(&packet, 0));
     if (!mki.empty())
@@ -127,7 +127,7 @@ TEST(SrtpEncryptor, acceptsSsrcDifferentFromMikey)
     {
         const QByteArray plainPacket = QByteArray::fromHex(packetHex);
         nx::utils::ByteArray packet;
-        packet.write(plainPacket);
+        packet.write(plainPacket.constData(), plainPacket.size());
         ASSERT_TRUE(server.encryptPacket(&packet, 0));
 
         int packetSize = (int) packet.size();
@@ -150,7 +150,8 @@ TEST(SrtpEncryptor, appliesRocToActualSsrc)
         {"8060ffff000000011234567801020304", "80600000000000021234567801020304"})
     {
         lastPacket.clear();
-        lastPacket.write(QByteArray::fromHex(packetHex));
+        const QByteArray plainPacket = QByteArray::fromHex(packetHex);
+        lastPacket.write(plainPacket.constData(), plainPacket.size());
         ASSERT_TRUE(server.encryptPacket(&lastPacket, 0));
     }
 
@@ -177,8 +178,9 @@ TEST(SrtpEncryptor, reportsReplayedPacket)
     SrtpDecryptor client;
     ASSERT_TRUE(client.init(context));
 
+    const QByteArray plainPacket = QByteArray::fromHex("80600001000000011234567801020304");
     nx::utils::ByteArray packet;
-    packet.write(QByteArray::fromHex("80600001000000011234567801020304"));
+    packet.write(plainPacket.constData(), plainPacket.size());
     ASSERT_TRUE(server.encryptPacket(&packet, 0));
     QByteArray duplicate(packet.data(), packet.size());
 

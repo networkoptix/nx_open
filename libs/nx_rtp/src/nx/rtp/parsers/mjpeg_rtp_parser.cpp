@@ -599,15 +599,15 @@ Result MjpegParser::processData(
         QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
             m_hdrBuffer.size() + m_frameSize + (needAddMarker ? 2 : 0)));
         m_mediaData = videoData;
-        videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer.data(), m_hdrBuffer.size());
+        videoData->m_data.write((const char*) m_hdrBuffer.data(), m_hdrBuffer.size());
         //m_videoData->data.write(m_frameData);
         for (uint i = 0; i < m_chunks.size(); ++i)
         {
-            videoData->m_data.uncheckedWrite(
-                (const char*)(rtpBufferBase + m_chunks[i].offset), m_chunks[i].size);
+            videoData->m_data.write(
+                (const char*) (rtpBufferBase + m_chunks[i].offset), m_chunks[i].size);
         }
         if (needAddMarker)
-            videoData->m_data.uncheckedWrite((const char*)jpeg_end, sizeof(jpeg_end));
+            videoData->m_data.write((const char*) jpeg_end, sizeof(jpeg_end));
 
         m_chunks.clear();
         m_frameSize = 0;

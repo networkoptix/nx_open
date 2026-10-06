@@ -142,7 +142,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(nx::utils::ByteArray& sendBuffer)
     if (!m_codecParamsData.isEmpty())
     {
         NX_ASSERT(!m_codecParamsData.isEmpty());
-        sendBuffer.write(m_codecParamsData);
+        sendBuffer.write(m_codecParamsData.constData(), m_codecParamsData.size());
         m_codecParamsData.clear();
         return true;
     }

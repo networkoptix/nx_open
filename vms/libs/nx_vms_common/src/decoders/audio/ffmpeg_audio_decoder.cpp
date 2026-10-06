@@ -95,7 +95,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, nx::utils::Byt
             m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_audioDecoderCtx);
         if (outbuf_len + decodedBytes > (int)result.capacity())
         {
-            result.reserve(result.capacity() * 2);
+            result.reserve((size_t) outbuf_len + decodedBytes);
             outbuf = (quint8*)result.data() + outbuf_len;
         }
 

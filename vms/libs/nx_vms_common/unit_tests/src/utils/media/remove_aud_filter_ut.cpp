@@ -24,7 +24,7 @@ TEST(mediaFilters, H264RemoveAudForAnexB)
         "00000001"
         "658884000A7B20"
     );
-    result->m_data.write(data);
+    result->m_data.write(data.constData(), data.size());
     result->compressionType = AV_CODEC_ID_H264;
     auto updated = std::dynamic_pointer_cast<const QnWritableCompressedVideoData>(
         filter.processData(result));
@@ -64,7 +64,7 @@ TEST(mediaFilters, H265RemoveAudForAnexB)
         "2601"
         "9A22"      // short dummy payload
     );
-    result->m_data.write(data);
+    result->m_data.write(data.constData(), data.size());
     result->compressionType = AV_CODEC_ID_H265;
     auto updated = std::dynamic_pointer_cast<const QnWritableCompressedVideoData>(
         filter.processData(result));
@@ -93,7 +93,7 @@ TEST(mediaFilters, H264RemoveAudForMp4)
         "00000007"
         "658884000A7B20"
     );
-    result->m_data.write(data);
+    result->m_data.write(data.constData(), data.size());
     result->compressionType = AV_CODEC_ID_H264;
 
     // FFmpeg extradata for MP4/H.264 (avcC), no box header, just avcC payload
@@ -147,7 +147,7 @@ TEST(mediaFilters, H265RemoveAudForMp4)
         "00000004"
         "26019A22"
     );
-    result->m_data.write(data);
+    result->m_data.write(data.constData(), data.size());
     result->compressionType = AV_CODEC_ID_H265;
 
     // FFmpeg extradata for MP4/H.265 (hvcC), no box header, just hvcC payload
