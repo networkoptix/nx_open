@@ -60,7 +60,6 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager(
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
 {
     stop();
-    m_threadPool.waitForDone();
 }
 
 void QnResourceDiscoveryManager::setReady(bool ready)
@@ -149,6 +148,7 @@ void QnResourceDiscoveryManager::stop()
 {
     pleaseStop();
     wait();
+    m_threadPool.waitForDone();
     NX_MUTEX_LOCKER lock(&m_searchersListMutex);
     m_searchersList.clear();
 
