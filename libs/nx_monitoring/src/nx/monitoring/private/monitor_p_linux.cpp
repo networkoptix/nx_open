@@ -245,7 +245,7 @@ InterfaceStatisticsContext InterfaceStatisticsContext::create(const QString& nam
 void InterfaceStatisticsContext::update(int64_t elapsed)
 {
     // Used, if interface speed cannot be read (noticed on vmware).
-    static const int kDefaultInterfaceSpeedMpbs = 1000;
+    static const int kDefaultInterfaceSpeedMbps = 1000;
     static const int kMsPerSec = 1000;
     const QString name = QString::fromStdString(interfaceName);
 
@@ -254,7 +254,7 @@ void InterfaceStatisticsContext::update(int64_t elapsed)
         * BYTES_PER_MB / CHAR_BIT;
     if (!bytesPerSecMax)
     {
-        bytesPerSecMax = kDefaultInterfaceSpeedMpbs * 1024 * 1024 / CHAR_BIT;
+        bytesPerSecMax = kDefaultInterfaceSpeedMbps * 1024 * 1024 / CHAR_BIT;
         NX_DEBUG(NX_SCOPE_TAG, "Failed to get NIC speed, assuming 1Gbps"); // Noticed on vmware.
     }
 
