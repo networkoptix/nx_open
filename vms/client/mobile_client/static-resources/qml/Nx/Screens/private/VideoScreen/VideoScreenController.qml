@@ -384,7 +384,7 @@ NxObject
     function jumpToNextChunk()
     {
         const jumpToLive = nextChunkMs === -1
-        forcePosition(nextChunkMs)
+        forcePosition(nextChunkMs, /*save*/ true)
         if (jumpToLive)
             playLive()
     }
@@ -420,7 +420,7 @@ NxObject
     function jumpToPreviousChunk()
     {
         if (NxGlobals.isValidTime(prevChunkMs))
-            forcePosition(prevChunkMs)
+            forcePosition(prevChunkMs, /*save*/ true)
     }
 
     function jumpToFirstChunk()
