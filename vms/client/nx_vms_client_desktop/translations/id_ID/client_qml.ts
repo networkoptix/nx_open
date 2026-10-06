@@ -2557,7 +2557,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Mengaktifkan opsi ini memungkinkan pihak ketiga meminta persetujuan untuk mendaftarkan Integrasi. Tersedia pengamanan, tetapi nonaktifkan opsi ini setelah semua Integrasi yang diperlukan terpasang - penggunaan jangka panjang tidak disarankan.</translation>
     </message>
   </context>
   <context>
@@ -3121,7 +3121,7 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Tes Event...</translation>
     </message>
     <message>
       <source>Event Rules</source>
