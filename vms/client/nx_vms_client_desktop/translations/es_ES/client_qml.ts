@@ -1734,7 +1734,7 @@ Select an Integration to begin configuring its parameters.</translation>
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
       <translation type="unfinished">
-        <numerusform>%n más</numerusform>
+        <numerusform>%n more</numerusform>
         <numerusform>%n more</numerusform>
       </translation>
     </message>
@@ -1989,11 +1989,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation>Objetos seleccionados</translation>
+      <translation type="unfinished">Select Objects</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation>Todos los Objetos</translation>
+      <translation type="unfinished">All Objects</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2377,9 +2377,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>...y %n más</numerusform>
-        <numerusform>...y %n más</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2834,9 +2834,9 @@ Presione Alt + Clic para seguir el objeto</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... y %n más</numerusform>
-        <numerusform>... y %n más</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
