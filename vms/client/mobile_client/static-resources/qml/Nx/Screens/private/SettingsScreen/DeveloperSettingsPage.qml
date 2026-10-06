@@ -426,23 +426,6 @@ BaseSettingsPage
             }
         }
 
-        LabeledSwitch
-        {
-            id: tutorialsSwitch
-
-            width: parent.width
-            text: "Enable tutorials"
-            checkState: appContext.settings.enableTutorials ? Qt.Checked : Qt.Unchecked
-            onCheckStateChanged:
-            {
-                const value = checkState != Qt.Unchecked
-                if (value === appContext.settings.enableTutorials)
-                    return
-
-                appContext.settings.enableTutorials = value
-            }
-        }
-
         Button
         {
             text: "Reset completed tutorials"

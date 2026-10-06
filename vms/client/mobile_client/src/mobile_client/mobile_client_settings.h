@@ -73,8 +73,6 @@ public:
         SidePanelWidth,
         ContentAreaMinWidth,
 
-        EnableTutorials,
-
         VariableCount
     };
 
@@ -198,8 +196,6 @@ private:
             crashReportingEnabled, setCrashReportingEnabled,
             CrashReportingEnabled,
             (nx::build_info::publicationType() != nx::build_info::PublicationType::release))
-
-        QN_DECLARE_RW_PROPERTY(bool, enableTutorials, setEnableTutorials, EnableTutorials, false)
 
         // Overrides the layout mode which is chosen by the window size otherwise. Values match
         // the LayoutMode.Value enumeration; -1 keeps the size-based mode.

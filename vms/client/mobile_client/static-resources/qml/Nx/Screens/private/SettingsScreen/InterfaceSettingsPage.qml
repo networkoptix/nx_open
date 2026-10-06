@@ -45,7 +45,7 @@ BaseSettingsPage
     {
         width: parent.width
 
-        visible: appContext.settings.enableTutorials
+        visible: appContext.settings.iniConfigValue("enableTutorials")
         text: qsTr("Tutorials")
         showIndicator: false
         showCustomArea: true
