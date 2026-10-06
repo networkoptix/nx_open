@@ -37,6 +37,10 @@
       <source>About</source>
       <translation>Σχετικά</translation>
     </message>
+    <message>
+      <source>User Manual</source>
+      <translation>Εγχειρίδιο Χρήστη</translation>
+    </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
@@ -596,6 +600,10 @@
       <source>Allows to show server time for the camera</source>
       <translation>Επιτρέπει την εμφάνιση της ώρας διακομιστή στην κάμερα</translation>
     </message>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1066,6 +1074,17 @@
     </message>
   </context>
   <context>
+    <name>SaasPromoBanner</name>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation>Ξεκλειδώστε αποκλειστικές δυνατότητες για αξιοποιήσιμες πληροφορίες από βίντεο και λειτουργίες που βασίζονται σε δεδομένα, σε μεγάλη κλίμακα</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Μάθετε περισσότερα</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1514,6 +1533,13 @@
     <message>
       <source>Ok, I got it</source>
       <translation>Εντάξει, το κατάλαβα</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
     </message>
   </context>
   <context>

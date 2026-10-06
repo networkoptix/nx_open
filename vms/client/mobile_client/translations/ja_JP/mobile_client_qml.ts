@@ -37,6 +37,10 @@
       <source>About</source>
       <translation>本製品について</translation>
     </message>
+    <message>
+      <source>User Manual</source>
+      <translation>ユーザーマニュアル</translation>
+    </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
@@ -595,6 +599,10 @@
       <source>Allows to show server time for the camera</source>
       <translation>カメラにサーバー時刻を表示できます</translation>
     </message>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1065,6 +1073,17 @@
     </message>
   </context>
   <context>
+    <name>SaasPromoBanner</name>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation>実用的なビデオインテリジェンスと大規模なデータ駆動型オペレーションを実現する限定機能をアンロック</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>詳細</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1513,6 +1532,13 @@
     <message>
       <source>Ok, I got it</source>
       <translation>了解しました。</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
     </message>
   </context>
   <context>

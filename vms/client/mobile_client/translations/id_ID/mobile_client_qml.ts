@@ -37,6 +37,10 @@
       <source>About</source>
       <translation>Tentang</translation>
     </message>
+    <message>
+      <source>User Manual</source>
+      <translation>Panduan Pengguna</translation>
+    </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
@@ -146,11 +150,11 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Geser di antara Resource</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Geser ke kanan untuk beralih ke Kamera berikutnya</translation>
     </message>
   </context>
   <context>
@@ -182,7 +186,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Bagaimana cara terkoneksi?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -595,6 +599,10 @@
       <source>Allows to show server time for the camera</source>
       <translation>Mengijinkan untuk menampilkan waktu server pada kamera</translation>
     </message>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -747,11 +755,11 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Mode Tampilan</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Ketuk untuk memilih tipe data yang diinginkan</translation>
     </message>
   </context>
   <context>
@@ -788,11 +796,11 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Tombol Floating Panel</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Ketuk tombol floating untuk membuka panel</translation>
     </message>
   </context>
   <context>
@@ -1062,6 +1070,17 @@
     <message>
       <source>Please restart the app to apply changes</source>
       <translation>Silakan restart aplikasi untuk menerapkan perubahan</translation>
+    </message>
+  </context>
+  <context>
+    <name>SaasPromoBanner</name>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation>Dapatkan fitur eksklusif untuk intelijen video yang dapat ditindaklanjuti dan operasi berbasis data dalam skala besar</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Pelajari lebih lanjut</translation>
     </message>
   </context>
   <context>
@@ -1425,11 +1444,11 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Soft Trigger</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Ketuk untuk mengaktifkan panel soft trigger</translation>
     </message>
   </context>
   <context>
@@ -1486,22 +1505,22 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Kartu Timeline dan Player</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Tekan lama untuk memunculkan pratinjau dengan detail selengkapnya</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Perbesar/Perkecil Timeline</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Cubit untuk memperkecil tampilan dan rentangkan jari untuk memperbesar tampilan</translation>
     </message>
   </context>
   <context>
@@ -1513,6 +1532,13 @@
     <message>
       <source>Ok, I got it</source>
       <translation>Oke, saya mengerti</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
     </message>
   </context>
   <context>
