@@ -19,16 +19,4 @@ BaseSettingsPage
         onCheckStateChanged:
             appContext.settings.enableHardwareDecoding = checkState != Qt.Unchecked
     }
-
-    LabeledSwitch
-    {
-        width: parent.width
-        text: qsTr("Software Decoder Fallback")
-        extraText: qsTr("Can decode rare video formats using software")
-        checkState: appContext.settings.enableSoftwareDecoderFallback
-            ? Qt.Checked
-            : Qt.Unchecked
-        onCheckStateChanged: appContext.settings.enableSoftwareDecoderFallback =
-            checkState != Qt.Unchecked
-    }
 }
