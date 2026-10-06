@@ -4,6 +4,7 @@ Tutorial
 {
     name: "cameraSwitcher"
     title: qsTr("Swipe Between Resources")
+    description: qsTr("Switch between cameras on a layout")
 
     trigger.name: "cameraSwitcher"
     trigger.when: TutorialTrigger.Available

@@ -4,6 +4,7 @@ Tutorial
 {
     name: "softTriggers"
     title: qsTr("Soft Triggers")
+    description: qsTr("Open Soft Trigger camera actions")
 
     trigger.name: "softTriggersButton"
     trigger.when: TutorialTrigger.Available
