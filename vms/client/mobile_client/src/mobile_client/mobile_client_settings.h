@@ -56,7 +56,6 @@ public:
         UseMaxHardwareDecodersCount,
         MaxHardwareDecodersCount,
 
-        EnableSoftwareDecoderFallback,
         ShowHowShareWorksNotification,
         ShowHowDetectedMotionShareWorksNotification,
 
@@ -183,11 +182,6 @@ private:
             int,
             maxHardwareDecodersCount, setMaxHardwareDecodersCount,
             MaxHardwareDecodersCount, 0) //< 0 means "use as many as the device supports" (translated to INT_MAX at startup).
-
-        QN_DECLARE_RW_PROPERTY(
-            bool,
-            enableSoftwareDecoderFallback, setEnableSoftwareDecoderFallback,
-            EnableSoftwareDecoderFallback, true)
 
         QN_DECLARE_RW_PROPERTY(
             bool,

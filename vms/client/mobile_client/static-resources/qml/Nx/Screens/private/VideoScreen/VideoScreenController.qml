@@ -228,7 +228,6 @@ NxObject
         onPlayingChanged: windowContext.ui.windowHelpers.setKeepScreenOn(playing)
         maxTextureSize: windowContext.ui.measurements.getMaxTextureSize()
         allowHardwareAcceleration: appContext.settings.enableHardwareDecoding
-        allowSoftwareDecoderFallback: appContext.settings.enableSoftwareDecoderFallback
 
         onPositionChanged:
         {
