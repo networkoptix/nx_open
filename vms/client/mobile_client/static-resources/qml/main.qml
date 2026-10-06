@@ -251,7 +251,7 @@ Controls.ApplicationWindow
     {
         id: tutorialsLoader
 
-        active: appContext.settings.enableTutorials
+        active: appContext.settings.iniConfigValue("enableTutorials")
         sourceComponent: Tutorials {}
     }
 
