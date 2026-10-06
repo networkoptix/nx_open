@@ -59,8 +59,8 @@ private:
         const QnLayoutResourcePtr& resource, const nx::vms::common::LayoutItemData& item);
     void handleResourceChanged(const QnResourcePtr& resource);
 
-private:
-    QnCounterHash<SystemContext*> systemContexts;
+public:
+    QnCounterHash<nx::vms::client::mobile::SystemContext*> systemContexts;
 };
 
 QnAvailableCameraListModel::QnAvailableCameraListModel(QObject* parent) :
@@ -148,6 +148,12 @@ void QnAvailableCameraListModel::setLayout(const QnLayoutResourcePtr& layout)
     d->setLayout(layout);
 }
 
+QList<nx::vms::client::mobile::SystemContext*> QnAvailableCameraListModel::systemContexts() const
+{
+    Q_D(const QnAvailableCameraListModel);
+    return d->systemContexts.keys();
+}
+
 bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& resource) const
 {
     if (!resource->hasFlags(Qn::live_cam))
@@ -193,6 +199,12 @@ void QnAvailableCameraListModelPrivate::resetResources()
     for (const auto& resourceEntry: resources)
         disconnect(resourceEntry.resource.get(), nullptr, this, nullptr);
     resources.clear();
+
+    // The cameras are re-added below, so the system contexts must be counted from scratch.
+    const auto oldSystemContexts = systemContexts.keys();
+    systemContexts.clear();
+    for (const auto systemContext: oldSystemContexts)
+        emit q->systemContextRemoved(systemContext);
 
     if (layout)
     {

@@ -51,6 +51,8 @@ struct QnCameraListModel::Private: public QObject
 {
     Private(QnCameraListModel* q);
 
+    void handleSystemContextAdded(mobile::SystemContext* systemContext);
+    void handleSystemContextRemoved(mobile::SystemContext* systemContext);
     void handleThumbnailUpdated(const QnVirtualCameraResourcePtr& camera);
     QModelIndex indexByResourceId(const nx::Uuid& resourceId) const;
 
@@ -66,36 +68,47 @@ QnCameraListModel::Private::Private(QnCameraListModel* q):
     q(q),
     model(std::make_unique<QnAvailableCameraListModel>())
 {
-    connect(model.get(), &QnAvailableCameraListModel::systemContextAdded, this,
-        [this](mobile::SystemContext* systemContext)
+    connect(model.get(),
+        &QnAvailableCameraListModel::systemContextAdded,
+        this,
+        &Private::handleSystemContextAdded);
+
+    connect(model.get(),
+        &QnAvailableCameraListModel::systemContextRemoved,
+        this,
+        &Private::handleSystemContextRemoved);
+
+    for (const auto systemContext: model->systemContexts())
+        handleSystemContextAdded(systemContext);
+}
+
+void QnCameraListModel::Private::handleSystemContextAdded(mobile::SystemContext* systemContext)
+{
+    systemContextConnections[systemContext].reset(connect(systemContext->cameraThumbnailCache(),
+        &QnCameraThumbnailCache::thumbnailUpdated,
+        this,
+        [this, systemContext = QPointer<core::SystemContext>(systemContext)](
+            const nx::Uuid& resourceId)
         {
-            systemContextConnections[systemContext].reset(connect(
-                systemContext->cameraThumbnailCache(),
-                &QnCameraThumbnailCache::thumbnailUpdated,
-                this,
-                [this, systemContext = QPointer<core::SystemContext>(systemContext)](
-                    const nx::Uuid& resourceId)
-                {
-                    if (!systemContext)
-                        return;
+            if (!systemContext)
+                return;
 
-                    const auto camera = systemContext->resourcePool()->getResourceById<
-                        QnVirtualCameraResource>(resourceId);
+            const auto camera =
+                systemContext->resourcePool()->getResourceById<QnVirtualCameraResource>(
+                    resourceId);
 
-                    if (camera)
-                        handleThumbnailUpdated(camera);
-                }));
+            if (camera)
+                handleThumbnailUpdated(camera);
+        }));
 
-            emit this->q->systemContextsSetChanged();
-        });
+    emit q->systemContextsSetChanged();
+}
 
-    connect(model.get(), &QnAvailableCameraListModel::systemContextRemoved, this,
-        [this](mobile::SystemContext* systemContext)
-        {
-            systemContextConnections.erase(systemContext);
+void QnCameraListModel::Private::handleSystemContextRemoved(mobile::SystemContext* systemContext)
+{
+    systemContextConnections.erase(systemContext);
 
-            emit this->q->systemContextsSetChanged();
-        });
+    emit q->systemContextsSetChanged();
 }
 
 void QnCameraListModel::registerQmlType()
