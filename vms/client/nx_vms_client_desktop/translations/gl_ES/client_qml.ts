@@ -1741,9 +1741,9 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n máis</numerusform>
-        <numerusform>%n máis</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1997,11 +1997,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation>Seleccionar obxectos</translation>
+      <translation type="unfinished">Select Objects</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation>Todos os obxectos</translation>
+      <translation type="unfinished">All Objects</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2385,9 +2385,9 @@ prema Alt + Clic para seguir o obxecto</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>...e %n máis</numerusform>
-        <numerusform>...e %n máis</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2842,9 +2842,9 @@ prema Alt + Clic para seguir o obxecto</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... e %n máis</numerusform>
-        <numerusform>... e %n máis</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

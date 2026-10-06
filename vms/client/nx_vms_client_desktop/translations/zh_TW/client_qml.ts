@@ -228,7 +228,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation>回到頂部</translation>
+      <translation type="unfinished">To the top</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -1732,8 +1732,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>還有%n 個</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -1986,11 +1986,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation>選擇物件</translation>
+      <translation type="unfinished">Select Objects</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation>所有物件</translation>
+      <translation type="unfinished">All Objects</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2369,8 +2369,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>...與另外 %n 個</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2824,8 +2824,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... 與另外 %n 個</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>

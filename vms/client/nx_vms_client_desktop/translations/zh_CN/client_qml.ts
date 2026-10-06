@@ -2372,8 +2372,8 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>还有 %n项...</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2827,8 +2827,8 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... 和 %n 更多</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
