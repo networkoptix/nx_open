@@ -2376,7 +2376,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>...and %n more</numerusform>
         <numerusform>...and %n more</numerusform>
       </translation>
@@ -2832,7 +2832,7 @@ Press Alt + Click to follow object</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>... and %n more</numerusform>
         <numerusform>... and %n more</numerusform>
       </translation>

@@ -1733,9 +1733,9 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n mer</numerusform>
-        <numerusform>%n mer</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2376,9 +2376,9 @@ Trykk Alt + Klikk for å følge objektet</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation>
-        <numerusform>...og %n mer</numerusform>
-        <numerusform>...og %n mer</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2832,9 +2832,9 @@ Trykk Alt + Klikk for å følge objektet</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation>
-        <numerusform>... og %n til</numerusform>
-        <numerusform>... og %n til</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
