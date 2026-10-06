@@ -2,6 +2,8 @@
 
 #include "../push_notification_storage.h"
 
+#include <QtCore/private/qjnihelpers_p.h>
+
 #include "android_secure_storage.h"
 #include "jni_helpers.h"
 
@@ -25,6 +27,21 @@ std::vector<std::byte> toBytes(JNIEnv* env, const jbyteArray& data)
 extern "C" {
 
 using namespace nx::vms::client::mobile;
+
+// Define custom implementation to avoid calling Qt's default JNI_OnLoad when QtCore is loaded as a
+// dependency, since it initializes Qt with a null Activity that is used at application startup.
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
+{
+    if (QtAndroidPrivate::javaVM())
+        return JNI_VERSION_1_6;
+
+    JNIEnv* env = nullptr;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
+        return JNI_ERR;
+
+    QtAndroidPrivate::initJNI(vm, env);
+    return JNI_VERSION_1_6;
+}
 
 // Implementation of PushNotificationStorage.java.
 JNIEXPORT jstring JNICALL Java_com_nxvms_mobile_utils_PushNotificationStorage_addUserNotification(
