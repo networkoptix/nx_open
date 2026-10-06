@@ -37,6 +37,10 @@
       <source>About</source>
       <translation>關於</translation>
     </message>
+    <message>
+      <source>User Manual</source>
+      <translation>使用者手冊</translation>
+    </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
@@ -595,6 +599,10 @@
       <source>Allows to show server time for the camera</source>
       <translation>允許攝影機顯示伺服器時間</translation>
     </message>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1065,6 +1073,17 @@
     </message>
   </context>
   <context>
+    <name>SaasPromoBanner</name>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation>解鎖專屬功能，實現可操作的影像智慧和大規模的數據導向營運</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>了解更多</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1513,6 +1532,13 @@
     <message>
       <source>Ok, I got it</source>
       <translation>好的，了解！</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
     </message>
   </context>
   <context>

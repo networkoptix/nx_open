@@ -37,6 +37,10 @@
       <source>About</source>
       <translation>Om</translation>
     </message>
+    <message>
+      <source>User Manual</source>
+      <translation>Användarmanual</translation>
+    </message>
   </context>
   <context>
     <name>ArchivePlaceholder</name>
@@ -596,6 +600,10 @@
       <source>Allows to show server time for the camera</source>
       <translation>Tillåter att visa servertid för kameran</translation>
     </message>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -1066,6 +1074,17 @@
     </message>
   </context>
   <context>
+    <name>SaasPromoBanner</name>
+    <message>
+      <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
+      <translation>Lås upp exklusiva funktioner för handlingskraftig videointelligens och datadriven verksamhet i stor skala</translation>
+    </message>
+    <message>
+      <source>Learn more</source>
+      <translation>Lär dig mer</translation>
+    </message>
+  </context>
+  <context>
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
@@ -1514,6 +1533,13 @@
     <message>
       <source>Ok, I got it</source>
       <translation>Okej, jag fattar</translation>
+    </message>
+  </context>
+  <context>
+    <name>TutorialsSettingsPage</name>
+    <message>
+      <source>Tutorials</source>
+      <translation type="unfinished">Tutorials</translation>
     </message>
   </context>
   <context>
