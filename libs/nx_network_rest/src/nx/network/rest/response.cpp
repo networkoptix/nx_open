@@ -36,10 +36,9 @@ void Response::insertOrReplaceCorsHeaders(
     bool supportedOriginCredentials,
     std::string_view methods)
 {
-    nx::network::http::insertOrReplaceCorsHeaders(
-        &httpHeaders,
+    nx::network::http::insertOrReplaceCorsHeaders(&httpHeaders,
         request.requestLine.method,
-        nx::network::http::getHeaderValue(request.headers, "Origin"),
+        request.headers,
         supportedOrigins.toStdString(),
         supportedOriginCredentials,
         std::move(methods));

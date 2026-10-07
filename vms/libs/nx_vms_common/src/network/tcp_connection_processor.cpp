@@ -456,10 +456,9 @@ nx::String QnTCPConnectionProcessor::createResponse(
     if (d->response.headers.find("Access-Control-Allow-Origin") == d->response.headers.end()
         && d->response.headers.find("Access-Control-Allow-Headers") == d->response.headers.end())
     {
-        nx::network::http::insertOrReplaceCorsHeaders(
-            &d->response.headers,
+        nx::network::http::insertOrReplaceCorsHeaders(&d->response.headers,
             d->request.requestLine.method,
-            nx::network::http::getHeaderValue(d->request.headers, "Origin"),
+            d->request.headers,
             d->owner->globalSettings()->supportedOrigins().toStdString(),
             d->owner->globalSettings()->supportedOriginCredentials(),
             /*methods*/ "GET");

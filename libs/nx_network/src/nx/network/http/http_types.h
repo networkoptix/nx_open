@@ -117,11 +117,13 @@ NX_NETWORK_API void removeHeader(
 /**
  * Adds CORS to headers. supportedOrigins must be equal to '*' or a comma separated origins
  * supported.
+ * @param requestHeaders Headers of the request being responded to. Origin is checked against
+ *     supportedOrigins, and for an allowed origin Access-Control-Request-Headers of a preflight
+ *     request is reflected into Access-Control-Allow-Headers.
  */
-NX_NETWORK_API void insertOrReplaceCorsHeaders(
-    HttpHeaders* headers,
+NX_NETWORK_API void insertOrReplaceCorsHeaders(HttpHeaders* headers,
     const class Method& method,
-    std::string origin,
+    const HttpHeaders& requestHeaders,
     const std::string& supportedOrigins,
     bool supportedOriginCredentials,
     std::string_view methods);

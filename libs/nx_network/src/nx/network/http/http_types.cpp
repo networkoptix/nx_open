@@ -109,15 +109,18 @@ static bool hasOrigin(const std::string& origins, const std::string& origin)
     return std::find(tokens.begin(), tokens.end(), origin) != tokens.end();
 }
 
-void insertOrReplaceCorsHeaders(
-    HttpHeaders* headers,
+void insertOrReplaceCorsHeaders(HttpHeaders* headers,
     const Method& method,
-    std::string origin,
+    const HttpHeaders& requestHeaders,
     const std::string& supportedOrigins,
     bool supportedOriginCredentials,
     std::string_view methods)
 {
-    if (!origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin)))
+    std::string origin = getHeaderValue(requestHeaders, "Origin");
+    const bool isOriginAllowed =
+        !origin.empty() && (supportedOrigins == "*" || hasOrigin(supportedOrigins, origin));
+
+    if (isOriginAllowed)
     {
         insertOrReplaceHeader(headers, {"Access-Control-Allow-Origin", std::move(origin)});
         insertOrReplaceHeader(headers,
@@ -130,11 +133,22 @@ void insertOrReplaceCorsHeaders(
     if (method == Method::get)
         return;
 
+    // Allowing the headers the preflight asks for, e.g. Authorization for the bearer token
+    // authentication, in addition to the always allowed ones.
+    std::string allowedHeaders = "X-PINGOTHER, Content-Type";
+    if (const auto requestedHeaders =
+            getHeaderValue(requestHeaders, "Access-Control-Request-Headers");
+        isOriginAllowed && !requestedHeaders.empty())
+    {
+        allowedHeaders += ", " + requestedHeaders;
+    }
+
     insertOrReplaceHeader(headers, HttpHeader("Access-Control-Allow-Methods", std::move(methods)));
     insertOrReplaceHeader(
-        headers, HttpHeader("Access-Control-Allow-Headers", "X-PINGOTHER, Content-Type"));
+        headers, HttpHeader("Access-Control-Allow-Headers", std::move(allowedHeaders)));
     insertOrReplaceHeader(headers, HttpHeader("Access-Control-Max-Age", "600"));
-    insertOrReplaceHeader(headers, HttpHeader("Vary", "Accept-Encoding, Origin"));
+    insertOrReplaceHeader(
+        headers, HttpHeader("Vary", "Accept-Encoding, Origin, Access-Control-Request-Headers"));
 }
 
 //-------------------------------------------------------------------------------------------------
