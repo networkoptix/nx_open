@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include <map>
+#include <array>
+#include <utility>
 
 #include <utils/math/space_mapper.h>
 
@@ -25,7 +26,24 @@ public:
     virtual Vector targetToSource(const Vector& target) const override;
 
 private:
-    std::map<QString, QnSpaceMapperPtr<qreal>> m_mappers;
+    enum class Axis
+    {
+        pan,
+        tilt,
+        rotation,
+        zoom,
+
+        /** Number of axes, used as the size of m_mappers. Not an axis; must stay last. */
+        count
+    };
+
+    const QnSpaceMapperPtr<qreal>& mapper(Axis axis) const
+    {
+        return m_mappers[std::to_underlying(axis)];
+    }
+
+private:
+    std::array<QnSpaceMapperPtr<qreal>, std::to_underlying(Axis::count)> m_mappers;
 };
 
 } // namespace ptz

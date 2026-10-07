@@ -1,10 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <string_view>
+
 #include <gtest/gtest.h>
 
 #include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_math.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/common/ptz/space_mapper.h>
 
 namespace {
 
@@ -160,4 +163,113 @@ TEST(PtzMapper, Mapping)
             x / maxLogical,
             0.1);
     }
+}
+
+namespace {
+
+using nx::vms::common::ptz::SpaceMapper;
+using nx::vms::common::ptz::Vector;
+
+/** Identity mapping that counts its calls, to observe when QnPtzMapper probes the axes. */
+class CountingMapper: public QnSpaceMapper<qreal>
+{
+public:
+    virtual qreal sourceToTarget(const qreal& source) const override
+    {
+        ++calls;
+        return source;
+    }
+
+    virtual qreal targetToSource(const qreal& target) const override
+    {
+        ++calls;
+        return target;
+    }
+
+    mutable int calls = 0;
+};
+
+QnSpaceMapperPtr<qreal> scalarMapper(
+    QList<QPair<qreal, qreal>> deviceToLogical, Qn::ExtrapolationMode mode)
+{
+    return QnSpaceMapperPtr<qreal>(
+        new QnScalarInterpolationSpaceMapper<qreal>(deviceToLogical, mode));
+}
+
+QnSpaceMapperPtr<qreal> identityMapper()
+{
+    return QnSpaceMapperPtr<qreal>(new QnIdentitySpaceMapper<qreal>());
+}
+
+} // namespace
+
+TEST(PtzMapper, logicalLimits)
+{
+    struct Case
+    {
+        std::string_view name;
+        QnSpaceMapperPtr<qreal> pan;
+        double expectedMinPan;
+        double expectedMaxPan;
+    };
+
+    const std::vector<Case> cases = {
+        // Periodic pan wraps into the logical range.
+        {"periodic",
+            scalarMapper({{-18000, -180}, {18000, 180}}, Qn::PeriodicExtrapolation),
+            -180.0,
+            180.0},
+        {"constant, symmetric",
+            scalarMapper({{-1, -170}, {1, 170}}, Qn::ConstantExtrapolation),
+            -170.0,
+            170.0},
+        {"constant, almost a full turn",
+            scalarMapper({{0, 0}, {1, 359.8}}, Qn::ConstantExtrapolation),
+            0.0,
+            359.8},
+        // Unbounded: the probe spans the full 720 degrees, which means "no limits".
+        {"linear",
+            scalarMapper({{-1, -90}, {0, 0}, {1, 120}}, Qn::LinearExtrapolation),
+            0.0,
+            360.0},
+        {"identity", identityMapper(), 0.0, 360.0},
+    };
+
+    const auto tilt = scalarMapper({{0, 90}, {9000, 0}}, Qn::ConstantExtrapolation);
+    const auto zoom =
+        scalarMapper({{0, 54.4}, {500, 40.9}, {1000, 28.1}}, Qn::ConstantExtrapolation);
+
+    for (const auto& testCase: cases)
+    {
+        SCOPED_TRACE(testCase.name);
+        const QnSpaceMapperPtr<Vector> spaceMapper(
+            new SpaceMapper(testCase.pan, tilt, identityMapper(), zoom));
+        const QnPtzMapper mapper(spaceMapper, spaceMapper);
+        const auto& limits = mapper.logicalLimits();
+
+        ASSERT_TRUE(limits.pan && limits.tilt && limits.fov);
+        EXPECT_DOUBLE_EQ(limits.pan->min, testCase.expectedMinPan);
+        EXPECT_DOUBLE_EQ(limits.pan->max, testCase.expectedMaxPan);
+        EXPECT_DOUBLE_EQ(limits.tilt->min, 0.0);
+        EXPECT_DOUBLE_EQ(limits.tilt->max, 90.0);
+        EXPECT_DOUBLE_EQ(limits.fov->min, 28.1);
+        EXPECT_DOUBLE_EQ(limits.fov->max, 54.4);
+    }
+}
+
+TEST(PtzMapper, logicalLimitsAreCalculatedLazilyAndOnce)
+{
+    const auto pan = new CountingMapper(); //< Owned by spaceMapper.
+    const QnSpaceMapperPtr<Vector> spaceMapper(new SpaceMapper(
+        QnSpaceMapperPtr<qreal>(pan), identityMapper(), identityMapper(), identityMapper()));
+
+    const QnPtzMapper mapper(spaceMapper, spaceMapper);
+    EXPECT_EQ(pan->calls, 0) << "Limits must not be calculated by the constructor";
+
+    mapper.logicalLimits();
+    const int callsAfterFirst = pan->calls;
+    EXPECT_GT(callsAfterFirst, 0);
+
+    mapper.logicalLimits();
+    EXPECT_EQ(pan->calls, callsAfterFirst) << "Limits must be calculated only once";
 }

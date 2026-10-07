@@ -3,6 +3,8 @@
 #ifndef QN_PTZ_MAPPER_H
 #define QN_PTZ_MAPPER_H
 
+#include <mutex>
+
 #include <nx/vms/common/ptz/vector.h>
 #include <utils/math/space_mapper.h>
 
@@ -35,15 +37,17 @@ public:
         return m_outputMapper->sourceToTarget(position);
     }
 
-    const nx::vms::api::PtzPositionLimits& logicalLimits() const
-    {
-        return m_logicalLimits;
-    }
+    /** Calculated on the first call: most mappers are loaded but never used by a controller. */
+    const nx::vms::api::PtzPositionLimits& logicalLimits() const;
+
+private:
+    nx::vms::api::PtzPositionLimits calculateLogicalLimits() const;
 
 private:
     QnSpaceMapperPtr<Vector> m_inputMapper;
     QnSpaceMapperPtr<Vector> m_outputMapper;
-    nx::vms::api::PtzPositionLimits m_logicalLimits;
+    mutable std::once_flag m_logicalLimitsCalculated;
+    mutable nx::vms::api::PtzPositionLimits m_logicalLimits;
 };
 
 #endif // QN_PTZ_MAPPER_H

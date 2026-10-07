@@ -41,10 +41,22 @@ QnPtzMapper::QnPtzMapper(
     m_inputMapper(inputMapper),
     m_outputMapper(outputMapper)
 {
-    /* OK, I know that this check sucks, but I really didn't want to
-     * extend the space mapper interface to make it simpler. */
+}
+
+const nx::vms::api::PtzPositionLimits& QnPtzMapper::logicalLimits() const
+{
+    std::call_once(
+        m_logicalLimitsCalculated, [this]() { m_logicalLimits = calculateLogicalLimits(); });
+    return m_logicalLimits;
+}
+
+nx::vms::api::PtzPositionLimits QnPtzMapper::calculateLogicalLimits() const
+{
+    nx::vms::api::PtzPositionLimits limits;
+
+    // The pan limits are found by probing the round trip over two full turns.
     qreal minPan = 36000.0, maxPan = -36000.0;
-    for(int pan = -360; pan <= 360; pan++)
+    for (int pan = -360; pan <= 360; pan++)
     {
         const auto pos = m_inputMapper->sourceToTarget(
             m_inputMapper->targetToSource(Vector(pan, 0, 0, 0)));
@@ -53,14 +65,14 @@ QnPtzMapper::QnPtzMapper(
         maxPan = qMax(pos.pan, maxPan);
     }
 
-    if(qFuzzyCompare(maxPan - minPan, 720.0))
+    if (qFuzzyCompare(maxPan - minPan, 720.0))
     {
         /* There are no limits for pan. */
-        m_logicalLimits.pan = {0.0, 360.0};
+        limits.pan = {0.0, 360.0};
     }
     else
     {
-        m_logicalLimits.pan = {minPan, maxPan};
+        limits.pan = {minPan, maxPan};
     }
 
     auto lo = m_inputMapper->sourceToTarget(
@@ -69,8 +81,9 @@ QnPtzMapper::QnPtzMapper(
     auto hi = m_inputMapper->sourceToTarget(m_inputMapper->targetToSource(
         Vector(0, 90, 0, 360)));
 
-    m_logicalLimits.tilt = {lo.tilt, hi.tilt};
-    m_logicalLimits.fov = {lo.zoom, hi.zoom};
+    limits.tilt = {lo.tilt, hi.tilt};
+    limits.fov = {lo.zoom, hi.zoom};
+    return limits;
 }
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<qreal> *target) {
