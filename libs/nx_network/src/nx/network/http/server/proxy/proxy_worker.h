@@ -62,6 +62,7 @@ private:
     std::string m_targetHostName;
     bool m_isSslConnectionRequired;
     std::unique_ptr<AsyncMessagePipeline> m_targetHostPipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     ProxyCompletionHander m_completionHandler;
     std::unique_ptr<AbstractMessageBodyConverter> m_messageBodyConverter;
     nx::Buffer m_messageBodyBuffer;

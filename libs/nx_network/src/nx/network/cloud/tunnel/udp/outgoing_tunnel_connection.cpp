@@ -28,7 +28,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_controlConnection(std::make_unique<ConnectionType>(std::move(udtConnection))),
     m_settings(settings)
 {
-    m_controlConnection->registerCloseHandler(
+    m_closeSubscription = m_controlConnection->registerCloseHandler(
         [this](auto reason, auto /*connectionDestroyed*/) { onConnectionClosed(reason); });
 
     bindToAioThread(getAioThread());

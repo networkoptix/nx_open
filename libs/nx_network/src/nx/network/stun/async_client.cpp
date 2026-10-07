@@ -465,11 +465,9 @@ void AsyncClient::initializeMessagePipeline(
     NX_INFO(this, nx::format("Connected to %1").arg(*m_endpoint));
 
     m_baseConnection = std::make_unique<BaseConnectionType>(std::move(connection));
-    m_baseConnection->registerCloseHandler(
+    m_closeSubscription = m_baseConnection->registerCloseHandler(
         [this, connection = m_baseConnection.get()](auto closeReason, auto /*connectionDestroyed*/)
-        {
-            closeConnection(closeReason, connection);
-        });
+        { closeConnection(closeReason, connection); });
     m_baseConnection->bindToAioThread(getAioThread());
     m_baseConnection->setMessageHandler(
         [this](Message message) { processMessage(std::move(message)); });

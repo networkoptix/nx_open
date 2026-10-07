@@ -7,6 +7,7 @@
 
 #include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/connection_server/detail/connection_statistics.h>
 #include <nx/utils/interruption_flag.h>
 
@@ -25,7 +26,11 @@ public:
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
 
-    void registerCloseHandler(OnConnectionClosedHandler handler);
+    [[nodiscard]] network::server::CloseHandlerSubscription registerCloseHandler(
+        OnConnectionClosedHandler handler)
+    {
+        return m_closeHandlers.add(std::move(handler));
+    }
 
     void start();
 
@@ -34,10 +39,8 @@ protected:
 
 private:
     std::unique_ptr<network::aio::AsyncChannelBridge> m_bridge;
-    std::vector<OnConnectionClosedHandler> m_connectionClosedHandlers;
+    network::server::CloseHandlerRegistry m_closeHandlers;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
-
-    void triggerConnectionClosedEvent(SystemError::ErrorCode closeReason);
 };
 
 } // namespace nx::cloud::gateway

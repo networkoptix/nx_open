@@ -20,16 +20,8 @@ HttpClientMessageBodySource::HttpClientMessageBodySource(
         [this](auto&&... args) { onSomeMessageBodyAvailable(std::forward<decltype(args)>(args)...); });
     m_messagePipeline->setOnMessageEnd(
         [this](auto&&... args) { onMessageEnd(std::forward<decltype(args)>(args)...); });
-    m_closeHandlerId = m_messagePipeline->registerCloseHandler(
+    m_closeSubscription = m_messagePipeline->registerCloseHandler(
         [this](auto reason, auto /*connectionDestroyed*/) { onConnectionClosed(reason); });
-}
-
-HttpClientMessageBodySource::~HttpClientMessageBodySource()
-{
-    // A close handler may be invoked after the connection is destroyed, so it has to be removed
-    // before this object is gone.
-    if (m_messagePipeline)
-        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
 }
 
 void HttpClientMessageBodySource::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -76,8 +68,7 @@ void HttpClientMessageBodySource::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
-    if (m_messagePipeline)
-        m_messagePipeline->removeCloseHandler(m_closeHandlerId);
+    m_closeSubscription.reset();
     m_messagePipeline.reset();
 }
 

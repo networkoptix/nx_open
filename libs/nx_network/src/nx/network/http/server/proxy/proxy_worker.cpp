@@ -35,11 +35,9 @@ ProxyWorker::ProxyWorker(
         std::move(connectionToTheTargetPeer));
     m_targetHostPipeline->parser().streamReader().setParseHeadersStrict(false);
 
-    m_targetHostPipeline->registerCloseHandler(
+    m_closeSubscription = m_targetHostPipeline->registerCloseHandler(
         [this](auto closeReason, auto /*connectionDestroyed*/)
-        {
-            onConnectionClosed(closeReason);
-        });
+        { onConnectionClosed(closeReason); });
 
     m_targetHostPipeline->setMessageHandler(
         [this](auto&&... args) { onMessageFromTargetHost(std::forward<decltype(args)>(args)...); });
@@ -108,6 +106,7 @@ void ProxyWorker::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
+    m_closeSubscription.reset();
     m_targetHostPipeline.reset();
 }
 
@@ -203,6 +202,7 @@ std::unique_ptr<ProxyWorker::ResponseMsgBodySource>
     if (contentLengthIter != message.response->headers.end())
         bodySource->setMessageBodyLimit(nx::utils::stoull(contentLengthIter->second));
 
+    m_closeSubscription.reset();
     m_targetHostPipeline.reset();
     return bodySource;
 }

@@ -7,6 +7,7 @@
 
 #include <nx/utils/interruption_flag.h>
 
+#include "base_server_connection.h"
 #include "detail/connection_statistics.h"
 #include "stream_socket_server.h"
 
@@ -26,8 +27,10 @@ public:
     void startReadingConnection(
         std::optional<std::chrono::milliseconds> /*inactivityTimeout*/);
 
-    void registerCloseHandler(
-        nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
+    [[nodiscard]] CloseHandlerSubscription registerCloseHandler(OnConnectionClosedHandler handler)
+    {
+        return m_closeHandlers.add(std::move(handler));
+    }
 
     void setKeepConnection(bool val);
 
@@ -42,7 +45,7 @@ private:
     const std::chrono::steady_clock::time_point m_creationTimestamp;
     bool m_keepConnection = false;
     std::queue<nx::Buffer> m_sendQueue;
-    std::vector<nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)>> m_connectionClosedHandlers;
+    CloseHandlerRegistry m_closeHandlers;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
 
     void onDataRead(
@@ -53,11 +56,7 @@ private:
 
     void sendNextMessage();
 
-    void onDataSent(
-        SystemError::ErrorCode errorCode,
-        size_t bytesSent);
-
-    void triggerConnectionClosedEvent(SystemError::ErrorCode reason);
+    void onDataSent(SystemError::ErrorCode errorCode, size_t bytesSent);
 };
 
 //-------------------------------------------------------------------------------------------------

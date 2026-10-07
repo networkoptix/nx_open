@@ -187,7 +187,7 @@ void Connector::testConnection(nx::MoveOnlyFunc<void(bool)> handler)
 
             m_httpPipeline = std::make_unique<nx::network::http::AsyncMessagePipeline>(
                 std::move(socket));
-            m_httpPipeline->registerCloseHandler(
+            m_closeSubscription = m_httpPipeline->registerCloseHandler(
                 [this](auto&&... args) { onTestConnectionClosed(std::move(args)...); });
             m_httpPipeline->setMessageHandler(
                 [this](auto&&... args) { onTestConnectionResponse(std::move(args)...); });

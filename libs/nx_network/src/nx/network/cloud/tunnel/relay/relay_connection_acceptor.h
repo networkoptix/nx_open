@@ -55,6 +55,7 @@ private:
     std::optional<int> m_serverPriority;
     ReverseConnectionCompletionHandler m_connectHandler;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     ReverseConnectionCompletionHandler m_onConnectionActivated;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::cloud::relay::api::BeginListeningResponse m_beginListeningResponse;

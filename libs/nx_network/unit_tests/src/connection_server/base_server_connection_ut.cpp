@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <atomic>
 #include <future>
 #include <optional>
 
@@ -236,12 +237,16 @@ protected:
         m_connection->setAuxiliaryMessageHandler(std::move(handler));
     }
 
-    int registerCloseHandler(BaseServerConnection::OnConnectionClosedHandler handler)
+    [[nodiscard]] CloseHandlerSubscription registerCloseHandler(
+        BaseServerConnection::OnConnectionClosedHandler handler)
     {
         return m_connection->registerCloseHandler(std::move(handler));
     }
 
-    void removeCloseHandler(int id) { m_connection->removeCloseHandler(id); }
+    void keepCloseHandler(CloseHandlerSubscription subscription)
+    {
+        m_closeSubscriptions.push_back(std::move(subscription));
+    }
 
     void resetConnection()
     {
@@ -250,6 +255,7 @@ protected:
 
 private:
     std::unique_ptr<TestConnection> m_connection;
+    std::vector<CloseHandlerSubscription> m_closeSubscriptions;
     bool m_invokingConnectionMethod = false;
     std::optional<bool> m_connectionClosedReportedDirectly;
     nx::utils::SyncMultiQueue<SystemError::ErrorCode, bool> m_connectionCloseEvents;
@@ -275,8 +281,8 @@ private:
         m_connection = std::make_unique<TestConnection>(
             std::move(socket),
             &m_receivedDataQueue);
-        m_connection->registerCloseHandler(
-            [this](auto... args) { saveConnectionClosedEvent(args...); });
+        keepCloseHandler(m_connection->registerCloseHandler(
+            [this](auto... args) { saveConnectionClosedEvent(args...); }));
     }
 
     void saveConnectionClosedEvent(SystemError::ErrorCode closeReason, bool connectionDestroyed)
@@ -366,38 +372,54 @@ TEST_F(ConnectionServerBaseServerConnection, close_handler_tells_if_connection_i
     std::promise<bool> destroyed;
     givenStartedConnection();
 
-    registerCloseHandler([this](auto... /*args*/) { resetConnection(); });
-    registerCloseHandler(
-        [&destroyed](auto /*closeReason*/, bool connectionDestroyed)
-        {
-            destroyed.set_value(connectionDestroyed);
-        });
+    keepCloseHandler(registerCloseHandler([this](auto... /*args*/) { resetConnection(); }));
+    keepCloseHandler(
+        registerCloseHandler([&destroyed](auto /*closeReason*/, bool connectionDestroyed)
+            { destroyed.set_value(connectionDestroyed); }));
 
     whenCloseConnection();
 
     ASSERT_TRUE(destroyed.get_future().get());
 }
 
-TEST_F(ConnectionServerBaseServerConnection, close_handler_removed_by_another_one_is_not_invoked)
+TEST_F(ConnectionServerBaseServerConnection, close_handler_cancelled_by_another_one_is_not_invoked)
 {
     std::promise<void> lastHandlerInvoked;
-    std::atomic<bool> removedHandlerInvoked = false;
-    int idToRemove = 0;
+    std::atomic<bool> cancelledHandlerInvoked = false;
+    CloseHandlerSubscription subscriptionToCancel;
 
     givenStartedConnection();
 
     // The handlers are invoked in the registration order.
-    registerCloseHandler(
-        [this, &idToRemove](auto... /*args*/) { removeCloseHandler(idToRemove); });
-    idToRemove = registerCloseHandler(
-        [&removedHandlerInvoked](auto... /*args*/) { removedHandlerInvoked = true; });
-    registerCloseHandler(
-        [&lastHandlerInvoked](auto... /*args*/) { lastHandlerInvoked.set_value(); });
+    keepCloseHandler(registerCloseHandler(
+        [&subscriptionToCancel](auto... /*args*/) { subscriptionToCancel.reset(); }));
+    subscriptionToCancel = registerCloseHandler(
+        [&cancelledHandlerInvoked](auto... /*args*/) { cancelledHandlerInvoked = true; });
+    keepCloseHandler(registerCloseHandler(
+        [&lastHandlerInvoked](auto... /*args*/) { lastHandlerInvoked.set_value(); }));
 
     whenCloseConnection();
 
     lastHandlerInvoked.get_future().wait();
-    ASSERT_FALSE(removedHandlerInvoked);
+    ASSERT_FALSE(cancelledHandlerInvoked);
+}
+
+TEST_F(ConnectionServerBaseServerConnection,
+    close_handler_is_not_invoked_after_its_subscription_is_gone)
+{
+    std::atomic<bool> handlerInvoked = false;
+
+    givenStartedConnection();
+
+    {
+        const auto subscription =
+            registerCloseHandler([&handlerInvoked](auto... /*args*/) { handlerInvoked = true; });
+    }
+
+    whenCloseConnection();
+    andConnectionCloseEventIsReported();
+
+    ASSERT_FALSE(handlerInvoked);
 }
 
 } // namespace nx::network::server::test

@@ -75,6 +75,7 @@ private:
     BandwidthCompletionHandler m_handler;
     TestContext m_testContext;
     std::unique_ptr<network::http::AsyncMessagePipeline> m_pipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     nx::utils::AsyncOperationGuard m_asyncGuard;
 };
 

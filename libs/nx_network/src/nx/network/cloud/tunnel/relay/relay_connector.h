@@ -43,6 +43,7 @@ private:
     aio::Timer m_timeoutTimer;
     nx::utils::ElapsedTimer m_responseTimer;
     std::unique_ptr<nx::network::http::AsyncMessagePipeline> m_httpPipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     std::string m_expectedConnectionTestId;
     nx::MoveOnlyFunc<void(bool)> m_connectionTestHandler;
 

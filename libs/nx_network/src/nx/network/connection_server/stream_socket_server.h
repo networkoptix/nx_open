@@ -115,11 +115,12 @@ public:
         auto connectionPtr = connection.get();
         if constexpr (requires { &ConnectionType::registerCloseHandler; })
         {
-            connection->registerCloseHandler(
-                [this, connectionPtr](auto closeReason, auto /*connectionDestroyed*/)
-                {
-                    closeConnection(closeReason, connectionPtr);
-                });
+            // The server closes every connection it holds before it is destroyed.
+            connection
+                ->registerCloseHandler(
+                    [this, connectionPtr](auto closeReason, auto /*connectionDestroyed*/)
+                    { closeConnection(closeReason, connectionPtr); })
+                .release();
         }
 
         NX_MUTEX_LOCKER lk(&m_mutex);

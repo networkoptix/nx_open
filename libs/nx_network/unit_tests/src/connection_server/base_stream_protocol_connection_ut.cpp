@@ -6,10 +6,10 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/socket_delegate.h>
 #include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/http/server/http_server_connection.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/byte_stream/pipeline.h>
@@ -165,7 +165,7 @@ public:
             [this](auto&&... args) { saveMessage(std::move(args)...); });
         m_connection->setOnSomeMessageBodyAvailable(
             [this](auto&&... args) { saveSomeBody(std::move(args)...); });
-        m_connection->registerCloseHandler(
+        m_closeSubscription = m_connection->registerCloseHandler(
             [this](auto&&... args) { saveConnectionClosedEvent(std::move(args)...); });
         m_connection->startReadingConnection();
     }
@@ -350,6 +350,7 @@ private:
     nx::utils::bstream::Pipe m_input;
     aio::test::AsyncChannel m_asyncChannel;
     std::unique_ptr<TestHttpConnection> m_connection;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     nx::utils::SyncQueue<std::unique_ptr<nx::network::http::Message>> m_receivedMessageQueue;
     nx::utils::bstream::test::NotifyingOutput m_receivedMsgBody;
     nx::Buffer m_expectedBody;

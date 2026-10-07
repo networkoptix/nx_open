@@ -32,6 +32,7 @@ protected:
 
 private:
     std::unique_ptr<MessagePipeline> m_messagePipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     http::tunneling::ValidateTunnelCompletionHandler m_completionHandler;
     std::unique_ptr<AbstractStreamSocket> m_connection;
     std::optional<std::chrono::milliseconds> m_timeout;

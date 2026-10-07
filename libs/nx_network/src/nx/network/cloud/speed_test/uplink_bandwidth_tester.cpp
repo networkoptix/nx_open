@@ -2,9 +2,9 @@
 
 #include "uplink_bandwidth_tester.h"
 
-#include <nx/utils/datetime.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/datetime.h>
 
 #include "http_api_paths.h"
 
@@ -103,7 +103,7 @@ void UplinkBandwidthTester::doBandwidthTest(BandwidthCompletionHandler handler)
                         std::bind(&UplinkBandwidthTester::onMessageReceived, this, _1));
 
                     const auto guard = m_asyncGuard.sharedGuard();
-                    m_pipeline->registerCloseHandler(
+                    m_closeSubscription = m_pipeline->registerCloseHandler(
                         [this, guard](auto error, auto /* connectionDestroyed */)
                         {
                             if (auto lock = guard->lock())

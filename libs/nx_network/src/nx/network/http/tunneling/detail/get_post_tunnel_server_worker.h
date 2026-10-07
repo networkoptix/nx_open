@@ -62,6 +62,8 @@ private:
         bool getResponseSent = false;
         bool postReceived = false;
         std::unique_ptr<AsyncMessagePipeline> connection;
+        nx::network::server::CloseHandlerSubscription getConnectionCloseSubscription;
+        nx::network::server::CloseHandlerSubscription closeSubscription;
         std::unique_ptr<AbstractMsgBodySourceWithCache> postBody;
         RequestProcessedHandler postCompletionHandler;
         std::unique_ptr<nx::network::aio::Timer> timer;
@@ -201,10 +203,12 @@ network::http::RequestResult
             closeConnection(tunnelSeq, SystemError::timedOut);
         });
 
-    connection->registerCloseHandler(
-        [this, tunnelSeq, guard = m_guard.sharedGuard(),
+    tunnelIter->second.getConnectionCloseSubscription = connection->registerCloseHandler(
+        [this,
+            tunnelSeq,
+            guard = m_guard.sharedGuard(),
             connectionId = requestContext.connectionAttrs.id](
-                SystemError::ErrorCode reason, auto /*connectionDestroyed*/)
+            SystemError::ErrorCode reason, auto /*connectionDestroyed*/)
         {
             if (auto lock = guard->lock())
             {
@@ -213,13 +217,7 @@ network::http::RequestResult
 
                 m_connectionToTunnel.erase(connectionId);
 
-                const auto it = m_tunnels.find(tunnelSeq);
-                if (it == m_tunnels.end())
-                    return;
-
-                // NOTE: HttpServerConnection does not support removing close connection handler.
-                // This condition replaces it.
-                if (it->second.getResponseSent)
+                if (m_tunnels.find(tunnelSeq) == m_tunnels.end())
                     return;
 
                 closeConnection(tunnelSeq, reason);
@@ -267,15 +265,14 @@ void GetPostTunnelServerWorker<ApplicationData...>::openDownStream(
     it->second.connection = std::make_unique<AsyncMessagePipeline>(
         connection->takeSocket());
     it->second.getResponseSent = true;
+    it->second.getConnectionCloseSubscription.reset();
 
     if (!it->second.postReceived)
     {
         // Receiving POST request.
-        it->second.connection->registerCloseHandler(
+        it->second.closeSubscription = it->second.connection->registerCloseHandler(
             [this, tunnelSeq](auto closeReason, auto /*connectionDestroyed*/)
-            {
-                closeConnection(tunnelSeq, closeReason);
-            });
+            { closeConnection(tunnelSeq, closeReason); });
         it->second.connection->setMessageHandler(
             [this, tunnelSeq](auto&&... args)
             {
@@ -434,6 +431,9 @@ void GetPostTunnelServerWorker<ApplicationData...>::closeConnection(
         tunnelSeq, closeReason, m_tunnels.size());
 
     m_tunnels.erase(tunnelSeq);
+    // The GET connection close handler is canceled with the tunnel, so it cannot do this anymore.
+    std::erase_if(
+        m_connectionToTunnel, [tunnelSeq](const auto& item) { return item.second == tunnelSeq; });
 }
 
 } // namespace nx::network::http::tunneling::detail

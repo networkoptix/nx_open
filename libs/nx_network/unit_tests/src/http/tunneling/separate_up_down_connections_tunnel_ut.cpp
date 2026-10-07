@@ -127,6 +127,7 @@ private:
     nx::utils::SyncQueue<Message> m_responses;
     nx::utils::SyncQueue<
         std::tuple<AsyncMessagePipeline*, SystemError::ErrorCode, bool>> m_connectionClosedEvents;
+    std::vector<nx::network::server::CloseHandlerSubscription> m_closeSubscriptions;
 
     nx::Url downChannelUrl()
     {
@@ -159,12 +160,12 @@ private:
             {
                 m_responses.push(std::move(msg));
             });
-        m_httpPipes.back()->registerCloseHandler(
+        m_closeSubscriptions.push_back(m_httpPipes.back()->registerCloseHandler(
             [this, ptr = m_httpPipes.back().get()](
                 SystemError::ErrorCode reason, bool connectionDestroyed)
             {
                 m_connectionClosedEvents.push(std::make_tuple(ptr, reason, connectionDestroyed));
-            });
+            }));
         m_httpPipes.back()->startReadingConnection();
     }
 

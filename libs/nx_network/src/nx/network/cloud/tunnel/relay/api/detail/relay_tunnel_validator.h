@@ -30,6 +30,7 @@ protected:
 
 private:
     network::http::AsyncMessagePipeline m_httpConnection;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     std::unique_ptr<network::AbstractStreamSocket> m_connection;
     std::optional<std::chrono::milliseconds> m_timeout;
     std::optional<nx::network::http::MimeProtoVersion> m_relayProtocol;

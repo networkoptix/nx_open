@@ -15,11 +15,9 @@ ClientConnectionValidator::ClientConnectionValidator(
 
     m_messagePipeline->setMessageHandler(
         [this](auto message) { processMessage(std::move(message)); });
-    m_messagePipeline->registerCloseHandler(
+    m_closeSubscription = m_messagePipeline->registerCloseHandler(
         [this](auto resultCode, auto /*connectionDestroyed*/)
-        {
-            processConnectionClosure(resultCode);
-        });
+        { processConnectionClosure(resultCode); });
 }
 
 void ClientConnectionValidator::bindToAioThread(
@@ -65,12 +63,15 @@ void ClientConnectionValidator::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
-    m_messagePipeline->pleaseStopSync();
+    m_closeSubscription.reset();
+    if (m_messagePipeline)
+        m_messagePipeline->pleaseStopSync();
 }
 
 void ClientConnectionValidator::processMessage(Message /*message*/)
 {
     m_connection = m_messagePipeline->takeSocket();
+    m_closeSubscription.reset();
     m_messagePipeline.reset();
 
     NX_VERBOSE(this, "STUN connection to %1 has been validated",

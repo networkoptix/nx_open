@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <utility>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -20,6 +21,112 @@
 namespace nx::network::server {
 
 static constexpr size_t kReadBufferCapacity = 16 * 1024;
+
+using OnConnectionClosedHandler =
+    nx::MoveOnlyFunc<void(SystemError::ErrorCode /*closeReason*/, bool /*connectionDestroyed*/)>;
+
+namespace detail { using CloseHandlers = std::map<int /*id*/, OnConnectionClosedHandler>; }
+
+class CloseHandlerRegistry;
+
+/**
+ * Keeps a close handler registered for as long as it lives. A registrar that does not own the
+ * connection MUST hold the subscription, otherwise its handler may be invoked after it is gone.
+ * Outliving the connection is safe. Canceling, by reset(), assignment or destruction, edits the
+ * connection's handler list unlocked, so it MUST run in the connection's AIO thread or after the
+ * connection is stopped.
+ */
+class CloseHandlerSubscription
+{
+public:
+    CloseHandlerSubscription() = default;
+    CloseHandlerSubscription(CloseHandlerSubscription&&) = default;
+    ~CloseHandlerSubscription() { reset(); }
+
+    CloseHandlerSubscription& operator=(CloseHandlerSubscription&& other)
+    {
+        if (this != &other)
+        {
+            reset();
+            m_handlers = std::move(other.m_handlers);
+            m_id = std::exchange(other.m_id, 0);
+        }
+        return *this;
+    }
+
+    /** Cancels the handler. Takes effect even while the close handlers are being invoked. */
+    void reset()
+    {
+        // The handlers outlive the connection while they are being invoked, which is exactly
+        // when a cancellation still has to be honored.
+        if (const auto handlers = m_handlers.lock())
+            handlers->erase(m_id);
+        m_handlers.reset();
+        m_id = 0;
+    }
+
+    /** Keeps the handler registered. Only for a registrar that outlives the connection. */
+    void release()
+    {
+        m_handlers.reset();
+        m_id = 0;
+    }
+
+private:
+    friend class CloseHandlerRegistry;
+
+    CloseHandlerSubscription(std::weak_ptr<detail::CloseHandlers> handlers, int id):
+        m_handlers(std::move(handlers)),
+        m_id(id)
+    {
+    }
+
+    std::weak_ptr<detail::CloseHandlers> m_handlers;
+    int m_id = 0;
+};
+
+/**
+ * The close handlers of a single connection.
+ */
+class CloseHandlerRegistry
+{
+public:
+    [[nodiscard]] CloseHandlerSubscription add(OnConnectionClosedHandler handler)
+    {
+        const int id = ++m_lastId;
+        m_handlers->emplace(id, std::move(handler));
+        return CloseHandlerSubscription(m_handlers, id);
+    }
+
+    /**
+     * Invokes the handlers in the registration order, extracting each one before invoking it, so
+     * a handler is free to destroy the connection or to cancel a handler that follows it.
+     * Handlers registered while this runs are left to the next call.
+     * @param connectionFreedFlag Interrupted by the connection destruction. Its state is passed
+     *     to the handlers as connectionDestroyed.
+     */
+    void invokeAll(
+        SystemError::ErrorCode closeReason, nx::utils::InterruptionFlag* connectionFreedFlag)
+    {
+        // The local copy keeps the handlers alive if one of them destroys the connection.
+        const auto handlers = m_handlers;
+        if (handlers->empty())
+            return;
+
+        const int lastId = handlers->rbegin()->first;
+
+        nx::utils::InterruptionFlag::Watcher watcher(connectionFreedFlag);
+        while (!handlers->empty() && handlers->begin()->first <= lastId)
+        {
+            auto node = handlers->extract(handlers->begin());
+            node.mapped()(closeReason, watcher.interrupted());
+        }
+    }
+
+private:
+    std::shared_ptr<detail::CloseHandlers> m_handlers = std::make_shared<detail::CloseHandlers>();
+    int m_lastId = 0;
+};
 
 /**
  * Contains common logic for server-side connection created by StreamSocketServer.
@@ -39,8 +146,7 @@ class NX_NETWORK_API BaseServerConnection:
     using base_type = aio::BasicPollable;
 
 public:
-    using OnConnectionClosedHandler = nx::MoveOnlyFunc<void(
-        SystemError::ErrorCode /*closeReason*/, bool /*connectionDestroyed*/)>;
+    using OnConnectionClosedHandler = server::OnConnectionClosedHandler;
 
     BaseServerConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket);
@@ -75,19 +181,13 @@ public:
     /**
      * Register handler to be executed when connection just about to be destroyed.
      * NOTE: Handler is invoked in socket's aio thread.
-     * WARNING: Handler may be invoked after the connection object is destroyed.
-     * @return Id that may be used to remove the handler.
+     * WARNING: Handler may be invoked after the connection object is destroyed, so the returned
+     * subscription MUST be kept for as long as the handler may use the registrar.
      */
-    int registerCloseHandler(OnConnectionClosedHandler handler);
-
-    /**
-     * Cancels the handler, and takes effect even while the close handlers are being invoked. The
-     * registrar MUST call this before it is destroyed, since a handler may be invoked after the
-     * connection object is gone. For the same reason it MUST NOT be called once the connection
-     * itself is destroyed (see the connectionDestroyed argument of the handler).
-     * @param id returned by BaseServerConnection::registerCloseHandler.
-     */
-    void removeCloseHandler(int id);
+    [[nodiscard]] CloseHandlerSubscription registerCloseHandler(OnConnectionClosedHandler handler)
+    {
+        return m_closeHandlers.add(std::move(handler));
+    }
 
     bool isSsl() const;
 
@@ -117,17 +217,10 @@ protected:
     SocketAddress getForeignAddress() const;
 
 private:
-    using ConnectionClosedHandlers = std::map<int /*id*/, OnConnectionClosedHandler>;
-
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend = 0;
-
-    // Shared with triggerConnectionClosedEvent() so that the dispatch outlives this connection
-    // while removeCloseHandler() still cancels the handlers it has not invoked yet.
-    std::shared_ptr<ConnectionClosedHandlers> m_connectionClosedHandlers =
-        std::make_shared<ConnectionClosedHandlers>();
-    std::atomic<int> m_lastConnectionClosedHandlerId = 0;
+    CloseHandlerRegistry m_closeHandlers;
     nx::utils::InterruptionFlag m_connectionFreedFlag;
     std::size_t m_totalBytesReceived = 0;
 
@@ -138,7 +231,6 @@ private:
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead);
     void onBytesSent(SystemError::ErrorCode errorCode, size_t count);
     void handleSocketError(SystemError::ErrorCode errorCode);
-    void triggerConnectionClosedEvent(SystemError::ErrorCode closeReason);
     void resetInactivityTimer();
     void removeInactivityTimer();
 };

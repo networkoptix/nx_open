@@ -4,9 +4,9 @@
 
 #include <functional>
 
+#include <nx/utils/system_network_headers.h>
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/system_network_headers.h>
 #include <nx/utils/time.h>
 
 namespace nx::network {
@@ -44,19 +44,14 @@ void TimeProtocolConnection::startReadingConnection(
     m_outputBuffer.append((const char*) &utcTimeMillis, sizeof(utcTimeMillis));
 
     if (!m_socket->setNonBlockingMode(true))
-        return triggerConnectionClosedEvent(SystemError::getLastOSErrorCode());
+        return m_closeHandlers.invokeAll(
+            SystemError::getLastOSErrorCode(), &m_connectionFreedFlag);
 
     connectionStatistics.messageReceived();
 
     m_socket->sendAsync(
         &m_outputBuffer,
         std::bind(&TimeProtocolConnection::onDataSent, this, _1, _2));
-}
-
-void TimeProtocolConnection::registerCloseHandler(
-    nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)> handler)
-{
-    m_connectionClosedHandlers.push_back(std::move(handler));
 }
 
 void TimeProtocolConnection::stopWhileInAioThread()
@@ -75,15 +70,7 @@ void TimeProtocolConnection::onDataSent(
             .arg(SystemError::toString(errorCode)));
     }
 
-    triggerConnectionClosedEvent(errorCode);
-}
-
-void TimeProtocolConnection::triggerConnectionClosedEvent(SystemError::ErrorCode reason)
-{
-    auto handlers = std::exchange(m_connectionClosedHandlers, {});
-    nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
-    for (auto& handler: handlers)
-        handler(reason, watcher.interrupted());
+    m_closeHandlers.invokeAll(errorCode, &m_connectionFreedFlag);
 }
 
 } // namespace nx::network

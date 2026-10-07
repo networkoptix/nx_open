@@ -87,6 +87,7 @@ private:
     const SocketAddress m_localPunchedAddress;
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     const Settings m_settings;
     std::map<UdtStreamSocket*, ConnectionContext> m_ongoingConnections;
     nx::Mutex m_mutex;

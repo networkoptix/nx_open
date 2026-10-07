@@ -25,7 +25,8 @@ void SimpleMessageServerConnection::startReadingConnection(
     using namespace std::placeholders;
 
     if (!m_socket->setNonBlockingMode(true))
-        return triggerConnectionClosedEvent(SystemError::getLastOSErrorCode());
+        return m_closeHandlers.invokeAll(
+            SystemError::getLastOSErrorCode(), &m_connectionFreedFlag);
 
     if (m_request.empty())
     {
@@ -39,12 +40,6 @@ void SimpleMessageServerConnection::startReadingConnection(
             &m_readBuffer, m_request.size(),
             std::bind(&SimpleMessageServerConnection::onDataRead, this, _1, _2));
     }
-}
-
-void SimpleMessageServerConnection::registerCloseHandler(
-    nx::MoveOnlyFunc<void(SystemError::ErrorCode, bool)> handler)
-{
-    m_connectionClosedHandlers.push_back(std::move(handler));
 }
 
 void SimpleMessageServerConnection::setKeepConnection(bool val)
@@ -67,7 +62,7 @@ void SimpleMessageServerConnection::onDataRead(
     {
         NX_VERBOSE(this, nx::format("Failure while reading connection from %1. %2")
             .args(m_socket->getForeignAddress(), SystemError::toString(errorCode)));
-        triggerConnectionClosedEvent(errorCode);
+        m_closeHandlers.invokeAll(errorCode, &m_connectionFreedFlag);
         return;
     }
 
@@ -75,7 +70,7 @@ void SimpleMessageServerConnection::onDataRead(
     {
         NX_VERBOSE(this, nx::format("Received unexpected message %1 from %2 while expecting %3")
             .args(m_readBuffer, m_socket->getForeignAddress(), m_request));
-        triggerConnectionClosedEvent(SystemError::invalidData);
+        m_closeHandlers.invokeAll(SystemError::invalidData, &m_connectionFreedFlag);
         return;
     }
 
@@ -124,22 +119,13 @@ void SimpleMessageServerConnection::onDataSent(
 
     if (!m_keepConnection)
     {
-        triggerConnectionClosedEvent(errorCode);
+        m_closeHandlers.invokeAll(errorCode, &m_connectionFreedFlag);
     }
     else
     {
         if (!m_sendQueue.empty())
             sendNextMessage();
     }
-}
-
-void SimpleMessageServerConnection::triggerConnectionClosedEvent(
-    SystemError::ErrorCode reason)
-{
-    auto handlers = std::exchange(m_connectionClosedHandlers, {});
-    nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
-    for (auto& handler: handlers)
-        handler(reason, watcher.interrupted());
 }
 
 } // namespace nx::network::server

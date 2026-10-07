@@ -23,8 +23,6 @@ public:
         const Response& response,
         std::unique_ptr<AsyncMessagePipeline> messagePipeline);
 
-    virtual ~HttpClientMessageBodySource() override;
-
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     virtual std::string mimeType() const override;
@@ -40,7 +38,7 @@ private:
     std::string m_mimeType;
     std::optional<uint64_t> m_contentLength;
     std::unique_ptr<AsyncMessagePipeline> m_messagePipeline;
-    int m_closeHandlerId = 0;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     bool m_eof = false;
     std::deque<nx::Buffer> m_messageBodyChunks;
     std::optional<CompletionHandler> m_handler;

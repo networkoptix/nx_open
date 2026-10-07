@@ -137,7 +137,7 @@ void RendezvousConnectorWithVerification::onConnectCompleted(
     connection->bindToAioThread(getAioThread());
     m_requestPipeline = std::make_unique<stun::MessagePipeline>(
         std::move(connection));
-    m_requestPipeline->registerCloseHandler(
+    m_closeSubscription = m_requestPipeline->registerCloseHandler(
         [this](auto... args) { onConnectionClosed(args...); });
 
     // NOTE: Have to do this since STUN parser in vms <= 4.2 crashes when receiving FINGERPRINT

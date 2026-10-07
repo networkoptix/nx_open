@@ -22,19 +22,13 @@ void BridgeToServerConnectionAdaptor::bindToAioThread(
     m_bridge->bindToAioThread(aioThread);
 }
 
-void BridgeToServerConnectionAdaptor::registerCloseHandler(
-    OnConnectionClosedHandler handler)
-{
-    m_connectionClosedHandlers.push_back(std::move(handler));
-}
-
 void BridgeToServerConnectionAdaptor::start()
 {
     m_bridge->start(
         [this](SystemError::ErrorCode error)
         {
             NX_VERBOSE(this, "Closing CONNECT tunnel.");
-            triggerConnectionClosedEvent(error);
+            m_closeHandlers.invokeAll(error, &m_connectionFreedFlag);
         });
 }
 
@@ -43,15 +37,6 @@ void BridgeToServerConnectionAdaptor::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_bridge.reset();
-}
-
-void BridgeToServerConnectionAdaptor::triggerConnectionClosedEvent(
-    SystemError::ErrorCode closeReason)
-{
-    auto connectionClosedHandlers = std::exchange(m_connectionClosedHandlers, {});
-    nx::utils::InterruptionFlag::Watcher watcher(&m_connectionFreedFlag);
-    for (auto& connectionCloseHandler: connectionClosedHandlers)
-        connectionCloseHandler(closeReason, watcher.interrupted());
 }
 
 } // namespace nx::cloud::gateway

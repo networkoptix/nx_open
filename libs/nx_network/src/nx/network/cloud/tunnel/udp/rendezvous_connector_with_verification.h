@@ -51,6 +51,7 @@ private:
     ConnectCompletionHandler m_connectCompletionHandler;
     ConnectCompletionHandler m_connectionClosedHandler;
     std::unique_ptr<stun::MessagePipeline> m_requestPipeline;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     std::unique_ptr<nx::network::UdtStreamSocket> m_udtConnection;
 
     void onConnectionClosed(SystemError::ErrorCode closeReason, bool /*connectionDestroyed*/);

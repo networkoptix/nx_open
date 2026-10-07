@@ -466,7 +466,7 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_readingCeased = false;
     bool m_isPersistentConnection = false;
-    int m_closeHandlerId = -1;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     ssl::AdapterFunc m_adapterFunc;
     std::optional<KeepAliveOptions> m_keepAliveOptions;
     nx::telemetry::HttpSpan m_telemetrySpan;

@@ -7,9 +7,9 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/chunked_body_source.h>
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
-#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
@@ -334,6 +334,7 @@ protected:
 
 private:
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectionClosedEvents;
+    std::vector<nx::network::server::CloseHandlerSubscription> m_closeSubscriptions;
     TestHttpServer m_httpServer;
     SocketAddress m_lastRequestOriginEndpoint;
     nx::utils::SyncQueue<LocalRequestContext> m_requestsReceived;
@@ -392,8 +393,9 @@ private:
     {
         recordRequest(requestContext);
 
-        requestContext.conn.lock()->registerCloseHandler(
-            [this](auto&&... args) { saveConnectionClosedEvent(std::forward<decltype(args)>(args)...); });
+        m_closeSubscriptions.push_back(
+            requestContext.conn.lock()->registerCloseHandler([this](auto&&... args)
+                { saveConnectionClosedEvent(std::forward<decltype(args)>(args)...); }));
 
         completionHandler(StatusCode::ok);
     }

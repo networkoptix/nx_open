@@ -107,6 +107,7 @@ private:
 
     std::unique_ptr<nx::network::RetryTimer> m_reconnectTimer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
+    nx::network::server::CloseHandlerSubscription m_closeSubscription;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 
     std::list<std::pair<Message, std::pair<void*, RequestHandler>>> m_requestQueue;

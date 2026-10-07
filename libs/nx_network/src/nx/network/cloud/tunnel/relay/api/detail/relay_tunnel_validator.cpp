@@ -5,8 +5,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>
 
-#include "../relay_api_notifications.h"
 #include "../relay_api_http_paths.h"
+#include "../relay_api_notifications.h"
 
 namespace nx::cloud::relay::api::detail {
 
@@ -20,8 +20,8 @@ TunnelValidator::TunnelValidator(
 
     m_httpConnection.setMessageHandler(
         [this](auto message) { processRelayNotification(std::move(message)); });
-    m_httpConnection.registerCloseHandler(
-        [this](auto reason, auto /*registerCloseHandler*/) { handleConnectionClosure(reason); });
+    m_closeSubscription = m_httpConnection.registerCloseHandler(
+        [this](auto reason, auto /*connectionDestroyed*/) { handleConnectionClosure(reason); });
 
     bindToAioThread(m_httpConnection.getAioThread());
 }

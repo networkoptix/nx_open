@@ -1085,6 +1085,7 @@ private:
     {
         nx::network::aio::Timer timer;
         int requestsReceived = 0;
+        nx::network::server::CloseHandlerSubscription closeSubscription;
     };
 
     nx::Url m_testUrl;
@@ -1130,11 +1131,11 @@ private:
             if (p.second)
             {
                 p.first->second = std::make_unique<HttpConnectionContext>();
-                requestContext.conn.lock()->registerCloseHandler(
-                    std::bind(
-                        &HttpClientAsyncReusingConnection::onConnectionClosed,
-                        this,
-                        requestContext.conn.lock().get()));
+                p.first->second->closeSubscription =
+                    requestContext.conn.lock()->registerCloseHandler(
+                        std::bind(&HttpClientAsyncReusingConnection::onConnectionClosed,
+                            this,
+                            requestContext.conn.lock().get()));
             }
             connectionContext = p.first->second.get();
         }

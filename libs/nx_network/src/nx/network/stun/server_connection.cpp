@@ -2,8 +2,8 @@
 
 #include "server_connection.h"
 
-#include <nx/network/socket_global.h>
 #include <nx/utils/system_network_headers.h>
+#include <nx/network/socket_global.h>
 
 #include "abstract_message_handler.h"
 
@@ -55,6 +55,7 @@ SocketAddress ServerConnection::getSourceAddress() const
 void ServerConnection::addOnConnectionCloseHandler(
     nx::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    // The handlers die with the connection they are registered on.
     registerCloseHandler(
         [handler = std::move(handler)](auto reason, auto connectionDestroyed)
         {
@@ -64,7 +65,8 @@ void ServerConnection::addOnConnectionCloseHandler(
                     "invoking close handler on destroyed connection");
             }
             handler(reason);
-        });
+        })
+        .release();
 }
 
 AbstractCommunicatingSocket* ServerConnection::socket()
