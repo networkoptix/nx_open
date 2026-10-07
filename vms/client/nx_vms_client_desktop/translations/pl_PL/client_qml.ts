@@ -1751,11 +1751,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n więcej</numerusform>
+        <numerusform>%n więcej</numerusform>
+        <numerusform>%n więcej</numerusform>
+        <numerusform>%n więcej</numerusform>
       </translation>
     </message>
   </context>
@@ -2011,11 +2011,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Wybierz obiekty</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Wszystkie obiekty</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2403,11 +2403,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...i jeszcze %n</numerusform>
+        <numerusform>...i jeszcze %n</numerusform>
+        <numerusform>...i jeszcze %n</numerusform>
+        <numerusform>...i jeszcze %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2864,11 +2864,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... i jeszcze %n</numerusform>
+        <numerusform>... i jeszcze %n</numerusform>
+        <numerusform>... i jeszcze %n</numerusform>
+        <numerusform>... i jeszcze %n</numerusform>
       </translation>
     </message>
   </context>

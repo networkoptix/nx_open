@@ -2364,8 +2364,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... และ %n เพิ่มเติม</numerusform>
       </translation>
     </message>
   </context>
@@ -2819,8 +2819,8 @@ Press Alt + Click to follow object</source>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... และ %n อื่น ๆ</numerusform>
       </translation>
     </message>
   </context>
