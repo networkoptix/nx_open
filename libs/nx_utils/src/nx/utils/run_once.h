@@ -3,158 +3,180 @@
 #pragma once
 
 #include <future>
+#include <map>
 #include <memory>
+#include <string_view>
 
-#include <nx/utils/lockable.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::utils {
 
-class RunOnceBase
-{
-public:
-    using Future = std::future<void>;
+// The future returned by RunOnce.
+using RunOnceFuture = std::future<void>;
 
-protected:
-    enum class State
-    {
-        idle,
-        inProgress,
-        reinit
-    };
+namespace detail {
+
+enum class TaskState
+{
+    idle,
+    inProgress,
+    reinit
 };
 
-template<typename T>
-class RunOnce: public RunOnceBase
+// Helper for the RunOnce Keyless overload.
+struct Keyless
+{
+};
+
+// The states of a RunOnce that has a key: one per key, an absent key meaning TaskState::idle
+template<typename Key>
+class StateHolder
 {
 public:
-    RunOnce() = default;
-
-    /*
-     * Schedule new task if it doesn't exists.
-     */
-    std::optional<Future> startOnceAsync(std::function<void()> task, const T& key)
+    TaskState& at(const Key& key) { return m_states[key]; }
+    void reset(const Key& key) { m_states.erase(key); }
+    static nx::log::Tag logTag(const Key& key)
     {
-        if (switchState(key, State::idle, State::inProgress))
-            return startTaskInternal(std::move(task), key);
-        return std::nullopt;
-    }
-
-    /*
-     * Schedule new task if it doesn't exists or it is running now.
-     * Multiple calls schedule only one task but it is guarantee that
-     * new task is scheduled after `restartOnceAsync` call.
-     */
-    std::optional<Future> restartOnceAsync(std::function<void()> task, const T& key)
-    {
-        if (switchState(key, State::inProgress, State::reinit))
-            return std::nullopt;
-        return startOnceAsync(std::move(task), key);
+        return nx::log::Tag(nx::format("RunOnce[%1]", key));
     }
 
 private:
-    nx::Lockable<std::map<T, State>> m_state;
-
-    bool switchState(const T& key, State from, State to)
-    {
-        auto state = m_state.lock();
-        auto& value = (*state)[key];
-        if (value != from)
-            return false;
-        value = to;
-        return true;
-    }
-
-    std::optional<Future> startTaskInternal(std::function<void()> task, const T& key)
-    {
-        try
-        {
-            return std::async(std::launch::async,
-                [this, task = std::move(task), key]()
-                {
-                    while (true)
-                    {
-                        task();
-                        auto state = m_state.lock();
-                        auto& value = (*state)[key];
-                        if (value == State::inProgress)
-                        {
-                            state->erase(key);
-                            break;
-                        }
-                        value = State::inProgress;
-                    }
-                });
-        }
-        catch (const std::exception& e)
-        {
-            NX_WARNING(this, "Failed to start an async task for %1: %2", key, e.what());
-            m_state.visit([&key](auto& state) { state.erase(key); });
-            return std::nullopt;
-        }
-    }
+    std::map<Key, TaskState> m_states;
 };
 
+// The state of a RunOnce that has no key. Key is ignored.
 template<>
-class RunOnce<void>: public RunOnceBase
+class StateHolder<Keyless>
 {
 public:
-
-    RunOnce() = default;
-
-    /*
-     * Schedule new task if it doesn't exists.
-     */
-    std::optional<Future> startOnceAsync(std::function<void()> task)
+    TaskState& at(Keyless) { return m_state; }
+    void reset(Keyless) { m_state = TaskState::idle; }
+    static nx::log::Tag logTag(Keyless)
     {
-        if (switchState(State::idle, State::inProgress))
-            return startTaskInternal(std::move(task));
-        return std::nullopt;
-    }
-
-    /*
-     * Schedule new task if it doesn't exists or it is running now.
-     * Multiple calls schedule only one task but it is guarantee that
-     * new task is scheduled after `restartOnceAsync` call.
-     */
-    std::optional<Future> restartOnceAsync(
-        std::function<void()> task)
-    {
-        if (switchState(State::inProgress, State::reinit))
-            return std::nullopt;
-        return startOnceAsync(std::move(task));
+        return nx::log::Tag(QStringLiteral("RunOnce[Keyless]"));
     }
 
 private:
-    std::atomic<State> m_state{State::idle};
+    TaskState m_state = TaskState::idle;
+};
 
-    bool switchState(State from, State to)
+} // namespace detail
+
+// Runs a task asynchronously, at most one task at a time per key.
+template<typename Key>
+class RunOnce
+{
+public:
+    // Schedule new task if it doesn't exists.
+    std::optional<RunOnceFuture> startOnceAsync(std::function<void()> task, const Key& key)
     {
-        return m_state.compare_exchange_strong(from, to);
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        return startOnceAsyncUnsafe(std::move(task), key);
     }
 
-    std::optional<Future> startTaskInternal(std::function<void()> task)
+    // Schedule new task if it doesn't exists or it is running now. Multiple calls schedule only
+    // one task but it is guarantee that new task is scheduled after `restartOnceAsync` call.
+    std::optional<RunOnceFuture> restartOnceAsync(std::function<void()> task, const Key& key)
     {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        TaskState& state = m_stateHolder.at(key);
+        if (state == TaskState::inProgress)
+        {
+            state = TaskState::reinit;
+            return std::nullopt;
+        }
+        return startOnceAsyncUnsafe(std::move(task), key);
+    }
+
+private:
+    using TaskState = detail::TaskState;
+    using StateHolder = detail::StateHolder<Key>;
+
+    nx::Mutex m_mutex;
+    StateHolder m_stateHolder;
+
+    // Starts the task if the key is idle: claims the state and creates the thread as one step.
+    // The caller's lock must span both, or a state seen as inProgress while the thread may still
+    // fail to exist lets a concurrent restartOnceAsync() set reinit that the rollback discards.
+    std::optional<RunOnceFuture> startOnceAsyncUnsafe(std::function<void()> task, const Key& key)
+    {
+        TaskState& state = m_stateHolder.at(key);
+        if (state != TaskState::idle)
+            return std::nullopt;
+        state = TaskState::inProgress;
         try
         {
             return std::async(std::launch::async,
-                [this, task = std::move(task)]()
-                {
-                    while (true)
-                    {
-                        task();
-                        if (switchState(State::inProgress, State::idle))
-                            break;
-                        m_state = State::inProgress;
-                    }
-                });
+                [this, task = std::move(task), key]() { runTaskLoop(task, key); });
         }
         catch (const std::exception& e)
         {
-            NX_WARNING(this, "Failed to start an async task: %1", e.what());
-            m_state = State::idle;
+            // Thread creation may fail (EAGAIN) on low-memory devices. Roll the state back so that
+            // a later call is able to retry, instead of letting the exception escape to the
+            // caller, which used to terminate the process.
+            NX_WARNING(StateHolder::logTag(key), "Failed to start an async task: %1", e.what());
+            m_stateHolder.reset(key);
             return std::nullopt;
         }
+    }
+
+    void runTaskLoop(const std::function<void()>& task, const Key& key)
+    {
+        while (true)
+        {
+            try
+            {
+                task();
+            }
+            catch (const std::exception& e)
+            {
+                // A throwing task must not leave the state claimed, which would stall every
+                // later call for this key. The exception itself is not swallowed: it still
+                // reaches the caller through the returned future.
+                resetStateAfterTaskFailure(e.what(), key);
+                throw;
+            }
+            catch (...)
+            {
+                resetStateAfterTaskFailure("an unknown exception", key);
+                throw;
+            }
+
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            TaskState& state = m_stateHolder.at(key);
+            if (state == TaskState::inProgress)
+            {
+                m_stateHolder.reset(key);
+                return;
+            }
+            state = TaskState::inProgress;
+        }
+    }
+
+    void resetStateAfterTaskFailure(std::string_view reason, const Key& key)
+    {
+        NX_WARNING(StateHolder::logTag(key), "The async task has thrown %1", reason);
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_stateHolder.reset(key);
+    }
+};
+
+// Runs a task asynchronously, at most one task at a time.
+template<>
+class RunOnce<void>: public RunOnce<detail::Keyless>
+{
+    using Keyed = RunOnce<detail::Keyless>;
+
+public:
+    std::optional<RunOnceFuture> startOnceAsync(std::function<void()> task)
+    {
+        return Keyed::startOnceAsync(std::move(task), {});
+    }
+
+    std::optional<RunOnceFuture> restartOnceAsync(std::function<void()> task)
+    {
+        return Keyed::restartOnceAsync(std::move(task), {});
     }
 };
 
