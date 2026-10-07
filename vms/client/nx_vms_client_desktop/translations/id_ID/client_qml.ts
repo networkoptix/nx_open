@@ -1732,8 +1732,8 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n selengkapnya</numerusform>
       </translation>
     </message>
   </context>
@@ -1986,11 +1986,11 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Pilih Objek</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Semua Objek</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2372,8 +2372,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...dan %n lainnya</numerusform>
       </translation>
     </message>
   </context>
@@ -2827,8 +2827,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... dan %n lainnya</numerusform>
       </translation>
     </message>
   </context>
