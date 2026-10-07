@@ -1,9 +1,13 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <gtest/gtest.h>
-
 #include <cstring>
+#include <limits>
+#include <new>
+#include <stdexcept>
 #include <string>
+#include <utility>
+
+#include <gtest/gtest.h>
 
 #include <nx/utils/byte_array.h>
 
@@ -11,6 +15,7 @@ namespace nx::utils::test {
 
 namespace {
 
+constexpr size_t kAlignment = 32;
 constexpr size_t kPadding = 64;
 
 void assertPaddingIsZeroed(const ByteArray& array)
@@ -35,7 +40,7 @@ TEST(ByteArray, paddingIsZeroedAfterWrite)
         assertPaddingIsZeroed(array);
     }
 
-    array.write((quint8) 42);
+    array.write("*", 1);
     assertPaddingIsZeroed(array);
 
     array.writeFiller(0xff, 10);
@@ -79,6 +84,150 @@ TEST(ByteArray, paddingIsZeroedAfterCopy)
 
     ByteArray moved(std::move(copy));
     assertPaddingIsZeroed(moved);
+}
+
+TEST(ByteArray, writeGrowsTheBuffer)
+{
+    ByteArray array(/*capacity*/ 4, kAlignment, /*padding*/ 0);
+
+    array.write("Hello, ", 7);
+    array.write("world", 5);
+
+    ASSERT_EQ(12u, array.size());
+    ASSERT_GE(array.capacity(), 12u);
+    ASSERT_EQ(0, memcmp(array.constData(), "Hello, world", 12));
+}
+
+TEST(ByteArray, reserveThrowsOnUnallocatableSize)
+{
+    ByteArray array(/*capacity*/ 0, kAlignment, /*padding*/ 0);
+
+    // Without the overflow guard in mallocAligned() this used to allocate a tiny buffer, and the
+    // following write() would memcpy into it.
+    ASSERT_THROW(array.reserve(std::numeric_limits<size_t>::max()), std::bad_alloc);
+}
+
+TEST(ByteArray, reserveThrowsOnCapacityPlusPaddingOverflow)
+{
+    ByteArray array(/*capacity*/ 0, kAlignment, /*padding*/ 64);
+
+    ASSERT_THROW(array.reserve(std::numeric_limits<size_t>::max()), std::length_error);
+}
+
+TEST(ByteArray, theEntryPointsRejectAnOverflowingSize)
+{
+    constexpr size_t kMax = std::numeric_limits<size_t>::max();
+
+    // The sums below wrap, so reserve() would see a small number, keep the buffer it already has
+    // and let the caller write far beyond it. The size has to be rejected where it is added up.
+    ByteArray array(/*capacity*/ 128, kAlignment, kPadding);
+    array.writeFiller('x', 100);
+
+    ASSERT_THROW(array.write("payload", kMax - 50), std::length_error);
+    ASSERT_THROW(array.startWriting(kMax - 50), std::length_error);
+    ASSERT_THROW(array.writeAt("payload", kMax - 50, 100), std::length_error);
+
+    // A negative count reaches the same arithmetic as a huge unsigned one.
+    ASSERT_THROW(array.writeFiller('x', -1), std::length_error);
+    ASSERT_THROW(array.writeAt("payload", 8, -1), std::length_error);
+
+    // The array is untouched by the rejected calls.
+    ASSERT_EQ(100u, array.size());
+    ASSERT_EQ(128u, array.capacity());
+}
+
+TEST(ByteArray, copyAssignmentIsIntactAfterAFailedAllocation)
+{
+    ByteArray destination(/*capacity*/ 16, kAlignment, /*padding*/ 0);
+    destination.write("Hello, world", 12);
+
+    // A padding this large cannot be allocated, so copying from this array fails.
+    const ByteArray source(/*capacity*/ 0, kAlignment, std::numeric_limits<size_t>::max() - 8);
+
+    ASSERT_THROW(destination = source, std::bad_alloc);
+
+    // The failed assignment must not have released the buffer of the destination: reading it here
+    // and freeing it in the destructor used to be a use-after-free and a double free.
+    ASSERT_EQ(12u, destination.size());
+    ASSERT_EQ(0, memcmp(destination.constData(), "Hello, world", 12));
+}
+
+TEST(ByteArray, copyAssignmentCopiesTheData)
+{
+    ByteArray source(/*capacity*/ 16, kAlignment, /*padding*/ 0);
+    source.write("Hello, world", 12);
+
+    ByteArray destination(/*capacity*/ 4, kAlignment, /*padding*/ 0);
+    destination.write("stale", 5);
+
+    destination = source;
+
+    ASSERT_EQ(12u, destination.size());
+    ASSERT_EQ(0, memcmp(destination.constData(), "Hello, world", 12));
+
+    // The copy must be independent of the source.
+    source.clear();
+    ASSERT_EQ(12u, destination.size());
+    ASSERT_EQ(0, memcmp(destination.constData(), "Hello, world", 12));
+}
+
+TEST(ByteArray, emptyArraysAreCopiedWithoutNullPointers)
+{
+    // memcpy() and memset() require valid pointers even for a zero length, while an array which
+    // was never written to holds a null one. UBSan reports the violation, so these have to stay
+    // guarded by a length check.
+    const ByteArray empty;
+    ASSERT_EQ(nullptr, empty.constData());
+
+    ByteArray destination;
+    destination = empty;
+    ASSERT_EQ(0u, destination.size());
+
+    const ByteArray copy(empty);
+    ASSERT_EQ(0u, copy.size());
+
+    ByteArray array(/*capacity*/ 16, kAlignment, kPadding);
+    array.write(empty);
+    array.write(nullptr, 0);
+    array.writeAt(nullptr, 0, 0);
+    array.writeFiller(0, 0);
+    ASSERT_EQ(0u, array.size());
+}
+
+TEST(ByteArray, moveTakesOverTheWholeBuffer)
+{
+    ByteArray source(/*capacity*/ 100000, kAlignment, kPadding);
+    source.write("Hello, world", 12);
+    const char* const buffer = source.constData();
+
+    ByteArray destination;
+    destination = std::move(source);
+
+    // The buffer is taken over as it is, so the capacity of the allocation comes along with it.
+    // Reporting the size instead used to make the next reserve() reallocate for nothing.
+    ASSERT_EQ(buffer, destination.constData());
+    ASSERT_EQ(100000u, destination.capacity());
+    ASSERT_EQ(12u, destination.size());
+    ASSERT_EQ(0, memcmp(destination.constData(), "Hello, world", 12));
+
+    destination.reserve(50000);
+    ASSERT_EQ(buffer, destination.constData()) << "The buffer was large enough already";
+
+    // The source must not keep describing a buffer it does not own any more.
+    ASSERT_EQ(0u, source.size());
+    ASSERT_EQ(0u, source.capacity());
+}
+
+TEST(ByteArray, selfCopyAssignmentKeepsTheData)
+{
+    ByteArray array(/*capacity*/ 16, kAlignment, /*padding*/ 0);
+    array.write("Hello, world", 12);
+
+    const ByteArray& alias = array;
+    array = alias;
+
+    ASSERT_EQ(12u, array.size());
+    ASSERT_EQ(0, memcmp(array.constData(), "Hello, world", 12));
 }
 
 } // namespace nx::utils::test

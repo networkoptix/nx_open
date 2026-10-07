@@ -84,15 +84,6 @@ TEST(utils, alignUp)
     ASSERT_EQ(8U, alignUp(7, 8));
 }
 
-TEST(utils, misalignedPtr)
-{
-    uint8_t data[1024];
-    const auto aligned = (uint8_t*) alignUp((intptr_t) data, 32);
-    ASSERT_EQ(0, (intptr_t) aligned % 32);
-    uint8_t* const misaligned = misalignedPtr(data);
-    ASSERT_TRUE((intptr_t) misaligned % 32 != 0);
-}
-
 static void testMallocAligned(int line, size_t size, size_t alignment)
 {
     const size_t expectedAlignment = std::max(alignment, kMinAlignment);
@@ -161,6 +152,16 @@ TEST(utils, freeAlignedNull)
     void* freedPtr = (void*) 1;
     freeAligned(nullptr, [&](void* ptrToFree) { freedPtr = ptrToFree; });
     ASSERT_EQ((void*) nullptr, freedPtr);
+}
+
+TEST(utils, mallocAlignedRejectsOverflowingSize)
+{
+    // A size that does not fit the address space together with the alignment overhead must fail.
+    // Before the overflow check the addition wrapped around, malloc() succeeded with a tiny buffer
+    // and the caller was handed a pointer to far less memory than it had asked for.
+    ASSERT_TRUE(mallocAligned(SIZE_MAX, 32) == nullptr);
+    ASSERT_TRUE(mallocAligned(SIZE_MAX - 32, 32) == nullptr);
+    ASSERT_TRUE(mallocAligned(1, SIZE_MAX) == nullptr);
 }
 
 static void testDecodeEscapedString(

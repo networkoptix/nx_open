@@ -3,13 +3,17 @@
 #pragma once
 
 #include <cstddef>
-#include <QtCore/QByteArray>
-#include <QtCore/qglobal.h>
+#include <cstdint>
 
 namespace nx::utils {
 
 /**
  * Container class for aligned memory chunks.
+ *
+ * Sizes passed to this class often come from stream parsers, i.e. are externally controlled.
+ * Therefore every operation that has to grow the buffer reports a failure to do so by throwing
+ * (std::bad_alloc, or std::length_error when the requested size overflows the address space)
+ * rather than by silently keeping the old, too small buffer.
  */
 class NX_UTILS_API ByteArray
 {
@@ -41,7 +45,7 @@ public:
     /**
      * Pointer to the data stored in this array.
      */
-    const char *constData() const { return m_data + m_ignore; }
+    const char* constData() const { return m_data; }
 
     /**
      * Pointer to the data stored in this array.
@@ -56,7 +60,7 @@ public:
     /**
      * Size of this array.
      */
-    size_t size() const { return m_size - m_ignore; }
+    size_t size() const { return m_size; }
 
     /**
      * Capacity of this array.
@@ -72,28 +76,15 @@ public:
     /**
      * \param data                      Pointer to the data to append to this array
      * \param size                      Size of the data to append.
-     * \returns                         New size of this array, or 0 in case of an error.
+     * \returns                         Number of bytes written.
+     * \throws std::bad_alloc, std::length_error
      */
     size_t write(const char* data, size_t size);
 
-    size_t write(quint8 value);
-
-    /**
-     * Write to buffer without any checks. Buffer MUST be preallocated before that call
-     * \param data                      Pointer to the data to append to this array
-     * \param size                      Size of the data to append.
-     */
-    void uncheckedWrite(const char* data, size_t size);
-
     /**
      * \param data                      Data to append to this array.
-     * \returns                         New size of this array, or 0 in case of an error.
-     */
-    size_t write(const QByteArray& data) { return write(data.constData(), data.size()); }
-
-    /**
-     * \param data                      Data to append to this array.
-     * \returns                         New size of this array, or 0 in case of an error.
+     * \returns                         Number of bytes written.
+     * \throws std::bad_alloc, std::length_error
      */
     size_t write(const ByteArray& data) { return write(data.constData(), data.size()); }
 
@@ -103,7 +94,7 @@ public:
      * \param filler                    Byte to use for filling the array that will be appended.
      * \param size                      Size of the array that will be appended.
      */
-    void writeFiller(quint8 filler, int size);
+    void writeFiller(uint8_t filler, int size);
 
     /**
      * Overwrites the contents of this array starting at the given position
@@ -130,23 +121,17 @@ public:
 
     /**
      * \param size                      Number of bytes that were appended to this
-     *                                  array using external mechanisms.
+     *                                  array using external mechanisms. Must not exceed the
+     *                                  amount reserved by startWriting(); a larger value is
+     *                                  clamped to the capacity.
      */
-    void finishWriting(size_t size)
-    {
-        m_size += size;
-        zeroPadding();
-    }
+    void finishWriting(size_t size);
 
     /**
-     * Removes trailing zero bytes from this array.
-     */
-    void removeTrailingZeros(int maxBytesToRemove);
-
-    /**
-     * Attempts to allocate memory for at least the given number of bytes.
+     * Allocates memory for at least the given number of bytes.
      *
      * \param size                      Number of bytes to reserve.
+     * \throws std::bad_alloc, std::length_error
      */
     void reserve(size_t size);
 
@@ -155,14 +140,20 @@ public:
      */
     void resize(size_t size);
 
-    /* Deprecated functions follow. */
-
-    // TODO: #sivanov This function breaks data alignment.
-    void ignore_first_bytes(size_t bytes_to_ignore);
-
 private:
-    bool reallocate(size_t capacity);
-    char* allocateBuffer(size_t capacity);
+    void reallocate(size_t capacity);
+
+    /**
+     * Allocates a buffer of the given capacity plus padding. The padding is left uninitialized -
+     * zeroPadding() fills the part of it which follows the data.
+     *
+     * Takes the alignment and the padding as parameters rather than reading the members, so that
+     * it can be called before the members of the target object are modified.
+     *
+     * \throws std::length_error       If capacity + padding does not fit size_t.
+     * \throws std::bad_alloc          If the allocation fails.
+     */
+    static char* allocateBuffer(size_t capacity, size_t alignment, size_t padding);
 
     /** Fills the padding which follows the array data with zeros. */
     void zeroPadding();
@@ -172,7 +163,6 @@ private:
     size_t m_capacity = 0;
     size_t m_size = 0;
     size_t m_padding = 0;
-    size_t m_ignore = 0;
     char* m_data = nullptr;
 };
 

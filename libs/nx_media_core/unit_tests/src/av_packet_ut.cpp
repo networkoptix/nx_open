@@ -52,7 +52,7 @@ TEST(AvPacket, paddedDataIsUsedInPlace)
     const std::vector<uint8_t> payload(kPayloadSize, kPayloadFiller);
 
     QnWritableCompressedVideoData data(kPayloadSize);
-    data.m_data.uncheckedWrite((const char*) payload.data(), payload.size());
+    data.m_data.write((const char*) payload.data(), payload.size());
     data.timestamp = 42;
     data.flags |= QnAbstractMediaData::MediaFlags_AVKey;
     ASSERT_GE(data.paddingSize(), (size_t) AV_INPUT_BUFFER_PADDING_SIZE);

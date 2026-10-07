@@ -2,12 +2,16 @@
 
 #include "io_context.h"
 
+#include <cerrno>
+#include <exception>
 #include <fstream>
+#include <new>
 
 #include <nx/utils/log/log.h>
 
 extern "C" {
 #include <libavformat/avio.h>
+#include <libavutil/error.h>
 #include <libavutil/opt.h>
 } // extern "C"
 
@@ -16,6 +20,58 @@ namespace nx::media::ffmpeg {
 static int ffmpegRead(void *opaque, uint8_t* buffer, int size);
 static int ffmpegWrite(void *opaque, const uint8_t* buffer, int size);
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence);
+
+namespace {
+
+void logHandlerFailure(const char* name, const char* reason) noexcept
+{
+    // Logging allocates, which is exactly what may have failed, so it must not throw either.
+    try
+    {
+        NX_ERROR(NX_SCOPE_TAG, "The ffmpeg %1 handler has failed: %2", name, reason);
+    }
+    catch (...)
+    {
+    }
+}
+
+/**
+ * Calls a handler on behalf of ffmpeg and turns an exception into an ffmpeg error code.
+ *
+ * The callbacks below are invoked from the C code of libavformat, which an exception cannot
+ * unwind through: the cleanup of the frames in between does not run, leaving the format and the
+ * IO context half written. Worse, avio_flush() in ~IoContext() and av_write_trailer() in the
+ * users of this class are reached from destructors, where an escaping exception calls
+ * std::terminate(). The handlers do throw: nx::utils::ByteArray reports an allocation failure
+ * with std::bad_alloc.
+ */
+template<typename Handler, typename... Args>
+auto invokeHandler(const char* name, const Handler& handler, Args... args)
+{
+    using Result = decltype(handler(args...));
+
+    try
+    {
+        return handler(args...);
+    }
+    catch (const std::bad_alloc&)
+    {
+        logHandlerFailure(name, "out of memory");
+        return (Result) AVERROR(ENOMEM);
+    }
+    catch (const std::exception& e)
+    {
+        logHandlerFailure(name, e.what());
+        return (Result) AVERROR(EIO);
+    }
+    catch (...)
+    {
+        logHandlerFailure(name, "unknown exception");
+        return (Result) AVERROR_UNKNOWN;
+    }
+}
+
+} // namespace
 
 IoContext::IoContext(uint32_t bufferSize, bool writable, bool seekable)
 {
@@ -49,7 +105,7 @@ static int ffmpegRead(void *opaque, uint8_t* buffer, int size)
     IoContext* owner = reinterpret_cast<IoContext*>(opaque);
     if (!owner->readHandler)
         return -1;
-    auto bytesRead = owner->readHandler(buffer, size);
+    auto bytesRead = invokeHandler("read", owner->readHandler, buffer, size);
     return bytesRead == 0 ? AVERROR_EOF : bytesRead;
 }
 
@@ -58,7 +114,7 @@ static int ffmpegWrite(void *opaque, const uint8_t* buffer, int size)
     IoContext* owner = reinterpret_cast<IoContext*>(opaque);
     if (!owner->writeHandler)
         return -1;
-    return owner->writeHandler(buffer, size);
+    return invokeHandler("write", owner->writeHandler, buffer, size);
 }
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
@@ -66,7 +122,7 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
     IoContext* owner = reinterpret_cast<IoContext*>(opaque);
     if (!owner->seekHandler)
         return -1;
-    return owner->seekHandler(pos, whence);
+    return invokeHandler("seek", owner->seekHandler, pos, whence);
 }
 
 IoContextPtr openFile(const std::string& fileName)

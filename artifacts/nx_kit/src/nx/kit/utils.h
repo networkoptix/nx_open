@@ -163,12 +163,6 @@ inline size_t alignUp(size_t value, size_t alignment)
     return value + alignment - remainder;
 }
 
-/** Shifts the pointer up to deliberately misalign it to an odd address - intended for tests. */
-inline uint8_t* misalignedPtr(void* data)
-{
-    return (uint8_t*) (17 + alignUp((uintptr_t) data, 32));
-}
-
 /** Alignment which mallocAligned() guarantees even if a smaller one is requested. */
 constexpr size_t kMinAlignment = 16;
 
@@ -180,13 +174,25 @@ constexpr size_t kMinAlignment = 16;
  *
  * @param alignment If less than kMinAlignment, kMinAlignment is used.
  * @param mallocFunc Function with the signature void*(size_t), which is called to allocate memory.
+ * @return nullptr if the requested size does not fit the address space together with the alignment
+ *     overhead, or if mallocFunc() fails.
  */
 template<class MallocFunc>
 void* mallocAligned(size_t size, size_t alignment, MallocFunc mallocFunc)
 {
     if (alignment < kMinAlignment)
         alignment = kMinAlignment;
-    const auto ptr = (char*) mallocFunc(size + alignment + sizeof(alignment));
+
+    // Reject sizes that overflow the arithmetic below. Without this check an overflowing request
+    // would succeed with a buffer far smaller than asked for, turning a bogus size into a heap
+    // overflow at the first write.
+    if (alignment > SIZE_MAX - sizeof(alignment))
+        return nullptr;
+    const size_t overhead = alignment + sizeof(alignment);
+    if (size > SIZE_MAX - overhead)
+        return nullptr;
+
+    const auto ptr = (char*) mallocFunc(size + overhead);
     if (!ptr) //< allocation error
         return ptr;
 

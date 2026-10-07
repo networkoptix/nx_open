@@ -18,7 +18,7 @@ TEST(AnnexbToMp4, EmptyCodecParameters)
     QnWritableCompressedVideoData frame(sizeof(frameData));
     frame.compressionType = AV_CODEC_ID_H264;
     frame.flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    frame.m_data.uncheckedWrite((char*)frameData, sizeof(frameData));
+    frame.m_data.write((char*) frameData, sizeof(frameData));
     auto codecParameters = QnFfmpegHelper::createVideoCodecParametersAnnexB(&frame);
     ASSERT_TRUE(codecParameters != nullptr);
     frame.context = codecParameters;
@@ -44,7 +44,7 @@ TEST(AnnexbToMp4, NoSpsPpps)
     QnWritableCompressedVideoData frame(sizeof(frameDataSpsPps));
     frame.compressionType = AV_CODEC_ID_H264;
     frame.flags |= QnAbstractMediaData::MediaFlags_AVKey;
-    frame.m_data.uncheckedWrite((char*)frameDataSpsPps, sizeof(frameDataSpsPps));
+    frame.m_data.write((char*) frameDataSpsPps, sizeof(frameDataSpsPps));
     auto codecParameters = QnFfmpegHelper::createVideoCodecParametersAnnexB(&frame);
     ASSERT_TRUE(codecParameters != nullptr);
     frame.context = codecParameters;

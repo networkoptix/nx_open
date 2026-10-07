@@ -64,7 +64,7 @@ QnWritableCompressedVideoDataPtr RtpChunkBuffer::buildFrame(
         new QnWritableCompressedVideoData(m_videoFrameSize + headerSize));
 
     if (header)
-        result->m_data.uncheckedWrite((char*)header, headerSize);
+        result->m_data.write((char*) header, headerSize);
 
     for (size_t i = 0; i < m_chunks.size(); ++i)
     {
@@ -80,16 +80,14 @@ QnWritableCompressedVideoDataPtr RtpChunkBuffer::buildFrame(
                 nalUnitSize += m_chunks[j].size;
             }
             const uint32_t sizeData = htonl(nalUnitSize);
-            result->m_data.uncheckedWrite((const char*) &sizeData, sizeof(uint32_t));
+            result->m_data.write((const char*) &sizeData, sizeof(uint32_t));
         }
 
         const auto chunkBufferStart = m_chunks[i].bufferStart
             ? (const char*) m_chunks[i].bufferStart
             : (const char*) rtpBuffer;
 
-        result->m_data.uncheckedWrite(
-            chunkBufferStart + m_chunks[i].bufferOffset,
-            m_chunks[i].size);
+        result->m_data.write(chunkBufferStart + m_chunks[i].bufferOffset, m_chunks[i].size);
     }
     return result;
 }

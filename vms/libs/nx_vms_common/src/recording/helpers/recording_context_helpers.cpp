@@ -120,7 +120,7 @@ QnAbstractCompressedMetadataPtr deserializeMetaDataPacket(const QByteArray& data
             auto result = std::make_shared<QnCompressedMetadata>(
                 MetadataType::ObjectDetection, payload.size());
 
-            result->m_data.write(payload);
+            result->m_data.write(payload.constData(), payload.size());
             return result;
         }
         break;
