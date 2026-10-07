@@ -343,6 +343,17 @@ AdaptiveScreen
         }
     }
 
+    // Workaround for a LayoutItemProxy bug. When the last proxy leaves an item, Qt schedules the
+    // item's proxy bookkeeping (QQuickLayoutItemProxyAttachedData) for deletion (via deleteLater);
+    // if a proxy returns to the item before that deletion runs (opening a camera and tapping Back
+    // immediately), the deletion then resets the returned proxies' targets to null and the grid
+    // disappears. This hidden proxy never takes control, but keeps the grid's bookkeeping alive.
+    LayoutItemProxy
+    {
+        visible: false
+        target: camerasGrid
+    }
+
     Loader
     {
         id: videoScreenLoader
