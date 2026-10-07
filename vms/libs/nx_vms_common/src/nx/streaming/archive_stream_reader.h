@@ -290,7 +290,7 @@ private:
     mutable std::optional<AudioLayoutConstPtr> m_audioLayout;
 
     qint64 determineDisplayTime(bool reverseMode);
-    void internalJumpTo(qint64 usec);
+    void internalJumpTo(qint64 usec, bool exactJumpToSpecifiedFrame = false);
     bool getNextVideoPacket();
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 usec, int channel, qint64 skipTime);
