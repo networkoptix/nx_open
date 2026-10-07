@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/time/calendar_utils.h>
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+#include <utils/common/synctime.h>
 
 using namespace std::chrono;
 
@@ -253,7 +254,7 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
         case TimeRangeRole:
             return QVariant::fromValue(QnTimePeriod::fromInterval(day.startTime, day.endTime));
         case IsFutureDateRole:
-            return day.date > QDateTime::currentDateTimeUtc().toTimeZone(d->timeZone).date();
+            return day.date > qnSyncTime->currentDateTime().toTimeZone(d->timeZone).date();
     }
 
     return QVariant();

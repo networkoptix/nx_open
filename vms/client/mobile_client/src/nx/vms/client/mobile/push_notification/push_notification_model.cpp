@@ -62,6 +62,8 @@ QVariant PushNotificationModel::data(const QModelIndex& index, int role) const
         {
             using namespace text;
 
+            // Device time is used intentionally: push notification time is stamped with the device
+            // clock on receipt by the platform push handler.
             const auto elapsed =
                 std::chrono::milliseconds(QDateTime::currentMSecsSinceEpoch()) - item.time;
 

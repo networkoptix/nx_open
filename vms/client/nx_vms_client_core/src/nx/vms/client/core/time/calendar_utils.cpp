@@ -2,6 +2,8 @@
 
 #include "calendar_utils.h"
 
+#include <utils/common/synctime.h>
+
 using namespace std::chrono;
 
 namespace nx::vms::client::core::calendar_utils {
@@ -41,9 +43,8 @@ NX_VMS_CLIENT_CORE_API QBitArray buildArchivePresence(
             break;
 
         const auto chunkStartTime = it->startTimeMs;
-        const auto chunkEndTime = it->isInfinite()
-            ? QDateTime::currentMSecsSinceEpoch()
-            : it->endTimeMs();
+        const auto chunkEndTime =
+            it->isInfinite() ? qnSyncTime->currentMSecsSinceEpoch() : it->endTimeMs();
 
         milliseconds endTime = nextTimestamp(startTime);
         while (i < count && endTime.count() <= chunkStartTime)

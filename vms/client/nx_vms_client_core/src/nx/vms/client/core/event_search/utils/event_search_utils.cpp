@@ -99,7 +99,7 @@ QString EventSearchUtils::timeFromNowText(
     if (qnSyncTime->currentDateTime().date() == dateTime.date())
     {
         const milliseconds msecsAgo{
-            QDateTime::currentMSecsSinceEpoch() - dateTime.toMSecsSinceEpoch()};
+            qnSyncTime->currentMSecsSinceEpoch() - dateTime.toMSecsSinceEpoch()};
         return time::fromNow(duration_cast<seconds>(msecsAgo)).toUpper();
     }
 

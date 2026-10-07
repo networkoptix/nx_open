@@ -48,7 +48,7 @@ Pane
         id: d
 
         readonly property alias ui: loader.item
-        property var monthData: createMonthDataFromPosition(new Date().getTime())
+        property var monthData: createMonthDataFromPosition(NxGlobals.syncNowMs())
 
         function previousMonthClicked()
         {

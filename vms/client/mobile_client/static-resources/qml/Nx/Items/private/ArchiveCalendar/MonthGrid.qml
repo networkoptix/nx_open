@@ -10,7 +10,7 @@ Item
 {
     id: control
 
-    property real position: new Date()
+    property real position: NxGlobals.syncNowMs()
     property alias timeZone: calendarModel.timeZone
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
