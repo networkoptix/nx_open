@@ -1733,9 +1733,9 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n περισσότερα</numerusform>
+        <numerusform>%n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -1989,11 +1989,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Επιλογή Αντικειμένων</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Όλα Τα Αντικείμενα</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2374,9 +2374,9 @@ Press Alt + Click to follow object</source>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...και %n περισσότερα</numerusform>
+        <numerusform>...και %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>
@@ -2830,9 +2830,9 @@ Press Alt + Click to follow object</source>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... και %n περισσότερα</numerusform>
+        <numerusform>... και %n περισσότερα</numerusform>
       </translation>
     </message>
   </context>

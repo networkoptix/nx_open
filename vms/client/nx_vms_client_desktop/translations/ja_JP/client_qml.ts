@@ -1726,8 +1726,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>ほか %n</numerusform>
       </translation>
     </message>
   </context>
@@ -1980,11 +1980,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>オブジェクトを選択</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>すべてのオブジェクト</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2367,8 +2367,8 @@ Alt + クリックを使用してください。</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...ほか %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -2821,8 +2821,8 @@ Alt + クリックを使用してください。</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ほか %n 件</numerusform>
       </translation>
     </message>
   </context>

@@ -1733,9 +1733,9 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n máis</numerusform>
+        <numerusform>%n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -1989,11 +1989,11 @@ Seleccione unha integración para comezar a configurar os seus parámetros.</tra
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>Seleccionar obxectos</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>Todos os obxectos</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2376,9 +2376,9 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...e %n máis</numerusform>
+        <numerusform>...e %n máis</numerusform>
       </translation>
     </message>
   </context>
@@ -2832,9 +2832,9 @@ prema Alt + Clic para seguir o obxecto</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... e %n máis</numerusform>
+        <numerusform>... e %n máis</numerusform>
       </translation>
     </message>
   </context>

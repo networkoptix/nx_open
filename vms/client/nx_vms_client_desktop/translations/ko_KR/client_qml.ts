@@ -1724,8 +1724,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n 더 보기</numerusform>
       </translation>
     </message>
   </context>
@@ -1978,11 +1978,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>오브젝트 선택</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>모든 객체</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2358,8 +2358,8 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... 이 외 %n 건 더 있음</numerusform>
       </translation>
     </message>
   </context>
@@ -2812,8 +2812,8 @@ Alt 키를 누른 채 클릭하여 객체를 따라가세요.</translation>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... 그리고 %n 더</numerusform>
       </translation>
     </message>
   </context>

@@ -220,7 +220,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
+      <translation>回到頂部</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -1724,8 +1724,8 @@ Select an Integration to begin configuring its parameters.</source>
     <message numerus="yes">
       <source>%n more</source>
       <comment>%n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>還有%n 個</numerusform>
       </translation>
     </message>
   </context>
@@ -1978,11 +1978,11 @@ Select an Integration to begin configuring its parameters.</source>
     <name>PixelationObjectSelectionDialog</name>
     <message>
       <source>Select Objects</source>
-      <translation type="unfinished">Select Objects</translation>
+      <translation>選擇物件</translation>
     </message>
     <message>
       <source>All Objects</source>
-      <translation type="unfinished">All Objects</translation>
+      <translation>所有物件</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2360,8 +2360,8 @@ Press Alt + Click to follow object</source>
     <name>ResourceList</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...與另外 %n 個</numerusform>
       </translation>
     </message>
   </context>
@@ -2814,8 +2814,8 @@ Press Alt + Click to follow object</source>
     <name>TreeView</name>
     <message numerus="yes">
       <source>... and %n more</source>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... 與另外 %n 個</numerusform>
       </translation>
     </message>
   </context>
