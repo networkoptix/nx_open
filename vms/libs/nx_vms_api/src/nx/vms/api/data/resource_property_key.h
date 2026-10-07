@@ -269,6 +269,9 @@ inline const QString kPrimaryStreamConfiguration = "primaryStreamConfiguration";
 /// Only used internally via `Camera` and internally
 inline const QString kPtzTargetId = "ptzTargetId";
 
+/// Used internally by QnTourPtzController (Server and Desktop fisheye)
+inline const QString kPtzTours = "ptzTours";
+
 /// Used via `QnVirtualCameraResource`
 inline const QString kRemoteArchiveMotionDetectionKey = "remoteArchiveMotionDetection";
 

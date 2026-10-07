@@ -2,8 +2,10 @@
 
 #pragma once
 
+#include <QtCore/QScopedPointer>
+
 #include <core/ptz/proxy_ptz_controller.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/utils/lockable.h>
 
 class QThreadPool;
 
@@ -18,31 +20,24 @@ class NX_VMS_COMMON_API QnTourPtzController: public QnProxyPtzController
     using base_type = QnProxyPtzController;
 
 public:
-    QnTourPtzController(
-        const QnPtzControllerPtr &baseController,
+    QnTourPtzController(const QnPtzControllerPtr& baseController,
         QThreadPool* threadPool,
         QThread* executorThread);
-    virtual ~QnTourPtzController();
+    virtual ~QnTourPtzController() override;
 
     static bool extends(Ptz::Capabilities capabilities);
 
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
-    virtual bool continuousMove(
-        const Vector& speed,
-        const Options& options) override;
+    virtual bool continuousMove(const Vector& speed, const Options& options) override;
 
-    virtual bool absoluteMove(
-        CoordinateSpace space,
+    virtual bool absoluteMove(CoordinateSpace space,
         const Vector& position,
         qreal speed,
         const Options& options) override;
 
     virtual bool viewportMove(
-        qreal aspectRatio,
-        const QRectF& viewport,
-        qreal speed,
-        const Options& options) override;
+        qreal aspectRatio, const QRectF& viewport, qreal speed, const Options& options) override;
 
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
 
@@ -52,14 +47,12 @@ public:
     virtual std::optional<QnPtzTour> getActiveTour() override;
     virtual bool getTours(QnPtzTourList* tours) const override;
 
-    static const QString kTourPropertyName;
+private:
+    void stopActiveTour();
 
 private:
-    void clearActiveTour();
-
-private:
-    nx::Mutex m_mutex;
-    QnResourcePropertyAdaptor<QnPtzTourHash>* m_adaptor;
-    QnPtzTour m_activeTour;
-    QnTourPtzExecutor* m_executor;
+    QnResourcePropertyAdaptor<QnPtzTourHash>* m_adaptor = nullptr;
+    // Also serializes the adaptor's read-modify-write operations with active-tour changes.
+    nx::Lockable<QnPtzTour> m_activeTour;
+    QScopedPointer<QnTourPtzExecutor, QScopedPointerDeleteLater> m_executor;
 };
