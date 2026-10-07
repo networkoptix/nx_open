@@ -806,8 +806,8 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
         else if (m_singleShotMode)
             endTime = time;
         m_rtspSession->sendPlay(time, endTime, m_rtspSession->getScale());
-        m_rtspSession->removeAdditionAttribute(kNoFindIframeParamName);
     }
+    m_rtspSession->removeAdditionAttribute(kNoFindIframeParamName); //< Only for this seek.
     m_sendedCSec = m_rtspSession->lastSendedCSeq();
     return time;
 }
