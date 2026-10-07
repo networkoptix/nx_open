@@ -521,6 +521,7 @@ begin_label:
     qint64 tmpSkipFramesToTime = m_tmpSkipFramesToTime;
     m_tmpSkipFramesToTime = 0;
     bool exactJumpToSpecifiedFrame = m_exactJumpToSpecifiedFrame;
+    m_exactJumpToSpecifiedFrame = false; //< Applies only to the jump command taken here.
     qint64 currentTimeHint = m_currentTimeHint;
     m_currentTimeHint = AV_NOPTS_VALUE;
 
@@ -554,7 +555,7 @@ begin_label:
                 NX_VERBOSE(this, "Jump to %1 to change quality",
                     nx::utils::timestampToDebugString(displayTime));
                 beforeJumpInternal(displayTime);
-                if (!exactJumpToSpecifiedFrame && channelCount > 1)
+                if (channelCount > 1)
                     setNeedKeyData();
                 m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
@@ -572,10 +573,9 @@ begin_label:
     {
         m_outOfPlaybackMask = false;
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);
-        m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
-        internalJumpTo(jumpTime);
+        internalJumpTo(jumpTime, exactJumpToSpecifiedFrame);
         emitJumpOccurred(jumpTime, usePreciseSeek, m_delegate->getSequence());
         m_BOF = true;
     }
@@ -612,7 +612,7 @@ begin_label:
 
         if (!delegateForNegativeSpeed)
         {
-            if (!exactJumpToSpecifiedFrame && channelCount > 1)
+            if (channelCount > 1)
                 setNeedKeyData();
             internalJumpTo(displayTime);
             if (reverseMode) {
@@ -623,6 +623,7 @@ begin_label:
                 setSkipFramesToTime(displayTime, false);
         }
         else {
+            m_ignoreSkippingFrame = false; //< Not an exact seek: decode the skipped frames.
             if (!reverseMode && displayTime != DATETIME_NOW && displayTime != qint64(AV_NOPTS_VALUE))
                 setSkipFramesToTime(displayTime, false);
         }
@@ -843,6 +844,9 @@ begin_label:
     if (m_currentData->isLive())
         setSkipFramesToTime(0, true);
 
+    // Taken before the skip below ends, so the last skipped frame is dropped too.
+    const bool dropSkippedFrame = videoData && m_ignoreSkippingFrame && m_skipFramesToTime != 0;
+
     if (videoData) // in case of video packet
     {
         if (m_skipFramesToTime)
@@ -853,6 +857,7 @@ begin_label:
                 {
                     // Some error or end of file. Stop reading frames.
                     setSkipFramesToTime(0, true);
+                    m_ignoreSkippingFrame = false;
                     QnAbstractMediaDataPtr tmp;
                     tmp.swap( m_nextData );
                     if (tmp && tmp->dataType == QnAbstractMediaData::EMPTY_DATA)
@@ -889,7 +894,10 @@ begin_label:
         m_skipFramesToTime = 0;
     }
 
-    if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
+    if (m_skipFramesToTime == 0)
+        m_ignoreSkippingFrame = false; //< Applies only to the skip started with the exact seek.
+
+    if (dropSkippedFrame && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore))
         goto begin_label;
 
     if (reverseMode && !delegateForNegativeSpeed)
@@ -937,8 +945,7 @@ begin_label:
 
         if (newTime != m_currentData->timestamp)
         {
-            if (!exactJumpToSpecifiedFrame && channelCount > 1)
-                setNeedKeyData();
+            setNeedKeyData(); //< Consumers do not wait for a key frame after this jump.
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
             m_BOF = true;
@@ -1025,14 +1032,14 @@ void QnArchiveStreamReader::updateMetadataReaders(int channel, StreamDataFilters
         m_motionConnection[channel]->removeById(kMotionReaderId);
 }
 
-void QnArchiveStreamReader::internalJumpTo(qint64 usec)
+void QnArchiveStreamReader::internalJumpTo(qint64 usec, bool exactJumpToSpecifiedFrame)
 {
     m_skippedMetadata.clear();
     m_nextData.reset();
     m_afterMotionData.reset();
     qint64 seekRez = 0;
     if (usec > 0 || resource()->hasFlags(Qn::live_cam)) {
-        seekRez = m_delegate->seek(usec, !m_exactJumpToSpecifiedFrame);
+        seekRez = m_delegate->seek(usec, !exactJumpToSpecifiedFrame);
     }
     else {
         // some local files can't correctly jump to 0
@@ -1041,7 +1048,8 @@ void QnArchiveStreamReader::internalJumpTo(qint64 usec)
         m_delegate->open(resource(), m_archiveIntegrityWatcher);
     }
 
-    m_exactJumpToSpecifiedFrame = false;
+    // Drop skipped frames only after an exact seek; a key frame seek needs them for decoding.
+    m_ignoreSkippingFrame = exactJumpToSpecifiedFrame;
     m_wakeup = true;
     m_bottomIFrameTime = -1;
     m_lastGopSeekTime = -1;
@@ -1292,6 +1300,7 @@ bool QnArchiveStreamReader::jumpToEx(
     if (needJump)
     {
         beforeJumpInternal(newTime);
+        m_exactJumpToSpecifiedFrame = false; //< Replaces a pending direct jump.
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
