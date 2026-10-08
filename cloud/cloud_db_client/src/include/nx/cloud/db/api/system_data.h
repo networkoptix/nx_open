@@ -1010,4 +1010,21 @@ struct SystemCredentials
     std::string authKey;
 };
 
+//-------------------------------------------------------------------------------------------------
+// Customization migration.
+
+struct CustomizationMigrationRequest
+{
+    /**%apidoc Customization of the System copy to be created. */
+    std::string targetCustomization;
+};
+
+enum class CustomizationMigrationAction
+{
+    /**%apidoc Complete the migration: the source System is removed. */
+    commit,
+    /**%apidoc Cancel the migration: the target System is removed. */
+    rollback,
+};
+
 } // namespace nx::cloud::db::api
