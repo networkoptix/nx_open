@@ -14,7 +14,7 @@ int64_t timePointToInt64Ms(system_clock::time_point tp)
 MediaChunk::MediaChunk(int64_t startTimeMs, int64_t durationMs, const char* bucketUrl):
     m_startTimeMs(startTimeMs),
     m_durationMs(durationMs),
-    m_bucketUrl(bucketUrl)
+    m_bucketUrl(bucketUrl ? bucketUrl : "")
 {}
 
 int64_t MediaChunk::startTimeMs() const
@@ -29,19 +29,18 @@ int64_t MediaChunk::durationMs() const
 
 const char* MediaChunk::locationUrl() const
 {
-    return m_bucketUrl;
+    return m_bucketUrl.c_str();
 }
 
 std::string MediaChunk::toString() const
 {
-    return "(" + std::to_string(m_startTimeMs) +
-        ", " + std::to_string(m_durationMs) +
-        ", " + std::string(m_bucketUrl) + ")";
+    return "(" + std::to_string(m_startTimeMs) + ", " + std::to_string(m_durationMs) + ", "
+        + m_bucketUrl + ")";
 }
 
 bool MediaChunk::operator<(const MediaChunk& other) const
 {
-    int urlComparisonRes = strcmp(m_bucketUrl, other.m_bucketUrl);
+    int urlComparisonRes = m_bucketUrl.compare(other.m_bucketUrl);
     if (urlComparisonRes != 0)
         return urlComparisonRes < 0;
 

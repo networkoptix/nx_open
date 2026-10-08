@@ -38,7 +38,7 @@ public:
 private:
     int64_t m_startTimeMs = -1;
     int64_t m_durationMs = -1;
-    const char* m_bucketUrl = nullptr;
+    std::string m_bucketUrl;
 };
 
 std::string toString(const std::vector<MediaChunk>& chunks);
