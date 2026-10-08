@@ -10,11 +10,12 @@
 namespace nx::vms::api {
 
 NX_REFLECTION_ENUM_CLASS(PtzApiType,
+    /**%apidoc[unused] */
     none,
+
     operational, //< Standard runtime PTZ control.
     configurational, //< Alternative PTZ control mode (may have different coordinate ranges).
-    any
-);
+    any);
 
 NX_REFLECTION_ENUM_CLASS(PtzPositionType,
 
@@ -48,7 +49,9 @@ struct NX_VMS_API PtzPositionFilter
     /**%apidoc[opt] Type of the position to be returned. */
     PtzPositionType type = PtzPositionType::absolute;
 
-    /**%apidoc[opt] API type to use. */
+    /**%apidoc[opt] API type to use. Defaults to "operational" when omitted.
+     * %example operational
+     */
     PtzApiType api = PtzApiType::operational;
 
     const PtzPositionFilter& getId() const { return *this; }
@@ -211,7 +214,9 @@ struct NX_VMS_API PtzViewportMove
      */
     float speed = 1.f;
 
-    /**%apidoc[opt] API type to use. */
+    /**%apidoc[opt] API type to use. Defaults to "operational" when omitted.
+     * %example operational
+     */
     PtzApiType api = PtzApiType::operational;
 };
 #define PtzViewportMove_Fields (deviceId)(viewportLeft)(viewportTop)(viewportRight)\
@@ -329,7 +334,9 @@ struct NX_VMS_API PtzAuxiliaryCommand
     /**%apidoc[opt] Command data (trait-specific). */
     QString data;
 
-    /**%apidoc[opt] API type to use. */
+    /**%apidoc[opt] API type to use. Defaults to "operational" when omitted.
+     * %example operational
+     */
     PtzApiType api = PtzApiType::operational;
 };
 #define PtzAuxiliaryCommand_Fields (deviceId)(trait)(data)(api)
