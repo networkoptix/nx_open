@@ -6,6 +6,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <network/cloud_system_data.h>
+#include <nx/cloud/db/api/system_data.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/common/system_context.h>
@@ -80,6 +81,11 @@ bool isNewSystem(const QnCloudSystem& info)
 bool isCloudSystem(const nx::vms::api::ModuleInformation& info)
 {
     return !info.cloudSystemId.isEmpty();
+}
+
+bool isPendingCloudSystem(nx::cloud::db::api::SystemStatus status)
+{
+    return status == nx::cloud::db::api::SystemStatus::deploymentReady;
 }
 
 QString getSystemName(const nx::vms::api::ModuleInformation& info)

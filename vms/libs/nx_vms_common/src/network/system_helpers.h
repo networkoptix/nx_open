@@ -7,6 +7,7 @@
 
 struct QnCloudSystem;
 
+namespace nx::cloud::db::api { enum class SystemStatus; }
 namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::vms::common { class SystemSettings; }
 
@@ -31,6 +32,12 @@ NX_VMS_COMMON_API bool isNewSystem(const nx::vms::api::ModuleInformation& info);
 NX_VMS_COMMON_API bool isNewSystem(const QnCloudSystem& info);
 
 NX_VMS_COMMON_API bool isCloudSystem(const nx::vms::api::ModuleInformation& info);
+
+/**
+ * Whether a cloud Site should be presented as pending: it has been created by the Deployment
+ * Service (e.g. for the QR code deployment) and its Server has not contacted the Cloud yet.
+ */
+NX_VMS_COMMON_API bool isPendingCloudSystem(nx::cloud::db::api::SystemStatus status);
 
 NX_VMS_COMMON_API QString getSystemName(const nx::vms::api::ModuleInformation& info);
 

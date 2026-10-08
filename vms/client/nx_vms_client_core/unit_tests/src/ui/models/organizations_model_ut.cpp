@@ -16,6 +16,18 @@ namespace test {
 
 namespace {
 
+using SystemStatus = nx::cloud::db::api::SystemStatus;
+
+SystemInOrganization makeSystem(const std::string& name, SystemStatus status)
+{
+    return {
+        .systemId = nx::Uuid::createUuid(),
+        .name = name,
+        .state = "active",
+        .system_state = status,
+    };
+}
+
 // Helper function to recursively dump the tree structure of a model into a QStringList.
 // Each line in the list represents a node in the tree, with indentation based on the level of
 // the node in the hierarchy. Section information is appended after ": " and newlines are replaced
@@ -51,6 +63,31 @@ class TestOrganizationsModel: public testing::Test
 {
 public:
     void buildTree();
+
+    // A single organization with no folders, and an empty systems model.
+    void givenOrganization();
+
+    void givenSystemInSystemsModel(const SystemInOrganization& system, bool isPending)
+    {
+        ASSERT_TRUE(controller->discoverSystem(QnCloudSystemDescription::create({
+            .cloudId = system.systemId.toSimpleString(),
+            .localId = nx::Uuid::createUuid(),
+            .name = QString::fromStdString(system.name),
+            .online = false,
+            .isPending = isPending,
+        })));
+    }
+
+    void thenOrgSystemIsShown(const SystemInOrganization& system, bool isShown)
+    {
+        EXPECT_EQ(isShown, model.indexFromNodeId(system.systemId).isValid()) << system.name;
+    }
+
+    void thenOrgSystemCount(int count)
+    {
+        EXPECT_EQ(count,
+            model.indexFromNodeId(org1Id).data(OrganizationsModel::SystemCountRole).toInt());
+    }
 
 public:
     std::unique_ptr<TestSystemsController> controller;
@@ -152,6 +189,7 @@ void TestOrganizationsModel::buildTree()
         .name = "System1",
         .state = "active",
         .groupId = group1.children[0].id,
+        .system_state = SystemStatus::activated,
     };
 
     SystemInOrganization system2 = {
@@ -159,6 +197,7 @@ void TestOrganizationsModel::buildTree()
         .name = "System2",
         .state = "active",
         .groupId = group1Id,
+        .system_state = SystemStatus::activated,
     };
 
     model.setChannelPartners(partnerList);
@@ -169,6 +208,28 @@ void TestOrganizationsModel::buildTree()
 
     model.setOrganizations(orgs2, partnerList.results[2].id);
     model.setOrgStructure(orgs2.results[0].id, {group3});
+
+    controller.reset(new TestSystemsController());
+    systemsModel.reset(new QnSystemsModel(controller.get()));
+    model.setSystemsModel(systemsModel.get());
+}
+
+void TestOrganizationsModel::givenOrganization()
+{
+    const ChannelPartner partner = {
+        .id = cp1Id,
+        .name = "ChannelPartner1",
+        .partnerCount = 1,
+    };
+
+    const Organization org = {
+        .id = org1Id,
+        .name = "Org1",
+        .channelPartner = cp1Id,
+    };
+
+    model.setChannelPartners({.count = 1, .results = {partner}});
+    model.setOrganizations({.count = 1, .results = {org}}, cp1Id);
 
     controller.reset(new TestSystemsController());
     systemsModel.reset(new QnSystemsModel(controller.get()));
@@ -370,6 +431,7 @@ TEST_F(TestOrganizationsModel, searchGrouping)
         .systemId = nx::Uuid::createUuid(),
         .name = "Site A",
         .state = "active",
+        .system_state = SystemStatus::activated,
     };
 
     SystemInOrganization system2 = {
@@ -377,6 +439,7 @@ TEST_F(TestOrganizationsModel, searchGrouping)
         .name = "Site A",
         .state = "active",
         .groupId = group3Id,
+        .system_state = SystemStatus::activated,
     };
 
     model.setChannelPartners(partnerList);
@@ -398,7 +461,8 @@ TEST_F(TestOrganizationsModel, searchGrouping)
         .systemId = nx::Uuid::createUuid(),
         .name = "Site A",
         .state = "active",
-        .groupId = group4Id
+        .groupId = group4Id,
+        .system_state = SystemStatus::activated,
     };
 
     model.setOrganizations(orgs2, partnerList.results[1].id);
@@ -520,6 +584,102 @@ TEST_F(TestOrganizationsModel, sitesSearch)
             "SubGroup3_2: ChannelPartner22 / Org3 / Group3",
         }),
         dumpTree(filterModel));
+}
+
+TEST_F(TestOrganizationsModel, activatedSystemIsShown)
+{
+    givenOrganization();
+    const auto system = makeSystem("Activated", SystemStatus::activated);
+
+    model.setOrgSystems(org1Id, {system});
+
+    thenOrgSystemIsShown(system, true);
+}
+
+TEST_F(TestOrganizationsModel, pendingSystemIsShown)
+{
+    givenOrganization();
+    const auto system = makeSystem("Pending", SystemStatus::deploymentReady);
+    givenSystemInSystemsModel(system, /*isPending*/ true);
+
+    model.setOrgSystems(org1Id, {system});
+
+    thenOrgSystemIsShown(system, true);
+}
+
+// The tile of an organization Site takes most of its data from the systems model, so a Site which
+// is missing there can't be displayed properly (see MOBILE-2662).
+TEST_F(TestOrganizationsModel, pendingSystemMissingFromSystemsModelIsHidden)
+{
+    givenOrganization();
+    const auto system = makeSystem("Pending", SystemStatus::deploymentReady);
+
+    model.setOrgSystems(org1Id, {system});
+
+    thenOrgSystemIsShown(system, false);
+}
+
+TEST_F(TestOrganizationsModel, pendingSystemNotPendingInSystemsModelIsHidden)
+{
+    givenOrganization();
+    const auto system = makeSystem("Pending", SystemStatus::deploymentReady);
+    givenSystemInSystemsModel(system, /*isPending*/ false);
+
+    model.setOrgSystems(org1Id, {system});
+
+    thenOrgSystemIsShown(system, false);
+}
+
+TEST_F(TestOrganizationsModel, systemsInOtherStatesAreHidden)
+{
+    givenOrganization();
+    const std::vector<SystemInOrganization> systems = {
+        makeSystem("Invalid", SystemStatus::invalid),
+        makeSystem("NotActivated", SystemStatus::notActivated),
+        makeSystem("Deleted", SystemStatus::deleted_),
+        makeSystem("BeingMerged", SystemStatus::beingMerged),
+        makeSystem("DeletedByMerge", SystemStatus::deletedByMerge),
+    };
+
+    // Even a pending row in the systems model must not make such a Site visible.
+    for (const auto& system: systems)
+        givenSystemInSystemsModel(system, /*isPending*/ true);
+
+    model.setOrgSystems(org1Id, systems);
+
+    for (const auto& system: systems)
+        thenOrgSystemIsShown(system, false);
+}
+
+TEST_F(TestOrganizationsModel, systemCountIncludesOnlyShownSystems)
+{
+    givenOrganization();
+    const auto activated = makeSystem("Activated", SystemStatus::activated);
+    const auto pending = makeSystem("Pending", SystemStatus::deploymentReady);
+    const auto unknownPending = makeSystem("UnknownPending", SystemStatus::deploymentReady);
+    const auto notActivated = makeSystem("NotActivated", SystemStatus::notActivated);
+    givenSystemInSystemsModel(pending, /*isPending*/ true);
+
+    model.setOrgSystems(org1Id, {activated, pending, unknownPending, notActivated});
+
+    thenOrgSystemCount(2);
+}
+
+// Organizations and the systems model are updated independently, so a pending Site may come with
+// the organization before the systems model knows it. It must appear with the next update.
+TEST_F(TestOrganizationsModel, pendingSystemIsShownOnUpdateAfterDiscovery)
+{
+    givenOrganization();
+    const auto system = makeSystem("Pending", SystemStatus::deploymentReady);
+
+    model.setOrgSystems(org1Id, {system});
+    thenOrgSystemIsShown(system, false);
+    thenOrgSystemCount(0);
+
+    givenSystemInSystemsModel(system, /*isPending*/ true);
+    model.setOrgSystems(org1Id, {system});
+    thenOrgSystemIsShown(system, true);
+    thenOrgSystemCount(1);
 }
 
 } // namespace test

@@ -546,6 +546,12 @@ void QnSystemsModelPrivate::addSystem(const SystemDescriptionPtr& systemDescript
                 emitDataChanged(systemDescription, QnSystemsModel::Is2FaEnabledForSystem);
             });
 
+    data->connections << connect(systemDescription.get(),
+        &SystemDescription::pendingChanged,
+        this,
+        [this, systemDescription]()
+        { emitDataChanged(systemDescription, QnSystemsModel::IsPending); });
+
     data->connections
         << connect(systemDescription.get(), &SystemDescription::oauthSupportedChanged, this,
            [this, systemDescription]()

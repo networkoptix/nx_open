@@ -133,6 +133,7 @@ signals:
     void versionChanged();
     void saasStateChanged();
     void organizationChanged();
+    void pendingChanged();
 };
 
 } // namespace nx::vms::client::core

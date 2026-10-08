@@ -5,6 +5,7 @@
 #include <QtCore/QCollator>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/qt_helpers.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/utils/string.h>
 #include <ui/models/systems_model.h>
@@ -60,26 +61,26 @@ void SystemsVisibilitySortFilterModel::setSourceModel(QAbstractItemModel* source
     setFilterCaseSensitivity(Qt::CaseInsensitive);
     setFilterRole(QnSystemsModel::SearchRoleId);
 
-    d->sourceModelConnections <<
-        QObject::connect(sourceModel, &QAbstractItemModel::dataChanged,
-            [this](
-                const QModelIndex& /*topLeft*/,
-                const QModelIndex& /*bottomRight*/,
-                const QVector<int>& roles)
-            {
-                static const QSet<int> kSortRoles = {
-                    QnSystemsModel::IsFactorySystemRoleId,
-                    QnSystemsModel::VisibilityScopeRoleId,
-                    QnSystemsModel::IsCloudSystemRoleId,
-                    QnSystemsModel::IsOnlineRoleId,
-                    QnSystemsModel::SearchRoleId,
-                    QnSystemsModel::SystemNameRoleId,
-                    QnSystemsModel::IsCompatibleToDesktopClient
-                };
+    d->sourceModelConnections << QObject::connect(sourceModel,
+        &QAbstractItemModel::dataChanged,
+        [this](const QModelIndex& /*topLeft*/,
+            const QModelIndex& /*bottomRight*/,
+            const QVector<int>& roles)
+        {
+            static const QSet<int> kSortRoles = {
+                QnSystemsModel::IsFactorySystemRoleId,
+                QnSystemsModel::VisibilityScopeRoleId,
+                QnSystemsModel::IsCloudSystemRoleId,
+                QnSystemsModel::IsOnlineRoleId,
+                QnSystemsModel::SearchRoleId,
+                QnSystemsModel::SystemNameRoleId,
+                QnSystemsModel::IsCompatibleToDesktopClient,
+                QnSystemsModel::IsPending,
+            };
 
-                if (kSortRoles.contains(QSet<int>(roles.begin(), roles.begin())))
-                    sort(0);
-            });
+            if (kSortRoles.intersects(nx::utils::toQSet(roles)))
+                sort(0);
+        });
     sort(0);
 
     d->sourceModelConnections << connect(sourceModel, &QnSystemsModel::rowsRemoved,

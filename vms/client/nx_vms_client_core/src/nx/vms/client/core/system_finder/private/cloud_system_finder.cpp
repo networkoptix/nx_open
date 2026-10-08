@@ -271,18 +271,18 @@ struct CloudSystemFinder::Private
                 systemDescription, system.online);
             systemDescription->setOnline(system.online);
 
-            NX_VERBOSE(this, "Update last known system version for the system %1 to [%2]",
-                systemDescription, system.version);
+            NX_VERBOSE(this,
+                "Update the system %1: version [%2], 2fa [%3], organization [%4], pending [%5]",
+                systemDescription,
+                system.version,
+                system.system2faEnabled,
+                system.organizationId,
+                system.isPending);
             const auto version = nx::utils::SoftwareVersion(system.version);
             systemDescription->updateLastKnownVersion(version);
-
-            NX_VERBOSE(this, "Set 2fa state for the system %1 to [%2]",
-                systemDescription, system.system2faEnabled);
             systemDescription->set2faEnabled(system.system2faEnabled);
-
-            NX_VERBOSE(this, "Set organization Id for the system %1 to [%2]",
-                systemDescription, system.organizationId);
             systemDescription->setOrganization(system.organizationId);
+            systemDescription->setPending(system.isPending);
         }
     }
 
@@ -310,7 +310,7 @@ struct CloudSystemFinder::Private
                 systemDescription->addServer(initialServer);
                 systemDescription->setServerHost(initialServer.id, systemUrl(system.cloudId));
             }
-            systemDescription->setPending(system.isPending);
+
             updatedSystems.insert(system.cloudId, systemDescription);
         }
 

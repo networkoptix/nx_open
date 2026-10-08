@@ -141,6 +141,11 @@ public:
     void setChannelPartners(const ChannelPartnerList& data);
     void setOrganizations(const OrganizationList& data, nx::Uuid parentId);
     void setOrgStructure(nx::Uuid orgId, const std::vector<GroupStructure>& data);
+
+    /**
+     * Sites which are neither activated nor pending in the systems model are skipped, so the
+     * systems model must be set and up to date before this call.
+     */
     void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data);
 
 signals:

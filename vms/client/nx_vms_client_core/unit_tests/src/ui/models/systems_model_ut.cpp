@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <QtTest/QSignalSpy>
+
 #include <nx/vms/client/core/system_finder/private/cloud_system_description.h>
 #include <nx/vms/client/core/system_finder/private/local_system_description.h>
 #include <ui/models/systems_model.h>
@@ -61,10 +63,18 @@ protected:
             localId.toSimpleString(), localId, /*cloudSystemId*/ QString(), "Local Site")));
     }
 
-    void givenCloudSystem(const QString& cloudId, const nx::Uuid& localId)
+    QnCloudSystemDescriptionPtr givenCloudSystem(
+        const QString& cloudId, const nx::Uuid& localId, bool isPending = false)
     {
-        ASSERT_TRUE(controller->discoverSystem(QnCloudSystemDescription::create(
-            {.cloudId = cloudId, .localId = localId, .name = "Cloud Site", .online = false})));
+        const auto system = QnCloudSystemDescription::create({
+            .cloudId = cloudId,
+            .localId = localId,
+            .name = "Cloud Site",
+            .online = false,
+            .isPending = isPending,
+        });
+        EXPECT_TRUE(controller->discoverSystem(system));
+        return system;
     }
 
     void thenSystemInRow(int row, const QString& systemId, bool isCloudSystem)
@@ -72,6 +82,13 @@ protected:
         const auto index = model->index(row, 0);
         EXPECT_EQ(systemId, index.data(QnSystemsModel::SystemIdRoleId).toString());
         EXPECT_EQ(isCloudSystem, index.data(QnSystemsModel::IsCloudSystemRoleId).toBool());
+    }
+
+    void thenSystemIsPending(const QString& systemId, bool isPending)
+    {
+        const auto index = model->index(model->getRowIndex(systemId), 0);
+        ASSERT_TRUE(index.isValid());
+        EXPECT_EQ(isPending, index.data(QnSystemsModel::IsPending).toBool());
     }
 
     void setVisibilityScope(TileVisibilityScope scope)
@@ -199,6 +216,41 @@ TEST_F(SystemsModelTest, controllerSetScopeInfo)
     thenSystemVisibilityScope(TileVisibilityScope::FavoriteTileVisibilityScope);
     setVisibilityScope(TileVisibilityScope::HiddenTileVisibilityScope);
     thenSystemVisibilityScope(TileVisibilityScope::HiddenTileVisibilityScope);
+}
+
+TEST_F(SystemsModelTest, isPendingRoleReflectsSystemState)
+{
+    const auto pendingCloudId = nx::Uuid::createUuid().toSimpleString();
+    const auto cloudId = nx::Uuid::createUuid().toSimpleString();
+    const auto localId = nx::Uuid::createUuid();
+
+    givenCloudSystem(pendingCloudId, nx::Uuid::createUuid(), /*isPending*/ true);
+    givenCloudSystem(cloudId, nx::Uuid::createUuid());
+    givenLocalSystem(localId);
+    thenNumberOfSystemsInModel(3);
+
+    thenSystemIsPending(pendingCloudId, true);
+    thenSystemIsPending(cloudId, false);
+    thenSystemIsPending(localId.toSimpleString(), false);
+}
+
+TEST_F(SystemsModelTest, pendingStateChangeEmitsIsPendingDataChanged)
+{
+    const auto cloudId = nx::Uuid::createUuid().toSimpleString();
+    const auto system = givenCloudSystem(cloudId, nx::Uuid::createUuid(), /*isPending*/ true);
+    thenSystemIsPending(cloudId, true);
+
+    QSignalSpy spy(model.get(), &QAbstractItemModel::dataChanged);
+
+    system->setPending(false);
+
+    ASSERT_EQ(spy.count(), 1);
+    const auto arguments = spy.takeFirst();
+    const auto index = model->index(model->getRowIndex(cloudId), 0);
+    EXPECT_EQ(arguments.at(0).value<QModelIndex>(), index);
+    EXPECT_EQ(arguments.at(1).value<QModelIndex>(), index);
+    EXPECT_EQ(arguments.at(2).value<QList<int>>(), QList<int>{QnSystemsModel::IsPending});
+    thenSystemIsPending(cloudId, false);
 }
 
 } // namespace test

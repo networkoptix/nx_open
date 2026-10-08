@@ -26,15 +26,14 @@ const nx::Uuid kServerId2 = nx::Uuid::createUuid();
 const nx::Uuid kTargetServerId = nx::Uuid::createUuid();
 
 QnCloudSystem createCloudSystem(
-    const QString& cloudId,
-    const nx::Uuid& localId,
-    bool online = true)
+    const QString& cloudId, const nx::Uuid& localId, bool online = true, bool pending = false)
 {
     QnCloudSystem system;
     system.cloudId = cloudId;
     system.localId = localId;
     system.online = online;
     system.system2faEnabled = false;
+    system.isPending = pending;
     return system;
 }
 
@@ -112,6 +111,13 @@ public:
         const auto system = finder->getSystem(cloudId);
         ASSERT_NE(system, nullptr);
         ASSERT_EQ(system->isOnline(), expectedOnline);
+    }
+
+    void thenSystemIsPending(const QString& cloudId, bool expectedPending)
+    {
+        const auto system = finder->getSystem(cloudId);
+        ASSERT_NE(system, nullptr);
+        ASSERT_EQ(system->isPending(), expectedPending);
     }
 
     void thenSystemIsReachable(const QString& cloudId, bool expectedReachable)
@@ -286,6 +292,74 @@ TEST_F(CloudSystemFinderTest, offlineSystemIsDiscovered)
     thenSystemCountIs(1);
     thenSystemExists(kCloudId1);
     thenSystemIsOnline(kCloudId1, false);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Pending state tests.
+//-------------------------------------------------------------------------------------------------
+
+TEST_F(CloudSystemFinderTest, pendingStateIsSetBeforeDiscovery)
+{
+    givenCloudSystemFinder();
+
+    QHash<QString, bool> isPendingOnDiscovery;
+    QObject::connect(finder.get(),
+        &CloudSystemFinder::systemDiscovered,
+        finder.get(),
+        [&isPendingOnDiscovery](const SystemDescriptionPtr& system)
+        { isPendingOnDiscovery[system->id()] = system->isPending(); });
+
+    const auto pendingSystem =
+        createCloudSystem(kCloudId1, kLocalId1, /*online*/ false, /*pending*/ true);
+    whenCloudSystemsReceived({pendingSystem, createCloudSystem(kCloudId2, kLocalId2)});
+
+    // Discovery listeners must see the pending state without waiting for a following update.
+    ASSERT_EQ(isPendingOnDiscovery.size(), 2);
+    ASSERT_TRUE(isPendingOnDiscovery.value(kCloudId1));
+    ASSERT_FALSE(isPendingOnDiscovery.value(kCloudId2));
+
+    thenSystemIsPending(kCloudId1, true);
+    thenSystemIsPending(kCloudId2, false);
+}
+
+TEST_F(CloudSystemFinderTest, pendingStateIsClearedWhenSystemIsActivated)
+{
+    givenCloudSystemFinder();
+
+    const auto pendingSystem =
+        createCloudSystem(kCloudId1, kLocalId1, /*online*/ false, /*pending*/ true);
+    whenCloudSystemsReceived({pendingSystem});
+    thenSystemIsPending(kCloudId1, true);
+
+    const auto system = getCloudSystemDescription(kCloudId1);
+    ASSERT_NE(system, nullptr);
+    QSignalSpy spy(system.get(), &SystemDescription::pendingChanged);
+
+    // The Server of the Site has contacted the Cloud for the first time.
+    whenCloudSystemsReceived({createCloudSystem(kCloudId1, kLocalId1)});
+
+    // The existing description is updated, not replaced.
+    ASSERT_EQ(getCloudSystemDescription(kCloudId1).get(), system.get());
+    thenSystemIsPending(kCloudId1, false);
+    ASSERT_EQ(spy.count(), 1);
+}
+
+TEST_F(CloudSystemFinderTest, pendingChangedIsNotEmittedWhenStateIsUnchanged)
+{
+    givenCloudSystemFinder();
+
+    const auto pendingSystem =
+        createCloudSystem(kCloudId1, kLocalId1, /*online*/ false, /*pending*/ true);
+    whenCloudSystemsReceived({pendingSystem});
+
+    const auto system = getCloudSystemDescription(kCloudId1);
+    ASSERT_NE(system, nullptr);
+    QSignalSpy spy(system.get(), &SystemDescription::pendingChanged);
+
+    whenCloudSystemsReceived({pendingSystem});
+
+    thenSystemIsPending(kCloudId1, true);
+    ASSERT_EQ(spy.count(), 0);
 }
 
 //-------------------------------------------------------------------------------------------------

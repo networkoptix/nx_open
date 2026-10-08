@@ -9,7 +9,7 @@ namespace nx::vms::client::core {
 
 QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem& system)
 {
-    return QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
+    auto result = QnCloudSystemDescriptionPtr(new QnCloudSystemDescription(
         /*systemId*/ helpers::getTargetSystemId(system),
         system.localId,
         system.cloudId,
@@ -19,6 +19,10 @@ QnCloudSystemDescriptionPtr QnCloudSystemDescription::create(const QnCloudSystem
         system.online,
         system.system2faEnabled,
         system.organizationId));
+
+    result->setPending(system.isPending);
+
+    return result;
 }
 
 QnCloudSystemDescription::QnCloudSystemDescription(

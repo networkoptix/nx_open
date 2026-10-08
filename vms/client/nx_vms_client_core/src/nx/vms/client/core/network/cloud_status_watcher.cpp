@@ -9,6 +9,7 @@
 #include <QtCore/QUrl>
 
 #include <network/cloud_system_data.h>
+#include <network/system_helpers.h>
 #include <nx/branding.h>
 #include <nx/cloud/db/client/cdb_connection.h>
 #include <nx/cloud/db/client/oauth_manager.h>
@@ -93,7 +94,7 @@ QnCloudSystemList getCloudSystemList(const SystemDataExList& systemsList)
         system.version = QString::fromStdString(systemData.version);
         system.organizationId = QString::fromStdString(
             nx::cloud::db::api::getAttrValueOr(systemData.attributes, "organizationId", ""));
-        system.isPending = systemData.status == SystemStatus::notActivated;
+        system.isPending = helpers::isPendingCloudSystem(systemData.status);
         result.append(system);
     }
 
@@ -548,7 +549,7 @@ void CloudStatusWatcher::Private::updateSystems()
 
     NX_DEBUG(this, "Updating systems list");
     Filter filter;
-    filter.nameToValue[FilterField::systemStatus] = "notActivated|activated";
+    filter.nameToValue[FilterField::systemStatus] = "deploymentReady|activated";
     updateSystemsRequestTimer.setRemainingTime(kUpdateSystemsRequestTimeout);
     cloudConnection->systemManager()->getSystemsFiltered(filter, std::move(handler));
 }

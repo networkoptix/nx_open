@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <ranges>
 
+#include <network/system_helpers.h>
 #include <nx/utils/coro/task_utils.h>
 #include <nx/utils/coro/when_all.h>
 #include <nx/utils/guarded_callback.h>
@@ -546,13 +547,15 @@ struct OrganizationsModel::Private
         }
     }
 
-    void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data)
+    void setOrgSystems(nx::Uuid orgId, std::vector<SystemInOrganization> data)
     {
         // Updating group structure (e.g. folder move) may have deleted some systems.
 
         auto orgNode = nodes.find(orgId);
         if (!orgNode)
             return;
+
+        removeInactiveSystems(data);
 
         auto& cachedSystems = orgSystemsCache[orgId];
         std::unordered_map<nx::Uuid, SystemInOrganization> newSystems;
@@ -695,8 +698,7 @@ struct OrganizationsModel::Private
 
                 const auto id = system.systemId.toSimpleString();
 
-                const bool isPending =
-                    system.system_state == cloud::db::api::SystemStatus::notActivated
+                const bool isPending = helpers::isPendingCloudSystem(system.system_state)
                     && q->indexFromSystemId(id).data(QnSystemsModel::IsPending).toBool();
 
                 return isPending;
@@ -1216,10 +1218,7 @@ coro::Task<bool> OrganizationsModel::Private::loadOrgAsync(struct Organization o
     if (groupStructure)
         setOrgStructure(org.id, *groupStructure);
     if (systems)
-    {
-        removeInactiveSystems(systems->results);
-        setOrgSystems(org.id, systems->results);
-    }
+        setOrgSystems(org.id, std::move(systems->results));
 
     if (groupStructure || systems)
     {

@@ -31,18 +31,9 @@ struct SystemInfo
     bool isOnline = true;
     bool isCompatible = true;
     TileVisibilityScope scope = TileVisibilityScope::DefaultTileVisibilityScope;
+    bool isPending = false;
 
-    bool operator==(const SystemInfo& other) const
-    {
-        return other.name == name &&
-            other.systemId == systemId &&
-            other.searchAddressPart == searchAddressPart &&
-            other.isNew == isNew &&
-            other.isCloud == isCloud &&
-            other.isOnline == isOnline &&
-            other.isCompatible == isCompatible &&
-            other.scope == scope;
-    }
+    bool operator==(const SystemInfo& other) const = default;
 };
 
 // A mock class for QnSystemsModel that implements Qt list model.
@@ -87,6 +78,8 @@ public:
                 return m_systems[row].isCompatible;
             case QnSystemsModel::VisibilityScopeRoleId:
                 return QVariant::fromValue(m_systems[row].scope);
+            case QnSystemsModel::IsPending:
+                return m_systems[row].isPending;
             default:
                 return QVariant();
         }
@@ -163,6 +156,9 @@ public:
 
         if (prevInfo.scope != info.scope)
             roles << QnSystemsModel::VisibilityScopeRoleId;
+
+        if (prevInfo.isPending != info.isPending)
+            roles << QnSystemsModel::IsPending;
 
         if (roles.isEmpty())
             return;
@@ -288,9 +284,17 @@ QVector<SystemInfo> systemsList(const QAbstractProxyModel* model)
         bool isCompatible = index.data(QnSystemsModel::IsCompatibleToDesktopClient).toBool();
         TileVisibilityScope visibilityScope = static_cast<TileVisibilityScope>(
             index.data(QnSystemsModel::VisibilityScopeRoleId).toInt());
+        bool isPending = index.data(QnSystemsModel::IsPending).toBool();
 
-        result.append(
-            {name, systemId, address, isNew, isCloud, isOnline, isCompatible, visibilityScope});
+        result.append({name,
+            systemId,
+            address,
+            isNew,
+            isCloud,
+            isOnline,
+            isCompatible,
+            visibilityScope,
+            isPending});
     }
 
     return result;
@@ -303,6 +307,7 @@ enum SystemFlags
     isNew = 0x02,
     isCloud = 0x04,
     isIncompatible = 0x08,
+    isPending = 0x10,
 };
 
 SystemInfo createSystem(
@@ -319,7 +324,9 @@ SystemInfo createSystem(
         bool(flags & SystemFlags::isCloud),
         !(flags & SystemFlags::isOffline),
         !(flags & SystemFlags::isIncompatible),
-        visibilityScope};
+        visibilityScope,
+        bool(flags & SystemFlags::isPending),
+    };
 };
 
 SystemInfo createSystem(
@@ -431,6 +438,67 @@ TEST_F(SystemsVisibilitySortFilterModelTest, offlineIncompatibleSortCheck)
     ASSERT_EQ(initialOrder, systemsList(m_visibilityModel.get()));
     auto offlineIncompatibleOrder = setSomeSystemsOfflineAndIncompatible();
     ASSERT_EQ(offlineIncompatibleOrder, systemsList(m_visibilityModel.get()));
+}
+
+TEST_F(SystemsVisibilitySortFilterModelTest, pendingSortCheck)
+{
+    SystemInfo onlineSystem = createSystem("Online", "192.168.2.1");
+    SystemInfo pendingSystem = createSystem("Pending",
+        "192.168.2.2",
+        SystemFlags::isOffline | SystemFlags::isCloud | SystemFlags::isPending);
+    SystemInfo cloudSystem =
+        createSystem("Cloud", "192.168.2.3", SystemFlags::isOffline | SystemFlags::isCloud);
+    SystemInfo localSystem = createSystem("Localhost", "localhost", SystemFlags::isOffline);
+    SystemInfo aSystem = createSystem("A", "192.168.2.4", SystemFlags::isOffline);
+
+    m_systemsModel->addSystem(aSystem);
+    m_systemsModel->addSystem(localSystem);
+    m_systemsModel->addSystem(cloudSystem);
+    m_systemsModel->addSystem(pendingSystem);
+    m_systemsModel->addSystem(onlineSystem);
+
+    // Pending Sites go after the connectable ones, but before any other offline Site.
+    const QVector<SystemInfo> expectedOrder{
+        onlineSystem,
+        pendingSystem,
+        cloudSystem,
+        localSystem,
+        aSystem,
+    };
+
+    ASSERT_EQ(expectedOrder, systemsList(m_visibilityModel.get()));
+}
+
+TEST_F(SystemsVisibilitySortFilterModelTest, pendingStateChangeSortCheck)
+{
+    SystemInfo aCloudSystem =
+        createSystem("ACloud", "192.168.2.1", SystemFlags::isOffline | SystemFlags::isCloud);
+    SystemInfo bCloudSystem = createSystem("BCloud",
+        "192.168.2.2",
+        SystemFlags::isOffline | SystemFlags::isCloud | SystemFlags::isPending);
+    SystemInfo localSystem = createSystem("Localhost", "localhost", SystemFlags::isOffline);
+
+    m_systemsModel->addSystem(aCloudSystem);
+    m_systemsModel->addSystem(bCloudSystem);
+    m_systemsModel->addSystem(localSystem);
+
+    const QVector<SystemInfo> pendingOrder{
+        bCloudSystem,
+        aCloudSystem,
+        localSystem,
+    };
+    ASSERT_EQ(pendingOrder, systemsList(m_visibilityModel.get()));
+
+    // Only the pending state changes, so the Site moves to its place among the offline ones.
+    bCloudSystem.isPending = false;
+    m_systemsModel->updateSystem(bCloudSystem);
+
+    const QVector<SystemInfo> activatedOrder{
+        aCloudSystem,
+        bCloudSystem,
+        localSystem,
+    };
+    ASSERT_EQ(activatedOrder, systemsList(m_visibilityModel.get()));
 }
 
 TEST_F(SystemsVisibilitySortFilterModelTest, visibilitySortCheck)

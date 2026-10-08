@@ -141,6 +141,10 @@ void SystemDescriptionAggregator::mergeSystem(int priority, const SystemDescript
         this, &SystemDescription::oauthSupportedChanged);
     connect(system.get(), &SystemDescription::system2faEnabledChanged,
         this, &SystemDescription::system2faEnabledChanged);
+    connect(system.get(),
+        &SystemDescription::pendingChanged,
+        this,
+        &SystemDescription::pendingChanged);
     connect(system.get(), &SystemDescription::saasStateChanged, this,
         [this]
         {
@@ -179,6 +183,7 @@ void SystemDescriptionAggregator::emitSystemChanged()
     emit system2faEnabledChanged();
     emit versionChanged();
     emit saasStateChanged();
+    emit pendingChanged();
 }
 
 void SystemDescriptionAggregator::handleServerChanged(const nx::Uuid& serverId,

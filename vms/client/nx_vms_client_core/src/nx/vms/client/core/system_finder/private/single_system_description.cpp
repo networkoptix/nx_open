@@ -408,7 +408,11 @@ qint64 SingleSystemDescription::getServerLastUpdatedMs(const nx::Uuid& serverId)
 
 void SingleSystemDescription::setPending(bool value)
 {
+    if (m_isPending == value)
+        return;
+
     m_isPending = value;
+    emit pendingChanged();
 }
 
 bool SingleSystemDescription::isPending() const
