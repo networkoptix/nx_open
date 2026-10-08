@@ -73,6 +73,11 @@ public:
 
     bool swallowErrorAndContinue();
 
+    bool isHardwareAccelerationAllowed() const
+    {
+        return allowHardwareAcceleration && !reverseMode;
+    }
+
 public:
     VideoDecoderPtr videoDecoder;
     CodecParametersConstPtr currentCodecParameters;
@@ -94,6 +99,14 @@ public:
     bool allowSoftwareDecoderFallback = true;
     bool isSoftwareFallbackMode = false;
     bool resetDecoder = false;
+
+    /**
+     * Reverse playback keeps a whole GOP of decoded frames alive (see GopReverser). Hardware
+     * decoders may hand out frames from a small pool owned by the codec (Android MediaCodec stops
+     * producing output and FFmpeg loops forever waiting for it), so reverse playback always uses
+     * a software decoder; the hardware one is restored when forward playback resumes.
+     */
+    bool reverseMode = false;
 
     /**
      * Set when the current decoder is software only because the process-wide hardware back-off
@@ -271,12 +284,23 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
             isSimilarParams = false;
     }
 
+    const bool reverseMode = frame->flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse);
+    if (reverseMode != d->reverseMode)
+    {
+        d->reverseMode = reverseMode;
+        if (d->allowHardwareAcceleration)
+        {
+            NX_DEBUG(this,
+                reverseMode ? "Reverse playback started, switching to software decoder"
+                            : "Forward playback resumed, switching back to hardware decoder");
+            d->resetDecoder = true;
+        }
+    }
+
     // A decoder that ended up as software because the process-wide hardware back-off was armed
     // (see FfmpegHwVideoDecoder) is otherwise never recreated while the stream parameters stay
     // the same. Once the back-off expires, retry hardware from the next key frame.
-    if (d->videoDecoder
-        && d->allowHardwareAcceleration
-        && !d->isSoftwareFallbackMode)
+    if (d->videoDecoder && d->isHardwareAccelerationAllowed() && !d->isSoftwareFallbackMode)
     {
         if (d->videoDecoder->capabilities().testFlag(
             AbstractVideoDecoder::Capability::hardwareAccelerated))
@@ -355,10 +379,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
         // Release previous decoder in case the hardware decoder can handle only single instance.
         d->videoDecoder.reset();
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType,
-            frameInfo.size,
-            d->allowHardwareAcceleration,
-            d->rhi);
+            frame->compressionType, frameInfo.size, d->isHardwareAccelerationAllowed(), d->rhi);
         if (!d->videoDecoder)
         {
             // The hardware decoder may be temporarily unavailable while no software decoder
@@ -374,7 +395,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame)
 
         // Sampling the back-off state both before and after the creation closes the races with
         // arming/expiry happening while the registry selects a decoder.
-        d->pendingHardwareRetry = d->allowHardwareAcceleration
+        d->pendingHardwareRetry = d->isHardwareAccelerationAllowed()
             && !d->videoDecoder->capabilities().testFlag(
                 AbstractVideoDecoder::Capability::hardwareAccelerated)
             && (hwUnavailableBeforeRecreate || FfmpegHwVideoDecoder::isTemporarilyUnavailable());
