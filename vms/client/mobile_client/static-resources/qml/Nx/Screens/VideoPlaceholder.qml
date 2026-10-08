@@ -157,7 +157,9 @@ Control
         {
             id: button
 
-            readonly property int requiredHeight: action ? (implicitHeight + Layout.topMargin) : 0
+            readonly property int requiredHeight: (action && control.interactive)
+                ? (implicitHeight + Layout.topMargin)
+                : 0
             readonly property bool hasEnoughSpace:
                 control.height >= (requiredHeight + image.requiredHeight)
 

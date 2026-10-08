@@ -211,8 +211,7 @@ Control
             height: thumbnailContent.height
 
             state: d.dummyState
-
-            onLogInClicked: mediaResourceHelper.cloudAuthorize()
+            interactive: false
         }
     }
 
