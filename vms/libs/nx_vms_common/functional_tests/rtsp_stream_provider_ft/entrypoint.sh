@@ -116,6 +116,10 @@ run_test gstreamer_rtsp_server.py avp udp 8554 "$EXPECTED_VIDEO_SHA256"
 run_test gstreamer_rtsp_server.py avp udp 8561 "$EXPECTED_VIDEO_SHA256" automatic
 # The transport selected for the first track must also be used for subsequent tracks.
 run_test rtsp_server.py avp_second_track_transport_rejected tcp 8562 "" automatic 2
+# A rejected SETUP must close the session, so that the stream is reopened instead of being read.
+run_test rtsp_server.py avp_setup_service_unavailable tcp 8564 "" tcp 2
+# A rejected PLAY must tear down the session created by SETUP.
+run_test rtsp_server.py avp_play_rejected tcp 8565 "" tcp 2
 
 # Secure RTSP tests.
 run_test gstreamer_rtsp_server.py savp tcp 8555 "$EXPECTED_VIDEO_SHA256"

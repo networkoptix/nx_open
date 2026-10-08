@@ -877,6 +877,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
         NX_WARNING(this, "Can't open RTSP stream [%1], SETUP request has been failed",
             m_url);
 
+        closeStream();
         m_openStreamResult = CameraDiagnostics::RequestFailedResult(m_url.toString(),
             "Can't open RTSP stream: SETUP request has been failed");
         return m_openStreamResult;
@@ -884,6 +885,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
 
     if (const auto result = registerMulticastAddressesIfNeeded(); !result)
     {
+        closeStream();
         m_openStreamResult = result;
         return m_openStreamResult;
     }
@@ -896,6 +898,7 @@ CameraDiagnostics::Result RtspStreamProvider::openStream()
         NX_WARNING(this, "Can't open RTSP stream [%1], PLAY request has been failed",
             m_url);
 
+        closeStream();
         m_openStreamResult = CameraDiagnostics::RequestFailedResult(m_url.toString(),
             "Can't open RTSP stream: PLAY request has been failed");
         return m_openStreamResult;
@@ -1024,8 +1027,9 @@ nx::Mutex& RtspStreamProvider::defaultTransportMutex()
 
 void RtspStreamProvider::closeStream()
 {
-    if (m_RtpSession.isOpened())
+    if (m_RtpSession.isOpened() && !m_RtpSession.sessionId().isEmpty())
         m_RtpSession.sendTeardown();
+
     m_RtpSession.stop();
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i) {
         if (m_demuxedData[i])

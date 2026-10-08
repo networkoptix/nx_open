@@ -536,11 +536,34 @@ def serve(client, mode, video_file):
         server_mikey = AXIS_MIKEY
     server_context = parse_mikey_payload(server_mikey)
     setup_attempt = 0
+    play_attempt = 0
+    teardown_session = None
 
     def validate_scenario():
-        if mode == "avp_second_track_transport_rejected" and setup_attempt != 2:
-            raise RuntimeError(
-                f"Expected two SETUP requests, received {setup_attempt}")
+        if mode == "avp_second_track_transport_rejected":
+            if setup_attempt != 2:
+                raise RuntimeError(
+                    f"Expected two SETUP requests, received {setup_attempt}")
+            # The session created by the first track SETUP must be released.
+            if teardown_session != session:
+                raise RuntimeError(
+                    f"Expected TEARDOWN of session {session}, received {teardown_session}")
+        if mode == "avp_setup_service_unavailable":
+            if setup_attempt != 1:
+                raise RuntimeError(
+                    f"Expected one SETUP request, received {setup_attempt}")
+            # No session has been created, so there is nothing to tear down.
+            if teardown_session is not None:
+                raise RuntimeError("Unexpected TEARDOWN without a session")
+        if mode == "avp_play_rejected":
+            if setup_attempt != 1 or play_attempt != 1:
+                raise RuntimeError(
+                    f"Expected one SETUP and one PLAY request, received {setup_attempt} "
+                    f"and {play_attempt}")
+            # The session created by SETUP must be released after the rejected PLAY.
+            if teardown_session != session:
+                raise RuntimeError(
+                    f"Expected TEARDOWN of session {session}, received {teardown_session}")
 
     try:
         while True:
@@ -579,6 +602,21 @@ def serve(client, mode, video_file):
                     ).encode()
                     client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
                     continue
+                if mode in ("avp_setup_service_unavailable", "avp_play_rejected"):
+                    body = (
+                        "v=0\r\n"
+                        "o=- 0 0 IN IP4 127.0.0.1\r\n"
+                        "s=Stream opening failure functional test\r\n"
+                        "t=0 0\r\n"
+                        f"a=control:{uri}/\r\n"
+                        "m=video 0 RTP/AVP 96\r\n"
+                        "c=IN IP4 0.0.0.0\r\n"
+                        "a=recvonly\r\n"
+                        "a=control:trackID=1\r\n"
+                        "a=rtpmap:96 H264/90000\r\n"
+                    ).encode()
+                    client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
+                    continue
                 stream_name = "AES-256-CM" if mode == "savp_media_level_aes256_cm" else "Axis"
                 session_key_management = (
                     "" if mode == "savp_media_level_aes256_cm"
@@ -608,6 +646,20 @@ def serve(client, mode, video_file):
                 client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
             elif method == "SETUP":
                 use_gcm = False
+                if mode == "avp_setup_service_unavailable":
+                    # The cameras from VMS-63226 reject SETUP this way.
+                    setup_attempt += 1
+                    client.sendall(response(503, "Service Unavailable", cseq))
+                    continue
+                if mode == "avp_play_rejected":
+                    setup_attempt += 1
+                    client.sendall(response(
+                        200,
+                        "OK",
+                        cseq,
+                        f"Session: {session};timeout=60\r\n"
+                        "Transport: RTP/AVP/TCP;unicast;interleaved=0-1"))
+                    continue
                 if mode == "avp_second_track_transport_rejected":
                     setup_attempt += 1
                     transport = header(request, "Transport")
@@ -719,6 +771,10 @@ def serve(client, mode, video_file):
                 client.sendall(response(
                     200, "OK", cseq, transport))
             elif method == "PLAY":
+                if mode == "avp_play_rejected":
+                    play_attempt += 1
+                    client.sendall(response(503, "Service Unavailable", cseq))
+                    continue
                 client.sendall(response(
                     200, "OK", cseq,
                     f"Session: {session}\r\nRTP-Info: url={uri};seq=0;rtptime=0"))
@@ -728,6 +784,7 @@ def serve(client, mode, video_file):
                 if stream is not None:
                     stream.start(*stream.start_args)
             elif method == "TEARDOWN":
+                teardown_session = header(request, "Session")
                 try:
                     client.sendall(response(200, "OK", cseq, f"Session: {session}"))
                 except OSError:
@@ -761,7 +818,9 @@ def main():
             "savp_axis_replayed_packet",
             "savp_media_level_aes256_cm",
             "savp",
-            "avp_second_track_transport_rejected"),
+            "avp_second_track_transport_rejected",
+            "avp_setup_service_unavailable",
+            "avp_play_rejected"),
         default="savp_axis")
     parser.add_argument("--rtp-transport", choices=("tcp", "udp"), required=True)
     parser.add_argument("--video-file", required=True)

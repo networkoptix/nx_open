@@ -1319,6 +1319,8 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
     nx::network::http::Request request = createPlayRequest( startPos, endPos );
     if( !sendRequestAndReceiveResponse( std::move(request), response ) )
     {
+        if (!m_SessionId.isEmpty())
+            sendTeardown();
         stop();
         return false;
     }
