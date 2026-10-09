@@ -865,23 +865,30 @@ namespace nxcip
 
         enum Capability
         {
-            ContinuousPanCapability             = 0x00000001,   //!< Camera supports continuous pan.
-            ContinuousTiltCapability            = 0x00000002,   //!< Camera supports continuous tilt.
-            ContinuousZoomCapability            = 0x00000004,   //!< Camera supports continuous zoom.
+            ContinuousPanCapability = 0x00000001, //!< Camera supports continuous pan.
+            ContinuousTiltCapability = 0x00000002, //!< Camera supports continuous tilt.
+            ContinuousZoomCapability = 0x00000004, //!< Camera supports continuous zoom.
 
-            AbsolutePanCapability               = 0x00000010,   //!< Camera supports absolute pan.
-            AbsoluteTiltCapability              = 0x00000020,   //!< Camera supports absolute tilt.
-            AbsoluteZoomCapability              = 0x00000040,   //!< Camera supports absolute zoom.
+            AbsolutePanCapability = 0x00000010, //!< Camera supports absolute pan.
+            AbsoluteTiltCapability = 0x00000020, //!< Camera supports absolute tilt.
+            AbsoluteZoomCapability = 0x00000040, //!< Camera supports absolute zoom.
 
-            FlipPtzCapability                   = 0x00000100,   //!< Camera supports flip state queries.
-            LimitsPtzCapability                 = 0x00000200,   //!< Camera supports coordinate space limits queries.
+            FlipPtzCapability = 0x00000100, //!< Camera supports flip state queries.
+            LimitsPtzCapability = 0x00000200, //!< Camera supports coordinate space limits queries.
 
-            DevicePositioningPtzCapability      = 0x00001000,   //!< Camera supports absolute positioning in device-specific coordinate space.
-            LogicalPositioningPtzCapability     = 0x00002000,   //!< Camera supports absolute positioning in logical space ---
-                                                                //! degrees for pan, tilt and fov (zoom).
+            DevicePositioningPtzCapability = 0x00001000, //!< Camera supports absolute positioning
+                                                         //!< in device-specific coordinate space.
+            LogicalPositioningPtzCapability =
+                0x00002000, //!< Camera supports absolute positioning in logical space ---
+                            //! degrees for pan, tilt and fov (zoom).
 
-            ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
-            AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+            NativePresetsCapability =
+                0x00010000, //!< CameraPtzPresetManager implements all native preset operations.
+
+            ContinuousPtzCapabilities = ContinuousPanCapability | ContinuousTiltCapability
+                | ContinuousZoomCapability,
+            AbsolutePtzCapabilities = AbsolutePanCapability | AbsoluteTiltCapability
+                | AbsoluteZoomCapability,
         };
 
         enum CoordinateSpace
@@ -980,6 +987,91 @@ namespace nxcip
             \returns                    NX_NO_ERROR on success, error code otherwise.
         */
         virtual int getFlip( int *flip ) = 0;
+    };
+
+    // {AAF4B9A6-6F32-47E8-86AF-C079DEC84E37}
+    static const nxpl::NX_GUID IID_CameraPtzPresetManager = {{0xaa,
+        0xf4,
+        0xb9,
+        0xa6,
+        0x6f,
+        0x32,
+        0x47,
+        0xe8,
+        0x86,
+        0xaf,
+        0xc0,
+        0x79,
+        0xde,
+        0xc8,
+        0x4e,
+        0x37}};
+
+    /**
+     * Optional native preset manager obtained from CameraPtzManager::queryInterface(). The caller
+     * owns one reference and releases it with releaseRef(). Calls may run concurrently with each
+     * other and with methods of the originating CameraPtzManager; implementations must synchronize
+     * shared state.
+     *
+     * NativePresetsCapability requires this interface and all five preset operations. Capacity
+     * reporting is independent of that capability; a reporting-only implementation may return
+     * NX_NOT_IMPLEMENTED for operations and must omit NativePresetsCapability.
+     *
+     * Input strings are borrowed NUL-terminated valid UTF-8, used only during the call. IDs must
+     * be nonempty; names may be empty. Neither may contain embedded NUL. All operations use the
+     * caller's opaque IDs, including IDs returned by getPresets(). IDs must survive manager
+     * recreation.
+     *
+     * Operations return NX_NO_ERROR on success and an NX_* error otherwise. Calls are not retried
+     * automatically after errors.
+     */
+    class CameraPtzPresetManager: public nxpl::PluginInterface
+    {
+    public:
+        /** Caller-owned output for getPresets(). */
+        class PresetWriter
+        {
+        public:
+            /** Copies one preset. Both UTF-8 strings are borrowed for this call only. */
+            virtual void add(const char* presetId, const char* name) = 0;
+
+        protected:
+            ~PresetWriter() = default;
+        };
+
+        /**
+         * Reports the device-advertised total native preset capacity, including device-side
+         * digital PTZ. This is not the configured preset count, free slots, maximum preset ID,
+         * or a limit on Server-stored presets. Do not infer it from the preset list or report an
+         * encoder's capacity as that of an attached camera without a reliable device contract.
+         *
+         * @param[out] count Non-null, caller-owned output used only during this call. On
+         * NX_NO_ERROR the implementation must write a value in [0, INT32_MAX]; zero explicitly
+         * means no native preset slots. Negative values are invalid.
+         * @return NX_NO_ERROR for a known count; NX_NO_DATA when no reliable count is available;
+         * NX_NOT_IMPLEMENTED when reporting is unsupported. Output is ignored for non-success
+         * results. Other NX_* errors (including retrieval failures) must not be reported as
+         * NX_NO_DATA or NX_NOT_IMPLEMENTED.
+         */
+        virtual int getMaximumNativePresetCount(int* count) const = 0;
+
+        /**
+         * Calls presets->add() serially for each preset before returning. The writer belongs
+         * to the caller and must not be retained. An empty successful result is valid.
+         * If the driver returns an error, the caller discards all entries from this call.
+         */
+        virtual int getPresets(PresetWriter* presets) const = 0;
+
+        /** Saves the current position, creating or replacing the preset with the supplied ID. */
+        virtual int createPreset(const char* presetId, const char* name) = 0;
+
+        /** Renames an existing preset without changing its saved position or moving the camera. */
+        virtual int updatePreset(const char* presetId, const char* name) = 0;
+
+        virtual int removePreset(const char* presetId) = 0;
+
+        /** Moves to the saved position at a finite speed in [0, 1]. */
+        virtual int activatePreset(const char* presetId, double speed) = 0;
     };
 
     //!Type of packets provided by \a StreamReader
