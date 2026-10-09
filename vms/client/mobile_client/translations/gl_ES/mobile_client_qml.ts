@@ -150,11 +150,11 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Desliza o dedo para cambiar entre recursos</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Desliza o dedo cara á dereita para cambiar á seguinte cámara</translation>
     </message>
   </context>
   <context>
@@ -756,11 +756,11 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Modo de visualización</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Toca para escoller o tipo de datos desexado</translation>
     </message>
   </context>
   <context>
@@ -797,7 +797,7 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Botón de panel flotante</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1437,11 +1437,11 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Disparadores suaves</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Toca para iniciar o panel de activadores suaves</translation>
     </message>
   </context>
   <context>
@@ -1498,22 +1498,22 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Fichas cronolóxicas e xogador</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Toque longo para iniciar a vista previa con máis detalles</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Zoom de liña de tempo cara a dentro/fóra</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Beliscar para afastar e separar para achegar</translation>
     </message>
   </context>
   <context>
@@ -1710,7 +1710,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Pulsa Atrás outra vez para saír</translation>
     </message>
   </context>
 </TS>
