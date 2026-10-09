@@ -2,15 +2,13 @@
 
 #include "wait_condition.h"
 
-#include <nx/utils/time.h>
-
 WaitConditionTimer::WaitConditionTimer(
-    nx::WaitCondition* waitCondition,
-    std::chrono::milliseconds timeout)
-    :
+    nx::WaitCondition* waitCondition, std::chrono::milliseconds timeout):
     m_waitCondition(waitCondition),
     m_timeout(timeout),
-    m_startTime(nx::utils::monotonicTime())
+    // Measured on the real clock: a test shifting nx::utils::monotonicTime() back while a wait is
+    // pending would otherwise stretch the wait by the shift.
+    m_startTime(std::chrono::steady_clock::now())
 {
 }
 
@@ -24,7 +22,7 @@ bool WaitConditionTimer::wait(nx::Mutex* mutex)
         return true;
     }
 
-    const auto timePassed = nx::utils::monotonicTime() - m_startTime;
+    const auto timePassed = steady_clock::now() - m_startTime;
     if (timePassed >= m_timeout)
         return false;
 
