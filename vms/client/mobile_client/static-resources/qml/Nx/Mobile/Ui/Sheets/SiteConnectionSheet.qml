@@ -22,6 +22,9 @@ AdaptiveSheet
 
     closeAutomatically: !d.connectingNow
 
+    scrollableHeader: !bottomEdge
+    scrollableFooter: !bottomEdge
+
     function connectToSite(
         systemName, systemId, localSystemId)
     {

@@ -159,7 +159,9 @@ Drawer
 
             width: parent.width
             height: content.kGradientSize
-                + (!control.scrollableHeader && header.visible ? headerProxy.y + headerProxy.height : 0)
+                + (!control.scrollableHeader && headerProxy.target
+                    ? headerProxy.y + headerProxy.height
+                    : 0)
             z: 5 //< Must be under header but over the flickable.
 
             distance: flickable.contentY
@@ -204,8 +206,12 @@ Drawer
             id: flickable
 
             anchors.fill: parent
-            anchors.topMargin: (!control.scrollableHeader && header.visible) ? header.height : 24
-            anchors.bottomMargin: (!control.scrollableFooter && footer.visible) ? footer.height : 20
+            anchors.topMargin: headerProxy.target
+                ? (control.scrollableHeader ? 0 : header.height)
+                : 24
+            anchors.bottomMargin: footerProxy.target
+                ? (control.scrollableFooter ? 0 : footer.height)
+                : 20
 
             z: 1
             interactive: control.interactive && contentHeight > height
@@ -217,7 +223,7 @@ Drawer
                 id: scrollableContent
 
                 height: contentColumn.y + contentColumn.height
-                    + (control.scrollableFooter && footer.visible ? footer.height : 0)
+                    + (control.scrollableFooter && footerProxy.target ? footer.height : 0)
                 width: parent.width
 
                 MouseArea //< Dismisses the keyboard on a tap between the content items.
@@ -236,7 +242,7 @@ Drawer
 
                     spacing: control.spacing
                     x: leftPadding
-                    y: (control.scrollableHeader && header.visible) ? header.height : 0
+                    y: (control.scrollableHeader && headerProxy.target) ? header.height : 0
                     width: parent.width - leftPadding - rightPadding
                 }
             }
@@ -294,8 +300,12 @@ Drawer
             width: parent.width
             height: kTopMargin + footerProxy.implicitHeight + kBottomMargin
 
-            anchors.bottom: control.scrollableFooter ? undefined : parent.bottom
-            y: control.scrollableFooter ? (contentColumn.y + contentColumn.height) : 0
+            // Not anchored to the bottom: after the anchor is reset, y keeps the anchored value
+            // instead of re-evaluating its binding. A scrollable footer stays at the bottom while
+            // there's enough space, and follows the content otherwise.
+            y: control.scrollableFooter
+                ? Math.max(contentColumn.y + contentColumn.height, flickable.height - height)
+                : (parent.height - height)
 
             visible: footerProxy.target
             z: 10
@@ -316,7 +326,9 @@ Drawer
 
             width: parent.width
             height: content.kGradientSize
-                + (!control.scrollableFooter && footer.visible ? footer.height - footer.kTopMargin : 0)
+                + (!control.scrollableFooter && footerProxy.target
+                    ? footer.height - footer.kTopMargin
+                    : 0)
             anchors.bottom: parent.bottom
             z: 5 //< Must be under footer but over the flickable.
 
