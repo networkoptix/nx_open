@@ -2571,7 +2571,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Activar esta opción permite que terceiros soliciten aprobación para rexistrar unha integración. Hai medidas de seguridade implementadas, pero desactívaas unha vez instaladas todas as integracións necesarias; non se recomenda o uso prolongado.</translation>
     </message>
   </context>
   <context>
@@ -3137,7 +3137,7 @@ prema Alt + Clic para seguir o obxecto</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Eventos de proba...</translation>
     </message>
     <message>
       <source>Event Rules</source>
