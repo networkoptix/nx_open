@@ -153,6 +153,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch between cameras on a layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Swipe right to switch to next Camera</source>
         <translation type="unfinished"></translation>
     </message>
@@ -604,6 +608,10 @@
         <source>Tutorials</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>See the interface walkthrough</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -759,6 +767,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Tap to choose desired data type</source>
         <translation type="unfinished"></translation>
     </message>
@@ -797,6 +809,10 @@
     <name>PanelButtonTutorial</name>
     <message>
         <source>Floating Panel Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reopen a collapsed panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1440,6 +1456,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Open Soft Trigger camera actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Tap to invoke soft triggers panel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1501,6 +1521,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>View event details with a long tap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Long tap to invoke preview with more details</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1509,6 +1533,10 @@
     <name>TimelineZoomTutorial</name>
     <message>
         <source>Zoom Timeline In/Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pinch or spread to zoom the Timeline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
