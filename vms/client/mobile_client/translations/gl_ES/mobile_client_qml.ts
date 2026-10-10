@@ -153,6 +153,10 @@
       <translation>Desliza o dedo para cambiar entre recursos</translation>
     </message>
     <message>
+      <source>Switch between cameras on a layout</source>
+      <translation type="unfinished">Switch between cameras on a layout</translation>
+    </message>
+    <message>
       <source>Swipe right to switch to next Camera</source>
       <translation>Desliza o dedo cara á dereita para cambiar á seguinte cámara</translation>
     </message>
@@ -186,7 +190,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Como conectar?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -602,7 +606,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Titoriais</translation>
+    </message>
+    <message>
+      <source>See the interface walkthrough</source>
+      <translation type="unfinished">See the interface walkthrough</translation>
     </message>
   </context>
   <context>
@@ -759,6 +767,10 @@
       <translation>Modo de visualización</translation>
     </message>
     <message>
+      <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
+      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+    </message>
+    <message>
       <source>Tap to choose desired data type</source>
       <translation>Toca para escoller o tipo de datos desexado</translation>
     </message>
@@ -800,8 +812,12 @@
       <translation>Botón de panel flotante</translation>
     </message>
     <message>
+      <source>Reopen a collapsed panel</source>
+      <translation type="unfinished">Reopen a collapsed panel</translation>
+    </message>
+    <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Toca o botón flotante para abrir o panel</translation>
     </message>
   </context>
   <context>
@@ -1440,6 +1456,10 @@
       <translation>Disparadores suaves</translation>
     </message>
     <message>
+      <source>Open Soft Trigger camera actions</source>
+      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+    </message>
+    <message>
       <source>Tap to invoke soft triggers panel</source>
       <translation>Toca para iniciar o panel de activadores suaves</translation>
     </message>
@@ -1501,6 +1521,10 @@
       <translation>Fichas cronolóxicas e xogador</translation>
     </message>
     <message>
+      <source>View event details with a long tap</source>
+      <translation type="unfinished">View event details with a long tap</translation>
+    </message>
+    <message>
       <source>Long tap to invoke preview with more details</source>
       <translation>Toque longo para iniciar a vista previa con máis detalles</translation>
     </message>
@@ -1510,6 +1534,10 @@
     <message>
       <source>Zoom Timeline In/Out</source>
       <translation>Zoom de liña de tempo cara a dentro/fóra</translation>
+    </message>
+    <message>
+      <source>Pinch or spread to zoom the Timeline</source>
+      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
@@ -1531,7 +1559,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Titoriais</translation>
     </message>
   </context>
   <context>
