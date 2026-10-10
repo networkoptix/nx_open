@@ -328,16 +328,44 @@ protected:
             });
     }
 
+    void whenRequestResourceVariant(const std::string& id)
+    {
+        nx::UrlQuery query;
+        query.addQueryItem("id", id);
+        whenRequestResourceWithQuery(query);
+    }
+
+    void whenRequestResourceWithQuery(const nx::UrlQuery& query)
+    {
+        m_client->makeAsyncCall<TestResource>(nx::network::http::Method::get,
+            kCachableResourcePath,
+            query,
+            [this](auto&&... args)
+            { m_results.push(std::make_tuple(std::forward<decltype(args)>(args)...)); });
+    }
+
+    void whenPutResource()
+    {
+        m_client->makeAsyncCall<TestResource>(nx::network::http::Method::put,
+            kCachableResourcePath,
+            {}, // query
+            m_resource,
+            [this](auto&&... args)
+            { m_results.push(std::make_tuple(std::forward<decltype(args)>(args)...)); });
+    }
+
     void whenUpdateResource()
     {
         m_resource.value = nx::utils::generateRandomName(7);
     }
 
-    void thenExpectedResourceWasProvided()
+    void thenExpectedResourceWasProvided() { thenResourceWasProvided(m_resource); }
+
+    void thenResourceWasProvided(const TestResource& expected)
     {
         m_lastResult = m_results.pop();
         ASSERT_EQ(StatusCode::ok, std::get<0>(*m_lastResult));
-        ASSERT_EQ(m_resource, std::get<1>(*m_lastResult));
+        ASSERT_EQ(expected, std::get<1>(*m_lastResult));
     }
 
     void andConditionalRequestWasSent()
@@ -345,6 +373,11 @@ protected:
         auto it = m_lastRequest.headers.find("If-None-Match");
         ASSERT_NE(m_lastRequest.headers.end(), it);
         ASSERT_EQ(std::get<1>(*m_lastResult).value, it->second);
+    }
+
+    void andRequestWasNotConditional()
+    {
+        ASSERT_FALSE(m_lastRequest.headers.contains(header::kIfNoneMatch));
     }
 
     void andCacheContainsRecentValue()
@@ -361,8 +394,13 @@ private:
     {
         m_lastRequest = ctx.request;
 
+        // The "id" query item selects a variant of the resource, like a filter applied to a list.
+        const auto id =
+            nx::UrlQuery(ctx.request.requestLine.url.query()).queryItemValue<std::string>("id");
+        const TestResource resource = id.empty() ? m_resource : TestResource{.value = id};
+
         auto etagIt = ctx.request.headers.find("If-None-Match");
-        if (etagIt != ctx.request.headers.end() && etagIt->second == m_resource.value)
+        if (etagIt != ctx.request.headers.end() && etagIt->second == resource.value)
         {
             handler(RequestResult(StatusCode::notModified));
             return;
@@ -370,8 +408,8 @@ private:
 
         RequestResult result(StatusCode::ok);
         result.body = std::make_unique<BufferSource>(
-            "application/json", nx::reflect::json::serialize(m_resource));
-        result.headers.emplace("ETag", m_resource.value);
+            "application/json", nx::reflect::json::serialize(resource));
+        result.headers.emplace("ETag", resource.value);
         handler(std::move(result));
     }
 
@@ -411,6 +449,50 @@ TEST_F(GenericApiClientWithCaching, cache_is_update_if_etag_not_matched)
     whenRequestResource();
     thenExpectedResourceWasProvided();
     andCacheContainsRecentValue();
+}
+
+TEST_F(GenericApiClientWithCaching, requests_with_different_queries_are_cached_separately)
+{
+    whenRequestResourceVariant("a");
+    thenResourceWasProvided({.value = "a"});
+
+    whenRequestResourceVariant("b");
+    thenResourceWasProvided({.value = "b"});
+    andRequestWasNotConditional();
+
+    whenRequestResourceVariant("a");
+    thenResourceWasProvided({.value = "a"});
+    andConditionalRequestWasSent();
+}
+
+TEST_F(GenericApiClientWithCaching, order_of_query_parameters_does_not_affect_cache)
+{
+    whenRequestResourceWithQuery("id=a&filter=x");
+    thenResourceWasProvided({.value = "a"});
+
+    whenRequestResourceWithQuery("filter=x&id=a");
+    thenResourceWasProvided({.value = "a"});
+    andConditionalRequestWasSent();
+}
+
+TEST_F(GenericApiClientWithCaching, order_of_repeated_query_parameter_values_is_kept)
+{
+    whenRequestResourceWithQuery("id=a&tag=1&tag=2");
+    thenResourceWasProvided({.value = "a"});
+
+    whenRequestResourceWithQuery("id=a&tag=2&tag=1");
+    thenResourceWasProvided({.value = "a"});
+    andRequestWasNotConditional();
+}
+
+TEST_F(GenericApiClientWithCaching, reply_to_non_get_request_is_not_cached)
+{
+    whenPutResource();
+    thenExpectedResourceWasProvided();
+
+    whenPutResource();
+    thenExpectedResourceWasProvided();
+    andRequestWasNotConditional();
 }
 
 //-------------------------------------------------------------------------------------------------

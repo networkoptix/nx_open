@@ -542,20 +542,23 @@ NX_REFLECTION_ENUM_CLASS(AuthType,
 namespace header {
 
 /** Common header name constants. */
-static constexpr char kAccept[] = "Accept";
-static constexpr char kAcceptLanguage[] = "Accept-Language";
-static constexpr char kContentDisposition[] = "Content-Disposition";
-static constexpr char kContentType[] = "Content-Type";
-static constexpr char kContentLength[] = "Content-Length";
-static constexpr char kUserAgent[] = "User-Agent";
-static constexpr char kAuthorization[] = "Authorization";
-static constexpr char kHost[] = "Host";
-static constexpr char kConnection[] = "Connection";
-static constexpr char kRequestId[] = "X-Request-Id";
-static constexpr char kAmznTraceId[] = "X-Amzn-Trace-Id";
+inline constexpr char kAccept[] = "Accept";
+inline constexpr char kAcceptLanguage[] = "Accept-Language";
+inline constexpr char kAuthorization[] = "Authorization";
+inline constexpr char kConnection[] = "Connection";
+inline constexpr char kContentDisposition[] = "Content-Disposition";
+inline constexpr char kContentLength[] = "Content-Length";
+inline constexpr char kContentType[] = "Content-Type";
+inline constexpr char kETag[] = "ETag";
+inline constexpr char kHost[] = "Host";
+inline constexpr char kIfMatch[] = "If-Match";
+inline constexpr char kIfNoneMatch[] = "If-None-Match";
+inline constexpr char kUserAgent[] = "User-Agent";
+inline constexpr char kAmznTraceId[] = "X-Amzn-Trace-Id";
+inline constexpr char kXCache[] = "X-Cache";
+inline constexpr char kRequestId[] = "X-Request-Id";
 
-static constexpr std::array<std::string_view, 8> kNonRepeatableHeaders = {
-    kAuthorization,
+inline constexpr std::array<std::string_view, 8> kNonRepeatableHeaders = {kAuthorization,
     kHost,
     kContentLength,
     kContentType,
@@ -563,7 +566,6 @@ static constexpr std::array<std::string_view, 8> kNonRepeatableHeaders = {
     kConnection,
     kRequestId,
     kAmznTraceId};
-
 
 //!Http authentication scheme enumeration
 namespace AuthScheme {
@@ -1001,11 +1003,6 @@ public:
 private:
     SocketAddress m_endpoint;
 };
-
-static constexpr char kETag[] = "ETag";
-static constexpr char kIfNoneMatch[] = "If-None-Match";
-static constexpr char kIfMatch[] = "If-Match";
-static constexpr char kXCache[] = "X-Cache";
 
 } // namespace header
 

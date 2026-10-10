@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <deque>
 #include <future>
 #include <optional>
@@ -97,6 +98,9 @@ public:
      * from the response. If the same request is made again and there is a cached value, then the
      * "If-None-Match: <cached ETag value>" is added to the request and, if the server responds
      * with "304 Not Modified" status, then the cached value is returned.
+     * Only GET requests are cached. The cache key consists of the method, the request path and
+     * the URL query, so requests to the same path with different queries are cached separately.
+     * The query parameters are sorted by name for the key, so their order does not matter.
      * The functionality is useful when there are multiple requests (e.g., periodic ones) with
      * rarely changing reply.
      * Disabled by default.
@@ -194,14 +198,15 @@ private:
     const nx::Url m_baseApiUrl;
     ssl::AdapterFunc m_adapterFunc;
     std::unordered_map<network::aio::BasicPollable*, Context> m_activeRequests;
-    nx::Mutex m_mutex;
+    mutable nx::Mutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
     unsigned int m_numRetries = 1;
     std::optional<nx::MoveOnlyFunc<bool(ResultType)>> m_isRequestSucceeded;
     ClientOptions m_clientOptions;
     bool m_cacheEnabled = false;
     // Actual value has type CacheEntry<T> where T is passed via OutputData template parameter.
-    std::unordered_map<std::string /*GET <path>*/, std::shared_ptr<const BaseCacheEntry>> m_cache;
+    // The key is like "GET <path>?<query parameters sorted by name>".
+    std::unordered_map<std::string, std::shared_ptr<const BaseCacheEntry>> m_cache;
     std::chrono::milliseconds m_lastResponseTime{0};
     nx::network::http::HttpHeaders m_lastResponseHeaders;
 
@@ -216,26 +221,23 @@ private:
     template<typename Output, typename SerializationLibWrapper, typename... Args>
 
     auto createHttpClient(HttpClientPtr asyncClient, const Url& url, Args&&... args);
-    std::string makeCacheKey(const network::http::Method& method, const std::string& requestPath);
+    std::string makeCacheKey(const network::http::Method& method,
+        const std::string& requestPath,
+        const nx::UrlQuery& query);
 
     template<typename CachedType>
-    std::shared_ptr<const CacheEntry<CachedType>> findCacheEntry(
-        const network::http::Method& method,
-        const std::string& requestPath);
+    std::shared_ptr<const CacheEntry<CachedType>> findCacheEntry(const std::string& key) const;
 
     template<typename CachedType>
-    void saveToCache(
-        const network::http::Method& method,
-        const std::string& requestPath,
-        CacheEntry<CachedType>&& cachedType);
+    void saveToCache(std::string key, CacheEntry<CachedType>&& cachedType);
 
-    template<typename... ResponseFetchers, typename Request, typename CompletionHandler,
-        typename CachedType, typename... Output
-    >
-    void processResponse(
-        const network::http::Method& method,
-        const std::string& requestPath,
-        Request* requestPtr,
+    template<typename... ResponseFetchers,
+        typename Request,
+        typename CompletionHandler,
+        typename CachedType,
+        typename... Output>
+    void processResponse(Request* requestPtr,
+        std::string cacheKey,
         std::shared_ptr<const CacheEntry<CachedType>>,
         CompletionHandler handler,
         SystemError::ErrorCode error,
@@ -455,19 +457,20 @@ inline void GenericApiClient<ApiResultCodeDescriptor, Base>::makeAsyncCallWithRe
         handler(result, std::forward<decltype(outArgs)>(outArgs)...);
     };
 
-    auto cacheEntry = findCacheEntry<Output>(method, requestPath);
+    auto cacheKey = makeCacheKey(method, requestPath, urlQuery);
+    auto cacheEntry = findCacheEntry<Output>(cacheKey);
     if (cacheEntry)
-        request->httpClient().addAdditionalHeader("If-None-Match", cacheEntry->etag);
+        request->httpClient().addAdditionalHeader(header::kIfNoneMatch, cacheEntry->etag);
 
-    request->execute(
-        method,
-        [this, method, requestPath, request, cacheEntry, handlerWrapper = std::move(handlerWrapper)](
-            auto&&... args) mutable
+    request->execute(method,
+        [this,
+            request,
+            cacheKey = std::move(cacheKey),
+            cacheEntry = std::move(cacheEntry),
+            handlerWrapper = std::move(handlerWrapper)](auto&&... args) mutable
         {
-            this->processResponse<ResponseFetchers...>(
-                method,
-                requestPath,
-                request,
+            this->processResponse<ResponseFetchers...>(request,
+                std::move(cacheKey),
                 std::move(cacheEntry),
                 std::move(handlerWrapper),
                 std::forward<decltype(args)>(args)...);
@@ -590,25 +593,39 @@ auto GenericApiClient<ApiResultCodeDescriptor, Base>::createHttpClient(
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 std::string GenericApiClient<ApiResultCodeDescriptor, Base>::makeCacheKey(
-    const network::http::Method& method,
-    const std::string& requestPath)
+    const network::http::Method& method, const std::string& requestPath, const nx::UrlQuery& query)
 {
-    return nx::utils::buildString(method.toString(), " ", requestPath);
+    // Add the method to the key if more methods will be cached.
+    if (!m_cacheEnabled || method != Method::get)
+        return {};
+
+    // Sort the parameters by name, so that the same parameters added in a different order give
+    // the same key. The sort is stable: repeated parameters keep their relative order, since it
+    // can be meaningful to the server.
+    QUrlQuery sortedQuery(static_cast<const QUrlQuery&>(query));
+    auto items = sortedQuery.queryItems();
+    std::stable_sort(items.begin(),
+        items.end(),
+        [](const auto& lhs, const auto& rhs) { return lhs.first < rhs.first; });
+    sortedQuery.setQueryItems(items);
+
+    const auto queryStr = sortedQuery.toString(QUrl::FullyEncoded).toStdString();
+
+    return nx::utils::buildString(requestPath, '?', queryStr);
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename CachedType>
-std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::template CacheEntry<CachedType, void>>
-    GenericApiClient<ApiResultCodeDescriptor, Base>::findCacheEntry(
-        const network::http::Method& method,
-        const std::string& requestPath)
+std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor,
+    Base>::template CacheEntry<CachedType, void>>
+    GenericApiClient<ApiResultCodeDescriptor, Base>::findCacheEntry(const std::string& key) const
 {
-    if (!m_cacheEnabled)
+    if (!m_cacheEnabled || key.empty())
         return nullptr;
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        auto cacheIter = m_cache.find(makeCacheKey(method, requestPath));
+        auto cacheIter = m_cache.find(key);
         if (cacheIter != m_cache.end())
             return std::dynamic_pointer_cast<const CacheEntry<CachedType>>(cacheIter->second);
     }
@@ -619,24 +636,23 @@ std::shared_ptr<const typename GenericApiClient<ApiResultCodeDescriptor, Base>::
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
 template<typename CachedType>
 void GenericApiClient<ApiResultCodeDescriptor, Base>::saveToCache(
-    const network::http::Method& method,
-    const std::string& requestPath,
-    CacheEntry<CachedType>&& cachedType)
+    std::string key, CacheEntry<CachedType>&& cachedType)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_cache[makeCacheKey(method, requestPath)] =
-        std::make_shared<CacheEntry<CachedType>>(std::forward<CacheEntry<CachedType>>(cachedType));
+    m_cache.insert_or_assign(std::move(key),
+        std::make_shared<CacheEntry<CachedType>>(
+            std::forward<CacheEntry<CachedType>>(cachedType)));
 }
 
 template<HasResultCodeT ApiResultCodeDescriptor, typename Base>
-template<typename... ResponseFetchers, typename Request, typename CompletionHandler,
-    typename CachedType, typename... Output
->
-void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
-    const network::http::Method& method,
-    const std::string& requestPath,
-    Request* requestPtr,
+template<typename... ResponseFetchers,
+    typename Request,
+    typename CompletionHandler,
+    typename CachedType,
+    typename... Output>
+void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(Request* requestPtr,
+    std::string cacheKey,
     std::shared_ptr<const CacheEntry<CachedType>> cacheEntry,
     CompletionHandler handler,
     SystemError::ErrorCode error,
@@ -660,20 +676,22 @@ void GenericApiClient<ApiResultCodeDescriptor, Base>::processResponse(
     {
         if (cacheEntry && response && response->statusLine.statusCode == StatusCode::notModified)
         {
-            handler(cacheEntry->result, cacheEntry->reply, ResponseFetchers()(*response)...);
+            auto responseVal = *response;
+            ctx.client.reset();
+
+            handler(cacheEntry->result, cacheEntry->reply, ResponseFetchers()(responseVal)...);
             return;
         }
 
-        if (m_cacheEnabled &&
-            response &&
-            response->statusLine.statusCode == StatusCode::ok &&
-            response->headers.contains("ETag"))
+        if (m_cacheEnabled && !cacheKey.empty() && response
+            && response->statusLine.statusCode == StatusCode::ok
+            && response->headers.contains(header::kETag))
         {
             CacheEntry<CachedType> entry;
-            entry.etag = getHeaderValue(response->headers, "ETag");
+            entry.etag = getHeaderValue(response->headers, header::kETag);
             entry.result = resultCode;
             entry.reply = (output, ...);
-            saveToCache(method, requestPath, std::move(entry));
+            saveToCache(std::move(cacheKey), std::move(entry));
         }
     }
 
