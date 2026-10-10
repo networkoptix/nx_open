@@ -153,6 +153,10 @@
       <translation>Svep mellan resurser</translation>
     </message>
     <message>
+      <source>Switch between cameras on a layout</source>
+      <translation type="unfinished">Switch between cameras on a layout</translation>
+    </message>
+    <message>
       <source>Swipe right to switch to next Camera</source>
       <translation>Svep åt höger för att växla till nästa kamera</translation>
     </message>
@@ -604,6 +608,10 @@
       <source>Tutorials</source>
       <translation>Handledningar</translation>
     </message>
+    <message>
+      <source>See the interface walkthrough</source>
+      <translation type="unfinished">See the interface walkthrough</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -759,6 +767,10 @@
       <translation>Visningsläge</translation>
     </message>
     <message>
+      <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
+      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+    </message>
+    <message>
       <source>Tap to choose desired data type</source>
       <translation>Tryck för att välja önskad datatyp</translation>
     </message>
@@ -798,6 +810,10 @@
     <message>
       <source>Floating Panel Button</source>
       <translation>Flytande panelknapp</translation>
+    </message>
+    <message>
+      <source>Reopen a collapsed panel</source>
+      <translation type="unfinished">Reopen a collapsed panel</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1440,6 +1456,10 @@
       <translation>Mjuka utlösare</translation>
     </message>
     <message>
+      <source>Open Soft Trigger camera actions</source>
+      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+    </message>
+    <message>
       <source>Tap to invoke soft triggers panel</source>
       <translation>Tryck för att öppna panelen för mjuka utlösare</translation>
     </message>
@@ -1501,6 +1521,10 @@
       <translation>Tidslinjekort och spelare</translation>
     </message>
     <message>
+      <source>View event details with a long tap</source>
+      <translation type="unfinished">View event details with a long tap</translation>
+    </message>
+    <message>
       <source>Long tap to invoke preview with more details</source>
       <translation>Långtryck för att åberopa förhandsgranskning med mer detaljer</translation>
     </message>
@@ -1510,6 +1534,10 @@
     <message>
       <source>Zoom Timeline In/Out</source>
       <translation>Zooma tidslinjen in/ut</translation>
+    </message>
+    <message>
+      <source>Pinch or spread to zoom the Timeline</source>
+      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>

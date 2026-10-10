@@ -153,6 +153,10 @@
       <translation>リソース間のスワイプ</translation>
     </message>
     <message>
+      <source>Switch between cameras on a layout</source>
+      <translation type="unfinished">Switch between cameras on a layout</translation>
+    </message>
+    <message>
       <source>Swipe right to switch to next Camera</source>
       <translation>右にスワイプすると次のカメラに切り替わります</translation>
     </message>
@@ -603,6 +607,10 @@
       <source>Tutorials</source>
       <translation>チュートリアル</translation>
     </message>
+    <message>
+      <source>See the interface walkthrough</source>
+      <translation type="unfinished">See the interface walkthrough</translation>
+    </message>
   </context>
   <context>
     <name>InvalidOrChangedCertificateDialog</name>
@@ -758,6 +766,10 @@
       <translation>ビューモード</translation>
     </message>
     <message>
+      <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
+      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+    </message>
+    <message>
       <source>Tap to choose desired data type</source>
       <translation>希望のデータタイプを選択するにはここをタップ</translation>
     </message>
@@ -797,6 +809,10 @@
     <message>
       <source>Floating Panel Button</source>
       <translation>フローティングパネルボタン</translation>
+    </message>
+    <message>
+      <source>Reopen a collapsed panel</source>
+      <translation type="unfinished">Reopen a collapsed panel</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1439,6 +1455,10 @@
       <translation>ソフトトリガー</translation>
     </message>
     <message>
+      <source>Open Soft Trigger camera actions</source>
+      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+    </message>
+    <message>
       <source>Tap to invoke soft triggers panel</source>
       <translation>ソフトトリガーパネルを起動するにはここをタップ</translation>
     </message>
@@ -1500,6 +1520,10 @@
       <translation>タイムラインのカードとプレイヤー</translation>
     </message>
     <message>
+      <source>View event details with a long tap</source>
+      <translation type="unfinished">View event details with a long tap</translation>
+    </message>
+    <message>
       <source>Long tap to invoke preview with more details</source>
       <translation>長押しすると、より詳細なプレビューが表示されます</translation>
     </message>
@@ -1509,6 +1533,10 @@
     <message>
       <source>Zoom Timeline In/Out</source>
       <translation>タイムラインのズームイン/ズームアウト</translation>
+    </message>
+    <message>
+      <source>Pinch or spread to zoom the Timeline</source>
+      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
