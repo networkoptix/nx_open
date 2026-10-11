@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Växla mellan kameror på en layout</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Se gränssnittsgenomgången</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Växla tidslinjen mellan rörelse, objekt och bokmärken</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Öppna en hopfälld panel igen</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Öppna kameraåtgärder med mjuk trigger</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
@@ -1522,7 +1522,7 @@
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Visa händelseinformation med ett långt tryck</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
@@ -1537,7 +1537,7 @@
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Nyp eller isär för att zooma tidslinjen</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
