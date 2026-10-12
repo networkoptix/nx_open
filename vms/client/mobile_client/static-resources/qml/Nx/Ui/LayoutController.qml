@@ -8,6 +8,8 @@ import QtQuick.Controls
 import Nx.Core
 import Nx.Mobile
 
+import nx.vms.client.core
+
 NxObject
 {
     id: layoutController
@@ -95,6 +97,19 @@ NxObject
     }
 
     readonly property alias fullscreen: d.fullscreen
+
+    function preferredVideoOrientation(aspectRatio, rotation)
+    {
+        const currentOrientation = isPortrait ? Qt.PortraitOrientation : Qt.LandscapeOrientation
+        if (aspectRatio <= 0 || aspectRatio === 1)
+            return currentOrientation
+
+        const verticalVideo = Geometry.isRotated90(rotation)
+            ? aspectRatio > 1
+            : aspectRatio < 1
+
+        return verticalVideo ? Qt.PortraitOrientation : Qt.LandscapeOrientation
+    }
 
     function enterFullscreen(orientation = Qt.LandscapeOrientation)
     {
