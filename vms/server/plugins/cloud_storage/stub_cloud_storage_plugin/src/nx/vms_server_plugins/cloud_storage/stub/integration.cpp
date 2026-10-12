@@ -33,12 +33,14 @@ void Integration::doObtainEngine(
     try
     {
         std::lock_guard lock(m_mutex);
-        if (!m_engine)
+        // The engine is stopped when its storage is removed. A storage added after that gets a
+        // new engine.
+        if (!m_engine || m_engine->isStopped())
         {
             NX_OUTPUT << __func__ << ": called with url '" << url << "'";
 
             // Here we may want to create all kinds of data managing clients, connections to
-            // databases and backends, which are supposed to be persistent throughout the plugin
+            // databases and backends, which are supposed to be persistent throughout the engine
             // lifetime.
 
             std::string workDir;

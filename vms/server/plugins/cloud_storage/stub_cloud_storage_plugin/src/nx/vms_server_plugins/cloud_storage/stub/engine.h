@@ -34,6 +34,8 @@ public:
     virtual nx::sdk::ErrorCode storageSpace(
         nx::sdk::cloud_storage::StorageSpace* storageSpace) const override;
 
+    bool isStopped() const;
+
 protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::cloud_storage::IDeviceAgent*>* outResult,
