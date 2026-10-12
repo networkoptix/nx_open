@@ -11,6 +11,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/thread/worker.h>
 
 #include "tcp_connection_processor.h"
 
@@ -42,6 +43,25 @@ public:
     bool isStopped = false;
 
     QString pathIgnorePrefix;
+
+    // Deleting a processor waits for its socket's AIO thread. Done inline, a single stuck AIO
+    // thread would stop accept() for good.
+    QVector<QnLongRunnable*> finished; //< Guarded by connectionMtx.
+    nx::Mutex deleteMutex;
+    nx::utils::Worker deleter{/*maxTaskCount*/ std::nullopt};
+
+    // Also called inline once QnLongRunnablePool::stopAll() has stopped the worker, which then
+    // drops posted tasks, and from run() for the last batch.
+    void deleteFinished()
+    {
+        NX_MUTEX_LOCKER deleteLock(&deleteMutex);
+        QVector<QnLongRunnable*> processors;
+        {
+            NX_MUTEX_LOCKER lock(&connectionMtx);
+            std::swap(processors, finished);
+        }
+        qDeleteAll(processors);
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -181,8 +201,7 @@ void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
 
-    QList<QnLongRunnable*> toDeleteList;
-
+    bool added = false;
     {
         NX_MUTEX_LOCKER lock(&d->connectionMtx);
 
@@ -192,7 +211,8 @@ void QnTcpListener::removeDisconnectedConnections()
             QnLongRunnable* processor = *itr;
             if (!processor->isRunning())
             {
-                toDeleteList << processor;
+                d->finished << processor;
+                added = true;
                 itr = d->connections.erase(itr);
             }
             else
@@ -202,8 +222,10 @@ void QnTcpListener::removeDisconnectedConnections()
         }
     }
 
-    for(QnLongRunnable* processor: toDeleteList)
-        delete processor;
+    if (d->deleter.needToStop())
+        d->deleteFinished();
+    else if (added)
+        d->deleter.post([d]() { d->deleteFinished(); });
 }
 
 void QnTcpListener::removeOwnership(QnLongRunnable* processor)
@@ -382,6 +404,7 @@ void QnTcpListener::run()
 
     NX_DEBUG(this, "(%1:%2). Removing all connections before stop",
         d->serverAddress, d->localPort);
+    d->deleteFinished();
     removeAllConnections();
     destroyServerSocket();
     NX_DEBUG(this, "Exiting run(). %1:%2", d->serverAddress, d->localPort);
