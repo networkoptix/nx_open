@@ -6,7 +6,6 @@
 #include <unordered_map>
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/thread.h>
 
 #include "aio_service.h"
 #include "basic_pollable.h"
@@ -34,12 +33,12 @@ public:
      * @param func Invoked to create a worker for a thread. Must be reentrant.
      */
     AsyncObjectPool(AIOService* aioService, FactoryFunc func):
+        m_aioService(aioService),
         m_factoryFunc(std::move(func))
     {
-        // FIXME: #skolesnik AIOService::initialize() may return before AioThread::run()
-        // initializes systemThreadId(), causing multiple workers to be registered under 0.
+        // Keyed by thread object: a thread id is not known until the thread is running.
         for (auto t: aioService->getAllAioThreads())
-            m_workers[t->systemThreadId()] = nullptr;
+            m_workers[t] = nullptr;
     }
 
     ~AsyncObjectPool()
@@ -54,7 +53,7 @@ public:
      */
     Worker* get()
     {
-        auto it = m_workers.find(nx::utils::Thread::currentThreadSystemId());
+        auto it = m_workers.find(m_aioService->getCurrentAioThread());
         if (it == m_workers.end())
             return nullptr;
 
@@ -72,7 +71,7 @@ public:
      */
     void clear()
     {
-        for (auto& [tid, worker]: m_workers)
+        for (auto& [thread, worker]: m_workers)
         {
             if (!worker)
                 continue;
@@ -82,8 +81,9 @@ public:
     }
 
 private:
+    AIOService* m_aioService;
     FactoryFunc m_factoryFunc;
-    std::unordered_map<nx::utils::ThreadId, std::unique_ptr<Worker>> m_workers;
+    std::unordered_map<AbstractAioThread*, std::unique_ptr<Worker>> m_workers;
 };
 
 } // namespace nx::network::aio
