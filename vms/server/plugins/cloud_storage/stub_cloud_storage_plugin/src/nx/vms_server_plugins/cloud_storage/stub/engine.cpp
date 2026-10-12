@@ -394,6 +394,12 @@ bool Engine::isOnline() const
     return true;
 }
 
+bool Engine::isStopped() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return m_needToStop;
+}
+
 nx::sdk::ErrorCode Engine::storageSpace(nx::sdk::cloud_storage::StorageSpace* storageSpace) const
 {
     storageSpace->freeSpace = 1000 * 1024 * 1024 * 1024LL;

@@ -40,6 +40,8 @@ public:
 
     virtual void flushMetadata(nx::sdk::cloud_storage::MetadataType type) override;
 
+    bool isStopped() const;
+
 protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::cloud_storage::IDeviceAgent*>* outResult,

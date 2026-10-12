@@ -11,6 +11,8 @@
 
 namespace nx::vms_server_plugins::cloud_storage::stub {
 
+class Engine;
+
 class Integration: public nx::sdk::RefCountable<nx::sdk::cloud_storage::IIntegration>
 {
 public:
@@ -27,7 +29,7 @@ protected:
 
 private:
     nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
-    nx::sdk::Ptr<nx::sdk::cloud_storage::IEngine> m_engine;
+    nx::sdk::Ptr<Engine> m_engine;
     std::mutex m_mutex;
     std::shared_ptr<DataManager> m_dataManager;
 };
