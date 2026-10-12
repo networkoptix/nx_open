@@ -62,7 +62,7 @@ bool matches(const QRegularExpression& pattern, const nx::vms::rules::Rule* rule
 
 RulesSortFilterProxyModel::RulesSortFilterProxyModel(QObject* parent):
     QSortFilterProxyModel{parent},
-    m_rulesTableModel{new RulesTableModel{this}}
+    m_rulesTableModel{new RulesTableModel{appContext()->currentSystemContext(), this}}
 {
     setSourceModel(m_rulesTableModel);
     setDynamicSortFilter(true);

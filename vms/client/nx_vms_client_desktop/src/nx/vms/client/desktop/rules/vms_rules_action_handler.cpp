@@ -4,8 +4,10 @@
 
 #include <api/server_rest_connection.h>
 #include <core/resource/camera_resource.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/api/data/lookup_list_data.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/debug_utils/utils/debug_custom_actions.h>
@@ -130,7 +132,10 @@ VmsRulesActionHandler::~VmsRulesActionHandler()
 
 void VmsRulesActionHandler::openVmsRulesDialog()
 {
-    if (!d->rulesDialog)
+    nx::utils::ElapsedTimer timer(nx::utils::ElapsedTimerState::started);
+    const bool isFirstOpening = !d->rulesDialog;
+
+    if (isFirstOpening)
     {
         d->rulesDialog = new VmsRulesDialog(mainWindowWidget());
         d->initialiseLookupLists();
@@ -148,6 +153,9 @@ void VmsRulesActionHandler::openVmsRulesDialog()
     {
         d->rulesDialog->open();
     }
+
+    NX_DEBUG(
+        this, "Rules dialog is opened in: %1, first opening: %2", timer.elapsed(), isFirstOpening);
 }
 
 void VmsRulesActionHandler::openEventLogDialog()

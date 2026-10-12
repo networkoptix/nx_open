@@ -17,13 +17,22 @@ namespace {
 typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
 /* Top-level domains can already be up to 30 symbols length for now, so do not limiting them. */
-static const QString kEmailPattern =
-    R"(^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,30}\.?$)";
+constexpr QStringView kEmailPattern =
+    uR"(^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,30}\.?$)";
 
 /* RFC5233 (sub-addressing, also known as plus addressing or tagged addressing). */
-static const QString kFullNamePattern = "^(?<fullname>.*)<(?<email>.+)>$";
+constexpr QStringView kFullNamePattern = u"^(?<fullname>.*)<(?<email>.+)>$";
 
 static constexpr int kAutoPort = 0;
+
+QRegularExpression compileRegex(QStringView pattern)
+{
+    QRegularExpression re(pattern.toString());
+    NX_ASSERT(re.isValid());
+    re.optimize();
+
+    return re;
+}
 
 } // namespace
 
@@ -105,9 +114,7 @@ bool QnEmailSettings::isValid(const QString& email, const QString& server)
 QnEmailAddress::QnEmailAddress(const QString& email):
     m_email(email.trimmed())
 {
-    QRegularExpression re(kFullNamePattern);
-    NX_ASSERT(re.isValid());
-
+    static const auto re = compileRegex(kFullNamePattern);
     const auto match = re.match(m_email);
     if (match.hasMatch())
     {
@@ -119,9 +126,9 @@ QnEmailAddress::QnEmailAddress(const QString& email):
 
 bool QnEmailAddress::isValid() const
 {
-    QRegularExpression re(kEmailPattern);
-    NX_ASSERT(re.isValid());
+    static const auto re = compileRegex(kEmailPattern);
     const auto match = re.match(m_email);
+
     return match.hasMatch();
 }
 

@@ -2,6 +2,8 @@
 
 #include "vms_rules_dialog.h"
 
+#include <QtQuick/QQuickWindow>
+
 #include <api/server_rest_connection.h>
 #include <nx/vms/api/rules/rule.h>
 #include <nx/vms/client/desktop/application_context.h>
@@ -38,6 +40,12 @@ VmsRulesDialog::VmsRulesDialog(QWidget* parent):
     QmlProperty<QObject*>(rootObjectHolder(), "dialog") = this;
     QmlProperty<bool>(rootObjectHolder(), "developerMode") =
         vms::client::desktop::ini().developerMode;
+
+    if (NX_ASSERT(m_rulesTableModel))
+    {
+        connect(
+            window(), &QWindow::visibleChanged, m_rulesTableModel, &RulesTableModel::setActive);
+    }
 }
 
 VmsRulesDialog::~VmsRulesDialog()

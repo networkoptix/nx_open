@@ -21,23 +21,7 @@ namespace {
 QnUserResourceList buildUserList(
     const QSet<nx::Uuid>& subjects, nx::vms::common::SystemContext* context)
 {
-    QnUserResourceList users;
-    QSet<nx::Uuid> groupIds;
-    nx::vms::common::getUsersAndGroups(context, subjects, users, groupIds);
-
-    for (const auto& user: context->accessSubjectHierarchy()->usersInGroups(groupIds))
-    {
-        if (std::find_if(users.begin(), users.end(),
-            [user](const QnUserResourcePtr& existing)
-            {
-                return user->getId() == existing->getId();
-            }) == users.end())
-        {
-            users << user;
-        }
-    }
-
-    return users;
+    return nx::vms::common::allUsers(context, subjects).values();
 }
 
 QnUserResourceList allVisibleUsers(QnResourcePool* resourcePool)
@@ -533,24 +517,20 @@ QString QnCloudUsersValidationPolicy::calculateAlert(
 
 QValidator::State QnUserWithEmailValidationPolicy::roleValidity(const nx::Uuid& roleId) const
 {
-    bool hasValid{false};
-    bool hasInvalid{false};
+    int validCount{};
+    int invalidCount{};
     for (const auto& user: systemContext()->accessSubjectHierarchy()->usersInGroups({roleId}))
     {
         if (userValidity(user))
-        {
-            hasValid = true;
-        }
+            ++validCount;
         else
-        {
-            if (hasValid)
-                return QValidator::State::Intermediate;
+            ++invalidCount;
 
-            hasInvalid = true;
-        }
+        if (validCount > 0 && invalidCount > 0)
+            return QValidator::State::Intermediate;
     }
 
-    return hasInvalid ? QValidator::State::Invalid : QValidator::State::Acceptable;
+    return invalidCount > 0 ? QValidator::State::Invalid : QValidator::State::Acceptable;
 }
 
 bool QnUserWithEmailValidationPolicy::userValidity(const QnUserResourcePtr& user) const
