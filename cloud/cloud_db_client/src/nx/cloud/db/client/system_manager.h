@@ -139,6 +139,14 @@ public:
     virtual void getSystemOffers(
         std::function<void(api::ResultCode, std::vector<api::SystemOffer>)> completionHandler) override;
 
+    virtual void startCustomizationMigration(const std::string& systemId,
+        const api::CustomizationMigrationRequest& request,
+        std::function<void(api::ResultCode, api::SystemCredentials)> completionHandler) override;
+
+    virtual void finishCustomizationMigration(const std::string& systemId,
+        const api::FinishCustomizationMigrationRequest& request,
+        std::function<void(api::ResultCode)> completionHandler) override;
+
     virtual void addSystemAttributes(
         const std::string& systemId,
         const std::vector<api::Attribute>& attributes,

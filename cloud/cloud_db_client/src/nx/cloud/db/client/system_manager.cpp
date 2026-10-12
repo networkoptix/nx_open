@@ -411,6 +411,30 @@ void SystemManager::getSystemOffers(
         std::move(completionHandler));
 }
 
+void SystemManager::startCustomizationMigration(const std::string& systemId,
+    const api::CustomizationMigrationRequest& request,
+    std::function<void(api::ResultCode, api::SystemCredentials)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall<api::SystemCredentials>(nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(
+            kSystemCustomizationMigrationPath, {systemId}),
+        {}, // query
+        request,
+        std::move(completionHandler));
+}
+
+void SystemManager::finishCustomizationMigration(const std::string& systemId,
+    const api::FinishCustomizationMigrationRequest& request,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    m_requestsExecutor->makeAsyncCall</*Output*/ void>(nx::network::http::Method::post,
+        nx::network::http::rest::substituteParameters(
+            kSystemFinishCustomizationMigrationPath, {systemId}),
+        {}, // query
+        request,
+        std::move(completionHandler));
+}
+
 void SystemManager::addSystemAttributes(
     const std::string& systemId,
     const std::vector<api::Attribute>& attributes,

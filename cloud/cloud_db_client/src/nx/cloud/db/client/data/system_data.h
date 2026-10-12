@@ -202,4 +202,6 @@ NX_REFLECTION_INSTRUMENT(CustomizationMigrationRequest, (targetCustomization))
 
 NX_REFLECTION_INSTRUMENT_ENUM(CustomizationMigrationAction, commit, rollback)
 
+NX_REFLECTION_INSTRUMENT(FinishCustomizationMigrationRequest, (action)(targetId))
+
 } // namespace nx::cloud::db::api

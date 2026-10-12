@@ -1006,7 +1006,10 @@ struct BatchErrorInfo
 
 struct SystemCredentials
 {
+    /**%apidoc Globally unique id of the System assigned by the Cloud. */
     std::string id;
+
+    /**%apidoc The key the System authenticates with. */
     std::string authKey;
 };
 
@@ -1025,6 +1028,15 @@ enum class CustomizationMigrationAction
     commit,
     /**%apidoc Cancel the migration: the target System is removed. */
     rollback,
+};
+
+struct FinishCustomizationMigrationRequest
+{
+    /**%apidoc How to finish the migration. Required. */
+    std::optional<CustomizationMigrationAction> action;
+
+    /**%apidoc Id of the System copy reported when the migration was started. Required. */
+    std::string targetId;
 };
 
 } // namespace nx::cloud::db::api

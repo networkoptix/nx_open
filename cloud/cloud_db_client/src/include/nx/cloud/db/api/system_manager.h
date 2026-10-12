@@ -266,6 +266,19 @@ public:
         const std::string& email,
         const std::string& attrName,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    //---------------------------------------------------------------------------------------------
+    // Customization migration methods.
+
+    /** Creates a copy of the System in another customization. Reports the copy credentials. */
+    virtual void startCustomizationMigration(const std::string& systemId,
+        const api::CustomizationMigrationRequest& request,
+        std::function<void(api::ResultCode, api::SystemCredentials)> completionHandler) = 0;
+
+    /** Commit removes the System, rollback removes its copy. */
+    virtual void finishCustomizationMigration(const std::string& systemId,
+        const api::FinishCustomizationMigrationRequest& request,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
 };
 
 } // namespace nx::cloud::db::api

@@ -47,6 +47,10 @@ static constexpr char kSystemHealthHistoryPath[] = "/cdb/systems/{systemId}/heal
 static constexpr char kSystemDataSyncSettingsPath[] = "/cdb/systems/{systemId}/data-sync-settings";
 static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/systems/{systemId}/merged_systems/";
 static constexpr char kSystemsValidateMSSignature[] = "/cdb/systems/{systemId}/signature/validate";
+static constexpr char kSystemCustomizationMigrationPath[] =
+    "/cdb/systems/{systemId}/customizationMigration";
+static constexpr char kSystemFinishCustomizationMigrationPath[] =
+    "/cdb/systems/{systemId}/finishMigration";
 static constexpr char kSystemUsersPath[] = "/cdb/v0/systems/{systemId}/users";
 static constexpr char kSystemUserPath[] = "/cdb/v0/systems/{systemId}/users/{accountEmail}";
 static constexpr char kSystemUsersPathV2[] = "/cdb/v2/systems/{systemId}/users";
