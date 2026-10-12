@@ -318,18 +318,6 @@ Page
 
         property bool forceVideoPause: downloadMediaSheet.opened
 
-        // Whether the displayed video (with the camera rotation applied) is vertical.
-        readonly property bool verticalVideo:
-        {
-            const aspectRatio = controller.mediaPlayer.aspectRatio
-            if (aspectRatio <= 0)
-                return false //< Not known yet; the default (forced landscape) applies.
-
-            return Geometry.isRotated90(controller.resourceHelper.customRotation)
-                ? aspectRatio > 1
-                : aspectRatio < 1
-        }
-
         readonly property bool canViewArchive: controller.accessRightsHelper.canViewArchive
         readonly property bool hasArchive: canViewArchive && cameraChunkProvider.bottomBound >= 0
 
@@ -1522,8 +1510,13 @@ Page
                 backgroundColor: "transparent"
                 icon.source: "image://skin/24x24/Outline/full_screen.svg"
 
-                onClicked: LayoutController.enterFullscreen(
-                    d.verticalVideo ? Qt.PortraitOrientation : Qt.LandscapeOrientation)
+                onClicked:
+                {
+                    const orientation = LayoutController.preferredVideoOrientation(
+                        controller.mediaPlayer.aspectRatio,
+                        controller.resourceHelper.customRotation)
+                    LayoutController.enterFullscreen(orientation)
+                }
 
                 // To block camera swipe if the button is dragged.
                 DragHandler { target: null }

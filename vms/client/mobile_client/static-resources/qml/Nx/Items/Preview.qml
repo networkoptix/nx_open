@@ -372,8 +372,12 @@ Rectangle
             ? ColorTheme.transparent("#0D1012", enabled ? 0.5 : 0.15)
             : "transparent"
 
-        onClicked: LayoutController.toggleFullscreen(
-            d.verticalVideo ? Qt.PortraitOrientation : Qt.LandscapeOrientation)
+        onClicked:
+        {
+            const orientation = LayoutController.preferredVideoOrientation(
+                preview.videoAspectRatio, preview.videoRotation)
+            LayoutController.toggleFullscreen(orientation)
+        }
     }
 
     ControlButton
@@ -541,11 +545,6 @@ Rectangle
                 easing.type: Easing.InOutQuad
             }
         }
-
-        readonly property bool verticalVideo: preview.isReady
-            && (preview.videoRotation === 0 || preview.videoRotation === 180
-                ? preview.videoAspectRatio < 1
-                : preview.videoAspectRatio > 1)
 
         property int exclusionAreaY: root.gestureExclusionEnabled
             ? slider.parent.mapToGlobal(0, slider.y).y * Screen.devicePixelRatio
