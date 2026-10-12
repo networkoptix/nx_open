@@ -2,6 +2,9 @@
 
 #include "rules_table_model.h"
 
+#include <vector>
+
+#include <QtCore/QHash>
 #include <QtQml/QtQml>
 
 #include <core/resource/camera_resource.h>
@@ -66,13 +69,13 @@ QString iconPath(ResourceIconCache::Key iconKey, bool enabled)
 }
 
 // Returns whether the given rule has Acceptable or Intermediate state.
-bool isRuleValid(const RulesTableModel::ConstRulePtr& rule)
+bool calculateRuleValidity(const RulesTableModel::ConstRulePtr& rule)
 {
     if (!rule->isCompatible())
         return false;
 
-    const auto validity = vms::rules::utils::visibleFieldsValidity(
-        rule.get(), appContext()->currentSystemContext());
+    const auto validity =
+        vms::rules::utils::visibleFieldsValidity(rule.get(), rule->engine()->systemContext());
 
     return validity.validity > QValidator::State::Invalid;
 }
@@ -93,50 +96,106 @@ bool hasLookupList(const vms::rules::ItemDescriptor& eventDescriptor)
         });
 }
 
+/**
+ * Cache of rule data that is expensive to calculate. The whole record is calculated on the first
+ * access and is dropped when the rule or anything it depends on changes.
+ */
+class RuleDataCache
+{
+public:
+    struct Data
+    {
+        bool isValid = false;
+    };
+
+    /**
+     * Returns the rule data, calculating it on the first access. The reference is valid only
+     * until the next call.
+     */
+    const Data& data(const RulesTableModel::ConstRulePtr& rule)
+    {
+        auto it = m_data.find(rule->id());
+        if (it == m_data.end())
+            it = m_data.insert(rule->id(), calculate(rule));
+
+        return *it;
+    }
+
+    void invalidate(nx::Uuid ruleId) { m_data.remove(ruleId); }
+
+    void clear() { m_data.clear(); }
+
+private:
+    Data calculate(const RulesTableModel::ConstRulePtr& rule) const
+    {
+        return {.isValid = calculateRuleValidity(rule)};
+    }
+
+private:
+    QHash<nx::Uuid, Data> m_data;
+};
+
 } // namespace
+
+struct RulesTableModel::Private
+{
+    vms::rules::Engine* const engine = nullptr;
+    std::vector<nx::Uuid> ruleIds;
+
+    /** Filled on demand from the const model methods. */
+    mutable RuleDataCache ruleDataCache;
+
+    /**
+     * While inactive, data refresh signals are ignored. The model starts active, as the data
+     * read before the first activation is up to date.
+     */
+    bool active = true;
+
+    /** Returns whether the given rule has Acceptable or Intermediate state. */
+    bool isRuleValid(const ConstRulePtr& rule) const { return ruleDataCache.data(rule).isValid; }
+};
 
 const Uuid RulesTableModel::kAnyDeviceUuid;
 
-RulesTableModel::RulesTableModel(QObject* parent):
+RulesTableModel::RulesTableModel(SystemContext* systemContext, QObject* parent):
     QAbstractTableModel(parent),
-    m_engine(appContext()->currentSystemContext()->vmsRulesEngine())
+    SystemContextAware(systemContext),
+    d(new Private{.engine = systemContext->vmsRulesEngine()})
 {
     initialise();
 
-    connect(
-        m_engine,
+    connect(d->engine,
         &vms::rules::Engine::ruleAddedOrUpdated,
         this,
         &RulesTableModel::onRuleAddedOrUpdated);
-    connect(m_engine, &vms::rules::Engine::ruleRemoved, this, &RulesTableModel::onRuleRemoved);
-    connect(m_engine, &vms::rules::Engine::rulesReset, this, &RulesTableModel::onRulesReset);
+    connect(d->engine, &vms::rules::Engine::ruleRemoved, this, &RulesTableModel::onRuleRemoved);
+    connect(d->engine, &vms::rules::Engine::rulesReset, this, &RulesTableModel::onRulesReset);
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-    connect(
-        resourcePool,
+    connect(resourcePool(),
         &QnResourcePool::resourcesAdded,
         this,
         &RulesTableModel::onResourcePoolChanged);
-    connect(
-        resourcePool,
+    connect(resourcePool(),
         &QnResourcePool::resourcesRemoved,
         this,
         &RulesTableModel::onResourcePoolChanged);
 
-    const auto accessController = appContext()->currentSystemContext()->accessController();
-    connect(
-        accessController,
+    connect(accessController(),
         &core::AccessController::permissionsMaybeChanged,
         this,
         &RulesTableModel::onPermissionsChanged);
 
-    const auto lookupListManager = appContext()->currentSystemContext()->lookupListManager();
-    connect(
-        lookupListManager,
+    connect(lookupListManager(),
+        &common::LookupListManager::initialized,
+        this,
+        &RulesTableModel::onLookupListsInitialized);
+    connect(lookupListManager(),
         &common::LookupListManager::removed,
         this,
         &RulesTableModel::onLookupListRemoved);
 }
+
+RulesTableModel::~RulesTableModel() = default;
 
 void RulesTableModel::onRuleAddedOrUpdated(nx::Uuid ruleId, bool added)
 {
@@ -144,17 +203,22 @@ void RulesTableModel::onRuleAddedOrUpdated(nx::Uuid ruleId, bool added)
 
     if (added)
     {
-        beginInsertRows({}, m_ruleIds.size(), m_ruleIds.size());
-        m_ruleIds.push_back(ruleId);
+        beginInsertRows({}, d->ruleIds.size(), d->ruleIds.size());
+        d->ruleIds.push_back(ruleId);
         endInsertRows();
     }
     else
     {
-        const auto ruleIt = std::find(m_ruleIds.cbegin(), m_ruleIds.cend(), ruleId);
-        if (ruleIt == m_ruleIds.cend())
+        d->ruleDataCache.invalidate(ruleId);
+
+        if (!d->active)
             return;
 
-        const auto distance = std::distance(m_ruleIds.cbegin(), ruleIt);
+        const auto ruleIt = std::find(d->ruleIds.cbegin(), d->ruleIds.cend(), ruleId);
+        if (ruleIt == d->ruleIds.cend())
+            return;
+
+        const auto distance = std::distance(d->ruleIds.cbegin(), ruleIt);
         emit dataChanged(index(distance, StateColumn), index(distance, CommentColumn));
     }
 };
@@ -163,14 +227,16 @@ void RulesTableModel::onRuleRemoved(nx::Uuid ruleId)
 {
     NX_VERBOSE(this, "Rule %1 is removed", ruleId);
 
-    const auto ruleIt = std::find(m_ruleIds.cbegin(), m_ruleIds.cend(), ruleId);
-    if (ruleIt == m_ruleIds.cend())
+    d->ruleDataCache.invalidate(ruleId);
+
+    const auto ruleIt = std::find(d->ruleIds.cbegin(), d->ruleIds.cend(), ruleId);
+    if (ruleIt == d->ruleIds.cend())
         return;
 
-    const auto distance = std::distance(m_ruleIds.cbegin(), ruleIt);
+    const auto distance = std::distance(d->ruleIds.cbegin(), ruleIt);
     beginRemoveRows({}, distance, distance);
 
-    m_ruleIds.erase(ruleIt);
+    d->ruleIds.erase(ruleIt);
 
     endRemoveRows();
 }
@@ -181,31 +247,38 @@ void RulesTableModel::onRulesReset()
 
     beginResetModel();
     initialise();
+    d->ruleDataCache.clear();
     endResetModel();
 }
 
 void RulesTableModel::onResourcePoolChanged(const QnResourceList& resources)
 {
+    if (!d->active)
+        return;
+
     const auto resourceIds = resources.ids();
 
     for (int row = 0; row < rowCount({}); ++row)
     {
         if (hasAnyOf(row, resourceIds))
-            emit dataChanged(createIndex(row, StateColumn), createIndex(row, TargetColumn));
+            refreshRow(row);
     }
 }
 
 void RulesTableModel::onPermissionsChanged(const QnResourceList& resources)
 {
+    if (!d->active)
+        return;
+
     const auto resourceIds = resources.ids();
 
     for (int row = 0; row < rowCount({}); ++row)
     {
-        const auto rule = m_engine->rule(m_ruleIds[row]);
+        const auto rule = d->engine->rule(d->ruleIds[row]);
         const auto eventFilter = rule->eventFilters().first();
-        const auto eventDescriptor = m_engine->eventDescriptor(eventFilter->eventType());
+        const auto eventDescriptor = d->engine->eventDescriptor(eventFilter->eventType());
         const auto actionBuilder = rule->actionBuilders().first();
-        const auto actionDescriptor = m_engine->actionDescriptor(actionBuilder->actionType());
+        const auto actionDescriptor = d->engine->actionDescriptor(actionBuilder->actionType());
 
         if (!vms::rules::hasSourceUser(eventDescriptor.value())
             && !vms::rules::hasTargetUser(actionDescriptor.value()))
@@ -218,45 +291,63 @@ void RulesTableModel::onPermissionsChanged(const QnResourceList& resources)
             // Permissions for any resource might be changed. Any rule with at least one selected
             // resource might be affected.
             if (hasResources(row))
-                emit dataChanged(createIndex(row, StateColumn), createIndex(row, TargetColumn));
+                refreshRow(row);
         }
         else
         {
             if (hasAnyOf(row, resourceIds))
-                emit dataChanged(createIndex(row, StateColumn), createIndex(row, TargetColumn));
+                refreshRow(row);
         }
     }
 }
 
+void RulesTableModel::onLookupListsInitialized()
+{
+    // All the lists are replaced, so any rule referencing a list might be affected.
+    refreshLookupListRows(nx::Uuid());
+}
+
 void RulesTableModel::onLookupListRemoved(nx::Uuid id)
 {
+    refreshLookupListRows(id);
+}
+
+void RulesTableModel::refreshLookupListRows(nx::Uuid listId)
+{
+    if (!d->active)
+        return;
+
+    const auto predicate = [listId](auto field)
+    {
+        const Uuid fieldListId{field->value()};
+        return listId.isNull() ? !fieldListId.isNull() : fieldListId == listId;
+    };
+
     for (int row = 0; row < rowCount({}); ++row)
     {
-        const auto rule = m_engine->rule(m_ruleIds[row]);
+        const auto rule = d->engine->rule(d->ruleIds[row]);
         const auto eventFilter = rule->eventFilters().first();
-        const auto eventDescriptor = m_engine->eventDescriptor(eventFilter->eventType());
+        const auto eventDescriptor = d->engine->eventDescriptor(eventFilter->eventType());
 
         if (!hasLookupList(eventDescriptor.value()))
             continue;
 
-        const auto predicate = [id](auto field) { return Uuid{field->value()} == id; };
-
         const auto objectLookupFields = eventFilter->fieldsByType<vms::rules::ObjectLookupField>();
         if (std::ranges::any_of(objectLookupFields, predicate))
         {
-            emit dataChanged(createIndex(row, StateColumn), createIndex(row, StateColumn));
-            return;
+            refreshRow(row);
+            continue;
         }
 
         const auto textLookupFields = eventFilter->fieldsByType<vms::rules::TextLookupField>();
         if (std::ranges::any_of(textLookupFields.begin(), textLookupFields.end(), predicate))
-            emit dataChanged(createIndex(row, StateColumn), createIndex(row, StateColumn));
+            refreshRow(row);
     }
 }
 
 int RulesTableModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return m_ruleIds.size();
+    return d->ruleIds.size();
 }
 
 int RulesTableModel::columnCount(const QModelIndex& /*parent*/) const
@@ -286,10 +377,7 @@ QVariant RulesTableModel::data(const QModelIndex& index, int role) const
 
     if (effectiveRole == Qt::ForegroundRole)
     {
-        if (!isRuleValid(rule))
-            return core::colorTheme()->color(kDisabledForegroundColor);
-
-        return rule->enabled()
+        return rule->enabled() && d->isRuleValid(rule)
             ? core::colorTheme()->color(kEnabledForegroundColor)
             : core::colorTheme()->color(kDisabledForegroundColor);
     }
@@ -373,25 +461,42 @@ RulesTableModel::ConstRulePtr RulesTableModel::getRule(const QModelIndex& index)
     if (!isIndexValid(index))
         return {};
 
-    return m_engine->rule(m_ruleIds[index.row()]);
+    return d->engine->rule(d->ruleIds[index.row()]);
+}
+
+void RulesTableModel::setActive(bool active)
+{
+    if (d->active == active)
+        return;
+
+    d->active = active;
+
+    if (!d->active)
+        return;
+
+    // Changes are not tracked while inactive, so everything must be refreshed on activation.
+    d->ruleDataCache.clear();
+
+    if (rowCount({}) > 0)
+        emit dataChanged(createIndex(0, 0), createIndex(rowCount({}) - 1, ColumnsCount - 1));
 }
 
 void RulesTableModel::initialise()
 {
-    const auto rules = m_engine->rules();
+    const auto rules = d->engine->rules();
 
-    m_ruleIds.clear();
-    m_ruleIds.reserve(rules.size());
+    d->ruleIds.clear();
+    d->ruleIds.reserve(rules.size());
 
     for (const auto& rule: rules)
     {
-        m_ruleIds.push_back(rule.first);
+        d->ruleIds.push_back(rule.first);
     }
 }
 
 bool RulesTableModel::isIndexValid(const QModelIndex& index) const
 {
-    return index.isValid() && index.row() < (int) m_ruleIds.size();
+    return index.isValid() && index.row() < (int) d->ruleIds.size();
 }
 
 bool RulesTableModel::canDisplayRule(const ConstRulePtr& rule) const
@@ -402,13 +507,19 @@ bool RulesTableModel::canDisplayRule(const ConstRulePtr& rule) const
     if (rule->eventFilters().empty() || rule->actionBuilders().empty())
         return false;
 
-    if (!m_engine->eventDescriptor(rule->eventFilters().first()->eventType()).has_value())
+    if (!d->engine->eventDescriptor(rule->eventFilters().first()->eventType()).has_value())
         return false;
 
-    if (!m_engine->actionDescriptor(rule->actionBuilders().first()->actionType()).has_value())
+    if (!d->engine->actionDescriptor(rule->actionBuilders().first()->actionType()).has_value())
         return false;
 
     return true;
+}
+
+void RulesTableModel::refreshRow(int row)
+{
+    d->ruleDataCache.invalidate(d->ruleIds[row]);
+    emit dataChanged(createIndex(row, StateColumn), createIndex(row, CommentColumn));
 }
 
 QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) const
@@ -425,7 +536,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
         if (!rule->enabled())
             return SortWeight::disabled;
 
-        if (!isRuleValid(rule))
+        if (!d->isRuleValid(rule))
             return SortWeight::invalid;
 
         return SortWeight::acceptable;
@@ -436,7 +547,7 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
 
     if (role == Qt::DecorationRole)
     {
-        if (!isRuleValid(rule))
+        if (!d->isRuleValid(rule))
             return kAttentionIconPath;
     }
 
@@ -446,7 +557,10 @@ QVariant RulesTableModel::stateColumnData(const ConstRulePtr& rule, int role) co
 QVariant RulesTableModel::eventColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_engine->eventDescriptor(rule->eventFilters().first()->eventType())->displayName();
+    {
+        return d->engine->eventDescriptor(rule->eventFilters().first()->eventType())
+            ->displayName();
+    }
 
     return {};
 }
@@ -454,7 +568,7 @@ QVariant RulesTableModel::eventColumnData(const ConstRulePtr& rule, int role) co
 QVariant RulesTableModel::sourceColumnData(const ConstRulePtr& rule, int role) const
 {
     const auto eventFilter = rule->eventFilters().first();
-    const auto eventDescriptor = m_engine->eventDescriptor(eventFilter->eventType());
+    const auto eventDescriptor = d->engine->eventDescriptor(eventFilter->eventType());
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(sourceIds(rule, eventDescriptor.value()));
@@ -479,8 +593,6 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
     if (sourceCameraField == nullptr)
         return {};
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-
     auto ids = sourceCameraField->ids();
     if (role == ResourceIdsRole)
     {
@@ -490,21 +602,19 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
         return QVariant::fromValue(ids);
     }
 
-    const auto resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+    const auto resources = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(ids);
     const auto properties = sourceCameraField->properties();
     const bool isValidSelection = !resources.empty() || properties.allowEmptySelection;
 
     if (role == Qt::DisplayRole)
     {
         if (!isValidSelection)
-            return vms::rules::Strings::selectCamera(appContext()->currentSystemContext());
+            return vms::rules::Strings::selectCamera(systemContext());
 
         if (sourceCameraField->acceptAll())
         {
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool,
-                tr("Any Device"),
-                tr("Any Camera"));
+                resourcePool(), tr("Any Device"), tr("Any Camera"));
         }
 
         if (resources.isEmpty())
@@ -516,7 +626,7 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
                 appContext()->localSettings()->resourceInfoLevel());
         }
 
-        return QnDeviceDependentStrings::getNumericName(resourcePool, resources);
+        return QnDeviceDependentStrings::getNumericName(resourcePool(), resources);
     }
 
     if (role == Qt::DecorationRole)
@@ -525,16 +635,15 @@ QVariant RulesTableModel::sourceCameraData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceCameraField->acceptAll() || resources.size() > 1)
-            return iconPath(ResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Cameras, rule->enabled() && d->isRuleValid(rule));
 
         if (resources.size() == 1)
         {
-            return iconPath(
-                appContext()->resourceIconCache()->key(resources.first()),
-                rule->enabled() && isRuleValid(rule));
+            return iconPath(appContext()->resourceIconCache()->key(resources.first()),
+                rule->enabled() && d->isRuleValid(rule));
         }
 
-        return iconPath(ResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::Camera, rule->enabled() && d->isRuleValid(rule));
     }
 
     return {};
@@ -548,13 +657,11 @@ QVariant RulesTableModel::sourceServerData(const ConstRulePtr& rule, int role) c
     if (sourceServerField == nullptr)
         return {};
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-
     const auto ids = sourceServerField->ids();
     if (role == ResourceIdsRole)
         return QVariant::fromValue(ids);
 
-    const auto resources = resourcePool->getResourcesByIds<QnMediaServerResource>(ids);
+    const auto resources = resourcePool()->getResourcesByIds<QnMediaServerResource>(ids);
     const auto properties = sourceServerField->properties();
     const bool isValidSelection = !resources.empty() || properties.allowEmptySelection;
 
@@ -584,16 +691,15 @@ QVariant RulesTableModel::sourceServerData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         if (sourceServerField->acceptAll() || resources.size() > 1)
-            return iconPath(ResourceIconCache::Servers, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Servers, rule->enabled() && d->isRuleValid(rule));
 
         if (resources.size() == 1)
         {
-            return iconPath(
-                appContext()->resourceIconCache()->key(resources.first()),
-                rule->enabled() && isRuleValid(rule));
+            return iconPath(appContext()->resourceIconCache()->key(resources.first()),
+                rule->enabled() && d->isRuleValid(rule));
         }
 
-        return iconPath(ResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::Server, rule->enabled() && d->isRuleValid(rule));
     }
 
     return {};
@@ -609,9 +715,8 @@ QVariant RulesTableModel::sourceUserData(const ConstRulePtr& rule, int role) con
 
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
-    const auto systemContext = appContext()->currentSystemContext();
-    nx::vms::common::getUsersAndGroups(systemContext->resourcePool(),
-        systemContext->userGroupManager(), sourceUserField->ids(), users, groups);
+    nx::vms::common::getUsersAndGroups(
+        resourcePool(), userGroupManager(), sourceUserField->ids(), users, groups);
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(nx::utils::toQSet(users.ids()));
@@ -622,7 +727,10 @@ QVariant RulesTableModel::sourceUserData(const ConstRulePtr& rule, int role) con
 QVariant RulesTableModel::actionColumnData(const ConstRulePtr& rule, int role) const
 {
     if (role == Qt::DisplayRole)
-        return m_engine->actionDescriptor(rule->actionBuilders().first()->actionType())->displayName();
+    {
+        return d->engine->actionDescriptor(rule->actionBuilders().first()->actionType())
+            ->displayName();
+    }
 
     if (role == ActionTypeRole)
         return rule->actionBuilders().first()->actionType();
@@ -633,7 +741,7 @@ QVariant RulesTableModel::actionColumnData(const ConstRulePtr& rule, int role) c
 QVariant RulesTableModel::targetColumnData(const ConstRulePtr& rule, int role) const
 {
     const auto actionBuilder = rule->actionBuilders().first();
-    const auto actionDescriptor = m_engine->actionDescriptor(actionBuilder->actionType());
+    const auto actionDescriptor = d->engine->actionDescriptor(actionBuilder->actionType());
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(targetIds(rule, actionDescriptor.value()));
@@ -666,7 +774,6 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
     bool acceptAll{false};
     bool hasAdditionalRecipients{false};
     bool allowEmptySelection{false};
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
 
     if (const auto targetDeviceField = actionBuilder->fieldByType<vms::rules::TargetDevicesField>())
     {
@@ -675,7 +782,7 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         useSource = targetDeviceField->useSource();
         allowEmptySelection = targetDeviceFieldProperties.allowEmptySelection;
         ids = targetDeviceField->ids();
-        resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+        resources = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(ids);
 
         if (targetDeviceFieldProperties.validationPolicy
             == vms::rules::kCameraAudioTransmissionValidationPolicy)
@@ -683,8 +790,9 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
             if (const auto targetUsersField =
                     actionBuilder->fieldByType<vms::rules::TargetUsersField>())
             {
-                hasAdditionalRecipients = !vms::rules::utils::users(
-                    targetUsersField->selection(), appContext()->currentSystemContext()).isEmpty();
+                const auto users =
+                    vms::rules::utils::users(targetUsersField->selection(), systemContext());
+                hasAdditionalRecipients = !users.isEmpty();
             }
         }
     }
@@ -696,7 +804,7 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         if (!targetSingleDeviceField->id().isNull())
         {
             ids = {targetSingleDeviceField->id()};
-            resources = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+            resources = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(ids);
         }
     }
     else
@@ -712,7 +820,7 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
     if (role == Qt::DisplayRole)
     {
         if (!isValidSelection)
-            return vms::rules::Strings::selectCamera(appContext()->currentSystemContext());
+            return vms::rules::Strings::selectCamera(systemContext());
 
         if (useSource)
         {
@@ -731,7 +839,7 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
                 appContext()->localSettings()->resourceInfoLevel());
         }
 
-        return QnDeviceDependentStrings::getNumericName(resourcePool, resources);
+        return QnDeviceDependentStrings::getNumericName(resourcePool(), resources);
     }
 
     if (role == Qt::DecorationRole)
@@ -742,10 +850,10 @@ QVariant RulesTableModel::targetCameraData(const ConstRulePtr& rule, int role) c
         const auto targetCamerasCount = resources.size() + (useSource ? 1 : 0);
 
         if (acceptAll || targetCamerasCount > 1)
-            return iconPath(ResourceIconCache::Cameras, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Cameras, rule->enabled() && d->isRuleValid(rule));
 
         if (targetCamerasCount == 1)
-            return iconPath(ResourceIconCache::Camera, rule->enabled() && isRuleValid(rule));
+            return iconPath(ResourceIconCache::Camera, rule->enabled() && d->isRuleValid(rule));
 
         return {};
     }
@@ -778,8 +886,7 @@ QVariant RulesTableModel::targetLayoutData(const ConstRulePtr& rule, int role) c
     if (role == ResourceIdsRole)
         return QVariant::fromValue(ids);
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-    const auto layouts = resourcePool->getResourcesByIds<QnLayoutResource>(ids);
+    const auto layouts = resourcePool()->getResourcesByIds<QnLayoutResource>(ids);
     const bool isValidSelection = !layouts.isEmpty() || allowEmptySelection;
 
     if (role == Qt::DisplayRole)
@@ -806,8 +913,8 @@ QVariant RulesTableModel::targetLayoutData(const ConstRulePtr& rule, int role) c
             return kAttentionIconPath;
 
         return layouts.size() > 1
-            ? iconPath(ResourceIconCache::Layouts, rule->enabled() && isRuleValid(rule))
-            : iconPath(ResourceIconCache::Layout, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Layouts, rule->enabled() && d->isRuleValid(rule))
+            : iconPath(ResourceIconCache::Layout, rule->enabled() && d->isRuleValid(rule));
     }
 
     return {};
@@ -822,9 +929,8 @@ QVariant RulesTableModel::targetUserData(const ConstRulePtr& rule, int role) con
 
     QnUserResourceList users;
     nx::vms::api::UserGroupDataList groups;
-    const auto systemContext = appContext()->currentSystemContext();
-    nx::vms::common::getUsersAndGroups(systemContext->resourcePool(),
-        systemContext->userGroupManager(), targetUserField->ids(), users, groups);
+    nx::vms::common::getUsersAndGroups(
+        resourcePool(), userGroupManager(), targetUserField->ids(), users, groups);
 
     if (role == ResourceIdsRole)
         return QVariant::fromValue(nx::utils::toQSet(users.ids()));
@@ -869,8 +975,8 @@ QVariant RulesTableModel::targetUserData(const ConstRulePtr& rule, int role) con
         const auto totalRecipientsCount = users.size() + additionalRecipients.size();
 
         return (targetUserField->acceptAll() || totalRecipientsCount > 1 || !groups.empty())
-            ? iconPath(ResourceIconCache::Users, rule->enabled() && isRuleValid(rule))
-            : iconPath(ResourceIconCache::User, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Users, rule->enabled() && d->isRuleValid(rule))
+            : iconPath(ResourceIconCache::User, rule->enabled() && d->isRuleValid(rule));
     }
 
     return {};
@@ -883,14 +989,12 @@ QVariant RulesTableModel::targetServerData(const ConstRulePtr& rule, int role) c
     if (!targetServerField)
         return {};
 
-    const auto resourcePool = appContext()->currentSystemContext()->resourcePool();
-
     const auto ids = targetServerField->ids();
     if (role == ResourceIdsRole)
         return QVariant::fromValue(ids);
 
     const QnMediaServerResourceList targetServers =
-        resourcePool->getResourcesByIds<QnMediaServerResource>(ids);
+        resourcePool()->getResourcesByIds<QnMediaServerResource>(ids);
     const auto properties = targetServerField->properties();
     const bool isValidSelection = !targetServers.isEmpty() || properties.allowEmptySelection;
 
@@ -922,8 +1026,8 @@ QVariant RulesTableModel::targetServerData(const ConstRulePtr& rule, int role) c
         const auto targetServerCount =
                 targetServers.size() + (targetServerField->useSource() ? 1 : 0);
         return targetServerField->acceptAll() || targetServerCount > 1
-            ? iconPath(ResourceIconCache::Servers, rule->enabled() && isRuleValid(rule))
-            : iconPath(ResourceIconCache::Server, rule->enabled() && isRuleValid(rule));
+            ? iconPath(ResourceIconCache::Servers, rule->enabled() && d->isRuleValid(rule))
+            : iconPath(ResourceIconCache::Server, rule->enabled() && d->isRuleValid(rule));
     }
 
     return {};
@@ -935,7 +1039,7 @@ QVariant RulesTableModel::systemData(const ConstRulePtr& rule, int role) const
         return tr("Site");
 
     if (role == Qt::DecorationRole)
-        return iconPath(ResourceIconCache::CurrentSystem, rule->enabled() && isRuleValid(rule));
+        return iconPath(ResourceIconCache::CurrentSystem, rule->enabled() && d->isRuleValid(rule));
 
     return {};
 }
@@ -1016,7 +1120,8 @@ bool RulesTableModel::hasResources(int row)
 
 void RulesTableModel::registerQmlType()
 {
-    qmlRegisterType<rules::RulesTableModel>("nx.vms.client.desktop", 1, 0, "RulesTableModel");
+    qmlRegisterUncreatableType<rules::RulesTableModel>(
+        "nx.vms.client.desktop", 1, 0, "RulesTableModel", "Cannot create RulesTableModel.");
 }
 
 } // namespace nx::vms::client::desktop::rules

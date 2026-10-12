@@ -2,16 +2,18 @@
 
 #pragma once
 
-#include <vector>
-
 #include <QtCore/QAbstractTableModel>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/system_context_aware.h>
 #include <nx/vms/rules/rules_fwd.h>
 
 namespace nx::vms::client::desktop::rules {
 
-class NX_VMS_CLIENT_DESKTOP_API RulesTableModel: public QAbstractTableModel
+class NX_VMS_CLIENT_DESKTOP_API RulesTableModel:
+    public QAbstractTableModel,
+    public SystemContextAware
 {
     Q_OBJECT
 
@@ -40,7 +42,8 @@ public:
     };
     Q_ENUM(Roles)
 
-    explicit RulesTableModel(QObject* parent = nullptr);
+    explicit RulesTableModel(SystemContext* systemContext, QObject* parent = nullptr);
+    virtual ~RulesTableModel() override;
 
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual int columnCount(const QModelIndex& parent) const override;
@@ -51,6 +54,11 @@ public:
 
     ConstRulePtr getRule(const QModelIndex& index) const;
 
+    /**
+     * While inactive, data refresh signals are ignored. Activation invalidates all cached data.
+     */
+    void setActive(bool active);
+
     static void registerQmlType();
 
     /**
@@ -60,19 +68,27 @@ public:
     static const Uuid kAnyDeviceUuid;
 
 private:
-    vms::rules::Engine* m_engine{nullptr};
-    std::vector<nx::Uuid> m_ruleIds;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 
     void onRuleAddedOrUpdated(nx::Uuid ruleId, bool added);
     void onRuleRemoved(nx::Uuid ruleId);
     void onRulesReset();
     void onResourcePoolChanged(const QnResourceList& resources);
     void onPermissionsChanged(const QnResourceList& resources);
+    void onLookupListsInitialized();
     void onLookupListRemoved(nx::Uuid id);
 
     void initialise();
     bool isIndexValid(const QModelIndex& index) const;
     bool canDisplayRule(const ConstRulePtr& rule) const;
+
+    // Drops the cached data of the rule at the given row and notifies the views.
+    void refreshRow(int row);
+
+    // Refreshes the rows of the rules referencing the given lookup list, or any lookup list if
+    // the id is null.
+    void refreshLookupListRows(nx::Uuid listId);
 
     QVariant stateColumnData(const ConstRulePtr& rule, int role) const;
     QVariant eventColumnData(const ConstRulePtr& rule, int role) const;
