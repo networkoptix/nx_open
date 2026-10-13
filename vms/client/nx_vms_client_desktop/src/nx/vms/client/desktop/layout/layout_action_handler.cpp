@@ -108,6 +108,15 @@ core::LayoutResourceList alreadyExistingLayouts(
     return result;
 }
 
+/**
+ * Live item time. DATETIME_NOW / 1000 is the live time of a display that was not a real-time
+ * source, see QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged().
+ */
+constexpr bool isLiveItemTime(qint64 timeMs)
+{
+    return timeMs == DATETIME_NOW || timeMs == DATETIME_NOW / 1000;
+}
+
 QSet<QnResourcePtr> localLayoutResources(QnResourcePool* resourcePool,
     const common::LayoutItemDataMap& items)
 {
@@ -1243,20 +1252,27 @@ void LayoutActionHandler::at_openInNewTabAction_triggered()
 
         if (streamSynchronizer->isRunning()) //< Current layout sync is on.
         {
-            const bool hasValidItemTime = std::ranges::any_of(layouts,
-                [](const auto& layout)
+            const bool hasStoredPosition = std::ranges::any_of(layouts,
+                [this](const auto& layout)
                 {
                     if (layout->isFile())
                         return false;
+
+                    const bool isOpened = workbench()->layout(layout) != nullptr;
                     return std::ranges::any_of(layout->getItems(),
-                        [&layout](const auto& item)
+                        [&layout, isOpened](const auto& item)
                         {
-                            return layout->itemData(item.uuid, Qn::ItemTimeRole).isValid();
+                            const QVariant time = layout->itemData(item.uuid, Qn::ItemTimeRole);
+                            if (!time.isValid())
+                                return false;
+
+                            // A closed layout left in live has nothing to preserve.
+                            return isOpened || !isLiveItemTime(time.value<qint64>());
                         });
                 });
 
             // We try to preserve playback position for layouts when it does not override anything.
-            if (!hasValidItemTime)
+            if (!hasStoredPosition)
                 overrideExistingPlaybackState = true;
         }
 
