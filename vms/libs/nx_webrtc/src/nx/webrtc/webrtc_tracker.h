@@ -41,6 +41,7 @@ private:
     WebSocketPtr m_webSocket;
     Session* m_session = nullptr;
     nx::Buffer m_buffer;
+    // Session::aioThread(), shared with the session's Consumer and ICEs.
     nx::network::aio::BasicPollable m_pollable;
     IceCandidate::Filter m_candidateFilter = IceCandidate::Filter::All;
     std::atomic<bool> m_started{};

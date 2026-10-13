@@ -5,13 +5,13 @@
 #include <nx/network/ssl/certificate.h>
 #include <nx/network/ssl/context.h>
 
-#include "webrtc_reader.h"
+#include "abstract_camera_data_provider.h"
+#include "webrtc_consumer.h"
 #include "webrtc_demuxer.h"
 #include "webrtc_ice.h"
-#include "webrtc_consumer.h"
+#include "webrtc_reader.h"
 #include "webrtc_tracks.h"
 #include "webrtc_transcoder.h"
-#include "abstract_camera_data_provider.h"
 
 namespace nx::webrtc {
 
@@ -69,13 +69,26 @@ public:
 
     const nx::network::ssl::Pem& getPem() const { return m_pem; }
     void addIceCandidate(const IceCandidate& iceCandidate);
-    std::shared_ptr<Tracker> tracker() { return m_tracker; }
+    std::shared_ptr<Tracker> tracker();
     void releaseTracker();
 
     // Should be called in `unlocked` state.
     void setReader(std::shared_ptr<Reader> reader);
 
     SessionPool* sessionPool() const { return m_sessionPool; }
+
+    /**
+     * Every pollable object owned by this session (Consumer, Tracker, Srflx and all the ICEs
+     * created here) lives in this single AIO thread. Keeping them together is what allows
+     * Consumer to be bound to its AIO thread once and never be rebound: moving a BasicPollable
+     * between AIO threads while posted calls for it are still queued in the old one is undefined
+     * behavior (see BasicPollable::bindToAioThread), and the posts come from provider threads at
+     * arbitrary moments, so there is no safe point to do it at.
+     * NOTE: IceTcp is the exception: it is created by the TCP listener before any session is
+     * known, so it keeps its own AIO thread. That is fine, since every Ice method Consumer uses
+     * is thread-safe.
+     */
+    nx::network::aio::AbstractAioThread* aioThread() const { return m_aioThread; }
     void setStreamDataFilter(nx::vms::api::StreamDataFilters filter) { m_streamDataFilter = filter; }
     void setTranscodingParams(
         nx::vms::api::WebRtcMethod method,
@@ -143,12 +156,14 @@ private:
         QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
     const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
+    void sendOffer();
     SessionDescription describeUnsafe() const;
 
 private:
     mutable nx::Mutex m_mutex;
 
     nx::vms::common::SystemContext* m_SystemContext = nullptr;
+    nx::network::aio::AbstractAioThread* const m_aioThread;
     std::string m_localPwd;
     const std::string m_localUfrag;
     Purpose m_purpose = Purpose::send;

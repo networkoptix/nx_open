@@ -9,7 +9,9 @@ namespace nx::webrtc {
 class NX_WEBRTC_API IceUdp: public Ice
 {
 public:
-    IceUdp(SessionPool* sessionPool, const SessionConfig& config);
+    IceUdp(SessionPool* sessionPool,
+        const SessionConfig& config,
+        nx::network::aio::AbstractAioThread* aioThread);
     virtual ~IceUdp();
     std::optional<nx::network::SocketAddress> bind(const nx::network::HostAddress& host);
     void resetSocket(std::unique_ptr<nx::network::AbstractDatagramSocket>&& socket);

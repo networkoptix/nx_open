@@ -10,8 +10,8 @@
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/websocket/websocket_handshake.h>
 
-#include "webrtc_session_pool.h"
 #include "nx_webrtc_ini.h"
+#include "webrtc_session_pool.h"
 
 namespace nx::webrtc {
 
@@ -21,6 +21,7 @@ using namespace nx;
 
 Tracker::Tracker(Session* session):
     m_session(session),
+    m_pollable(session->aioThread()),
     m_sessionId(session->id())
 {
     const std::string iceCandidatesIni = ::ini().webrtcIceCandidates;

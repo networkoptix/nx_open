@@ -22,23 +22,16 @@ constexpr std::chrono::seconds kRenegotiationTimeout(10);
 
 Consumer::Consumer(Session* session):
     m_mediaQueue(kMediaQueueSize),
+    m_pollable(session->aioThread()),
+    m_renegotiationTimer(session->aioThread()),
     m_session(session),
     m_sessionId(session->id())
 {
-    // Keep the timer in the same aio thread as the pollable, startStream() rebinds them together.
-    m_renegotiationTimer.bindToAioThread(m_pollable.getAioThread());
 }
 
 Consumer::~Consumer()
 {
-    std::promise<void> stoppedPromise;
-    m_pollable.dispatch(
-        [this, &stoppedPromise]()
-        {
-            stopUnsafe();
-            stoppedPromise.set_value();
-        });
-    stoppedPromise.get_future().wait();
+    m_pollable.executeInAioThreadSync([this]() { stopUnsafe(); });
 }
 
 bool Consumer::canAcceptData() const
@@ -51,23 +44,34 @@ void Consumer::clearQueueForDevice(nx::Uuid deviceId)
     m_mediaQueue.clearDataForDevice(deviceId);
 }
 
-bool Consumer::startStream(Streamer* streamer)
+void Consumer::startStream(Streamer* streamer)
 {
-    m_streamer = streamer;
-    m_pollable.bindToAioThread(streamer->ice()->getAioThread());
-    m_renegotiationTimer.bindToAioThread(streamer->ice()->getAioThread());
-    return true;
+    // NOTE: m_pollable is not rebound to the ICE thread here. It stays in the session thread for
+    // the whole lifetime of the consumer, see Session::aioThread(). Every Ice method used from
+    // this thread (writeBatch(), writeDataChannelBatch(), writePacket()) is thread-safe and
+    // hops to the socket thread on its own, so nothing needs the two to match.
+
+    // A previous ICE may have stopped this consumer before losing the session. This reset must
+    // stay synchronous: posted, it could run after a stop issued by this same ICE has raised the
+    // flag and queued its cleanup, and that cleanup would then skip itself.
+    m_needStop = false;
+    // m_streamer is read in the session thread, which is not this one for IceTcp.
+    runInMuxingThread([this, streamer]() { m_streamer = streamer; });
 }
 
 void Consumer::stopUnsafe()
 {
     m_needStop = true;
 
-    if (!m_pollable.isInSelfAioThread())
-        return; // Nothing was started on this thread, m_pollable is bound elsewhere
-
-    m_renegotiationTimer.pleaseStopSync();
-    m_pollable.pleaseStopSync();
+    // Called from the ICE thread, which is the session thread for every ICE but IceTcp.
+    m_pollable.dispatch(
+        [this]()
+        {
+            if (!m_needStop)
+                return; //< Another ICE has locked the session and restarted the stream meanwhile.
+            m_renegotiationTimer.pleaseStopSync();
+            m_pollable.pleaseStopSync();
+        });
 }
 
 void Consumer::startProvidersIfNeeded()

@@ -16,22 +16,21 @@ constexpr std::chrono::seconds kKeepAliveTimeout{15};
 // but default lifetime in coturn is 300s.
 constexpr std::chrono::seconds kPermissionsLifetime{295};
 
-IceRelay::IceRelay(
-    SessionPool* sessionPool,
+IceRelay::IceRelay(SessionPool* sessionPool,
     const SessionConfig& config,
+    nx::network::aio::AbstractAioThread* aioThread,
     const std::string& sessionId,
-    const CandidateHandler& handler)
-    :
-    Ice(sessionPool, config),
+    const CandidateHandler& handler):
+    Ice(sessionPool, config, aioThread),
     m_sessionId(sessionId),
+    m_keepAliveTimer(aioThread),
+    m_createPermissionTimer(aioThread),
+    m_refreshTimer(aioThread),
     m_onCandidateReadyHandler(handler)
 {
     m_readBuffer.reserve(kRawReadBufferSize);
 
     m_socket.bindToAioThread(m_pollable.getAioThread());
-    m_keepAliveTimer.bindToAioThread(m_pollable.getAioThread());
-    m_createPermissionTimer.bindToAioThread(m_pollable.getAioThread());
-    m_refreshTimer.bindToAioThread(m_pollable.getAioThread());
 
     m_socket.setSendBufferSize(kIceTcpSendBufferSize);
     m_socket.setNonBlockingMode(true);

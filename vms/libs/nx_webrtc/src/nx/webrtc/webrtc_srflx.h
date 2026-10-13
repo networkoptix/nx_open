@@ -32,6 +32,7 @@ public:
 public:
     Srflx(const std::string& sessionId,
         const std::vector<nx::network::SocketAddress>& stunServers,
+        nx::network::aio::AbstractAioThread* aioThread,
         const Handler& handler);
     ~Srflx();
 

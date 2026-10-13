@@ -45,7 +45,15 @@ protected:
     };
 
 public:
-    Ice(SessionPool* sessionPool, const SessionConfig& config);
+    /**
+     * @param aioThread AIO thread to run this ICE in. Sessions pass their own thread here so that
+     *     every pollable of a session shares it, see Session::aioThread(). Nullptr lets the AIO
+     *     service pick a thread, which is what IceTcp does: it is created before its session is
+     *     known.
+     */
+    Ice(SessionPool* sessionPool,
+        const SessionConfig& config,
+        nx::network::aio::AbstractAioThread* aioThread);
     virtual ~Ice();
 
     // Main API.

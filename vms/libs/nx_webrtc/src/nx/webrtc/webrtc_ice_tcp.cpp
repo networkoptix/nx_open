@@ -41,14 +41,13 @@ void ListenerTcp::run()
     m_sessionPool->gotIceTcp(std::move(ice));
 }
 
-IceTcp::IceTcp(
-    std::unique_ptr<nx::network::AbstractStreamSocket>&& socket,
+IceTcp::IceTcp(std::unique_ptr<nx::network::AbstractStreamSocket>&& socket,
     SessionPool* sessionPool,
     const SessionConfig& config,
-    const QByteArray& readBuffer
-    )
-    :
-    Ice(sessionPool, config),
+    const QByteArray& readBuffer):
+    // No session is known yet (it is resolved from the ufrag of the first STUN binding), so
+    // there is no session AIO thread to join.
+    Ice(sessionPool, config, /*aioThread*/ nullptr),
     m_socket(std::move(socket), readBuffer)
 {
     m_readBuffer.reserve(kRawReadBufferSize);
