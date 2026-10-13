@@ -18,8 +18,8 @@ qt/*:qtserialport=False
 ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
 ffmpeg/*:openh264=False
-ffmpeg/*:av1=False
-boost/*:header_only = True
+ffmpeg/*:svtav1=False
+boost/*:header_only=True
 
 [tool_requires]
 *:android-ndk/r29

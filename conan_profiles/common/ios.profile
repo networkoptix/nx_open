@@ -21,5 +21,5 @@ ffmpeg/*:shared=False
 ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
 ffmpeg/*:openh264=False
-boost/*:header_only = True
-ffmpeg/*:av1=False
+boost/*:header_only=True
+ffmpeg/*:svtav1=False

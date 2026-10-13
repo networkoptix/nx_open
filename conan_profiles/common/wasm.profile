@@ -20,7 +20,7 @@ qt/*:qtwebview=False
 qt/*:qtserialport=False
 
 ffmpeg/*:shared=False
-ffmpeg/*:av1=False
+ffmpeg/*:svtav1=False
 ffmpeg/*:vorbis=False
 ffmpeg/*:vpx=False
 ffmpeg/*:openh264=False
