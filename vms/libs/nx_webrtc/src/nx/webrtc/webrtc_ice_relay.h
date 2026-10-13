@@ -13,9 +13,9 @@ class NX_WEBRTC_API IceRelay: public Ice
 public:
     using CandidateHandler = std::function<void(const IceCandidate&)>;
 public:
-    IceRelay(
-        SessionPool* sessionPool,
+    IceRelay(SessionPool* sessionPool,
         const SessionConfig& config,
+        nx::network::aio::AbstractAioThread* aioThread,
         const std::string& sessionId,
         const CandidateHandler& handler);
     virtual ~IceRelay();

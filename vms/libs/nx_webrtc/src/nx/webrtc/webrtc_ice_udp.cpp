@@ -14,13 +14,14 @@ constexpr int kBindingCountLimit = 100; // Send binding for first 5 seconds.
 
 using namespace nx::network;
 
-IceUdp::IceUdp(SessionPool* sessionPool, const SessionConfig& config)
-    :
-    Ice(sessionPool, config)
+IceUdp::IceUdp(SessionPool* sessionPool,
+    const SessionConfig& config,
+    nx::network::aio::AbstractAioThread* aioThread):
+    Ice(sessionPool, config, aioThread),
+    m_keepAliveTimer(aioThread),
+    m_bindingTimer(aioThread)
 {
     m_readBuffer.reserve(kRawReadBufferSize);
-    m_keepAliveTimer.bindToAioThread(m_pollable.getAioThread());
-    m_bindingTimer.bindToAioThread(m_pollable.getAioThread());
 }
 
 IceUdp::~IceUdp()

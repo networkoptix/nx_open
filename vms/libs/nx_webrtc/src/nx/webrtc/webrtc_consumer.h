@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <deque>
 
 #include <nx/media/annexb_to_mp4.h>
@@ -40,7 +41,7 @@ public:
     void putData(const QnConstAbstractMediaDataPtr& data);
 
     // API for Streamer.
-    bool startStream(Streamer* streamer);
+    void startStream(Streamer* streamer);
     bool handleSrtp(std::vector<uint8_t> buffer);
     void seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handler);
     void startProvidersIfNeeded();
@@ -59,6 +60,13 @@ public:
     bool canAcceptData() const;
     std::string idForToStringFromPtr() const;
 
+    /**
+     * Runs func in the session AIO thread (Session::aioThread()), the one that owns this consumer,
+     * the muxer and the providers. Anything touching that state must go through here, because the
+     * ICE does not necessarily live in the same thread -- IceTcp has its own, see startStream().
+     */
+    void runInMuxingThread(std::function<void()>&& func);
+
 private:
     friend class Ice;
 
@@ -66,7 +74,6 @@ private:
     void processNextData();
     void sendMetadata(const QnConstCompressedMetadataPtr& metadata);
     void handleRtcp(uint8_t* data, int size);
-    void runInMuxingThread(std::function<void()>&& func);
     void stopUnsafe();
     void sendMediaBuffer();
     void startRenegotiationTimeout();
@@ -74,7 +81,8 @@ private:
 private:
     // Main.
     nx::vms::server::MediaQueue m_mediaQueue;
-    bool m_needStop = false;
+    // Set from the ICE thread, read in the session thread, see stopUnsafe().
+    std::atomic<bool> m_needStop{false};
     nx::network::aio::BasicPollable m_pollable;
     // Fires if the client doesn't answer a renegotiation offer, see startRenegotiationTimeout().
     nx::network::aio::Timer m_renegotiationTimer;

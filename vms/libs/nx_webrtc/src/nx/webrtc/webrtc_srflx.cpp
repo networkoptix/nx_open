@@ -13,13 +13,16 @@ using namespace nx::network;
 
 Srflx::Srflx(const std::string& sessionId,
     const std::vector<nx::network::SocketAddress>& stunServers,
-    const Handler& handler)
-    :
+    nx::network::aio::AbstractAioThread* aioThread,
+    const Handler& handler):
     m_sessionId(sessionId),
+    m_pollable(aioThread),
     m_socket(nx::network::SocketFactory::createDatagramSocket()),
     m_handler(handler)
 {
-    m_pollable.bindToAioThread(m_socket->getAioThread());
+    // The socket is still untouched here, so it is the one that joins the session thread. The
+    // punched socket is handed over to an IceUdp of the same session, which keeps it there.
+    m_socket->bindToAioThread(m_pollable.getAioThread());
     for (const auto& stunServer: stunServers)
         m_addrQueue.push_back(stunServer);
 

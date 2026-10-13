@@ -2,10 +2,10 @@
 
 #include "webrtc_streamer.h"
 
-#include <core/resource/camera_resource.h>
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+#include <core/resource/camera_resource.h>
 
 #include <nx/metric/metrics_storage.h>
 
@@ -30,14 +30,20 @@ std::string Streamer::idForToStringFromPtr() const
 bool Streamer::start(Ice* ice, Dtls* dtls)
 {
     NX_ASSERT(ice);
-    m_ice = ice;
-    m_iceType = m_ice->type();
+    m_iceType = ice->type();
     updateMetrics(1);
 
-    m_session->muxer()->setSrtpEncryptionData(dtls->encryptionData());
+    // m_ice and the muxer belong to the session thread, which is not this one when the stream
+    // runs over IceTcp. The seek() calls below are posted to that thread from here as well, so
+    // they run after this.
+    m_session->consumer()->runInMuxingThread(
+        [this, ice, encryptionData = dtls->encryptionData()]()
+        {
+            m_ice = ice;
+            m_session->muxer()->setSrtpEncryptionData(encryptionData);
+        });
 
-    if (!m_session->consumer()->startStream(this))
-        return false;
+    m_session->consumer()->startStream(this);
 
     for (auto& provider: m_session->allProviders())
     {
@@ -152,19 +158,22 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
         }
 
         const nx::vms::api::StreamIndex newStream = parseStreamIndex(addObj);
-        try
-        {
-            m_session->createProvider(
-                deviceId,
-                positionMs,
-                newStream,
-                std::nullopt /*speedOpt*/);
-            m_session->consumer()->startProvidersIfNeeded(); //TODO It looks suspicious.
-        }
-        catch (const std::exception& e)
-        {
-            NX_WARNING(this, "Can't create provider: %1", e.what());
-        }
+        // Providers and muxers belong to the session thread, which is not this one when the
+        // stream runs over IceTcp.
+        m_session->consumer()->runInMuxingThread(
+            [this, deviceId, positionMs, newStream]()
+            {
+                try
+                {
+                    m_session->createProvider(
+                        deviceId, positionMs, newStream, std::nullopt /*speedOpt*/);
+                    m_session->consumer()->startProvidersIfNeeded(); // TODO It looks suspicious.
+                }
+                catch (const std::exception& e)
+                {
+                    NX_WARNING(this, "Can't create provider: %1", e.what());
+                }
+            });
         return;
     }
 
@@ -176,9 +185,14 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
                 deviceId = nx::Uuid::fromStringSafe(value.GetString());
         }
         if (!deviceId.isNull())
-            m_session->removeProvider(deviceId);
+        {
+            m_session->consumer()->runInMuxingThread(
+                [this, deviceId]() { m_session->removeProvider(deviceId); });
+        }
         else
+        {
             NX_WARNING(this, "deviceId should be provided to remove stream");
+        }
     }
     else if (d.HasMember("seek"))
     {

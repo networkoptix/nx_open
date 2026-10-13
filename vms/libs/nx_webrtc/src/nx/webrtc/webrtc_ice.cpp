@@ -11,7 +11,10 @@ using namespace nx::vms::api;
 using namespace nx::network;
 using namespace nx;
 
-Ice::Ice(SessionPool* sessionPool, const SessionConfig& config):
+Ice::Ice(SessionPool* sessionPool,
+    const SessionConfig& config,
+    nx::network::aio::AbstractAioThread* aioThread):
+    m_pollable(aioThread),
     m_sessionPool(sessionPool),
     m_dataChannel(this, kDefaultSctpPort, config)
 {

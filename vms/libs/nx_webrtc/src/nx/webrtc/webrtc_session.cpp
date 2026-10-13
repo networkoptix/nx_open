@@ -3,6 +3,7 @@
 #include "webrtc_session.h"
 
 #include <core/resource/camera_resource.h>
+#include <nx/network/socket_global.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/vms/common/system_context.h>
@@ -11,10 +12,9 @@
 #include "webrtc_ice_tcp.h"
 #include "webrtc_ice_udp.h"
 #include "webrtc_receiver.h"
-#include "webrtc_streamer.h"
-#include "webrtc_tracker.h"
 #include "webrtc_session_pool.h"
 #include "webrtc_srflx.h"
+#include "webrtc_streamer.h"
 #include "webrtc_tracker.h"
 
 /* RFC list:
@@ -74,17 +74,16 @@ std::string Session::generateLocalUfrag()
     return generatePwd(4);
 }
 
-Session::Session(
-    nx::vms::common::SystemContext* context,
+Session::Session(nx::vms::common::SystemContext* context,
     SessionPool* sessionPool,
     createDataProviderFactory providerFactory,
     const std::string& localUfrag,
     const nx::network::SocketAddress& address,
     const SessionConfig& config,
     const std::vector<nx::network::SocketAddress>& stunServers,
-    Purpose purpose)
-    :
+    Purpose purpose):
     m_SystemContext(context),
+    m_aioThread(nx::network::SocketGlobals::aioService().findLeastUsedAioThread()),
     m_localUfrag(localUfrag),
     m_purpose(purpose),
     m_localAddress(address),
@@ -149,7 +148,7 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
     // UDP host candidates.
     for (const auto& address: addresses)
     {
-        auto udpIce = std::make_unique<IceUdp>(m_sessionPool, m_config);
+        auto udpIce = std::make_unique<IceUdp>(m_sessionPool, m_config, m_aioThread);
         auto iceLocalAddress = udpIce->bind(address.address);
         if (iceLocalAddress)
         {
@@ -164,7 +163,9 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
 
     // Srflx candidate.
     // Use first 2 accessible STUN servers from list.
-    m_srflx = std::make_unique<Srflx>(m_localUfrag, m_stunServers,
+    m_srflx = std::make_unique<Srflx>(m_localUfrag,
+        m_stunServers,
+        m_aioThread,
         [this](const nx::network::SocketAddress& mappedAddress,
             std::unique_ptr<nx::network::AbstractDatagramSocket>&& socket)
         {
@@ -178,7 +179,7 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
                 iceLocalAddress = socket->getLocalAddress();
 
                 NX_MUTEX_LOCKER lk(&m_mutex);
-                m_punchedUdpIce = std::make_unique<IceUdp>(m_sessionPool, m_config);
+                m_punchedUdpIce = std::make_unique<IceUdp>(m_sessionPool, m_config, m_aioThread);
                 m_punchedUdpIce->resetSocket(std::move(socket));
                 if (m_remoteSrflx)
                     m_punchedUdpIce->sendBinding(*m_remoteSrflx.get(), describeUnsafe());
@@ -196,11 +197,11 @@ void Session::start(const QList<nx::network::SocketAddress>& addresses)
             }
         });
 
-    m_relayIce = std::make_unique<IceRelay>(m_sessionPool, m_config, id(),
-        [this](const IceCandidate& candidate)
-        {
-            addIceCandidate(candidate);
-        });
+    m_relayIce = std::make_unique<IceRelay>(m_sessionPool,
+        m_config,
+        m_aioThread,
+        id(),
+        [this](const IceCandidate& candidate) { addIceCandidate(candidate); });
 
     m_sessionPool->turnInfoFetcher().fetchTurnInfo(
         id(),
@@ -237,8 +238,7 @@ AbstractCameraDataProviderPtr Session::createProvider(
         return AbstractCameraDataProviderPtr();
     }
 
-    if (m_tracker && m_tracker->isStarted())
-        m_tracker->sendOffer();
+    sendOffer();
 
     return provider;
 }
@@ -266,8 +266,7 @@ bool Session::removeProvider(nx::Uuid deviceId)
         track->useTranscoding = false;
     }
 
-    if (m_tracker && m_tracker->isStarted())
-        m_tracker->sendOffer();
+    sendOffer();
 
     return true;
 }
@@ -341,8 +340,7 @@ RenegotiationResult Session::renegotiateProvider(
         return RenegotiationResult::failed;
     }
 
-    if (m_tracker && m_tracker->isStarted())
-        m_tracker->sendOffer();
+    sendOffer();
 
     return RenegotiationResult::offerSent;
 }
@@ -772,13 +770,23 @@ void Session::addIceCandidate(const IceCandidate& iceCandidate)
         m_tracker->onIceCandidate(m_iceCandidates.back());
 }
 
+std::shared_ptr<Tracker> Session::tracker()
+{
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    return m_tracker;
+}
+
+void Session::sendOffer()
+{
+    if (auto tracker = this->tracker(); tracker && tracker->isStarted())
+        tracker->sendOffer();
+}
+
 void Session::releaseTracker()
 {
-    auto tracker = m_tracker;
-    {
-        NX_MUTEX_LOCKER lk(&m_mutex);
-        m_tracker.reset();
-    }
+    std::shared_ptr<Tracker> tracker; //< Destroyed after the lock is released.
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    std::swap(tracker, m_tracker);
 }
 
 std::shared_ptr<AbstractCameraDataProvider> Session::provider(nx::Uuid deviceId) const
