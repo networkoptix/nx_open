@@ -210,6 +210,10 @@ Control
             width: thumbnailContent.width
             height: thumbnailContent.height
 
+            // The camera name label overlaps the top of the placeholder, so the content is laid
+            // out below it.
+            topPadding: cameraInfo.y + cameraInfo.height
+
             state: d.dummyState
             interactive: false
         }
@@ -315,6 +319,7 @@ Control
             VideoDummy
             {
                 anchors.fill: parent
+                topPadding: cameraInfo.y + cameraInfo.height
                 state: "audioOnlyMode"
                 visible: !video.visible && mediaPlayer.audioOnlyMode
             }
