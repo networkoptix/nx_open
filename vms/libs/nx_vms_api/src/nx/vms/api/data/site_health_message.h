@@ -94,7 +94,7 @@ NX_REFLECTION_ENUM_CLASS(SiteHealthMessageType,
 struct SiteHealthMessage
 {
     SiteHealthMessageType type = SiteHealthMessageType::count;
-    bool active = true;
+    bool active = true; //< If False, the clients remove the message instead of showing it.
     std::chrono::microseconds timestampUs = std::chrono::microseconds::zero();
     UuidList resourceIds;
     std::map<std::string, std::string> attributes;
@@ -102,7 +102,7 @@ struct SiteHealthMessage
     nx::Uuid resourceId() const { return resourceIds.empty() ? nx::Uuid() : resourceIds.front(); }
 };
 
-#define SiteHealthMessage_Fields (type)(timestampUs)(resourceIds)(attributes)
+#define SiteHealthMessage_Fields (type)(active)(timestampUs) (resourceIds) (attributes)
 NX_REFLECTION_INSTRUMENT(SiteHealthMessage, SiteHealthMessage_Fields)
 
 } // namespace nx::vms::api
