@@ -5,6 +5,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/manifest.h>
@@ -31,6 +32,8 @@ EventTypePickerWidget::EventTypePickerWidget(SystemContext* context, QWidget* pa
 
     for (const auto& eventDescriptor: sortedListOfEvents)
         ui->eventTypeComboBox->addItem(eventDescriptor.displayName, eventDescriptor.id);
+
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(ui->eventTypeComboBox);
 
     connect(
         ui->eventTypeComboBox,

@@ -3,11 +3,14 @@
 #include "combo_box_utils.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QEvent>
+#include <QtGui/QKeyEvent>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListView>
-#include <QtWidgets/QTreeView>
 #include <QtWidgets/QTableView>
+#include <QtWidgets/QTreeView>
 
 #include <nx/utils/log/assert.h>
 
@@ -17,6 +20,65 @@ struct ComboBoxUtils
 {
     Q_DECLARE_TR_FUNCTIONS(ComboBoxUtils)
 };
+
+#ifdef Q_OS_MACOS
+
+/**
+ * Event filter for the combo box popup view. Postpones the item selection by the Enter key from
+ * the ShortcutOverride phase to the KeyPress phase.
+ */
+class PopupEnterKeyHandler: public QObject
+{
+public:
+    explicit PopupEnterKeyHandler(QComboBox* combo): QObject(combo), m_combo(combo) {}
+
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+        const auto type = event->type();
+        if (type != QEvent::ShortcutOverride && type != QEvent::KeyPress)
+            return false;
+
+        const auto key = static_cast<QKeyEvent*>(event)->key();
+        if (key != Qt::Key_Return && key != Qt::Key_Enter)
+            return false;
+
+        const auto view = m_combo->view();
+        if (watched != view || !view->isVisible())
+            return false;
+
+        const auto index = view->currentIndex();
+        if (index.parent() != m_combo->rootModelIndex())
+            return false; //< Nested items are not supported, let Qt handle the key.
+
+        const bool selectable = index.isValid() && index.flags().testFlag(Qt::ItemIsEnabled);
+        if (type == QEvent::KeyPress && selectable)
+        {
+            // Replicates what Qt does on the item selection from the popup.
+            const int row = index.row();
+            const QString text = m_combo->itemText(row);
+            m_combo->hidePopup();
+            if (row != m_combo->currentIndex())
+            {
+                m_combo->setCurrentIndex(row);
+            }
+            else if (const auto lineEdit = m_combo->lineEdit())
+            {
+                lineEdit->selectAll();
+                lineEdit->setText(text);
+            }
+            emit m_combo->activated(row);
+            emit m_combo->textActivated(text);
+        }
+
+        event->accept();
+        return true;
+    }
+
+private:
+    QComboBox* const m_combo;
+};
+
+#endif // Q_OS_MACOS
 
 } // namespace
 
@@ -90,6 +152,18 @@ QString multipleValuesText()
 void insertMultipleValuesItem(QComboBox* combo, int index)
 {
     insertHiddenItem(combo, index, multipleValuesText());
+}
+
+void installPopupEnterKeyHandlerIfRequired(QComboBox* combo)
+{
+#ifdef Q_OS_MACOS
+    if (!NX_ASSERT(combo))
+        return;
+
+    combo->view()->installEventFilter(new PopupEnterKeyHandler(combo));
+#else
+    Q_UNUSED(combo);
+#endif
 }
 
 } // namespace combo_box_utils

@@ -5,6 +5,7 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/rules/event_filter_fields/state_field.h>
 #include <nx/vms/rules/strings.h>
@@ -45,6 +46,7 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
         durationTypeLayout->addWidget(new QWidget); //< Title is not required here.
 
         m_durationTypeComboBox = new QComboBox;
+        combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_durationTypeComboBox);
         m_durationTypeComboBox->addItem(tr("For the duration of event"));
         m_durationTypeComboBox->addItem(tr("Of fixed duration"));
 
@@ -88,6 +90,7 @@ ActionDurationPickerWidget::ActionDurationPickerWidget(
             durationTypeLayout->addWidget(actionStartLabel);
 
             m_actionStartComboBox = new StateComboBox;
+            combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_actionStartComboBox);
             m_actionStartComboBox->setStateStringProvider(
                 [](vms::rules::State state)
                 {

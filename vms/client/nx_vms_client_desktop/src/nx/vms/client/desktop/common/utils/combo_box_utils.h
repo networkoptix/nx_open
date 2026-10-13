@@ -28,5 +28,12 @@ void insertHiddenItem(QComboBox* combo, int index, const QIcon& icon,
 QString multipleValuesText();
 void insertMultipleValuesItem(QComboBox* combo, int index = 0);
 
+/**
+ * Makes Enter/Return pressed in the open combo box popup select the current item without
+ * triggering the default button of the dialog which contains the combo box (QTBUG-121023). MacOS
+ * specific.
+ */
+void installPopupEnterKeyHandlerIfRequired(QComboBox* combo);
+
 } // namespace combo_box_utils
 } // namespace nx::vms::client::desktop

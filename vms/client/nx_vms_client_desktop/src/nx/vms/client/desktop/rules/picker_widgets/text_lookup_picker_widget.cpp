@@ -9,6 +9,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/common/utils/validators.h>
 #include <nx/vms/client/desktop/common/widgets/input_field.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
@@ -58,6 +59,7 @@ TextLookupPicker::TextLookupPicker(
         parent->eventFilter()->eventType() == vms::rules::utils::type<vms::rules::GenericEvent>();
 
     m_checkTypeComboBox = new QComboBox;
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_checkTypeComboBox);
     m_checkTypeComboBox->addItem(
         tr("Contains keywords"),
         QVariant::fromValue(LookupCheckType::containsKeywords));
@@ -117,6 +119,7 @@ TextLookupPicker::TextLookupPicker(
         sortModel->sort(0);
 
         m_lookupListComboBox = new QComboBox;
+        combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_lookupListComboBox);
         m_lookupListComboBox->setSizePolicy(
             QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         m_lookupListComboBox->setModel(sortModel);

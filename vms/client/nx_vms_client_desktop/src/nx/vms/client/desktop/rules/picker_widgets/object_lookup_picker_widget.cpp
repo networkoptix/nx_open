@@ -9,6 +9,7 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/rules/utils/strings.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
@@ -54,6 +55,7 @@ ObjectLookupPicker::ObjectLookupPicker(
     auto comboBoxesLayout = new QHBoxLayout;
 
     m_checkTypeComboBox = new QComboBox;
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_checkTypeComboBox);
     m_checkTypeComboBox->addItem(
         tr("Has attributes"),
         QVariant::fromValue(LookupCheckType::hasAttributes));
@@ -111,6 +113,7 @@ ObjectLookupPicker::ObjectLookupPicker(
         sortModel->sort(0);
 
         m_lookupListComboBox = new QComboBox;
+        combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_lookupListComboBox);
         m_lookupListComboBox->setSizePolicy(
             QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         m_lookupListComboBox->setModel(sortModel);

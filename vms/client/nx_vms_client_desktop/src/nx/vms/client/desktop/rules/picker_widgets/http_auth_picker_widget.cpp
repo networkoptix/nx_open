@@ -7,6 +7,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QVBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
@@ -96,6 +97,7 @@ HttpAuthPicker::HttpAuthPicker(
     mainLayout->setContentsMargins(
             style::Metrics::kDefaultTopLevelMargin, 4, style::Metrics::kDefaultTopLevelMargin, 4);
     d->comboBox = new QComboBox;
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(d->comboBox);
     mainLayout->addLayout(d->createWidgetWithHint(tr("Authentication"), d->comboBox));
 
     d->loginPasswordGroup = new QWidget(this);

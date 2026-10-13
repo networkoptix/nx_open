@@ -4,10 +4,11 @@
 
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
-#include <nx/vms/client/desktop/file_cache/server_notification_cache.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/models/notification_sound_model.h>
 
@@ -25,6 +26,7 @@ SoundPicker::SoundPicker(
 
     contentLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
     m_comboBox = new QComboBox;
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_comboBox);
     m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
     contentLayout->addWidget(m_comboBox);
 

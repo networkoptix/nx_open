@@ -7,6 +7,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
@@ -40,6 +41,7 @@ public:
         auto contentLayout = new QHBoxLayout;
 
         m_comboBox = new D;
+        combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_comboBox);
         m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         contentLayout->addWidget(m_comboBox);
 

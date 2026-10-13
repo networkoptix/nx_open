@@ -9,6 +9,7 @@
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/watchers/cloud_service_checker.h>
 #include <nx/vms/client/desktop/application_context.h>
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/rules/actions/push_notification_action.h>
 #include <nx/vms/rules/engine.h>
@@ -62,6 +63,8 @@ ActionTypePickerWidget::ActionTypePickerWidget(SystemContext* context, QWidget* 
     };
 
     updateActionTypeComboBox();
+    combo_box_utils::installPopupEnterKeyHandlerIfRequired(ui->actionTypeComboBox);
+
     connect(
         appContext()->cloudServiceChecker(),
         &nx::vms::client::core::CloudServiceChecker::supportedServicesChanged,

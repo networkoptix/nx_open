@@ -5,6 +5,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QHBoxLayout>
 
+#include <nx/vms/client/desktop/common/utils/combo_box_utils.h>
+
 #include "field_picker_widget.h"
 #include "picker_widget_utils.h"
 
@@ -21,6 +23,7 @@ public:
     {
         auto contentLayout = new QHBoxLayout;
         m_comboBox = new D;
+        combo_box_utils::installPopupEnterKeyHandlerIfRequired(m_comboBox);
         m_comboBox->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         contentLayout->addWidget(m_comboBox);
 
