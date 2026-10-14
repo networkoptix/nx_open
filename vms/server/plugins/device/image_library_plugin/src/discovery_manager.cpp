@@ -62,7 +62,7 @@ static const char* VENDOR_NAME = "IMAGE_LIBRARY";
 
 void DiscoveryManager::getVendorName( char* buf ) const
 {
-    strcpy( buf, VENDOR_NAME );
+    nxpt::copyStr(buf, nxcip::MAX_TEXT_LEN, VENDOR_NAME);
 }
 
 int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
@@ -121,9 +121,12 @@ int DiscoveryManager::checkHostAddress(
         return 0;
     }
 
-    strcpy(cameraInfo->url, address); //< Use the full URL in this field.
-    strcpy(cameraInfo->uid, path.c_str());
-    strcpy(cameraInfo->modelName, path.c_str());
+    if (!nxpt::copyStr(cameraInfo->url, address) //< Use the full URL in this field.
+        || !nxpt::copyStr(cameraInfo->uid, path) || !nxpt::copyStr(cameraInfo->modelName, path))
+    {
+        NX_PRINT << "The URL or path " << toString(path) << " is too long.";
+        return 0;
+    }
 
     logCameraInfo(*cameraInfo, std::string("DiscoveryManager::") + __func__ + "()");
 

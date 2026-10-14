@@ -6,25 +6,26 @@
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 
-#include <execinfo.h>
-#include <fcntl.h>
-#include <pwd.h>
-#include <signal.h>
-#include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <time.h>
-#include <unistd.h>
+    #include <sstream>
+    #include <execinfo.h>
+    #include <fcntl.h>
+    #include <pwd.h>
+    #include <signal.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+    #include <time.h>
+    #include <unistd.h>
 
-// It is basicly more safe to use POSIX threads instead of any kind of wrappers,
-// just to be sure that no memory alocations are taking place in the signal handlers
-#include <pthread.h>
+    // It is basicly more safe to use POSIX threads instead of any kind of wrappers,
+    // just to be sure that no memory alocations are taking place in the signal handlers
+    #include <pthread.h>
 
-#include <QDebug>
+    #include <QDebug>
 
-#include <nx/utils/app_info.h>
+    #include <nx/utils/app_info.h>
+    #include <nx/utils/string.h>
 
 static const int BUFFER_SIZE = 2048;
 static const int STACK_SHIFT = 2; // signalHandler and printThreadData
@@ -103,7 +104,8 @@ template<class ... Args>
 static int printFd(int fd, Args ... args)
 {
      char buffer[BUFFER_SIZE];
-     if (const int len = sprintf(buffer, args ...))
+     const int len = nx::utils::formatStr(buffer, args...);
+     if (len > 0)
          return write(fd, buffer, len);
      return 0;
 }

@@ -536,7 +536,7 @@ int getMacFromEth0(char MAC_str[MAC_ADDR_LEN], char** host)
     std::unique_ptr<int, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(&s, SCOPED_GUARD_FUNC);
 
     //TODO #akolesnikov read interface name
-    strcpy(ifr.ifr_name, "eth0");
+    nx::utils::copyStr(ifr.ifr_name, "eth0");
 
     //reading mac address
     if (ioctl(s, SIOCGIFHWADDR, &ifr) == -1)

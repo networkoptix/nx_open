@@ -81,7 +81,7 @@ namespace rpi_cam
     void DiscoveryManager::getVendorName( char * buf ) const
     {
         static const char * VENDOR_NAME = "Raspberry Pi";
-        strcpy(buf, VENDOR_NAME);
+        nxpt::copyStr(buf, nxcip::MAX_TEXT_LEN, VENDOR_NAME);
     }
 
     int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * serverURL)

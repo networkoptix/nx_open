@@ -3,6 +3,8 @@
 #include <string>
 #include <cstdlib>
 
+#include <plugins/plugin_tools.h>
+
 #include "rpi_camera.h"
 
 #include "discovery_manager.h"
@@ -46,10 +48,9 @@ namespace rpi_cam
     {
         static const std::string kModel = "NxPi";
 
-        memset( (void*) &m_info, 0, sizeof(nxcip::CameraInfo) );
-        strncpy( m_info.url, url.c_str(), std::min(url.size(), sizeof(nxcip::CameraInfo::url))-1 );
-        strncpy( m_info.uid, serial.c_str(), std::min(serial.size(), sizeof(nxcip::CameraInfo::uid))-1 );
-        strncpy( m_info.modelName, kModel.c_str(), std::min(kModel.size(), sizeof(nxcip::CameraInfo::modelName))-1 );
+        nxpt::copyStr(m_info.url, url);
+        nxpt::copyStr(m_info.uid, serial);
+        nxpt::copyStr(m_info.modelName, kModel);
     }
 
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )

@@ -13,17 +13,88 @@
     #include <Windows.h>
 #endif
 
+#include <algorithm>
 #include <cerrno>
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
 #include <limits>
 #include <sstream>
+#include <string_view>
 #include <type_traits>
 
 #include "plugin_api.h"
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define NX_PRINTF_FORMAT_ATTRIBUTE(FORMAT_INDEX, FIRST_ARG_INDEX) \
+        __attribute__((format(printf, FORMAT_INDEX, FIRST_ARG_INDEX)))
+#else
+    #define NX_PRINTF_FORMAT_ATTRIBUTE(FORMAT_INDEX, FIRST_ARG_INDEX)
+#endif
+
 namespace nxpt {
+
+/** Bounds-checked string copy. destSize includes the NUL terminator. Returns false on overflow. */
+inline bool copyStr(char* dest, size_t destSize, std::string_view src)
+{
+    if (!dest || destSize == 0)
+        return false;
+
+    const size_t copyLen = std::min(src.size(), destSize - 1);
+    memcpy(dest, src.data(), copyLen);
+    dest[copyLen] = '\0';
+    return src.size() < destSize;
+}
+
+/** Same as above, but destSize is deduced from the destination array type. */
+template<size_t N>
+inline bool copyStr(char (&dest)[N], std::string_view src)
+{
+    return copyStr(dest, N, src);
+}
+
+/** Bounds-checked vsnprintf. destSize includes the NUL terminator. */
+NX_PRINTF_FORMAT_ATTRIBUTE(3, 0)
+inline int vformatStr(char* dest, size_t destSize, const char* format, va_list args)
+{
+    if (!dest || destSize == 0)
+        return -1;
+    const int result = vsnprintf(dest, destSize, format, args);
+    return (result >= 0 && result < (int) destSize) ? result : -1;
+}
+
+/** Same as above, but destSize is deduced from the destination array type. */
+template<size_t N>
+NX_PRINTF_FORMAT_ATTRIBUTE(2, 0)
+inline int vformatStr(char (&dest)[N], const char* format, va_list args)
+{
+    return vformatStr(dest, N, format, args);
+}
+
+/** Bounds-checked snprintf. destSize includes the NUL terminator. */
+NX_PRINTF_FORMAT_ATTRIBUTE(3, 4)
+inline int formatStr(char* dest, size_t destSize, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    const int result = vformatStr(dest, destSize, format, args);
+    va_end(args);
+    return result;
+}
+
+/** Same as above, but destSize is deduced from the destination array type. */
+template<size_t N>
+NX_PRINTF_FORMAT_ATTRIBUTE(2, 3)
+inline int formatStr(char (&dest)[N], const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    const int result = vformatStr(dest, N, format, args);
+    va_end(args);
+    return result;
+}
 
 namespace atomic {
 

@@ -53,7 +53,7 @@ static const char* VENDOR_NAME = "AXIS";
 
 void AxisCameraDiscoveryManager::getVendorName( char* buf ) const
 {
-    strcpy( buf, VENDOR_NAME );
+    nxpt::copyStr(buf, nxcip::MAX_TEXT_LEN, VENDOR_NAME);
 }
 
 int AxisCameraDiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
@@ -212,8 +212,8 @@ int AxisCameraDiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /
 nxcip::BaseCameraManager* AxisCameraDiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
 {
     AxisCameraManager* obj = new AxisCameraManager( info );
-    strcpy( obj->cameraInfo().defaultLogin, AXIS_DEFAULT_LOGIN );
-    strcpy( obj->cameraInfo().defaultPassword, AXIS_DEFAULT_PASSWORD );
+    nxpt::copyStr(obj->cameraInfo().defaultLogin, AXIS_DEFAULT_LOGIN);
+    nxpt::copyStr(obj->cameraInfo().defaultPassword, AXIS_DEFAULT_PASSWORD);
     return obj;
 }
 
@@ -229,7 +229,7 @@ int AxisCameraDiscoveryManager::getReservedModelList( char** modelList, int* cou
     if( *count >= 1 )
     {
         *count = 1;
-        strcpy( modelList[0], "*1344*" );
+        nxpt::copyStr(modelList[0], nxcip::MAX_MODEL_NAME_SIZE, "*1344*");
     }
     else
     {

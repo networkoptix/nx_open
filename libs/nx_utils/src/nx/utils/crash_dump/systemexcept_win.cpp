@@ -17,6 +17,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/string.h>
 
 #include "../platform/win32_syscall_resolver.h"
 
@@ -84,13 +85,14 @@ static bool GetProgramName( char* buffer ) {
     return true;
 }
 
-static bool GetCrashPrefix( char* sCrashPrefix )
+template<size_t N>
+static bool GetCrashPrefix(char (&sCrashPrefix)[N])
 {
     char sProgramName[MAX_SYMBOL_SIZE];
     if( !GetProgramName( sProgramName ) )
         return false;
 
-    return sprintf( sCrashPrefix, "%s_%s", sProgramName, fullVersionId.c_str());
+    return nx::utils::formatStr(sCrashPrefix, "%s_%s", sProgramName, fullVersionId.c_str()) >= 0;
 }
 
 // Customer-defined exception codes (bit 29 set), used for CRT failures that are reported to us
@@ -157,8 +159,12 @@ static void WriteDump(HANDLE hThread, PEXCEPTION_POINTERS ex, DWORD faultingThre
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here.
     char sFileName[MAX_PATH];
-    if( sprintf(sFileName, "%s\\%s_%i.dmp", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
+    if (nx::utils::formatStr(
+            sFileName, "%s\\%s_%i.dmp", sAppData, sCrashPrefix, GetCurrentProcessId())
+        < 0)
+    {
         return;
+    }
 
     HANDLE hFile = ::CreateFileA(
         sFileName,
@@ -383,8 +389,12 @@ CreateLegacyDumpFile() {
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here.
     char sFileName[MAX_PATH];
-    if( sprintf( sFileName, "%s\\%s_%i.except", sAppData, sCrashPrefix, GetCurrentProcessId() ) < 0)
+    if (nx::utils::formatStr(
+            sFileName, "%s\\%s_%i.except", sAppData, sCrashPrefix, GetCurrentProcessId())
+        < 0)
+    {
         return INVALID_HANDLE_VALUE;
+    }
 
     return ::CreateFileA(
         sFileName,
@@ -399,14 +409,14 @@ CreateLegacyDumpFile() {
 static
 void FWriteFile( HANDLE hFile , const char* fmt , ... ) {
     va_list vl;
-    va_start(vl,fmt);
+    va_start(vl, fmt);
     char pBuffer[1024];
-    DWORD dwWritten;
-    int iRet = vsprintf(pBuffer,fmt,vl);
+    const int len = nx::utils::vformatStr(pBuffer, fmt, vl);
     va_end(vl);
-    if( iRet <=0 )
+    if (len <= 0)
         return;
-    WriteFile(hFile,pBuffer,iRet,&dwWritten,NULL);
+    DWORD dwWritten;
+    WriteFile(hFile, pBuffer, (DWORD) len, &dwWritten, NULL);
 }
 
 static

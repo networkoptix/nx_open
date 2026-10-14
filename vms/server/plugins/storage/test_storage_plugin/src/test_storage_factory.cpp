@@ -40,7 +40,7 @@ std::string getAppDir()
 #elif defined (__linux__)
 
     char tmp[64];
-    sprintf(tmp, "/proc/%d/exe", getpid());
+    snprintf(tmp, sizeof(tmp), "/proc/%d/exe", getpid());
     int bytes = readlink(tmp, buf, sizeof buf);
     if (bytes <= 0)
         return result;

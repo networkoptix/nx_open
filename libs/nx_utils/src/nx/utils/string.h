@@ -2,7 +2,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cctype>
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -15,11 +18,80 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+#include "general_macros.h"
 #include "literal.h"
 #include "qnbytearrayref.h"
 #include "std_string_utils.h"
 
 namespace nx::utils {
+
+inline bool copyStr(char* dest, size_t destSize, std::string_view src)
+{
+    if (!dest || destSize == 0)
+        return false;
+
+    const size_t copyLen = std::min(src.size(), destSize - 1);
+    memcpy(dest, src.data(), copyLen);
+    dest[copyLen] = '\0';
+    return src.size() < destSize;
+}
+
+template<size_t N>
+inline bool copyStr(char (&dest)[N], std::string_view src)
+{
+    return copyStr(dest, N, src);
+}
+
+inline bool copyBytes(void* dest, size_t destSize, const void* src, size_t srcSize)
+{
+    if (!dest || (!src && srcSize > 0) || srcSize > destSize)
+        return false;
+    memcpy(dest, src, srcSize);
+    return true;
+}
+
+template<size_t N>
+inline bool copyBytes(uint8_t (&dest)[N], const void* src, size_t srcSize)
+{
+    return copyBytes(dest, N, src, srcSize);
+}
+
+NX_PRINTF_FORMAT_ATTRIBUTE(3, 0)
+inline int vformatStr(char* dest, size_t destSize, const char* format, va_list args)
+{
+    if (!dest || destSize == 0)
+        return -1;
+    const int result = vsnprintf(dest, destSize, format, args);
+    return (result >= 0 && result < (int) destSize) ? result : -1;
+}
+
+template<size_t N>
+NX_PRINTF_FORMAT_ATTRIBUTE(2, 0)
+inline int vformatStr(char (&dest)[N], const char* format, va_list args)
+{
+    return vformatStr(dest, N, format, args);
+}
+
+NX_PRINTF_FORMAT_ATTRIBUTE(3, 4)
+inline int formatStr(char* dest, size_t destSize, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    const int result = vformatStr(dest, destSize, format, args);
+    va_end(args);
+    return result;
+}
+
+template<size_t N>
+NX_PRINTF_FORMAT_ATTRIBUTE(2, 3)
+inline int formatStr(char (&dest)[N], const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    const int result = vformatStr(dest, N, format, args);
+    va_end(args);
+    return result;
+}
 
 /**
 * \param string                        String to perform replacement on.

@@ -53,8 +53,9 @@ int MediaEncoder::releaseRef() const
 
 int MediaEncoder::getMediaUrl( char* urlBuf ) const
 {
-    strcpy( urlBuf, m_cameraManager->info().url );
-    return nxcip::NX_NO_ERROR;
+    return nxpt::copyStr(urlBuf, nxcip::MAX_TEXT_LEN, m_cameraManager->info().url)
+        ? nxcip::NX_NO_ERROR
+        : nxcip::NX_UNDEFINED_BEHAVOUR;
 }
 
 int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* /*infoList*/, int* infoListCount ) const

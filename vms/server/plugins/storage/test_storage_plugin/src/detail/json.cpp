@@ -741,7 +741,7 @@ static void writeNumber(
     char *dot;
     char *end;
 
-    sprintf(writeBuf, "%.5Lf", num);
+    snprintf(writeBuf, kWriteBufSize, "%.5Lf", num);
     dot = strchr(writeBuf, '.');
     end = writeBuf + strlen(writeBuf) - 1;
 

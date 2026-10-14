@@ -1,7 +1,8 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <cstring>
 #include "test_file_info_iterator.h"
+#include <cstdio>
+#include <cstring>
 
 namespace {
 
@@ -23,9 +24,7 @@ nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) con
 
     char buf[4096];
     FsStubNode_fullPath(resultNode, buf, sizeof buf);
-    memset(m_urlBuf, '\0', sizeof m_urlBuf);
-    strcpy(m_urlBuf, m_prefix.data());
-    strcat(m_urlBuf, buf);
+    snprintf(m_urlBuf, sizeof(m_urlBuf), "%s%s", m_prefix.c_str(), buf);
 
     m_fInfo.url = m_urlBuf;
     m_fInfo.type = resultNode->type == file ? nx_spl::isFile : nx_spl::isDir;

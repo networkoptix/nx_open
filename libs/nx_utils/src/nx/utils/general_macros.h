@@ -108,3 +108,10 @@
 #else
     #define NX_NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
+
+#if defined(__GNUC__) || defined(__clang__)
+    #define NX_PRINTF_FORMAT_ATTRIBUTE(FORMAT_INDEX, FIRST_ARG_INDEX) \
+        __attribute__((format(printf, FORMAT_INDEX, FIRST_ARG_INDEX)))
+#else
+    #define NX_PRINTF_FORMAT_ATTRIBUTE(FORMAT_INDEX, FIRST_ARG_INDEX)
+#endif
