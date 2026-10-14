@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Cambiar entre cámaras nun deseño</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Ver a guía paso a paso da interface</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Cambiar a liña de tempo entre movemento, obxectos e marcadores</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Reabrir un panel contraído</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Abrir accións da cámara con disparo suave</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
@@ -1522,7 +1522,7 @@
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Ver os detalles do evento cun toque longo</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
@@ -1537,7 +1537,7 @@
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Aperta ou separa os dedos para ampliar ou reducir a liña de tempo</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>

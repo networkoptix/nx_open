@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Εναλλαγή μεταξύ καμερών σε μια διάταξη</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
@@ -610,7 +610,7 @@
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Δείτε την ξενάγηση στη διεπαφή</translation>
     </message>
   </context>
   <context>
@@ -768,7 +768,7 @@
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Εναλλαγή χρονοδιαγράμματος μεταξύ κίνησης, αντικειμένων και σελιδοδεικτών</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
@@ -813,7 +813,7 @@
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Ανοίξτε ξανά ένα συμπτυγμένο πλαίσιο</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
@@ -1457,7 +1457,7 @@
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Άνοιγμα ενεργειών κάμερας με Soft Trigger</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
@@ -1522,7 +1522,7 @@
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Δείτε τις λεπτομέρειες του συμβάντος με ένα παρατεταμένο πάτημα</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
@@ -1537,7 +1537,7 @@
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Τσιμπήστε ή απλώστε για μεγέθυνση του Χρονοδιαγράμματος</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
