@@ -99,6 +99,13 @@ GetPostTunnelServer<ApplicationData...>::GetPostTunnelServer(
 template<typename ...ApplicationData>
 GetPostTunnelServer<ApplicationData...>::~GetPostTunnelServer()
 {
+    /**
+     * NOTE: connection events in the parent class are dispatched via
+     * conn->aioThread->dispatch(nullptr, ...), which means they can't be removed from the aio
+     * queue and may fire after this tunnel server is destroyed. to prevent this, we must wait here
+     * in the child class for the all pending requests to complete, and then clear the pool.
+     */
+    this->waitForPendingRequests();
     m_pool.clear();
 }
 

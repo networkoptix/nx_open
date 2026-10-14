@@ -60,6 +60,7 @@ ConnectionUpgradeTunnelServer<ApplicationData...>::ConnectionUpgradeTunnelServer
 template<typename ...ApplicationData>
 ConnectionUpgradeTunnelServer<ApplicationData...>::~ConnectionUpgradeTunnelServer()
 {
+    this->waitForPendingRequests();
 }
 
 template<typename ...ApplicationData>
