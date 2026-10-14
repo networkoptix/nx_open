@@ -110,13 +110,6 @@ function(nx_run_conan)
             "--core-conf core.download:download_cache=${conanDownloadCache}")
     endif()
 
-    if(WIN32)
-        # Generate PowerShell runtime activation scripts (conanrun.ps1) alongside the default
-        # .bat/.sh. Conan2 does not emit these by default, leaving IDEs such as CLion without a
-        # way to set up the runtime environment (e.g. Qt libs) before launching a target.
-        list(APPEND flags "-c tools.env.virtualenv:powershell=powershell.exe")
-    endif()
-
     list(APPEND flags ${extraConanArgs})
 
     set(CONAN_HOME $ENV{CONAN_HOME})
