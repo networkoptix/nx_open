@@ -3,6 +3,7 @@
 from conan.errors import ConanException
 from conan.tools.build import cross_building
 from conan.tools.cmake import CMakeDeps
+from conan.tools.env import VirtualBuildEnv, VirtualRunEnv
 from conan.tools.files import save
 from conan.tools.system.package_manager import Apt
 from conan import ConanFile
@@ -60,8 +61,6 @@ def generate_conan_package_refs(conanfile):
 
 class NxOpenConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
-
-    generators = "VirtualRunEnv"
 
     options = {
         "targetDevice": ["ANY"],
@@ -121,6 +120,12 @@ class NxOpenConan(ConanFile):
         for config in ("Debug", "Release", "RelWithDebInfo"):
             deps.configuration = config
             deps.generate()
+
+        suffix = f"{self.settings.build_type}-{self.settings.arch}".lower()
+        for env in (VirtualRunEnv(self), VirtualBuildEnv(self)):
+            env.generate()
+            if platform.system() == "Windows":
+                env.vars().save_script(f"{env.basename}-{suffix}.ps1")
 
         generate_conan_package_paths(self)
         generate_conan_package_refs(self)
