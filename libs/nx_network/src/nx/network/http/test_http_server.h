@@ -9,7 +9,6 @@
 #include <nx/network/ssl/context.h>
 
 #include "server/authentication_dispatcher.h"
-#include "server/handler/http_server_handler_custom.h"
 #include "server/http_message_dispatcher.h"
 #include "server/http_server_authentication_manager.h"
 #include "server/http_server_plain_text_credentials_provider.h"
@@ -133,10 +132,11 @@ public:
     nx::network::http::HttpStreamSocketServer& server() { return *m_httpServer; }
     const nx::network::http::HttpStreamSocketServer& server() const { return *m_httpServer; }
     nx::network::http::server::rest::MessageDispatcher& httpMessageDispatcher()
-        { return m_httpMessageDispatcher; }
+    {
+        return m_httpMessageDispatcher;
+    }
 
     void terminateListener();
-    void pleaseStopSync();
 
     // Installs handler to receive all incoming HTTP request.
     // handler->setNextHandler() receives the previous default handler.

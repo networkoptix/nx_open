@@ -117,7 +117,8 @@ SeparateUpDownConnectionsTunnelServer<ApplicationData...>::~SeparateUpDownConnec
 {
     m_removeInactiveTunnelsTimer.pleaseStopSync();
 
-    closeAllTunnels();
+    this->waitForPendingRequests();
+    this->closeAllTunnels();
 }
 
 template<typename ...ApplicationData>
@@ -344,18 +345,10 @@ public:
     {
     }
 
-    virtual ~ExperimentalTunnelServer();
-
     virtual void registerRequestHandlers(
         const std::string& basePath,
         nx::network::http::AbstractMessageDispatcher* messageDispatcher) override;
 };
-
-template<typename ...ApplicationData>
-ExperimentalTunnelServer<ApplicationData...>::~ExperimentalTunnelServer()
-{
-    this->closeAllTunnels();
-}
 
 template<typename ...ApplicationData>
 void ExperimentalTunnelServer<ApplicationData...>::registerRequestHandlers(

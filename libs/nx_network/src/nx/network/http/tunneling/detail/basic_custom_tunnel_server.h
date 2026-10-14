@@ -50,6 +50,13 @@ public:
     std::string requestPath() const;
 
 protected:
+    /**
+     * Blocks until all in-flight processTunnelInitiationRequest dispatches have completed.
+     * Derived class destructors that clean up resources used by processOpenTunnelRequest
+     * must call this before releasing those resources.
+     */
+    void waitForPendingRequests() { m_asyncCallsTracker.wait(); }
+
     virtual StatusCode::Value validateOpenTunnelRequest(
         const RequestContext& requestContext);
 
@@ -110,7 +117,7 @@ BasicCustomTunnelServer<ApplicationData...>::BasicCustomTunnelServer(
 template<typename ...ApplicationData>
 BasicCustomTunnelServer<ApplicationData...>::~BasicCustomTunnelServer()
 {
-    m_asyncCallsTracker.wait();
+    waitForPendingRequests();
 }
 
 template<typename ...ApplicationData>
@@ -204,13 +211,14 @@ void BasicCustomTunnelServer<ApplicationData...>::authorizeTunnel(
 
     auto requestContextPtr = requestContext.get();
 
-    m_tunnelAuthorizer->authorize(
-        requestContextPtr,
-        [this, aioThread = connection.getAioThread(), requestContext = std::move(requestContext),
-            completionHandler = std::move(completionHandler)](
-                StatusCode::Value result,
-                HttpHeaders responseHeaders,
-                ApplicationData... applicationData) mutable
+    m_tunnelAuthorizer->authorize(requestContextPtr,
+        [this,
+            aioThread = connection.getAioThread(),
+            requestContext = std::move(requestContext),
+            completionHandler = std::move(completionHandler),
+            locker = m_asyncCallsTracker.getScopedIncrement()](StatusCode::Value result,
+            HttpHeaders responseHeaders,
+            ApplicationData... applicationData) mutable
         {
             NX_VERBOSE(this, "Tunnel %1 authorization completed with %2",
                 requestContext->request.requestLine.url, StatusCode::toString(result));
@@ -223,9 +231,8 @@ void BasicCustomTunnelServer<ApplicationData...>::authorizeTunnel(
                 std::move(applicationData)...);
 
             // Moving execution to the connection thread.
-            aioThread->dispatch(
-                nullptr,
-                [this, args = std::move(args), locker = m_asyncCallsTracker.getScopedIncrement()]() mutable
+            aioThread->dispatch(nullptr,
+                [this, args = std::move(args), locker = std::move(locker)]() mutable
                 {
                     std::apply([this](auto&&... args)
                     {
