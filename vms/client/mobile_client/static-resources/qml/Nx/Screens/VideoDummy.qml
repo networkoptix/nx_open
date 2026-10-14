@@ -8,6 +8,7 @@ VideoPlaceholder
     id: control
 
     signal logInClicked()
+    signal setUp2FaClicked()
 
     state: ""
 
@@ -55,6 +56,7 @@ VideoPlaceholder
                 type: VideoPlaceholder.Error
                 text: qsTr("2FA disabled")
                 imageSource: "image://skin/48x48/Outline/restrict.svg"
+                action: setUp2FaAction
             }
         },
         State
@@ -219,5 +221,13 @@ VideoPlaceholder
 
         text: qsTr("Log In")
         onTriggered: control.logInClicked()
+    }
+
+    Action
+    {
+        id: setUp2FaAction
+
+        text: qsTr("Set Up 2FA")
+        onTriggered: control.setUp2FaClicked()
     }
 }

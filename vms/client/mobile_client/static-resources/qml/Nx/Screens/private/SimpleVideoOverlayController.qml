@@ -17,6 +17,8 @@ QtObject
     readonly property bool offline: status === API.ResourceStatus.offline
     readonly property bool unauthorized: status === API.ResourceStatus.unauthorized
     readonly property bool needsCloudAuthorization: mediaResourceHelper.needsCloudAuthorization
+    readonly property bool is2FaDisabled: !appContext.cloudStatusWatcher.is2FaEnabledForUser
+        && mediaResourceHelper.is2FaEnabled
     readonly property bool hasDefaultPassword: mediaResourceHelper.hasDefaultCameraPassword
     readonly property bool hasOldFirmware: mediaResourceHelper.hasOldCameraFirmware
     readonly property bool ioModule: !mediaResourceHelper.hasVideo && mediaResourceHelper.isIoModule
@@ -25,6 +27,8 @@ QtObject
     {
         if (needsCloudAuthorization)
             return "needsCloudAuthorization"
+        if (is2FaDisabled)
+            return "is2FaDisabled"
         if (unauthorized)
             return "cameraUnauthorized"
         if (hasDefaultPassword)

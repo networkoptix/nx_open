@@ -101,6 +101,9 @@ public:
     Q_INVOKABLE void openVideoScreen(QnResource* cameraResource, qint64 timestamp);
     Q_INVOKABLE void openSessionsScreen();
 
+    /** Shows the error about 2FA being required by the Site but disabled for the cloud user. */
+    Q_INVOKABLE void showTwoFactorAuthError(const QString& systemName);
+
 signals:
     void resourceChanged();
     void resourcesScreenRequested(const UuidList& filterIds);
