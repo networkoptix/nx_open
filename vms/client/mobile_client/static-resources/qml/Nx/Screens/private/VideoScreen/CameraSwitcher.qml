@@ -189,10 +189,31 @@ Item
             listView.currentIndex = row
         }
 
+        // Model changes can put another camera into the current position of the list.
+        function restoreCurrentItem()
+        {
+            if (listView.moving) //< onMovementEnded handles it.
+                return
+
+            if (d.resource && switcher.camerasModel.rowByResource(d.resource) !== -1)
+                d.syncToResource()
+        }
+
         onResourceChanged:
             d.syncToResource()
 
         Component.onCompleted:
             d.syncToResource()
+    }
+
+    Connections
+    {
+        target: switcher.camerasModel
+
+        function onRowsInserted() { d.restoreCurrentItem() }
+        function onRowsRemoved() { d.restoreCurrentItem() }
+        function onRowsMoved() { d.restoreCurrentItem() }
+        function onLayoutChanged() { d.restoreCurrentItem() }
+        function onModelReset() { d.restoreCurrentItem() }
     }
 }
