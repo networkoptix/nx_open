@@ -1558,6 +1558,12 @@ Page
 
                     onLogInClicked:
                         controller.resourceHelper.cloudAuthorize()
+
+                    onSetUp2FaClicked:
+                    {
+                        windowContext.deprecatedUiController.showTwoFactorAuthError(
+                            controller.resourceHelper.crossSystemName)
+                    }
                 }
             }
         }

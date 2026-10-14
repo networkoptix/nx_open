@@ -18,6 +18,23 @@
 #include <nx/vms/common/system_settings.h>
 #include <utils/common/delayed.h>
 
+namespace {
+
+std::pair<QString, QString> connectionErrorTitleAndText(
+    nx::vms::client::core::RemoteConnectionErrorCode errorCode,
+    const nx::vms::api::ModuleInformation& moduleInformation)
+{
+    const auto title = moduleInformation.systemName.isEmpty()
+        ? QnMobileClientUiController::tr("Cannot connect to the Server")
+        : QnMobileClientUiController::tr("Cannot connect to the Site \"%1\"", "%1 is a site name")
+              .arg(moduleInformation.systemName);
+
+    return {title,
+        nx::vms::client::mobile::UiMessages::getConnectionErrorText(errorCode, moduleInformation)};
+}
+
+} // namespace
+
 class QnMobileClientUiControllerPrivate
 {
 public:
@@ -112,19 +129,12 @@ QnMobileClientUiController::QnMobileClientUiController(
             }
             else
             {
-                using UiMessages = nx::vms::client::mobile::UiMessages;
-                const auto errorText =
-                    UiMessages::getConnectionErrorText(errorCode, moduleInformation);
+                const auto [title, errorText] =
+                    connectionErrorTitleAndText(errorCode, moduleInformation);
 
-                using nx::vms::client::core::RemoteConnectionErrorCode;
                 const bool is2faError =
                     errorCode == RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
                         || errorCode == RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
-
-                const auto title = moduleInformation.systemName.isEmpty()
-                    ? tr("Cannot connect to the Server")
-                    : tr("Cannot connect to the Site \"%1\"", "%1 is a site name")
-                        .arg(moduleInformation.systemName);
 
                 if (is2faError)
                     emit twoFactorAuthError(title, errorText);
@@ -215,6 +225,17 @@ void QnMobileClientUiController::openVideoScreen(QnResource* cameraResource, qin
     NX_DEBUG(this, "openVideoScreen(): camera is <%1>, timestamp is <%2>",
         (cameraResource ? cameraResource->getId() : nx::Uuid{}), timestamp);
     emit videoScreenRequested(cameraResource, timestamp);
+}
+
+void QnMobileClientUiController::showTwoFactorAuthError(const QString& systemName)
+{
+    nx::vms::api::ModuleInformation moduleInformation;
+    moduleInformation.systemName = systemName;
+
+    const auto [title, errorText] = connectionErrorTitleAndText(
+        nx::vms::client::core::RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled,
+        moduleInformation);
+    emit twoFactorAuthError(title, errorText);
 }
 
 void QnMobileClientUiController::openSessionsScreen()
