@@ -128,13 +128,12 @@ bool RtspRestreamer::tryRewriteRequest(nx::Url& url, bool force)
     return true;
 }
 
-void RtspRestreamer::setRequest(const QString& request)
+void RtspRestreamer::setRequest(const nx::Url& request)
 {
-    nx::Url url(request);
-    m_useCloud = tryRewriteRequest(url, false);
-    m_url = url;
+    m_url = request;
+    m_useCloud = tryRewriteRequest(m_url, false);
 
-    m_reader.setRequest(url.toString());
+    m_reader.setRequest(m_url);
 }
 
 QnAbstractMediaDataPtr RtspRestreamer::getNextData()
@@ -265,7 +264,7 @@ CameraDiagnostics::Result RtspRestreamer::openStream()
         {
             m_useCloud = tryRewriteRequest(m_url, true);
             if (m_useCloud)
-                m_reader.setRequest(m_url.toString());
+                m_reader.setRequest(m_url);
         }
         if (m_useCloud)
         {

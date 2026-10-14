@@ -101,7 +101,7 @@ public:
     /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
-    void setRequest(const QString& request);
+    void setRequest(const nx::Url& request);
     void setRole(Qn::ConnectionRole role);
     // Force credentials. If credentials were not explicitly set, derived classes may use other
     // sources to automatically obtain them.
@@ -229,7 +229,7 @@ protected:
     mutable nx::Mutex m_tracksMutex;
     std::map<int, int> m_trackIndices;
 
-    QString m_request;
+    nx::Url m_request;
     QString m_logName;
 
     std::vector<nx::utils::ByteArray*> m_demuxedData;

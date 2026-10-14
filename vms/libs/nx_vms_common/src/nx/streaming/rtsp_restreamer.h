@@ -44,7 +44,7 @@ public:
     /** Implementation of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
-    void setRequest(const QString& request);
+    void setRequest(const nx::Url& request);
     void setRole(Qn::ConnectionRole role);
     nx::Url getCurrentStreamUrl() const;
     void setUserAgent(const QString& value);

@@ -13,6 +13,7 @@
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/network/compat_poll.h>
 #include <nx/network/rtsp/rtsp_types.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/rtp/parsers/aac_rtp_parser.h>
 #include <nx/rtp/parsers/av1_rtp_parser.h>
 #include <nx/rtp/parsers/h264_rtp_parser.h>
@@ -114,7 +115,7 @@ void RtspStreamProvider::reportNetworkIssue(
 {
 }
 
-void RtspStreamProvider::setRequest(const QString& request)
+void RtspStreamProvider::setRequest(const nx::Url& request)
 {
     m_request = request;
     updateStreamUrlIfNeeded();
@@ -1325,32 +1326,19 @@ std::string RtspResourceStreamProvider::timeHelperKey() const
 
 void RtspResourceStreamProvider::updateStreamUrlIfNeeded()
 {
-    // TODO: #skolesnik nx::network::url::Builder() ?
-    int mediaPort = m_resource->mediaPort();
-    if (m_request.startsWith("rtsp://") || m_request.startsWith("rtsps://"))
+    const int mediaPort = m_resource->mediaPort();
+    if (nx::network::rtsp::isUrlScheme(m_request.scheme()))
     {
         m_url = m_request;
         if (mediaPort)
             m_url.setPort(mediaPort); //< Override port.
+        return;
     }
-    else
-    {
-        m_url.clear();
-        m_url.setScheme("rtsp");
-        m_url.setHost(m_resource->getHostAddress().toString());
-        m_url.setPort(mediaPort ? mediaPort : nx::network::rtsp::DEFAULT_RTSP_PORT);
 
-        if (!m_request.isEmpty())
-        {
-            auto requestParts = m_request.split('?');
-            QString path = requestParts[0];
-            if (!path.startsWith('/'))
-                path.insert(0, '/');
-            m_url.setPath(path);
-            if (requestParts.size() > 1)
-                m_url.setQuery(requestParts[1]);
-        }
-    }
+    m_url = nx::network::url::Builder(m_request)
+                .setScheme(nx::network::rtsp::kUrlSchemeName)
+                .setHost(m_resource->getHostAddress())
+                .setPort(mediaPort ? mediaPort : nx::network::rtsp::DEFAULT_RTSP_PORT);
 }
 
 nx::streaming::rtp::TimePolicy RtspResourceStreamProvider::getTimePolicy() const
