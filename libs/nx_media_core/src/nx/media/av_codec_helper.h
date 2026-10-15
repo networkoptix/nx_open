@@ -16,8 +16,13 @@ class NX_MEDIA_CORE_API QnAvCodecHelper
 {
 public:
     /**
-     * @return Codec name. Can be empty, but never null.
+     * @return Codec name. Can be empty for invalid/unknown codecs.
      */
-    static QString codecIdToString(AVCodecID codecId);
+    static const QString& codecIdToString(AVCodecID codecId);
+
+    /**
+     * Case-insensitive codec ID search by its name.
+     * @return Codec ID. AV_CODEC_ID_NONE if not found.
+     */
     static AVCodecID codecIdFromString(const QString& codecId);
 };

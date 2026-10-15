@@ -2,14 +2,15 @@
 
 #include "av_codec_helper.h"
 
-#include <QtCore/QByteArray>
-#include <QtCore/QMap>
+#include <map>
 
-QMap<AVCodecID, QByteArray> codecToStringMap()
+#include <QtCore/QString>
+
+#include <nx/utils/string/comparator.h>
+
+std::map<AVCodecID, QString> codecToStringMap()
 {
-    QMap<AVCodecID, QByteArray> codecToStringData =
-    {
-        {AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO"},
+    std::map<AVCodecID, QString> codecToStringData = {{AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO"},
         {AV_CODEC_ID_MPEG2VIDEO, "MPEG2VIDEO"}, //< Preferred id for MPEG-1/2 video decoding.
         {AV_CODEC_ID_H261, "H261"},
         {AV_CODEC_ID_H263, "H263"},
@@ -323,29 +324,32 @@ QMap<AVCodecID, QByteArray> codecToStringMap()
         // Dummy codec for streams containing only metadata information.
         {AV_CODEC_ID_FFMETADATA, "FFMETADATA"},
 
-        {AV_CODEC_ID_NONE, ""},
-
-        { AV_CODEC_ID_MPEG1VIDEO, "MPEG1VIDEO" }
-    };
+        {AV_CODEC_ID_NONE, ""}};
     return codecToStringData;
 }
 
-QMap<QByteArray, AVCodecID> inverseMap(const QMap<AVCodecID, QByteArray>& source)
+const QString& QnAvCodecHelper::codecIdToString(AVCodecID codecId)
 {
-    QMap<QByteArray, AVCodecID> result;
-    for (auto itr = source.begin(); itr != source.end(); ++itr)
-        result.insert(itr.value(), itr.key());
-    return result;
-}
+    static const std::map<AVCodecID, QString> kCodecToStringData = codecToStringMap();
 
-QString QnAvCodecHelper::codecIdToString(AVCodecID codecId)
-{
-    static const QMap<AVCodecID, QByteArray> kCodecToStringData = codecToStringMap();
-    return QString::fromLatin1(kCodecToStringData.value(codecId));
+    if (const auto it = kCodecToStringData.find(codecId); it != kCodecToStringData.end())
+        return it->second;
+    static const QString kEmpty;
+    return kEmpty;
 }
 
 AVCodecID QnAvCodecHelper::codecIdFromString(const QString& value)
 {
-    static const QMap<QByteArray, AVCodecID> kStringToCodecData = inverseMap(codecToStringMap());
-    return kStringToCodecData.value(value.toLatin1(), AV_CODEC_ID_NONE);
+    using Comparator = nx::utils::CaseInsensitiveStringCompare;
+    static const std::map<QString, AVCodecID, Comparator> kStringToCodecData = []()
+    {
+        std::map<QString, AVCodecID, Comparator> data;
+        for (auto& [codec, name]: codecToStringMap())
+            data[name] = codec;
+        return data;
+    }();
+
+    if (const auto it = kStringToCodecData.find(value); it != kStringToCodecData.end())
+        return it->second;
+    return AV_CODEC_ID_NONE;
 }
