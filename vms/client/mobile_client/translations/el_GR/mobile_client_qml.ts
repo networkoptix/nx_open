@@ -1622,6 +1622,10 @@
       <translation>Δεν υπάρχει ζωντανή ροή</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Ρύθμιση 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Κρυπτογραφημένη αρχειοθέτηση</translation>
     </message>

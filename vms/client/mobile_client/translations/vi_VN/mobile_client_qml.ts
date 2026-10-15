@@ -1621,6 +1621,10 @@
       <translation>Không có luồng trực tiếp</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Thiết lập 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Lưu trữ được mã hóa</translation>
     </message>

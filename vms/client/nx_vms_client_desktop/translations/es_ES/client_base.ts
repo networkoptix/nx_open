@@ -6592,7 +6592,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>Crear marcador...</translation>
     </message>
   </context>
   <context>

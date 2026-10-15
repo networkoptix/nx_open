@@ -1622,6 +1622,10 @@
       <translation>Non hai emisión en directo</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Configurar 2FA, autenticación en 2 pasos</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Arquivo cifrado</translation>
     </message>

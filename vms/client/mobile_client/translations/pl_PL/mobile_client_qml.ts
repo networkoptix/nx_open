@@ -1624,6 +1624,10 @@
       <translation>Brak strumienia na żywo</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Skonfiguruj 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Archiwum jest zaszyfrowane</translation>
     </message>

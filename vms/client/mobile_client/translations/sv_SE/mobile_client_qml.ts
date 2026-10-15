@@ -1622,6 +1622,10 @@
       <translation>Ingen liveström</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Konfigurera 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Arkivet är krypterat</translation>
     </message>
