@@ -1622,6 +1622,10 @@
         <translation></translation>
     </message>
     <message>
+        <source>Set Up 2FA</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Archive encrypted</source>
         <translation></translation>
     </message>
