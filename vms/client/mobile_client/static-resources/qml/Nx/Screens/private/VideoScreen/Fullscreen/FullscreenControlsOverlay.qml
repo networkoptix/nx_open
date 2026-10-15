@@ -44,6 +44,8 @@ Item
 
     readonly property int tapRewindDistanceMs: 5000
 
+    property alias defaultSpeed: speedControl.defaultSpeed
+
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 

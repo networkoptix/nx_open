@@ -47,6 +47,12 @@ Rectangle
     // Whether the slider is pressed and held by the user.
     property alias pressed: speedSlider.pressed
 
+    // In `revertOnRelease` mode the slider changes speed while dragged, but on release the speed
+    // returns to `defaultSpeed` (or to zero, if playback was paused). Selecting a speed from
+    // the quick access menu, however, sets both `speed` and `defaultSpeed`.
+    property bool revertOnRelease: true
+    property real defaultSpeed: 1
+
     // Whether the quick access menu is opened.
     readonly property alias menuOpened: quickAccessMenu.opened
 
@@ -151,6 +157,7 @@ Rectangle
 
             property bool updating: false
             property real sliderSpeed: speedControl.effectivePaused ? 0 : speedControl.speed
+            property bool wasPaused: false
 
             opacity: (speedControl.enabled && !enabled) ? 0.3 : 1.0
             enabled: !(speedControl.forced1x && speedControl.disabledWhenForced1x)
@@ -165,6 +172,14 @@ Rectangle
             snapMode: Slider.SnapOnRelease
             grooveHighlight: Slider.FillingFromZero
             value: speedToValue(sliderSpeed)
+
+            Behavior on value
+            {
+                id: sliderValueAnimatedBehavior
+
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                enabled: speedControl.revertOnRelease
+            }
 
             /**
              * JS object with speed to slider value conversion parameters:
@@ -259,6 +274,34 @@ Rectangle
                 speedControl.moved()
                 speedSlider.updating = false
             }
+
+            onPressedChanged:
+            {
+                sliderValueAnimatedBehavior.enabled = !pressed && speedControl.revertOnRelease
+
+                if (!speedControl.revertOnRelease)
+                    return
+
+                if (pressed)
+                {
+                    wasPaused = speedControl.paused
+                    return
+                }
+
+                // This block is necessary even when restoring to paused to restore desired speed
+                // first (so it's the speed in effect when externally unpaused later).
+                if (speedControl.speed !== speedControl.defaultSpeed)
+                {
+                    speedControl.speed = speedControl.defaultSpeed
+                    speedControl.moved()
+                }
+
+                if (wasPaused && !speedControl.paused)
+                {
+                    speedControl.speed = 0
+                    speedControl.moved()
+                }
+            }
         }
 
         ControlButton
@@ -283,8 +326,8 @@ Rectangle
 
     onEffectivePausedChanged:
     {
-        if (!effectivePaused && speed == 0)
-            speed = 1
+        if (!effectivePaused && speed === 0)
+            speed = speedControl.revertOnRelease ? speedControl.defaultSpeed : 1
     }
 
     Menu
@@ -364,6 +407,7 @@ Rectangle
 
                 onTriggered:
                 {
+                    speedControl.defaultSpeed = menuItem.speed
                     speedControl.speed = menuItem.speed
                     speedControl.moved()
                 }
