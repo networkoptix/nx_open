@@ -1626,6 +1626,10 @@
       <translation>لا يوجد فيديو مباشر</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation type="unfinished">Archive encrypted</translation>
     </message>

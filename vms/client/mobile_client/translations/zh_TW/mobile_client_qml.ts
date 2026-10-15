@@ -1621,6 +1621,10 @@
       <translation>無即時影像串流</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>設定雙重認證(2FA)</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>已加密的錄影資料</translation>
     </message>

@@ -1621,6 +1621,10 @@
       <translation>ライブストリームなし</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>二要素認証のセットアップ</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>アーカイブは暗号化されています</translation>
     </message>

@@ -1622,6 +1622,10 @@
       <translation>Canlı yayın yok</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Arşiv şifreli</translation>
     </message>

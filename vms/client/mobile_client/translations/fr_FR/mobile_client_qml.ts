@@ -1622,6 +1622,10 @@
       <translation>Aucun flux en direct</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Configurer 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Archive chiffrée</translation>
     </message>

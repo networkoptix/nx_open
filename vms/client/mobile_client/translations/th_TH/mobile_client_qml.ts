@@ -1621,6 +1621,10 @@
       <translation>ไม่มีสตรีมภาพปัจจุบัน</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation type="unfinished">Set Up 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>การเข้ารหัสถูกเก็บถาวร</translation>
     </message>

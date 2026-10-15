@@ -1622,6 +1622,10 @@
       <translation>No hay transmisión en vivo</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Configurar 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation type="unfinished">Archive encrypted</translation>
     </message>

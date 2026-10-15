@@ -1621,6 +1621,10 @@
       <translation>라이브 스트림 없음</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>2FA 설정</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>아카이브 암호화</translation>
     </message>

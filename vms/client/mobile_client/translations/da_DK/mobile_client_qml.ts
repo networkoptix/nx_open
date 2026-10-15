@@ -1622,6 +1622,10 @@
       <translation>Ingen live stream</translation>
     </message>
     <message>
+      <source>Set Up 2FA</source>
+      <translation>Opsæt 2FA</translation>
+    </message>
+    <message>
       <source>Archive encrypted</source>
       <translation>Arkivet er krypteret</translation>
     </message>
