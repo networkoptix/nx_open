@@ -713,16 +713,20 @@ Page
 
         hasActionButton: actionSheet.hasActions
 
-        onBackButtonClicked: LayoutController.exitFullscreen()
+        onDefaultSpeedChanged:
+            speedControl.defaultSpeed = defaultSpeed
 
-        onExitFullscreenButtonClicked: LayoutController.exitFullscreen()
+        onBackButtonClicked:
+            LayoutController.exitFullscreen()
 
-        onCalendarButtonClicked: calendarPanel.open()
+        onExitFullscreenButtonClicked:
+            LayoutController.exitFullscreen()
+
+        onCalendarButtonClicked:
+            calendarPanel.open()
 
         onMenuButtonClicked:
-        {
             menu.open()
-        }
     }
 
     Rectangle
@@ -979,6 +983,9 @@ Page
 
                             onMoved:
                                 controller.setSpeed(speed)
+
+                            onDefaultSpeedChanged:
+                                fullscreenControlsOverlay.defaultSpeed = defaultSpeed
 
                             // Reflect the actual playback speed so the control stays correct
                             // when the speed is changed elsewhere (e.g. the fullscreen controls).

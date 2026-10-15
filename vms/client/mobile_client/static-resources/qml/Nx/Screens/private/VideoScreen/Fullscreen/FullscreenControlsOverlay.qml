@@ -44,6 +44,8 @@ Item
 
     readonly property int tapRewindDistanceMs: 5000
 
+    property alias defaultSpeed: speedControl.defaultSpeed
+
     // Whether the user is seeking by double taps on the screen edges right now.
     readonly property bool tapRewindActive: leftTapRewindControl.indicatorShown
         || rightTapRewindControl.indicatorShown
