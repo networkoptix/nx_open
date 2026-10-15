@@ -123,6 +123,7 @@ public:
     bool hasChildren(const QModelIndex &parent = QModelIndex()) const override;
     Q_INVOKABLE QStringList childSystemIds(const QModelIndex& parent = QModelIndex()) const;
     Q_INVOKABLE bool hasFolders(const QModelIndex& parent = QModelIndex()) const;
+    Q_INVOKABLE bool isPartOf(const QModelIndex& index, const QModelIndex& parent) const;
 
     CloudStatusWatcher* statusWatcher() const;
     void setStatusWatcher(CloudStatusWatcher* statusWatcher);
@@ -152,6 +153,8 @@ signals:
     void hasOrganizationsChanged();
     void foldersChanged(const QModelIndex& orgIndex);
     void fullTreeLoaded();
+    void channelPartnerLost(const QModelIndex& index);
+    void organizationLost(const QModelIndex& index);
 
 private:
     struct Private;

@@ -120,6 +120,7 @@ void SessionManager::Private::startSession(
             {
                 NX_DEBUG(this, "User name changed to empty, stopping session");
                 q->stopSessionByUser();
+                emit q->sessionStoppedOnAccessLost();
             }
         },
         Qt::QueuedConnection);

@@ -402,7 +402,10 @@ struct OrganizationsModel::Private
         for (const auto& id: prevIds)
         {
             if (auto node = nodes.find(id))
+            {
+                emit q->channelPartnerLost(q->createIndex(node->row(), 0, node));
                 remove(node->row(), node->parentNode());
+            }
         }
     }
 
@@ -461,7 +464,10 @@ struct OrganizationsModel::Private
         for (const auto& id: prevIds)
         {
             if (auto node = nodes.find(id))
+            {
+                emit q->organizationLost(q->createIndex(node->row(), 0, node));
                 remove(node->row(), node->parentNode());
+            }
         }
     }
 
@@ -1203,6 +1209,17 @@ bool OrganizationsModel::hasFolders(const QModelIndex& parent) const
 
     return std::ranges::any_of(node->allChildren(),
         [](const auto& child) { return child->type == NodeType::Folder; });
+}
+
+bool OrganizationsModel::isPartOf(const QModelIndex& index, const QModelIndex& parent) const
+{
+    for (auto current = index; current.isValid(); current = current.parent())
+    {
+        if (current == parent)
+            return true;
+    }
+
+    return false;
 }
 
 QHash<int, QByteArray> OrganizationsModel::roleNames() const
