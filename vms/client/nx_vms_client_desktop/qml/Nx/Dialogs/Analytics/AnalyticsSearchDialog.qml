@@ -2,13 +2,13 @@
 
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Window
 
 import Nx.Analytics
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Core.EventSearch
+import Nx.Dialogs
 import Nx.Models
 import Nx.RightPanel
 
@@ -20,7 +20,7 @@ import nx.vms.client.desktop.analytics
 import "metrics.js" as Metrics
 import "../../RightPanel/private" as RightPanel
 
-Window
+Dialog
 {
     id: dialog
 
@@ -33,6 +33,7 @@ Window
         && eventModel.analyticsSetup.vectorizationSearchEnabled
 
     modality: Qt.NonModal
+    flags: Qt.Window
 
     width: Metrics.kDefaultDialogWidth
     height: Metrics.kDefaultDialogHeight
@@ -71,8 +72,6 @@ Window
             layout.currentIndex = tileView ? 0 : 1
         layout.children[tileView ? 0 : 1].controller.enabled = true
     }
-
-    signal accepted()
 
     TabBar
     {

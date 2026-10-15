@@ -54,6 +54,9 @@ Window
 
     property bool enabled: true //< Required for GUI autotesting.
 
+    // Esc is handled on the window root item, so it works without contentItem too.
+    Component.onCompleted: rootItem.Keys.escapePressed.connect(onEscapeKeyPressed)
+
     onContentItemChanged:
     {
         if (!contentItem)
@@ -69,7 +72,6 @@ Window
 
         // Changed from `Shortcut` to key press handling due to `Shortcuts` propagating shortcut
         // events to the parent window if this window is not in focus.
-        contentItem.Keys.escapePressed.connect(onEscapeKeyPressed)
         contentItem.Keys.enterPressed.connect(onEnterOrReturnKeyPressed)
         contentItem.Keys.returnPressed.connect(onEnterOrReturnKeyPressed)
     }

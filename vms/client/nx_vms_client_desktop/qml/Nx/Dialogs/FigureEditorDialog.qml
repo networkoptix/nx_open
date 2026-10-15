@@ -1,23 +1,24 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick
-import QtQuick.Window
 
 import Nx.Items
 import Nx.Common
 import Nx.Controls
 import Nx.Core
 import Nx.Core.Items
+import Nx.Dialogs
 import Nx.Instruments
 
 import nx.vms.client.core
 import nx.vms.client.desktop
 
-Window
+Dialog
 {
     id: dialog
 
     modality: Qt.ApplicationModal
+    flags: Qt.Window
 
     width: 600
     height: 400
@@ -25,8 +26,6 @@ Window
     minimumHeight: 400
 
     color: ColorTheme.colors.dark3
-
-    signal accepted()
 
     property alias figureType: editor.figureType
     property alias figureSettings: editor.figureSettings
@@ -66,12 +65,6 @@ Window
     CursorManager
     {
         id: cursorManager
-    }
-
-    Shortcut
-    {
-        sequences: [StandardKey.Cancel]
-        onActivated: dialog.close()
     }
 
     Item
@@ -213,11 +206,7 @@ Window
             {
                 text: qsTr("OK")
                 isAccentButton: true
-                onClicked:
-                {
-                    accepted()
-                    close()
-                }
+                onClicked: dialog.accept()
                 width: Math.max(implicitWidth, 80)
                 enabled: editor.figureAcceptable
             }
@@ -225,7 +214,7 @@ Window
             Button
             {
                 text: qsTr("Cancel")
-                onClicked: close()
+                onClicked: dialog.reject()
                 width: Math.max(implicitWidth, 80)
             }
         }
