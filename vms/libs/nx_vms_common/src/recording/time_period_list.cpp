@@ -28,17 +28,6 @@ QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod):
     push_back(singlePeriod);
 }
 
-QnTimePeriodList::QnTimePeriodList():
-    base_type()
-{
-}
-
-QnTimePeriodList::QnTimePeriodList(size_type count):
-    base_type(count)
-{
-
-}
-
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const
 {
     if (isEmpty())
