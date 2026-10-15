@@ -463,7 +463,7 @@
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>¡Cámara desconectada</translation>
     </message>
     <message>
       <source>Device</source>
@@ -475,30 +475,30 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>Dispositivo desconectado</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>Cámara desconectada</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>Módulo de E/S desconectado</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>Dispositivo desconectado en %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>Cámara desconectada en %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>Módulo de E/S desconectado en %1</translation>
     </message>
   </context>
   <context>
@@ -528,12 +528,12 @@
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>Dispositivo #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>Cámara #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -544,7 +544,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>Salida del dispositivo</translation>
     </message>
   </context>
   <context>
@@ -559,7 +559,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>Grabación de cámara</translation>
     </message>
     <message>
       <source>On</source>
@@ -592,11 +592,11 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>Fallo del ventilador</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>Fallo del ventilador en %1</translation>
     </message>
   </context>
   <context>
@@ -607,11 +607,11 @@
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>Omitir el registro</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>Y Fuente</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
@@ -619,11 +619,11 @@
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>Dispositivos relacionados:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>Cámaras relacionadas:</translation>
     </message>
   </context>
   <context>
@@ -634,7 +634,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>Solicitud HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -646,7 +646,7 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>Autenticación HTTP</translation>
     </message>
     <message>
       <source>Custom headers</source>
@@ -657,11 +657,11 @@
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>Los campos de usuario y contraseña deben completarse en caso de seleccionar el método de autenticación básica o digest</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>El campo token debe completarse en caso de que se haya seleccionado el tipo de autenticación bearer</translation>
     </message>
   </context>
   <context>
@@ -669,17 +669,17 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <comment>Numerus form depends on the amount of invalid headers</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Algunos de los encabezados no son válidos</numerusform>
+        <numerusform>Algunos de los encabezados no son válidos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>Todos los encabezados no son válidos</numerusform>
+        <numerusform>Todos los encabezados no son válidos</numerusform>
       </translation>
     </message>
   </context>
@@ -687,7 +687,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>Método HTTP no permitido</translation>
     </message>
   </context>
   <context>
@@ -705,19 +705,19 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>Para Plugin</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>Y el nivel es</translation>
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>Diagnóstico de integración en %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>Diagnóstico de integración</translation>
     </message>
   </context>
   <context>
@@ -756,7 +756,7 @@
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>Problema de sincronización LDAP en %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
@@ -772,15 +772,15 @@
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>No hay suficientes licencias en %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>La grabación se ha desactivado en los siguientes dispositivos:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>La grabación se ha desactivado en las siguientes cámaras:</translation>
     </message>
   </context>
   <context>
@@ -859,7 +859,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>No se pudo forzar el uso de la hora de la cámara, ya que presenta demasiado retraso. En su lugar, se utilizará la hora del sitio.</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
@@ -871,7 +871,7 @@
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>Mostrar notificación de escritorio</translation>
     </message>
     <message>
       <source>Force Acknowledgment</source>
@@ -882,15 +882,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>La lista no está seleccionada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>La lista con el ID dado &apos;%1&apos; no existe</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>La lista con el ID dado &apos;%1&apos; tiene un tipo de objeto no válido: &apos;%2&apos;, se esperaba: &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -904,18 +904,18 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>No se puede establecer una duración cero para el estado del evento `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>No se puede establecer una duración distinta de cero para el estado del evento `%1`</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>Grabación de pánico</translation>
     </message>
   </context>
   <context>
@@ -1296,11 +1296,11 @@
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>La lista no está seleccionada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>La lista con el ID dado &apos;%1&apos; no existe</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
