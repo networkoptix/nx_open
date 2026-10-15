@@ -964,6 +964,11 @@ AdaptiveScreen
         target: windowContext.sessionManager
 
         function onSessionStoppedManually() { sessionsScreen.restoreLastOpenedLocation() }
+
+        function onSessionStoppedOnAccessLost()
+        {
+            Workflow.showBanner(qsTr("Failed to access site"), Banner.Error)
+        }
     }
 
     QtObject
@@ -1018,6 +1023,23 @@ AdaptiveScreen
         function onDataChanged() { updateVisibility() }
         function onRowsInserted() { updateVisibility() }
         function onRowsRemoved() { updateVisibility() }
+    }
+
+    Connections
+    {
+        target: organizationsModel
+
+        function onChannelPartnerLost(index)
+        {
+            if (organizationsModel.isPartOf(sessionsScreen.rootIndex, index))
+                Workflow.showBanner(qsTr("Failed to access channel partner"), Banner.Error)
+        }
+
+        function onOrganizationLost(index)
+        {
+            if (organizationsModel.isPartOf(sessionsScreen.rootIndex, index))
+                Workflow.showBanner(qsTr("Failed to access organization"), Banner.Error)
+        }
     }
 
     Connections

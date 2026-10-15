@@ -227,6 +227,9 @@ signals:
     /** Signalizes when session is stooped by the user (called stopSession). */
     void sessionStoppedManually();
 
+    /** Signalizes when session is stopped because the user has lost access to the site. */
+    void sessionStoppedOnAccessLost();
+
     /** Signalizes that session successfully restored after connection loss. */
     void sessionRestored();
 
