@@ -371,16 +371,9 @@ BaseSettingsPage
                 ]
                 textRole: "text"
                 valueRole: "value"
-
+                currentValue: appContext.settings.forcedLayoutMode
+                implicitContentWidthPolicy: QuickControls.ComboBox.WidestText
                 onActivated: appContext.settings.forcedLayoutMode = currentValue
-
-                Binding
-                {
-                    target: layoutModeComboBox
-                    property: "currentIndex"
-                    value: layoutModeComboBox.indexOfValue(
-                        appContext.settings.forcedLayoutMode)
-                }
             }
         }
 
