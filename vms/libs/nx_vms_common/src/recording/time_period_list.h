@@ -34,8 +34,9 @@ class NX_VMS_COMMON_API QnTimePeriodList:
 #endif
 
 public:
-    QnTimePeriodList();
     QnTimePeriodList(const QnTimePeriod &singlePeriod);
+
+    using base_type::base_type;
 
     /**
      * \param timeMs                    Time value to search for, in milliseconds.
