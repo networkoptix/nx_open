@@ -4,7 +4,6 @@ import QtQuick
 import QtQuick.Shapes
 
 import Nx.Core
-import Nx.Core.Controls
 
 Item
 {
@@ -12,130 +11,153 @@ Item
 
     property int alignment: Qt.AlignLeft
     property alias hintText: indicatorHint.text
-    property bool rewindAnimationEnabled: true
 
-    // Width-to-height ratio of the rewind indicator.
-    readonly property real indicatorAspectRatio: 2 / 3
+    // Seeking in this direction is impossible (e.g. forward in live): the arrows are dimmed and
+    // not animated.
+    property bool seekBlocked: false
 
-    implicitWidth: height * indicatorAspectRatio
+    // Width of the indicator attached to the outer edge of the control.
+    property real indicatorWidth: width
+
+    // Number of seeks in the current series. A new series starts when the indicator is hidden.
+    readonly property alias seekCount: d.seekCount
+
+    // Whether the indicator is shown, i.e. a seek series is in progress.
+    readonly property alias indicatorShown: d.indicatorShown
+
+    // Width of the tap zone. The indicator inside it has its own width.
+    implicitWidth: height * 2 / 3
 
     signal activated()
     signal tapped()
 
-    Shape
+    Rectangle
     {
         id: indicatorBody
 
-        // Keep the indicator proportions when the control is much taller than wide (portrait
-        // fullscreen): a lobe at the screen edge instead of a full-height slab.
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
-        height: Math.min(parent.height, width / control.indicatorAspectRatio)
-        opacity: 0
+        readonly property real innerRadius: width / 2
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        x: control.alignment === Qt.AlignLeft ? 0 : control.width - width
+        width: control.indicatorWidth
+
+        color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
+        topLeftRadius: control.alignment === Qt.AlignLeft ? 0 : innerRadius
+        bottomLeftRadius: topLeftRadius
+        topRightRadius: control.alignment === Qt.AlignLeft ? innerRadius : 0
+        bottomRightRadius: topRightRadius
+
+        opacity: d.indicatorShown ? 1 : 0
+        visible: opacity > 0
 
         Behavior on opacity
         {
+            id: fadeBehavior
+
             NumberAnimation
             {
-                duration: 200
-                easing.type: Easing.InOutQuad
+                duration: fadeBehavior.targetValue > 0 ? 150 : 200
+                easing.type: Easing.OutQuad
             }
         }
 
-        ShapePath
+        // Content is centered in the part of the indicator not covered by the system insets.
+        Item
         {
-            fillColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
-            strokeWidth: 0
+            id: contentArea
 
-            startX: 0
-            startY: 0
+            anchors.fill: parent
+            anchors.leftMargin: indicatorBody.SafeArea.margins.left
+            anchors.rightMargin: indicatorBody.SafeArea.margins.right
 
-            PathLine { x: indicatorBody.width / 3; y: 0 }
-            PathArc
+            Column
             {
-                x: indicatorBody.width / 3
-                y: indicatorBody.height
-                radiusX: indicatorBody.height / 2
-                radiusY: indicatorBody.height / 2
-            }
-            PathLine { x: 0; y: indicatorBody.height }
-            PathLine { x: 0; y: 0 }
-        }
+                anchors.centerIn: parent
+                width: parent.width
+                spacing: 8
 
-        Row
-        {
-            anchors.centerIn: parent
-
-            Repeater
-            {
-                model: 3
-                delegate: ColoredImage
+                Row
                 {
-                    id: rewindIcon
+                    id: arrows
 
-                    primaryColor: ColorTheme.colors.light4
-                    opacity: rewindAnimationEnabled ? 0 : 0.3
+                    property int step: 0
 
-                    sourcePath: "image://skin/24x24/Outline/play_small.svg"
-                    sourceSize: Qt.size(24, 24)
-                    mirror: true
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    spacing: 6
+                    rotation: control.alignment === Qt.AlignLeft ? 180 : 0
 
-                    SequentialAnimation
+                    Repeater
                     {
-                        id: rewindAnimation
+                        model: 3
 
-                        PauseAnimation { duration: 400 - index * 200 }
-                        NumberAnimation
+                        delegate: Shape
                         {
-                            duration: 300
-                            target: rewindIcon
-                            property: "opacity"
-                            from: 0
-                            to: 1
-                        }
-                        PauseAnimation { duration: 200 }
-                        NumberAnimation
-                        {
-                            duration: 300
-                            target: rewindIcon
-                            property: "opacity"
-                            from: 1
-                            to: 0
+                            // Cascade: the brightest arrow moves forward by half an arrow per
+                            // step, so each arrow goes 0 -> 0.5 -> 1 -> 0.5 -> 0 over the loop.
+                            readonly property real cascadeOpacity:
+                                Math.max(0, 1 - Math.abs(arrows.step - index - 2) / 2)
+
+                            width: 14
+                            height: 16
+                            preferredRendererType: Shape.CurveRenderer
+                            opacity: control.seekBlocked ? 0.3 : cascadeOpacity
+
+                            Behavior on opacity
+                            {
+                                enabled: !control.seekBlocked
+
+                                NumberAnimation
+                                {
+                                    duration: cascadeTimer.interval
+                                    easing.type: Easing.OutQuad
+                                }
+                            }
+
+                            ShapePath
+                            {
+                                fillColor: ColorTheme.colors.light4
+                                strokeWidth: -1
+
+                                PathSvg
+                                {
+                                    path: "M0 2.585C0 1.433 1.244 0.711 2.244 1.282L11.721 6.698"
+                                        + "C12.729 7.273 12.729 8.727 11.721 9.302L2.244 14.718"
+                                        + "C1.244 15.289 0 14.567 0 13.415V2.585Z"
+                                }
+                            }
                         }
                     }
 
-                    Connections
+                    Timer
                     {
-                        target: control
-                        function onActivated()
-                        {
-                            if (rewindAnimationEnabled)
-                                rewindAnimation.restart()
-                        }
+                        id: cascadeTimer
+
+                        interval: 200
+                        repeat: true
+                        running: indicatorBody.visible && !control.seekBlocked
+
+                        // Start from the step where the first arrow is already visible.
+                        onRunningChanged: arrows.step = 1
+                        onTriggered: arrows.step = (arrows.step + 1) % 6
                     }
+                }
+
+                Text
+                {
+                    id: indicatorHint
+
+                    width: parent.width
+                    leftPadding: 12
+                    rightPadding: 12
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+
+                    color: ColorTheme.colors.light4
+                    font { pixelSize: 14; weight: Font.Normal }
                 }
             }
         }
-
-        transform: Scale
-        {
-            origin: Qt.point(indicatorBody.width / 2, indicatorBody.height / 2)
-            xScale: control.alignment === Qt.AlignLeft ? 1 : -1
-        }
-    }
-
-    Text
-    {
-        id: indicatorHint
-
-        anchors.centerIn: indicatorBody
-        anchors.verticalCenterOffset: 24
-
-        color: ColorTheme.colors.light4
-        opacity: indicatorBody.opacity
-
-        font { pixelSize: 16; weight: Font.Normal }
     }
 
     TapHandler
@@ -144,9 +166,9 @@ Item
 
         // Taps are counted manually: TapHandler.doubleTapped requires the taps to be close to
         // each other, fires only after the double click interval and gives up on the third quick
-        // tap. Here any two quick taps inside the control count, each further quick tap rewinds
-        // again, and a single tap is reported once the interval has passed. This lets the user
-        // rapidly tap several steps back or forward without pauses between the taps.
+        // tap. Here any two quick taps inside the control start a seek series, and while the
+        // indicator is shown every further tap seeks again. A single tap outside of a series is
+        // reported once the interval has passed.
         onTapped: (eventPoint) =>
         {
             // WithinBounds does not cancel the gesture on drag, so a swipe inside the control
@@ -157,6 +179,28 @@ Item
                 return
 
             tapSequenceTimer.registerTap()
+        }
+    }
+
+    QtObject
+    {
+        id: d
+
+        property int seekCount: 0
+        property bool indicatorShown: false
+
+        function seek()
+        {
+            // The count is not reset on hide, so the label does not change while fading out.
+            if (!indicatorShown)
+                seekCount = 0
+
+            if (!control.seekBlocked)
+                ++seekCount
+
+            // Show the indicator before notifying, so the series never looks finished in between.
+            control.showIndicator()
+            control.activated()
         }
     }
 
@@ -179,28 +223,45 @@ Item
 
         function registerTap()
         {
+            if (d.indicatorShown)
+            {
+                stop()
+                taps = 0
+                d.seek()
+                return
+            }
+
             ++taps
             restart()
 
-            if (taps < 2)
-                return
-
-            control.activated()
-            control.showIndicator()
+            if (taps >= 2)
+                d.seek()
         }
     }
 
     Timer
     {
         id: hideTimer
-        interval: 600
+
+        interval: 800
         repeat: false
-        onTriggered: indicatorBody.opacity = 0
+
+        onTriggered: control.hideIndicator()
     }
 
     function showIndicator()
     {
-        indicatorBody.opacity = 1
+        // Restart the cascade also when the indicator is shown again while still fading out.
+        if (!d.indicatorShown)
+            arrows.step = 1
+
+        d.indicatorShown = true
         hideTimer.restart()
+    }
+
+    function hideIndicator()
+    {
+        hideTimer.stop()
+        d.indicatorShown = false
     }
 }
