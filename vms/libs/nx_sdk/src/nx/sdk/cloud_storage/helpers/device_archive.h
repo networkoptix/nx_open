@@ -17,6 +17,7 @@ enum class ChunkOperation
 {
     add,
     remove,
+    removeInterval,
 };
 
 /**
@@ -69,12 +70,14 @@ public:
 
     virtual const IMediaChunkList* addedChunks() const override;
     virtual const IMediaChunkList* removedChunks() const override;
+    virtual const IMediaChunkList* intervalsToRemove() const override;
     virtual int streamIndex() const override;
 
 private:
     const int m_streamIndex;
     Ptr<IMediaChunkList> m_addedChunks;
     Ptr<IMediaChunkList> m_removedChunks;
+    Ptr<IMediaChunkList> m_intervalsToRemove;
 };
 
 class DeviceArchive: public nx::sdk::RefCountable<IDeviceArchive>
