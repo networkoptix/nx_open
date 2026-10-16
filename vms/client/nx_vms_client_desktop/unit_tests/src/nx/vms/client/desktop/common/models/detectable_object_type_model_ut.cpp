@@ -102,6 +102,11 @@ protected:
         m_filterModel->setObjectTypes(m_stateViewBuilder->stateView()->objectTypes());
     }
 
+    void afterTheSameObjectTypesAreSetAgain()
+    {
+        m_filterModel->setObjectTypes(m_filterModel->objectTypes());
+    }
+
 private:
     static std::map<std::string, std::set<nx::Uuid>> toDescriptorAttributeSupportInfo(
         const InputData::AttributeSupportInfo& inputDataAttributeSupportInfo)
@@ -186,6 +191,26 @@ TEST_F(DetectableObjectTypeModelTest, derivedTypes)
         };
 
     checkRecursive(m_testCase.expected.objectTypes, {});
+}
+
+TEST_F(DetectableObjectTypeModelTest, unchangedObjectTypesAreNotNotified)
+{
+    givenDescriptors("basics");
+    afterStateViewIsBuilt();
+    const auto filterModel = m_testModel->sourceModel();
+    const auto typeBefore = filterModel->objectTypeById("base.object.type.2");
+    ASSERT_NE(typeBefore, nullptr);
+
+    int notificationCount = 0;
+    QObject context;
+    QObject::connect(filterModel,
+        &core::analytics::taxonomy::AnalyticsFilterModel::objectTypesChanged,
+        &context,
+        [&]() { ++notificationCount; });
+
+    afterTheSameObjectTypesAreSetAgain();
+    ASSERT_EQ(notificationCount, 0);
+    ASSERT_EQ(filterModel->objectTypeById("base.object.type.2"), typeBefore);
 }
 
 } // namespace nx::vms::client::desktop
