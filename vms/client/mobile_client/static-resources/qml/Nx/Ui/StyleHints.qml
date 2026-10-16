@@ -27,11 +27,12 @@ QtObject
     // Width of the sheet on tablet layout. By design is unified with the side panel width.
     readonly property int sheetWidth: panelWidth
 
-    // Preferred sheet edge in landscape. Left-handed mode is not supported on tablet layout.
-    readonly property int preferredSheetEdge:
-        (!LayoutController.hasSidePanels && appContext.settings.leftHandedMode)
-            ? Qt.LeftEdge
-            : Qt.RightEdge
+    // Whether the left-handed mode is in effect. It is not supported on tablet layout.
+    readonly property bool leftHandedMode:
+        !LayoutController.hasSidePanels && appContext.settings.leftHandedMode
+
+    // Preferred sheet edge in landscape.
+    readonly property int preferredSheetEdge: leftHandedMode ? Qt.LeftEdge : Qt.RightEdge
 
     // Minimum width of the content area between the side panels on tablet layout. If a panel
     // would push the content area below this threshold, the auto-close logic in AdaptiveScreen

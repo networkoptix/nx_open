@@ -66,7 +66,7 @@ Page
     backgroundColor: "black"
     clip: false
 
-    LayoutMirroring.enabled: appContext.settings.leftHandedMode
+    LayoutMirroring.enabled: StyleHints.leftHandedMode
     LayoutMirroring.childrenInherit: true
 
     states:
