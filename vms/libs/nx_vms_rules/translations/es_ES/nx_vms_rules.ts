@@ -1333,11 +1333,11 @@
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>La lista no está seleccionada</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>La lista con el ID dado &apos;%1&apos; no existe</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
