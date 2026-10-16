@@ -2,11 +2,16 @@
 
 #include "string.h"
 
+#include <algorithm>
 #include <array>
+#include <cctype>
+#include <charconv>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <string_view>
+#include <variant>
 
 #include <QtCore/QByteArray>
 #include <QtCore/QRegularExpression>
@@ -159,6 +164,153 @@ QString generateUniqueString(
     }
 
     return templateString.arg(number);
+}
+
+// -------------------------------------------------------------------------- //
+// String comparison
+// -------------------------------------------------------------------------- //
+
+namespace {
+
+bool isDigit(QChar c)
+{
+    return c.isDigit();
+}
+
+bool isDigit(char c)
+{
+    return std::isdigit(static_cast<unsigned char>(c)) != 0;
+}
+
+QChar toLower(QChar c)
+{
+    return c.toLower();
+}
+
+char toLower(char c)
+{
+    return (char) std::tolower(static_cast<unsigned char>(c));
+}
+
+QStringView left(QStringView view, std::ptrdiff_t count)
+{
+    return view.left(count);
+}
+
+std::string_view left(std::string_view view, std::ptrdiff_t count)
+{
+    return view.substr(0, count);
+}
+
+QStringView dropFirst(QStringView view, std::ptrdiff_t count)
+{
+    return view.sliced(count);
+}
+
+std::string_view dropFirst(std::string_view view, std::ptrdiff_t count)
+{
+    view.remove_prefix(count);
+    return view;
+}
+
+int toNumber(QStringView sv)
+{
+    return sv.toInt();
+}
+
+int toNumber(std::string_view sv)
+{
+    int value = 0;
+    std::from_chars(sv.data(), sv.data() + sv.size(), value);
+    return value;
+}
+
+template<typename TChar>
+class Token
+{
+public:
+    Token(int value): m_value(value) {}
+
+    Token(Qt::CaseSensitivity caseSensitive, TChar c):
+        m_value(caseSensitive == Qt::CaseSensitive ? c : toLower(c))
+    {
+    }
+
+    friend bool operator==(const Token& l, const Token& r) { return l.m_value == r.m_value; }
+    friend bool operator<(const Token& l, const Token& r) { return l.m_value < r.m_value; }
+
+private:
+    std::variant<int, TChar> m_value;
+};
+
+template<typename View>
+auto takeFirstToken(View& string, Qt::CaseSensitivity caseSensitive)
+{
+    using TChar = std::decay_t<decltype(string[0])>;
+
+    if (!isDigit(string[0]))
+    {
+        const TChar c = string[0];
+        string = dropFirst(string, 1);
+        return Token<TChar>(caseSensitive, c);
+    }
+
+    const auto endOfNumber = std::ranges::find_if_not(string, [](auto c) { return isDigit(c); });
+    const auto numberView = left(string, endOfNumber - string.begin());
+    string = dropFirst(string, numberView.size());
+    return Token<TChar>(toNumber(numberView));
+}
+
+template<typename View>
+int naturalStringCompareImpl(View lhs, View rhs, Qt::CaseSensitivity caseSensitive)
+{
+    while (!lhs.empty() && !rhs.empty())
+    {
+        const auto lhsToken = takeFirstToken(lhs, caseSensitive);
+        const auto rhsToken = takeFirstToken(rhs, caseSensitive);
+        if (lhsToken < rhsToken)
+            return -1;
+        if (rhsToken < lhsToken)
+            return 1;
+    }
+
+    if (!lhs.empty())
+        return 1;
+    if (!rhs.empty())
+        return -1;
+    return 0;
+}
+
+} // namespace
+
+int naturalStringCompare(QStringView lhs, QStringView rhs, Qt::CaseSensitivity caseSensitive)
+{
+    return naturalStringCompareImpl(lhs, rhs, caseSensitive);
+}
+
+int naturalStringCompare(
+    std::string_view lhs, std::string_view rhs, Qt::CaseSensitivity caseSensitive)
+{
+    return naturalStringCompareImpl(lhs, rhs, caseSensitive);
+}
+
+bool naturalStringLess(const QString& lhs, const QString& rhs)
+{
+    return naturalStringCompare(lhs, rhs, Qt::CaseInsensitive) < 0;
+}
+
+bool naturalStringLess(std::string_view lhs, std::string_view rhs)
+{
+    return naturalStringCompare(lhs, rhs, Qt::CaseInsensitive) < 0;
+}
+
+QStringList naturalStringSort(const QStringList& list, Qt::CaseSensitivity caseSensitive)
+{
+    QStringList result = list;
+    std::ranges::sort(result,
+        [caseSensitive](const QString& left, const QString& right)
+        { return naturalStringCompare(left, right, caseSensitive) < 0; });
+    return result;
 }
 
 void trimInPlace(QString* const str, const QString& symbols)

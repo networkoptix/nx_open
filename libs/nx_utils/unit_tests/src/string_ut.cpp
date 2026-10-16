@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <algorithm>
 #include <functional>
 #include <vector>
 
@@ -595,5 +596,36 @@ static std::vector<QuoteDelimitedTokensInput> kQuoteDelimitedTokensInput{
 
 INSTANTIATE_TEST_SUITE_P(String, QuoteDelimitedTokens,
     ::testing::ValuesIn(kQuoteDelimitedTokensInput));
+
+template<typename T>
+void checkNaturalStringLessCorrectOrder()
+{
+    const auto less = [](const T& l, const T& r)
+    {
+        return naturalStringLess(l, r);
+    };
+
+    EXPECT_TRUE(less("test", "test1"));
+    EXPECT_TRUE(less("test", "test_1"));
+    EXPECT_TRUE(less("test_1", "test_a"));
+    EXPECT_TRUE(less("test!", "test!2"));
+    EXPECT_TRUE(less("test+1", "test-1"));
+    EXPECT_TRUE(less("test1", "test2"));
+    EXPECT_TRUE(less("test2", "test10"));
+    EXPECT_TRUE(less("test10", "test!1"));
+    EXPECT_TRUE(less("test!1", "test+a"));
+    EXPECT_TRUE(less("test+a", "test_1"));
+    EXPECT_TRUE(less("test_a", "test_b"));
+    EXPECT_TRUE(less("videoToken001", "vIDeoToken002"));
+    EXPECT_TRUE(less("VideoEncoderToken_101", "VideoEncoderToken_102"));
+    EXPECT_TRUE(less("VideoEncoderToken_202", "VideoEncoderToken_301"));
+    EXPECT_TRUE(less("", "non_empty"));
+}
+
+TEST(String, naturalStringLessCorrectOrder)
+{
+    checkNaturalStringLessCorrectOrder<QString>();
+    checkNaturalStringLessCorrectOrder<std::string_view>();
+}
 
 } // namespace nx::utils::test

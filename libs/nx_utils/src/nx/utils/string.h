@@ -125,8 +125,19 @@ Like QString::toDouble, but throws on failure.
 */
 NX_UTILS_API double parseDouble(const QString& string);
 
-NX_UTILS_API QString xorEncrypt(const QString &plaintext, const QString &key);
-NX_UTILS_API QString xorDecrypt(const QString &crypted, const QString &key);
+NX_UTILS_API int naturalStringCompare(
+    QStringView lhs, QStringView rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
+NX_UTILS_API int naturalStringCompare(std::string_view lhs,
+    std::string_view rhs,
+    Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
+NX_UTILS_API QStringList naturalStringSort(
+    const QStringList& list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
+
+NX_UTILS_API bool naturalStringLess(const QString& lhs, const QString& rhs);
+NX_UTILS_API bool naturalStringLess(std::string_view lhs, std::string_view rhs);
+
+NX_UTILS_API QString xorEncrypt(const QString& plaintext, const QString& key);
+NX_UTILS_API QString xorDecrypt(const QString& crypted, const QString& key);
 
 /** Returns filename extension (with dot) from the string containing filename of dialog filter.
 *  Supports strings like "/home/file.avi" -> ".avi"; "Avi files (*.avi)" -> ".avi"
