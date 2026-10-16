@@ -676,7 +676,9 @@ Page
         anchors.fill: cameraSwitcher
 
         color: ColorTheme.transparent(ColorTheme.colors.dark1, 0.5)
-        opacity: controller.preloaderRequired ? 1 : 0
+        opacity: controller.preloaderRequired && !fullscreenControlsOverlay.suppressPreloader
+            ? 1
+            : 0
         visible: opacity > 0
 
         Behavior on opacity { NumberAnimation { duration: 250 }}

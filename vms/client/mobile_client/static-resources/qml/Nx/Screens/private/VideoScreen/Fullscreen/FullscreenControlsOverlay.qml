@@ -44,6 +44,17 @@ Item
 
     readonly property int tapRewindDistanceMs: 5000
 
+    // Whether the user is seeking by double taps on the screen edges right now.
+    readonly property bool tapRewindActive: leftTapRewindControl.indicatorShown
+        || rightTapRewindControl.indicatorShown
+
+    // Every tap seek reloads the media. The preloader is not shown while the user keeps tapping
+    // and while the last seek is loading, but not longer than the suppression timeout.
+    readonly property bool suppressPreloader: tapRewindActive || preloaderSuppressionTimer.running
+
+    // 35% of the player width, but not narrower than 112 and not wider than 180.
+    readonly property real tapRewindIndicatorWidth: Math.max(112, Math.min(180, width * 0.35))
+
     LayoutMirroring.enabled: false
     LayoutMirroring.childrenInherit: true
 
@@ -52,10 +63,23 @@ Item
         opacityController.setOverlayVisible(!opacityController.overlayVisible)
     }
 
+    function tapRewindHintText(sign, seekCount)
+    {
+        const durationMs = tapRewindDistanceMs * Math.max(1, seekCount)
+        return sign + Duration.toString(durationMs, Duration.Seconds, Duration.Long)
+    }
+
+    function startTapRewind(otherSide)
+    {
+        otherSide.hideIndicator()
+        preloaderSuppressionTimer.restart()
+
+        if (!speedControl.menuOpened)
+            opacityController.setOverlayVisible(false)
+    }
+
     function showDurationHint(durationMs)
     {
-        opacityController.setOverlayVisible(true)
-
         const sign = durationMs > 0 ? "+" : "-"
         const durationString = Duration.toString(Math.abs(durationMs),
             Duration.DaysAndTime, Duration.Long, " ")
@@ -122,6 +146,31 @@ Item
 
     Timer
     {
+        id: preloaderSuppressionTimer
+
+        interval: 2000
+        repeat: false
+    }
+
+    // Once the series is over and the media of the last seek is loaded, a later loading is not
+    // caused by taps, so the preloader suppression ends early.
+    function updatePreloaderSuppression()
+    {
+        if (!controller.preloaderRequired && !tapRewindActive)
+            preloaderSuppressionTimer.stop()
+    }
+
+    onTapRewindActiveChanged: updatePreloaderSuppression()
+
+    Connections
+    {
+        target: controller
+
+        function onPreloaderRequiredChanged() { updatePreloaderSuppression() }
+    }
+
+    Timer
+    {
         id: userInactivityTimer
         interval: 5000
         repeat: false
@@ -139,14 +188,17 @@ Item
         anchors.top: parent.top
         // At most half of the overlay, so the zones never overlap in portrait fullscreen.
         width: Math.min(implicitWidth, control.width / 2)
+        indicatorWidth: tapRewindIndicatorWidth
         alignment: Qt.AlignLeft
-        hintText: "-%1".arg(Duration.toString(tapRewindDistanceMs, Duration.Seconds, Duration.Long))
+        hintText: tapRewindHintText("-", seekCount)
 
         visible: showPlaybackControls
 
         onTapped: control.toggle()
         onActivated:
         {
+            startTapRewind(rightTapRewindControl)
+
             const skippedMs = controller.jumpDistance(-tapRewindDistanceMs)
             if (Math.abs(skippedMs) > tapRewindDistanceMs)
                 showDurationHint(skippedMs)
@@ -162,18 +214,20 @@ Item
         anchors.top: parent.top
         // At most half of the overlay, so the zones never overlap in portrait fullscreen.
         width: Math.min(implicitWidth, control.width / 2)
+        indicatorWidth: tapRewindIndicatorWidth
         alignment: Qt.AlignRight
-        hintText: controller.playingLive
-            ? qsTr("You are in Live Mode")
-            : "+%1".arg(Duration.toString(tapRewindDistanceMs, Duration.Seconds, Duration.Long))
-        rewindAnimationEnabled: !controller.playingLive
+        hintText: seekBlocked ? qsTr("You are in Live Mode") : tapRewindHintText("+", seekCount)
+        // Same condition as in VideoScreenController.jumpDistance(), also true on pause in live.
+        seekBlocked: controller.mediaPlayer.liveMode
 
         visible: showPlaybackControls
 
         onTapped: control.toggle()
         onActivated:
         {
-            if (controller.playingLive)
+            startTapRewind(leftTapRewindControl)
+
+            if (seekBlocked)
                 return
 
             const skippedMs = controller.jumpDistance(tapRewindDistanceMs)
@@ -205,6 +259,8 @@ Item
 
             Item
             {
+                id: topBar
+
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -275,59 +331,6 @@ Item
 
                     implicitWidth: children[0]?.implicitWidth ?? 0
                     implicitHeight: children[0]?.implicitHeight ?? 0
-                }
-
-                Rectangle
-                {
-                    id: hintBanner
-
-                    anchors.horizontalCenter: titleLabels.horizontalCenter
-                    anchors.top: titleLabels.bottom
-                    anchors.topMargin: 8 + actionVisualizerContainer.implicitHeight
-
-                    width: hintText.implicitWidth + 20
-                    height: hintText.implicitHeight + 12
-
-                    radius: 4
-                    color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
-
-                    opacity: 0
-                    visible: opacity > 0
-
-                    Behavior on opacity
-                    {
-                        NumberAnimation
-                        {
-                            duration: 200
-                            easing.type: Easing.InOutQuad
-                        }
-                    }
-
-                    Text
-                    {
-                        id: hintText
-
-                        anchors.centerIn: parent
-
-                        font { pixelSize: 16; weight: Font.Normal }
-                        color: ColorTheme.colors.light4
-                    }
-
-                    Timer
-                    {
-                        id: hideTimer
-
-                        interval: 2000
-                        repeat: false
-                        onTriggered: hintBanner.opacity = 0
-                    }
-
-                    function showBanner(text)
-                    {
-                        hintText.text = text
-                        opacity = 1
-                        hideTimer.restart()
-                    }
                 }
 
                 OverlayControlButton
@@ -647,6 +650,61 @@ Item
 
         // To block camera swipe if the speed control is dragged.
         DragHandler { target: null }
+    }
+
+    Rectangle
+    {
+        id: hintBanner
+
+        // Lives outside of the controls container to stay visible while the controls are hidden,
+        // but is placed under the camera title.
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: topControls.y + topBar.y + titleLabels.y + titleLabels.height + 8
+            + (controlsContainer.visible ? actionVisualizerContainer.implicitHeight : 0)
+
+        width: hintText.implicitWidth + 20
+        height: hintText.implicitHeight + 12
+
+        radius: 4
+        color: ColorTheme.transparent(ColorTheme.colors.dark3, 0.5)
+
+        opacity: 0
+        visible: opacity > 0
+
+        Behavior on opacity
+        {
+            NumberAnimation
+            {
+                duration: 200
+                easing.type: Easing.InOutQuad
+            }
+        }
+
+        Text
+        {
+            id: hintText
+
+            anchors.centerIn: parent
+
+            font { pixelSize: 16; weight: Font.Normal }
+            color: ColorTheme.colors.light4
+        }
+
+        Timer
+        {
+            id: hideTimer
+
+            interval: 2000
+            repeat: false
+            onTriggered: hintBanner.opacity = 0
+        }
+
+        function showBanner(text)
+        {
+            hintText.text = text
+            opacity = 1
+            hideTimer.restart()
+        }
     }
 
     MouseArea
