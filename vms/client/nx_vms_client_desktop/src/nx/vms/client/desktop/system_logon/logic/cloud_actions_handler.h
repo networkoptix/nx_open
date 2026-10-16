@@ -6,6 +6,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+namespace nx::vms::client::core { class CloudAuthRequest; }
+
 namespace nx::vms::client::desktop {
 
 class CloudActionsHandler: public QObject, public QnWorkbenchContextAware
@@ -25,6 +27,8 @@ private:
 
     void at_logout();
     void at_forcedLogout();
+
+    void onCloudAuthRequest(core::CloudAuthRequest* request);
 
     // While set, the user-logout slot skips SSO termination (forced logout - session already
     // invalid server-side).

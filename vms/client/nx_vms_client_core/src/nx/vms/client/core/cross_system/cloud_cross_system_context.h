@@ -16,6 +16,7 @@
 namespace nx::vms::client::core {
 
 class SystemContext;
+class CloudAuthRequest;
 
 class NX_VMS_CLIENT_CORE_API CloudCrossSystemContext: public QObject
 {
@@ -89,7 +90,7 @@ signals:
     void statusChanged(Status oldStatus, Status newStatus);
     void camerasAdded(const QnVirtualCameraResourceList& cameras);
     void camerasRemoved(const QnVirtualCameraResourceList& cameras);
-    void cloudAuthorizationRequested(QPrivateSignal);
+    void cloudAuthorizationRequested(CloudAuthRequest* request);
 
 private:
     struct Private;

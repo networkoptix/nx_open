@@ -581,25 +581,7 @@ struct ApplicationContext::Private
 
         registerDebugAction("Cross-site contexts restore",
             [this](auto)
-            {
-                q->cloudCrossSystemManager()->resetCloudSystems(/*enableCloudSystems*/ true);
-            });
-
-        connect(q->cloudCrossSystemManager(),
-            &core::CloudCrossSystemManager::cloudAuthorizationRequested,
-            q,
-            [this]()
-            {
-                if (qnCloudStatusWatcher->cloudLogin().isEmpty())
-                {
-                    q->mainWindowContext()->menu()->trigger(
-                        menu::LoginToCloud, {Qn::ForceRole, true});
-                }
-                else
-                {
-                    q->mainWindowContext()->connectActionsHandler()->reconnectToCloudIfNeeded();
-                }
-            });
+            { q->cloudCrossSystemManager()->resetCloudSystems(/*enableCloudSystems*/ true); });
     }
 
     void initializeSystemContext()

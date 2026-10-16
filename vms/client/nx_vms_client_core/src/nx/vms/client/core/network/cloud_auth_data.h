@@ -4,7 +4,10 @@
 
 #include <chrono>
 #include <expected>
+#include <optional>
 #include <string>
+
+#include <QtCore/QObject>
 
 #include <nx/network/http/auth_tools.h>
 
@@ -78,5 +81,36 @@ NX_REFLECTION_ENUM_CLASS(OauthDataRequestError,
 );
 
 using CloudAuthDataOrError = std::expected<CloudAuthData, OauthDataRequestError>;
+
+/**
+ * Request for the Cloud re-authorization. The handler must start it right away, and then finish
+ * it either synchronously or asynchronously, when the user is done with the authorization.
+ */
+class NX_VMS_CLIENT_CORE_API CloudAuthRequest: public QObject
+{
+    Q_OBJECT
+
+public:
+    bool isStarted() const;
+    bool isFinished() const;
+    std::optional<OauthDataRequestError> error() const;
+
+    void start();
+    void finish(std::optional<OauthDataRequestError> error = {});
+
+signals:
+    void finished();
+
+private:
+    enum class State
+    {
+        none,
+        started,
+        finished,
+    };
+
+    State m_state = State::none;
+    std::optional<OauthDataRequestError> m_error;
+};
 
 } // namespace nx::vms::client::core

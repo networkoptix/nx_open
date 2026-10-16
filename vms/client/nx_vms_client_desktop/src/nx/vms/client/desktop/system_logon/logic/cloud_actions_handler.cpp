@@ -2,6 +2,7 @@
 
 #include "cloud_actions_handler.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtCore/QUrl>
@@ -13,6 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/client/core/common/utils/cloud_url_helper.h>
+#include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
@@ -22,6 +24,7 @@
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_logon/logic/connect_actions_handler.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -148,6 +151,14 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
                     menu()->trigger(menu::DisconnectAction, {Qn::ForceRole, true});
             }
         });
+
+    if (const auto cloudCrossSystemManager = appContext()->cloudCrossSystemManager())
+    {
+        connect(cloudCrossSystemManager,
+            &core::CloudCrossSystemManager::cloudAuthorizationRequested,
+            this,
+            &CloudActionsHandler::onCloudAuthRequest);
+    }
 }
 
 CloudActionsHandler::~CloudActionsHandler()
@@ -213,6 +224,23 @@ void CloudActionsHandler::at_forcedLogout()
         nx::vms::client::core::RemoteConnectionErrorCode::cloudSessionExpired,
         /*moduleInformation*/ {},
         appContext()->version());
+}
+
+void CloudActionsHandler::onCloudAuthRequest(core::CloudAuthRequest* request)
+{
+    request->start();
+
+    // Both ways below are synchronous. Unsuccessful re-authorization can destroy the request
+    // together with its cross-site context.
+    const QPointer<core::CloudAuthRequest> guard(request);
+
+    if (qnCloudStatusWatcher->cloudLogin().isEmpty())
+        menu()->trigger(menu::LoginToCloud, {Qn::ForceRole, true});
+    else
+        connectActionsHandler()->reconnectToCloudIfNeeded();
+
+    if (guard)
+        guard->finish();
 }
 
 } // namespace nx::vms::client::desktop

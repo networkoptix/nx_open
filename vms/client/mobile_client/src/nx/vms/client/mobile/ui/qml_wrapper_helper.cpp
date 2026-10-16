@@ -51,6 +51,14 @@ QString QmlWrapperHelper::showScreen(
     const QUrl& source,
     const QVariantMap& properties)
 {
+    const auto screen = pushScreen(context, source, properties);
+
+    return screen ? detail::QmlResultWait(screen).result() : QString{};
+}
+
+QObject* QmlWrapperHelper::pushScreen(
+    WindowContext* context, const QUrl& source, const QVariantMap& properties)
+{
     auto stackView = context->mainWindow()->findChild<QObject*>(
         "mainStackView");
     QObject* screen = nullptr;
@@ -59,9 +67,7 @@ QString QmlWrapperHelper::showScreen(
         Q_ARG(QUrl, source),
         Q_ARG(QVariant, QVariant::fromValue(properties)));
 
-    return screen
-        ? detail::QmlResultWait(screen).result()
-        : QString{};
+    return screen;
 }
 
 } // namespace nx::vms::client::mobile

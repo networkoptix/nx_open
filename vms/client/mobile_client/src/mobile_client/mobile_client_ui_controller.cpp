@@ -117,15 +117,9 @@ QnMobileClientUiController::QnMobileClientUiController(
                 && windowContext()->uiController()->screens()->showCloudLoginScreen(
                     /*reauthentication*/ true, user, token))
             {
-                connect(nx::vms::client::core::appContext()->cloudStatusWatcher(),
-                    &nx::vms::client::core::CloudStatusWatcher::credentialsChanged,
-                    this,
-                    [this, moduleInformation]()
-                    {
-                        sessionManager()->startCloudSession(
-                            moduleInformation.cloudSystemId, moduleInformation.systemName);
-                    },
-                    Qt::SingleShotConnection);
+                // The screen reports success when the new cloud auth data is already applied.
+                sessionManager()->startCloudSession(
+                    moduleInformation.cloudSystemId, moduleInformation.systemName);
             }
             else
             {

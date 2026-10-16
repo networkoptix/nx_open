@@ -24,6 +24,7 @@ namespace nx::vms::client::core { class SystemContext; }
 
 namespace nx::vms::client::mobile {
 
+class CloudActionHandler;
 class InteractiveItemRegistry;
 class RemoteLogManager;
 class SessionManager;
@@ -83,6 +84,8 @@ public:
     QnMobileClientUriHandler* uriHandler() const;
 
     InteractiveItemRegistry* interactiveItemRegistry() const;
+
+    CloudActionHandler* cloudActionHandler() const;
 
     // Deprecated classes
     QnMobileClientUiController* deprecatedUiController() const;

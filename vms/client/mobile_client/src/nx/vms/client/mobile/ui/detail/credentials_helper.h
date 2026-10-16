@@ -35,11 +35,18 @@ public:
 
     Q_INVOKABLE void clearSavedPasswords();
 
-    /** Create Oauth client with the specified token and optional user. */
+    /**
+     * Create Oauth client with the specified token and optional user. A 2FA validation client
+     * only validates the token and does not produce new auth data.
+     */
     Q_INVOKABLE nx::vms::client::core::OauthClient* createOauthClient(
-        const QString& token,
-        const QString& user,
-        bool forced = false) const;
+        const QString& token, const QString& user, bool twoFactorValidation = false) const;
+
+    /**
+     * Apply auth data received by the Oauth client to CloudStatusWatcher. Returns false if there
+     * is no auth data.
+     */
+    Q_INVOKABLE bool applyAuthData(nx::vms::client::core::OauthClient* client, bool forced) const;
 
     bool hasDigestCloudPassword() const;
 

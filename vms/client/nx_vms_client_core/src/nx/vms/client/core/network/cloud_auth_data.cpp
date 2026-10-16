@@ -6,6 +6,7 @@
 
 #include <nx/cloud/db/client/data/access_scope.h>
 #include <nx/network/jose/jwt.h>
+#include <nx/utils/log/assert.h>
 #include <nx/utils/std_string_utils.h>
 
 namespace nx::vms::client::core {
@@ -46,6 +47,41 @@ bool isSsoSession(const std::string& refreshToken)
     const auto scope = nx::cloud::db::api::AccessScope::buildAccessScope(claims->aud().value_or(""));
     return scope
         && scope->attributes().count(nx::cloud::db::api::AccessScope::kSsoOrganizationId) > 0;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool CloudAuthRequest::isStarted() const
+{
+    return m_state != State::none;
+}
+
+bool CloudAuthRequest::isFinished() const
+{
+    return m_state == State::finished;
+}
+
+std::optional<OauthDataRequestError> CloudAuthRequest::error() const
+{
+    return m_error;
+}
+
+void CloudAuthRequest::start()
+{
+    if (!NX_ASSERT(m_state == State::none))
+        return;
+
+    m_state = State::started;
+}
+
+void CloudAuthRequest::finish(std::optional<OauthDataRequestError> error)
+{
+    if (!NX_ASSERT(m_state != State::finished))
+        return;
+
+    m_error = error;
+    m_state = State::finished;
+    emit finished();
 }
 
 } // namespace nx::vms::client::core

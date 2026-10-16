@@ -35,6 +35,7 @@
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/settings/local_settings.h>
 #include <nx/vms/client/mobile/system_context.h>
+#include <nx/vms/client/mobile/ui/cloud_action_handler.h>
 #include <nx/vms/client/mobile/ui/detail/credentials_helper.h>
 #include <nx/vms/client/mobile/ui/detail/screens.h>
 #include <nx/vms/client/mobile/ui/qml_wrapper_helper.h>
@@ -363,16 +364,11 @@ ApplicationContext::ApplicationContext(
     initializeCrossSystemModules();
     d->windowContext->setMainSystemContext(d->mainSystemContext.get());
 
+    // The window context is created before the cross-site modules, so it can't connect itself.
     connect(cloudCrossSystemManager(),
         &core::CloudCrossSystemManager::cloudAuthorizationRequested,
-        this,
-        [this]()
-        {
-            const auto token = QString::fromStdString(
-                cloudStatusWatcher()->credentials().authToken.value);
-            d->windowContext->uiController()->screens()->showCloudLoginScreen(
-                /*reauthentication*/ true, /*user*/ {}, token);
-        });
+        d->windowContext->cloudActionHandler(),
+        &CloudActionHandler::handleCloudAuthRequest);
 
     connect(qApp, &QGuiApplication::aboutToQuit, this, &ApplicationContext::closeWindow);
 }

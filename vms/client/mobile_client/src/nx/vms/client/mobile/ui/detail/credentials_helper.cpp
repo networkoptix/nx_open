@@ -69,13 +69,13 @@ void CredentialsHelper::clearSavedPasswords()
 }
 
 core::OauthClient* CredentialsHelper::createOauthClient(
-    const QString& token,
-    const QString& user,
-    bool forced) const
+    const QString& token, const QString& user, bool twoFactorValidation) const
 {
-    const core::OauthClientType type = token.isEmpty()
-        ? core::OauthClientType::loginCloud
-        : core::OauthClientType::renew;
+    core::OauthClientType type = core::OauthClientType::renew;
+    if (twoFactorValidation)
+        type = core::OauthClientType::system2faAuth;
+    else if (token.isEmpty())
+        type = core::OauthClientType::loginCloud;
 
     static constexpr std::chrono::days kRefreshTokenLifetime(180);
     const auto result = new core::OauthClient(type, core::OauthViewType::mobile, /*cloudSystem*/ {},
@@ -87,21 +87,21 @@ core::OauthClient* CredentialsHelper::createOauthClient(
             ? nx::network::http::AuthToken{}
             : nx::network::http::BearerAuthToken(token.toStdString())));
 
-    connect(result, &core::OauthClient::authDataReady, this,
-        [result, forced]()
-        {
-            const auto authData = result->authData();
-            if (authData.empty())
-            {
-                emit result->cancelled();
-                return;
-            }
-
-            appContext()->cloudStatusWatcher()->setAuthData(authData, forced
-                ? core::CloudStatusWatcher::AuthMode::forced
-                : core::CloudStatusWatcher::AuthMode::login);
-        });
     return result;
+}
+
+bool CredentialsHelper::applyAuthData(core::OauthClient* client, bool forced) const
+{
+    if (!NX_ASSERT(client))
+        return false;
+
+    const auto authData = client->authData();
+    if (authData.empty())
+        return false;
+
+    return appContext()->cloudStatusWatcher()->setAuthData(authData,
+        forced ? core::CloudStatusWatcher::AuthMode::forced
+               : core::CloudStatusWatcher::AuthMode::login);
 }
 
 bool CredentialsHelper::hasDigestCloudPassword() const

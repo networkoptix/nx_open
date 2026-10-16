@@ -12,6 +12,7 @@
 namespace nx::vms::client::core {
 
 class CloudCrossSystemContext;
+class CloudAuthRequest;
 
 /**
  * Monitors available Cloud Systems and manages corresponding cross-system Contexts.
@@ -43,7 +44,7 @@ signals:
     void systemFound(const QString& systemId);
     void systemAboutToBeLost(const QString& systemId);
     void systemLost(const QString& systemId);
-    void cloudAuthorizationRequested(QPrivateSignal);
+    void cloudAuthorizationRequested(CloudAuthRequest* request);
 
 private:
     struct Private;

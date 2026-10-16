@@ -14,6 +14,8 @@ class WindowContext;
 
 namespace detail {
 
+class QmlResultWatcher;
+
 class Screens: public QObject, public WindowContextAware
 {
     Q_OBJECT
@@ -27,6 +29,14 @@ public:
 
     /** Show cloud authentication screen. */
     bool showCloudLoginScreen(
+        bool reauthentication, const QString& user = {}, const QString& token = {}) const;
+
+    /**
+     * Open cloud authentication screen without waiting for the result. The result is "success"
+     * when the new auth data is applied to CloudStatusWatcher, "rejected" when the user closes the
+     * screen, and "failed" or empty otherwise. Returns null if the screen can't be opened.
+     */
+    QmlResultWatcher* openCloudLoginScreen(
         bool reauthentication, const QString& user = {}, const QString& token = {}) const;
 };
 

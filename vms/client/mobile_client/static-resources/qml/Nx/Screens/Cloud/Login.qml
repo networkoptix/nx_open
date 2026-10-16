@@ -20,11 +20,19 @@ Page
 
     property bool forced: false
 
+    /** Validates the token with 2FA only, the Cloud Status Watcher auth data is not changed. */
+    property bool twoFactorValidation: false
+
+    /**
+     * Reported once: "success" when the new auth data is applied to the Cloud Status Watcher (or
+     * the token is validated with 2FA), "rejected" when the user closes the screen, "failed"
+     * otherwise.
+     */
     signal gotResult(value: string)
 
     title: qsTr("Log In")
 
-    onLeftButtonClicked: Workflow.popCurrentScreen()
+    onLeftButtonClicked: d.finish("rejected")
 
     WebView
     {
@@ -66,6 +74,7 @@ Page
         id: d
 
         property OauthClient oauthClient
+        property bool finished: false
 
         // The native web view is opaque and white and is layered above the Qt scene, so nothing
         // drawn in QML can hide it while a page loads. Called repeatedly because the view is
@@ -88,8 +97,18 @@ Page
             warning.buttonClicked.connect(
                 function(buttonId)
                 {
-                    Workflow.popCurrentScreen()
+                    d.finish("failed")
                 })
+        }
+
+        function finish(result)
+        {
+            if (finished)
+                return
+
+            finished = true
+            screen.gotResult(result)
+            Workflow.popCurrentScreen()
         }
 
         function handleUrlChanged(url)
@@ -104,8 +123,11 @@ Page
 
             redirectUrlWorkaround.stop()
 
-            screen.gotResult("success")
-            d.oauthClient.setCode(code)
+            // On 2FA validation the cloud returns the validated token as the code.
+            if (screen.twoFactorValidation)
+                d.oauthClient.twoFaVerified(code)
+            else
+                d.oauthClient.setCode(code)
         }
 
         // Actual page url is not updated via onUrlChanged on some platforms, Android among them,
@@ -124,12 +146,33 @@ Page
         }
     }
 
+    Connections
+    {
+        target: d.oauthClient
+
+        function onAuthDataReady()
+        {
+            if (screen.twoFactorValidation)
+            {
+                d.finish("success")
+                return
+            }
+
+            const helper = appContext.credentialsHelper
+            const applied = helper.applyAuthData(d.oauthClient, screen.forced)
+            d.finish(applied ? "success" : "failed")
+        }
+
+        function onCancelled()
+        {
+            d.finish("failed")
+        }
+    }
+
     Component.onCompleted:
     {
-        const helper = appContext.credentialsHelper.createOauthClient(token, user, forced)
-        const closePage = ()=>Workflow.popCurrentScreen()
-        helper.authDataReady.connect(closePage)
-        helper.cancelled.connect(closePage)
+        const helper =
+            appContext.credentialsHelper.createOauthClient(token, user, twoFactorValidation)
         helper.setLocale(locale.name)
 
         d.oauthClient = helper

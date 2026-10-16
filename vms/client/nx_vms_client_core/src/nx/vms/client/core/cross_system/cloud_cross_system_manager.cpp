@@ -6,10 +6,10 @@
 
 #include <network/system_helpers.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
-#include <nx/vms/client/core/system_finder/system_finder.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/cloud_status_watcher.h>
+#include <nx/vms/client/core/system_finder/system_finder.h>
 
 #include "cloud_cross_system_context.h"
 
@@ -24,7 +24,6 @@ struct CloudCrossSystemManager::Private
         std::make_unique<CloudCrossSystemRequestScheduler>();
 
     void setCloudSystems(const QnCloudSystemList& currentCloudSystems);
-    void requestCloudAuthorization();
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -135,9 +134,10 @@ void CloudCrossSystemManager::Private::setCloudSystems(
 
         NX_VERBOSE(this, "Found new cloud system %1", systemDescription);
         auto context = std::make_unique<CloudCrossSystemContext>(systemDescription);
-        connections << connect(
-            context.get(), &CloudCrossSystemContext::cloudAuthorizationRequested, q,
-            [this]() { requestCloudAuthorization(); });
+        connections << connect(context.get(),
+            &CloudCrossSystemContext::cloudAuthorizationRequested,
+            q,
+            &CloudCrossSystemManager::cloudAuthorizationRequested);
 
         cloudSystems[systemId] = std::move(context);
         emit q->systemFound(systemId);
@@ -168,11 +168,6 @@ void CloudCrossSystemManager::Private::setCloudSystems(
 
     // Avoid blocking current thread (may be main thread) by waiting for futures we no longer need.
     std::thread([c = std::move(remainingConnections)] {}).detach();
-}
-
-void CloudCrossSystemManager::Private::requestCloudAuthorization()
-{
-    emit q->cloudAuthorizationRequested(QPrivateSignal{});
 }
 
 } // namespace nx::vms::client::core

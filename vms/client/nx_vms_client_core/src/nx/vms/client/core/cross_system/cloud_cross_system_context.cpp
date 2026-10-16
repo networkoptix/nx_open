@@ -23,6 +23,7 @@
 #include <nx/vms/client/core/cross_system/cross_system_access_controller.h>
 #include <nx/vms/client/core/cross_system/private/grouped_task_queue.h>
 #include <nx/vms/client/core/ini.h>
+#include <nx/vms/client/core/network/cloud_auth_data.h>
 #include <nx/vms/client/core/network/cloud_connection_factory.h>
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/logon_data_helpers.h>
@@ -183,6 +184,7 @@ struct CloudCrossSystemContext::Private
     core::UserResourcePtr user;
     core::CrossSystemServerResourcePtr server;
     std::unique_ptr<core::CloudSessionTokenUpdater> tokenUpdater;
+    std::unique_ptr<CloudAuthRequest> authRequest;
     bool automaticReconnection = false;
     bool needsCloudAuthorization = false;
     int retryCount = 0;
@@ -322,6 +324,49 @@ struct CloudCrossSystemContext::Private
         emit q->statusChanged(oldStatus, status);
     }
 
+    /**
+     * Requests the Cloud re-authorization. The request may be handled either synchronously or
+     * asynchronously, so the handler may be called before this method returns. The handler is
+     * not called if this context is destroyed earlier.
+     */
+    void requestCloudAuth(std::function<void(bool success)> handler)
+    {
+        if (!NX_ASSERT(!authRequest, "Cloud authorization is already in progress"))
+            return;
+
+        NX_VERBOSE(this, "Requesting cloud authorization for: %1", systemDescription);
+
+        authRequest = std::make_unique<CloudAuthRequest>();
+        const QPointer request = authRequest.get();
+
+        connect(request,
+            &CloudAuthRequest::finished,
+            q,
+            [this, request, handler = std::move(handler)]
+            {
+                if (!NX_ASSERT(authRequest.get() == request))
+                    return;
+
+                // The request emits this signal, so it can't be deleted right away.
+                authRequest.release()->deleteLater();
+
+                const auto error = request->error();
+                if (error)
+                    NX_VERBOSE(this, "Cloud authorization failed: %1", *error);
+                else
+                    NX_VERBOSE(this, "Cloud authorization finished");
+
+                handler(!error);
+            });
+
+        emit q->cloudAuthorizationRequested(request);
+
+        // Unsuccessful cloud re-authorization can cause deletion of this context.
+        // The request should be started on signal processing.
+        if (request && !NX_ASSERT(request->isStarted(), "Cloud authorization was not handled"))
+            request->finish(OauthDataRequestError::internalCancellation);
+    }
+
     void makeConnection(
         GroupedTaskQueue::PromisePtr promise,
         const core::LogonData& logonData,
@@ -335,6 +380,7 @@ struct CloudCrossSystemContext::Private
                 {
                     NX_VERBOSE(this, "Connection successfully established");
                     connectionError.reset();
+                    retryCount = 0;
                     initializeContext(*connection);
                 }
                 else if (const auto error = std::get_if<core::RemoteConnectionError>(&result))
@@ -344,9 +390,20 @@ struct CloudCrossSystemContext::Private
                         && allowUserInteraction && retryCount == 0)
                     {
                         connectionProcess.reset();
-                        emit q->cloudAuthorizationRequested(QPrivateSignal{});
-                        ensureConnection(/*allowUserInteraction*/ true);
                         retryCount++;
+                        requestCloudAuth(
+                            [this](bool success)
+                            {
+                                if (success)
+                                {
+                                    ensureConnection(/*allowUserInteraction*/ true);
+                                }
+                                else
+                                {
+                                    retryCount = 0;
+                                    updateStatus(Status::connectionFailure);
+                                }
+                            });
                         return;
                     }
 
@@ -403,6 +460,13 @@ struct CloudCrossSystemContext::Private
         if (connectionProcess)
         {
             NX_VERBOSE(this, "Connection is already in progress");
+            return false;
+        }
+
+        // Current cloud credentials are not valid for the connection anyway.
+        if (authRequest)
+        {
+            NX_VERBOSE(this, "Cloud authorization is in progress");
             return false;
         }
 
@@ -891,19 +955,26 @@ bool CloudCrossSystemContext::needsCloudAuthorization()
 
 void CloudCrossSystemContext::cloudAuthorize()
 {
+    if (d->authRequest)
+    {
+        NX_VERBOSE(this, "Cloud authorization is already in progress");
+        return;
+    }
+
     if (!d->systemContext->connection())
     {
         initializeConnection(/*allowUserInteraction*/ true);
         return;
     }
 
-    // Unsuccessful cloud re-authorization can cause deletion of this context.
-    const QPointer guard(this);
-
-    emit cloudAuthorizationRequested(QPrivateSignal{});
-
-    if (guard)
-        d->issueAccessToken();
+    d->requestCloudAuth(
+        [this](bool success)
+        {
+            // When the context needs cloud authorization, it has already issued the access token
+            // on the credentials change.
+            if (success && !d->needsCloudAuthorization)
+                d->issueAccessToken();
+        });
 }
 
 nx::Uuid  CloudCrossSystemContext::organizationId() const

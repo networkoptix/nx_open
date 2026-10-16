@@ -21,6 +21,10 @@ public:
         WindowContext* context,
         const QUrl& source,
         const QVariantMap& properties = QVariantMap());
+
+    /** Pushes the screen without waiting for its result. Returns the created screen. */
+    static QObject* pushScreen(
+        WindowContext* context, const QUrl& source, const QVariantMap& properties = QVariantMap());
 };
 
 } // namespace nx::vms::client::mobile
