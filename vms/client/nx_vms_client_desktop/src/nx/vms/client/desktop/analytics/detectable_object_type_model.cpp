@@ -164,6 +164,13 @@ void DetectableObjectTypeModel::setEngine(AbstractEngine* engine)
     d->filterModel->setSelectedEngine(engine);
 }
 
+ObjectType* DetectableObjectTypeModel::setEngineAndFindObjectType(
+    AbstractEngine* engine, const std::function<QString()>& selectedObjectTypeId)
+{
+    setEngine(engine);
+    return d->filterModel->objectTypeById(selectedObjectTypeId());
+}
+
 AnalyticsFilterModel* DetectableObjectTypeModel::sourceModel() const
 {
     return d->filterModel;

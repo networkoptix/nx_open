@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <functional>
+
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/vms/client/core/analytics/analytics_filter_model.h>
@@ -38,6 +40,14 @@ public:
 
     void setLiveTypesExcluded(bool value);
     void setEngine(nx::analytics::taxonomy::AbstractEngine* value);
+
+    /**
+     * Switches the engine and returns the object type with the selected id among the new types.
+     * The id is requested after the switch, whose notification handlers may change the selection.
+     */
+    core::analytics::taxonomy::ObjectType* setEngineAndFindObjectType(
+        nx::analytics::taxonomy::AbstractEngine* engine,
+        const std::function<QString()>& selectedObjectTypeId);
 
     core::analytics::taxonomy::AnalyticsFilterModel* sourceModel() const;
 

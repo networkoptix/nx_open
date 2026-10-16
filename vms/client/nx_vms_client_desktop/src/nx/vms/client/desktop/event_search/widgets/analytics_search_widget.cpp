@@ -484,11 +484,11 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
 
 void AnalyticsSearchWidget::Private::updateTypeButton()
 {
-    const auto objectTypeId = m_analyticsSetup->objectType();
-    ObjectType* objectType = m_objectTypeModel->sourceModel()->objectTypeById(objectTypeId);
-
-    const auto engine = engineById(m_analyticsSetup->engine());
-    m_objectTypeModel->setEngine(engine);
+    // The engine switch re-enters this method through objectTypesChanged, and the nested call may
+    // clear the selected type, so the type is read only after the switch.
+    ObjectType* objectType =
+        m_objectTypeModel->setEngineAndFindObjectType(engineById(m_analyticsSetup->engine()),
+            [this]() { return m_analyticsSetup->objectType(); });
     m_typeSelectionButton->setVisible(!m_filterModel->objectTypes().empty());
 
     if (objectType)
