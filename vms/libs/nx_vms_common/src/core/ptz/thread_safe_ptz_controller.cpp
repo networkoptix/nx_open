@@ -44,6 +44,9 @@ bool ThreadSafePtzController::viewportMove(
     const Options& options)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!supports(Command::viewportMove, options))
+        return false;
+
     return base_type::viewportMove(aspectRatio, viewport, speed, options);
 }
 
