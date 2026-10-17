@@ -924,13 +924,13 @@
       <source>%n/%1 Local recording services</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Local recording services</numerusform>
+        <numerusform>%n/%1 Lokale Aufnahmedienste</numerusform>
         <numerusform>%n/%1 Local recording services</numerusform>
       </translation>
     </message>
     <message>
       <source>Local recording services</source>
-      <translation type="unfinished">Local recording services</translation>
+      <translation>Lokale Aufnahmedienste</translation>
     </message>
   </context>
   <context>
