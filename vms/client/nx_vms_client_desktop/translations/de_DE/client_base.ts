@@ -6481,7 +6481,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>View Bookmarks</source>
-      <translation type="unfinished">View Bookmarks</translation>
+      <translation>Lesezeichen anzeigen</translation>
     </message>
     <message>
       <source>Manage Bookmarks</source>
