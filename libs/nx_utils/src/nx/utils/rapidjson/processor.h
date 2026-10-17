@@ -128,7 +128,9 @@ struct TypeHelper<std::string>
         if (jsonNode->IsString())
             return OutputType(jsonNode->GetString(), jsonNode->GetStringLength());
         if (jsonNode->IsInt())
-            return std::to_string(jsonNode->GetInt());
+            return QString::number(jsonNode->GetInt()).toStdString();
+        if (jsonNode->IsDouble())
+            return QString::number(jsonNode->GetDouble()).toStdString();
         return std::nullopt;
     }
 };

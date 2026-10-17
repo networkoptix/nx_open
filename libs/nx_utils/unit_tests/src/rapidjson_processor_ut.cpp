@@ -92,7 +92,9 @@ const QString manyFieldsObject = R"(
     "B2": "5",
     "A4": "6",
     "A5": "7",
+    "A6": "7,5",
     "B3": "8",
+    "A7": "8.5",
     "object1": {"A11": "11", "A12": "12", "B11": "13"},
     "object2": {"A21": "21", "B21": "22", "A22": "23"}
 }
@@ -214,7 +216,8 @@ TEST(Processor, IteratorHelperTest)
     }
     objStr.remove(R"(,"A1":"new_val","A2":"2")");
     objStr.remove(R"(,"A3":"4")");
-    objStr.remove(R"(,"A4":"6","A5":"7")");
+    objStr.remove(R"(,"A4":"6","A5":"7","A6":"7,5")");
+    objStr.remove(R"(,"A7":"8.5")");
     ASSERT_EQ(objStr.toStdString(), documentToString(objDoc));
 }
 
@@ -619,8 +622,8 @@ TEST(Processor, CustomAction)
         };
         auto s = r.applyActionToValues(addNamesToVector, "/[?]", NameCont("A"));
 
-        std::vector<std::string> rightResult = {"A1", "A2", "A3", "A4", "A5"};
-        ASSERT_EQ(s, 5);
+        std::vector<std::string> rightResult = {"A1", "A2", "A3", "A4", "A5", "A6", "A7"};
+        ASSERT_EQ(s, 7);
         ASSERT_EQ(names, rightResult);
     }
     // Custom action applies to rapidjson::ValueIterator.
@@ -675,7 +678,8 @@ TEST(Processor, Negation)
     using namespace nx::utils::rapidjson::predicate;
     const Processor rManyFields{manyFieldsObject.toUtf8()};
     const auto v1 = rManyFields.getAllValues<std::string>("/[?]", std::not_fn(NameCont("B")));
-    const std::vector<std::string> rightResult1{"manyFieldsObject", "1", "2", "4", "6", "7"};
+    const std::vector<std::string> rightResult1{
+        "manyFieldsObject", "1", "2", "4", "6", "7", "7,5", "8.5"};
     ASSERT_EQ(v1, rightResult1);
 
     const auto notAll = rManyFields.getAllValues<std::string>("/[?]", std::not_fn(All()));
@@ -754,6 +758,15 @@ TEST(Processor, CopyValueFromOneProcessorToAnother2)
     for (::rapidjson::Value* value: valuesInserted)
         insertedAsStrings.push_back(documentToString(*value));
     ASSERT_EQ(extractedAsStrings, insertedAsStrings);
+}
+
+TEST(Processor, NumberToString)
+{
+    const Processor r{R"({"int": 7, "double": 8.5, "integralDouble": 5.0, "negative": -0.25})"};
+    ASSERT_EQ(r.getValue<std::string>("/int"), "7");
+    ASSERT_EQ(r.getValue<std::string>("/double"), "8.5");
+    ASSERT_EQ(r.getValue<std::string>("/integralDouble"), "5");
+    ASSERT_EQ(r.getValue<std::string>("/negative"), "-0.25");
 }
 
 } // namespace nx::utils::rapidjson::test
