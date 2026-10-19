@@ -55,20 +55,23 @@ RunParameters getRunParameters(
     if (nx::build_info::isWindows())
         return RunParameters{info.absoluteFilePath(), info.absolutePath(), arguments};
 
-    // When we try to run MacOs client it runs global launcher of the application.
-    // Global launcher looks for the newest applauncher and redirects request to it to
-    // run the newest (or some specified) version. Up to 4.2 applauncher run client
-    // by the direct executable call. The chain was user->initial client->applauncher->
-    // final client. Because of that final client used settings from the initial one.
-    // From 4.3 applauncher runs 4.3+ clients as a bundle which fixes settings usage.
+    // A plain launch of the MacOs client bundle redirects the request to the newest applauncher,
+    // which runs the newest (or some specified) version. Up to 4.2 applauncher run client by the
+    // direct executable call. The chain was user->initial client->applauncher->final client.
+    // Because of that final client used settings from the initial one. From 4.3 applauncher runs
+    // 4.3+ clients as a bundle which fixes settings usage.
     static const nx::utils::SoftwareVersion kMinimalBundleRunVersion(4,3);
     if (nx::build_info::isMacOsX() && targetVersion >= kMinimalBundleRunVersion)
     {
         auto bundleDir = info.absoluteDir();
         bundleDir.cd("../../");
         // Always run with "-n" (open a new instance) to simulate other OSes behavior.
-        // All arguments after "--run" are passed to the client binary.
-        const QStringList runArguments{"-n", "-a", bundleDir.absolutePath(), "--args", "--run"};
+        // All arguments after the run option are passed to the client binary.
+        const QStringList runArguments{"-n",
+            "-a",
+            bundleDir.absolutePath(),
+            "--args",
+            nx::vms::applauncher::api::kMacRunClientOption};
         return RunParameters{"open", bundleDir.absolutePath(), runArguments + arguments};
     }
 

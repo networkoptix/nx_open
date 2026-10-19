@@ -6,6 +6,7 @@
 
 #include <client/client_startup_parameters.h>
 #include <nx/utils/platform/process.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <utils/mac_utils.h>
 #include <utils/unity_launcher_workaround.h>
@@ -35,7 +36,8 @@ PidType ClientProcessRunner::runClient(const QStringList& arguments) const
         : qApp->applicationDirPath().append('/').append(execFile);
 
 #ifdef Q_OS_MACOS
-    return mac_startDetached(execPath, arguments);
+    return mac_startDetached(
+        execPath, QStringList{nx::vms::applauncher::api::kMacRunClientOption} + arguments);
 #else
     return utils::UnityLauncherWorkaround::startDetached(execPath, arguments);
 #endif
