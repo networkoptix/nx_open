@@ -333,6 +333,8 @@ private:
     rest::Handle m_expectedStatusHandle = 0;
     std::atomic_bool m_requestingStop = false;
     std::atomic_bool m_requestingFinish = false;
+    /** Connection used for the pending /ec2/finishUpdate request. */
+    std::weak_ptr<rest::ServerConnection> m_finishRequestConnection;
 
     std::shared_ptr<PeerStateTracker> m_stateTracker;
 
