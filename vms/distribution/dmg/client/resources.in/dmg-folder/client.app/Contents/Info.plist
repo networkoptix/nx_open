@@ -9,7 +9,7 @@
     <key>CFBundleDisplayName</key>
     <string>@customization.vmsName@</string>
     <key>CFBundleExecutable</key>
-    <string>launcher</string>
+    <string>@client.binary.name@</string>
     <key>CFBundleIconFile</key>
     <string>appIcon.icns</string>
     <key>CFBundleIdentifier</key>

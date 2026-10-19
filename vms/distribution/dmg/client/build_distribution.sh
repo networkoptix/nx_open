@@ -24,20 +24,6 @@ APP_BUNDLE="$DISPLAY_PRODUCT_NAME.app"
 APP_DIR="$SRC/$APP_BUNDLE"
 APP_RESOURCES_DIR="$APP_DIR/Contents/Resources"
 
-copyMacOsSpecificApplauncherStuff()
-{
-    LAUNCHER_DIR=LAUNCHER.app
-    LAUNCHER_RESOURCES_DIR="$LAUNCHER_DIR/Contents/Resources"
-
-    rm -rf $LAUNCHER_DIR
-    osacompile -o $LAUNCHER_DIR global_launcher.applescript
-
-    mkdir -p "$APP_RESOURCES_DIR/Scripts"
-    cp "$LAUNCHER_RESOURCES_DIR/Scripts/main.scpt" "$APP_RESOURCES_DIR/Scripts"
-    cp "$LAUNCHER_RESOURCES_DIR/droplet.rsrc" "$APP_RESOURCES_DIR/launcher.rsrc"
-    cp "$LAUNCHER_DIR/Contents/MacOS/droplet" "$APP_DIR/Contents/MacOS/launcher"
-}
-
 copyWebEngineFiles()
 {
     local -r FRAMEWORK="QtWebEngineCore.framework"
@@ -105,8 +91,6 @@ buildDistribution()
     cp "$APP_ICON" "$APP_RESOURCES_DIR/appIcon.icns"
     cp "$INSTALLER_ICON" "$SRC/.VolumeIcon.icns"
     cp -r "$BUILD_DIR/bin/fonts" "$APP_RESOURCES_DIR/"
-
-    copyMacOsSpecificApplauncherStuff
 
     PYTHONPATH="${VMS_DISTRIBUTION_COMMON_DIR}/scripts" "${PYTHON}" macdeployqt.py \
         "$CURRENT_BUILD_DIR" "$APP_DIR" "$BUILD_DIR/bin" "$BUILD_DIR/lib" "$CLIENT_HELP_PATH" \
