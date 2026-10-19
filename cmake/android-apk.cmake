@@ -4,6 +4,14 @@ option(buildApk
     "Build Android APK automatically. Uncheck if you want to use Qt Creator to debug the application."
     ON)
 
+option(androidDebuggable
+    "Make APK and AAB debuggable in release builds (for automated tests, not for publishing)."
+    OFF)
+
+if(androidDebuggable)
+    message(STATUS "Android packages are debuggable (androidDebuggable is ON)")
+endif()
+
 function(find_buildtools sdk_path result_variable)
     set(buildToolsDir "${sdk_path}/build-tools")
 
@@ -135,8 +143,24 @@ function(add_android_apk target)
             FILE_CONTENTS "${FILE_CONTENTS}")
     endif()
 
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/build.gradle "${FILE_CONTENTS}")
-    nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/build.gradle)
+    # Appended after the template's android block, so it takes precedence over it. Debug builds
+    # are debuggable anyway.
+    if(androidDebuggable)
+        string(APPEND FILE_CONTENTS
+            "\nandroid {\n"
+            "    buildTypes {\n"
+            "        release {\n"
+            "            debuggable = true\n"
+            "        }\n"
+            "    }\n"
+            "}\n")
+    endif()
+
+    # Unlike file(WRITE), keeps the timestamp if the content is unchanged, so the APK is rebuilt
+    # only when the Gradle script actually changes.
+    set(gradle_file ${CMAKE_CURRENT_BINARY_DIR}/build.gradle)
+    file(GENERATE OUTPUT ${gradle_file} CONTENT "${FILE_CONTENTS}")
+    nx_store_known_file(${gradle_file})
 
     if("hwaddress" IN_LIST enabledSanitizers)
         set(wrapsh_path "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/wrap.sh")
@@ -160,10 +184,10 @@ function(add_android_apk target)
     add_custom_command(
         COMMENT "Generating ${apk_unsigned_file_name}"
         OUTPUT ${apk_unsigned_file_name}
-        DEPENDS ${APK_TARGET} ${APK_DEPENDS}
+        DEPENDS ${APK_TARGET} ${APK_DEPENDS} ${gradle_file}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE} ${apk_dir}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_TEMPLATE} ${PACKAGE_SOURCE}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/build.gradle ${PACKAGE_SOURCE}/build.gradle
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${gradle_file} ${PACKAGE_SOURCE}/build.gradle
         COMMAND ${CMAKE_COMMAND} -E make_directory "${libs_dir}/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/resources/lib/${CMAKE_ANDROID_ARCH_ABI}"
         ${copy_java_libs_command}
