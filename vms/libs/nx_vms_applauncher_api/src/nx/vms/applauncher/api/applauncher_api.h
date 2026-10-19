@@ -15,6 +15,9 @@ namespace nx::vms::applauncher::api {
  */
 NX_VMS_APPLAUNCHER_API_API QString launcherPipeName();
 
+/** Makes the macOS Client bundle run the Client, not forward the launch to applauncher. */
+constexpr auto kMacRunClientOption = "--run";
+
 NX_REFLECTION_ENUM_CLASS(TaskType,
     run,
     quit,
