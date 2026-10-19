@@ -436,9 +436,10 @@ Item
 
     RefreshIndicator
     {
+        parent: notifications
         anchors.horizontalCenter: parent.horizontalCenter
+        y: (refreshWatcher.overshoot - height) / 2
         progress: refreshWatcher.refreshProgress
-        y: notifications.y + refreshWatcher.overshoot * progress - height - notifications.spacing * 2
     }
 
     Binding
