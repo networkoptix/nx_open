@@ -2,6 +2,10 @@
 
 #include "hw_video_decoder_old_player.h"
 
+#include <chrono>
+#include <map>
+#include <mutex>
+
 #include <QtGui/rhi/qrhi.h>
 
 #include <nx/build_info.h>
@@ -13,7 +17,9 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/dict.h>
 #include <libavutil/hwcontext.h>
+#include <libavutil/mem.h>
 } // extern "C"
 
 #include "hw_video_api.h"
@@ -22,6 +28,72 @@ extern "C" {
 namespace nx::media {
 
 namespace {
+
+/**
+ * Process-wide back-off for hardware video decoder failures, similar to the one in
+ * FfmpegHwVideoDecoder (MOBILE-3198).
+ *
+ * When a HW device can not be created (e.g. VAAPI on a machine without a working VA driver),
+ * HwVideoDecoder silently falls back to software decoding. Without a back-off every new decoder
+ * (e.g. on every showreel layout switch) tries to create the device again, which loads and unloads
+ * the driver, takes time and leaks memory in some drivers. While the back-off is armed for a
+ * device, new decoders for it go directly to SW. The device is re-probed after the cooldown.
+ */
+class HwDeviceBackOff
+{
+public:
+    using Clock = std::chrono::steady_clock;
+
+    static constexpr std::chrono::seconds kCooldown{60};
+
+    bool isActive(const std::string& key) const
+    {
+        std::lock_guard lock(m_mutex);
+        const auto it = m_unavailableUntil.find(key);
+        return it != m_unavailableUntil.end() && Clock::now() < it->second;
+    }
+
+    void noteFailure(const std::string& key)
+    {
+        std::lock_guard lock(m_mutex);
+        m_unavailableUntil[key] = Clock::now() + kCooldown;
+    }
+
+    void noteSuccess(const std::string& key)
+    {
+        std::lock_guard lock(m_mutex);
+        m_unavailableUntil.erase(key);
+    }
+
+private:
+    mutable std::mutex m_mutex;
+    std::map<std::string, Clock::time_point> m_unavailableUntil;
+};
+
+HwDeviceBackOff& hwDeviceBackOff()
+{
+    static HwDeviceBackOff instance;
+    return instance;
+}
+
+std::string hwDeviceKey(AVHWDeviceType type,
+    const std::string& device,
+    nx::media::ffmpeg::AvOptions* options,
+    AVCodecID codec)
+{
+    std::string optionsString;
+    if (options && options->get())
+    {
+        char* buffer = nullptr;
+        if (av_dict_get_string(options->get(), &buffer, '=', ':') >= 0 && buffer)
+            optionsString = buffer;
+        av_freep(&buffer);
+    }
+
+    const char* typeName = av_hwdevice_get_type_name(type);
+    return std::string(typeName ? typeName : "none") + "|" + device + "|" + optionsString + "|"
+        + std::to_string((int) codec);
+}
 
 AVHWDeviceType deviceTypeFromRhi(QRhi* rhi)
 {
@@ -182,6 +254,27 @@ bool HwVideoDecoderOldPlayer::decode(
                 initFunc = api->initFunc(m_rhi, decoderData);
                 options = api->options(m_rhi);
                 device = api->device(m_rhi);
+
+                // Devices with custom initialization are created by the client itself.
+                if (!initFunc)
+                {
+                    const auto key =
+                        hwDeviceKey(hwType, device, options.get(), data->compressionType);
+                    if (hwDeviceBackOff().isActive(key))
+                    {
+                        NX_DEBUG(this,
+                            "Switching to FFmpeg SW video decoder, HW device %1 has recently "
+                            "failed",
+                            key);
+                        hwType = AV_HWDEVICE_TYPE_NONE;
+                        options.reset();
+                        device.clear();
+                    }
+                    else
+                    {
+                        m_pendingHwDeviceKey = key;
+                    }
+                }
             }
 
             m_impl = std::make_shared<nx::media::ffmpeg::HwVideoDecoder>(
@@ -208,6 +301,7 @@ bool HwVideoDecoderOldPlayer::decode(
         if (m_lastStatus < 0)
         {
             NX_WARNING(this, "Failed to decode frame");
+            notePendingHwDeviceResult(/*success*/ false);
             m_decoderData.reset();
             m_impl.reset();
         }
@@ -215,11 +309,15 @@ bool HwVideoDecoderOldPlayer::decode(
     }
 
     const int hwIndex = getHwDataIndex((*outFramePtr).get());
-
     if ((*outFramePtr)->width <= 0 || (*outFramePtr)->height <= 0 || !(*outFramePtr)->data[hwIndex])
         return false;
 
     m_lastStatus = 0;
+
+    // HwVideoDecoder falls back to SW silently, so the first decoded frame shows whether the HW
+    // device was created.
+    notePendingHwDeviceResult(/*success*/ (bool) (*outFramePtr)->hw_frames_ctx);
+
     if ((*outFramePtr)->hw_frames_ctx)
     {
         const auto frame = (*outFramePtr).get();
@@ -250,11 +348,33 @@ bool HwVideoDecoderOldPlayer::decode(
     return true;
 }
 
+void HwVideoDecoderOldPlayer::notePendingHwDeviceResult(bool success)
+{
+    if (m_pendingHwDeviceKey.empty())
+        return;
+
+    if (success)
+    {
+        hwDeviceBackOff().noteSuccess(m_pendingHwDeviceKey);
+    }
+    else
+    {
+        NX_DEBUG(this,
+            "HW device %1 failed, it will not be used for %2 s",
+            m_pendingHwDeviceKey,
+            HwDeviceBackOff::kCooldown.count());
+        hwDeviceBackOff().noteFailure(m_pendingHwDeviceKey);
+    }
+
+    m_pendingHwDeviceKey.clear();
+}
+
 bool HwVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
 {
     NX_DEBUG(this, "Reset decoder");
     m_decoderData.reset();
     m_impl.reset();
+    m_pendingHwDeviceKey.clear();
     return true;
 }
 

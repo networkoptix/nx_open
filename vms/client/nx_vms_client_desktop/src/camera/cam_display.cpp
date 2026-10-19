@@ -16,7 +16,6 @@
 #include <nx/vms/client/core/media/queued_voice_spectrum_analyzer.h>
 #include <nx/vms/client/core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
 #include <utils/common/synctime.h>
@@ -163,8 +162,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnAbstractArchiveStreamR
     m_liveMaxLenReached(false),
     m_hasVideo(true)
 {
-    nx::vms::client::desktop::ini().reload();
-
     if (resource && resource->hasFlags(Qn::live_cam))
         m_isRealTimeSource = true;
     else

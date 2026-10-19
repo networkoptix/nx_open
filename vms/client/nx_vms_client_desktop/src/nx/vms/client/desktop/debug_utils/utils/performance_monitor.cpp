@@ -2,7 +2,14 @@
 
 #include "performance_monitor.h"
 
+#include <chrono>
+
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
+
+#include <nx/monitoring/activity_monitor.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include "performance_worker.h"
 
@@ -19,12 +26,36 @@ struct PerformanceMonitor::Private
     QScopedPointer<QThread> workerThread;
     bool visible = false;
     bool debugInfoVisible = false;
+
+    std::unique_ptr<monitoring::ActivityMonitor> memoryUsageMonitor;
+    QTimer memoryUsageLogTimer;
 };
 
 PerformanceMonitor::PerformanceMonitor(QObject* parent):
     base_type(parent),
     d(new Private())
 {
+    const std::chrono::seconds memoryUsageLogPeriod(ini().memoryUsageLogPeriodSec);
+    if (memoryUsageLogPeriod <= std::chrono::seconds::zero())
+        return;
+
+    d->memoryUsageMonitor = monitoring::ActivityMonitor::createForCurrentPlatform();
+
+    // Reading the memory usage is cheap, so it is done in the main thread.
+    connect(&d->memoryUsageLogTimer,
+        &QTimer::timeout,
+        this,
+        [this]()
+        {
+            static constexpr std::uint64_t kBytesInMB = 1024 * 1024;
+
+            NX_INFO(this,
+                "Memory usage: %1 MB, private: %2 MB, threads: %3",
+                d->memoryUsageMonitor->thisProcessRamUsageBytes() / kBytesInMB,
+                d->memoryUsageMonitor->thisProcessPrivateRamUsageBytes() / kBytesInMB,
+                d->memoryUsageMonitor->thisProcessThreads());
+        });
+    d->memoryUsageLogTimer.start(memoryUsageLogPeriod);
 }
 
 PerformanceMonitor::~PerformanceMonitor()

@@ -464,6 +464,11 @@ struct NX_VMS_CLIENT_DESKTOP_API Ini: nx::kit::IniConfig
     NX_INI_FLAG(true, enableHolePunching,
         "[Support] Allow client to use UDP Hole Punching network feature.");
 
+    NX_INI_INT(300,
+        memoryUsageLogPeriodSec,
+        "[Support] Period of writing the process memory usage to the log, in seconds. Helps to\n"
+        "investigate memory leaks during long runs. Set to 0 to disable.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
