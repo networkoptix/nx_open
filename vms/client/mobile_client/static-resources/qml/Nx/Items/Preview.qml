@@ -43,9 +43,19 @@ Rectangle
     enum DataState { Available, Checking, NoData }
     property int dataState: Preview.DataState.Available
 
+    // Height of the playback controls under the video.
+    readonly property real controlsHeight: LayoutController.fullscreen
+        ? 0
+        : bottomPanel.height + slider.progressLineHeight
+
     signal previous()
     signal next()
     signal showOnCamera()
+
+    function preferredHeight(availableHeight)
+    {
+        return Math.min(root.width / (16.0 / 9.0) + root.controlsHeight, availableHeight / 2)
+    }
 
     function heightForWidth(h)
     {
@@ -82,9 +92,7 @@ Rectangle
         id: preview
 
         anchors.fill: parent
-        anchors.bottomMargin: LayoutController.fullscreen
-            ? 0
-            : bottomPanel.height + slider.progressLineHeight
+        anchors.bottomMargin: root.controlsHeight
 
         audioEnabled: audioController.audioEnabled
         scalable: true

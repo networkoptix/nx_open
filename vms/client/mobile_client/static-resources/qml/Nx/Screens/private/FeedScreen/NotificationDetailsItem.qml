@@ -36,8 +36,10 @@ Item
 
         title: root.title
 
-        width: parent.width
-        height: LayoutController.fullscreen ? root.height : StyleHints.previewHeight
+        width: d.detailsOnTheRight ? root.width - StyleHints.panelWidth : root.width
+        height: LayoutController.fullscreen || d.detailsOnTheRight
+            ? root.height
+            : preview.preferredHeight(root.height)
 
         withNavigationControls: d.resourceCount > 1
         hasPrevious: d.currentIndex > 0
@@ -56,7 +58,8 @@ Item
 
         anchors.fill: parent
         anchors.margins: 20
-        anchors.topMargin: 20 + (preview.visible ? preview.height : 0)
+        anchors.topMargin: 20 + (preview.visible && !d.detailsOnTheRight ? preview.height : 0)
+        anchors.leftMargin: 20 + (preview.visible && d.detailsOnTheRight ? preview.width : 0)
 
         contentHeight: notificationDetailsColumn.implicitHeight
         clip: true
@@ -141,6 +144,9 @@ Item
         property var currentCamera: null
 
         readonly property int resourceCount: resourceIds.length
+
+        readonly property bool detailsOnTheRight: LayoutController.isHorizontalCompact
+            && !LayoutController.fullscreen
 
         function reset()
         {

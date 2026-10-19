@@ -50,7 +50,7 @@ Item
             Layout.fillWidth: true
             Layout.preferredHeight: LayoutController.fullscreen
                 ? detailsItem.height
-                : StyleHints.previewHeight
+                : preview.preferredHeight(detailsItem.height)
 
             target: preview
         }
@@ -283,7 +283,17 @@ Item
     {
         id: d
 
-        readonly property bool isPortraitLayout: detailsItem.width < detailsItem.height
+        readonly property bool isPortraitLayout:
+        {
+            if (LayoutController.isCompact)
+                return true
+
+            if (LayoutController.isHorizontalCompact)
+                return false
+
+            // Modes, when the item is located on the right panel of the application.
+            return detailsItem.width < detailsItem.height
+        }
 
         function updateCurrentEvent()
         {

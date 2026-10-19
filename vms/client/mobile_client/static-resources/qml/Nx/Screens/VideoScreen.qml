@@ -130,7 +130,7 @@ Page
 
             PropertyChanges
             {
-                navigatorProxyItem.width: 360
+                navigatorProxyItem.width: StyleHints.panelWidth
                 navigatorProxyItem.height: modernVideoScreen.height
 
                 // The navigator takes the header area as well, which the narrowed tool bar leaves
@@ -184,6 +184,10 @@ Page
 
             PropertyChanges
             {
+                cameraSwitcher.height: Math.min(
+                    cameraSwitcher.width / (16.0 / 9.0),
+                    modernVideoScreen.contentItem.height / 2 - navigationBar.height)
+
                 fullscreenControlsOverlay.visible: false
             }
         },
@@ -1084,7 +1088,6 @@ Page
     {
         id: navigatorProxyItem
 
-        implicitWidth: 360
         target: navigator
         visible: !LayoutController.fullscreen && modernVideoScreen.ownsNavigator
     }

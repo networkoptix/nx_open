@@ -39,9 +39,6 @@ QtObject
     // hides one of the panels.
     readonly property int contentAreaMinimumWidth: appContext.settings.contentAreaMinWidth
 
-    // Preferred preview height.
-    readonly property int previewHeight: 270
-
     // Navigation bar height or width depending on the location.
     readonly property int navigationBarSize: 72
 }
