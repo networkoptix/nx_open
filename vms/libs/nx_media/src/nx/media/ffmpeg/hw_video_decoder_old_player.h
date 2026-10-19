@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <nx/media/ffmpeg/abstract_video_decoder.h>
 #include <nx/media/video_data_packet.h>
 
@@ -36,6 +38,10 @@ public:
     static int instanceCount();
 
 private:
+    /** Updates the HW device back-off if the HW device of the current decoder is not checked. */
+    void notePendingHwDeviceResult(bool success);
+
+private:
     QRhi* m_rhi = nullptr;
     std::shared_ptr<nx::media::ffmpeg::HwVideoDecoder> m_impl;
     std::shared_ptr<VideoApiDecoderData> m_decoderData;
@@ -44,6 +50,9 @@ private:
     QnAbstractMediaData::MediaFlags m_lastFlags {};
     static int m_instanceCount;
     bool m_isHW = true;
+
+    /** Key of the HW device which was requested for the current decoder and is not checked. */
+    std::string m_pendingHwDeviceKey;
     MultiThreadDecodePolicy m_mtDecodingPolicy = MultiThreadDecodePolicy::enabled;
 };
 
