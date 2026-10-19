@@ -41,7 +41,7 @@ Supported target platforms and architectures:
 - macOS Monterey 12.6.3 (Xcode with Clang) x64, Apple M1/M2.
 
 Build prerequisites:
-- **Python 3.8+** - should be available on `PATH` as `python`, and for macOS and Ubuntu also as
+- **Python 3.10+** - should be available on `PATH` as `python`, and for macOS and Ubuntu also as
     `python3`.
 - **Pip** - should be available on `PATH` as `pip` and be installed for the Python interpreter used
     by the build.

@@ -44,14 +44,14 @@ directory `conan_cache/` next to the repository root and the build directories.
 
 ### Windows
 
-**Python 3.8+** should be installed and available on `PATH` as `python`. A possible installation
-procedure of Python 3.8 could look like the following:
+**Python 3.10+** should be installed and available on `PATH` as `python`. A possible installation
+procedure of Python 3.12 could look like the following:
 - Disable the Python alias that opens Microsoft Store: go to "Start" ->
     "Manage app execution aliases" and disable all python-related aliases for App Installer
     (`python.exe` and `python3.exe`).
 - Download the Python installer from
-    [python-3.8.10](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe).
-- In the installer, select "Add Python 3.8 to PATH". Note that the component "tcl/tk and IDLE"
+    [python-3.12.10](https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe).
+- In the installer, select "Add Python 3.12 to PATH". Note that the component "tcl/tk and IDLE"
     is not required.
 - It is recommended to activate "Disable path length limit" option at the end of the installer.
 
@@ -87,11 +87,12 @@ Take the `<version>` value from `requirements.txt`.
 
 ### Linux
 
-**Python 3.8+** should be installed and available on `PATH` as both `python` and `python3`. A
-possible installation procedure of Python 3.8 could look like the following:
-- **Ubuntu 20**: Make `python` command equivalent to `python3`:
+**Python 3.10+** should be installed and available on `PATH` as both `python` and `python3`. A
+possible installation procedure could look like the following:
+- **Ubuntu 22.04, 24.04, 26.04**: the system Python (3.10, 3.12 and 3.14 respectively) is
+    suitable. Make `python` command equivalent to `python3`:
     ```
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 100
+    sudo apt install python-is-python3
     ```
 - If you have Python 2 installed on your machine and you need it for some reason, you can run
     ```
@@ -130,8 +131,8 @@ compilers installed in the Linux system (if any) are not used.
 
 ### macOS
 
-**Python 3.8+** should be installed and available on `PATH` as both `python` and `python3`. A
-possible installation procedure for Python 3.8 could look like the following:
+**Python 3.10+** should be installed and available on `PATH` as both `python` and `python3`. A
+possible installation procedure for Python 3.12 could look like the following:
 - Install Homebrew:
   ```
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -139,8 +140,8 @@ possible installation procedure for Python 3.8 could look like the following:
 - Install and configure Python 3 using `pyenv`:
   ```
   brew install pyenv
-  pyenv install 3.8
-  pyenv global 3.8
+  pyenv install 3.12
+  pyenv global 3.12
   echo 'eval "$(pyenv init -)"' >>~/.zshrc
   eval "$(pyenv init -)"
   ```
