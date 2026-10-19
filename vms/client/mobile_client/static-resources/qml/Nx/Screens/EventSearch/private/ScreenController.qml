@@ -7,7 +7,6 @@ import Nx.Core.Controls
 import Nx.Core.Items
 import Nx.Core.Ui
 import Nx.Mobile
-import Nx.Models
 
 import nx.vms.client.core
 
@@ -40,15 +39,8 @@ NxObject
             return
         }
 
-        if (direction === EventSearch.FetchDirection.newer
-            || direction === EventSearch.FetchDirection.older)
-        {
-            if (direction === EventSearch.FetchDirection.newer)
-                view.positionViewAtBeginning()
-            else
-                view.positionViewAtEnd()
-        }
-        else
+        if (direction !== EventSearch.FetchDirection.newer
+            && direction !== EventSearch.FetchDirection.older)
         {
             controller.searchModel.clear()
             direction = EventSearch.FetchDirection.older
@@ -61,12 +53,8 @@ NxObject
     {
         id: refreshWatcher
 
-        property int lastRequestType: ViewUpdateWatcher.RequestType.None
-
         onUpdateRequested: (requestType) =>
         {
-            lastRequestType = requestType
-
             switch (requestType)
             {
                 case ViewUpdateWatcher.RequestType.TopFetch:
@@ -95,40 +83,55 @@ NxObject
 
         function onAsyncFetchStarted(request)
         {
-            if (!view.count)
+            d.reload = !view.count
+
+            if (d.reload)
+            {
                 refreshPreloader.visible = true
-            else if (request.direction === EventSearch.FetchDirection.newer)
-                view.headerItem.visible = true
+                return
+            }
+
+            if (request.direction === EventSearch.FetchDirection.newer)
+                view.headerItem.loading = true
             else if (request.direction === EventSearch.FetchDirection.older)
-                view.footerItem.visible = true
+                view.footerItem.loading = true
         }
 
         function onFetchFinished(result, centralItemIndex, request)
         {
             refreshPreloader.visible = false
-            view.headerItem.visible = false
-            view.footerItem.visible = false
 
-            if (view.count === 0)
-                return
+            // The fetched rows are not laid out yet, so the previously first row still has
+            // index 0. It is instantiated only when it is in or near the viewport, and that is
+            // exactly when the rows inserted before it push it down the screen.
+            const pushedRow = view.itemAtIndex(0)
+            const pushedRowY = pushedRow ? pushedRow.y - view.contentY : 0
 
-            const initialPosition = request.direction === EventSearch.FetchDirection.newer
-                ? ListView.Beginning
-                : ListView.End
+            view.forceLayout()
 
-            view.positionViewAtIndex(centralItemIndex, initialPosition)
+            if (d.reload)
+            {
+                // An emptied view may still be returning to its bounds, and the rows arriving in
+                // the middle of the return would stop it there.
+                view.positionViewAtBeginning()
+            }
+            else if (pushedRow
+                && request.direction === EventSearch.FetchDirection.newer
+                && centralItemIndex > 0)
+            {
+                // Keep the pushed row where it is on the screen, also during a drag or a trackpad
+                // momentum: the position set here survives the next move events. The view may
+                // still be returning to the header: stopping the return here leaves the view in
+                // bounds unless the fetched rows are shorter than the remaining overshoot.
+                view.positionViewAtIndex(centralItemIndex, ListView.Beginning)
+                view.contentY = Math.max(view.contentY - pushedRowY, view.headerItem.y)
+                d.keepOnScreen(centralItemIndex)
+            }
 
-            const targetPosition = request.direction === EventSearch.FetchDirection.newer
-                ? ListView.End
-                : ListView.Beginning
-            const targetIndex = refreshWatcher.lastRequestType === ViewUpdateWatcher.RequestType.BottomFetch
-                ? view.count - 1
-                : 0
+            d.reload = false
 
-            d.goToPosAnimation.from = view.contentY
-            view.positionViewAtIndex(targetIndex, targetPosition)
-            d.goToPosAnimation.to = view.contentY
-            d.goToPosAnimation.running = true
+            view.headerItem.loading = false
+            view.footerItem.loading = false
         }
     }
 
@@ -136,19 +139,28 @@ NxObject
     {
         id: d
 
-        readonly property real kPreloaderHeight: refreshWatcher.topOvershoot
-        property NumberAnimation goToPosAnimation:
-            NumberAnimation
+        property bool reload: false //< The current fetch fills an empty list.
+
+        // The fetched delegates get their final heights from their layouts in the next polish,
+        // and the rows below them move down. Puts the item back before that frame is rendered.
+        // Looked up by index both times: the delegate may be gone by then if no frame was rendered
+        // in between (e.g. the model was cleared while the application was in the background).
+        function keepOnScreen(index)
+        {
+            const window = view.Window.window
+            const item = view.itemAtIndex(index)
+            if (!item || !window)
+                return
+
+            const y = item.y - view.contentY
+            const restore = () =>
             {
-                id: goToPositionAnimation
-                target: view
-                property: "contentY"
-                duration: 500
+                window.afterAnimating.disconnect(restore)
+                const current = view.itemAtIndex(index)
+                if (current)
+                    view.contentY = current.y - y
             }
-        property ModelDataAccessor accessor:
-            ModelDataAccessor
-            {
-                model: controller.searchModel
-            }
+            window.afterAnimating.connect(restore)
+        }
     }
 }

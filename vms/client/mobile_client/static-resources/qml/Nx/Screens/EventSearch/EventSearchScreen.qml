@@ -317,21 +317,96 @@ AdaptiveScreen
 
     component Preloader: Item
     {
+        id: preloader
+
         property bool topPreloader: false
+        property bool loading: false //< Shown while loading and until it collapses afterwards.
+
+        // Room between the rows and the view edge, negative when the preloader is out of view.
+        function exposedHeight()
+        {
+            return preloader.topPreloader
+                ? preloader.y + preloader.height - view.contentY
+                : view.contentY + view.height - preloader.y
+        }
+
+        function collapse()
+        {
+            if (preloader.loading || preloader.height === 0 || heightAnimation.running)
+                return
+
+            const exposed = preloader.exposedHeight()
+            if (exposed < 0)
+            {
+                preloader.height = 0
+                return
+            }
+
+            // The view returns from beyond the preloader: collapse when the rows reach it.
+            if (exposed > preloader.height + 0.5)
+                return
+
+            heightAnimation.to = 0
+            heightAnimation.restart()
+        }
 
         width: (parent && parent.width) || 0
-        height: visible ? 46 : 0
-        visible: false
+        height: 0
+        visible: preloader.loading || preloader.height > 0
         z: 1
+
+        onLoadingChanged:
+        {
+            heightAnimation.stop()
+
+            if (!preloader.loading)
+            {
+                preloader.collapse()
+                return
+            }
+
+            // Requested with the room for it in the overshoot already: nothing moves.
+            preloader.height = view.preloaderHeight
+        }
+
+        onHeightChanged:
+        {
+            if (!heightAnimation.running || view.dragging)
+                return
+
+            // Collapsing, the view is kept in its bounds here: Qt does it only when the view is
+            // not moving, and a return to the bounds restarted by every step of the collapse stalls.
+            const beyond = preloader.exposedHeight() - preloader.height
+            if (beyond > 0)
+                view.contentY += preloader.topPreloader ? beyond : -beyond
+        }
+
+        Connections
+        {
+            target: view
+
+            function onContentYChanged() { preloader.collapse() }
+        }
+
+        NumberAnimation on height
+        {
+            id: heightAnimation
+
+            running: false
+            duration: 200
+            easing.type: Easing.OutCubic
+        }
 
         SpinnerBusyIndicator
         {
-            readonly property real offset: topPreloader
-                ? -view.spacing / 2
+            // At a fixed distance from the rows, like the refresh indicator: it does not move
+            // relative to them while the preloader grows or collapses.
+            readonly property real offset: preloader.topPreloader
+                ? preloader.height - view.preloaderHeight - view.spacing / 2
                 : view.spacing / 2
-            x: (parent.width - width) / 2
-            y: (parent.height - height ) / 2 + offset
-            running: parent.visible
+            x: (preloader.width - width) / 2
+            y: (view.preloaderHeight - height) / 2 + offset
+            running: preloader.visible
         }
     }
 
@@ -603,6 +678,8 @@ AdaptiveScreen
         {
             id: view
 
+            readonly property real preloaderHeight: screenController.refreshWatcher.topOvershoot
+
             y: contentSearchProxy.visible ? searchField.height + 32 : 20
             height: parent.height - y
             width: parent.width
@@ -747,10 +824,15 @@ AdaptiveScreen
 
         RefreshIndicator
         {
+            // In the list viewport, not over the search field. Centered where the top preloader
+            // spinner appears: the spinner replaces it in place when the fetch starts.
+            parent: view
             anchors.horizontalCenter: parent.horizontalCenter
-            progress: screenController.refreshWatcher.refreshProgress
-            y: view.y + screenController.refreshWatcher.overshoot * progress - height - view.spacing * 2
+            y: screenController.refreshWatcher.overshoot
+                - (view.preloaderHeight + view.spacing + height) / 2
             z: -1
+            visible: !view.headerItem?.loading
+            progress: screenController.refreshWatcher.refreshProgress
         }
     }
 
