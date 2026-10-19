@@ -940,21 +940,34 @@ bool ServerUpdateTool::requestRetryAction()
 
 bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 {
+    const auto connection = connectedServerApi();
     if (m_requestingFinish)
     {
-        NX_WARNING(this, "requestFinishUpdate(%1) - previous request is not complete",
+        // A destroyed connection terminates its requests without calling the callbacks, so the
+        // request sent through another connection will never complete.
+        if (connection && m_finishRequestConnection.lock() == connection)
+        {
+            NX_WARNING(this,
+                "requestFinishUpdate(%1) - previous request is not complete",
+                skipActivePeers);
+            return false;
+        }
+
+        NX_WARNING(this,
+            "requestFinishUpdate(%1) - previous request was lost with its connection",
             skipActivePeers);
-        return false;
     }
 
     m_requestingFinish = true;
-    const auto connection = connectedServerApi();
     if (!connection)
     {
         NX_ERROR(this, "requestFinishUpdate(%1) - no connection to the server", skipActivePeers);
+        m_requestingFinish = false;
         emit finishUpdateComplete(false, toString(InternalError::noConnection));
         return false;
     }
+
+    m_finishRequestConnection = connection;
 
     NX_VERBOSE(this, "requestFinishUpdate(%1) - sending request", skipActivePeers);
 
