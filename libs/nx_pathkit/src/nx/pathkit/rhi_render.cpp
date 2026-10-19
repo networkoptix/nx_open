@@ -11,6 +11,7 @@
 
 #include "rhi_render.h"
 
+#include <algorithm>
 #include <limits>
 #include <optional>
 
@@ -295,7 +296,8 @@ static constexpr auto kMatrix4x4Size = 4 * 4 * sizeof(float);
 
 RhiPaintDeviceRenderer::RhiPaintDeviceRenderer(QRhi* rhi, Settings settings):
     m_rhi(rhi),
-    m_settings(settings)
+    m_settings(settings),
+    m_textureCache(settings.cachedTextureLifetime, std::max(settings.maxCachedTextures, 0))
 {
     if (!NX_ASSERT(m_rhi, "RhiPaintDeviceRenderer requires a non-null QRhi"))
         return;
@@ -403,7 +405,6 @@ void RhiPaintDeviceRenderer::createTexturePipeline(QRhiRenderPassDescriptor* rp)
     tps->setRenderPassDescriptor(rp);
     tps->create();
 
-    m_textureCache.setMaxCost(m_settings.cacheSize * m_settings.cacheSize);
     m_gradientCache.setMaxCost(kMaxCachedGradientTextures);
 
     const int atlasSize = std::min(m_textureSizeMax, m_settings.atlasSize);
@@ -653,9 +654,9 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
 
     std::shared_ptr<QRhiTexture> texture;
 
-    if (TextureEntry* cached = m_textureCache.object(key))
+    if (const auto cached = m_textureCache.getValue(key))
     {
-        texture = cached->texture;
+        texture = cached->get();
     }
     else
     {
@@ -666,11 +667,30 @@ QRhiShaderResourceBindings* RhiPaintDeviceRenderer::getTextureBindings(
         texture.reset(m_rhi->newTexture(textureFormat, image.size(), 1));
         texture->create();
         rub->uploadTexture(texture.get(), image);
-        const auto size = texture->pixelSize();
-        m_textureCache.insert(key, new TextureEntry(texture), size.width() * size.height());
+        m_textureCache.put(key, texture);
     }
 
     return getTextureBindings(texture, outRect);
+}
+
+void RhiPaintDeviceRenderer::limitTextureCacheSize()
+{
+    const qint64 maxPixels = (qint64) m_settings.cacheSize * m_settings.cacheSize;
+
+    // The cache lists textures starting from the most recently used one, so the least recently
+    // used textures which do not fit into the budget are removed.
+    qint64 pixels = 0;
+    std::vector<qint64> keysToRemove;
+    for (const auto& [key, item]: m_textureCache)
+    {
+        const QSize size = item.value->pixelSize();
+        pixels += (qint64) size.width() * size.height();
+        if (pixels > maxPixels)
+            keysToRemove.push_back(key);
+    }
+
+    for (const auto key: keysToRemove)
+        m_textureCache.erase(key);
 }
 
 void RhiPaintDeviceRenderer::prepareAtlas(const RhiPaintEngineSyncData::Entries& entries)
@@ -1127,6 +1147,8 @@ std::vector<RhiPaintDeviceRenderer::Batch> RhiPaintDeviceRenderer::processEntrie
     }
 
     pathAllocator->clear();
+
+    limitTextureCacheSize();
 
     currentStats = {
         .entries = (size_t) entries.all().size(),

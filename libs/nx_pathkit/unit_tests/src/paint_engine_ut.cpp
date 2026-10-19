@@ -1,14 +1,21 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <algorithm>
+#include <chrono>
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include <QtGui/QOffscreenSurface>
+#include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
+#include <QtGui/QPixmap>
 #include <QtGui/rhi/qrhi.h>
 
 #include <nx/pathkit/rhi_paint_device.h>
 #include <nx/pathkit/rhi_paint_engine.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <nx/utils/time.h>
 
 #include "rhi_offscreen_renderer.h"
 
@@ -378,6 +385,130 @@ TEST_F(PaintEngineTest, pathWithHoleOnTop)
 
             p.drawPath(result);
         });
+}
+
+namespace {
+
+static constexpr auto kTextureLifetime = std::chrono::seconds(60);
+
+/**
+ * Renders frames with pixmaps which are too big for the atlas, so each pixmap gets its own texture
+ * in the texture cache. The time is shifted manually to check the texture lifetime.
+ */
+class TextureCacheRenderer
+{
+public:
+    static constexpr QSize kFrameSize{256, 256};
+    static constexpr QSize kPixmapSize{512, 512};
+
+    TextureCacheRenderer(QRhi* rhi, int maxCachedTextures, int cacheSize = 0):
+        m_offscreen(rhi, kFrameSize, Qt::white),
+        m_renderer(rhi,
+            {.cacheSize = cacheSize,
+                .maxCachedTextures = maxCachedTextures,
+                .cachedTextureLifetime = kTextureLifetime}),
+        m_timeShift(nx::utils::test::ClockType::steady)
+    {
+    }
+
+    /**
+     * Each new pixmap gets a new cache key, like pixmaps of widgets which are recreated on every
+     * layout switch.
+     */
+    static std::vector<QPixmap> createPixmaps(int count)
+    {
+        std::vector<QPixmap> pixmaps;
+        for (int i = 0; i < count; ++i)
+        {
+            QPixmap pixmap(kPixmapSize);
+            pixmap.fill(QColor::fromHsv(i * 30 % 360, 255, 255));
+            pixmaps.push_back(pixmap);
+        }
+        return pixmaps;
+    }
+
+    /** Renders a frame and returns the number of textures in the texture cache after it. */
+    size_t render(const std::vector<QPixmap>& pixmaps)
+    {
+        RhiPaintDevice paintDevice;
+        paintDevice.setSize(kFrameSize);
+
+        QPainter p(&paintDevice);
+        for (int i = 0; i < (int) pixmaps.size(); ++i)
+            p.drawPixmap(QRect(QPoint(i * 16, i * 16), QSize(64, 64)), pixmaps[i]);
+        p.end();
+
+        m_renderer.sync(&paintDevice);
+        m_offscreen.render(&m_renderer);
+
+        return m_renderer.stats().texturesInCache;
+    }
+
+    void passTime(std::chrono::milliseconds duration) { m_timeShift.applyRelativeShift(duration); }
+
+private:
+    RhiOffscreenRenderer m_offscreen;
+    RhiPaintDeviceRenderer m_renderer;
+    nx::utils::test::ScopedTimeShift m_timeShift;
+};
+
+} // namespace
+
+TEST_F(PaintEngineTest, textureCacheIsLimitedByCount)
+{
+    TextureCacheRenderer renderer(rhi.get(), /*maxCachedTextures*/ 4);
+
+    for (int frame = 0; frame < 10; ++frame)
+    {
+        EXPECT_EQ(renderer.render(TextureCacheRenderer::createPixmaps(1)),
+            (size_t) std::min(frame + 1, 4));
+    }
+}
+
+TEST_F(PaintEngineTest, textureCacheIsLimitedByCountWithinFrame)
+{
+    TextureCacheRenderer renderer(rhi.get(), /*maxCachedTextures*/ 4);
+
+    EXPECT_EQ(renderer.render(TextureCacheRenderer::createPixmaps(10)), 4u);
+}
+
+TEST_F(PaintEngineTest, textureCacheIsLimitedBySize)
+{
+    // Four 512x512 textures fit into 1024x1024 pixels.
+    TextureCacheRenderer renderer(rhi.get(), /*maxCachedTextures*/ 1000, /*cacheSize*/ 1024);
+
+    for (int frame = 0; frame < 10; ++frame)
+    {
+        EXPECT_EQ(renderer.render(TextureCacheRenderer::createPixmaps(1)),
+            (size_t) std::min(frame + 1, 4));
+    }
+
+    EXPECT_EQ(renderer.render(TextureCacheRenderer::createPixmaps(10)), 4u);
+}
+
+TEST_F(PaintEngineTest, unusedTexturesAreRemovedAfterLifetime)
+{
+    TextureCacheRenderer renderer(rhi.get(), /*maxCachedTextures*/ 1000);
+
+    EXPECT_EQ(renderer.render(TextureCacheRenderer::createPixmaps(3)), 3u);
+
+    const auto pixmaps = TextureCacheRenderer::createPixmaps(3);
+    EXPECT_EQ(renderer.render(pixmaps), 6u);
+
+    renderer.passTime(kTextureLifetime + std::chrono::milliseconds(1));
+    EXPECT_EQ(renderer.render(pixmaps), 3u);
+}
+
+TEST_F(PaintEngineTest, usedTexturesStayInCache)
+{
+    TextureCacheRenderer renderer(rhi.get(), /*maxCachedTextures*/ 3);
+
+    const auto pixmaps = TextureCacheRenderer::createPixmaps(3);
+    for (int frame = 0; frame < 10; ++frame)
+    {
+        EXPECT_EQ(renderer.render(pixmaps), 3u);
+        renderer.passTime(kTextureLifetime / 2);
+    }
 }
 
 } // namespace test

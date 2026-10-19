@@ -2,11 +2,14 @@
 
 #pragma once
 
+#include <chrono>
 #include <unordered_set>
 #include <vector>
 
 #include <QtCore/QCache>
 #include <QtGui/rhi/qrhi.h>
+
+#include <nx/utils/data_structures/time_out_cache.h>
 
 #include "atlas.h"
 #include "rhi_paint_engine.h"
@@ -96,19 +99,27 @@ public:
         TextureEntry(std::shared_ptr<QRhiTexture> t): texture(t) {}
     };
 
+    /**
+     * Every new pixmap gets a new cache key, so textures of pixmaps which are not drawn anymore
+     * (e.g. pixmaps of widgets recreated on every layout switch) must be removed from the cache.
+     * The cache keeps at most maxCachedTextures most recently used textures of at most
+     * cacheSize * cacheSize pixels in total, and removes the textures which were not used for
+     * cachedTextureLifetime.
+     */
     struct Settings
     {
         int cacheSize = 0; //< Use max texture size.
+        int maxCachedTextures = 1024;
+        std::chrono::milliseconds cachedTextureLifetime = std::chrono::minutes(5);
         int atlasSize = 1024;
         int maxAtlasEntrySize = 128;
     };
 
-    static constexpr Settings kDefaultSettinigs =
-    {
-        .cacheSize = 0,
+    static constexpr Settings kDefaultSettinigs = {.cacheSize = 0,
+        .maxCachedTextures = 1024,
+        .cachedTextureLifetime = std::chrono::minutes(5),
         .atlasSize = 1024,
-        .maxAtlasEntrySize = 128
-    };
+        .maxAtlasEntrySize = 128};
 
     struct Stats
     {
@@ -159,6 +170,7 @@ private:
     QRectF textureCoordsFromAtlas(const Atlas::Rect& rect, int padding) const;
 
     void prepareAtlas(const RhiPaintEngineSyncData::Entries& entries);
+    void limitTextureCacheSize();
 
     QImage getImage(const QPixmap& pixmap);
     void fillTextureVerts(
@@ -204,7 +216,7 @@ private:
     };
     std::vector<Texture> textures;
 
-    QCache<qint64, TextureEntry> m_textureCache;
+    nx::utils::TimeOutCache<qint64, std::shared_ptr<QRhiTexture>> m_textureCache;
     QCache<GradientWrapper, TextureEntry> m_gradientCache;
 
     std::vector<Batch> batches;
