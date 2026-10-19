@@ -1313,6 +1313,19 @@ void MessageBus::gotTransaction(
     const TransportHeader& /*transportHeader*/,
     nx::Locker<nx::Mutex>* lock)
 {
+    if constexpr (std::is_same_v<T, nx::vms::api::IdData>)
+    {
+        // Only clients need this: they get no alivePeers, so the stale entry would make the
+        // RuntimeData proxied after the peer reconnects look like a duplicate and be dropped.
+        if (localPeer().isClient() && tran.command == ApiCommand::runtimeInfoRemoved)
+        {
+            const auto& peerId = tran.params.id;
+            erase_if(m_lastRuntimeInfo,
+                [&peerId](const auto& it)
+                { return it.key().id == peerId || it.value().parentServerId == peerId; });
+        }
+    }
+
     if (m_handler)
     {
         nx::Unlocker<nx::Mutex> unlock(lock);
