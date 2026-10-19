@@ -5,7 +5,9 @@
 #include <future>
 #include <memory>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 #include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
@@ -346,6 +348,12 @@ private:
     static QString toString(WidgetUpdateState state);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
+    /** Title of the message box shown when the update installation fails. */
+    static QString installationErrorText();
+
+    /** Hint appended to update error messages. */
+    static QString contactSupportText();
+
     /**
      * Changes source for getting update.
      * It will try to skip any changes if we picking the same mode.
@@ -386,6 +394,8 @@ private:
     void processDownloadingState();
     void processReadyInstallState();
     void processInstallingState();
+    /** Sends /ec2/finishUpdate and starts a new retry period. */
+    void startFinishUpdate();
 
     bool isChecking() const;
     bool hasLatestVersion() const;
@@ -440,6 +450,15 @@ private:
 
     /** Finishing update when a user pressed "Finish update" before installation has finished. */
     bool m_finishingForcefully = false;
+
+    /** Finishing request was rejected; do not finish automatically until the user asks again. */
+    bool m_finishUpdateFailed = false;
+
+    /** Time since the first /ec2/finishUpdate request after entering 'finishingInstall'. */
+    QElapsedTimer m_finishUpdateElapsed;
+
+    /** Repeats a rejected /ec2/finishUpdate request. Stopped on any widget state change. */
+    QTimer m_finishUpdateRetryTimer;
 
     QPointer<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;

@@ -86,6 +86,10 @@ constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 const auto kWaitForUpdateCheckFuture = std::chrono::milliseconds(1);
 const auto kDelayForCheckingInstallStatus = std::chrono::minutes(1);
 const auto kPeriodForCheckingInstallStatus = std::chrono::seconds(10);
+const auto kFinishUpdateRetryDelay = std::chrono::seconds(5);
+// Servers can reject requests for a while after a restart, so retry for some time before
+// reporting an error.
+const auto kFinishUpdateRetryTimeout = std::chrono::minutes(1);
 
 const int kLinkCopiedMessageTimeoutMs = 2000;
 
@@ -206,6 +210,19 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
 
     m_showDebugData = ini().massSystemUpdateDebugInfo;
+
+    m_finishUpdateRetryTimer.setSingleShot(true);
+    m_finishUpdateRetryTimer.setInterval(kFinishUpdateRetryDelay);
+    connect(&m_finishUpdateRetryTimer,
+        &QTimer::timeout,
+        this,
+        [this]()
+        {
+            if (m_widgetState != WidgetUpdateState::finishingInstall || !m_serverUpdateTool)
+                return;
+
+            m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
+        });
 
     auto watcher =
         workbenchContext()->findInstance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
@@ -779,6 +796,7 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     m_forceUiStateUpdate = true;
     m_updateRemoteStateChanged = true;
     m_finishingForcefully = false;
+    m_finishUpdateFailed = false;
 
     // TODO: We should collect all these changes to a separate state-structure.
     // TODO: We should split state flags more consistently.
@@ -1268,9 +1286,8 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         if (messageBox->exec() == QDialogButtonBox::Yes)
         {
             m_finishingForcefully = true;
+            m_finishUpdateFailed = false;
             setTargetState(WidgetUpdateState::finishingInstall, peersIssued);
-            //m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
-
         }
     }
     else if (m_widgetState == WidgetUpdateState::complete)
@@ -1511,15 +1528,14 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
             QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
             // 1. Everything is complete
             messageBox->setIcon(QnMessageBoxIcon::Critical);
-            messageBox->setText(tr("There was an error while installing updates:"));
+            messageBox->setText(installationErrorText());
 
             PeerStateTracker::ErrorReport report;
             m_stateTracker->getErrorReport(report);
 
             injectResourceList(*messageBox, resourcePool()->getResourcesByIds(report.peers));
             QString text = nx::vms::common::html::paragraph(report.message);
-            text += nx::vms::common::html::paragraph(
-                tr("If the problem persists, please contact Customer Support."));
+            text += nx::vms::common::html::paragraph(contactSupportText());
             messageBox->setInformativeText(text);
             auto installNow = messageBox->addButton(tr("OK"),
                 QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
@@ -1536,9 +1552,51 @@ void MultiServerUpdatesWidget::atFinishUpdateComplete(bool success, const QStrin
     }
     else
     {
-        NX_ERROR(this, "atFinishUpdateComplete(%1) - %2", success, error);
-        auto targets = m_stateTracker->peersIssued() + m_stateTracker->peersInstalling();
-        setTargetState(WidgetUpdateState::installingStalled, targets);
+        NX_ERROR(this,
+            "atFinishUpdateComplete(%1) - %2, %3 ms since the first attempt",
+            success,
+            error,
+            m_finishUpdateElapsed.elapsed());
+
+        // Retry failures while staying in 'finishingInstall'. Going back to
+        // 'installingStalled' without m_finishUpdateFailed would make processInstallingState()
+        // request finishing again on the next status poll, which loops forever while the server
+        // keeps rejecting the request: VMS-63275.
+        if (m_finishUpdateElapsed.durationElapsed() < kFinishUpdateRetryTimeout)
+        {
+            m_finishUpdateRetryTimer.start();
+            return;
+        }
+
+        QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
+        messageBox->setIcon(QnMessageBoxIcon::Critical);
+        messageBox->setText(installationErrorText());
+        QString text = nx::vms::common::html::paragraph(error);
+        text += nx::vms::common::html::paragraph(contactSupportText());
+        messageBox->setInformativeText(text);
+
+        auto tryAgain = messageBox->addButton(tr("Try again"), QDialogButtonBox::AcceptRole);
+        auto close = messageBox->addButton(QDialogButtonBox::Close);
+        messageBox->setEscapeButton(close);
+        messageBox->exec();
+
+        // The widget state could have been changed while the dialog was shown.
+        if (m_widgetState == WidgetUpdateState::finishingInstall && m_serverUpdateTool)
+        {
+            if (messageBox->clickedButton() == tryAgain)
+            {
+                NX_INFO(this, "atFinishUpdateComplete() - retrying to finish update");
+                startFinishUpdate();
+                return;
+            }
+
+            // The servers have already installed the update, so there is nothing to cancel.
+            // Wait until the user finishes the update with the "Finish Update" button.
+            NX_INFO(this, "atFinishUpdateComplete() - finishing is postponed by the user");
+            m_finishUpdateFailed = true;
+            setTargetState(WidgetUpdateState::installingStalled,
+                m_stateTracker->peersIssued() + m_stateTracker->peersInstalling());
+        }
     }
 
     clientMessageProcessor()->holdConnection(QnClientMessageProcessor::HoldConnectionPolicy::none);
@@ -2045,8 +2103,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
         PeerStateTracker::ErrorReport report;
         m_stateTracker->getErrorReport(report);
         QString text = report.message;
-        text += nx::vms::common::html::paragraph(
-            tr("If the problem persists, please contact Customer Support."));
+        text += nx::vms::common::html::paragraph(contactSupportText());
         messageBox->setInformativeText(text);
 
         // TODO: Client can be here as well, but it would not be displayed.
@@ -2117,6 +2174,13 @@ void MultiServerUpdatesWidget::processReadyInstallState()
     }
 }
 
+void MultiServerUpdatesWidget::startFinishUpdate()
+{
+    m_finishUpdateRetryTimer.stop();
+    m_finishUpdateElapsed.start();
+    m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
+}
+
 void MultiServerUpdatesWidget::processInstallingState()
 {
     m_stateTracker->processInstallTaskSet();
@@ -2135,7 +2199,7 @@ void MultiServerUpdatesWidget::processInstallingState()
     auto peersFailed = m_stateTracker->peersFailed();
 
     // No peers are doing anything right now. We should check if installation is complete.
-    if (peersInstalling.empty())
+    if (peersInstalling.empty() && !m_finishUpdateFailed)
     {
         auto peersIssued = m_stateTracker->peersIssued();
         NX_INFO(this,
@@ -2284,6 +2348,7 @@ void MultiServerUpdatesWidget::setTargetState(
     {
         NX_VERBOSE(this, "setTargetState() from %1 to %2", toString(m_widgetState),
             toString(state));
+        m_finishUpdateRetryTimer.stop();
         bool stopProcess = false;
         switch (state)
         {
@@ -2320,6 +2385,7 @@ void MultiServerUpdatesWidget::setTargetState(
                 break;
             case WidgetUpdateState::installing:
                 m_stateTracker->setPeersInstalling(targets, true);
+                m_finishUpdateFailed = false;
                 if (runCommands && !targets.empty())
                 {
                     QSet<nx::Uuid> servers = targets;
@@ -2343,7 +2409,7 @@ void MultiServerUpdatesWidget::setTargetState(
 
             case WidgetUpdateState::finishingInstall:
                 clearTaskSet = false;
-                m_serverUpdateTool->requestFinishUpdate(/*skipActivePeers=*/true);
+                startFinishUpdate();
                 break;
             case WidgetUpdateState::complete:
                 stopProcess = true;
@@ -2448,15 +2514,18 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         case WidgetUpdateState::startingDownload:
         case WidgetUpdateState::startingInstall:
         case WidgetUpdateState::installing:
+        case WidgetUpdateState::finishingInstall:
             ui->cancelProgressAction->setEnabled(false);
             break;
         default:
             ui->cancelProgressAction->setEnabled(true);
     }
 
+    // The button is disabled while finishing. Keep its previous caption ("Cancel" when finishing
+    // automatically, "Finish Update" when the user has asked to finish), so it does not flip.
     if (m_widgetState == WidgetUpdateState::installingStalled)
         ui->cancelProgressAction->setText(tr("Finish Update"));
-    else
+    else if (m_widgetState != WidgetUpdateState::finishingInstall)
         ui->cancelProgressAction->setText(tr("Cancel"));
 
     ui->selectUpdateTypeButton->setEnabled(!isChecking);
@@ -2965,6 +3034,16 @@ void MultiServerUpdatesWidget::atModelDataChanged(const QModelIndex& topLeft, co
         QModelIndex index = m_sortedModel->index(row, ServerUpdatesModel::ProgressColumn);
         ui->tableView->openPersistentEditor(index);
     }
+}
+
+QString MultiServerUpdatesWidget::installationErrorText()
+{
+    return tr("There was an error while installing updates:");
+}
+
+QString MultiServerUpdatesWidget::contactSupportText()
+{
+    return tr("If the problem persists, please contact Customer Support.");
 }
 
 QString MultiServerUpdatesWidget::toString(WidgetUpdateState state)
