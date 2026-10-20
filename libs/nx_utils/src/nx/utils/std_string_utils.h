@@ -1252,6 +1252,13 @@ std::basic_string<CharType> removeExcessSeparators(String<CharType> str, Separat
  */
 NX_UTILS_API int stricmp(const std::string_view& left, const std::string_view& right);
 
+/**
+ * Decodes octal escape sequences of exactly three digits, like `\040` for a space, which Linux
+ * uses for special chars in paths in /proc/mounts and /proc/<pid>/mountinfo. Other chars,
+ * including a backslash which does not start such a sequence, are copied as is.
+ */
+NX_UTILS_API std::string decodeOctalEncoded(std::string_view str);
+
 //-------------------------------------------------------------------------------------------------
 
 template<typename StringType, typename Suffix>

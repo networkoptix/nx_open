@@ -29,17 +29,11 @@
 #include <QtCore/QStringList>
 
 #include <errno.h>
-#include <signal.h>
-#include <sys/resource.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-#include <sys/sysmacros.h>
 #include <sys/time.h>
 #include <time.h>
 #include <net/if_arp.h>
 
 #include <nx/ranges.h>
-#include <nx/utils/concurrent.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/format.h>
 #include <nx/utils/log/log.h>
@@ -145,6 +139,35 @@ std::expected<std::string, std::error_code> readTextFile(const std::filesystem::
 
     return contents;
 }
+
+// Leading fields of one line in the Linux /proc/self/mountinfo file. The device number is the one
+// stat() reports as st_dev for the mount point, but reading it requires no access to the mount
+// point itself.
+struct MountInfoFields
+{
+    unsigned int majorNumber;
+    unsigned int minorNumber;
+    std::string mountPoint;
+
+    static std::expected<MountInfoFields, std::string_view> parse(std::string_view line)
+    {
+        std::istringstream fields{std::string(line)};
+        std::string mountId;
+        std::string parentId;
+        std::string device;
+        std::string root;
+        std::string mountPoint;
+        if (!(fields >> mountId >> parentId >> device >> root >> mountPoint))
+            return std::unexpected(line);
+
+        MountInfoFields result{};
+        if (std::sscanf(device.c_str(), "%u:%u", &result.majorNumber, &result.minorNumber) != 2)
+            return std::unexpected(line);
+
+        result.mountPoint = nx::utils::decodeOctalEncoded(mountPoint);
+        return result;
+    }
+};
 
 // Leading fields of one line in the Linux /proc/diskstats file. Extraction is positional, so the
 // fields between readsCompleted and writesCompleted are parsed only to reach the latter.
@@ -395,23 +418,51 @@ std::vector<ActivityMonitor::DiskIo> LinuxMonitor::Private::totalDiskIo()
     if (!partitionsInfoProvider)
         return {};
 
+    // Partitions are listed with root privileges, so stat() on their mount points may fail with
+    // EACCES for this process. Mountinfo provides the same device numbers without such access.
+    const std::expected mountInfo = readTextFile("/proc/self/mountinfo");
+    if (!mountInfo)
+    {
+        NX_WARNING(
+            NX_SCOPE_TAG, "Unable to read /proc/self/mountinfo: %1", mountInfo.error().message());
+        return {};
+    }
+
+    const auto [mounts, invalidMountLines] = std::string_view(*mountInfo) | std::views::split('\n')
+        | std::views::filter([](const auto& line) { return !std::ranges::empty(line); })
+        | std::views::transform(nx::ranges::asStringView)
+        | std::views::transform(MountInfoFields::parse) | nx::actions::partitionSums;
+
+    if (!invalidMountLines.empty())
+    {
+        NX_WARNING(NX_SCOPE_TAG,
+            "Unable to parse %1 lines from /proc/self/mountinfo: %2",
+            invalidMountLines.size(),
+            nx::utils::join(invalidMountLines, " | "));
+    }
+
+    // A later mount over the same mount point hides the earlier one, as it does for stat().
+    const std::unordered_map deviceIdByMountPoint = nx::ranges::fold_left(mounts,
+        std::unordered_map<std::string, std::uint64_t>{},
+        [](auto result, const MountInfoFields& fields)
+        {
+            result[fields.mountPoint] = diskId(fields.majorNumber, fields.minorNumber);
+            return result;
+        });
+
     const std::map diskIoById = nx::ranges::fold_left(partitionsInfoProvider->partitionInfo(),
         std::map<std::uint64_t, DiskIo>{},
-        [](auto result, const PartitionSpace& partition)
+        [&deviceIdByMountPoint](auto result, const PartitionSpace& partition)
         {
-            struct stat info{};
             const std::filesystem::path& path = partition.path;
-            if (::stat(path.c_str(), &info) != 0)
+            const auto deviceId = deviceIdByMountPoint.find(path.string());
+            if (deviceId == deviceIdByMountPoint.end())
             {
-                const auto errorCode = errno; //< Preserve it before logging can alter it.
-                NX_WARNING(NX_SCOPE_TAG,
-                    "Unable to identify the block device for %1: %2",
-                    path.string(),
-                    SystemError::toString(errorCode));
+                NX_VERBOSE(NX_SCOPE_TAG, "%1 is not in /proc/self/mountinfo", path.string());
                 return result;
             }
 
-            result[diskId(major(info.st_dev), minor(info.st_dev))].mountPoints.emplace_back(path);
+            result[deviceId->second].mountPoints.emplace_back(path);
             return result;
         });
 
@@ -437,7 +488,7 @@ std::vector<ActivityMonitor::DiskIo> LinuxMonitor::Private::totalDiskIo()
     }
 
     // /proc/diskstats also lists devices without mount points, which are not reported.
-    // TODO: #skolesnik Derive the mapping from /proc/self/mountinfo instead; the provider may be
+    // TODO: #skolesnik Take the mount points from /proc/self/mountinfo too; the provider may be
     // stale.
     const std::vector reported = diskStats
         | std::views::filter([&diskIoById](const DiskStatsFields& fields)
