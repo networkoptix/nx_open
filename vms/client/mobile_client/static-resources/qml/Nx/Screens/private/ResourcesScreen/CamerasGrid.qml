@@ -443,10 +443,11 @@ Item
                 const maxLogicalRotation =
                     sizesCalculator.defaultColumnsCount * kDefaultRotationStep
 
-                if (logicalRotation < minLogicalRotation || maxLogicalRotation < logicalRotation)
+                if (Math.floor(logicalRotation / kDefaultRotationStep)
+                    !== sizesCalculator.columnsCount)
                 {
                     // Rebase against the currently displayed columns count if logicalRotation
-                    // drifted out of the valid range (e.g. after orientation change, pinch gesture,
+                    // does not match it (e.g. after orientation change, pinch gesture,
                     // or a reload that clamped the raw user intent). Otherwise the first wheel tick
                     // would either be wasted on clamping from far outside the range or silently
                     // overwrite the cross-orientation raw value.
