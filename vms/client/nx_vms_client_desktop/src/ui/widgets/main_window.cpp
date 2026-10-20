@@ -465,11 +465,14 @@ MainWindow::MainWindow(WindowContext* context, QWidget* parent, Qt::WindowFlags 
         });
 
 #if defined Q_OS_MACOS
-    // Enforce focus on right click.
-    installEventHandler(this, QEvent::MouseButtonPress, this,
-        [this](QObject* /*object*/, QEvent* event)
+    // Enforce focus on right click. Filter the application, as children accept their presses.
+    installEventHandler(qApp,
+        QEvent::MouseButtonPress,
+        this,
+        [this](QObject* object, QEvent* event)
         {
-            if (isActiveWindow())
+            const auto widget = qobject_cast<QWidget*>(object);
+            if (!widget || widget->window() != this || isActiveWindow())
                 return;
 
             if (auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
