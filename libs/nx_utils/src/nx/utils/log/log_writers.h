@@ -45,6 +45,14 @@ private:
 
 /**
  * File writer with backup rotation.
+ *
+ * Construction also recovers leftover log and temporary archive files from an interrupted
+ * previous run. Runtime rotation avoids Qt's file-copy fallback while logging locks are held;
+ * failed rotations remain on disk for a later attempt or constructor-time recovery.
+ *
+ * Nothing done under the writer lock may log through NX_* macros (NX_ASSERT included): the message
+ * comes back to this writer on the same thread and deadlocks on the already held locks. Report
+ * problems there to std::cerr instead.
  */
 class NX_UTILS_API File: public AbstractWriter
 {
