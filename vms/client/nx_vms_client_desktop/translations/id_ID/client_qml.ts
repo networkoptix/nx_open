@@ -1732,8 +1732,8 @@ Pilih Integrasi untuk mulai mengkonfigurasi parameternya.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n selengkapnya</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2372,8 +2372,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>...dan %n lainnya</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2827,8 +2827,8 @@ Tekan Alt + Klik untuk mengikuti objek</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... dan %n lainnya</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
