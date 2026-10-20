@@ -552,6 +552,27 @@ TEST(StringRemoveExcessSeparatorsInplace, no_out_bounds_access_on_empty_result_s
 }
 
 //-------------------------------------------------------------------------------------------------
+// decodeOctalEncoded
+
+TEST(StringDecodeOctalEncoded, decoded)
+{
+    ASSERT_EQ("", decodeOctalEncoded(""));
+    ASSERT_EQ("/abc/def", decodeOctalEncoded("/abc/def"));
+    ASSERT_EQ("/ab cd/ab cd/ab", decodeOctalEncoded(R"(/ab\040cd/ab\040cd/ab)"));
+    ASSERT_EQ("a\tb\nc\\d", decodeOctalEncoded(R"(a\011b\012c\134d)"));
+    ASSERT_EQ(" ", decodeOctalEncoded(R"(\040)"));
+}
+
+TEST(StringDecodeOctalEncoded, not_three_octal_digits_are_kept)
+{
+    ASSERT_EQ(R"(ab\40cd)", decodeOctalEncoded(R"(ab\40cd)"));
+    ASSERT_EQ(R"(ab\0)", decodeOctalEncoded(R"(ab\0)"));
+    ASSERT_EQ(R"(ab\)", decodeOctalEncoded(R"(ab\)"));
+    ASSERT_EQ(R"(ab\089)", decodeOctalEncoded(R"(ab\089)"));
+    ASSERT_EQ(R"(ab\777)", decodeOctalEncoded(R"(ab\777)")); //< Does not fit in one byte.
+}
+
+//-------------------------------------------------------------------------------------------------
 // Hex
 
 class StringHex:
