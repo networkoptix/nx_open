@@ -2,6 +2,8 @@
 
 #include "section_column_model.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::client::core {
 
 SectionColumnModel::~SectionColumnModel() {}
@@ -35,6 +37,9 @@ int SectionColumnModel::findSectionRole() const
 
 void SectionColumnModel::setColumns(int columns)
 {
+    if (!NX_ASSERT(columns > 0))
+        columns = 1;
+
     if (m_columns == columns)
         return;
 
@@ -49,7 +54,9 @@ void SectionColumnModel::updateModel()
     if (!sourceModel())
         return;
 
-    auto newMapping = Mapping::fromModel(sourceModel(), m_sectionRole, m_columns);
+    auto newMapping = m_sectionRole == -1
+        ? Mapping{}
+        : Mapping::fromModel(sourceModel(), m_sectionRole, m_columns);
     const int diff = newMapping.rowCount - m_mapping.rowCount;
 
     // This is potentially dangerous, as we send begin*Rows() signals when the source model has
@@ -66,20 +73,20 @@ void SectionColumnModel::updateModel()
         beginRemoveRows({}, m_mapping.rowCount + diff, m_mapping.rowCount - 1);
         m_mapping = std::move(newMapping);
         endRemoveRows();
+
+        // Workaround for a bug in Qt: sometimes QML ListView does not update `count` property if
+        // model's rowCount() jumps N -> 0 -> N.
+        // Similar issue: https://bugreports.qt.io/browse/QTBUG-129165
+        if (m_mapping.rowCount == 0)
+        {
+            beginResetModel();
+            endResetModel();
+            return;
+        }
     }
     else
     {
         m_mapping = std::move(newMapping);
-    }
-
-    // Workaround for a bug in Qt: sometimes QML ListView does not update `count` property if
-    // model's rowCount() jumps N -> 0 -> N.
-    // Similar issue: https://bugreports.qt.io/browse/QTBUG-129165
-    if (m_mapping.rowCount == 0)
-    {
-        beginResetModel();
-        endResetModel();
-        return;
     }
 
     if (m_mapping.rowCount > 0)
@@ -104,21 +111,28 @@ void SectionColumnModel::setSourceModel(QAbstractItemModel* model)
     {
         m_sectionRole = findSectionRole();
 
-        connect(sourceModel(), &QAbstractItemModel::dataChanged, this,
-            [this](
-                const QModelIndex& topLeft,
+        connect(sourceModel(),
+            &QAbstractItemModel::dataChanged,
+            this,
+            [this](const QModelIndex& topLeft,
                 const QModelIndex& bottomRight,
                 const QList<int>& roles)
             {
-                if (roles.contains(m_sectionRole))
+                // An empty roles list means that all roles may have changed.
+                if (roles.isEmpty() || roles.contains(m_sectionRole))
                 {
                     updateModel();
                     return;
                 }
 
-                emit dataChanged(
-                    index(m_mapping.fromSourceRow(topLeft.row()), 0),
-                    index(m_mapping.fromSourceRow(bottomRight.row()), 0), {Qt::DisplayRole});
+                const int firstRow = m_mapping.fromSourceRow(topLeft.row());
+                const int lastRow = m_mapping.fromSourceRow(bottomRight.row());
+
+                // Source rows are not shown, e.g. if the section role is unknown.
+                if (firstRow < 0 || lastRow < 0)
+                    return;
+
+                emit dataChanged(index(firstRow, 0), index(lastRow, 0), {Qt::DisplayRole});
             });
 
         connect(sourceModel(), &QAbstractItemModel::rowsInserted, this,
@@ -158,6 +172,9 @@ void SectionColumnModel::setSourceModel(QAbstractItemModel* model)
             {
                 updateModel();
             });
+
+        // Like Qt proxy models, don't emit sourceModelChanged() or model reset signals here.
+        connect(sourceModel(), &QObject::destroyed, this, [this]() { m_mapping.clear(); });
     }
 
     updateSections();

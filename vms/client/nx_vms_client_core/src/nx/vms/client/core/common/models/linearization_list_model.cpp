@@ -401,11 +401,6 @@ QHash<int, QByteArray> LinearizationListModel::roleNames() const
 
     auto result = base_type::roleNames();
     result.insert(kRoles);
-
-    // Need to insert source model roles to make them available in SectionColumnModel.
-    if (sourceModel())
-        result.insert(sourceModel()->roleNames());
-
     return result;
 }
 
