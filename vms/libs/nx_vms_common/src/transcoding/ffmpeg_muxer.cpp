@@ -190,7 +190,7 @@ bool FfmpegMuxer::open(std::optional<QnAviArchiveMetadata> metadata)
         return false;
     }
 
-    if (m_formatCtx->nb_streams == 0)
+    if (!m_formatCtx || m_formatCtx->nb_streams == 0)
         return false;
 
     m_ioContext = std::make_unique<nx::media::ffmpeg::IoContext>(

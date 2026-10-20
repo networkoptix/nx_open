@@ -7,6 +7,7 @@
 #include <nx/utils/log/log.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
 #include <transcoding/ffmpeg_muxer.h>
+#include <transcoding/ffmpeg_transcoder.h>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -114,6 +115,160 @@ TEST(FfmpegMuxer, videoContainerCompatibility)
     EXPECT_TRUE(addVideo(AV_CODEC_ID_AV1, "rtp"));
     EXPECT_TRUE(addVideo(AV_CODEC_ID_H264, "rtp")); //< The relaxed compliance is AV1 only.
     EXPECT_TRUE(addVideo(AV_CODEC_ID_AV1, "matroska")); //< The archive is not affected.
+}
+
+TEST(FfmpegMuxer, openWithoutContainerDoesNotCrash)
+{
+    ::FfmpegMuxer muxer({});
+    EXPECT_FALSE(muxer.open());
+}
+
+TEST(FfmpegMuxer, openAfterFinalizeDoesNotCrash)
+{
+    ::FfmpegMuxer muxer({});
+    ASSERT_TRUE(muxer.setContainer("rtp"));
+    EXPECT_TRUE(muxer.finalize());
+    EXPECT_FALSE(muxer.open());
+}
+
+namespace {
+
+QnConstAbstractMediaDataPtr videoFrame(AVCodecID codec, int64_t timestamp)
+{
+    auto context = std::make_shared<CodecParameters>();
+    auto* av = context->getAvCodecParameters();
+    av->codec_type = AVMEDIA_TYPE_VIDEO;
+    av->codec_id = codec;
+    av->width = 320;
+    av->height = 240;
+
+    // An IDR slice NAL unit; stream copy does not decode it.
+    static const uint8_t kH264Data[] = {
+        0x00, 0x00, 0x00, 0x01, 0x65, 0x88, 0x84, 0x00, 0x33, 0xff};
+    static const uint8_t kHevcData[] = {
+        0x00, 0x00, 0x00, 0x01, 0x26, 0x01, 0xaf, 0x00, 0x33, 0xff};
+    const auto& data = codec == AV_CODEC_ID_HEVC ? kHevcData : kH264Data;
+
+    QnWritableCompressedVideoDataPtr video(new QnWritableCompressedVideoData(sizeof(data)));
+    video->compressionType = codec;
+    video->context = context;
+    video->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+    video->timestamp = timestamp;
+    video->m_data.write((const char*) data, sizeof(data));
+    return video;
+}
+
+std::unique_ptr<QnFfmpegTranscoder> createStreamCopyTranscoder()
+{
+    auto transcoder =
+        std::make_unique<QnFfmpegTranscoder>(QnFfmpegTranscoder::Config(), /*metrics*/ nullptr);
+    if (!transcoder->muxer().setContainer("mpegts")
+        || !transcoder->setVideoCodec(AV_CODEC_ID_H264,
+            QnFfmpegTranscoder::TM_DirectStreamCopy,
+            Qn::StreamQuality::normal,
+            QSize(320, 240)))
+    {
+        return nullptr;
+    }
+    return transcoder;
+}
+
+std::unique_ptr<QnFfmpegTranscoder> createHevcToH264Transcoder()
+{
+    // As ProgressiveDownloadingBasePrivate configures it: the video codec is set once, there is
+    // no before-open callback.
+    auto transcoder =
+        std::make_unique<QnFfmpegTranscoder>(QnFfmpegTranscoder::Config(), /*metrics*/ nullptr);
+    if (!transcoder->muxer().setContainer("mpegts")
+        || !transcoder->setVideoCodec(AV_CODEC_ID_H264,
+            QnFfmpegTranscoder::TM_FfmpegTranscode,
+            Qn::StreamQuality::normal,
+            /*sourceResolution*/ QSize(320, 240),
+            /*resolution*/ QSize(320, 240)))
+    {
+        return nullptr;
+    }
+    return transcoder;
+}
+
+} // namespace
+
+TEST(FfmpegTranscoder, repeatedFinalizeAfterDataDoesNotCrash)
+{
+    const auto transcoder = createStreamCopyTranscoder();
+    ASSERT_TRUE(transcoder);
+    ASSERT_EQ(0, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 0), nullptr));
+
+    const QnConstAbstractMediaDataPtr eof(new QnEmptyMediaData());
+    nx::utils::ByteArray result;
+    EXPECT_EQ(0, transcoder->transcodePacket(eof, &result));
+    EXPECT_EQ(0, transcoder->transcodePacket(eof, &result)); //< Used to reopen the closed muxer.
+    EXPECT_EQ(0, result.size());
+}
+
+TEST(FfmpegTranscoder, mediaAfterFinalizeIsRejected)
+{
+    const auto transcoder = createStreamCopyTranscoder();
+    ASSERT_TRUE(transcoder);
+    ASSERT_EQ(0, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 0), nullptr));
+    ASSERT_EQ(0, transcoder->finalize(nullptr));
+
+    EXPECT_EQ(-1, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 40'000), nullptr));
+}
+
+TEST(FfmpegTranscoder, reopenAfterSetContainer)
+{
+    // HLS reuses the transcoder for the next chunk.
+    const auto transcoder = createStreamCopyTranscoder();
+    ASSERT_TRUE(transcoder);
+    ASSERT_EQ(0, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 0), nullptr));
+    ASSERT_EQ(0, transcoder->finalize(nullptr));
+
+    ASSERT_TRUE(transcoder->muxer().setContainer("mpegts"));
+    nx::utils::ByteArray result;
+    ASSERT_EQ(0, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 40'000), &result));
+    const auto size = result.size();
+    ASSERT_EQ(0, transcoder->finalize(&result));
+    EXPECT_GT(size + result.size(), 0);
+}
+
+TEST(FfmpegTranscoder, finalizeBeforeDataKeepsTranscoderUsable)
+{
+    // E.g. an archive gap packet before the first frame.
+    const auto transcoder = createStreamCopyTranscoder();
+    ASSERT_TRUE(transcoder);
+    EXPECT_EQ(0, transcoder->finalize(nullptr));
+
+    nx::utils::ByteArray result;
+    ASSERT_EQ(0, transcoder->transcodePacket(videoFrame(AV_CODEC_ID_H264, 0), &result));
+    const auto size = result.size();
+    ASSERT_EQ(0, transcoder->finalize(&result));
+    EXPECT_GT(size + result.size(), 0);
+}
+
+TEST(FfmpegTranscoder, transcodingOutputCodec)
+{
+    const auto transcoder = createHevcToH264Transcoder();
+    ASSERT_TRUE(transcoder);
+
+    // The frame is not decodable, only the codec chosen on open matters.
+    transcoder->transcodePacket(videoFrame(AV_CODEC_ID_HEVC, 0), nullptr);
+    ASSERT_TRUE(transcoder->muxer().getVideoCodecParameters());
+    EXPECT_EQ(AV_CODEC_ID_H264, transcoder->muxer().getVideoCodecParameters()->codec_id);
+}
+
+TEST(FfmpegTranscoder, finalizeBeforeDataKeepsTranscoding)
+{
+    // E.g. an archive gap packet before the first frame of a progressive download.
+    const auto transcoder = createHevcToH264Transcoder();
+    ASSERT_TRUE(transcoder);
+    transcoder->transcodePacket(QnConstAbstractMediaDataPtr(new QnEmptyMediaData()), nullptr);
+
+    // The frame is not decodable, only the codec chosen on open matters.
+    transcoder->transcodePacket(videoFrame(AV_CODEC_ID_HEVC, 0), nullptr);
+    ASSERT_TRUE(transcoder->muxer().getVideoCodecParameters());
+    EXPECT_EQ(AV_CODEC_ID_H264, transcoder->muxer().getVideoCodecParameters()->codec_id)
+        << "The video transcoder was dropped, the source stream is copied as is";
 }
 
 TEST(FfmpegAudioDecoder, decodingG726)

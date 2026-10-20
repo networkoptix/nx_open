@@ -97,6 +97,9 @@ bool QnFfmpegTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
 
 int QnFfmpegTranscoder::openAndTranscodeDelayedData()
 {
+    if (!NX_ASSERT(!m_delayedVideoQueue.isEmpty() || !m_delayedAudioQueue.isEmpty()))
+        return -1;
+
     const auto& video = m_delayedVideoQueue.isEmpty() ?
         QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first();
     const auto& audio = m_delayedAudioQueue.isEmpty() ?
@@ -148,6 +151,9 @@ int QnFfmpegTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media
     if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
 
+    if (!m_initialized && !m_muxer.getFormatContext())
+        return -1; // The output is finalized, setContainer() is required to start a new one.
+
     m_eofCounter = 0;
 
     int errCode = true;
@@ -194,6 +200,10 @@ int QnFfmpegTranscoder::finalize(nx::utils::ByteArray* const result)
 {
     if (!m_initialized)
     {
+        // Nothing to open: opening without data fails and drops the configured transcoders.
+        if (m_delayedVideoQueue.isEmpty() && m_delayedAudioQueue.isEmpty())
+            return 0;
+
         int errCode = openAndTranscodeDelayedData();
         if (errCode != 0)
         {
