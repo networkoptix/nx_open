@@ -106,7 +106,7 @@ public:
         return total;
     }
 
-private:
+protected:
     QString m_basePath;
 };
 
@@ -198,6 +198,154 @@ TEST_F(LogFile, Rotation)
     checkFile({"a", "b", "12345678901234567890"}, "_002", File::Extension::zip);
     checkFile({"6666666666", "1234567890"}, "_003", File::Extension::zip);
     checkFile({"zzz"});
+}
+
+TEST_F(LogFile, RotationWithArchiveOpenedByAnotherProcess)
+{
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "1234567890");
+        w->write(Level::undefined, "1234567890"); //< Overflow
+        w->write(Level::undefined, "xxx");
+        w->write(Level::undefined, "yyy");
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow
+        w->write(Level::undefined, "7777777777");
+        w->write(Level::undefined, "8888888888"); //< Overflow
+        w->write(Level::undefined, "a");
+        w->write(Level::undefined, "b");
+    }
+    checkFile({"1234567890", "1234567890"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"7777777777", "8888888888"}, "_003", File::Extension::zip);
+    checkFile({"a", "b"});
+
+    // On Windows an opened file can be neither removed nor renamed.
+    QFile openedArchive(m_basePath + "_002" + toQString(File::Extension::zip));
+    ASSERT_TRUE(openedArchive.open(QIODevice::ReadOnly));
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow + Rotation
+    }
+    openedArchive.close();
+
+#if defined(Q_OS_WIN)
+    // The opened archive keeps its number, the others are numbered around it.
+    checkFile({"7777777777", "8888888888"}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_003", File::Extension::zip);
+#else
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_001", File::Extension::zip);
+    checkFile({"7777777777", "8888888888"}, "_002", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_003", File::Extension::zip);
+#endif
+    checkFile();
+}
+
+TEST_F(LogFile, RotationWithMaxArchivesAndOldestOpenedByAnotherProcess)
+{
+    static constexpr size_t kLogSize = 20;
+    const auto archiveName = [this](int number)
+    {
+        return File::makeFileName(m_basePath, number, File::Extension::zip);
+    };
+
+    for (int i = 1; i <= kMaxLogRotation; ++i)
+    {
+        QFile archive(archiveName(i));
+        ASSERT_TRUE(archive.open(QIODevice::WriteOnly));
+    }
+
+    // On Windows an opened file can not be removed, so the next oldest one has to be.
+    QFile openedArchive(archiveName(1));
+    ASSERT_TRUE(openedArchive.open(QIODevice::ReadOnly));
+    {
+        auto w = makeWriter(kLogSize);
+        w->write(Level::undefined, "1234567890");
+        w->write(Level::undefined, "1234567890"); //< Overflow + Rotation
+    }
+    openedArchive.close();
+
+    EXPECT_FALSE(QFile::exists(archiveName(kMaxLogRotation + 1)));
+    checkFile({"1234567890", "1234567890"}, "_999", File::Extension::zip);
+    const QFileInfo baseInfo(m_basePath);
+    const auto archives = baseInfo.dir().entryList(
+        {baseInfo.fileName() + "_*" + toQString(File::Extension::zip)}, QDir::Files);
+    EXPECT_EQ(kMaxLogRotation, archives.size());
+    checkFile();
+}
+
+class LogFileWithOccupiedName: public LogFile
+{
+protected:
+    /** Writes 3 archives and the current log file. */
+    void SetUp() override
+    {
+        LogFile::SetUp();
+        {
+            auto w = makeWriter(kLogSize, kVolumeSize);
+            w->write(Level::undefined, "1234567890");
+            w->write(Level::undefined, "1234567890"); //< Overflow
+            w->write(Level::undefined, "xxx");
+            w->write(Level::undefined, "yyy");
+            w->write(Level::undefined, "12345678901234567890"); //< Overflow
+            w->write(Level::undefined, "7777777777");
+            w->write(Level::undefined, "8888888888"); //< Overflow
+            w->write(Level::undefined, "a");
+            w->write(Level::undefined, "b");
+        }
+    }
+
+    void TearDown() override
+    {
+        if (!m_occupiedName.isEmpty())
+            QDir().rmdir(m_occupiedName);
+    }
+
+    /**
+     * Replaces the first archive with a directory with the given name: renaming to this name fails
+     * on every platform.
+     */
+    void occupy(const QString& name)
+    {
+        ASSERT_TRUE(QFile::remove(m_basePath + "_001" + toQString(File::Extension::zip)));
+        m_occupiedName = name;
+        ASSERT_TRUE(QDir().mkdir(m_occupiedName));
+    }
+
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
+    QString m_occupiedName;
+};
+
+TEST_F(LogFileWithOccupiedName, Rotation)
+{
+    {
+        auto w = makeWriter(kLogSize, kVolumeSize);
+        // Occupied after construction, so only the rotation has to deal with it.
+        occupy(m_basePath + "_001" + toQString(File::Extension::zip));
+        w->write(Level::undefined, "12345678901234567890"); //< Overflow + Rotation
+    }
+
+    EXPECT_TRUE(QFileInfo(m_occupiedName).isDir());
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"7777777777", "8888888888"}, "_003", File::Extension::zip);
+    checkFile({"a", "b", "12345678901234567890"}, "_004", File::Extension::zip);
+    checkFile();
+}
+
+TEST_F(LogFileWithOccupiedName, LeftoversRotation)
+{
+    // The archive _002 can not be moved to its temporary name _001, as if it were opened by
+    // another process on Windows.
+    occupy(m_basePath + "_001" + toQString(File::Extension::zipTmp));
+    makeWriter(kLogSize, kVolumeSize);
+
+    checkFile({}, "_001", File::Extension::zip);
+    checkFile({"xxx", "yyy", "12345678901234567890"}, "_002", File::Extension::zip);
+    checkFile({"7777777777", "8888888888"}, "_003", File::Extension::zip);
+    checkFile({"a", "b"});
 }
 
 TEST_F(LogFile, RotationZipNoZip)
