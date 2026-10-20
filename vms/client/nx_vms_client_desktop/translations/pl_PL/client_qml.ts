@@ -1759,11 +1759,11 @@ Wybierz integrację, aby rozpocząć konfigurowanie jej parametrów.</translatio
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation>
-        <numerusform>%n więcej</numerusform>
-        <numerusform>%n więcej</numerusform>
-        <numerusform>%n więcej</numerusform>
-        <numerusform>%n więcej</numerusform>
+      <translation type="unfinished">
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
+        <numerusform>%n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2411,11 +2411,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
-        <numerusform>...i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
+        <numerusform>...and %n more</numerusform>
       </translation>
     </message>
   </context>
@@ -2872,11 +2872,11 @@ naciśnij Alt + kliknij, aby śledzić obiekt</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
-        <numerusform>... i jeszcze %n</numerusform>
+      <translation type="unfinished">
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
+        <numerusform>... and %n more</numerusform>
       </translation>
     </message>
   </context>
