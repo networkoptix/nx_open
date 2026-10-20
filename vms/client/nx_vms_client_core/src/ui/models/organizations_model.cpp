@@ -283,6 +283,8 @@ struct OrganizationsModel::Private
         if (parent == nullptr)
             parent = root.get();
 
+        NX_ASSERT(isInModel(parent), "Inserting into a node which is not in the model");
+
         auto parentIndex = parent == root.get()
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
@@ -307,11 +309,16 @@ struct OrganizationsModel::Private
         if (!parent)
             parent = root.get();
 
+        NX_ASSERT(isInModel(parent), "Removing from a node which is not in the model");
+
         auto parentIndex = parent == root.get()
             ? QModelIndex()
             : q->createIndex(parent->row(), 0, parent);
 
-        const bool isFolder = parent->allChildren()[row]->type == OrganizationsModel::Folder;
+        const auto& node = parent->allChildren()[row];
+        const bool isFolder = node->type == OrganizationsModel::Folder;
+
+        discardCachedOrgData(node.get());
 
         {
             const ScopedRemoveRows guard(q, parentIndex, row, row);
@@ -323,6 +330,21 @@ struct OrganizationsModel::Private
             if (const auto orgIdx = orgIndexFor(parent); orgIdx.isValid())
                 emit q->foldersChanged(orgIdx);
         }
+    }
+
+    // Discard cached data of organizations in the subtree, so that it's applied again if the
+    // organizations are added back.
+    void discardCachedOrgData(const TreeNode* node)
+    {
+        if (node->type == OrganizationsModel::Organization)
+        {
+            orgStructureCache.erase(node->id);
+            orgSystemsCache.erase(node->id);
+            return;
+        }
+
+        for (const auto& child: node->allChildren())
+            discardCachedOrgData(child.get());
     }
 
     // Remove only Folder nodes under 'parent', keeping System nodes. Report model changes.
@@ -443,6 +465,53 @@ struct OrganizationsModel::Private
         }
     }
 
+    // Create a node for the group with all its subgroups. The node is not in the model yet, so
+    // its children are added without reporting model changes.
+    std::unique_ptr<TreeNode> createGroupNode(const GroupStructure& group)
+    {
+        auto node = nodes.create(group);
+
+        for (const auto& child: group.children)
+        {
+            if (auto existingNode = nodes.find(child.id))
+            {
+                // A node which is not in the model belongs to the subtree being created, so the
+                // structure contains duplicate ids.
+                if (!isInModel(existingNode))
+                {
+                    NX_WARNING(this, "Duplicate group id %1 in the structure", child.id);
+                    continue;
+                }
+
+                // We already have this group but under a different parent. Remove it.
+                remove(existingNode->row(), existingNode->parentNode());
+            }
+
+            node->append(createGroupNode(child));
+        }
+
+        return node;
+    }
+
+    static bool isSelfOrAncestor(const TreeNode* node, const TreeNode* parent)
+    {
+        for (auto current = parent; current; current = current->parentNode())
+        {
+            if (current == node)
+                return true;
+        }
+
+        return false;
+    }
+
+    bool isInModel(const TreeNode* node) const
+    {
+        while (node && node != root.get())
+            node = node->parentNode();
+
+        return node != nullptr;
+    }
+
     // Set group (folder) structure under 'parent' node recursively.
     void setNodeGroups(TreeNode* parent, const std::vector<GroupStructure>& groups)
     {
@@ -480,17 +549,16 @@ struct OrganizationsModel::Private
                 prevIds.erase(group.id);
             }
 
-            // Append new group.
-            auto node = nodes.create(group);
-            setNodeGroups(node.get(), group.children);
-            insert(parent->allChildren().size(), std::move(node), parent);
+            // Append new group with all its subgroups at once.
+            insert(parent->allChildren().size(), createGroupNode(group), parent);
         }
 
-        // Remove groups that are not present here.
+        // Remove groups that are not present here. Skip the ones which have been moved under
+        // another parent while processing the groups above.
         for (const auto& id: prevIds)
         {
-            if (auto node = nodes.find(id))
-                remove(node->row(), node->parentNode());
+            if (auto node = nodes.find(id); node && node->parentNode() == parent)
+                remove(node->row(), parent);
         }
     }
 
@@ -511,15 +579,45 @@ struct OrganizationsModel::Private
             clearStructure(orgNode);
             if (cachedIt != orgStructureCache.end())
                 orgStructureCache.erase(cachedIt);
-            return;
+        }
+        else
+        {
+            setNodeGroups(orgNode, data);
+
+            if (cachedIt != orgStructureCache.end())
+                cachedIt->second = data;
+            else
+                orgStructureCache.emplace(orgId, data);
         }
 
-        setNodeGroups(orgNode, data);
+        // Updating the structure removes systems along with their folders, including moved
+        // folders, which are re-created.
+        restoreOrgSystems(orgNode);
+    }
 
-        if (cachedIt != orgStructureCache.end())
-            cachedIt->second = data;
-        else
-            orgStructureCache.emplace(orgId, data);
+    // Restore the cached systems of the organization which are missing in the model, if their
+    // folders exist.
+    void restoreOrgSystems(TreeNode* orgNode)
+    {
+        const auto it = orgSystemsCache.find(orgNode->id);
+        if (it == orgSystemsCache.end())
+            return;
+
+        for (const auto& [systemId, system]: it->second)
+        {
+            if (nodes.find(systemId))
+                continue;
+
+            const auto parentNode = system.groupId.isNull() ? orgNode : nodes.find(system.groupId);
+
+            if (parentNode && (parentNode == orgNode || isFolderOf(parentNode, orgNode)))
+                insert(parentNode->allChildren().size(), nodes.create(system), parentNode);
+        }
+    }
+
+    static bool isFolderOf(const TreeNode* node, const TreeNode* orgNode)
+    {
+        return node->type == OrganizationsModel::Folder && isSelfOrAncestor(orgNode, node);
     }
 
     void updateOrganizationSystemCount(TreeNode* orgNode, int count)
@@ -547,8 +645,6 @@ struct OrganizationsModel::Private
 
     void setOrgSystems(nx::Uuid orgId, const std::vector<SystemInOrganization>& data)
     {
-        // Updating group structure (e.g. folder move) may have deleted some systems.
-
         auto orgNode = nodes.find(orgId);
         if (!orgNode)
             return;
