@@ -115,6 +115,11 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
     return result;
 }
 
+void H264Parser::backupPendingData(const uint8_t* rtpBufferBase)
+{
+    m_chunks.backupCurrentData(rtpBufferBase);
+}
+
 void H264Parser::clear()
 {
     m_chunks.clear();

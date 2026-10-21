@@ -68,6 +68,11 @@ void RtpParser::clear()
     m_codecParser->clear();
 }
 
+void RtpParser::backupPendingData(const uint8_t* rtpBufferBase)
+{
+    m_codecParser->backupPendingData(rtpBufferBase);
+}
+
 QnAbstractMediaDataPtr RtpParser::nextData(const nx::rtp::RtcpSenderReport& senderReport)
 {
     auto data = m_codecParser->nextData();

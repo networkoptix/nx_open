@@ -32,6 +32,13 @@ public:
 
     virtual void clear() = 0;
 
+    /**
+     * Called before the RTP buffer of the track is cleared. The buffer is shared by every parser
+     * of the track, so a parser that keeps references into it must copy the data it still needs
+     * out of the buffer here.
+     */
+    virtual void backupPendingData(const uint8_t* /*rtpBufferBase*/) {}
+
     virtual bool forceProcessEmptyData() const { return false; }
 
     int getFrequency() const { return m_frequency; };

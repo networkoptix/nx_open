@@ -55,6 +55,9 @@ public:
 
     virtual void clear() override;
 
+    // Implementation of StreamParser::backupPendingData
+    virtual void backupPendingData(const uint8_t* rtpBufferBase) override;
+
     // Implementation of StreamParser::setSDPInfo
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
 

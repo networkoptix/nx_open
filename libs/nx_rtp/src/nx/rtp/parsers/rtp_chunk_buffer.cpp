@@ -44,17 +44,21 @@ void RtpChunkBuffer::backupCurrentData(const uint8_t* currentBufferBase)
     for (const auto& chunk: m_chunks)
         chunksLength += chunk.size;
 
-    m_nextFrameChunksBuffer.resize(chunksLength);
+    // The chunks may already have been backed up, so collect them in the spare buffer and swap it
+    // in afterwards instead of writing into the buffer that is possibly being read from.
+    m_spareChunksBuffer.resize(chunksLength);
+    uint8_t* backupBufRaw = m_spareChunksBuffer.data();
 
     int offset = 0;
-    uint8_t* nextFrameBufRaw = m_nextFrameChunksBuffer.data();
     for (auto& chunk: m_chunks)
     {
-        memcpy(nextFrameBufRaw + offset, currentBufferBase + chunk.bufferOffset, chunk.size);
-        chunk.bufferStart = nextFrameBufRaw;
-        chunk.bufferOffset = (int)offset;
+        const uint8_t* source = chunk.bufferStart ? chunk.bufferStart : currentBufferBase;
+        memcpy(backupBufRaw + offset, source + chunk.bufferOffset, chunk.size);
+        chunk.bufferStart = backupBufRaw;
+        chunk.bufferOffset = offset;
         offset += chunk.size;
     }
+    m_nextFrameChunksBuffer.swap(m_spareChunksBuffer);
 }
 
 QnWritableCompressedVideoDataPtr RtpChunkBuffer::buildFrame(
