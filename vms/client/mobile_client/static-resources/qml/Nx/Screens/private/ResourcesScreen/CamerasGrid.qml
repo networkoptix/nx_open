@@ -319,6 +319,12 @@ Item
 
                     active:
                     {
+                        if (sizesCalculator.availableWidth <= 0
+                            || sizesCalculator.availableHeight <= 0)
+                        {
+                            return false
+                        }
+
                         const margin = sizesCalculator.columnsCount <= 2
                             ? flickable.height
                             : flickable.height / 2
