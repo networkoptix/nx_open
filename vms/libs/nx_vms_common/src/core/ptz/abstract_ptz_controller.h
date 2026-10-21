@@ -33,6 +33,7 @@ protected:
     using Options = nx::vms::common::ptz::Options;
     using Override = nx::vms::common::ptz::Override;
     using Type = nx::vms::common::ptz::Type;
+    using Types = nx::vms::common::ptz::Types;
     using Vector = nx::vms::common::ptz::Vector;
 
 public:
@@ -59,6 +60,15 @@ public:
     virtual void invalidate();
 
 public slots: //< Class is exposed to QML. All functions in section below are invokable
+    /**
+     * @returns Concrete PTZ API modes implemented by this controller. Individual operations still
+     * depend on getCapabilities(). Type::any is a selector, not a separate supported mode.
+     */
+    virtual Types getSupportedPtzTypes() const = 0;
+
+    /** @returns Whether the given concrete API mode is implemented by this controller. */
+    bool supportsPtzType(Type type) const;
+
     /**
      * @param capabilities Capabilities to check.
      * @param options Additional options (e.g. ptz type)

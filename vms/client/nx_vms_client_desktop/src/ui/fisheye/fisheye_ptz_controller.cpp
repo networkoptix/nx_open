@@ -255,7 +255,7 @@ void QnFisheyePtzController::tick(int deltaMSecs)
 Ptz::Capabilities QnFisheyePtzController::getCapabilities(
     const Options& options) const
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
         return Ptz::Capability::none;
 
     return m_capabilities;
@@ -266,7 +266,7 @@ bool QnFisheyePtzController::getLimits(
     CoordinateSpace space,
     const Options& options) const
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
     {
         NX_WARNING(
             this,
@@ -288,7 +288,7 @@ bool QnFisheyePtzController::getFlip(
     Qt::Orientations* flip,
     const Options& options) const
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
     {
         NX_WARNING(
             this,
@@ -307,7 +307,7 @@ bool QnFisheyePtzController::continuousMove(
     const Vector& speed,
     const Options& options)
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
     {
         NX_WARNING(
             this,
@@ -340,7 +340,7 @@ bool QnFisheyePtzController::absoluteMove(
     qreal speed,
     const Options& options)
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
     {
         NX_WARNING(
             this,
@@ -401,7 +401,7 @@ bool QnFisheyePtzController::getPosition(
     CoordinateSpace space,
     const Options& options) const
 {
-    if (options.type != Type::operational)
+    if (!supportsPtzType(options.type))
     {
         NX_WARNING(
             this,

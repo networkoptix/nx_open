@@ -36,6 +36,12 @@ std::optional<QnPtzTour> QnAbstractPtzController::getActiveTour()
     return std::nullopt;
 }
 
+bool QnAbstractPtzController::supportsPtzType(Type type) const
+{
+    return (type == Type::operational || type == Type::configurational)
+        && getSupportedPtzTypes().testFlag(type);
+}
+
 bool QnAbstractPtzController::hasCapabilities(
     Ptz::Capabilities capabilities,
     const Options& options) const

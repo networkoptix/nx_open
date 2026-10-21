@@ -15,7 +15,7 @@ signals:
     void finished(nx::vms::common::ptz::Command command, const QVariant& data);
 };
 
-class QnThreadedPtzController: public QnProxyPtzController
+class NX_VMS_COMMON_API QnThreadedPtzController: public QnProxyPtzController
 {
     using base_type = QnProxyPtzController;
 

@@ -317,6 +317,23 @@ void registerDeviceBaseHandlers(
         GlobalPermission::none,
         std::make_unique<IntercomAcceptHandler>(serverModule, serverConnector));
 
+    /**%apidoc GET /rest/v{5-}/devices/{deviceId}/ptz/apiTypes
+     * Retrieves the concrete PTZ API modes supported by the Device. Individual operations depend
+     * on the corresponding "ptz.capabilities" and "ptz.configCapabilities" fields returned by
+     * `GET /rest/v{4-}/devices`. Modes without capabilities are omitted. The "any" selector is not
+     * a separate mode and is not returned.
+     * %caption Get supported PTZ APIs
+     * %ingroup Device PTZ
+     * %struct PtzDeviceId
+     * %param[ref] _format,_stripDefault,_keepDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{std::vector<PtzApiType>} Supported concrete API types.
+     */
+    reg("rest/v{5-}/devices/:deviceId/ptz/apiTypes",
+        GlobalPermission::none,
+        std::make_unique<ptz::ApiTypesHandler>(serverModule, serverConnector));
+
     /**%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/move
      * Starts a continuous PTZ move.
      * Supported Device PTZ capabilities can be obtained from "ptz.capabilities" and "ptz.configCapabilities"

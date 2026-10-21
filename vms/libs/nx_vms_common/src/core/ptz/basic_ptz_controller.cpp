@@ -7,6 +7,11 @@ QnBasicPtzController::QnBasicPtzController(const QnResourcePtr& resource):
 {
 }
 
+QnBasicPtzController::Types QnBasicPtzController::getSupportedPtzTypes() const
+{
+    return {};
+}
+
 Ptz::Capabilities QnBasicPtzController::getCapabilities(
     const Options& /*options*/) const
 {

@@ -25,6 +25,8 @@ public:
     RemotePtzController(const QnVirtualCameraResourcePtr& camera);
     virtual ~RemotePtzController();
 
+    virtual Types getSupportedPtzTypes() const override;
+
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
     virtual bool continuousMove(

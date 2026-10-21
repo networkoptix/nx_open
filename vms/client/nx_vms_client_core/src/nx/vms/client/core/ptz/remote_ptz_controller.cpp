@@ -34,6 +34,17 @@ RemotePtzController::~RemotePtzController()
 {
 }
 
+Types RemotePtzController::getSupportedPtzTypes() const
+{
+    Types result;
+    for (const auto type: kAllTypes)
+    {
+        if (getCapabilities({type}) != Ptz::Capability::none)
+            result |= type;
+    }
+    return result;
+}
+
 Ptz::Capabilities RemotePtzController::getCapabilities(
     const Options& options) const
 {

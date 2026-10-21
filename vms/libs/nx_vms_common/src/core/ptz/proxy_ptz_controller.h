@@ -23,6 +23,8 @@ public: // Overrides section
 
     virtual void invalidate() override;
 
+    virtual Types getSupportedPtzTypes() const override;
+
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
     virtual bool continuousMove(

@@ -10,6 +10,7 @@ class NX_VMS_COMMON_API QnBasicPtzController: public QnAbstractPtzController
 
 public:
     QnBasicPtzController(const QnResourcePtr &resource);
+    virtual Types getSupportedPtzTypes() const override;
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
     virtual bool continuousMove(

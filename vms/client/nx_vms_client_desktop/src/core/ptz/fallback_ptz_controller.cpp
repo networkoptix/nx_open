@@ -9,12 +9,8 @@
 using namespace nx::core;
 
 QnFallbackPtzController::QnFallbackPtzController(
-    const QnPtzControllerPtr& mainController,
-    const QnPtzControllerPtr& fallbackController)
-    :
+    const QnPtzControllerPtr& mainController, const QnPtzControllerPtr& fallbackController):
     base_type(mainController->resource()),
-    m_hasOperationalCapabilities(true),
-    m_hasConfigurationalCapabilities(true),
     m_mainController(mainController),
     m_fallbackController(fallbackController)
 {
@@ -43,13 +39,7 @@ QnFallbackPtzController::~QnFallbackPtzController()
 void QnFallbackPtzController::baseChanged(DataFields fields)
 {
     if (fields.testFlag(DataField::capabilities))
-    {
-        m_hasOperationalCapabilities = m_mainController
-            ->getCapabilities({Type::operational}) != Ptz::Capability::none;
-
-        m_hasConfigurationalCapabilities = m_mainController
-            ->getCapabilities({Type::configurational}) != Ptz::Capability::none;
-    }
+        m_mainSupportedTypes = m_mainController->getSupportedPtzTypes();
 
     emit changed(fields);
 }
@@ -57,11 +47,8 @@ void QnFallbackPtzController::baseChanged(DataFields fields)
 const QnPtzControllerPtr& QnFallbackPtzController::baseController(
     const Options& options) const
 {
-    const bool isControllerValid = options.type == Type::operational
-        ? m_hasOperationalCapabilities
-        : m_hasConfigurationalCapabilities;
-
-    return isControllerValid ? m_mainController : m_fallbackController;
+    return m_mainSupportedTypes.testAnyFlags(options.type) ? m_mainController
+                                                           : m_fallbackController;
 }
 
 QnPtzControllerPtr QnFallbackPtzController::mainController() const
@@ -72,6 +59,11 @@ QnPtzControllerPtr QnFallbackPtzController::mainController() const
 QnPtzControllerPtr QnFallbackPtzController::fallbackController() const
 {
     return m_fallbackController;
+}
+
+QnFallbackPtzController::Types QnFallbackPtzController::getSupportedPtzTypes() const
+{
+    return m_mainController->getSupportedPtzTypes() | m_fallbackController->getSupportedPtzTypes();
 }
 
 Ptz::Capabilities QnFallbackPtzController::getCapabilities(const Options& options) const

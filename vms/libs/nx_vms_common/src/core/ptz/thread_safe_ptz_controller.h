@@ -15,6 +15,8 @@ public:
 
     virtual ~ThreadSafePtzController() = default;
 
+    virtual Types getSupportedPtzTypes() const override;
+
     virtual Ptz::Capabilities getCapabilities(
         const Options& options = {Type::operational}) const override;
 

@@ -25,6 +25,8 @@ public:
     QnFisheyePtzController(const QnMediaResourcePtr& mediaRes);
     virtual ~QnFisheyePtzController();
 
+    virtual Types getSupportedPtzTypes() const override { return Type::operational; }
+
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
     virtual bool continuousMove(

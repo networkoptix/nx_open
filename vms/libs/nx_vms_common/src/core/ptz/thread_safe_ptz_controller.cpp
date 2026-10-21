@@ -9,6 +9,12 @@ ThreadSafePtzController::ThreadSafePtzController(QnPtzControllerPtr controller):
 {
 }
 
+Types ThreadSafePtzController::getSupportedPtzTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::getSupportedPtzTypes();
+}
+
 Ptz::Capabilities ThreadSafePtzController::getCapabilities(const Options& options) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

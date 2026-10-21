@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include <nx/utils/log/log.h>
 #include "proxy_ptz_controller.h"
+#include <nx/utils/log/log.h>
 
 QnProxyPtzController::QnProxyPtzController(const QnPtzControllerPtr& controller):
     base_type(controller ? controller->resource() : QnResourcePtr())
@@ -52,6 +52,11 @@ void QnProxyPtzController::invalidate()
 {
     if (m_controller)
         m_controller->invalidate();
+}
+
+QnProxyPtzController::Types QnProxyPtzController::getSupportedPtzTypes() const
+{
+    return m_controller ? m_controller->getSupportedPtzTypes() : Types{};
 }
 
 Ptz::Capabilities QnProxyPtzController::getCapabilities(const Options& options) const

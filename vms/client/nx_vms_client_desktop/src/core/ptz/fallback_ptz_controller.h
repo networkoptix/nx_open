@@ -4,7 +4,7 @@
 
 #include <core/ptz/abstract_ptz_controller.h>
 
-class QnFallbackPtzController: public QnAbstractPtzController
+class NX_VMS_CLIENT_DESKTOP_API QnFallbackPtzController: public QnAbstractPtzController
 {
     Q_OBJECT
     using base_type = QnAbstractPtzController;
@@ -17,6 +17,8 @@ public:
 
     QnPtzControllerPtr mainController() const;
     QnPtzControllerPtr fallbackController() const;
+
+    virtual Types getSupportedPtzTypes() const override;
 
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
 
@@ -91,8 +93,7 @@ private:
     const QnPtzControllerPtr& baseController(const Options& options) const;
 
 private:
-    bool m_hasOperationalCapabilities;
-    bool m_hasConfigurationalCapabilities;
+    Types m_mainSupportedTypes;
     QnPtzControllerPtr m_mainController;
     QnPtzControllerPtr m_fallbackController;
 };
