@@ -2377,9 +2377,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... és még %n</numerusform>
+        <numerusform>... és még %n</numerusform>
       </translation>
     </message>
   </context>
@@ -2834,9 +2834,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... és még %n</numerusform>
+        <numerusform>... és még %n</numerusform>
       </translation>
     </message>
   </context>
