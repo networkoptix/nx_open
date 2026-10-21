@@ -200,6 +200,22 @@ public class QnActivity extends QtActivity
             });
     }
 
+    private static volatile boolean nativeEventLoopStarted;
+    private boolean stoppedBeforeEventLoop;
+
+    /** Called from C++ via JNI once the Qt event loop is running. */
+    public static void setNativeEventLoopStarted()
+    {
+        nativeEventLoopStarted = true;
+    }
+
+    @Override
+    protected void onStop()
+    {
+        stoppedBeforeEventLoop = !nativeEventLoopStarted;
+        super.onStop();
+    }
+
     @Override
     protected void onDestroy()
     {
@@ -207,6 +223,10 @@ public class QnActivity extends QtActivity
 
         if (listener != null)
             listener.disable();
+
+        // Qt hangs on quit if the Activity was stopped before its event loop started.
+        if (stoppedBeforeEventLoop && !isChangingConfigurations())
+            android.os.Process.killProcess(android.os.Process.myPid());
 
         super.onDestroy();
     }
