@@ -5,7 +5,7 @@
     <name>BasicAction</name>
     <message>
       <source>Tooltip text</source>
-      <translation type="unfinished">Tooltip text</translation>
+      <translation>Tipp/Hinweis</translation>
     </message>
   </context>
   <context>
@@ -89,7 +89,7 @@
     </message>
     <message>
       <source>Unexpected validation policy</source>
-      <translation type="unfinished">Unexpected validation policy</translation>
+      <translation>Unerwartete Validierungs-Richtlinie</translation>
     </message>
     <message>
       <source>Select at least one Server</source>
@@ -330,7 +330,7 @@
       <comment>Numerus form depend on layouts count</comment>
       <translation type="unfinished">
         <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+        <numerusform>Ausgewählte Layouts wurden entfernt</numerusform>
       </translation>
     </message>
   </context>
