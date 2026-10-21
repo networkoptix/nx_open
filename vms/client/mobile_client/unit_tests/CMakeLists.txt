@@ -9,4 +9,6 @@ nx_add_test(mobile_client_ut
     SUITES
     COMPONENT Client
     FOLDER client/tests
+    ADDITIONAL_MOCABLES
+        src/nx/vms/client/mobile/ui/fake_result_screen.h
 )

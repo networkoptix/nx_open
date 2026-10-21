@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/client/mobile/window_context_aware.h>
@@ -19,7 +20,6 @@ class OperationManager;
 
 } // namespace nx::vms::client::mobile
 
-class QnMobileClientUiControllerPrivate;
 class QnMobileClientUiController:
     public QObject,
     public nx::vms::client::mobile::WindowContextAware
@@ -123,6 +123,6 @@ signals:
     void twoFactorAuthError(const QString& title, const QString& errorText);
 
 private:
-    QScopedPointer<QnMobileClientUiControllerPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(QnMobileClientUiController)
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };

@@ -6,13 +6,11 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/core/application_context.h>
-#include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/mobile/session/session_manager.h>
 #include <nx/vms/client/mobile/session/ui_messages.h>
-#include <nx/vms/client/mobile/ui/detail/screens.h>
-#include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/ui/cloud_action_handler.h>
 #include <nx/vms/client/mobile/utils/operation_manager.h>
 #include <nx/vms/client/mobile/window_context.h>
 #include <nx/vms/common/system_settings.h>
@@ -35,23 +33,84 @@ std::pair<QString, QString> connectionErrorTitleAndText(
 
 } // namespace
 
-class QnMobileClientUiControllerPrivate
+struct QnMobileClientUiController::Private
 {
-public:
+    QnMobileClientUiController* const q;
     std::unique_ptr<nx::vms::client::mobile::OperationManager> operationManager;
     QnResourcePtr resource;
     bool avoidHandlingConnectionStuff = false;
     QnMobileClientUiController::Screen currentScreen =
         QnMobileClientUiController::Screen::UnknownScreen;
+
+    void handleSessionError(nx::vms::client::core::RemoteConnectionErrorCode errorCode,
+        const nx::vms::api::ModuleInformation& moduleInformation);
+    void showSessionError(nx::vms::client::core::RemoteConnectionErrorCode errorCode,
+        const nx::vms::api::ModuleInformation& moduleInformation);
 };
 
+void QnMobileClientUiController::Private::handleSessionError(
+    nx::vms::client::core::RemoteConnectionErrorCode errorCode,
+    const nx::vms::api::ModuleInformation& moduleInformation)
+{
+    NX_DEBUG(q, "handleSessionError(): current screen is <%1>", q->currentScreen());
+
+    if (q->avoidHandlingConnectionStuff())
+        return;
+
+    nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
+
+    if (errorCode != nx::vms::client::core::RemoteConnectionErrorCode::truncatedSessionToken)
+    {
+        showSessionError(errorCode, moduleInformation);
+        return;
+    }
+
+    q->windowContext()->cloudActionHandler()->requestCloudReauthorization(q,
+        [this, errorCode, moduleInformation](
+            std::optional<nx::vms::client::core::OauthDataRequestError> error)
+        {
+            // The connection state may change while the screen is open.
+            if (q->avoidHandlingConnectionStuff() || q->sessionManager()->hasSession())
+            {
+                NX_DEBUG(q, "handleSessionError(): connection state changed, result is ignored");
+                return;
+            }
+
+            if (error)
+            {
+                showSessionError(errorCode, moduleInformation);
+                return;
+            }
+
+            // The new cloud auth data is already applied on success.
+            q->sessionManager()->startCloudSession(
+                moduleInformation.cloudSystemId, moduleInformation.systemName);
+        });
+}
+
+void QnMobileClientUiController::Private::showSessionError(
+    nx::vms::client::core::RemoteConnectionErrorCode errorCode,
+    const nx::vms::api::ModuleInformation& moduleInformation)
+{
+    using nx::vms::client::core::RemoteConnectionErrorCode;
+    const auto [title, errorText] = connectionErrorTitleAndText(errorCode, moduleInformation);
+
+    const bool is2faError = errorCode == RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
+        || errorCode == RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
+
+    if (is2faError)
+        emit q->twoFactorAuthError(title, errorText);
+    else
+        emit q->genericError(title, errorText);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QnMobileClientUiController::QnMobileClientUiController(
-    nx::vms::client::mobile::WindowContext* context,
-    QObject* parent)
-    :
+    nx::vms::client::mobile::WindowContext* context, QObject* parent):
     base_type(parent),
     nx::vms::client::mobile::WindowContextAware(context),
-    d_ptr(new QnMobileClientUiControllerPrivate{
+    d(new Private{.q = this,
         .operationManager = std::make_unique<nx::vms::client::mobile::OperationManager>()})
 {
     NX_DEBUG(this, "QnMobileClientUiController(): created mobile client UI controller");
@@ -95,48 +154,12 @@ QnMobileClientUiController::QnMobileClientUiController(
                 emit resourcesScreenRequested(UuidList{});
         });
 
-    using RemoteConnectionErrorCode = nx::vms::client::core::RemoteConnectionErrorCode;
-    const auto handleSessionError =
-        [this](
-            RemoteConnectionErrorCode errorCode,
+    connect(sessionManager(),
+        &SessionManager::sessionFinishedWithError,
+        this,
+        [this](nx::vms::client::core::RemoteConnectionErrorCode errorCode,
             const nx::vms::api::ModuleInformation& moduleInformation)
-        {
-            NX_DEBUG(this, "initialize(): sessionFinishedWithError: current screen is <%1>",
-                currentScreen());
-
-            if (avoidHandlingConnectionStuff())
-                return;
-
-            nx::vms::client::core::appContext()->coreSettings()->lastConnection = {};
-            const QString user =
-                nx::vms::client::core::appContext()->cloudStatusWatcher()->cloudLogin();
-
-            const auto token = QString::fromStdString(
-                nx::vms::client::core::appContext()->cloudStatusWatcher()->credentials().authToken.value);
-            if (errorCode == RemoteConnectionErrorCode::truncatedSessionToken
-                && windowContext()->uiController()->screens()->showCloudLoginScreen(
-                    /*reauthentication*/ true, user, token))
-            {
-                // The screen reports success when the new cloud auth data is already applied.
-                sessionManager()->startCloudSession(
-                    moduleInformation.cloudSystemId, moduleInformation.systemName);
-            }
-            else
-            {
-                const auto [title, errorText] =
-                    connectionErrorTitleAndText(errorCode, moduleInformation);
-
-                const bool is2faError =
-                    errorCode == RemoteConnectionErrorCode::systemIsNotCompatibleWith2Fa
-                        || errorCode == RemoteConnectionErrorCode::twoFactorAuthOfCloudUserIsDisabled;
-
-                if (is2faError)
-                    emit twoFactorAuthError(title, errorText);
-                else
-                    emit genericError(title, errorText);
-            }
-        };
-    connect(sessionManager(), &SessionManager::sessionFinishedWithError, this, handleSessionError);
+        { d->handleSessionError(errorCode, moduleInformation); });
 }
 
 QnMobileClientUiController::~QnMobileClientUiController()
@@ -145,13 +168,11 @@ QnMobileClientUiController::~QnMobileClientUiController()
 
 QnMobileClientUiController::Screen QnMobileClientUiController::currentScreen() const
 {
-    Q_D(const QnMobileClientUiController);
     return d->currentScreen;
 }
 
 void QnMobileClientUiController::setCurrentScreen(Screen value)
 {
-    Q_D(QnMobileClientUiController);
     if (d->currentScreen == value)
         return;
 
@@ -159,17 +180,13 @@ void QnMobileClientUiController::setCurrentScreen(Screen value)
     emit currentScreenChanged();
 }
 
-
 QnResource* QnMobileClientUiController::rawResource() const
 {
-    Q_D(const QnMobileClientUiController);
     return d->resource.get();
 }
 
 void QnMobileClientUiController::setRawResource(QnResource* value)
 {
-    Q_D(QnMobileClientUiController);
-
     if (d->resource == value)
         return;
 
@@ -179,13 +196,11 @@ void QnMobileClientUiController::setRawResource(QnResource* value)
 
 bool QnMobileClientUiController::avoidHandlingConnectionStuff() const
 {
-    Q_D(const QnMobileClientUiController);
     return d->avoidHandlingConnectionStuff;
 }
 
 void QnMobileClientUiController::setAvoidHandlingConnectionStuff(bool value)
 {
-    Q_D(QnMobileClientUiController);
     if (d->avoidHandlingConnectionStuff == value)
         return;
 
@@ -195,7 +210,6 @@ void QnMobileClientUiController::setAvoidHandlingConnectionStuff(bool value)
 
 nx::vms::client::mobile::OperationManager* QnMobileClientUiController::operationManager() const
 {
-    Q_D(const QnMobileClientUiController);
     return d->operationManager.get();
 }
 

@@ -27,10 +27,6 @@ public:
     /** Show 2FA validation screen and validate specified token. */
     bool show2faValidationScreen(const network::http::Credentials& credentials) const;
 
-    /** Show cloud authentication screen. */
-    bool showCloudLoginScreen(
-        bool reauthentication, const QString& user = {}, const QString& token = {}) const;
-
     /**
      * Open cloud authentication screen without waiting for the result. The result is "success"
      * when the new auth data is applied to CloudStatusWatcher, "rejected" when the user closes the

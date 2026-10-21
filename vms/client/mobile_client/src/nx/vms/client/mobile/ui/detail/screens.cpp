@@ -40,13 +40,6 @@ bool Screens::show2faValidationScreen(const network::http::Credentials& credenti
     return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
 }
 
-bool Screens::showCloudLoginScreen(
-    bool reauthentication, const QString& user, const QString& token) const
-{
-    const auto properties = cloudLoginProperties(reauthentication, user, token);
-    return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
-}
-
 QmlResultWatcher* Screens::openCloudLoginScreen(
     bool reauthentication, const QString& user, const QString& token) const
 {

@@ -6,6 +6,7 @@
 #include <nx/vms/client/core/network/cloud_status_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
+#include <nx/vms/client/mobile/window_context.h>
 
 #include "detail/qml_result_watcher.h"
 #include "detail/screens.h"
@@ -18,41 +19,60 @@ CloudActionHandler::CloudActionHandler(WindowContext* context, QObject* parent):
 {
 }
 
+CloudActionHandler::CloudActionHandler(QObject* parent):
+    base_type(parent),
+    WindowContextAware(WindowContext::fromQmlContext(this))
+{
+}
+
 CloudActionHandler::~CloudActionHandler()
 {
 }
 
-void CloudActionHandler::handleCloudAuthRequest(core::CloudAuthRequest* request)
+void CloudActionHandler::requestCloudReauthorization(
+    QObject* context, ReauthorizationHandler handler)
 {
-    request->start();
+    NX_CRITICAL(context);
 
-    // Several cross-site contexts may request the authorization at once, they share the screen.
+    // The main session and several cross-site contexts may request the authorization at once,
+    // they share the screen.
     if (!m_cloudAuthScreenResult || m_cloudAuthScreenResult->hasResult())
     {
-        const auto watcher = appContext()->cloudStatusWatcher();
-        const auto token = QString::fromStdString(watcher->credentials().authToken.value);
-        m_cloudAuthScreenResult = uiController()->screens()->openCloudLoginScreen(
-            /*reauthentication*/ true, /*user*/ {}, token);
-
+        m_cloudAuthScreenResult = openCloudLoginScreen();
         if (!m_cloudAuthScreenResult)
         {
-            request->finish(core::OauthDataRequestError::noParent);
+            handler(core::OauthDataRequestError::noParent);
             return;
         }
     }
 
     connect(m_cloudAuthScreenResult,
         &detail::QmlResultWatcher::resultReady,
-        request,
-        [request](const QString& result)
+        context,
+        [handler = std::move(handler)](const QString& result)
         {
             if (result == "success")
-                request->finish();
+                handler(std::nullopt);
             else if (result == "failed")
-                request->finish(core::OauthDataRequestError::internalCancellation);
+                handler(core::OauthDataRequestError::internalCancellation);
             else
-                request->finish(core::OauthDataRequestError::dialogRejected);
+                handler(core::OauthDataRequestError::dialogRejected);
         });
+}
+
+void CloudActionHandler::handleCloudAuthRequest(core::CloudAuthRequest* request)
+{
+    request->start();
+    requestCloudReauthorization(request,
+        [request](std::optional<core::OauthDataRequestError> error) { request->finish(error); });
+}
+
+detail::QmlResultWatcher* CloudActionHandler::openCloudLoginScreen()
+{
+    const auto watcher = appContext()->cloudStatusWatcher();
+    const auto token = QString::fromStdString(watcher->credentials().authToken.value);
+    return uiController()->screens()->openCloudLoginScreen(
+        /*reauthentication*/ true, watcher->cloudLogin(), token);
 }
 
 } // namespace nx::vms::client::mobile
