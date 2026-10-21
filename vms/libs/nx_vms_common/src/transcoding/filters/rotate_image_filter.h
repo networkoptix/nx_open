@@ -18,6 +18,10 @@ NX_VMS_COMMON_API CLVideoDecoderOutputPtr rotateImage(
 class NX_VMS_COMMON_API QnRotateImageFilter: public QnAbstractImageFilter
 {
 public:
+    /** @return The angle rounded to the nearest multiple of 90 in [0, 360). */
+    static int normalizedAngle(int angle);
+
+public:
     QnRotateImageFilter(int angle);
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;

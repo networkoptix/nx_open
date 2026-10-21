@@ -331,7 +331,8 @@ void FilterChain::createObjectInfoFilter()
     if (!oESettings || !oESettings->taxonomyState || oESettings->typeSettings.empty())
         return;
 
-    m_metadataFilters.push_back(AbstractMetadataFilterPtr(new ObjectInfoFilter(*oESettings, m_settings)));
+    m_metadataFilters.push_back(
+        AbstractMetadataFilterPtr(new ObjectInfoFilter(*oESettings, m_settings.rotation)));
 }
 
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,

@@ -7,6 +7,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QPainterPath>
 #include <QtGui/QTextFrame>
+#include <QtGui/QTransform>
 
 #include <analytics/common/object_metadata.h>
 #include <nx/fusion/serialization/ubjson.h>
@@ -16,6 +17,7 @@
 #include <nx/vms/common/system_context.h>
 #include <nx/vms/common/utils/geometry.h>
 #include <nx/vms/common/utils/object_painter_helper.h>
+#include <transcoding/filters/rotate_image_filter.h>
 #include <transcoding/transcoding_utils.h>
 
 #include "image_to_frame_painter.h"
@@ -147,6 +149,16 @@ bool objectRectIsValid(const QRectF& rect)
         && rect.y() <= 1 && 0 <= rect.x() && rect.x() <= 1;
 }
 
+/** Maps the frame rotated clockwise by `rotation` back onto the source frame. */
+QTransform rotatedToSource(const QSize& sourceSize, const QSize& rotatedSize, int rotation)
+{
+    QTransform result;
+    result.translate(sourceSize.width() / 2.0, sourceSize.height() / 2.0);
+    result.rotate((360 - rotation) % 360);
+    result.translate(-rotatedSize.width() / 2.0, -rotatedSize.height() / 2.0);
+    return result;
+}
+
 } // namespace
 
 QSize ObjectInfoFilter::updatedResolution(const QSize& sourceSize)
@@ -159,12 +171,9 @@ QSize ObjectInfoFilter::updatedResolution(const QSize& sourceSize)
     return sourceSize;
 }
 
-ObjectInfoFilter::ObjectInfoFilter(
-    const ObjectExportSettings& settings,
-    const Settings& generalSettings)
-    :
+ObjectInfoFilter::ObjectInfoFilter(const ObjectExportSettings& settings, int rotation):
     m_settings(settings),
-    m_generalSettings(generalSettings)
+    m_rotation(QnRotateImageFilter::normalizedAngle(rotation))
 {
 }
 
@@ -255,32 +264,33 @@ void ObjectInfoFilter::drawDescription(
 {
     auto doc = buildDescription(objectMetadata, height);
 
-    auto tooltipGeometry = vms::common::ObjectPainterHelper::calculateLabelGeometry(
-        {0., 0., (qreal) width, (qreal) height},
-        vms::common::Geometry::dilated(doc->size(), kTooltipMargins),
-        kTooltipMargins,
-        frameRect);
+    // The frame is rotated after this filter, so the label is laid out in the rotated frame to
+    // stay upright.
+    const QSize sourceSize(width, height);
+    const QSize rotatedSize = m_rotation % 180 == 0 ? sourceSize : sourceSize.transposed();
+    const QTransform transform = rotatedToSource(sourceSize, rotatedSize, m_rotation);
+    const QRect rotatedFrameRect = transform.inverted().mapRect(frameRect);
+
+    auto tooltipGeometry =
+        vms::common::ObjectPainterHelper::calculateLabelGeometry(QRectF(QPointF(), rotatedSize),
+            vms::common::Geometry::dilated(doc->size(), kTooltipMargins),
+            kTooltipMargins,
+            rotatedFrameRect);
     auto backgroundColor = vms::common::ObjectPainterHelper::calculateTooltipColor(frameColor);
 
     tooltipGeometry = vms::common::Geometry::eroded(tooltipGeometry, kTooltipMargins);
 
     // Actual drawing.
     painter.save();
+    painter.setTransform(transform);
     painter.setPen(Qt::NoPen);
     painter.setBrush(backgroundColor);
     painter.drawRoundedRect(tooltipGeometry, kRoundingRadius, kRoundingRadius);
 
-    paintArrow(&painter, tooltipGeometry, frameRect);
+    paintArrow(&painter, tooltipGeometry, rotatedFrameRect);
 
     painter.setPen(m_settings.textColor);
-
-    painter.translate(tooltipGeometry.topLeft() / 2 + tooltipGeometry.bottomRight() / 2);
-    painter.rotate(m_generalSettings.rotation);
-    if (m_generalSettings.rotation == 0 || m_generalSettings.rotation == 180)
-        painter.translate(-tooltipGeometry.width() / 2, -tooltipGeometry.height() / 2);
-    else
-        painter.translate(-tooltipGeometry.height() / 2, -tooltipGeometry.width() / 2);
-
+    painter.translate(tooltipGeometry.topLeft());
     doc->drawContents(&painter);
 
     painter.restore();

@@ -15,7 +15,8 @@ namespace detail { class ImageToFramePainter; } // namespace detail
 class NX_VMS_COMMON_API ObjectInfoFilter: public AbstractMetadataFilter
 {
 public:
-    ObjectInfoFilter(const ObjectExportSettings& settings, const Settings& generalSettings);
+    /** @param rotation Clockwise angle the filter chain rotates the frame by after this filter. */
+    ObjectInfoFilter(const ObjectExportSettings& settings, int rotation);
     virtual ~ObjectInfoFilter() override;
 
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
@@ -39,7 +40,7 @@ private:
         int width,
         int height);
     const ObjectExportSettings m_settings;
-    const Settings m_generalSettings;
+    const int m_rotation;
     std::vector<nx::common::metadata::ObjectMetadataPacketPtr> m_metadata;
     std::map<Uuid, std::shared_ptr<QTextDocument>> m_descriptions;
 };
