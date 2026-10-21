@@ -4,6 +4,7 @@
 
 #include <QtCore/QByteArray>
 
+#include <nx/rtp/parsers/rtp_chunk_buffer.h>
 #include <nx/rtp/parsers/rtp_stream_parser.h>
 
 namespace nx::rtp {
@@ -24,6 +25,9 @@ public:
     virtual Result processRtpExtension(
         const RtpHeaderExtensionHeader& extensionHeader, quint8* data, int size) override;
     virtual void clear() override {}
+
+    // Implementation of StreamParser::backupPendingData
+    virtual void backupPendingData(const uint8_t* rtpBufferBase) override;
 
     // Resolution that was configured using the camera API.
     void setConfiguredResolution(int width, int height);
@@ -58,17 +62,10 @@ private:
     int m_lumaTablePos;
     int m_chromaTablePos;
 
-    //nx::utils::ByteArray m_frameData;
-    int m_frameSize;
     std::vector<uint8_t> m_onvifJpegHeader;
     bool m_sofFound = false;
     CodecParametersConstPtr m_codecParameters;
-    struct Chunk
-    {
-        int offset;
-        int size;
-    };
-    std::vector<Chunk> m_chunks;
+    RtpChunkBuffer m_chunks;
 };
 
 } // namespace nx::rtp

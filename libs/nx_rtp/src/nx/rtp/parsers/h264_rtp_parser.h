@@ -26,6 +26,7 @@ public:
         int bytesRead,
         bool& gotData) override;
     virtual void clear() override;
+    virtual void backupPendingData(const uint8_t* rtpBufferBase) override;
 
 private:
     RtpChunkBuffer m_chunks;

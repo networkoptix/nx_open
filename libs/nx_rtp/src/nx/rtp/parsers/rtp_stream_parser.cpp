@@ -19,16 +19,19 @@ void StreamParser::setFrequency(int frequency)
 
 QnAbstractMediaDataPtr VideoStreamParser::nextData()
 {
-    if (m_mediaData)
+    if (!m_mediaData)
+        return QnAbstractMediaDataPtr();
+
+    QnAbstractMediaDataPtr result;
+    result.swap(m_mediaData);
+    if (!result->context)
     {
-        QnAbstractMediaDataPtr result;
-        result.swap(m_mediaData);
-        return result;
-    }
-    else
-    {
+        // The parser has not been able to build codec parameters from the stream yet. Such a
+        // frame can neither be described nor transcoded, so drop it instead of passing it on.
+        NX_WARNING(this, "%1: Drop a video frame without codec parameters", logId());
         return QnAbstractMediaDataPtr();
     }
+    return result;
 }
 
 

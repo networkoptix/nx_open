@@ -333,7 +333,11 @@ MjpegParser::MjpegParser()
     m_hdrHeight = -1;
     m_lumaTablePos = 0;
     m_chromaTablePos = 0;
-    m_frameSize = 0;
+}
+
+void MjpegParser::backupPendingData(const uint8_t* rtpBufferBase)
+{
+    m_chunks.backupCurrentData(rtpBufferBase);
 }
 
 void MjpegParser::setConfiguredResolution(int width, int height)
@@ -574,43 +578,30 @@ Result MjpegParser::processData(
         }
 
         m_chunks.clear();
-        m_frameSize = 0;
     }
 
     // Check buffer overflow
-    if (m_frameSize + bytesLeft > MAX_ALLOWED_FRAME_SIZE)
+    if (m_chunks.size() + bytesLeft > MAX_ALLOWED_FRAME_SIZE)
     {
         m_chunks.clear();
-        m_frameSize = 0;
         return {false, "RTP MJPEG parser buffer overflow"};
     }
-    m_chunks.emplace_back(Chunk{int(curPtr - rtpBufferBase), bytesLeft});
-    m_frameSize += bytesLeft;
+    m_chunks.addChunk(int(curPtr - rtpBufferBase), (uint16_t) bytesLeft);
 
     bool lastPacketReceived = rtpHeader.marker;
     if (lastPacketReceived)
     {
         const quint8* EOI_marker = curPtr + bytesLeft - 2;
-        //if (m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
-        //    m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
         bool needAddMarker =
-            m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
+            m_chunks.size() < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
-        QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
-            m_hdrBuffer.size() + m_frameSize + (needAddMarker ? 2 : 0)));
+        QnWritableCompressedVideoDataPtr videoData =
+            m_chunks.buildFrame(rtpBufferBase, m_hdrBuffer.data(), (int) m_hdrBuffer.size());
         m_mediaData = videoData;
-        videoData->m_data.write((const char*) m_hdrBuffer.data(), m_hdrBuffer.size());
-        //m_videoData->data.write(m_frameData);
-        for (uint i = 0; i < m_chunks.size(); ++i)
-        {
-            videoData->m_data.write(
-                (const char*) (rtpBufferBase + m_chunks[i].offset), m_chunks[i].size);
-        }
         if (needAddMarker)
             videoData->m_data.write((const char*) jpeg_end, sizeof(jpeg_end));
 
         m_chunks.clear();
-        m_frameSize = 0;
 
         videoData->channelNumber = 0;
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;

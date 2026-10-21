@@ -16,6 +16,11 @@ public:
     void addChunk(int bufferOffset, uint16_t len, bool nalStart = false);
     QnWritableCompressedVideoDataPtr buildFrame(
         const uint8_t* rtpBuffer, const uint8_t* header, int headerSize);
+
+    /**
+     * Copies the chunks that are still pending out of the RTP buffer into a private one, so that
+     * they survive the RTP buffer being cleared or overwritten. May be called any number of times.
+     */
     void backupCurrentData(const uint8_t* currentBufferBase);
     void clear();
     int size() const;
@@ -42,6 +47,7 @@ private:
     int m_videoFrameSize = 0;
     std::vector<Chunk> m_chunks;
     std::vector<uint8_t> m_nextFrameChunksBuffer;
+    std::vector<uint8_t> m_spareChunksBuffer;
 };
 
 } // namespace nx::rtp
