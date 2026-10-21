@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP – erweiterte Einstellungen</translation>
     </message>
     <message>
       <source>Users</source>
@@ -315,7 +315,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API-Integrationen interagieren über die REST-API mit dem %1 -Server und tauschen Metadaten aus</translation>
     </message>
     <message>
       <source>New requests</source>
@@ -1235,7 +1235,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Wählen Sie den Joystick.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
@@ -1246,7 +1246,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Die Digest-Authentifizierung ist veraltet und wird in der nächsten Version deaktiviert. Sie sollte nur verwendet werden, wenn die standardmäßige Bearer-Authentifizierung nicht verwendet werden kann.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
@@ -1859,7 +1859,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation/>
     </message>
   </context>
   <context>
@@ -1874,7 +1874,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Noch keine benutzerdefinierten Gruppen</translation>
     </message>
     <message>
       <source>No groups found</source>
@@ -1975,7 +1975,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Verwenden Sie %1 oder %2, um mehrere Ressourcen auszuwählen, oder %3, um die Auswahl aufzuheben</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
@@ -2385,9 +2385,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>...und %n mehr</numerusform>
+        <numerusform>...und %n mehr</numerusform>
       </translation>
     </message>
   </context>
@@ -2479,7 +2479,7 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Die Website wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
@@ -2842,9 +2842,9 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... und %n mehr</numerusform>
+        <numerusform>... und %n mehr</numerusform>
       </translation>
     </message>
   </context>
