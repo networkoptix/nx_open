@@ -8,6 +8,7 @@ extern "C" {
 
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QTimer>
 #include <QtGui/QCursor>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QFont>
@@ -18,6 +19,10 @@ extern "C" {
 #include <QtQuick/QQuickWindow>
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWebView/QtWebView>
+
+#if defined(Q_OS_ANDROID)
+    #include <QtCore/QJniObject>
+#endif
 
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -175,6 +180,14 @@ int runUi(QGuiApplication* application)
         QUrl initialIntentData = getInitialIntentData();
         if (initialIntentData.isValid())
             QDesktopServices::openUrl(initialIntentData);
+
+        // Deferred, since the flag must be set from inside exec(), when quit() already works.
+        QTimer::singleShot(0,
+            []
+            {
+                QJniObject::callStaticMethod<void>(
+                    "com/nxvms/mobile/QnActivity", "setNativeEventLoopStarted");
+            });
     #endif
 
     return application->exec();
