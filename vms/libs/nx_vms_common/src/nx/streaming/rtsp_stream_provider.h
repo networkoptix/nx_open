@@ -210,6 +210,7 @@ private:
     bool isFormatSupported(const nx::rtp::Sdp::Media media) const;
     bool processData(
         TrackInfo& track, uint8_t* buffer, int offset, int size, int channel, int& errorCount);
+    void clearDemuxedData(TrackInfo& track, const uint8_t* rtpBufferBase, int channel);
 
     // Returns true if any of custom track factories support this codec
     bool isCodecSupportedByCustomParserFactories(const QString& codecName) const;

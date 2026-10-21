@@ -383,8 +383,8 @@ bool RtspStreamProvider::processData(
     {
         NX_DEBUG(this, "%1 RTP parsing error: %2", m_logName, result.message);
         clearKeyData(track.logicalChannelNum);
-        m_demuxedData[channel]->clear();
         parser->clear();
+        clearDemuxedData(track, buffer, channel);
     }
 
     if (!result.success || packetLoss)
@@ -405,9 +405,24 @@ bool RtspStreamProvider::processData(
     }
 
     if (m_gotData)
-        m_demuxedData[channel]->clear();
+        clearDemuxedData(track, buffer, channel);
 
     return true;
+}
+
+void RtspStreamProvider::clearDemuxedData(
+    TrackInfo& track, const uint8_t* rtpBufferBase, int channel)
+{
+    // The buffer is shared by every parser of the track and is refilled from offset zero, so the
+    // parsers that reference it directly must copy their pending data out of it first. Otherwise
+    // a parser of an extra payload type, e.g. vendor metadata interleaved into the video channel,
+    // silently corrupts the frame a video parser is assembling.
+    for (const auto& [_, parser]: track.rtpParsers)
+    {
+        if (parser)
+            parser->backupPendingData(rtpBufferBase);
+    }
+    m_demuxedData[channel]->clear();
 }
 
 bool RtspStreamProvider::isCodecSupportedByCustomParserFactories(const QString& codecName) const

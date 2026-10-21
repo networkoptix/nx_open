@@ -19,6 +19,9 @@ public:
     Result processData(uint8_t* buffer, int offset, int size, bool& packetLoss, bool& gotData);
     void clear();
 
+    // See StreamParser::backupPendingData().
+    void backupPendingData(const uint8_t* rtpBufferBase);
+
     // Prevents a false loss report after skipping another payload type's packets, which share the
     // SSRC sequence space. processData() does this for the packets it skips itself.
     void resetSequenceCheck() { m_sequenceNumber.reset(); }

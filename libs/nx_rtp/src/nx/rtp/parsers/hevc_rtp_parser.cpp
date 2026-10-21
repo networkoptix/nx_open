@@ -432,6 +432,11 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, u
     return result;
 }
 
+void HevcParser::backupPendingData(const uint8_t* rtpBufferBase)
+{
+    m_chunks.backupCurrentData(rtpBufferBase);
+}
+
 void HevcParser::clear()
 {
     reset();
