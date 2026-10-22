@@ -361,6 +361,13 @@ int MOBILE_CLIENT_EXPORT main(int argc, char *argv[])
     if (nx::build_info::isLinux() && qgetenv("QSG_RENDER_LOOP").isEmpty())
         qputenv("QSG_RENDER_LOOP", "basic");
 
+    // The incremental QML garbage collector (the default since Qt 6.8) can miss objects created
+    // while a collection cycle is paused mid-marking, e.g. during a screen creation, and free
+    // their storage while they are alive: declared functions become undefined and var properties
+    // lose their values. A zero time limit makes every collection run to completion at once, as
+    // it was before Qt 6.8. Possibly related bug report - QTBUG-148459.
+    qputenv("QV4_GC_TIMELIMIT", "0");
+
     QtWebView::initialize();
     QGuiApplication application(argc, argv);
 
