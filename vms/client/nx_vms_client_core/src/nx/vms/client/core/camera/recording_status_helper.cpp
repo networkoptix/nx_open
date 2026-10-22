@@ -65,42 +65,46 @@ std::pair<RecordingStatus, RecordingMetadataTypes> currentRecordingMode(
     const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera || camera->hasFlags(Qn::virtual_camera))
-        return {RecordingStatus::noRecordingNoArchive, {RecordingMetadataType::none}};
+        return {RecordingStatus::noRecordingNoArchive, {}};
 
-    if (camera->isScheduleEnabled())
+    // The server does not record while the schedule is disabled. The recording status may still
+    // be reported for a short time after the schedule is turned off, so it is ignored here.
+    if (!camera->isScheduleEnabled())
     {
-        const auto dateTime = qnSyncTime->currentDateTime();
-        const int dayOfWeek = dateTime.date().dayOfWeek();
-        const int seconds = dateTime.time().msecsSinceStartOfDay() / 1000;
-
-        const bool recording = ResourceStatus::recording == camera->getStatus();
-        const auto scheduledTasks = camera->getScheduleTasks();
-        for (const auto& task: scheduledTasks)
-        {
-            const bool isRecording = (task.recordingType != RecordingType::never);
-            if (task.dayOfWeek == dayOfWeek && qBetween(task.startTime, seconds, task.endTime + 1)
-                && isRecording)
-            {
-                auto status = RecordingStatus::recordingContinious;
-                if (task.recordingType == RecordingType::metadataOnly)
-                    status = RecordingStatus::recordingMetadataOnly;
-                else if (task.recordingType == RecordingType::metadataAndLowQuality)
-                    status = RecordingStatus::recordingMetadataAndLQ;
-                if (!recording)
-                    return {RecordingStatus::recordingScheduled, task.metadataTypes};
-                return {status, task.metadataTypes};
-            }
-        }
-        if (recording) //< Recording can also be started by an event rule.
-            return {RecordingStatus::recordingContinious, {RecordingMetadataType::none}};
-        else
-            return {RecordingStatus::recordingScheduled, {RecordingMetadataType::none}};
+        return {hasArchive(camera) ? RecordingStatus::noRecordingOnlyArchive
+                                   : RecordingStatus::noRecordingNoArchive,
+            {}};
     }
 
-    return {hasArchive(camera)
-        ? RecordingStatus::noRecordingOnlyArchive
-        : RecordingStatus::noRecordingNoArchive,
-        {RecordingMetadataType::none}};
+    if (camera->getStatus() != ResourceStatus::recording)
+        return {RecordingStatus::recordingScheduled, {}};
+
+    // The schedule is evaluated by the server in its own time zone.
+    const auto dateTime = QDateTime::fromMSecsSinceEpoch(
+        qnSyncTime->currentMSecsSinceEpoch(), ServerTimeWatcher::timeZone(camera));
+    const int dayOfWeek = dateTime.date().dayOfWeek();
+    const int seconds = dateTime.time().msecsSinceStartOfDay() / 1000;
+
+    for (const auto& task: camera->getScheduleTasks())
+    {
+        if (task.dayOfWeek != dayOfWeek || !qBetween(task.startTime, seconds, task.endTime + 1))
+            continue;
+
+        switch (task.recordingType)
+        {
+            case RecordingType::always:
+                return {RecordingStatus::recordingContinious, task.metadataTypes};
+            case RecordingType::metadataOnly:
+                return {RecordingStatus::recordingMetadataOnly, task.metadataTypes};
+            case RecordingType::metadataAndLowQuality:
+                return {RecordingStatus::recordingMetadataAndLQ, task.metadataTypes};
+            case RecordingType::never:
+                break;
+        }
+    }
+
+    // Recording is not covered by the schedule, e.g. it was started by an event rule.
+    return {RecordingStatus::recordingContinious, {}};
 }
 
 } // namespace
@@ -153,6 +157,11 @@ void RecordingStatusHelper::setCamera(const QnVirtualCameraResourcePtr& camera)
             &RecordingStatusHelper::updateRecordingMode);
         m_connections << connect(m_camera.data(),
             &QnVirtualCameraResource::scheduleEnabledChanged,
+            this,
+            &RecordingStatusHelper::updateRecordingMode);
+        // The schedule is evaluated in the time zone of the parent server.
+        m_connections << connect(m_camera.data(),
+            &QnVirtualCameraResource::parentIdChanged,
             this,
             &RecordingStatusHelper::updateRecordingMode);
 

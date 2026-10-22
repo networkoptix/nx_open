@@ -1,10 +1,17 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <chrono>
+
 #include <gtest/gtest.h>
+
+#include <QtCore/QTimeZone>
 
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_property_key.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/reflect/json.h>
+#include <nx/vms/api/data/server_timezone_information.h>
 #include <nx/vms/client/core/camera/recording_status_helper.h>
 #include <nx/vms/client/core/skin/skin.h>
 #include <nx/vms/client/core/skin/svg_icon_colorer.h>
@@ -16,6 +23,8 @@
 
 namespace nx::vms::client::desktop {
 namespace test {
+
+using namespace std::chrono;
 
 const core::SvgIconColorer::ThemeSubstitutions kArchiveTheme = {
     {QIcon::Normal, {.primary = "light10"}}};
@@ -64,6 +73,13 @@ public:
         ASSERT_EQ(m_recordingStatusHelper.recordingEnabled(), value);
     }
 
+    void thenShortTooltipIs(const QString& value)
+    {
+        ASSERT_EQ(m_recordingStatusHelper.shortTooltip(), value);
+    }
+
+    void whenCameraIsRecording() { m_camera->setStatus(api::ResourceStatus::recording); }
+
     void whenRecordingEnabled() { m_camera->setScheduleEnabled(true); }
 
     void whenStorageDisabled()
@@ -100,6 +116,31 @@ public:
 
         systemContext()->cameraHistoryPool()->setServerFootageData(
             server->getId(), {m_camera->getId()});
+    }
+
+    void givenServerTimeZone(seconds offsetFromUtc)
+    {
+        auto server = addServer();
+        server->setStatus(api::ResourceStatus::online);
+
+        nx::vms::api::ServerTimeZoneInformation timeZoneInfo;
+        timeZoneInfo.timeZoneOffsetMs = offsetFromUtc;
+        server->setProperty(ResourcePropertyKey::Server::kTimeZoneInformation,
+            QString::fromStdString(nx::reflect::json::serialize(timeZoneInfo)));
+
+        m_camera->setParentId(server->getId());
+    }
+
+    void givenRecordingOnlyOn(int dayOfWeek, nx::vms::api::RecordingType recordingType)
+    {
+        auto tasks = nx::vms::common::defaultSchedule(30);
+        for (auto& task: tasks)
+        {
+            task.recordingType =
+                task.dayOfWeek == dayOfWeek ? recordingType : nx::vms::api::RecordingType::never;
+        }
+
+        m_camera->setScheduleTasks(tasks);
     }
 };
 
@@ -209,6 +250,52 @@ TEST_F(RecordingStatusHelperTest, scheduleDisablingUpdatesIcon)
     whenRecordingDisabled();
     thenIconIs(QIcon());
     thenIconPathIs(QString());
+}
+
+TEST_F(RecordingStatusHelperTest, recordingNotCoveredBySchedule)
+{
+    whenRecordingEnabled();
+    givenRecordingIsSet(nx::vms::api::RecordingType::never);
+    whenCameraIsRecording(); //< E.g. recording is started by an event rule.
+    thenIconIs(qnSkin->icon(kRecordingIcon));
+    thenIconPathIs(QString("image://skin/20x20/Solid/record_on.svg"));
+    thenRecordingEnabledIs(true);
+    thenShortTooltipIs("Continuous");
+}
+
+TEST_F(RecordingStatusHelperTest, recordingStatusIgnoredWhenScheduleDisabled)
+{
+    givenRecordingIsSet(nx::vms::api::RecordingType::always);
+    whenCameraIsRecording(); //< E.g. the server has not stopped recording yet.
+    thenIconIs(QIcon());
+    thenIconPathIs(QString());
+    thenRecordingEnabledIs(false);
+
+    givenArchiveExists();
+    thenIconIs(qnSkin->icon(kArchiveIcon));
+    thenIconPathIs(QString("image://skin/20x20/Solid/archive.svg"));
+    thenRecordingEnabledIs(false);
+}
+
+TEST_F(RecordingStatusHelperTest, scheduleUsesServerTimeZone)
+{
+    // Choose a server time zone where the current day of week differs from the local one. Dates
+    // in UTC+14 and UTC-12 always differ, so at least one of them differs from the local date.
+    const auto now = QDateTime::currentDateTime();
+    seconds serverOffset = 14h;
+    if (now.toTimeZone(QTimeZone::fromDurationAheadOfUtc(serverOffset)).date() == now.date())
+        serverOffset = -12h;
+    const int serverDayOfWeek =
+        now.toTimeZone(QTimeZone::fromDurationAheadOfUtc(serverOffset)).date().dayOfWeek();
+    ASSERT_NE(serverDayOfWeek, now.date().dayOfWeek());
+
+    givenServerTimeZone(serverOffset);
+    whenRecordingEnabled();
+    whenCameraIsRecording();
+    givenRecordingOnlyOn(serverDayOfWeek, nx::vms::api::RecordingType::metadataOnly);
+
+    // With the local time zone the current slot would be "never", resulting in "Continuous".
+    thenShortTooltipIs("Motion only");
 }
 
 } // namespace test
