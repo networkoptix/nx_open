@@ -4,6 +4,7 @@
 
 #include <optional>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -1025,6 +1026,10 @@ Player::Player(QObject *parent):
 {
     NX_DEBUG(this, "Player()");
     ini().reload();
+
+    // The window destroys its RHI before its child players, while the decoders may still use it.
+    if (const auto app = QCoreApplication::instance())
+        connect(app, &QCoreApplication::aboutToQuit, this, [this]() { stop(); });
 }
 
 Player::~Player()
