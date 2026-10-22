@@ -1199,6 +1199,18 @@
       <translation>登入</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>未能連接站點</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>無法存取通路夥伴</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>無法存取組織用戶</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>合作夥伴</translation>
     </message>

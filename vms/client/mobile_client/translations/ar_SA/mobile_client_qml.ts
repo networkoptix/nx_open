@@ -1204,6 +1204,18 @@
       <translation>تسجيل الدخول</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>فشل الوصول إلى الموقع</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>فشل الوصول إلى شريك القناة</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>فشل الوصول إلى المؤسسة</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>الشركاء</translation>
     </message>

@@ -1200,6 +1200,18 @@
       <translation>Нэвтрэх</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Сайтад хандахад алдаа гарлаа</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Сувгийн түнш рүү хандахад алдаа гарлаа</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Байгууллагад хандахад алдаа гарлаа</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Хамтрагчид</translation>
     </message>

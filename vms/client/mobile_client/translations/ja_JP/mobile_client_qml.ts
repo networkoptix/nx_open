@@ -1199,6 +1199,18 @@
       <translation>ログイン</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>サイトへのアクセスに失敗しました。</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>チャネルパートナーへのアクセスに失敗しました</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>組織へのアクセスに失敗しました</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>パートナー</translation>
     </message>
