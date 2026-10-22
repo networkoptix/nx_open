@@ -1200,6 +1200,18 @@
       <translation>Log ind</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Kunne ikke få adgang til webstedet</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Kunne ikke tilgå kanalpartner</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Kunne ikke få adgang til organisationen</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Partnere</translation>
     </message>

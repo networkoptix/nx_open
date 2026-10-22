@@ -1200,6 +1200,18 @@
       <translation>Είσοδος</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Αποτυχία πρόσβασης στην τοποθεσία</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Αποτυχία πρόσβασης στον εμπορικό συνεργάτη</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Αποτυχία πρόσβασης στον οργανισμό</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Συνεργάτες</translation>
     </message>

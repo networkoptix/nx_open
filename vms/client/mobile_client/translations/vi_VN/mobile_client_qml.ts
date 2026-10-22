@@ -1199,6 +1199,18 @@
       <translation>Đăng nhập</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Không thể truy cập Chi nhánh</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Không thể truy cập đối tác kênh</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Không thể truy cập vào tổ chức</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Đối tác</translation>
     </message>

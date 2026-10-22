@@ -1200,6 +1200,18 @@
       <translation>Connexion</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Impossible d'accéder au site</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Impossible d'accéder au partenaire de distribution</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Impossible d'accéder à l'organisation</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Partenaires</translation>
     </message>

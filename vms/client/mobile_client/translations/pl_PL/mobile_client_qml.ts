@@ -150,15 +150,15 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Przesuwaj między zasobami</translation>
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Przełącz między kamerami na układzie</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Przesuń w prawo, aby przejść do następnej kamery</translation>
     </message>
   </context>
   <context>
@@ -190,7 +190,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Jak się połączyć?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -608,11 +608,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Poradniki</translation>
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Zobacz przewodnik po interfejsie</translation>
     </message>
   </context>
   <context>
@@ -752,7 +752,7 @@
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Edytuj udostępnianie</translation>
     </message>
   </context>
   <context>
@@ -766,15 +766,15 @@
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Tryb podglądu</translation>
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Przełączanie osi czasu między Ruchem, Obiektami i Zakładkami</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Kliknij, aby wybrać żądany typ danych</translation>
     </message>
   </context>
   <context>
@@ -811,15 +811,15 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Pływający przycisk panelu</translation>
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Ponowne otwarcie zwiniętego panelu</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Kliknij pływający przycisk, aby otworzyć panel</translation>
     </message>
   </context>
   <context>
@@ -1087,7 +1087,7 @@
     <name>SaasPromoBanner</name>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Odblokuj unikalne funkcje zaawansowanej analityki wideo i zarządzaj operacjami na dużą skalę na podstawie danych</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -1200,6 +1200,18 @@
     <message>
       <source>Log In</source>
       <translation>Zaloguj się</translation>
+    </message>
+    <message>
+      <source>Failed to access site</source>
+      <translation>Nie udało się uzyskać dostępu do witryny</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Nie udało się uzyskać dostępu do partnera kanału</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Nie udało się uzyskać dostępu do organizacji</translation>
     </message>
     <message>
       <source>Partners</source>
@@ -1455,15 +1467,15 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Wyzwalacze programowe</translation>
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Otwórz akcje przycisku ekranowego kamery</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Dotknij, aby wywołać panel wyzwalaczy programowych</translation>
     </message>
   </context>
   <context>
@@ -1520,30 +1532,30 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Karty osi czasu i Odtwarzacz wideo</translation>
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Wyświetl szczegóły wydarzenia po długim dotknięciu</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Naciśnij i przytrzymaj, aby wywołać podgląd z większą ilością szczegółów</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Powiększ/pomniejsz oś czasu</translation>
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Zsuń/rozsuń palce, by skalować oś czasu</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Zsuń palce, żeby zmniejszyć, i rozsuń, żeby powiększyć</translation>
     </message>
   </context>
   <context>
@@ -1561,7 +1573,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Poradniki</translation>
     </message>
   </context>
   <context>
@@ -1744,7 +1756,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Naciśnij ponownie, aby wyjść</translation>
     </message>
   </context>
 </TS>

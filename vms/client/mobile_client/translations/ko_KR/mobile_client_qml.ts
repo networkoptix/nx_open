@@ -1199,6 +1199,18 @@
       <translation>로그인</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>사이트에 접속하지 못했습니다</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>채널 파트너에 액세스하지 못했습니다.</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>조직에 접근하지 못했습니다</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>파트너</translation>
     </message>

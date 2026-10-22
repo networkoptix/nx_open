@@ -1200,6 +1200,18 @@
       <translation>Logga in</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Misslyckades med att komma åt webbplatsen</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Det gick inte att komma åt kanalpartnern</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Det gick inte att komma åt organisationen</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Partners</translation>
     </message>

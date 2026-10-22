@@ -1200,6 +1200,18 @@
       <translation>Iniciar sesión</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation>Erro ao acceder ao sitio</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Produciuse un erro ao acceder ao socio/partner da canle</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Produciuse un erro ao acceder á organización</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>Partners</translation>
     </message>

@@ -1201,6 +1201,18 @@
       <translation type="unfinished">Log In</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation type="unfinished">Failed to access site</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation type="unfinished">Failed to access channel partner</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation type="unfinished">Failed to access organization</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation type="unfinished">Partners</translation>
     </message>

@@ -1200,6 +1200,18 @@
       <translation>Oturum Aç</translation>
     </message>
     <message>
+      <source>Failed to access site</source>
+      <translation type="unfinished">Failed to access site</translation>
+    </message>
+    <message>
+      <source>Failed to access channel partner</source>
+      <translation>Kanal iş ortağına erişilemedi</translation>
+    </message>
+    <message>
+      <source>Failed to access organization</source>
+      <translation>Kuruluşa erişilemedi</translation>
+    </message>
+    <message>
       <source>Partners</source>
       <translation>İş Ortakları</translation>
     </message>
