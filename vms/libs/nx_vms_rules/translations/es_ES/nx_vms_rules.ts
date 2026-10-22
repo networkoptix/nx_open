@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>Preparado para</translation>
     </message>
   </context>
   <context>
@@ -1278,11 +1278,11 @@
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>No se pudo obtener el descriptor del evento</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>El evento no tiene cámara de origen</translation>
     </message>
   </context>
   <context>
