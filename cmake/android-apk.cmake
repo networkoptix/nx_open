@@ -118,9 +118,7 @@ function(add_android_apk target)
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/extra_java_libs.txt "${java_libs}")
     nx_store_known_file(${CMAKE_CURRENT_BINARY_DIR}/extra_java_libs.txt)
 
-    file(COPY ${QT_DIR}/src/android/templates/build.gradle DESTINATION ${APK_TEMPLATE})
-
-    file(READ ${APK_TEMPLATE}/build.gradle FILE_CONTENTS)
+    file(READ ${QT_DIR}/src/android/templates/build.gradle FILE_CONTENTS)
 
     if(APK_GRADLE_DEPENDENCIES)
         string(REGEX REPLACE
