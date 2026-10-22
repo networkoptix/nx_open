@@ -1200,6 +1200,18 @@
         <translation></translation>
     </message>
     <message>
+        <source>Failed to access site</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to access channel partner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to access organization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Partners</source>
         <translation></translation>
     </message>
