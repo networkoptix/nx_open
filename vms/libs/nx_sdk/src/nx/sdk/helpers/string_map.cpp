@@ -76,7 +76,14 @@ std::map<std::string, std::string> toStdMap(const Ptr<const IStringMap>& sdkMap)
         return result;
 
     for (int i = 0; i < sdkMap->count(); ++i)
-        result[sdkMap->key(i)] = sdkMap->value(i);
+    {
+        const char* const key = sdkMap->key(i);
+        if (!key)
+            continue;
+
+        const char* const value = sdkMap->value(i);
+        result[key] = value ? value : "";
+    }
 
     return result;
 }
