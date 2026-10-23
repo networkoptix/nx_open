@@ -38,7 +38,7 @@ QtObject
         if (offline)
             return "cameraOffline"
         if (ioModule)
-            return "ioModuleWarning"
+            return mediaResourceHelper.audioSupported ? "ioModuleAudioPlaying" : "ioModuleWarning"
         return ""
     }
 }
