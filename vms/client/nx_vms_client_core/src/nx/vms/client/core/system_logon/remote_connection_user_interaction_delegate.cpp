@@ -2,6 +2,7 @@
 
 #include "remote_connection_user_interaction_delegate.h"
 
+#include <nx/network/http/auth_tools.h>
 #include <nx/vms/client/core/application_context.h>
 #include <nx/vms/client/core/settings/client_core_settings.h>
 
@@ -139,10 +140,10 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificatesOfServersInTarge
     }
 }
 
-bool RemoteConnectionUserInteractionDelegate::request2FaValidation(
-    const nx::network::http::Credentials& credentials)
+void RemoteConnectionUserInteractionDelegate::request2FaValidation(
+    const nx::network::http::Credentials& credentials, std::promise<bool> result)
 {
-    return d->validateToken(credentials);
+    d->validateToken(credentials, std::move(result));
 }
 
 } // namespace nx::vms::client::core

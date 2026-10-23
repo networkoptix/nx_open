@@ -194,25 +194,18 @@ struct RemoteConnectionFactory::Private
             context->systemContext);
     }
 
-    bool executeInUiThreadSync(
-        ContextPtr context,
-        std::function<bool(AbstractRemoteConnectionUserInteractionDelegate* delegate)> handler)
+    AbstractRemoteConnectionUserInteractionDelegate* interactionDelegate(ContextPtr context) const
+    {
+        return context->customUserInteractionDelegate
+            ? context->customUserInteractionDelegate.get()
+            : userInteractionDelegate.get();
+    }
+
+    /** @return Future value, or false if the connection process is terminated before it. */
+    bool waitUnlessTerminated(ContextPtr context, std::future<bool> future) const
     {
         using namespace std::chrono_literals;
 
-        auto isAccepted = std::make_shared<std::promise<bool>>();
-        auto delegate = context->customUserInteractionDelegate
-            ? context->customUserInteractionDelegate.get()
-            : userInteractionDelegate.get();
-
-        // Capture context to ensure delegate will not be destroyed by the time handler is run.
-        executeInThread(delegate->thread(),
-            [context, isAccepted, handler, delegate]()
-            {
-                isAccepted->set_value(handler(delegate));
-            });
-
-        std::future<bool> future = isAccepted->get_future();
         std::future_status status;
         do {
             status = future.wait_for(100ms);
@@ -221,7 +214,50 @@ struct RemoteConnectionFactory::Private
 
         } while (status != std::future_status::ready);
 
-        return future.get();
+        try
+        {
+            return future.get();
+        }
+        catch (const std::future_error& e)
+        {
+            NX_WARNING(this, "User interaction result is not received: %1", e.what());
+            return false;
+        }
+    }
+
+    /**
+     * Executes the handler in the delegate's thread and waits for the result the handler sets.
+     * @return The result, or false if there is no delegate or the connection process is
+     *     terminated before the result is set.
+     */
+    bool executeInUiThread(ContextPtr context,
+        std::function<void(AbstractRemoteConnectionUserInteractionDelegate* delegate,
+            std::promise<bool> result)> handler)
+    {
+        const auto delegate = interactionDelegate(context);
+        if (!delegate)
+        {
+            NX_WARNING(this, "User interaction delegate is not set.");
+            return false;
+        }
+
+        std::promise<bool> result;
+        auto future = result.get_future();
+
+        // Capture context to ensure delegate will not be destroyed by the time handler is run.
+        executeInThread(delegate->thread(),
+            [context, handler, delegate, result = std::move(result)]() mutable
+            { handler(delegate, std::move(result)); });
+
+        return waitUnlessTerminated(context, std::move(future));
+    }
+
+    bool executeInUiThreadSync(ContextPtr context,
+        std::function<bool(AbstractRemoteConnectionUserInteractionDelegate* delegate)> handler)
+    {
+        return executeInUiThread(context,
+            [handler](AbstractRemoteConnectionUserInteractionDelegate* delegate,
+                std::promise<bool> result) { result.set_value(handler(delegate)); });
     }
 
     void logInitialInfo(ContextPtr context)
@@ -773,15 +809,15 @@ struct RemoteConnectionFactory::Private
                 credentials.authToken =
                     nx::network::http::BearerAuthToken(response.access_token);
 
-                auto validate =
-                    [credentials = std::move(credentials)]
-                        (AbstractRemoteConnectionUserInteractionDelegate* delegate)
-                    {
-                        return delegate->request2FaValidation(credentials);
-                    };
+                auto validate = [credentials = std::move(credentials)](
+                                    AbstractRemoteConnectionUserInteractionDelegate* delegate,
+                                    std::promise<bool> result)
+                {
+                    delegate->request2FaValidation(credentials, std::move(result));
+                };
 
                 const bool validated = context->logonData.userInteractionAllowed
-                    && executeInUiThreadSync(context, validate);
+                    && executeInUiThread(context, validate);
 
                 if (validated)
                 {

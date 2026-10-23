@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <future>
+
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
 
@@ -67,9 +69,10 @@ public:
     /**
      * Show OAUTH dialog with request for second factor for cloud access token validation.
      * Should be executed in the delegate's thread.
-     * @return Validation success.
+     * @param result Will be set to the validation success once the validation is finished.
      */
-    virtual bool request2FaValidation(const nx::network::http::Credentials& credentials) = 0;
+    virtual void request2FaValidation(
+        const nx::network::http::Credentials& credentials, std::promise<bool> result) = 0;
 };
 
 } // namespace nx::vms::client::core

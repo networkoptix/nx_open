@@ -13,16 +13,6 @@ namespace {
 
 static const auto kLoginScreenUrl = QUrl("qrc:///qml/Nx/Screens/Cloud/Login.qml");
 
-QVariantMap cloudLoginProperties(bool reauthentication, const QString& user, const QString& token)
-{
-    QVariantMap properties;
-    properties["forced"] = reauthentication;
-    properties["user"] = user;
-    if (!token.isEmpty())
-        properties["token"] = token;
-    return properties;
-}
-
 } // namespace
 
 Screens::Screens(WindowContext* context, QObject* parent):
@@ -31,21 +21,42 @@ Screens::Screens(WindowContext* context, QObject* parent):
 {
 }
 
-bool Screens::show2faValidationScreen(const network::http::Credentials& credentials) const
+void Screens::open2faValidationScreen(
+    const network::http::Credentials& credentials, std::promise<bool> result) const
 {
-    QVariantMap properties;
-    properties["user"] = QString::fromStdString(credentials.username);
-    properties["token"] = QString::fromStdString(credentials.authToken.value);
-    properties["twoFactorValidation"] = true;
-    return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
+    const QVariantMap properties{
+        {"user", QString::fromStdString(credentials.username)},
+        {"token", QString::fromStdString(credentials.authToken.value)},
+        {"twoFactorValidation", true},
+    };
+
+    const auto screen = QmlWrapperHelper::pushScreen(windowContext(), kLoginScreenUrl, properties);
+    if (!screen)
+    {
+        result.set_value(false);
+        return;
+    }
+
+    // The watcher emits the result exactly once, also when the screen is destroyed without it.
+    const auto watcher = new QmlResultWatcher(screen);
+    connect(watcher,
+        &QmlResultWatcher::resultReady,
+        watcher,
+        [result = std::move(result)](const QString& value) mutable
+        { result.set_value(value == "success"); });
 }
 
 QmlResultWatcher* Screens::openCloudLoginScreen(
     bool reauthentication, const QString& user, const QString& token) const
 {
-    const auto screen = QmlWrapperHelper::pushScreen(
-        windowContext(), kLoginScreenUrl, cloudLoginProperties(reauthentication, user, token));
+    QVariantMap properties{
+        {"forced", reauthentication},
+        {"user", user},
+    };
+    if (!token.isEmpty())
+        properties["token"] = token;
 
+    const auto screen = QmlWrapperHelper::pushScreen(windowContext(), kLoginScreenUrl, properties);
     return screen ? new QmlResultWatcher(screen) : nullptr;
 }
 

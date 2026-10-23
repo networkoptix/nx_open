@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <future>
+
 #include <QtCore/QObject>
 
 #include <nx/vms/client/mobile/window_context_aware.h>
@@ -24,8 +26,9 @@ class Screens: public QObject, public WindowContextAware
 public:
     Screens(WindowContext* context, QObject* parent = nullptr);
 
-    /** Show 2FA validation screen and validate specified token. */
-    bool show2faValidationScreen(const network::http::Credentials& credentials) const;
+    /** Open 2FA validation screen and report token validation result asynchronously. */
+    void open2faValidationScreen(
+        const network::http::Credentials& credentials, std::promise<bool> result) const;
 
     /**
      * Open cloud authentication screen without waiting for the result. The result is "success"

@@ -17,17 +17,15 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
     createConnectionUserInteractionDelegate(
     std::function<QWidget*()> parentWidget)
 {
-    const auto validateToken =
-        [parentWidget](const nx::network::http::Credentials& credentials)
-        {
-            auto parent = parentWidget();
-            if (!parent)
-                return false;
-
-            return OauthLoginDialog::validateToken(
+    const auto validateToken = [parentWidget](const nx::network::http::Credentials& credentials,
+                                   std::promise<bool> result)
+    {
+        auto parent = parentWidget();
+        result.set_value(parent
+            && OauthLoginDialog::validateToken(
                 parent, OauthLoginDialog::tr("Connect to Site"), credentials)
-                    .has_value();
-        };
+                .has_value());
+    };
 
     const auto askToAcceptCertificates =
         [parentWidget](

@@ -17,11 +17,11 @@
 #include <nx/vms/client/core/network/remote_connection_error_strings.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/desktop/application_context.h>
-#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/help/help_topic_accessor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/window_context.h>
 #include <nx/vms/common/html/html.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -159,14 +159,10 @@ struct ConnectionTestingDialog::Private
             return m_baseDelegate->acceptCertificatesOfServersInTargetSystem(certificatesInfo);
         }
 
-        virtual bool request2FaValidation(
-            const nx::network::http::Credentials& credentials) override
+        virtual void request2FaValidation(const nx::network::http::Credentials& /*credentials*/,
+            std::promise<bool> result) override
         {
-            if (!m_owner)
-                return false;
-
-            auto guard = m_owner->d->pauseTimer();
-            return m_baseDelegate->request2FaValidation(credentials);
+            result.set_value(NX_ASSERT(false, "Not intended for cloud connections"));
         }
 
     private:

@@ -70,6 +70,14 @@ std::vector<UserInfo> makeDefaultUsers()
     };
 }
 
+std::vector<UserInfo> makeDefaultUsersWith2fa()
+{
+    auto users = makeDefaultUsers();
+    for (auto& user: users)
+        user.requires2fa = user.userType == nx::vms::api::UserType::cloud;
+    return users;
+}
+
 struct TestSystemData
 {
     nx::utils::SoftwareVersion version = kLatestVersion;
@@ -109,6 +117,7 @@ class RemoteConnectionFactoryTest: public ::testing::Test
 {
     class UserInteractionDelegate: public AbstractRemoteConnectionUserInteractionDelegate
     {
+    public:
         virtual bool acceptNewCertificate(
             const TargetCertificateInfo& /*certificateInfo*/) override { return true; }
 
@@ -118,8 +127,15 @@ class RemoteConnectionFactoryTest: public ::testing::Test
         virtual bool acceptCertificatesOfServersInTargetSystem(
             const QList<TargetCertificateInfo>& /*certificatesInfo*/) override { return true; }
 
-        virtual bool request2FaValidation(const nx::network::http::Credentials& /*credentials*/)
-            override { return true; }
+        virtual void request2FaValidation(const nx::network::http::Credentials& /*credentials*/,
+            std::promise<bool> result) override
+        {
+            validationRequested = true;
+            result.set_value(validationResult);
+        }
+
+        bool validationResult = true;
+        bool validationRequested = false;
     };
 
 public:
@@ -171,8 +187,9 @@ public:
             nx::vms::api::PeerType::desktopClient,
             Qn::SerializationFormat::json);
 
-        auto userInteractionDelegate = std::make_unique<UserInteractionDelegate>();
-        connectionFactory->setUserInteractionDelegate(std::move(userInteractionDelegate));
+        auto delegate = std::make_unique<UserInteractionDelegate>();
+        userInteractionDelegate = delegate.get();
+        connectionFactory->setUserInteractionDelegate(std::move(delegate));
     }
 
     void givenSystem(TestSystemData data = {})
@@ -292,11 +309,22 @@ public:
         EXPECT_EQ(requestsManager->requestsCount(), count);
     }
 
+    void then2faValidationIsRequested()
+    {
+        EXPECT_TRUE(userInteractionDelegate->validationRequested);
+    }
+
     void thenConnectionSuccessful()
     {
         ASSERT_TRUE(std::holds_alternative<RemoteConnectionPtr>(result));
         auto connection = std::get_if<RemoteConnectionPtr>(&result);
         ASSERT_TRUE((bool) connection->get());
+    }
+
+    void thenConnectionFailedWith(RemoteConnectionErrorCode code)
+    {
+        ASSERT_TRUE(std::holds_alternative<RemoteConnectionError>(result));
+        EXPECT_EQ(std::get<RemoteConnectionError>(result).code, code);
     }
 
     void thenAuthenticatedAs(nx::network::http::Credentials credentials)
@@ -333,6 +361,7 @@ public:
 
     std::unique_ptr<CertificateVerifier> certificateVerifier;
     std::unique_ptr<RemoteConnectionFactory> connectionFactory;
+    UserInteractionDelegate* userInteractionDelegate = nullptr;
 
     std::shared_ptr<RemoteConnectionFactoryRequestsManager> requestsManager;
 
@@ -514,6 +543,26 @@ TEST_F(RemoteConnectionFactoryTest, cloudSystem42Test)
     whenConnectToSystem();
     thenRequestsCountIs(3); //< moduleInformation, loginWithDigest, userModel
     thenConnectionSuccessful();
+}
+
+TEST_F(RemoteConnectionFactoryTest, cloudSystem2faAcceptedTest)
+{
+    givenSystem({.users = makeDefaultUsersWith2fa()});
+    givenLogonData({.isCloud = true});
+    whenConnectToSystem();
+    then2faValidationIsRequested();
+    thenRequestsCountIs(2); //< serversInfo, loginWithToken
+    thenConnectionSuccessful();
+}
+
+TEST_F(RemoteConnectionFactoryTest, cloudSystem2faRejectedTest)
+{
+    givenSystem({.users = makeDefaultUsersWith2fa()});
+    givenLogonData({.isCloud = true});
+    userInteractionDelegate->validationResult = false;
+    whenConnectToSystem();
+    then2faValidationIsRequested();
+    thenConnectionFailedWith(RemoteConnectionErrorCode::unauthorized);
 }
 
 // Check scenario when we certainly sure current user is LDAP one, e.g. on reconnect.

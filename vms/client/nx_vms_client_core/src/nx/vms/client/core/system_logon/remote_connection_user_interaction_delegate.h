@@ -16,8 +16,9 @@ class NX_VMS_CLIENT_CORE_API RemoteConnectionUserInteractionDelegate:
     using base_type = nx::vms::client::core::AbstractRemoteConnectionUserInteractionDelegate;
 
 public:
-    using TokenValidator =
-        std::function<bool (const nx::network::http::Credentials& credentials)>;
+    /** Is called in the delegate's thread, must set the result now or later. */
+    using TokenValidator = std::function<void(
+        const nx::network::http::Credentials& credentials, std::promise<bool> result)>;
     using AskUserToAcceptCertificates = std::function<bool (
         const QList<TargetCertificateInfo>& certificatesInfo,
         CertificateWarning::Reason warningType)>;
@@ -41,7 +42,8 @@ public:
     virtual bool acceptCertificatesOfServersInTargetSystem(
         const QList<TargetCertificateInfo>& certificatesInfo) override;
 
-    virtual bool request2FaValidation(const nx::network::http::Credentials& credentials) override;
+    virtual void request2FaValidation(
+        const nx::network::http::Credentials& credentials, std::promise<bool> result) override;
 
 private:
     struct Private;

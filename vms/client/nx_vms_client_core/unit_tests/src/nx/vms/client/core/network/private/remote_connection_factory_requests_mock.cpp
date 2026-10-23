@@ -2,6 +2,8 @@
 
 #include "remote_connection_factory_requests_mock.h"
 
+#include <nx/cloud/db/api/oauth_manager.h>
+
 namespace nx::vms::client::core {
 namespace test {
 
@@ -160,6 +162,11 @@ std::future<RemoteConnectionFactoryContext::CloudTokenInfo>
 
             Context::CloudTokenInfo result;
             result.response.access_token = makeAccessToken(user->token, cloudSystemId);
+            if (user->requires2fa)
+            {
+                result.response.error =
+                    std::string(nx::cloud::db::api::OauthManager::k2faRequiredError);
+            }
             return result;
         });
 }

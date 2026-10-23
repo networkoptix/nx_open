@@ -26,6 +26,9 @@ public:
         std::string password;
         std::string token;
         nx::vms::api::UserType userType = nx::vms::api::UserType::local;
+
+        /** Whether cloud access token requires validation with a second factor. */
+        bool requires2fa = false;
     };
 
     /** Add user to the system. Empty token makes user support digest auth only. */

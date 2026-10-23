@@ -233,10 +233,13 @@ void ApplicationContext::Private::initializeConnectionUserInteractionDelegate()
     const QPointer<WindowContext> wc = windowContext.get();
 
     const auto validateToken =
-        [wc](const nx::network::http::Credentials& credentials)
-        {
-            return wc && wc->uiController()->screens()->show2faValidationScreen(credentials);
-        };
+        [wc](const nx::network::http::Credentials& credentials, std::promise<bool> result)
+    {
+        if (wc)
+            wc->uiController()->screens()->open2faValidationScreen(credentials, std::move(result));
+        else
+            result.set_value(false);
+    };
 
     const auto askToAcceptCertificates =
         [wc](const QList<core::TargetCertificateInfo>& certificatesInfo,
