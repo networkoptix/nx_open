@@ -2089,7 +2089,7 @@
     </message>
     <message>
       <source>Timeout for remote session token cache (other Servers and Cloud).</source>
-      <translation type="unfinished">Timeout for remote session token cache (other Servers and Cloud).</translation>
+      <translation>فترة تحديث ذاكرة التخزين المؤقت لرمز الجلسة البعيدة (الخوادم الأخرى والسحابة).</translation>
     </message>
     <message>
       <source>Default video codec.</source>
@@ -2097,7 +2097,7 @@
     </message>
     <message>
       <source>Default codec for export video.</source>
-      <translation type="unfinished">Default codec for export video.</translation>
+      <translation> الترميز الافتراضي لتصدير الفيديو.</translation>
     </message>
     <message>
       <source>Low quality screen video codec.</source>
@@ -2109,7 +2109,7 @@
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
-      <translation type="unfinished">URI for resource_data.json automatic update.</translation>
+      <translation>عنوان URI للتحديث التلقائي لملف resource_data.json.</translation>
     </message>
     <message>
       <source>Meta data storage change policy.</source>
@@ -2117,19 +2117,19 @@
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
-      <translation type="unfinished">Persistent Servers for update storage.</translation>
+      <translation>خوادم دائمة لتخزين التحديثات.</translation>
     </message>
     <message>
       <source>Persistent Servers where updates are stored.</source>
-      <translation type="unfinished">Persistent Servers where updates are stored.</translation>
+      <translation>خوادم دائمة حيث يتم تخزين التحديثات.</translation>
     </message>
     <message>
       <source>VMS Server version specific features.</source>
-      <translation type="unfinished">VMS Server version specific features.</translation>
+      <translation>ميزات خاصة بإصدار خادم VMS.</translation>
     </message>
     <message>
       <source>Default locale for new users.</source>
-      <translation type="unfinished">Default locale for new users.</translation>
+      <translation>الإعدادات الافتراضية للمستخدمين الجدد.</translation>
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
