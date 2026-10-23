@@ -284,6 +284,9 @@ Item
                 {
                     id: titleLabels
 
+                    readonly property real maxWidth:
+                        menuButton.x - (backButton.x + backButton.width) - 2 * 8
+
                     anchors.centerIn: parent
                     spacing: 5
 
@@ -306,8 +309,11 @@ Item
                         {
                             id: cameraTitleLabel
 
+                            width: Math.min(implicitWidth,
+                                titleLabels.maxWidth - recordingStatusIndicator.width)
                             font { pixelSize: 18; weight: Font.Medium }
-                            color: ColorTheme.colors.light4
+                            color: StyleHints.foregroundColor
+                            elide: Text.ElideRight
                         }
                     }
 
@@ -316,8 +322,10 @@ Item
                         id: cameraTimestampLabel
 
                         anchors.horizontalCenter: parent.horizontalCenter
+                        width: Math.min(implicitWidth, titleLabels.maxWidth)
                         font { pixelSize: 16; weight: Font.Normal }
-                        color: ColorTheme.colors.light4
+                        color: StyleHints.foregroundColor
+                        elide: Text.ElideRight
                     }
                 }
 
