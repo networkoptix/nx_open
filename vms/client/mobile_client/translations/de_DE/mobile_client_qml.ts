@@ -1205,7 +1205,7 @@
     </message>
     <message>
       <source>Failed to access channel partner</source>
-      <translation type="unfinished">Failed to access channel partner</translation>
+      <translation>Fehler beim Zugriff auf den Channel-Partner</translation>
     </message>
     <message>
       <source>Failed to access organization</source>

@@ -1201,11 +1201,11 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation>Kunne ikke få adgang til webstedet</translation>
+      <translation>Kunne ikke få adgang til sitet</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
-      <translation>Kunne ikke tilgå kanalpartner</translation>
+      <translation>Kunne ikke tilgå kanal partner</translation>
     </message>
     <message>
       <source>Failed to access organization</source>
