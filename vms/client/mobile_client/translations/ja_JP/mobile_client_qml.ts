@@ -1200,7 +1200,7 @@
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation>サイトへのアクセスに失敗しました。</translation>
+      <translation>サイトへのアクセスに失敗しました</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
