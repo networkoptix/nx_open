@@ -21,6 +21,7 @@ std::unique_ptr<QProcess> createProcess(
     process->setArguments(arguments);
     if (!workingDirectory.isNull())
         process->setWorkingDirectory(workingDirectory);
+    process->setUnixProcessParameters(QProcess::UnixProcessFlag::CloseFileDescriptors);
     return process;
 }
 
