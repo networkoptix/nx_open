@@ -224,7 +224,7 @@
       <source>%n new results</source>
       <translation>
         <numerusform>%n neues Ergebnis</numerusform>
-        <numerusform>%n neue Ergebnisse</numerusform>
+        <numerusform>%n Neue Ergebnisse</numerusform>
       </translation>
     </message>
     <message>
@@ -237,7 +237,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kameraplugineinstellungen zu konfigurieren</translation>
+      <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kamera-Plugin-Einstellungen zu konfigurieren</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -546,7 +546,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Ausgesetzt</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -678,7 +678,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation>Schlüssel</translation>
+      <translation>Key</translation>
     </message>
     <message>
       <source>Value</source>
@@ -1011,7 +1011,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation>Fertig stellen</translation>
+      <translation>Fertigstellen</translation>
     </message>
   </context>
   <context>
@@ -1075,7 +1075,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;Beschreibung</translation>
+      <translation>Beschreibung</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -1121,7 +1121,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>&amp;Beschreibung</translation>
+      <translation>Beschreibung</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1239,7 +1239,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Keine Geräte verbunden.</translation>
     </message>
   </context>
   <context>
@@ -1250,7 +1250,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Die Digest-Authentifizierung ist veraltet und wird in der nächsten Version deaktiviert. Sie sollte nur verwendet werden, wenn die standardmäßige Bearer-Authentifizierung nicht möglich ist. Benutzeranmeldungen dürfen nur aus Kleinbuchstaben bestehen.</translation>
     </message>
   </context>
   <context>
@@ -1294,7 +1294,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Löschen</translation>
+      <translation>Entfernen</translation>
     </message>
   </context>
   <context>
@@ -1309,11 +1309,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation>Kamerastream</translation>
+      <translation>Kamera-Stream</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation>Videostream von der Kamera zur Analyse auswählen</translation>
+      <translation>Wählen Sie den Videostream der Kamera zur Analyse aus</translation>
     </message>
     <message>
       <source>Usage</source>
@@ -1381,7 +1381,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation>Vorherige</translation>
+      <translation>Zurück</translation>
     </message>
     <message>
       <source>Next</source>
@@ -1844,7 +1844,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remember me</source>
-      <translation>Erinnere mich</translation>
+      <translation>Anmeldeinformationen merken</translation>
     </message>
   </context>
   <context>
@@ -1859,7 +1859,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation/>
+      <translation>Integrations-Pairing-Code</translation>
     </message>
   </context>
   <context>
@@ -1882,11 +1882,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Suchkriterien ändern oder neue Gruppe erstellen</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Keine Gruppen</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
@@ -1937,7 +1937,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation>Passwörter stimmen nicht überrein</translation>
+      <translation>Passwörter stimmen nicht überein</translation>
     </message>
   </context>
   <context>
@@ -1990,7 +1990,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation>Farbintensität</translation>
+      <translation>Intensität</translation>
     </message>
   </context>
   <context>
@@ -2035,7 +2035,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Stream ist offline</translation>
+      <translation>Server ist offline</translation>
     </message>
   </context>
   <context>
@@ -2135,12 +2135,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation>Ziehen Sie über einen beliebigen Teil des Videos,
- um PTZ zu aktivieren</translation>
+      <translation>Ziehen Sie den Mauszeiger über einen beliebigen Bereich des Videos, um die PTZ-Funktion zu aktivieren</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation>Gehen Sie zu Lokale Einstellungen, um eine Ziehmarkierung über die Mitte des Videos zu aktivieren</translation>
+      <translation>Gehen Sie zu Lokale Einstellungen, um eine Zieh-Markierung über die Mitte des Videos zu aktivieren</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
@@ -2483,7 +2482,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Die Website wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
@@ -2571,7 +2570,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Durch Aktivierung dieser Option können Drittanbieter die Genehmigung zur Registrierung einer Integration beantragen. Es sind Sicherheitsvorkehrungen getroffen, die Option sollte jedoch deaktiviert werden, sobald alle erforderlichen Integrationen installiert sind – eine längere Nutzung wird nicht empfohlen.</translation>
     </message>
   </context>
   <context>
@@ -2586,7 +2585,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation>Stellen Sie die minimale und maximale Objektgröße ein.</translation>
+      <translation>Minimale und maximale Objektgröße festlegen.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
@@ -2632,13 +2631,13 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation>Für diese Kamera setzen</translation>
+      <translation>Für diese Kamera festlegen</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation>
-        <numerusform>Für %n Kamera festlegen</numerusform>
-        <numerusform>Für %n Kamera festlegen</numerusform>
+      <translation type="unfinished">
+        <numerusform>Set for all %n Cameras</numerusform>
+        <numerusform>Für %n Kameras festlegen</numerusform>
       </translation>
     </message>
     <message>
@@ -2780,7 +2779,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Über das Kontextmenü können Sie Sites aus der Hauptliste ausblenden</translation>
     </message>
   </context>
   <context>
@@ -2822,11 +2821,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>Letzten 7 Tage</translation>
+      <translation>Letzte 7 Tage</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>Letzten 30 Tage</translation>
+      <translation>Letzte 30 Tage</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -3071,7 +3070,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Stellen Sie sicher, dass dieser Computer eine Verbindung zu %1 Herstellen kann</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
