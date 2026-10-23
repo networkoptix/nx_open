@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Shapes
 
 import Nx.Core
+import Nx.Core.Handlers
 
 Item
 {
@@ -18,6 +19,11 @@ Item
 
     // Width of the indicator attached to the outer edge of the control.
     property real indicatorWidth: width
+
+    // Maximum delay between the release of a tap and the press of the next one for the taps to
+    // make a sequence. Every tap of a sequence but the first one seeks. While the indicator is
+    // shown, the sequence goes on regardless of the delay.
+    property int doubleTapIntervalMs: 250
 
     // Number of seeks in the current series. A new series starts when the indicator is hidden.
     readonly property alias seekCount: d.seekCount
@@ -160,25 +166,25 @@ Item
         }
     }
 
-    TapHandler
+    // Passive, so the gestures still reach the video under the control.
+    PassiveTapHandler
     {
-        gesturePolicy: TapHandler.WithinBounds
+        id: tapHandler
 
-        // Taps are counted manually: TapHandler.doubleTapped requires the taps to be close to
-        // each other, fires only after the double click interval and gives up on the third quick
-        // tap. Here any two quick taps inside the control start a seek series, and while the
-        // indicator is shown every further tap seeks again. A single tap outside of a series is
-        // reported once the interval has passed.
         onTapped: (eventPoint) =>
         {
-            // WithinBounds does not cancel the gesture on drag, so a swipe inside the control
-            // also ends up here. A finger that slid away from the press point is not a tap.
-            const dx = eventPoint.position.x - eventPoint.pressPosition.x
-            const dy = eventPoint.position.y - eventPoint.pressPosition.y
-            if (Math.hypot(dx, dy) > Application.styleHints.startDragDistance)
-                return
+            const inSequence = d.indicatorShown
+                || eventPoint.pressTimestamp - d.lastTapTimestamp < control.doubleTapIntervalMs
 
-            tapSequenceTimer.registerTap()
+            if (!inSequence)
+                d.finishSequence()
+
+            d.pendingSingleTap = !inSequence
+            d.lastTapTimestamp = eventPoint.timestamp
+            sequenceTimer.restart()
+
+            if (inSequence)
+                d.seek()
         }
     }
 
@@ -188,6 +194,10 @@ Item
 
         property int seekCount: 0
         property bool indicatorShown: false
+
+        // Whether the sequence has only one tap so far, and the release time of its last tap.
+        property bool pendingSingleTap: false
+        property real lastTapTimestamp: 0
 
         function seek()
         {
@@ -202,40 +212,37 @@ Item
             control.showIndicator()
             control.activated()
         }
+
+        function finishSequence()
+        {
+            sequenceTimer.stop()
+
+            if (pendingSingleTap)
+                control.tapped()
+
+            pendingSingleTap = false
+            lastTapTimestamp = 0
+        }
     }
 
     Timer
     {
-        id: tapSequenceTimer
+        id: sequenceTimer
 
-        property int taps: 0
-
-        interval: Application.styleHints.mouseDoubleClickInterval
+        // Whether a tap belongs to the sequence is decided by the event timestamps. The timer
+        // only ends the sequence, so it gets a margin of a few frames to never fire before a late
+        // delivered tap that is still within the window.
+        interval: control.doubleTapIntervalMs + 50
         repeat: false
 
         onTriggered:
         {
-            if (taps === 1)
-                control.tapped()
-
-            taps = 0
-        }
-
-        function registerTap()
-        {
-            if (d.indicatorShown)
-            {
-                stop()
-                taps = 0
-                d.seek()
-                return
-            }
-
-            ++taps
-            restart()
-
-            if (taps >= 2)
-                d.seek()
+            // The next tap may be still pressed: its release decides, or the next check if it
+            // never becomes a tap.
+            if (tapHandler.active)
+                restart()
+            else
+                d.finishSequence()
         }
     }
 
@@ -263,5 +270,13 @@ Item
     {
         hideTimer.stop()
         d.indicatorShown = false
+    }
+
+    // Drops the current tap sequence without reporting a pending single tap.
+    function cancelTaps()
+    {
+        sequenceTimer.stop()
+        d.pendingSingleTap = false
+        d.lastTapTimestamp = 0
     }
 }

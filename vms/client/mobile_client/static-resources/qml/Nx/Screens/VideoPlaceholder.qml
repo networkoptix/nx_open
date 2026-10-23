@@ -74,6 +74,9 @@ Control
     {
         color: control.backgroundColor
 
+        // The highlight is scaled beyond the bounds, it must not cover the neighbor items.
+        clip: true
+
         Shape
         {
             id: highlight
