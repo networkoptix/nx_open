@@ -487,7 +487,7 @@ bool CloudStatusWatcher::Private::updateSystemsInternal(int triesCount)
 
     NX_DEBUG(this, "Updating systems list");
     Filter filter;
-    filter.nameToValue[FilterField::systemStatus] = "notActivated|activated";
+    filter.nameToValue[FilterField::systemStatus] = "activated";
     cloudConnection->systemManager()->getSystemsFiltered(filter, std::move(handler));
     return true;
 }
