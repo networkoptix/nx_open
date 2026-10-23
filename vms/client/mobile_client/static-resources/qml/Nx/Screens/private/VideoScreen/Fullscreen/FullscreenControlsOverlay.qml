@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 import Nx.Core
 import Nx.Core.Controls
+import Nx.Core.Handlers
 import Nx.Items
 import Nx.Mobile.Controls
 import Nx.Ui
@@ -17,6 +18,13 @@ Item
 {
     id: control
 
+    enum ControlsVisibilityOverride
+    {
+        NoControlsOverride,
+        ForceControlsVisible, //< E.g. while a menu is opened from the controls.
+        ForceControlsHidden //< E.g. while a panel covering the controls is opened.
+    }
+
     property VideoScreenController controller
     property bool showPlaybackControls: true
     property bool hasChunkNavigation: true
@@ -26,6 +34,10 @@ Item
     // with the `actionButtonContainer.visible` binding, since the container visibility is
     // controlled by LayoutItemProxy.
     property bool hasActionButton: false
+
+    // Overrides the controls visibility driven by user activity. The controls hidden by the
+    // override stay hidden after it is reset, until the user shows them.
+    property int controlsVisibilityOverride: FullscreenControlsOverlay.NoControlsOverride
 
     property alias cameraTitle: cameraTitleLabel.text
     property alias cameraTimestampText: cameraTimestampLabel.text
@@ -73,10 +85,11 @@ Item
 
     function startTapRewind(otherSide)
     {
+        otherSide.cancelTaps()
         otherSide.hideIndicator()
         preloaderSuppressionTimer.restart()
 
-        if (!speedControl.menuOpened)
+        if (!opacityController.keepShown)
             opacityController.setOverlayVisible(false)
     }
 
@@ -97,14 +110,29 @@ Item
             opacityController.setOverlayVisible(true)
     }
 
+    onControlsVisibilityOverrideChanged:
+    {
+        if (controlsVisibilityOverride === FullscreenControlsOverlay.ForceControlsHidden)
+            opacityController.setOverlayVisible(false)
+    }
+
     QtObject
     {
         id: opacityController
 
         property bool overlayVisible: true
 
+        // Whether the controls are kept shown, e.g. while a menu is opened from them.
+        readonly property bool keepShown: control.controlsVisibilityOverride
+                === FullscreenControlsOverlay.ForceControlsVisible
+            || speedControl.menuOpened
+
+        readonly property bool controlsShown: control.controlsVisibilityOverride
+                !== FullscreenControlsOverlay.ForceControlsHidden
+            && (overlayVisible || keepShown)
+
         // Opacity value expected for any overlay control or block unless otherwise specified.
-        property real defaultControlsOpacity: overlayVisible && !control.scrubbingActive
+        property real defaultControlsOpacity: controlsShown && !control.scrubbingActive
             ? 1.0
             : 0.0
 
@@ -118,7 +146,7 @@ Item
         }
 
         // Opacity value for the speed controller.
-        property real speedControlOpacity: control.scrubbingActive || overlayVisible
+        property real speedControlOpacity: control.scrubbingActive || controlsShown
             ? 1.0
             : 0.0
 
@@ -139,11 +167,13 @@ Item
 
         function reportUserActivity()
         {
-            if (speedControl.menuOpened)
+            if (keepShown)
                 userInactivityTimer.stop()
             else if (overlayVisible)
                 userInactivityTimer.restart()
         }
+
+        onKeepShownChanged: reportUserActivity()
     }
 
     Timer
@@ -174,10 +204,31 @@ Item
     Timer
     {
         id: userInactivityTimer
-        interval: 5000
+        interval: 1500
         repeat: false
 
         onTriggered: opacityController.setOverlayVisible(false)
+    }
+
+    function isInTapRewindControl(position)
+    {
+        return [leftTapRewindControl, rightTapRewindControl].some(
+            (item) => item.visible && item.contains(control.mapToItem(item, position)))
+    }
+
+    // Taps outside of the rewind tap controls toggle the controls immediately. The rewind tap
+    // controls report their single taps themselves, after making sure no sequence follows.
+    PassiveTapHandler
+    {
+        onTapped: (eventPoint) =>
+        {
+            if (control.isInTapRewindControl(eventPoint.position))
+                return
+
+            leftTapRewindControl.cancelTaps()
+            rightTapRewindControl.cancelTaps()
+            control.toggle()
+        }
     }
 
     // Rewind tap controls.
@@ -643,9 +694,6 @@ Item
 
         onMoved:
             controller.setSpeed(speed)
-
-        onMenuOpenedChanged:
-            opacityController.reportUserActivity()
 
         // Reflect the actual playback speed so the control stays correct when the speed is
         // changed elsewhere (e.g. the normal-mode controls).

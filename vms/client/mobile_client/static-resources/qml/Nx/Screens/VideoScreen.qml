@@ -616,12 +616,6 @@ Page
         onShowRoiHint:
             banner.showText(roiHintText)
 
-        onClicked:
-        {
-            if (LayoutController.fullscreen)
-                fullscreenControlsOverlay.toggle()
-        }
-
         Connections
         {
             target: video.roiController
@@ -712,6 +706,16 @@ Page
         showCalendarControl: d.hasArchive
 
         hasActionButton: actionSheet.hasActions
+        controlsVisibilityOverride:
+        {
+            if (menu.opened)
+                return FullscreenControlsOverlay.ForceControlsVisible
+
+            if (calendarPanel.opened || actionSheet.opened)
+                return FullscreenControlsOverlay.ForceControlsHidden
+
+            return FullscreenControlsOverlay.NoControlsOverride
+        }
 
         onDefaultSpeedChanged:
             speedControl.defaultSpeed = defaultSpeed
