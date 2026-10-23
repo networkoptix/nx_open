@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <nx/media/video_data_packet.h>
+
 #include "abstract_media_data_filter.h"
 
 /**
@@ -19,4 +21,8 @@ class NX_VMS_COMMON_API H2645PrependParameterSets: public AbstractMediaDataFilte
 public:
     virtual QnConstAbstractDataPacketPtr processData(
         const QnConstAbstractDataPacketPtr& data) override;
+
+    // Returns nullptr if the frame needs no parameter sets or they can't be read from the
+    // extradata, otherwise the frame with the parameter sets prepended.
+    QnCompressedVideoDataPtr processVideoData(const QnConstCompressedVideoDataPtr& data);
 };
