@@ -62,21 +62,33 @@ QnConstAbstractDataPacketPtr H2645PrependParameterSets::processData(
     const QnConstAbstractDataPacketPtr& data)
 {
     const auto videoData = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
-    if (!videoData || !videoData->context)
+    if (!videoData)
         return data;
 
+    if (auto result = processVideoData(videoData))
+        return result;
+
+    return data;
+}
+
+QnCompressedVideoDataPtr H2645PrependParameterSets::processVideoData(
+    const QnConstCompressedVideoDataPtr& videoData)
+{
+    if (!videoData->context)
+        return nullptr;
+
     if (!(videoData->flags & QnAbstractMediaData::MediaFlags_AVKey))
-        return data;
+        return nullptr;
 
     const bool isH264 = videoData->compressionType == AV_CODEC_ID_H264;
     const bool isH265 = videoData->compressionType == AV_CODEC_ID_H265;
     if (!isH264 && !isH265)
-        return data;
+        return nullptr;
 
     const uint8_t* extraData = videoData->context->getExtradata();
     const int extraDataSize = videoData->context->getExtradataSize();
     if (!extraData || extraDataSize <= 0)
-        return data;
+        return nullptr;
 
     const bool isAnnexB = nx::media::nal::isStartCode(extraData, extraDataSize);
     const auto units = isAnnexB
@@ -90,7 +102,7 @@ QnConstAbstractDataPacketPtr H2645PrependParameterSets::processData(
         : h265HasKeyframeWithoutParamSets(units);
 
     if (!needsPrepend)
-        return data;
+        return nullptr;
 
     std::vector<uint8_t> header;
     if (isAnnexB)
@@ -106,7 +118,7 @@ QnConstAbstractDataPacketPtr H2645PrependParameterSets::processData(
         if (headerAnnexB.empty())
         {
             NX_WARNING(this, "Failed to read parameter sets from extradata");
-            return data;
+            return nullptr;
         }
         header = nx::media::nal::convertStartCodesToSizes(
             headerAnnexB.data(), headerAnnexB.size());
