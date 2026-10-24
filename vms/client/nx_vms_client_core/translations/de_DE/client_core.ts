@@ -13,7 +13,7 @@
     <name>QnSystemsModel</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Neue Site</translation>
     </message>
     <message>
       <source>Your Site</source>
