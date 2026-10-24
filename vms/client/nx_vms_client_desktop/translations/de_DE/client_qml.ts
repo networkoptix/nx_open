@@ -1191,7 +1191,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Keine Gruppen</translation>
     </message>
     <message>
       <source>LDAP</source>
