@@ -1142,7 +1142,7 @@
       <comment>Numerus form depends on the amount of items</comment>
       <translation type="unfinished">
         <numerusform>Unmute Items</numerusform>
-        <numerusform>Unmute Items</numerusform>
+        <numerusform>Stummschaltung für Elemente aufheben</numerusform>
       </translation>
     </message>
     <message>
@@ -1302,7 +1302,7 @@
     <message numerus="yes">
       <source>Delete %n groups?</source>
       <translation type="unfinished">
-        <numerusform>Delete %n groups?</numerusform>
+        <numerusform>%n Gruppe löschen?</numerusform>
         <numerusform>Delete %n groups?</numerusform>
       </translation>
     </message>
@@ -1644,7 +1644,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Cannot reach the server</source>
-      <translation type="unfinished">Cannot reach the server</translation>
+      <translation>Der Server ist nicht erreichbar</translation>
     </message>
     <message>
       <source>Username or Password are incorrect</source>
@@ -1911,7 +1911,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>RHI backend</source>
-      <translation type="unfinished">RHI backend</translation>
+      <translation>RHI-Backend</translation>
     </message>
     <message>
       <source>RHI device</source>
@@ -2470,7 +2470,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Year</source>
-      <translation type="unfinished">Year</translation>
+      <translation>Jahr</translation>
     </message>
   </context>
   <context>
@@ -3459,7 +3459,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings are read-only. Please contact your site administrator. All changes will be lost after program exit.</translation>
+      <translation>Die Einstellungen sind schreibgeschützt. Bitte wenden Sie sich an Ihren Site-Administrator. Alle Änderungen gehen nach dem Beenden des Programms verloren.</translation>
     </message>
   </context>
   <context>
@@ -4541,7 +4541,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
-      <translation type="unfinished">Choose a read-write policy to define how interact with storage directories.</translation>
+      <translation>Wählen Sie eine Lese-/Schreibrichtlinie, um festzulegen, wie mit Speicherverzeichnissen interagiert wird.</translation>
     </message>
     <message>
       <source>Exclusive</source>
@@ -4570,7 +4570,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</source>
-      <translation type="unfinished">Shared - server reads from all folders but writes only to its own folder. It deletes old data only from its own folder.</translation>
+      <translation>Geteilt - Der Server liest von allen Ordnern, schreibt aber nur in seinem eigenen Ordner. Er löscht alte Daten nur aus seinem eigenen Ordner.</translation>
     </message>
     <message>
       <source>Isolated - server reads and writes exclusively to its own folder. It deletes old data only from its own folder.</source>
@@ -5100,7 +5100,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Site will stop functioning today</source>
-      <translation type="unfinished">Site will stop functioning today</translation>
+      <translation>Die Site wird heute nicht mehr funktionieren</translation>
     </message>
     <message>
       <source>Site will stop functioning tomorrow</source>
@@ -6052,7 +6052,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <source>%n removed servers</source>
       <translation type="unfinished">
         <numerusform>%n removed servers</numerusform>
-        <numerusform>%n removed servers</numerusform>
+        <numerusform>%n entfernte Server</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -6186,7 +6186,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Suchkriterien ändern oder neue Gruppe erstellen</translation>
     </message>
     <message>
       <source>Multiple groups share the same name, which can lead to confusion. To maintain a clear and organized structure, we suggest providing unique names for each group.</source>
@@ -6819,7 +6819,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Setting was changed</source>
-      <translation type="unfinished">Setting was changed</translation>
+      <translation>Einstellung wurde geändert</translation>
     </message>
     <message>
       <source>&quot;All archive&quot; option was changed to &quot;Motion, Objects, Bookmarks&quot; due to cloud storage backup was enabled</source>
@@ -7752,7 +7752,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>This web page is requesting access to your account for authorization</source>
-      <translation type="unfinished">This web page is requesting access to your account for authorization</translation>
+      <translation>Diese Webseite benötigt Zugriff auf Ihr Konto zur Autorisierung</translation>
     </message>
   </context>
   <context>
@@ -8846,7 +8846,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Failed to merge %1 to our site.</source>
-      <translation type="unfinished">Failed to merge %1 to our site.</translation>
+      <translation>Fehler beim Zusammenführen von %1 mit unserer Site.</translation>
     </message>
   </context>
   <context>
@@ -9337,11 +9337,11 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>An object doesn&apos;t have attributes that matches selected list</source>
-      <translation type="unfinished">An object doesn&apos;t have attributes that matches selected list</translation>
+      <translation>Ein Objekt verfügt über keine Attribute, die mit der ausgewählten Liste übereinstimmen</translation>
     </message>
     <message>
       <source>Object was added to the List</source>
-      <translation type="unfinished">Object was added to the List</translation>
+      <translation>Das Objekt wurde der Liste hinzugefügt</translation>
     </message>
     <message>
       <source>An object has been added to the &quot;%1&quot; successfully</source>
@@ -9439,7 +9439,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MembersModel</name>
     <message>
       <source>This group has been assigned at organization level and can be managed only at organization level</source>
-      <translation type="unfinished">This group has been assigned at organization level and can be managed only at organization level</translation>
+      <translation>Diese Gruppe wurde auf Organisationsebene zugeordnet und kann nur auf Organisationsebene verwaltet werden</translation>
     </message>
     <message>
       <source>The user has been assigned to this group at organization level and can be unassigned only at organization level</source>
@@ -9482,7 +9482,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Sites zusammenführen</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -10374,7 +10374,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>The web page can interact with the Desktop Client and request access to the user session</source>
-      <translation type="unfinished">The web page can interact with the Desktop Client and request access to the user session</translation>
+      <translation>Die Webseite kann mit dem Desktop-Client interagieren und Zugriff auf die Benutzersitzung anfordern</translation>
     </message>
     <message>
       <source>An integration may interact with the Desktop Client and request access to the user session</source>
@@ -10622,7 +10622,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Ausgesetzt</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11397,7 +11397,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Your access to the Site expires %1</source>
       <comment>%1 is a date</comment>
-      <translation type="unfinished">Your access to the Site expires %1</translation>
+      <translation>Ihr Zugriff auf die Site läuft ab %1</translation>
     </message>
     <message>
       <source>Your access to the Site expires in %1</source>
@@ -11883,7 +11883,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Stellen Sie sicher, dass dieser Computer eine Verbindung zu %1 Herstellen kann</translation>
     </message>
     <message>
       <source>in %1</source>
@@ -12398,7 +12398,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Neue Site</translation>
     </message>
   </context>
   <context>
@@ -13079,7 +13079,7 @@ Wir empfehlen Ihnen, diese Webseite nicht zu öffnen. Wenn Sie die Risiken verst
     <message>
       <source>On %1, the system will automatically disable the service on some devices.</source>
       <comment>%1 will be substituted with date and time</comment>
-      <translation type="unfinished">On %1, the system will automatically disable the service on some devices.</translation>
+      <translation>Am %1wird das System den Dienst auf einigen Geräten automatisch deaktivieren.</translation>
     </message>
   </context>
   <context>

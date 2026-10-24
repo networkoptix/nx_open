@@ -56,7 +56,7 @@
     <message>
       <source>License is not validated by %1</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">License is not validated by %1</translation>
+      <translation>Lizenz wurde nicht von %1 validiert</translation>
     </message>
     <message>
       <source>Invalid type</source>

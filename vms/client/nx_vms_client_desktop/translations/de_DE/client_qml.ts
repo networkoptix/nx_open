@@ -539,7 +539,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Ausgesetzt</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -1184,7 +1184,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Keine Gruppen</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1232,7 +1232,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Keine Geräte verbunden.</translation>
     </message>
   </context>
   <context>
@@ -1243,7 +1243,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Die Digest-Authentifizierung ist veraltet und wird in der nächsten Version deaktiviert. Sie sollte nur verwendet werden, wenn die standardmäßige Bearer-Authentifizierung nicht möglich ist. Benutzeranmeldungen dürfen nur aus Kleinbuchstaben bestehen.</translation>
     </message>
   </context>
   <context>
@@ -1867,7 +1867,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Integrations-Pairing-Code</translation>
     </message>
   </context>
   <context>
@@ -1890,11 +1890,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Suchkriterien ändern oder neue Gruppe erstellen</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Keine Gruppen</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
@@ -2480,7 +2480,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Die Website wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
@@ -2568,7 +2568,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Durch Aktivierung dieser Option können Drittanbieter die Genehmigung zur Registrierung einer Integration beantragen. Es sind Sicherheitsvorkehrungen getroffen, die Option sollte jedoch deaktiviert werden, sobald alle erforderlichen Integrationen installiert sind – eine längere Nutzung wird nicht empfohlen.</translation>
     </message>
   </context>
   <context>
@@ -2777,7 +2777,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Über das Kontextmenü können Sie Sites aus der Hauptliste ausblenden</translation>
     </message>
   </context>
   <context>
@@ -3068,7 +3068,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Stellen Sie sicher, dass dieser Computer eine Verbindung zu %1 Herstellen kann</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
