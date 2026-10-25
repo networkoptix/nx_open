@@ -1055,7 +1055,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sites zusammenführen...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -6166,9 +6166,9 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message numerus="yes">
       <source>Delete %n groups</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n groups</numerusform>
-        <numerusform>Delete %n groups</numerusform>
+      <translation>
+        <numerusform>%n Gruppe löschen</numerusform>
+        <numerusform>%n Gruppe löschen</numerusform>
       </translation>
     </message>
     <message>
@@ -7927,7 +7927,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Neue Site</translation>
     </message>
   </context>
   <context>
@@ -9473,7 +9473,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Neue Site</translation>
     </message>
     <message>
       <source>Site was not found.</source>
