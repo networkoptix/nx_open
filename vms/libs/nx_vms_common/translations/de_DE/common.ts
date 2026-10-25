@@ -1449,7 +1449,7 @@
     <name>SystemHelpers</name>
     <message>
       <source>New Site</source>
-      <translation type="unfinished">New Site</translation>
+      <translation>Neue Site</translation>
     </message>
   </context>
   <context>
