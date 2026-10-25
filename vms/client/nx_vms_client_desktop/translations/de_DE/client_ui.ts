@@ -1660,7 +1660,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sites zusammenführen...</translation>
     </message>
     <message>
       <source>Take system name and settings from</source>
