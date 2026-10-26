@@ -11,6 +11,7 @@ from itertools import chain
 from pathlib import Path
 import platform
 import shutil
+import stat
 import sys
 import yaml
 import os
@@ -344,6 +345,10 @@ class NxOpenConan(ConanFile):
             self.import_files_from_package(package, "bin", "bin", "*.dll")
             self.import_files_from_package(package, "bin", "bin", "*.pdb")
 
+    def canHardlink(self, src):
+        # Symlinks must stay symlinks.
+        return not stat.S_ISLNK(src.lstat().st_mode)
+
     def finish_import(self):
         for dst, src in self.__imported_files.items():
             if dst.exists() and dst.stat().st_mtime == src.stat().st_mtime:
@@ -354,9 +359,15 @@ class NxOpenConan(ConanFile):
 
             dst.unlink(missing_ok=True)
             self.output.info(f"Importing {src} -> {dst}")
-            shutil.copy2(src, dst, follow_symlinks=False)
 
-        self.fixLibraryPermissions()
+            if self.canHardlink(src):
+                try:
+                    os.link(src, dst)
+                    continue
+                except OSError:
+                    pass
+
+            shutil.copy2(src, dst, follow_symlinks=False)
 
         with open(Path(self.generators_folder) / "conan_imported_files.txt", "w") as file:
             for dst, src in self.__imported_files.items():
@@ -406,14 +417,6 @@ class NxOpenConan(ConanFile):
 
         if finish_import:
             self.finish_import()
-
-    # Temporary workaround for conan issue 6470.
-    def fixLibraryPermissions(self):
-        if platform.system() == "Windows":
-            return
-
-        if self._lib_path.is_dir():
-            self.run(f"chmod -R u+w {self._lib_path}")
 
     @property
     def isLinux(self):
