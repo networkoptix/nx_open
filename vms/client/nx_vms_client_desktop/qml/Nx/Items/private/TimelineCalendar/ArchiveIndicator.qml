@@ -29,7 +29,7 @@ Item
             switch (timePeriodType)
             {
                 case CommonGlobals.RecordingContent:
-                    return cameraHasArchive ? ColorTheme.colors.green_l : ColorTheme.colors.green_d
+                    return cameraHasArchive ? ColorTheme.colors.green : ColorTheme.colors.green_bg
                 case CommonGlobals.MotionContent:
                     return cameraHasArchive ? ColorTheme.colors.red_l : ColorTheme.colors.red_d
                 case CommonGlobals.AnalyticsContent:
