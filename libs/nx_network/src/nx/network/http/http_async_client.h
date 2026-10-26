@@ -3,6 +3,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -443,6 +444,8 @@ private:
     Request m_request;
     Message m_response;
     nx::Buffer m_responseMessageBody;
+    /** Decoded response body size, including bytes already fetched from m_responseMessageBody. */
+    std::uint64_t m_responseMessageBodySize = 0;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     std::unique_ptr<AsyncMessagePipeline> m_messagePipeline;
     std::unique_ptr<HarEntry> m_harEntry;

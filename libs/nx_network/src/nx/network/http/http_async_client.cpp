@@ -678,11 +678,9 @@ void AsyncClient::doRequest(
     if (m_harEntry)
     {
         m_harEntry->setRequest(
-            method,
-            url.toString(),
-            m_request.headers);
+            method, url.toString(), m_request.requestLine.version, m_request.headers);
 
-        if (method == Method::post || method == Method::put)
+        if (!m_request.messageBody.empty())
             m_harEntry->setRequestBody(m_request.messageBody);
     }
 
@@ -846,6 +844,16 @@ void AsyncClient::asyncConnectDone(SystemError::ErrorCode errorCode)
 void AsyncClient::sendRequest()
 {
     m_state = State::sSendingRequest;
+
+    if (m_harEntry)
+    {
+        // If socket is reused, we will get straight here without prior `asyncConnectDone`.
+        if (const auto& socket = m_messagePipeline->socket())
+        {
+            m_harEntry->setServerAddress(
+                socket->getForeignAddress().address.toString(), socket->getForeignAddress().port);
+        }
+    }
 
     Message msg(MessageType::request);
     *msg.request = m_request;
@@ -1069,6 +1077,7 @@ void AsyncClient::onSomeMessageBodyAvailable(nx::Buffer buffer)
     if (isIgnoringCurrentMessage())
         return;
 
+    m_responseMessageBodySize += buffer.size();
     m_responseMessageBody += std::move(buffer);
 
     emitSomeMessageBodyAvailable();
@@ -1093,6 +1102,9 @@ void AsyncClient::onMessageEnd()
     if (m_harEntry)
     {
         m_harEntry->setResponseBody(m_responseMessageBody);
+        m_harEntry->setResponseBodySize(
+            m_messagePipeline->parser().streamReader().messageBodyBytesRead());
+        m_harEntry->setResponseContentSize(m_responseMessageBodySize);
         m_harEntry.reset();
     }
 
@@ -1155,6 +1167,7 @@ void AsyncClient::resetDataBeforeNewRequest()
     m_numberOfRedirectsTried = 0;
     m_request = nx::network::http::Request();
     m_responseMessageBody.clear();
+    m_responseMessageBodySize = 0;
     m_response = Message();
 }
 
