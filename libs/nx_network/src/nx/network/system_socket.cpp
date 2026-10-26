@@ -1370,6 +1370,25 @@ bool TCPSocket::getKeepAlive(std::optional< KeepAliveOptions >* result) const
 // class TCPServerSocket
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
+
+/**
+ * Accepts a connection with the close-on-exec flag set on the new descriptor: child processes
+ * created by exec() must not inherit accepted connections (the same as in Socket::createSocket()).
+ */
+static int acceptCloseOnExec(int fd)
+{
+#ifdef _WIN32
+    return ::accept(fd, NULL, NULL);
+#elifdef __linux__
+    return ::accept4(fd, NULL, NULL, SOCK_CLOEXEC);
+#else
+    const int newFd = ::accept(fd, NULL, NULL);
+    if (newFd >= 0)
+        ::fcntl(newFd, F_SETFD, FD_CLOEXEC);
+    return newFd;
+#endif
+}
+
 /**
  * @return fd (>=0) on success, <0 on error (-2 if timed out)
  */
@@ -1379,7 +1398,7 @@ static int acceptWithTimeout(
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept(fd, NULL, NULL);
+        return acceptCloseOnExec(fd);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1407,7 +1426,7 @@ static int acceptWithTimeout(
         ::SetLastError(errorCode);
         return -1;
     }
-    return ::accept(fd, NULL, NULL);
+    return acceptCloseOnExec(fd);
 #else
     struct pollfd sockPollfd;
     memset(&sockPollfd, 0, sizeof(sockPollfd));
@@ -1425,7 +1444,7 @@ static int acceptWithTimeout(
         return -1;
     }
     if (sockPollfd.revents & POLLIN)
-        return ::accept(fd, NULL, NULL);
+        return acceptCloseOnExec(fd);
 
     if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE

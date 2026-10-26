@@ -3,10 +3,22 @@
 #include <memory>
 #include <thread>
 
+#ifndef _WIN32
+    #include <fcntl.h>
+    #include <signal.h>
+    #include <spawn.h>
+    #include <sys/wait.h>
+    #include <unistd.h>
+#endif
+
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
+
+#ifndef _WIN32
+extern "C" char** environ;
+#endif
 
 namespace nx::network::test {
 
@@ -18,6 +30,14 @@ public:
     {
         if (m_client)
             m_client->pleaseStopSync();
+
+#ifndef _WIN32
+        if (m_childPid > 0)
+        {
+            ::kill(m_childPid, SIGKILL);
+            ::waitpid(m_childPid, nullptr, 0);
+        }
+#endif
     }
 
 protected:
@@ -37,6 +57,37 @@ protected:
          m_acceptedSocket = m_tcpServerSocket.accept();
          ASSERT_EQ(SystemError::noError, connected.get_future().get());
     }
+
+#ifndef _WIN32
+    void thenAcceptedSocketHasCloseOnExecFlag()
+    {
+        const int flags = ::fcntl(m_acceptedSocket->handle(), F_GETFD);
+        ASSERT_NE(-1, flags);
+        ASSERT_TRUE(flags & FD_CLOEXEC);
+    }
+
+    // The child is spawned without any descriptor filtering (unlike QProcess with
+    // UnixProcessFlag::CloseFileDescriptors): only the close-on-exec flag of the accepted
+    // socket prevents inheriting it.
+    void whenSpawnLongLivingChildProcess()
+    {
+        const char* argv[] = {"/bin/sleep", "60", nullptr};
+        ASSERT_EQ(0,
+            ::posix_spawn(
+                &m_childPid, argv[0], nullptr, nullptr, const_cast<char* const*>(argv), environ));
+    }
+
+    void whenCloseAcceptedSocket() { m_acceptedSocket.reset(); }
+
+    void thenClientReceivesEofImmediately()
+    {
+        ASSERT_TRUE(m_client->setNonBlockingMode(false));
+        ASSERT_TRUE(m_client->setRecvTimeout(3000));
+
+        char buf[1];
+        ASSERT_EQ(0, m_client->recv(buf, sizeof(buf), 0)) << SystemError::getLastOSErrorText();
+    }
+#endif
 
     void thenTimeoutsAreReportedCorrectly()
     {
@@ -70,6 +121,9 @@ private:
     std::unique_ptr<TCPSocket> m_client;
     TCPServerSocket m_tcpServerSocket;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
+#ifndef _WIN32
+    pid_t m_childPid = 0;
+#endif
 
     virtual void SetUp() override
     {
@@ -224,6 +278,23 @@ TEST_F(TcpSocket, accepted_socket_timeouts_properly_reported)
     whenAcceptedSocket();
     thenTimeoutsAreReportedCorrectly();
 }
+
+#ifndef _WIN32
+
+// Child process spawned while a connection is open must not keep the connection alive after the
+// server has closed it. The accepted descriptor must be marked close-on-exec for that.
+TEST_F(TcpSocket, accepted_socket_is_not_inherited_by_child_process)
+{
+    whenAcceptedSocket();
+    thenAcceptedSocketHasCloseOnExecFlag();
+
+    whenSpawnLongLivingChildProcess();
+    whenCloseAcceptedSocket();
+
+    thenClientReceivesEofImmediately();
+}
+
+#endif
 
 TEST(TcpServerSocketIpv6, BindsToLocalAddress)
 {

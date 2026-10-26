@@ -553,7 +553,9 @@ inline constexpr char kETag[] = "ETag";
 inline constexpr char kHost[] = "Host";
 inline constexpr char kIfMatch[] = "If-Match";
 inline constexpr char kIfNoneMatch[] = "If-None-Match";
+inline constexpr char kKeepAlive[] = "Keep-Alive";
 inline constexpr char kUserAgent[] = "User-Agent";
+
 inline constexpr char kAmznTraceId[] = "X-Amzn-Trace-Id";
 inline constexpr char kXCache[] = "X-Cache";
 inline constexpr char kRequestId[] = "X-Request-Id";

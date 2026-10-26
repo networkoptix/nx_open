@@ -6,6 +6,7 @@
 
 #include <chrono>
 
+#include <nx/network/aio/timer.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
@@ -13,19 +14,18 @@
 #include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/writable_message_body.h>
-#include <nx/network/url/url_builder.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/network/ssl/context.h>
 #include <nx/network/ssl/ssl_stream_socket.h>
-#include <nx/network/socket_delegate.h>
-#include <nx/network/system_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/message_body.h>
 #include <nx/network/test_support/synchronous_tcp_server.h>
-#include <nx/network/aio/timer.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 #include <nx/utils/random.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/time.h>
 #include <nx/utils/uuid.h>
 
 #include "repeating_buffer_msg_body_source.h"
@@ -115,6 +115,8 @@ static constexpr char kEmptyResourceLimitedByConnectionClosurePath[] =
 static constexpr char kMalformedResponsePath[] = "/HttpClientTest/malformed-response";
 static constexpr char kPartialBodyResponsePath[] = "/HttpClientTest/partial-body-response";
 static constexpr char kSaveRequestPath[] = "/HttpClientTest/save-request";
+static constexpr char kKeepAliveTimeoutPath[] = "/HttpClientTest/keep-alive-timeout";
+static constexpr auto kServerKeepAliveTimeout = std::chrono::seconds(2);
 static constexpr auto kPartialBodyReadTimeout = 50ms;
 
 static constexpr char kResponseBody[] = "testtesttest";
@@ -188,6 +190,10 @@ protected:
                 sendMalformedResponse(std::forward<decltype(args)>(args)...);
             });
 
+        m_httpServer.registerRequestProcessorFunc(kKeepAliveTimeoutPath,
+            [this](auto&&... args)
+            { sendResponseWithKeepAliveTimeout(std::forward<decltype(args)>(args)...); });
+
         m_httpServer.registerStaticProcessor(
             kFiniteResourcePath,
             kResponseBody,
@@ -252,6 +258,18 @@ protected:
     {
         whenSendGetRequest();
         thenSuccessResponseIsReceived();
+    }
+
+    void givenClientWithPersistentConnectionToServerWithKeepAliveTimeout()
+    {
+        m_client->doGet(prepareUrl(kKeepAliveTimeoutPath), [this]() { saveResponse(); });
+        thenSuccessResponseIsReceived();
+    }
+
+    void whenSendGetRequestAfterIdlePeriod(std::chrono::milliseconds idlePeriod)
+    {
+        m_timeShift.applyRelativeShift(idlePeriod);
+        whenSendGetRequest();
     }
 
     void givenHttpClientInitializedWithPreexistingConnectionToServer()
@@ -552,6 +570,14 @@ protected:
         }
     }
 
+    void andANewTcpConnectionHasBeenUsed()
+    {
+        std::set<std::uint64_t> connectionIds;
+        while (!m_receivedRequests.empty())
+            connectionIds.insert(m_receivedRequests.pop().connectionAttrs.id);
+        ASSERT_EQ(2U, connectionIds.size());
+    }
+
     void andTheSameTcpConnectionHasBeenUsed()
     {
         std::optional<std::uint64_t> connectionId;
@@ -611,6 +637,7 @@ private:
     RequestResult m_prevRequestResult;
     std::unique_ptr<AbstractMsgBodySource> m_responseBodySource;
     std::unique_ptr<AbstractStreamSocket> m_preestablishedConnection;
+    nx::utils::test::ScopedTimeShift m_timeShift{nx::utils::test::ClockType::steady};
 
     void configureClient()
     {
@@ -625,6 +652,19 @@ private:
     {
         m_receivedRequests.push(std::move(requestContext));
         completionHandler(nx::network::http::StatusCode::ok);
+    }
+
+    void sendResponseWithKeepAliveTimeout(nx::network::http::RequestContext requestContext,
+        nx::network::http::RequestProcessedHandler completionHandler)
+    {
+        m_receivedRequests.push(std::move(requestContext));
+
+        http::RequestResult result(StatusCode::ok);
+        result.headers.emplace(header::kKeepAlive,
+            header::KeepAlive(
+                std::chrono::duration_cast<std::chrono::seconds>(kServerKeepAliveTimeout))
+                .toString());
+        completionHandler(std::move(result));
     }
 
     void handleExtraResponseMessageRequest(
@@ -835,6 +875,28 @@ TEST_F(HttpAsyncClient, silently_reconnects_if_inactive_persistent_connection_is
     whenSendGetRequest();
 
     thenSuccessResponseIsReceived();
+}
+
+TEST_F(HttpAsyncClient, reuses_persistent_connection_within_server_keep_alive_timeout)
+{
+    givenClientWithPersistentConnectionToServerWithKeepAliveTimeout();
+
+    whenSendGetRequest();
+
+    thenSuccessResponseIsReceived();
+    andTheSameTcpConnectionHasBeenUsed();
+}
+
+TEST_F(HttpAsyncClient, does_not_reuse_persistent_connection_idle_for_server_keep_alive_timeout)
+{
+    givenClientWithPersistentConnectionToServerWithKeepAliveTimeout();
+
+    // The server may close the connection at any moment close to the timeout. The client must
+    // not risk sending a request that is lost without any response.
+    whenSendGetRequestAfterIdlePeriod(kServerKeepAliveTimeout - std::chrono::milliseconds(500));
+
+    thenSuccessResponseIsReceived();
+    andANewTcpConnectionHasBeenUsed();
 }
 
 TEST_F(HttpAsyncClient, message_body_receival_can_be_stopped_and_resumed)
