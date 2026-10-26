@@ -3,6 +3,9 @@
 #include "har.h"
 
 #include <chrono>
+#include <optional>
+#include <string>
+#include <string_view>
 
 #include <cpptrace/cpptrace.hpp>
 
@@ -11,11 +14,15 @@
 #include <QtCore/QDir>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QString>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include <nx/branding.h>
 #include <nx/build_info.h>
 #include <nx/kit/ini_config.h>
+#include <nx/utils/log/format.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std_string_utils.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace {
@@ -48,16 +55,71 @@ QVariantList getFrameList(const cpptrace::raw_trace& rawTrace)
     return stacktraceList;
 }
 
+static QString dateTimeAsString(QDateTime dateTime)
+{
+    dateTime.setTimeZone(QTimeZone::systemTimeZone());
+    return dateTime.toString(Qt::ISODateWithMs);
+}
+
 static QString currentDateTimeAsString()
 {
-    QDateTime local(QDateTime::currentDateTime());
-    local.setTimeZone(QTimeZone::systemTimeZone());
-    return local.toString(Qt::ISODateWithMs);
+    return dateTimeAsString(QDateTime::currentDateTime());
 }
 
 } // namespace
 
 namespace nx::network::http {
+
+namespace {
+
+std::string contentType(const HttpHeaders& headers)
+{
+    const auto it = headers.find(header::ContentType::NAME);
+    return it == headers.end() ? std::string() : it->second;
+}
+
+/**
+ * @return Lower-case media type without parameters, e.g. "application/soap+xml" for
+ * "application/soap+xml; charset=utf-8".
+ */
+std::string mediaType(const std::string& contentType)
+{
+    return nx::utils::trim(header::ContentType(contentType).value);
+}
+
+bool isTextMediaType(std::string_view type)
+{
+    return type.starts_with("text/") || type == header::ContentType::kJson.value
+        || type == header::ContentType::kXml.value || type == header::ContentType::kForm.value
+        || type.ends_with("+json") //< E.g. "application/problem+json".
+        || type.ends_with("+xml"); //< E.g. "application/soap+xml".
+}
+
+QString toHarHttpVersion(const MimeProtoVersion& version)
+{
+    return NX_FMT("%1/%2", version.protocol, version.version);
+}
+
+QVariantList toHarHeaders(const HttpHeaders& headers)
+{
+    QVariantList result;
+    for (const auto& [name, value]: headers)
+    {
+        result.append(QVariantMap{
+            {"name", QString::fromStdString(name)}, {"value", QString::fromStdString(value)}});
+    }
+    return result;
+}
+
+QVariantList toHarQueryString(const QString& url)
+{
+    QVariantList result;
+    for (const auto& [name, value]: QUrlQuery(QUrl(url)).queryItems(QUrl::FullyDecoded))
+        result.append(QVariantMap{{"name", name}, {"value", value}});
+    return result;
+}
+
+} // namespace
 
 // HAR (HTTP Archive) is a JSON-formatted archive file for logging client interaction.
 // Spec: http://www.softwareishard.com/blog/har-12-spec
@@ -96,14 +158,15 @@ public:
         m_port = port;
     }
 
-    void setRequest(
-        nx::network::http::Method method,
-        const QString& url,
-        const nx::network::http::HttpHeaders& headers) override
+    void setRequest(nx::network::http::Method method,
+        QString url,
+        nx::network::http::MimeProtoVersion httpVersion,
+        nx::network::http::HttpHeaders headers) override
     {
-        m_method = method;
-        m_url = url;
-        m_requestHeaders = headers;
+        m_method = std::move(method);
+        m_url = std::move(url);
+        m_requestHttpVersion = std::move(httpVersion);
+        m_requestHeaders = std::move(headers);
     }
 
     void setResponseHeaders(
@@ -126,10 +189,25 @@ public:
         m_requestBody = body;
     }
 
+    void setRequestBodySize(std::uint64_t transferredSize) override
+    {
+        m_requestBodySize = transferredSize;
+    }
+
     void setResponseBody(const nx::Buffer& body) override
     {
         m_responseBody = body;
         m_endTime = steady_clock::now();
+    }
+
+    void setResponseBodySize(std::uint64_t transferredSize) override
+    {
+        m_responseBodySize = transferredSize;
+    }
+
+    void setResponseContentSize(std::uint64_t decodedSize) override
+    {
+        m_responseContentSize = decodedSize;
     }
 
     void markConnectStart() override
@@ -165,10 +243,14 @@ public:
 
     int getSendTime() const
     {
-        if (m_requestSentTime < m_connectDoneTime || m_connectDoneTime < m_startTime)
+        // A reused connection is not connected, so sending starts right away.
+        const auto sendStartTime =
+            m_connectDoneTime < m_startTime ? m_startTime : m_connectDoneTime;
+
+        if (m_requestSentTime < sendStartTime)
             return -1;
 
-        return duration_cast<milliseconds>(m_requestSentTime - m_connectDoneTime).count();
+        return duration_cast<milliseconds>(m_requestSentTime - sendStartTime).count();
     }
 
     int getWaitTime() const
@@ -211,17 +293,17 @@ public:
     time_point<steady_clock> m_connectDoneTime = {};
     time_point<steady_clock> m_requestSentTime = {};
     time_point<steady_clock> m_responseReceivedTime = {};
-    time_point<steady_clock> m_responseEndTime = {};
     time_point<steady_clock> m_endTime = {};
 
     cpptrace::raw_trace m_stackTrace;
 
     QString m_url;
-
+    nx::network::http::MimeProtoVersion m_requestHttpVersion;
     nx::network::http::Method m_method;
 
     nx::network::http::HttpHeaders m_requestHeaders;
     nx::Buffer m_requestBody;
+    std::optional<std::uint64_t> m_requestBodySize;
 
     std::string m_serverAddress;
     quint16 m_port = 0;
@@ -229,6 +311,8 @@ public:
     StatusLine m_statusLine;
     nx::network::http::HttpHeaders m_responseHeaders;
     nx::Buffer m_responseBody;
+    std::optional<std::uint64_t> m_responseBodySize;
+    std::optional<std::uint64_t> m_responseContentSize;
 
     std::string m_errorText;
 };
@@ -260,6 +344,8 @@ void Har::setFileName(const QString& fileName)
 
     if (d->harFile.isOpen())
         d->harFile.close();
+
+    d->entryCount = 0;
 
     if (fileName.isEmpty())
     {
@@ -344,16 +430,9 @@ void EntryImpl::write()
 
     QVariantMap entryInfo;
 
-    QVariantList requestHeaders;
-    for (const auto& header: m_requestHeaders)
-    {
-        requestHeaders.append(QVariantMap{
-            {"name", QString::fromStdString(header.first)},
-            {"value", QString::fromStdString(header.second)}
-        });
-    }
+    entryInfo["cache"] = QVariantMap{}; //< For Firefox compatibility.
 
-    entryInfo["startedDateTime"] = currentDateTimeAsString();
+    entryInfo["startedDateTime"] = dateTimeAsString(m_startedDateTime);
 
     entryInfo["time"] = getTotalTime();
     entryInfo["serverIPAddress"] = QString::fromStdString(m_serverAddress);
@@ -363,30 +442,27 @@ void EntryImpl::write()
         entryInfo["_serverPort"] = (int) m_port; //< For Safari compatibility.
     }
 
-    auto requestInfo = QVariantMap{
-        {"method", toString(m_method)},
+    auto requestInfo = QVariantMap{{"method", toString(m_method)},
         {"url", m_url},
-        {"httpVersion", "HTTP/1.1"},
-        {"headers", requestHeaders},
-        {"queryString", QVariantList{}},
+        {"httpVersion", toHarHttpVersion(m_requestHttpVersion)},
+        {"headers", toHarHeaders(m_requestHeaders)},
+        {"queryString", toHarQueryString(m_url)},
         {"cookies", QVariantList{}},
         {"headersSize", -1},
-        {"bodySize", 0}
-    };
+        {"bodySize", (qint64) m_requestBodySize.value_or(m_requestBody.size())}};
 
-    if ((m_method == nx::network::http::Method::post || m_method == nx::network::http::Method::put)
-        && !m_requestBody.empty())
+    if (!m_requestBody.empty())
     {
-        auto it = m_requestHeaders.find("Content-Type");
-        if (it == m_requestHeaders.end() || it->second == "application/json")
-        {
-            // If no Content-Type header is set, we assume JSON.
+        // If no Content-Type header is set, we assume JSON.
+        std::string requestContentType = contentType(m_requestHeaders);
+        if (requestContentType.empty())
+            requestContentType = header::ContentType::kJson.toString();
 
-            requestInfo["bodySize"] = QVariant((int) m_requestBody.size());
-            requestInfo["postData"] = QVariantMap{
-                {"mimeType", "application/json"}, // Placeholder for content type.
-                {"text", QString::fromUtf8(m_requestBody)}
-            };
+        if (isTextMediaType(mediaType(requestContentType)))
+        {
+            requestInfo["postData"] =
+                QVariantMap{{"mimeType", QString::fromStdString(requestContentType)},
+                    {"text", QString::fromUtf8(m_requestBody)}};
         }
     }
 
@@ -404,60 +480,42 @@ void EntryImpl::write()
 
     if (m_statusLine.statusCode != 0)
     {
-        QVariantList responseHeaders;
-        for (const auto& header: m_responseHeaders)
-        {
-            responseHeaders.append(QVariantMap{
-                {"name", QString::fromStdString(header.first)},
-                {"value", QString::fromStdString(header.second)}
-            });
-        }
+        const std::string responseContentType = contentType(m_responseHeaders);
+        const std::string responseMediaType = mediaType(responseContentType);
+        const auto decodedSize = m_responseContentSize.value_or(m_responseBody.size());
+        const auto transferredSize = m_responseBodySize.value_or(decodedSize);
 
-        QVariantMap responseInfo = {
-            {"status", m_statusLine.statusCode},
-            {"statusText", QString::fromStdString(m_statusLine.reasonPhrase)},
-            {"httpVersion", "HTTP/1.1"},
-            {"headers", responseHeaders},
-            {"cookies", QVariantList{}},
-            {"content", QVariantMap{
-                {"size", 0},
-                {"mimeType", "application/json"},
-                {"text", ""}
-            }},
-            {"redirectURL", ""},
-            {"headersSize", -1},
-            {"bodySize", 0},
-            {"_error", QString::fromStdString(m_errorText)}
-        };
+        QVariantMap content{{"size", (qint64) decodedSize},
+            {"mimeType",
+                responseContentType.empty() ? QString("x-unknown")
+                                            : QString::fromStdString(responseContentType)}};
+
+        if (transferredSize < decodedSize)
+            content["compression"] = (qint64) (decodedSize - transferredSize);
 
         if (!m_responseBody.empty())
         {
-            if (const auto it = m_responseHeaders.find("Content-Type");
-                it != m_responseHeaders.end())
+            if (isTextMediaType(responseMediaType))
             {
-                if (it->second == "application/json"
-                    || it->second.starts_with("application/xml")
-                    || it->second.starts_with("text/"))
-                {
-                    responseInfo["content"] = QVariantMap{
-                        {"size", (int) m_responseBody.size()},
-                        {"mimeType", QString::fromStdString(it->second)},
-                        {"text", QString::fromUtf8(m_responseBody)}
-                    };
-                }
-                else if (it->second.starts_with("image/"))
-                {
-                    responseInfo["content"] = QVariantMap{
-                        {"size", (int) m_responseBody.size()},
-                        {"mimeType", QString::fromStdString(it->second)},
-                        {"text", m_responseBody.toBase64().c_str()},
-                        {"encoding", "base64"}
-                    };
-                }
+                content["text"] = QString::fromUtf8(m_responseBody);
+            }
+            else if (responseMediaType.starts_with("image/"))
+            {
+                content["text"] = m_responseBody.toBase64().c_str();
+                content["encoding"] = "base64";
             }
         }
 
-        entryInfo["response"] = responseInfo;
+        entryInfo["response"] = QVariantMap{{"status", m_statusLine.statusCode},
+            {"statusText", QString::fromStdString(m_statusLine.reasonPhrase)},
+            {"httpVersion", toHarHttpVersion(m_statusLine.version)},
+            {"headers", toHarHeaders(m_responseHeaders)},
+            {"cookies", QVariantList{}},
+            {"content", content},
+            {"redirectURL", ""},
+            {"headersSize", -1},
+            {"bodySize", (qint64) transferredSize},
+            {"_error", QString::fromStdString(m_errorText)}};
     }
     else
     {
