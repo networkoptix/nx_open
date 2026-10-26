@@ -104,12 +104,23 @@ QnAbstractCompressedMetadataPtr deserializeMetaDataPacket(const QByteArray& data
     QByteArray payload;
     stream >> type;
     stream >> payload;
+    if (stream.status() != QDataStream::Ok)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Unable to deserialize metadata packet of size %1", data.size());
+        return QnAbstractCompressedMetadataPtr();
+    }
 
     switch (type)
     {
         case MetadataType::Motion:
         {
             QnMetaDataV1Light motionData;
+            if (payload.size() < (int) sizeof(motionData))
+            {
+                NX_DEBUG(
+                    NX_SCOPE_TAG, "Too short motion metadata payload: %1 bytes", payload.size());
+                return QnAbstractCompressedMetadataPtr();
+            }
             memcpy(&motionData, payload.constData(), sizeof(motionData));
             motionData.doMarshalling();
             return QnMetaDataV1::fromLightData(motionData);
