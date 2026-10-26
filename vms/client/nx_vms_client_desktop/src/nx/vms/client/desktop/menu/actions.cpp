@@ -249,10 +249,10 @@ void initialize(Manager* manager, Action* root)
 
     factory(OpenSaasPromoAction)
         .flags(NoTarget)
-        .requiredPowerUserPermissions();
+        .condition(ConditionWrapper(new RequiresAdministratorCondition()));
 
-//-------------------------------------------------------------------------------------------------
-// VMS Rules and Event log actions.
+    //---------------------------------------------------------------------------------------------
+    // VMS Rules and Event log actions.
 
     factory(OpenEventLogAction)
         .flags(GlobalHotkey | NoTarget | SingleTarget | MultiTarget

@@ -510,11 +510,10 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
                 && m_cloudStorageWatcher->enabledCloudStorageCount() > 0;
 
         case SystemHealthIndex::saasPromo:
-            return hasPowerUserPermissions()
+            return user() && user()->isAdministrator()
                 && !systemSettings()->cloudSystemId().isEmpty()
                 && systemSettings()->organizationId().isNull()
-                && !nx::branding::saasPromoUrl().isEmpty()
-                && !showOnceSettings()->saasPromo();
+                && !nx::branding::saasPromoUrl().isEmpty() && !showOnceSettings()->saasPromo();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
