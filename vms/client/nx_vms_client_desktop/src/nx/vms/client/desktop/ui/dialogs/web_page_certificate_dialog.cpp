@@ -26,16 +26,20 @@ WebPageCertificateDialog::WebPageCertificateDialog(
         : nx::vms::common::html::bold(tr("Web Page")).append(": ").append(url.toDisplayString());
 
     const QString infoText = isIntegration
-        ? tr("You try to open the\n%1\nbut this integration presented an untrusted certificate"
-            " auth.\nWe recommend you not to open this integration. If you understand the risks,"
-            " you can open the integration.", "%1 is the integration address").arg(addressLine)
-        : tr("You try to open the\n%1\nbut this web page presented an untrusted certificate auth."
-            "\nWe recommend you not to open this web page. If you understand the risks, you can"
-            " open the web page.", "%1 is the web page address").arg(addressLine);
+        ? tr("%1\nThis integration presented an untrusted certificate. It is not recommended to"
+             " open this integration unless the risks are understood and accepted.",
+              "%1 is the integration address")
+              .arg(addressLine)
+        : tr("%1\nThis web page presented an untrusted certificate. It is not recommended to"
+             " open this web page unless the risks are understood and accepted.",
+              "%1 is the web page address")
+              .arg(addressLine);
 
     setInformativeText(infoText);
 
-    addButton(tr("Connect anyway"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    addButton(isIntegration ? tr("Open Integration") : tr("Open Web Page"),
+        QDialogButtonBox::AcceptRole,
+        Qn::ButtonAccent::Warning);
 
     setStandardButtons({QDialogButtonBox::Cancel});
     button(QDialogButtonBox::Cancel)->setFocus();
