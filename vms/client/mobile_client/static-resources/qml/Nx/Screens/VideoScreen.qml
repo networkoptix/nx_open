@@ -1484,7 +1484,7 @@ Page
 
             height: 56
             visible: !LayoutController.fullscreen
-                && video.shown && (!d.ptzMode || !ptz.overlayStyle)
+                && video.shown && !(d.ptzMode && ptz.overlayStyle)
 
             anchors.bottom: content.bottom
             anchors.right: content.right
@@ -1512,30 +1512,6 @@ Page
 
                 text: timeline.labelFormatter.cameraTimestamp(
                     controller.mediaPlayer.displayedPosition, timeline.timeZone)
-            }
-
-            ControlButton
-            {
-                id: fullscreenButton
-
-                anchors.right: bottomOverlayControls.right
-                anchors.bottom: bottomOverlayControls.bottom
-                width: 48
-                height: 48
-                foregroundColor: ColorTheme.colors.light4
-                backgroundColor: "transparent"
-                icon.source: "image://skin/24x24/Outline/full_screen.svg"
-
-                onClicked:
-                {
-                    const orientation = LayoutController.preferredVideoOrientation(
-                        controller.mediaPlayer.aspectRatio,
-                        controller.resourceHelper.customRotation)
-                    LayoutController.enterFullscreen(orientation)
-                }
-
-                // To block camera swipe if the button is dragged.
-                DragHandler { target: null }
             }
         }
 
@@ -1582,6 +1558,32 @@ Page
                     }
                 }
             }
+        }
+
+        ControlButton
+        {
+            id: fullscreenButton
+
+            visible: !LayoutController.fullscreen && !(d.ptzMode && ptz.overlayStyle)
+
+            anchors.right: content.right
+            anchors.bottom: content.bottom
+            width: 48
+            height: 48
+            foregroundColor: ColorTheme.colors.light4
+            backgroundColor: "transparent"
+            icon.source: "image://skin/24x24/Outline/full_screen.svg"
+
+            onClicked:
+            {
+                const orientation = LayoutController.preferredVideoOrientation(
+                    controller.mediaPlayer.aspectRatio,
+                    controller.resourceHelper.customRotation)
+                LayoutController.enterFullscreen(orientation)
+            }
+
+            // To block camera swipe if the button is dragged.
+            DragHandler { target: null }
         }
 
         Ptz
