@@ -12,6 +12,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/reflect/enum_instrument.h>
 #include <nx/telemetry/http_span.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/interruption_flag.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -466,6 +467,8 @@ private:
     std::unique_ptr<AbstractMsgBodySource> m_requestBody;
     bool m_readingCeased = false;
     bool m_isPersistentConnection = false;
+    std::chrono::milliseconds m_serverKeepAliveTimeout = std::chrono::milliseconds::zero();
+    nx::utils::ElapsedTimer m_connectionIdleTimer;
     int m_closeHandlerId = -1;
     ssl::AdapterFunc m_adapterFunc;
     std::optional<KeepAliveOptions> m_keepAliveOptions;
@@ -487,6 +490,7 @@ private:
     void resetDataBeforeNewRequest();
     void initiateHttpMessageDelivery();
     ConnectionReusePolicy getConnectionReusePolicy() const;
+    bool isPersistentConnectionExpired() const;
     void sendRequestOverExternalConnection();
     bool configureSocket(AbstractStreamSocket* connection);
     void initiateTcpConnection();

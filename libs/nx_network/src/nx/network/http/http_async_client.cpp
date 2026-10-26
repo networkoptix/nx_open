@@ -36,6 +36,13 @@ namespace nx::network::http {
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * A persistent connection is not reused if it has been idle for at least
+ * (server Keep-Alive timeout - this margin): the request must reach the server before the
+ * server closes the idle connection.
+ */
+static constexpr std::chrono::milliseconds kKeepAliveTimeoutSafetyMargin = std::chrono::seconds(1);
+
 static ClientOptions::Timeouts kDefaultTimeouts{
     /*sendTimeout*/ std::chrono::milliseconds(10001),
     /*responseReadTimeout*/ std::chrono::milliseconds(10002),
@@ -970,9 +977,25 @@ void AsyncClient::onMessageReceived(Message message)
 
     m_response = std::move(message);
 
-    m_isPersistentConnection =
-        (m_response.version() == nx::network::http::http_1_1) &&
-        (nx::network::http::getHeaderValue(m_response.headers(), "Connection") != "close");
+    const auto connectionHeader =
+        nx::network::http::getHeaderValue(m_response.headers(), header::kConnection);
+    m_isPersistentConnection = m_response.version() == nx::network::http::http_1_1
+        && nx::utils::stricmp(connectionHeader, "close") != 0;
+
+    m_serverKeepAliveTimeout = std::chrono::milliseconds::zero();
+    if (m_isPersistentConnection)
+    {
+        // RFC 7230 (A.1.2): the server may close an idle persistent connection after the
+        // timeout given in the Keep-Alive header.
+        const auto keepAliveHeader =
+            nx::network::http::getHeaderValue(m_response.headers(), header::kKeepAlive);
+        if (header::KeepAlive keepAlive; !keepAliveHeader.empty()
+            && keepAlive.parse(keepAliveHeader)
+            && keepAlive.timeout > std::chrono::seconds::zero())
+        {
+            m_serverKeepAliveTimeout = keepAlive.timeout;
+        }
+    }
 
     if (isMalformed(*m_response.response))
     {
@@ -1064,6 +1087,7 @@ void AsyncClient::onMessageEnd()
 
     const auto ignore = isIgnoringCurrentMessage();
     ++m_messageReceivedThroughTheCurrentConnectionCount;
+    m_connectionIdleTimer.restart();
     if (ignore)
     {
         ++m_currentMessageNumber;
@@ -1160,6 +1184,8 @@ void AsyncClient::initiateHttpMessageDelivery()
         m_totalRequestsSentViaCurrentConnection = 0;
         m_messageReceivedThroughTheCurrentConnectionCount = 0;
         m_currentMessageNumber = 0;
+        m_serverKeepAliveTimeout = std::chrono::milliseconds::zero();
+        m_connectionIdleTimer.invalidate();
     }
 
     ++m_totalRequestsScheduled;
@@ -1199,8 +1225,7 @@ void AsyncClient::initiateHttpMessageDelivery()
 
 AsyncClient::ConnectionReusePolicy AsyncClient::getConnectionReusePolicy() const
 {
-    if (m_messagePipeline
-        && m_isPersistentConnection
+    if (m_messagePipeline && m_isPersistentConnection && !isPersistentConnectionExpired()
         && m_remoteEndpointWithProtocol == endpointWithProtocol(m_contentLocationUrl)
         && m_lastSysErrorCode == SystemError::noError)
     {
@@ -1211,6 +1236,31 @@ AsyncClient::ConnectionReusePolicy AsyncClient::getConnectionReusePolicy() const
         return ConnectionReusePolicy::rawConnection;
 
     return ConnectionReusePolicy::noReuse;
+}
+
+bool AsyncClient::isPersistentConnectionExpired() const
+{
+    if (m_serverKeepAliveTimeout <= std::chrono::milliseconds::zero()
+        || !m_connectionIdleTimer.isValid())
+    {
+        return false;
+    }
+
+    // The server closes a connection that has been idle for the advertised Keep-Alive timeout.
+    // A request sent over it normally fails with FIN/RST and is resent over a new connection.
+    // But a server that has leaked the descriptor to a child process sends nothing: the request
+    // is acknowledged by the kernel, never read, and the client waits for the whole response
+    // timeout. So a connection idle for (almost) the timeout is not reused at all.
+    const auto idleTime = m_connectionIdleTimer.elapsed();
+    if (idleTime + kKeepAliveTimeoutSafetyMargin < m_serverKeepAliveTimeout)
+        return false;
+
+    NX_VERBOSE(this,
+        "Not reusing connection to %1: idle for %2, server Keep-Alive timeout %3",
+        m_remoteEndpointWithProtocol,
+        idleTime,
+        m_serverKeepAliveTimeout);
+    return true;
 }
 
 void AsyncClient::sendRequestOverExternalConnection()

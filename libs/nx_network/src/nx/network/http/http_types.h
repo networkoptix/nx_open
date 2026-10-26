@@ -549,6 +549,7 @@ static constexpr char kUserAgent[] = "User-Agent";
 static constexpr char kAuthorization[] = "Authorization";
 static constexpr char kHost[] = "Host";
 static constexpr char kConnection[] = "Connection";
+static constexpr char kKeepAlive[] = "Keep-Alive";
 static constexpr char kRequestId[] = "X-Request-Id";
 static constexpr char kAmznTraceId[] = "X-Amzn-Trace-Id";
 
