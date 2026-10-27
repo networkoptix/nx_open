@@ -146,6 +146,14 @@ if(compilerClang)
     endif()
 endif()
 
+if(compilerClang AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 23)
+    # Before LLVM 23, `this` is assumed dereferenceable for the whole member function, so a member
+    # read guarded by a check that the object still exists may be hoisted above the check and
+    # executed after a callback has deleted the object (VMS-61625). LLVM 23 defaults to this flag.
+    # The value is required by LLVM 19 (Apple clang 17), where the option is unsigned.
+    add_compile_options(-mllvm -use-dereferenceable-at-point-semantics=1)
+endif()
+
 option(colorOutput "Always produce ANSI-colored output (GNU/Clang only)." OFF)
 if(${colorOutput})
     if(compilerGcc)
