@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+#include <regex>
+
 #include <nx/utils/string.h>
 
 #include "query_context.h"
@@ -76,6 +78,14 @@ std::optional<nx::utils::SoftwareVersion> parseVersion(
         build = nx::utils::stoi(tokens[2], &ok);
 
     return nx::utils::SoftwareVersion(major, minor, build);
+}
+
+std::string redactMysqlErrorValues(std::string_view errorText)
+{
+    static const std::regex kQuotedValue(
+        "(Duplicate entry |value: |character string: |convert string )"
+        "'[\\s\\S]*?'(?= for | from | QMYSQL|$)");
+    return std::regex_replace(std::string(errorText), kQuotedValue, "$1'***'");
 }
 
 } // namespace detail

@@ -38,6 +38,12 @@ namespace detail {
  */
 NX_SQL_API std::optional<nx::utils::SoftwareVersion> parseVersion(std::string_view text);
 
+/**
+ * Replaces row values that MySQL quotes in error messages (e.g. "Duplicate entry 'x' for key")
+ * with "***", so that the error text can be logged without exposing user data.
+ */
+NX_SQL_API std::string redactMysqlErrorValues(std::string_view errorText);
+
 } // namespace detail
 
 } // namespace nx::sql

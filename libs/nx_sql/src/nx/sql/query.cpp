@@ -11,6 +11,7 @@
 
 #include "abstract_db_connection.h"
 #include "db_statistics_collector.h"
+#include "utils.h"
 
 namespace nx::sql {
 
@@ -155,13 +156,13 @@ void SqlQuery::exec(const std::optional<std::string_view>& query)
     }
     else
     {
-        NX_TRACE(this, "Query %1 failed. %2",
-            m_sqlQuery.lastQuery(), m_sqlQuery.lastError().text());
+        auto error = getLastError();
+        NX_TRACE(this, "Query %1 failed. %2", m_sqlQuery.lastQuery(), error.text);
 
         telemetrySpan.setStatus(nx::telemetry::Span::Status::error);
-        telemetrySpan.setAttribute("error", m_sqlQuery.lastError().text().toStdString());
+        telemetrySpan.setAttribute("error", error.text);
 
-        throw Exception(getLastError());
+        throw Exception(std::move(error));
     }
 }
 
@@ -273,6 +274,9 @@ DBResult SqlQuery::getLastError()
     }
 
     res.text = lastError.text().toStdString();
+    if (m_driverType == RdbmsDriverType::mysql)
+        res.text = detail::redactMysqlErrorValues(res.text);
+
     if (lastError.text().contains("syntax error"))
     {
         // Ad hoc: "syntax error" in `analytics::db::Filter::freeText` is reported by QSqlQuery

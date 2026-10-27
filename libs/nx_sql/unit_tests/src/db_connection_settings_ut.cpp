@@ -2,8 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/random.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/deprecated_settings.h>
+#include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/sql/types.h>
@@ -56,6 +57,19 @@ TEST_F(DbConnectionOptions, custom_default_values_are_not_overwritten)
     givenOptionsWithCustomDefaultValues();
     havingLoadedOptionsFromSettings();
     assertIfNotOnlySpecifiedFieldsWereOverridden();
+}
+
+TEST(DbConnectionOptionsSerialization, password_is_not_serialized)
+{
+    ConnectionOptions options;
+    options.userName = "dbUser42";
+    options.password = "S3cretDbPa55";
+
+    const auto serialized = nx::reflect::json::serialize(options);
+
+    ASSERT_NE(std::string::npos, serialized.find("dbUser42"));
+    ASSERT_EQ(std::string::npos, serialized.find("S3cretDbPa55"));
+    ASSERT_EQ(std::string::npos, serialized.find("\"password\""));
 }
 
 } // namespace nx::sql::test

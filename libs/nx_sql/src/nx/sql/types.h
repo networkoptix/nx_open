@@ -120,8 +120,9 @@ public:
     bool operator==(const ConnectionOptions&) const = default;
 };
 
+// password is intentionally not instrumented so that serialized options never expose it in logs.
 NX_REFLECTION_INSTRUMENT(ConnectionOptions, (driverType)(hostName)(port)(dbName)(userName) \
-    (password)(connectOptions)(encoding)(maxConnectionCount)(inactivityTimeout) \
+    (connectOptions)(encoding)(maxConnectionCount)(inactivityTimeout) \
     (maxPeriodQueryWaitsForAvailableConnection)(maxErrorsInARowBeforeClosingConnection) \
     (failOnDbTuneError)(concurrentModificationQueryLimit)(execDDLStatements))
 
