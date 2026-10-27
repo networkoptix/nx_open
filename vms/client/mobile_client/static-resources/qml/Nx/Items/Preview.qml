@@ -119,7 +119,7 @@ Rectangle
             state: d.effectiveDataState === Preview.DataState.NoData
                 ? "noData"
                 : "cannotDecryptMedia"
-            minimumVerticalPadding: 19
+            verticalContentPadding: 19
         }
 
         GradientShadow

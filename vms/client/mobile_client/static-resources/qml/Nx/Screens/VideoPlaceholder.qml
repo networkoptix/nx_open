@@ -2,13 +2,27 @@
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Layouts
 import QtQuick.Shapes
 
 import Nx.Core
 import Nx.Core.Controls
 import Nx.Mobile.Controls
 
+/**
+ * A placeholder (overlay) to display in place of a video.
+ *
+ * Consist of a mandatory image, optional title and optional action button.
+ *
+ * The title text is wrapped by words and is allowed to occupy maximum three lines; excessive text
+ * is elided (replaced with an ellipsis). If the text doesn't fit *horizontally* (in that case
+ * the line that doesn't fit consists of just one word), it's proportionally scaled down to fit.
+ *
+ * If the placeholder doesn't fit *vertically* (including `verticalContentPadding` paddings), then:
+ *      - the title hides;
+ *      - if there's still not enough space, the action button hides;
+ *      - if there's still not enough space, the image and the surrounding `verticalContentPadding`
+ *        paddings are proportionally scaled down to fit.
+ */
 Control
 {
     id: control
@@ -30,52 +44,19 @@ Control
 
     property real highlightIntensity: type === VideoPlaceholder.Error ? 0.10 : 0.25
 
-    property real minimumVerticalPadding: 44
+    // Extra space around the content. Unlike the control paddings, it is scaled down together with
+    // the image if there is not enough space even for the image alone.
+    property real verticalContentPadding: 44
 
     property bool interactive: true
 
-    QtObject
-    {
-        id: d
-
-        // Content sizes at full scale. If the control is too small, all content is scaled down
-        // together, so the icon and the title change size smoothly.
-        readonly property real kIconSize: 48
-        readonly property real kTitleFontSize: 40
-        readonly property real kTitleTopMargin: 16
-        readonly property real kTitleMaximumWidth: 300
-        readonly property real kMinimumTitleFontSize: 10
-
-        readonly property bool hasTitle: !!control.text
-
-        // Depends only on the control size, so placeholders of the same size look the same
-        // for any title text.
-        readonly property real contentScale:
-        {
-            const titleHeight = hasTitle ? kTitleTopMargin + titleMetrics.height : 0
-            const referenceHeight = kIconSize + titleHeight + minimumVerticalPadding * 2
-            const heightScale = (control.availableHeight - button.requiredHeight) / referenceHeight
-            const widthScale = hasTitle ? control.availableWidth / kTitleMaximumWidth : 1
-            return MathUtils.bound(0, Math.min(heightScale, widthScale), 1)
-        }
-
-        // Prevents division by zero when the control has no size yet.
-        readonly property real safeScale: Math.max(contentScale, 0.01)
-    }
-
-    FontMetrics
-    {
-        id: titleMetrics
-
-        font.pixelSize: d.kTitleFontSize
-    }
+    horizontalPadding: 8
+    verticalPadding: 0
+    clip: true
 
     background: Rectangle
     {
         color: control.backgroundColor
-
-        // The highlight is scaled beyond the bounds, it must not cover the neighbor items.
-        clip: true
 
         Shape
         {
@@ -135,87 +116,104 @@ Control
 
     contentItem: Item
     {
-        ColumnLayout
+        id: content
+
+        readonly property real imageSize: 48
+        readonly property real titleSpacing: 16
+        readonly property real buttonSpacing: 24
+
+        readonly property bool hasButton: !!control.action && control.interactive
+        readonly property bool hasTitle: !!control.text
+
+        readonly property real buttonHeight: hasButton ? (buttonSpacing + button.height) : 0
+        readonly property real titleHeight:
+            hasTitle ? (titleSpacing + title.tightHeight * title.scale) : 0
+
+        readonly property real paddingsHeight: control.verticalContentPadding * 2
+
+        readonly property bool showButton: hasButton
+            && (imageSize + buttonHeight + paddingsHeight) <= content.height
+
+        readonly property bool showTitle: hasTitle
+            && (imageSize + buttonHeight + titleHeight + paddingsHeight) <= content.height
+
+        Item
         {
-            id: contentLayout
+            id: contentColumn
 
-            anchors.centerIn: parent
-            spacing: 0
+            width: content.width
+            anchors.verticalCenter: content.verticalCenter
 
-            Item
+            height:
             {
-                Layout.preferredWidth: scaledContent.implicitWidth * d.contentScale
-                Layout.preferredHeight: scaledContent.implicitHeight * d.contentScale
-                Layout.alignment: Qt.AlignHCenter
+                let result = image.height //< Might be scaled down if even the image doesn't fit.
+                if (content.showTitle)
+                    result += content.titleHeight
+                if (content.showButton)
+                    result += content.buttonHeight
+                return result
+            }
 
-                // The content always has full size and is scaled as one item. So when the control
-                // is resized (e.g. during tile animation), the icon and the title are not redrawn.
-                ColumnLayout
-                {
-                    id: scaledContent
+            ColoredImage
+            {
+                id: image
 
-                    spacing: 0
-                    scale: d.contentScale
-                    transformOrigin: Item.TopLeft
+                anchors.horizontalCenter: contentColumn.horizontalCenter
 
-                    ColoredImage
-                    {
-                        id: image
+                // If there is not enough space even for the image alone, the image and
+                // the vertical paddings are scaled down together.
+                readonly property real shrinkFactor: MathUtils.bound(0,
+                    content.height / (content.imageSize + content.paddingsHeight), 1)
 
-                        sourceSize: Qt.size(d.kIconSize, d.kIconSize)
-                        primaryColor: foregroundColor
+                width: content.imageSize * shrinkFactor
+                height: width
+                sourceSize: Qt.size(width, height)
 
-                        Layout.preferredWidth: d.kIconSize
-                        Layout.preferredHeight: d.kIconSize
-                        Layout.alignment: Qt.AlignHCenter
-                    }
+                visible: width >= 4
+                primaryColor: foregroundColor
+            }
 
-                    Text
-                    {
-                        id: title
+            Text
+            {
+                id: title
 
-                        // One line always fits. More lines are shown only if there is enough
-                        // space, otherwise the text is cut with "...".
-                        readonly property int fittingLineCount:
-                        {
-                            const availableHeight =
-                                (control.availableHeight - button.requiredHeight) / d.safeScale
-                                - d.kIconSize - d.kTitleTopMargin - minimumVerticalPadding * 2
-                            return Math.floor(availableHeight / titleMetrics.height)
-                        }
+                readonly property real tightHeight: lineHeight * lineCount
 
-                        visible: d.hasTitle
-                            && d.kTitleFontSize * d.contentScale >= d.kMinimumTitleFontSize
-                        color: control.foregroundColor
-                        font.pixelSize: d.kTitleFontSize
-                        font.capitalization: Font.AllUppercase
-                        wrapMode: Text.WordWrap
-                        elide: Text.ElideRight
-                        horizontalAlignment: Qt.AlignHCenter
-                        maximumLineCount: MathUtils.bound(1, fittingLineCount, 3)
+                width: Math.min(300, content.width)
+                scale: MathUtils.bound(0, width / contentWidth, 1)
+                transformOrigin: Item.Top
 
-                        Layout.topMargin: d.kTitleTopMargin
-                        Layout.preferredWidth: Math.min(
-                            d.kTitleMaximumWidth, control.availableWidth / d.safeScale)
-                        Layout.alignment: Qt.AlignHCenter
-                    }
-                }
+                visible: content.showTitle
+
+                anchors.top: image.bottom
+                anchors.topMargin:
+                    content.titleSpacing - Math.round((height - tightHeight) * scale / 2)
+                anchors.horizontalCenter: contentColumn.horizontalCenter
+
+                font.pixelSize: 40
+                font.capitalization: Font.AllUppercase
+                color: control.foregroundColor
+                horizontalAlignment: Qt.AlignHCenter
+                maximumLineCount: 3
+                wrapMode: Text.WordWrap
+
+                // A single word must not be elided: it is scaled down to fit instead.
+                elide: /\s/.test(text.trim()) ? Text.ElideRight : Text.ElideNone
+
+                // Fixed line height for cross-device stability.
+                lineHeightMode: Text.FixedHeight
+                lineHeight: 48
             }
 
             Button
             {
                 id: button
 
-                readonly property bool hasEnoughSpace: control.availableHeight
-                    >= implicitHeight + Layout.topMargin + d.kIconSize + minimumVerticalPadding * 2
+                visible: content.showButton
+                width: Math.min(content.width, implicitWidth)
 
-                readonly property int requiredHeight:
-                    visible ? (implicitHeight + Layout.topMargin) : 0
-
-                visible: !!action && hasEnoughSpace && control.interactive
-
-                Layout.topMargin: 24
-                Layout.alignment: Qt.AlignHCenter
+                anchors.bottom: contentColumn.bottom
+                anchors.horizontalCenter: contentColumn.horizontalCenter
             }
         }
     }
