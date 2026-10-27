@@ -851,7 +851,7 @@
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation>Kameras und Ressourcen suchen</translation>
+      <translation>Kameras &amp; Ressourcen suchen</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -875,23 +875,23 @@
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation>Windowskonfiguration speichern</translation>
+      <translation>Fensterkonfiguration speichern</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation>Windowskonfiguration</translation>
+      <translation>Fensterkonfiguration</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation>Aktuellen Status speichern</translation>
+      <translation>Aktuellen Zustand speichern</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation>Gespeicherten Status wiederherstellen</translation>
+      <translation>Gespeicherten Zustand wiederherstellen</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation>Gespeicherten Status löschen</translation>
+      <translation>Gespeicherten Zustand löschen</translation>
     </message>
     <message>
       <source>Close all Windows</source>
@@ -923,7 +923,7 @@
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation>Zellabstand</translation>
+      <translation>Zellenabstand</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>Save Current Layout As Cloud...</source>
-      <translation>Aktuelles Layout als Cloud speichern...</translation>
+      <translation>Aktuelles Layout speichern als Cloud...</translation>
     </message>
     <message>
       <source>Save Layout As Cloud...</source>
@@ -1091,7 +1091,7 @@
     </message>
     <message>
       <source>Cell Aspect Ratio</source>
-      <translation>Zelle Seitenverhältnis</translation>
+      <translation>Seitenverhältnis der Zelle</translation>
     </message>
     <message>
       <source>Layout</source>
@@ -1103,7 +1103,7 @@
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation>Startbildschirm</translation>
+      <translation>Willkommensbildschirm</translation>
     </message>
     <message>
       <source>New Welcome Screen</source>
@@ -1739,7 +1739,7 @@ Lizenzschlüssel: %2</translation>
       <source>Password must be no longer than %n characters</source>
       <translation>
         <numerusform>Das Passwort darf nicht länger als %n Zeichen sein</numerusform>
-        <numerusform>Das Passwort darf nicht länger als %n Zeichen sein</numerusform>
+        <numerusform>Die Passwörter dürfen nicht länger als %n Zeichen sein</numerusform>
       </translation>
     </message>
     <message>
@@ -1758,8 +1758,8 @@ Lizenzschlüssel: %2</translation>
       <source>Password should not contain %n or more consecutive characters together</source>
       <comment>Numerus: %n is a hardcoded 4</comment>
       <translation>
-        <numerusform>Das Passwort sollte nicht %n oder mehr aufeinanderfolgende Zeichen zusammen enthalten</numerusform>
-        <numerusform>Das Passwort sollte nicht %n oder mehr aufeinanderfolgende Zeichen zusammen enthalten</numerusform>
+        <numerusform>Passwort sollte nicht %n oder mehr aufeinander folgende Zeichen zusammen enthalten</numerusform>
+        <numerusform>Passwörter sollten nicht %n oder mehr aufeinander folgende Zeichen zusammen enthalten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1806,11 +1806,11 @@ Lizenzschlüssel: %2</translation>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation>Layout ist geschützt</translation>
+      <translation>Layout ist gesperrt</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation>Diese Kamera unterstützt kein erweitertes PTZ</translation>
+      <translation>Diese Kamera unterstützt keine erweiterten PTZ-Funktionen</translation>
     </message>
     <message>
       <source>Zooming out...</source>
@@ -1818,7 +1818,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation>Verschieben...</translation>
+      <translation>Bewegen...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
@@ -1857,14 +1857,14 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>Ändern des Dewarping-Modus</translation>
+      <translation>Entzerrungsmodus ändern</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>Möchten Sie diese Seite wirklich verlassen? Von Ihnen vorgenommene Änderungen könnten verlorengehen.</translation>
+      <translation>Möchten Sie diese Seite wirklich verlassen? Von Ihnen vorgenommene Änderungen könnten verloren gehen.</translation>
     </message>
   </context>
   <context>
@@ -1976,11 +1976,11 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Stellen Sie den kleinsten Wert ein, der die Live-Ansicht nicht beeinträchtigt. Größerer Puffer macht die Wiedergabe flüssiger, erhöht aber die Verzögerung zwischen Echtzeit- und Live-Ansicht; kleinerer Puffer verringert die Verzögerung, kann aber zu Stocken führen.</translation>
+      <translation>Stellen Sie den Wert auf den kleinsten Wert ein, der die Live-Ansicht nicht beeinträchtigt. Ein größerer Puffer sorgt für eine flüssigere Wiedergabe, erhöht aber die Verzögerung zwischen Echtzeit und Live-Ansicht; ein kleinerer Puffer verringert die Verzögerung, kann aber zu Rucklern führen.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation>Warnung! Dies ist eine experimentelle Option, die CPU spart, aber die Animation beeinträchtigen kann.</translation>
+      <translation>Achtung! Dies ist eine experimentelle Option, die CPU-Leistung spart, aber die Animation beeinträchtigen kann.</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -2000,15 +2000,15 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation>Nur Server mit öffentlichem Zertifikat verbinden</translation>
+      <translation>Verbinden Sie nur Server mit öffentlichem Zertifikat</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation>Der Zertifikatsspeicher wird gelöscht.</translation>
+      <translation>Der Zertifikatspeicher wird gelöscht.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation>Aktuelle Clientinstanz wird getrennt.</translation>
+      <translation>Die aktuelle Client-Instanz wird getrennt.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
@@ -2024,7 +2024,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation>Bei der ersten Verbindung zum Server werden Sie aufgefordert, das Zertifikat zu akzeptieren, wenn es Fehler enthält</translation>
+      <translation>Bei der ersten Verbindung zum Server werden Sie um Ihre Bestätigung gebeten, das Zertifikat zu akzeptieren, falls es Fehler enthält</translation>
     </message>
     <message>
       <source>Select Folder...</source>
@@ -2351,11 +2351,11 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation>MitM-Angriff</translation>
+      <translation>Man-in-the-Middle-Angriff</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation>MitM-Angriff von Server %1</translation>
+      <translation>Man-in-the-Middle-Angriff vom Server %1</translation>
     </message>
     <message>
       <source>Connected to %1</source>
@@ -3294,7 +3294,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation>Features</translation>
+      <translation>Funktionen</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3306,7 +3306,7 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>Archivstreams erlaubt</translation>
+      <translation>Archiv-Streams erlaubt</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -3506,11 +3506,11 @@ Lizenzschlüssel: %2</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>Legt die Zeit fest, die im Client verwendet werden soll (Zeitleiste, Zeitstempel usw.), wenn sich Client- und Servercomputer in unterschiedlichen Zeitzonen befinden.</translation>
+      <translation>Legt die Zeit fest, die im Client verwendet werden soll (Zeitleiste, Zeitstempel usw.), wenn sich Client- und Serversysteme in unterschiedlichen Zeitzonen befinden.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>Die Länge der Zeit, die jede Kamera im Layout angezeigt wird, wenn Sie eine Tour starten.</translation>
+      <translation>Dauer der Anzeige jeder Kamera im Layout beim Start einer Tour.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers.</source>
@@ -4099,7 +4099,7 @@ Lizenzschlüssel: %2</translation>
       <source>%n Layouts</source>
       <translation>
         <numerusform>%n Layout</numerusform>
-        <numerusform>%n Layout</numerusform>
+        <numerusform>%n Layouts</numerusform>
       </translation>
     </message>
   </context>
@@ -5166,7 +5166,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation>Enthält keine persönlichen Daten und ist völlig anonym.</translation>
+      <translation>Enthält keinerlei persönliche Informationen und ist vollkommen anonym.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
@@ -5178,7 +5178,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation>Wenn Failover aktiviert ist, fordert der Server unabhängig von dieser Einstellung möglicherweise weiterhin Kamerastatusaktualisierungen an.</translation>
+      <translation>Wenn Failover aktiviert ist, kann der Server unabhängig von dieser Einstellung weiterhin Kamerastatusaktualisierungen anfordern.</translation>
     </message>
     <message>
       <source>When enabled, new cameras and servers are continuously discovered and discovery requests are sent to cameras for status updates.</source>
@@ -5290,7 +5290,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <comment>Numerus form depend on the number of displays. %2 will be substituted by a list of them</comment>
       <translation>
         <numerusform>PC %1 - Monitor %2</numerusform>
-        <numerusform>PC %1 - Monitor %2</numerusform>
+        <numerusform>PC %1 - Monitore %2</numerusform>
       </translation>
     </message>
   </context>
@@ -5362,7 +5362,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Moving...</source>
-      <translation>Verschieben...</translation>
+      <translation>Bewegen...</translation>
     </message>
     <message>
       <source>Focusing...</source>
@@ -5422,15 +5422,15 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>PNG Image</source>
-      <translation>PNG-Bilddatei</translation>
+      <translation>PNG-Bild</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation>JPEG-Bilddatei</translation>
+      <translation>JPEG-Bild</translation>
     </message>
     <message>
       <source>No timestamp</source>
-      <translation>Keine Zeitmarke</translation>
+      <translation>Kein Zeitstempel</translation>
     </message>
     <message>
       <source>No camera name</source>
@@ -5736,7 +5736,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Move Partially</source>
-      <translation>Teilweise bewegen</translation>
+      <translation>Teilweise verschieben</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n layouts?</source>
@@ -6414,11 +6414,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation>Thumbnails ausblenden</translation>
+      <translation>Miniaturansichten ausblenden</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation>Thumbnails anzeigen</translation>
+      <translation>Miniaturansichten anzeigen</translation>
     </message>
     <message>
       <source>Last day</source>
@@ -6426,11 +6426,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation>Letzten 7 Tage</translation>
+      <translation>Letzte 7 Tage</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation>Letzten 30 Tage</translation>
+      <translation>Letzte 30 Tage</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
@@ -6570,7 +6570,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Logs Management</source>
-      <translation>Logs Verwaltung</translation>
+      <translation>Protokollverwaltung</translation>
     </message>
   </context>
   <context>
@@ -6640,19 +6640,19 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation>Dieses Gerät hat keinen Audioeingang oder es ist nicht richtig konfiguriert. Wählen Sie ein anderes Gerät als Audioquelle aus.</translation>
+      <translation>Dieses Gerät verfügt über keinen Audioeingang oder ist nicht korrekt konfiguriert. Wählen Sie ein anderes Gerät als Audioquelle.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation>Diese Kamera hat keinen Audioeingang oder ist nicht richtig konfiguriert. Wählen Sie eine andere Kamera als Audioquelle.</translation>
+      <translation>Diese Kamera verfügt über keinen Audioeingang oder ist nicht korrekt konfiguriert. Wählen Sie eine andere Kamera als Audioquelle.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation>Dieses Gerät hat keinen Audioausgang oder es ist nicht richtig konfiguriert. Wählen Sie ein anderes Gerät für die Audiowiedergabe aus.</translation>
+      <translation>Dieses Gerät verfügt über keinen Audioausgang oder ist nicht korrekt konfiguriert. Wählen Sie ein anderes Gerät zur Audiowiedergabe.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation>Diese Kamera hat keinen Audioausgang oder ist nicht richtig konfiguriert. Wählen Sie eine andere Kamera für die Audiowiedergabe.</translation>
+      <translation>Diese Kamera verfügt über keinen Audioausgang oder ist nicht korrekt konfiguriert. Wählen Sie eine andere Kamera für die Audiowiedergabe.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
@@ -7126,7 +7126,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Hilft, Probleme mit der Bildqualität bei einigen Kameras zu beheben; bei anderen wird die Bitrate deutlich erhöht.</translation>
+      <translation>Hilft bei der Behebung von Bildqualitätsproblemen bei einigen Kameras; bei anderen führt dies zu einer deutlichen Erhöhung der Bitrate.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -7141,7 +7141,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream wie er ist.</translation>
+      <translation>Der Server ändert keine Kameraeinstellungen, er empfängt und verwendet den Kamerastream unverändert.</translation>
     </message>
     <message>
       <source>Multicast</source>
@@ -7149,7 +7149,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Use if supported</source>
-      <translation>Verwenden, wenn unterstützt</translation>
+      <translation>Verwenden Sie die Option, falls unterstützt</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7169,11 +7169,11 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation>Der Server überträgt die Zeiteinstellungen nicht an die Kamera.</translation>
+      <translation>Der Server überträgt keine Zeiteinstellungen an die Kamera.</translation>
     </message>
     <message>
       <source>default</source>
-      <translation>standard</translation>
+      <translation>Standard</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -7852,7 +7852,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <name>nx::vms::client::desktop::ConnectActionsHandler</name>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Die Videowand wird auf dem Server entfernt und geschlossen.</translation>
+      <translation>Die Videowall wird auf dem Server entfernt und geschlossen.</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
