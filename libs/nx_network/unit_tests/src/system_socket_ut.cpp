@@ -1,12 +1,18 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <array>
+#include <atomic>
+#include <cstdlib>
+#include <future>
 #include <memory>
+#include <mutex>
 #include <thread>
 
 #ifndef _WIN32
     #include <fcntl.h>
     #include <signal.h>
     #include <spawn.h>
+    #include <sys/mman.h>
     #include <sys/wait.h>
     #include <unistd.h>
 #endif
@@ -41,6 +47,8 @@ public:
     }
 
 protected:
+    SocketAddress serverAddress() const { return m_tcpServerSocket.getLocalAddress(); }
+
     void whenAcceptedSocket()
     {
         m_client = std::make_unique<TCPSocket>(AF_INET);
@@ -295,6 +303,113 @@ TEST_F(TcpSocket, accepted_socket_is_not_inherited_by_child_process)
 }
 
 #endif
+
+#ifndef _WIN32
+
+namespace {
+
+// Allocations made on this thread while s_allocateInPages is set get a page of their own, unmapped
+// on delete, so that a read of freed memory traps instead of returning stale data.
+thread_local bool s_allocateInPages = false;
+std::atomic<int> s_pageAllocationCount{0};
+std::mutex s_pageAllocationsMutex;
+std::array<std::pair<void*, std::size_t>, 64> s_pageAllocations;
+
+void* allocateInPages(std::size_t size)
+{
+    const auto pageSize = (std::size_t) sysconf(_SC_PAGESIZE);
+    const auto mapSize = (size + pageSize - 1) / pageSize * pageSize;
+    void* p = mmap(nullptr, mapSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (p == MAP_FAILED)
+        throw std::bad_alloc();
+
+    std::lock_guard lock(s_pageAllocationsMutex);
+    for (auto& slot: s_pageAllocations)
+    {
+        if (slot.first)
+            continue;
+        slot = {p, mapSize};
+        ++s_pageAllocationCount;
+        return p;
+    }
+    munmap(p, mapSize);
+    throw std::bad_alloc();
+}
+
+bool unmapIfAllocatedInPages(void* ptr)
+{
+    if (s_pageAllocationCount.load() == 0)
+        return false;
+
+    std::lock_guard lock(s_pageAllocationsMutex);
+    for (auto& [p, size]: s_pageAllocations)
+    {
+        if (p != ptr)
+            continue;
+        munmap(p, size);
+        p = nullptr;
+        --s_pageAllocationCount;
+        return true;
+    }
+    return false;
+}
+
+} // namespace
+
+} // namespace nx::network::test
+
+void* operator new(std::size_t size)
+{
+    if (nx::network::test::s_allocateInPages)
+        return nx::network::test::allocateInPages(size);
+    if (void* p = std::malloc(size))
+        return p;
+    throw std::bad_alloc();
+}
+
+void operator delete(void* ptr) noexcept
+{
+    if (!nx::network::test::unmapIfAllocatedInPages(ptr))
+        std::free(ptr);
+}
+
+void operator delete(void* ptr, std::size_t) noexcept
+{
+    operator delete(ptr);
+}
+
+namespace nx::network::test {
+
+TEST_F(TcpSocket, deleted_from_its_own_connect_handler)
+{
+    // Every object the socket constructor allocates, the AIO helper among them, gets its own page,
+    // unmapped when freed: a read of the helper after the handler has deleted the socket traps.
+    s_allocateInPages = true;
+    auto socket = new TCPSocket(AF_INET);
+    s_allocateInPages = false;
+    ASSERT_GT(s_pageAllocationCount.load(), 0);
+    ASSERT_TRUE(socket->setNonBlockingMode(true));
+    auto aioThread = socket->getAioThread();
+
+    std::promise<SystemError::ErrorCode> connected;
+    auto connectedFuture = connected.get_future();
+    socket->connectAsync(serverAddress(),
+        [socket, connected = std::move(connected)](SystemError::ErrorCode code) mutable
+        {
+            delete socket;
+            connected.set_value(code);
+        });
+    ASSERT_EQ(SystemError::noError, connectedFuture.get());
+
+    // What runs after the handler returns is what reads freed memory; let the thread get there.
+    std::promise<void> drained;
+    auto drainedFuture = drained.get_future();
+    aioThread->post(nullptr, [drained = std::move(drained)]() mutable { drained.set_value(); });
+    drainedFuture.wait();
+    ASSERT_EQ(0, s_pageAllocationCount.load());
+}
+
+#endif // !_WIN32
 
 TEST(TcpServerSocketIpv6, BindsToLocalAddress)
 {
