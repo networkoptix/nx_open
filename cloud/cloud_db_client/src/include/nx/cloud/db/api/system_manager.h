@@ -270,7 +270,10 @@ public:
     //---------------------------------------------------------------------------------------------
     // Customization migration methods.
 
-    /** Creates a copy of the System in another customization. Reports the copy credentials. */
+    /**
+     * Creates a copy of the System in another customization. Requires the System credentials.
+     * Reports the copy credentials.
+     */
     virtual void startCustomizationMigration(const std::string& systemId,
         const api::CustomizationMigrationRequest& request,
         std::function<void(api::ResultCode, api::SystemCredentials)> completionHandler) = 0;
