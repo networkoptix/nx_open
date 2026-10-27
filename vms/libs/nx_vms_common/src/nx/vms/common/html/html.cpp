@@ -136,6 +136,12 @@ QString tagged(const QString& text, const QString& tag, const QString& attribute
         : nx::format("<%1 %2>%3</%1>", tag, attributes, text).toQString();
 }
 
+QString emptyLine()
+{
+    static const QString kEmptyLine = QString(kLineBreak) + kLineBreak;
+    return kEmptyLine;
+}
+
 QString document(const QString& text)
 {
     return tagged(text, "html");

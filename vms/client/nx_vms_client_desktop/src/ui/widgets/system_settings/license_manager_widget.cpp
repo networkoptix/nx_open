@@ -60,8 +60,6 @@ namespace html = nx::vms::common::html;
 
 namespace {
 
-static const QString kEmptyLine = QString(html::kLineBreak) + html::kLineBreak;
-
 license::DeactivationErrors filterDeactivationErrors(const license::DeactivationErrors& errors)
 {
     license::DeactivationErrors result;
@@ -449,7 +447,7 @@ bool LicenseManagerWidget::confirmDeactivation(const QnLicenseList& licenses)
         QDialogButtonBox::Cancel,
         QDialogButtonBox::NoButton,
         this);
-    confirmationDialog.setInformativeText(licenseDetails.join(kEmptyLine), false);
+    confirmationDialog.setInformativeText(licenseDetails.join(html::emptyLine()), false);
     confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(tr("Deactivate"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);

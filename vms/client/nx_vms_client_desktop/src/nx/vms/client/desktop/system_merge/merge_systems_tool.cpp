@@ -5,11 +5,11 @@
 #include <core/resource/media_server_resource.h>
 #include <network/system_helpers.h>
 #include <nx/branding.h>
-#include <nx/network/http/http_client.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/core/common/utils/cloud_url_helper.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection_user_interaction_delegate.h>
@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
+#include <nx/vms/common/html/html.h>
 #include <nx/vms/license/remote_licenses.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <ui/widgets/main_window.h>
@@ -26,30 +27,24 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-MergeSystemsStatus mergeStatusFromResult(const nx::network::rest::Result& result)
-{
-    using namespace nx::network::rest;
-
-    switch (result.errorId)
-    {
-        case ErrorId::ok:
-            return MergeSystemsStatus::ok;
-        case ErrorId::forbidden:
-            return MergeSystemsStatus::forbidden;
-        case ErrorId::notFound:
-            return MergeSystemsStatus::notFound;
-        case ErrorId::unauthorized:
-            return MergeSystemsStatus::unauthorized;
-        default:
-            return MergeSystemsStatus::unknownError;
-    }
-}
-
 nx::network::ssl::CertificateChain parseCertificateChainSafe(const std::string& pemString)
 {
     return pemString.empty()
         ? nx::network::ssl::CertificateChain()
         : nx::network::ssl::Certificate::parse(pemString);
+}
+
+/**
+ * Whether the server rejects the merge for mismatching Site versions. The server checks
+ * customization and cloud host before the protocol version and reports any of them as a generic
+ * `forbidden` error, so the protocol only matters if the first two are compatible.
+ */
+bool isVersionMismatch(const nx::vms::api::ModuleInformationBase& current,
+    const nx::vms::api::ModuleInformationBase& target)
+{
+    return target.customization == current.customization
+        && (target.cloudHost.isEmpty() || target.cloudHost == current.cloudHost)
+        && target.protoVersion != current.protoVersion;
 }
 
 } // namespace
@@ -183,11 +178,9 @@ void MergeSystemsTool::mergeSystemDryRun(const Context& ctx)
                     const auto& error = status.error();
                     NX_WARNING(
                         this, "Can't dry run merge, rest result: %1", QJson::serialized(error));
-                    reportSystemFound(*ctx,
-                        mergeStatusFromResult(error),
-                        error.errorString,
-                        true,
-                        nx::vms::api::MergeStatusReply());
+                    const auto [mergeStatus, errorText] = mergeStatusFromResult(error, *ctx);
+                    reportSystemFound(
+                        *ctx, mergeStatus, errorText, true, nx::vms::api::MergeStatusReply());
                 }
             }
         };
@@ -344,7 +337,8 @@ void MergeSystemsTool::at_serverInfoReceived(Context& ctx,
         }
         else
         {
-            reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
+            const auto [mergeStatus, errorText] = mergeStatusFromResult(error, ctx);
+            reportSystemFound(ctx, mergeStatus, errorText, true);
         }
     }
 }
@@ -396,7 +390,8 @@ void MergeSystemsTool::at_sessionCreated(
     {
         const auto& error = loginSession.error();
         NX_WARNING(this, "Can't create session, rest result: %1", QJson::serialized(error));
-        reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
+        const auto [mergeStatus, errorText] = mergeStatusFromResult(error, ctx);
+        reportSystemFound(ctx, mergeStatus, errorText, true);
     }
 }
 
@@ -418,7 +413,8 @@ void MergeSystemsTool::at_licensesReceived(
     {
         const auto& error = licenseDataList.error();
         NX_WARNING(this, "Can't get licenses, rest result: %1", QJson::serialized(error));
-        reportSystemFound(ctx, mergeStatusFromResult(error), error.errorString, true);
+        const auto [mergeStatus, errorText] = mergeStatusFromResult(error, ctx);
+        reportSystemFound(ctx, mergeStatus, errorText, true);
     }
 }
 
@@ -440,7 +436,8 @@ void MergeSystemsTool::at_mergeStarted(
     {
         const auto& error = mergeStatus.error();
         NX_WARNING(this, "Can't merge systems, rest result: %1", QJson::serialized(error));
-        reportMergeFinished(ctx, mergeStatusFromResult(error), error.errorString);
+        const auto [status, errorText] = mergeStatusFromResult(error, ctx);
+        reportMergeFinished(ctx, status, errorText);
     }
 }
 
@@ -474,6 +471,37 @@ bool MergeSystemsTool::checkServerCertificateEquality(const Context& ctx)
 
     return (serverChain[0] == ctx.targetHandshakeChain[0])
         || (!userProvidedChain.empty() && userProvidedChain[0] == ctx.targetHandshakeChain[0]);
+}
+
+std::pair<MergeSystemsStatus, QString> MergeSystemsTool::mergeStatusFromResult(
+    const nx::network::rest::Result& result, const Context& ctx)
+{
+    using namespace nx::network::rest;
+
+    switch (result.errorId)
+    {
+        case ErrorId::ok:
+            return {MergeSystemsStatus::ok, {}};
+        case ErrorId::forbidden:
+        {
+            // The server reports mismatching Site versions as a generic `forbidden` error. Drop
+            // its text to show the client one with a release notes link.
+            const auto context = desktop::SystemContext::fromResource(ctx.proxy);
+            if (!ctx.mergeData.ignoreIncompatible && !ctx.targetInfo.id.isNull()
+                && NX_ASSERT(context)
+                && isVersionMismatch(context->moduleInformation(), ctx.targetInfo))
+            {
+                return {MergeSystemsStatus::incompatibleVersion, {}};
+            }
+            return {MergeSystemsStatus::forbidden, result.errorString};
+        }
+        case ErrorId::notFound:
+            return {MergeSystemsStatus::notFound, result.errorString};
+        case ErrorId::unauthorized:
+            return {MergeSystemsStatus::unauthorized, result.errorString};
+        default:
+            return {MergeSystemsStatus::unknownError, result.errorString};
+    }
 }
 
 MergeSystemsStatus MergeSystemsTool::verifyTargetCertificate(const Context& ctx)
@@ -536,6 +564,8 @@ QString MergeSystemsTool::getErrorMessage(
     MergeSystemsStatus value,
     const nx::vms::api::ModuleInformation& moduleInformation)
 {
+    using namespace nx::vms::common::html;
+
     const auto systemName = helpers::isNewSystem(moduleInformation)
             ? '"' + tr("New Site") + '"'
             : moduleInformation.systemName;
@@ -547,14 +577,17 @@ QString MergeSystemsTool::getErrorMessage(
         case MergeSystemsStatus::notFound:
             return tr("Site was not found.");
         case MergeSystemsStatus::incompatibleVersion:
-            return tr("The discovered Site %1 has an incompatible version %2.",
-                "%1 is name of Site, %2 is version information")
-                .arg(systemName).arg(moduleInformation.version.toString());
         case MergeSystemsStatus::incompatibleInternal:
-            // System info is absent in this case.
-            return tr("Selected Site has an older software version that is incompatible with"
-                " the current Site. Update selected Site to the latest build to merge it with"
-                " the current one.");
+        {
+            const core::CloudUrlHelper urlHelper(
+                nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
+                nx::vms::utils::SystemUri::ReferralContext::SettingsDialog);
+            return tr(
+                "The sites have mismatching software versions. Please update both of them to"
+                " the latest build.")
+                .append(emptyLine())
+                .append(link(tr("View Release Notes"), urlHelper.downloadUrl()));
+        }
         case MergeSystemsStatus::unauthorized:
             return tr("The password or user name is invalid.");
         case MergeSystemsStatus::forbidden:

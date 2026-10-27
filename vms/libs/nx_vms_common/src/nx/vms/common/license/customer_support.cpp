@@ -16,8 +16,6 @@ namespace nx::vms::common {
 
 namespace {
 
-static const QString kEmptyLine = QString(html::kLineBreak) + html::kLineBreak;
-
 ContactAddress::Channel detectChannel(const QString& address)
 {
     if (address.isEmpty())
@@ -185,7 +183,7 @@ QString CustomerSupport::customerSupportMessage(
     for (const CustomerSupport::Contact& contact: regionalContacts)
         regionalSupport.push_back(contact.company + html::kLineBreak + contact.address.href);
 
-    return regionalSupport.join(kEmptyLine);
+    return regionalSupport.join(html::emptyLine());
 }
 
 } // namespace nx::vms::common

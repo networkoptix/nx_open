@@ -27,8 +27,6 @@ namespace nx::vms::client::desktop {
 
 namespace {
 
-static const QString kEmptyLine = QString(html::kLineBreak) + html::kLineBreak;
-
 QnLicensePtr findLicenseInList(const QByteArray& key, const QnLicenseList& licenses)
 {
     for (const auto& license: licenses)
@@ -149,7 +147,8 @@ public:
         const QnLicenseList& licenses,
         const license::DeactivationErrors& errors)
     {
-        static const QString kMessageDelimiter = kEmptyLine + "&mdash;&mdash;" + kEmptyLine;
+        static const QString kMessageDelimiter =
+            html::emptyLine() + "&mdash;&mdash;" + html::emptyLine();
 
         QStringList result;
         QnLicenseList licensesWithErrors;
@@ -176,7 +175,8 @@ public:
             licensesWithErrors);
 
         const QString licensesBlock = result.join(kMessageDelimiter);
-        const QString contactsDelimiter = (result.size() == 1) ? kEmptyLine : kMessageDelimiter;
+        const QString contactsDelimiter =
+            (result.size() == 1) ? html::emptyLine() : kMessageDelimiter;
         return licensesBlock + contactsDelimiter + contactCustomerSupportText;
     }
 };
@@ -192,14 +192,11 @@ void LicenseActivationDialogs::licenseIsIncompatible(QWidget* parent)
 {
     const QString supportContactString = Private::getValidLicenseKeyMessage(parent);
 
-    Private::showMessage(
-        parent,
+    Private::showMessage(parent,
         QnMessageBoxIcon::Warning,
         tr("Incompatible license"),
         tr("License you are trying to activate is incompatible with your software.")
-            + kEmptyLine
-            + supportContactString
-    );
+            + html::emptyLine() + supportContactString);
 }
 
 void LicenseActivationDialogs::invalidDataReceived(QWidget* parent)
@@ -209,14 +206,10 @@ void LicenseActivationDialogs::invalidDataReceived(QWidget* parent)
         tr("To report the issue please contact %1."),
         tr("To report the issue please contact your Regional / License support:"));
 
-    Private::showMessage(
-        parent,
+    Private::showMessage(parent,
         QnMessageBoxIcon::Critical,
         tr("Failed to activate license"),
-        tr("Invalid data received.")
-            + kEmptyLine
-            + supportContactString
-    );
+        tr("Invalid data received.") + html::emptyLine() + supportContactString);
 }
 
 void LicenseActivationDialogs::databaseErrorOccurred(QWidget* parent)
@@ -231,26 +224,20 @@ void LicenseActivationDialogs::databaseErrorOccurred(QWidget* parent)
 
 void LicenseActivationDialogs::invalidLicenseKey(QWidget* parent)
 {
-    Private::showMessage(
-        parent,
+    Private::showMessage(parent,
         QnMessageBoxIcon::Warning,
         tr("Invalid License Key"),
-        tr("Please make sure it is entered correctly.")
-            + kEmptyLine
-            + Private::whatIfProblemPersistsMessage(parent)
-    );
+        tr("Please make sure it is entered correctly.") + html::emptyLine()
+            + Private::whatIfProblemPersistsMessage(parent));
 }
 
 void LicenseActivationDialogs::invalidKeyFile(QWidget* parent)
 {
-    Private::showMessage(
-        parent,
+    Private::showMessage(parent,
         QnMessageBoxIcon::Warning,
         tr("Invalid activation key file"),
-        tr("Select a valid activation key file to continue.")
-            + kEmptyLine
-            + Private::whatIfProblemPersistsMessage(parent)
-    );
+        tr("Select a valid activation key file to continue.") + html::emptyLine()
+            + Private::whatIfProblemPersistsMessage(parent));
 }
 
 void LicenseActivationDialogs::licenseAlreadyActivated(
@@ -266,15 +253,11 @@ void LicenseActivationDialogs::licenseAlreadyActivated(
         : tr("This license is already activated and linked to Hardware ID %1 on %2")
             .arg(hardwareId, time);
 
-    Private::showMessage(
-        parent,
+    Private::showMessage(parent,
         QnMessageBoxIcon::Warning,
         tr("License already activated on another server"),
-        text
-            + kEmptyLine
-            + supportContactString,
-        CopyToClipboardButtonVisibility::visible
-    );
+        text + html::emptyLine() + supportContactString,
+        CopyToClipboardButtonVisibility::visible);
 }
 
 void LicenseActivationDialogs::licenseAlreadyActivatedHere(QWidget* parent)

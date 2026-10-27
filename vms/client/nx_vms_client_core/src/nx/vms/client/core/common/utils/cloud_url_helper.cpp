@@ -73,6 +73,11 @@ QUrl CloudUrlHelper::faqUrl() const
     return makeUrl("/content/faq");
 }
 
+QUrl CloudUrlHelper::downloadUrl() const
+{
+    return makeUrl("/download");
+}
+
 QUrl CloudUrlHelper::mobileUserManualUrl() const
 {
     return makeUrl("/documentation/mobile");

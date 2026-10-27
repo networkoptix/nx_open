@@ -108,6 +108,10 @@ private:
     static bool checkServerCertificateEquality(const Context& ctx);
     MergeSystemsStatus verifyTargetCertificate(const Context& ctx);
 
+    /** @return Merge status and the server error text, empty if the client one should be used. */
+    static std::pair<MergeSystemsStatus, QString> mergeStatusFromResult(
+        const nx::network::rest::Result& result, const Context& ctx);
+
     void reportMergeFinished(
         const Context& ctx,
         MergeSystemsStatus status,

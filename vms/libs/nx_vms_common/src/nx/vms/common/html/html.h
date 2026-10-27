@@ -64,6 +64,9 @@ NX_VMS_COMMON_API QString underlined(const QString& text);
 
 NX_VMS_COMMON_API QString underlinedColored(const QString& text, const QColor& color);
 
+/** <br/><br/> */
+NX_VMS_COMMON_API QString emptyLine();
+
 /** <p>text</p> */
 NX_VMS_COMMON_API QString paragraph(const QString& text);
 
