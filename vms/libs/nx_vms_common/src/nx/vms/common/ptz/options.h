@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 #include "type.h"
@@ -12,8 +14,11 @@ namespace ptz {
 struct Options
 {
     Type type = Type::operational;
+
+    /** Optional relative movement speed in [0, 1]. Unsupported overrides are ignored. */
+    std::optional<double> speed;
 };
-#define PtzOptions_Fields (type)
+#define PtzOptions_Fields (type)(speed)
 QN_FUSION_DECLARE_FUNCTIONS(Options, (json), NX_VMS_COMMON_API)
 
 } // namespace ptz

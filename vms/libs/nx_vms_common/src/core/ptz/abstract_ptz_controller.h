@@ -183,12 +183,12 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * at least one of the <tt>Ptz::Capability::relativePanTiltZoomRotation</tt>.
      *
      * @param direction Direction to move. Each component must be in range [-1, 1].
-     * @param options Additional options (e.g. ptz type)
+     * @param options Additional options, including optional movement speed in [0, 1].
+     *     Omitted or unsupported speed preserves the controller default.
      * @returns Whether the operation was successful.
      */
     virtual bool relativeMove(
-        const Vector& direction,
-        const Options& options = {Type::operational}) = 0;
+        const Vector& direction, const Options& options = {Type::operational}) = 0;
 
     /**
      * Changes the camera focus relatively to its current position.

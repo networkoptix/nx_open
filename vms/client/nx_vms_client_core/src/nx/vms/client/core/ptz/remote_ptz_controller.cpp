@@ -239,15 +239,15 @@ bool RemotePtzController::viewportMove(
     return sendRequest(Command::viewportMove, params, QByteArray(), options);
 }
 
-bool RemotePtzController::relativeMove(
-    const Vector& direction,
-    const Options& options)
+bool RemotePtzController::relativeMove(const Vector& direction, const Options& options)
 {
     nx::network::rest::Params params;
     params.insert("pan", QnLexical::serialized(direction.pan));
     params.insert("tilt", QnLexical::serialized(direction.tilt));
     params.insert("rotation", QnLexical::serialized(direction.rotation));
     params.insert("zoom", QnLexical::serialized(direction.zoom));
+    if (options.speed)
+        params.insert("speed", QnLexical::serialized(*options.speed));
     params.insert("type", options.type);
     params.insert("sequenceId", m_sequenceId);
     params.insert("sequenceNumber", nextSequenceNumber());

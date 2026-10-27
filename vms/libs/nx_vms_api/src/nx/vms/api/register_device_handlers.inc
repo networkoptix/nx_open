@@ -388,7 +388,6 @@ void registerDeviceBaseHandlers(
      * %return:{PtzPosition} Device position
      *     %param[unused] deviceId
      *     %param[unused] type
-     *     %param[unused] speed
      *
      **%apidoc POST /rest/v{4-}/devices/{deviceId}/ptz/position
      * Moves the Device to an absolute position. When the Device reports its PTZ capabilities to
@@ -397,7 +396,9 @@ void registerDeviceBaseHandlers(
      * fields via `GET /rest/v{4-}/devices`
      * %caption Move to absolute PTZ position
      * %ingroup Device PTZ
-     * %struct PtzPosition
+     * %struct PtzMovement
+     *     %param[unused] focus
+     *     %param speed Movement speed [0.0 to 1.0].
      * %param[ref] _local,_strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{PtzPosition} Device position
@@ -408,7 +409,9 @@ void registerDeviceBaseHandlers(
      * PTZ capabilities can not be read via API.
      * %caption Move to absolute PTZ position
      * %ingroup Device PTZ
-     * %struct PtzPosition
+     * %struct PtzMovement
+     *     %param[unused] focus
+     *     %param speed Movement speed [0.0 to 1.0].
      * %param[ref] _local,_strict,_ticket
      * %permissions Depends on Resource access rights.
      * %return:{PtzPosition} Device position
@@ -429,7 +432,12 @@ void registerDeviceBaseHandlers(
      * %ingroup Device PTZ
      * %struct PtzMovement
      *     %param[unused] type
-     *     %param[unused] speed
+     *     %param pan Relative pan displacement [-1.0 to 1.0].
+     *     %param tilt Relative tilt displacement [-1.0 to 1.0].
+     *     %param zoom Relative zoom displacement [-1.0 to 1.0].
+     *     %param focus Relative focus displacement [-1.0 to 1.0].
+     *     %param speed Optional movement speed [0.0 to 1.0]. When omitted, uses the default speed.
+     *         Unsupported speed overrides are ignored. Does not affect focus.
      * %param[ref] _local,_strict,_ticket
      * %permissions Depends on Resource access rights.
      */

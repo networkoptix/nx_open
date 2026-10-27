@@ -87,14 +87,8 @@ struct NX_VMS_API PtzPosition: PtzPositionFilter
      * %example 1.0
      */
     std::optional<float> zoom = std::nullopt;
-
-    /**%apidoc
-     * Movement speed.
-     * %example 0.1
-     */
-    float speed = 0.f;
 };
-#define PtzPosition_Fields PtzPositionFilter_Fields (pan)(tilt)(zoom)(speed)
+#define PtzPosition_Fields PtzPositionFilter_Fields(pan)(tilt)(zoom)
 QN_FUSION_DECLARE_FUNCTIONS(PtzPosition, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PtzPosition, PtzPosition_Fields)
 
@@ -165,8 +159,15 @@ struct NX_VMS_API PtzMovement: PtzPosition
      * %example -1.0
      */
     std::optional<float> focus = std::nullopt;
+
+    /**%apidoc[opt]
+     * Movement speed [0.0 to 1.0]. For relative movement, omission preserves the default speed
+     * and unsupported speed overrides are ignored. Does not affect focus.
+     * %example 0.1
+     */
+    std::optional<float> speed;
 };
-#define PtzMovement_Fields PtzPosition_Fields (focus)
+#define PtzMovement_Fields PtzPosition_Fields(focus)(speed)
 QN_FUSION_DECLARE_FUNCTIONS(PtzMovement, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PtzMovement, PtzMovement_Fields)
 
