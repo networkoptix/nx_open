@@ -100,9 +100,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
 
     .updateNotificationsEnabled = true,
 
-    .emailSettings = EmailSettings{
-        .useCloudServiceToSendEmail = false
-    },
+    .emailSettings = EmailSettings{.useCloudServiceToSendEmail = false},
 
     .timeSynchronizationEnabled = true,
     .primaryTimeServer = nx::Uuid{},
@@ -113,7 +111,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .metadataStorageChangePolicy = MetadataStorageChangePolicy::keep,
 
     .allowRegisteringIntegrations = false,
-    .integrationProcessMode = IntegrationProcessMode::manifestControlled,
+    .integrationProcessMode = kDefaultIntegrationProcessMode,
 
     .additionalLocalFsTypes = QString{},
     .arecontRtspEnabled = false,
@@ -188,8 +186,7 @@ const SaveableSettingsBase kDefaultSaveableSettingsBase{
     .targetUpdateInformation = QByteArray{},
     .upnpPortMappingEnabled = true,
     .useTextEmailFormat = false,
-    .useWindowsEmailLineFeed = false
-};
+    .useWindowsEmailLineFeed = false};
 
 const UserSessionSettings kDefaultUserSessionSettings{
     .sessionLimitS = std::chrono::days{30},

@@ -1007,7 +1007,7 @@ SystemSettings::AdaptorList SystemSettings::initMiscAdaptors()
     d->integrationProcessModeAdaptor =
         new QnReflectLexicalResourcePropertyAdaptor<nx::vms::api::IntegrationProcessMode>(
             Names::integrationProcessMode,
-            nx::vms::api::IntegrationProcessMode::manifestControlled,
+            nx::vms::api::kDefaultIntegrationProcessMode,
             this,
             []()
             {

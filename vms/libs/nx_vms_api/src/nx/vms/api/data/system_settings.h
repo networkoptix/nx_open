@@ -26,6 +26,9 @@ NX_REFLECTION_ENUM_CLASS(IntegrationProcessMode,
     forceLoadingInSeparateProcess,
     forceLoadingInCurrentProcess);
 
+inline constexpr auto kDefaultIntegrationProcessMode =
+    IntegrationProcessMode::forceLoadingInCurrentProcess;
+
 struct SaveableSettingsBase
 {
     std::optional<QString> defaultExportVideoCodec;
