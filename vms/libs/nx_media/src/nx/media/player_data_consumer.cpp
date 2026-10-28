@@ -3,6 +3,7 @@
 #include "player_data_consumer.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <core/resource/media_resource.h>
 #include <nx/fusion/serialization/lexical.h>
@@ -36,6 +37,12 @@ static const int kDefaultDecodedVideoQueueSize = 2;
  * or network issue/reconnect.
  */
 static const int kEmptyPacketThreshold = 3;
+
+/**
+ * On pause, the max time to keep requesting more data for the frame which the decoder still holds.
+ * Limits reading the archive if the decoder does not output anything at all.
+ */
+constexpr std::chrono::seconds kMaxFrameAwaitTime(3);
 
 QSize qMax(const QSize& size1, const QSize& size2)
 {
@@ -304,6 +311,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
             videoDecoder->setAllowSoftwareDecoderFallback(m_allowSoftwareDecoderFallback);
             videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
             m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
+            m_lastDecodedSequence.push_back(0);
         }
     }
     SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
@@ -313,12 +321,38 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         NX_WARNING(this, nx::format("Cannot decode the video frame. The frame is skipped."));
         // False result means we want to repeat this frame later, thus, returning true.
     }
+    requestDataForAwaitedFrame(*data);
     return true;
+}
+
+void PlayerDataConsumer::requestDataForAwaitedFrame(const QnCompressedVideoData& frame)
+{
+    // On pause, the hardware decoder may still hold the frame to display after the reader stops.
+    // Keep feeding it until the frame comes out, as QnCamDisplay does.
+    if (!m_archiveReader->isSingleShotMode()
+        || frame.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore)
+        || std::ranges::all_of(
+            m_lastDecodedSequence, [&frame](int sequence) { return sequence == frame.opaque; }))
+    {
+        return;
+    }
+
+    if (m_awaitedSequence != frame.opaque)
+    {
+        m_awaitedSequence = frame.opaque;
+        m_frameAwaitTimer.restart();
+    }
+
+    if (!m_frameAwaitTimer.hasExpired(kMaxFrameAwaitTime))
+        m_archiveReader->needMoreData();
 }
 
 void PlayerDataConsumer::onDecodedFrame(VideoFramePtr decodedFrame)
 {
     FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
+    if (metadata.sequence != 0 && !metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
+        m_lastDecodedSequence[metadata.videoChannel] = metadata.sequence;
+
     if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Reverse))
     {
         if (!m_gopReverser)
@@ -511,6 +545,7 @@ void PlayerDataConsumer::endOfRun()
 {
     NX_MUTEX_LOCKER lock(&m_decoderMutex);
     m_videoDecoders.clear();
+    m_lastDecodedSequence.clear();
     m_audioDecoder.reset();
 }
 
