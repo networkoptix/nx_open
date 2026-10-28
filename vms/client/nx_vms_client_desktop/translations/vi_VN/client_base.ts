@@ -9427,13 +9427,12 @@ Hiệu suất Chi nhánh bị giảm.</translation>
       <translation>Không tìm thấy Chi nhánh.</translation>
     </message>
     <message>
-      <source>The discovered Site %1 has an incompatible version %2.</source>
-      <comment>%1 is name of Site, %2 is version information</comment>
-      <translation>Phát hiện Chi nhánh %1 có phiên bản không tương thích %2.</translation>
+      <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
+      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
     </message>
     <message>
-      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>Chi nhánh đã chọn có phiên bản phần mềm cũ hơn không tương thích với Chi nhánh hiện tại. Cập nhật Chi nhánh đã chọn lên bản dựng mới nhất để hợp nhất với bản dựng hiện tại.</translation>
+      <source>View Release Notes</source>
+      <translation type="unfinished">View Release Notes</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12007,30 +12006,26 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
       <translation>Trang Web</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <source>%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation>Bạn cố gắng mở
-%1
-nhưng tích hợp này đưa ra chứng chỉ xác thực không đáng tin cậy.
-Chúng tôi khuyên bạn không nên mở tích hợp này. Nếu bạn hiểu được rủi ro, bạn có thể mở.</translation>
+      <translation type="unfinished">%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <source>%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation>Bạn cố gắng mở
-%1
-nhưng trang web này hiển thị xác thực chứng chỉ không đáng tin cậy.
-Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn hiểu về các rủi ro, bạn vẫn có thể mở trang web.</translation>
+      <translation type="unfinished">%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Vẫn kết nối</translation>
+      <source>Open Integration</source>
+      <translation type="unfinished">Open Integration</translation>
+    </message>
+    <message>
+      <source>Open Web Page</source>
+      <translation type="unfinished">Open Web Page</translation>
     </message>
   </context>
   <context>

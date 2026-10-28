@@ -9432,13 +9432,12 @@ Site performance is degraded.</source>
       <translation>サイトが見つかりませんでした。</translation>
     </message>
     <message>
-      <source>The discovered Site %1 has an incompatible version %2.</source>
-      <comment>%1 is name of Site, %2 is version information</comment>
-      <translation>検出されたサイト %1 は互換性のないバージョン %2 です。</translation>
+      <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
+      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
     </message>
     <message>
-      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>対象のサイトは、現在のサイトと互換性のない古いソフトウェアバージョンです。対象サイトを最新のビルドに更新してから、現在のシステムと統合してください。</translation>
+      <source>View Release Notes</source>
+      <translation type="unfinished">View Release Notes</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12012,28 +12011,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>Webページ</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <source>%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation>%1
-を開こうとしましたが、このインテグレーションは信頼できない証明書を提示しました。
-このインテグレーションを開かないことをお勧めします。リスクを理解している場合は、インテグレーションを開いても構いません。</translation>
+      <translation type="unfinished">%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <source>%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation>%1
-を開こうとしましたが、このWebページは信頼できない証明書を提示しました。
-このWebページを開かないことをお勧めします。リスクを理解している場合は、Webページを開いても構いません。</translation>
+      <translation type="unfinished">%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>理解した上で接続</translation>
+      <source>Open Integration</source>
+      <translation type="unfinished">Open Integration</translation>
+    </message>
+    <message>
+      <source>Open Web Page</source>
+      <translation type="unfinished">Open Web Page</translation>
     </message>
   </context>
   <context>

@@ -9569,13 +9569,12 @@ Webstedets ydeevne er forringet.</translation>
       <translation>Sitet blev ikke fundet.</translation>
     </message>
     <message>
-      <source>The discovered Site %1 has an incompatible version %2.</source>
-      <comment>%1 is name of Site, %2 is version information</comment>
-      <translation>Det fundne Site %1 har en inkompatibel version %2.</translation>
+      <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
+      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
     </message>
     <message>
-      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>Det valgte Site har en ældre softwareversion, der ikke er kompatibel med det nuværende Site. Opdater det valgte Site til den seneste version for at flette det sammen med det nuværende.</translation>
+      <source>View Release Notes</source>
+      <translation type="unfinished">View Release Notes</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12184,28 +12183,26 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
       <translation>Webside</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <source>%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation>Du forsøger at åbne
-%1, men denne integration viste et ikke betroet certifikat auth.
-Vi anbefaler, at du ikke åbner denne integration. Hvis du forstår risiciene, kan du åbne integrationen.</translation>
+      <translation type="unfinished">%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <source>%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation>Du forsøger at åbne
-%1, men denne webside præsenterede en upålidelig certifikatgodkendelse.
-Vi anbefaler, at du ikke åbner denne webside. Hvis du forstår risiciene, kan du åbne websiden.</translation>
+      <translation type="unfinished">%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Tilslut alligevel</translation>
+      <source>Open Integration</source>
+      <translation type="unfinished">Open Integration</translation>
+    </message>
+    <message>
+      <source>Open Web Page</source>
+      <translation type="unfinished">Open Web Page</translation>
     </message>
   </context>
   <context>

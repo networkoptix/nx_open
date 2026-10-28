@@ -9569,13 +9569,12 @@ Les performances du client sont dégradées.</translation>
       <translation>Le site n'a pas été trouvé.</translation>
     </message>
     <message>
-      <source>The discovered Site %1 has an incompatible version %2.</source>
-      <comment>%1 is name of Site, %2 is version information</comment>
-      <translation>Le site découvert %1 a une version incompatible %2.</translation>
+      <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
+      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
     </message>
     <message>
-      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>Le site sélectionné possède une ancienne version du logiciel qui est incompatible avec le site actuel. Mettez à jour le site sélectionné vers la dernière version pour le fusionner avec la version actuelle.</translation>
+      <source>View Release Notes</source>
+      <translation type="unfinished">View Release Notes</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12186,30 +12185,26 @@ N'épinglez pas ce certificat si vous n'avez pas modifié le certificat SSL du s
       <translation>Page Web</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <source>%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation>Vous essayez d'ouvrir
-%1
-mais cette intégration a présenté une authentification de certificat non fiable.
-Nous vous recommandons de ne pas ouvrir cette intégration. Si vous comprenez les risques, vous pouvez ouvrir l'intégration.</translation>
+      <translation type="unfinished">%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <source>%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation>Vous essayez d'ouvrir le
-%1
-mais cette page Web a présenté un certificat d'authentification non approuvé.
-Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les risques, vous pouvez ouvrir la page Web.</translation>
+      <translation type="unfinished">%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>Se connecter quand même</translation>
+      <source>Open Integration</source>
+      <translation type="unfinished">Open Integration</translation>
+    </message>
+    <message>
+      <source>Open Web Page</source>
+      <translation type="unfinished">Open Web Page</translation>
     </message>
   </context>
   <context>

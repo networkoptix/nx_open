@@ -9427,13 +9427,12 @@ Site performance is degraded.</source>
       <translation>사이트를 찾을 수 없습니다.</translation>
     </message>
     <message>
-      <source>The discovered Site %1 has an incompatible version %2.</source>
-      <comment>%1 is name of Site, %2 is version information</comment>
-      <translation>발견된 사이트 %1 에는 호환되지 않는 버전 %2이 있습니다.</translation>
+      <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
+      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
     </message>
     <message>
-      <source>Selected Site has an older software version that is incompatible with the current Site. Update selected Site to the latest build to merge it with the current one.</source>
-      <translation>선택한 사이트에는 현재 사이트와 호환되지 않는 이전 소프트웨어 버전이 있습니다. 선택한 사이트를 최신 빌드로 업데이트하여 현재 사이트와 통합하세요.</translation>
+      <source>View Release Notes</source>
+      <translation type="unfinished">View Release Notes</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12007,28 +12006,26 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <translation>웹페이지:</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this integration presented an untrusted certificate auth.
-We recommend you not to open this integration. If you understand the risks, you can open the integration.</source>
+      <source>%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation>%1
-를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
-이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
+      <translation type="unfinished">%1
+This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>You try to open the
-%1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <source>%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation>%1
-를 열려고 시도했지만 이 웹 페이지는 신뢰할 수 없는 인증을 제공했습니다.
-이 웹 페이지를 열지 않는 것이 좋습니다. 위험을 이해하면 웹 페이지를 열 수 있습니다.</translation>
+      <translation type="unfinished">%1
+This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
     </message>
     <message>
-      <source>Connect anyway</source>
-      <translation>그래도 연결</translation>
+      <source>Open Integration</source>
+      <translation type="unfinished">Open Integration</translation>
+    </message>
+    <message>
+      <source>Open Web Page</source>
+      <translation type="unfinished">Open Web Page</translation>
     </message>
   </context>
   <context>
