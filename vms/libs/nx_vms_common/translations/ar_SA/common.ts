@@ -2133,43 +2133,43 @@
     </message>
     <message>
       <source>Additional local FS storage types for recording.</source>
-      <translation type="unfinished">Additional local FS storage types for recording.</translation>
+      <translation>أنواع تخزين نظام الملفات المحلي الإضافية للتسجيل.</translation>
     </message>
     <message>
       <source>Keep IO port state on when Server connects to the device.</source>
-      <translation type="unfinished">Keep IO port state on when Server connects to the device.</translation>
+      <translation>حافظ على حالة منفذ الإدخال/الإخراج قيد التشغيل عند اتصال الخادم بالجهاز.</translation>
     </message>
     <message>
       <source>Media buffer size (KB, 10KB-4MB).</source>
-      <translation type="unfinished">Media buffer size (KB, 10KB-4MB).</translation>
+      <translation>حجم مخزن الوسائط (كيلوبايت، 10 كيلوبايت - 4 ميجابايت).</translation>
     </message>
     <message>
       <source>Media buffer size for audio only devices (KB, 1KB-1MB).</source>
-      <translation type="unfinished">Media buffer size for audio only devices (KB, 1KB-1MB).</translation>
+      <translation>حجم مخزن الوسائط لأجهزة الصوت فقط (كيلوبايت، 1 كيلوبايت - 1 ميجابايت).</translation>
     </message>
     <message>
       <source>Force analytics DB storage mount point permissions in case of failure.</source>
-      <translation type="unfinished">Force analytics DB storage mount point permissions in case of failure.</translation>
+      <translation>فرض أذونات نقطة تحميل مخزن قاعدة بيانات التحليلات في حالة الفشل.</translation>
     </message>
     <message>
       <source>Check video stream permissions on VMS server period (milliseconds).</source>
-      <translation type="unfinished">Check video stream permissions on VMS server period (milliseconds).</translation>
+      <translation>تحقق من أذونات بث الفيديو على خادم VMS (بالمللي ثانية).</translation>
     </message>
     <message>
       <source>Storage encryption enabled.</source>
-      <translation type="unfinished">Storage encryption enabled.</translation>
+      <translation>تم تفعيل تشفير التخزين.</translation>
     </message>
     <message>
       <source>Current storage encryption key.</source>
-      <translation type="unfinished">Current storage encryption key.</translation>
+      <translation>مفتاح تشفير التخزين الحالي.</translation>
     </message>
     <message>
       <source>Show Servers in the Resource Tree for non-admins.</source>
-      <translation type="unfinished">Show Servers in the Resource Tree for non-admins.</translation>
+      <translation>عرض الخوادم في شجرة الموارد للمستخدمين غير الإداريين.</translation>
     </message>
     <message>
       <source>HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</source>
-      <translation type="unfinished">HTTP header: Server, supported variables: $vmsName, $vmsVersion, $company, $compatibility.</translation>
+      <translation>رأس HTTP: الخادم، المتغيرات المدعومة: $vmsName, $vmsVersion, $company, $compatibility.</translation>
     </message>
     <message>
       <source>HTTP header: Origin.</source>
@@ -2177,39 +2177,39 @@
     </message>
     <message>
       <source>HTTP header: X-Frame-Options.</source>
-      <translation type="unfinished">HTTP header: X-Frame-Options.</translation>
+      <translation>رأس HTTP: X-Frame-Options.</translation>
     </message>
     <message>
       <source>Use only HTTPS for cameras.</source>
-      <translation type="unfinished">Use only HTTPS for cameras.</translation>
+      <translation>استخدم بروتوكول HTTPS فقط للكاميرات.</translation>
     </message>
     <message>
       <source>Allow Power User editing Security Settings.</source>
-      <translation type="unfinished">Allow Power User editing Security Settings.</translation>
+      <translation>السماح للمستخدمين المتقدمين بتعديل إعدادات الأمان.</translation>
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>تفعيل وظائف واجهة برمجة التطبيقات المهملة (غير آمنة).</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
-      <translation type="unfinished">Enable deprecated HTTP Basic and Digest Authentications (insecure).</translation>
+      <translation>قم بتمكين مصادقة HTTP الأساسية ومصادقة Digest المهملة (غير آمنة).</translation>
     </message>
     <message>
       <source>Expose IP addresses for autodiscovery.</source>
-      <translation type="unfinished">Expose IP addresses for autodiscovery.</translation>
+      <translation>عرض عناوين IP للاكتشاف التلقائي.</translation>
     </message>
     <message>
       <source>Show mouse timeline preview.</source>
-      <translation type="unfinished">Show mouse timeline preview.</translation>
+      <translation>عرض معاينة الجدول الزمني بالماوس.</translation>
     </message>
     <message>
       <source>LDAP settings.</source>
-      <translation type="unfinished">LDAP settings.</translation>
+      <translation>إعدادات LDAP.</translation>
     </message>
     <message>
       <source>SMTP settings. These settings are visible for Power Users only.</source>
-      <translation type="unfinished">SMTP settings. These settings are visible for Power Users only.</translation>
+      <translation>إعدادات SMTP. هذه الإعدادات مرئية للمستخدمين المتقدمين فقط.</translation>
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
