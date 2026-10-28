@@ -5,13 +5,13 @@
     <name>nx::vms::license::UsageHelper</name>
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
-        <numerusform>%n %2 are used out of %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
+        <numerusform>يتم استخدام %n %2 من أصل %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
