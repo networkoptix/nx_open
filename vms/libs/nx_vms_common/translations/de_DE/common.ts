@@ -515,9 +515,9 @@
     <message numerus="yes">
       <source>%1 have no input ports</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation>
-        <numerusform>%1 hat keinen Input-Port</numerusform>
-        <numerusform>%1 hat keinen Input-Port</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no input ports</numerusform>
+        <numerusform>%1 haben keinen Input-Port</numerusform>
       </translation>
     </message>
   </context>
@@ -540,9 +540,9 @@
     <message numerus="yes">
       <source>%1 have no output relays</source>
       <comment>Numerus: %1 will be replaced by either camera name or string like &apos;1 of 2 devices&apos;</comment>
-      <translation>
-        <numerusform>%1 hat kein Ausgangsrelais</numerusform>
-        <numerusform>%1 hat kein Ausgangsrelais</numerusform>
+      <translation type="unfinished">
+        <numerusform>%1 have no output relays</numerusform>
+        <numerusform>%1 haben kein Ausgangsrelais</numerusform>
       </translation>
     </message>
   </context>
@@ -959,7 +959,7 @@
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 und %2 haben keine %3 Berechtigung für einige der ausgewählten Kameras</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
@@ -1280,9 +1280,9 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Stunde</numerusform>
+        <numerusform>Stunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1905,7 +1905,7 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>Veraltete API-Funktionen aktivieren (unsicher).</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
