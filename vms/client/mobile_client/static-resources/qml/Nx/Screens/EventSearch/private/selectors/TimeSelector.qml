@@ -19,6 +19,7 @@ OptionSelector
 
     descriptionText: qsTr("Period")
     unselectedValue: EventSearch.TimeSelection.anytime
+    unselectedTextValue: EventSearchUtils.timeSelectionText(unselectedValue)
     valueToTextFunc:
         (value) => EventSearchUtils.timeSelectionText(value ?? EventSearch.TimeSelection.anytime)
 
