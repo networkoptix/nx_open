@@ -32,7 +32,7 @@ QString EventSearchUtils::timeSelectionText(EventSearch::TimeSelection value)
         case EventSearch::TimeSelection::month:
             return tr("Last 30 days");
         default:
-            return tr("Any time");
+            return tr("Any Period");
     }
 }
 
