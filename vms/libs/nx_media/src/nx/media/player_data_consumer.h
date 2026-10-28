@@ -15,6 +15,7 @@
 #include <nx/media/media_fwd.h>
 #include <nx/media/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
+#include <nx/utils/elapsed_timer.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/media/externaltimesource.h>
 
@@ -138,6 +139,7 @@ private:
     bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
     void onDecodedFrame(VideoFramePtr frame);
+    void requestDataForAwaitedFrame(const QnCompressedVideoData& frame);
 
     void enqueueVideoFrame(VideoFramePtr decodedFrame);
     int getBufferingMask() const;
@@ -215,8 +217,16 @@ private:
     QnConstResourceVideoLayoutPtr m_cachedVideoLayout;
     std::atomic<double> m_speed;
     nx::media::StreamEventPacket m_mediaEvent;
-    const QnArchiveStreamReader* m_archiveReader = nullptr;
+    QnArchiveStreamReader* m_archiveReader = nullptr;
     std::unique_ptr<GopReverser> m_gopReverser;
+
+    /** Per video channel: sequence of the last decoded frame which is not a skipped one. */
+    std::vector<int> m_lastDecodedSequence;
+
+    /** Sequence for which m_frameAwaitTimer limits the requests of more data on pause. */
+    int m_awaitedSequence = 0;
+    nx::utils::ElapsedTimer m_frameAwaitTimer;
+
     int m_queueSize;
     QRhi* m_rhi = nullptr;
 };
