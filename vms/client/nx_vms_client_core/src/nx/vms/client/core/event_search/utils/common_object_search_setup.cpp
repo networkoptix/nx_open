@@ -9,15 +9,15 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scoped_connections.h>
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/core/event_search/models/abstract_search_list_model.h>
 #include <nx/vms/client/core/event_search/utils/text_filter_setup.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/utils/managed_camera_set.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::client::core {
 
@@ -56,6 +56,7 @@ public:
 private:
     void updateRelevantCameras();
     void updateRelevantTimePeriod();
+    void updateCurrentDate();
     void setCurrentDate(const QDateTime& value);
     QnTimePeriod interestTimePeriod() const;
 
@@ -262,17 +263,7 @@ void CommonObjectSearchSetup::updateRelevantCamerasForMode(EventSearch::CameraSe
 CommonObjectSearchSetup::Private::Private(CommonObjectSearchSetup* q):
     q(q)
 {
-    m_dayChangeTimer->callOnTimeout(this,
-        [this]()
-        {
-            const auto timeWatcher = m_systemContext
-                ? m_systemContext->serverTimeWatcher()
-                : nullptr;
-
-            if (timeWatcher)
-                setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
-        });
-
+    m_dayChangeTimer->callOnTimeout(this, [this]() { updateCurrentDate(); });
     m_dayChangeTimer->start(1s);
 
     m_applyTimelineSelectionOperation.setInterval(kTimeSelectionDelay);
@@ -328,6 +319,7 @@ void CommonObjectSearchSetup::Private::setSystemContext(SystemContext* value)
     m_systemContext = value;
     emit q->mixedDevicesChanged();
 
+    updateCurrentDate();
     updateRelevantCameras();
 }
 
@@ -467,6 +459,14 @@ void CommonObjectSearchSetup::Private::updateRelevantTimePeriod()
     m_model->setInterestTimePeriod(m_currentTimePeriod);
 }
 
+void CommonObjectSearchSetup::Private::updateCurrentDate()
+{
+    const auto timeWatcher = m_systemContext ? m_systemContext->serverTimeWatcher() : nullptr;
+
+    if (timeWatcher)
+        setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
+}
+
 void CommonObjectSearchSetup::Private::setCurrentDate(const QDateTime& value)
 {
     auto startOfDay = value;
@@ -505,6 +505,12 @@ QnTimePeriod CommonObjectSearchSetup::Private::interestTimePeriod() const
         default:
             NX_ASSERT(false);
             break;
+    }
+
+    if (!NX_ASSERT(m_currentDate.isValid(),
+            "A relative time period is requested before the current date is known"))
+    {
+        return QnTimePeriod::anytime();
     }
 
     return QnTimePeriod(m_currentDate.addDays(1 - days).toMSecsSinceEpoch(),

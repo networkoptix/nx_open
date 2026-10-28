@@ -81,6 +81,13 @@ NxObject
     {
         target: view ? controller.searchModel : null
 
+        // Refills the list after the model drops its rows on its own: the relative period moves
+        // at midnight, a gap in the live tracks, the server switches the metadata storage.
+        function onModelReset()
+        {
+            Qt.callLater(d.refillIfEmpty)
+        }
+
         function onAsyncFetchStarted(request)
         {
             d.reload = !view.count
@@ -140,6 +147,12 @@ NxObject
         id: d
 
         property bool reload: false //< The current fetch fills an empty list.
+
+        function refillIfEmpty()
+        {
+            if (view && !view.count)
+                controller.requestUpdate(EventSearch.FetchDirection.older)
+        }
 
         // The fetched delegates get their final heights from their layouts in the next polish,
         // and the rows below them move down. Puts the item back before that frame is rendered.
