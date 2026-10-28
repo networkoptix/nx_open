@@ -966,7 +966,7 @@
     <message>
       <source>%1 and %2 do not have %3 permission for some of selected cameras</source>
       <comment>%1 and %2 are the numbers of user groups and users in a correct numeric form (e.g. &apos;2 groups and 1 user&apos;), %3 is the permission name</comment>
-      <translation type="unfinished">%1 and %2 do not have %3 permission for some of selected cameras</translation>
+      <translation>%1 und %2 haben keine %3 Berechtigung für einige der ausgewählten Kameras</translation>
     </message>
     <message numerus="yes">
       <source>%n groups do not have %1 permission for some of selected cameras</source>
@@ -1287,9 +1287,9 @@
     <message numerus="yes">
       <source>Hours</source>
       <comment>Numerus: Capitalized full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>Hours</numerusform>
-        <numerusform>Hours</numerusform>
+      <translation>
+        <numerusform>Stunden</numerusform>
+        <numerusform>Stunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1916,7 +1916,7 @@
     </message>
     <message>
       <source>Enable deprecated API functions (insecure).</source>
-      <translation type="unfinished">Enable deprecated API functions (insecure).</translation>
+      <translation>Veraltete API-Funktionen aktivieren (unsicher).</translation>
     </message>
     <message>
       <source>Enable deprecated HTTP Basic and Digest Authentications (insecure).</source>
