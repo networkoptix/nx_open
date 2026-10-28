@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/thread.h>
 
@@ -36,10 +37,11 @@ public:
     AsyncObjectPool(AIOService* aioService, FactoryFunc func):
         m_factoryFunc(std::move(func))
     {
-        // FIXME: #skolesnik AIOService::initialize() may return before AioThread::run()
-        // initializes systemThreadId(), causing multiple workers to be registered under 0.
-        for (auto t: aioService->getAllAioThreads())
+        const auto threads = aioService->getAllAioThreads();
+        for (auto t: threads)
             m_workers[t->systemThreadId()] = nullptr;
+        NX_ASSERT(m_workers.size() == threads.size() && !m_workers.contains(0),
+            "AIO thread ids are not all known");
     }
 
     ~AsyncObjectPool()
@@ -50,13 +52,12 @@ public:
     /**
      * @return An object instance that corresponds to the current thread. If there is no object
      * it is created by invoking factory func provided through the constructor.
-     * If it is called not from an AIO thread that belongs to supplied AIOService, nullptr is returned.
+     * Must be called from an AIO thread of the supplied AIOService.
      */
     Worker* get()
     {
         auto it = m_workers.find(nx::utils::Thread::currentThreadSystemId());
-        if (it == m_workers.end())
-            return nullptr;
+        NX_CRITICAL(it != m_workers.end(), "Not an AIO thread of the pool's AIOService");
 
         if (!it->second)
             it->second = m_factoryFunc();

@@ -1,6 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <memory>
+#include <set>
 
 #include <gtest/gtest.h>
 
@@ -187,6 +188,20 @@ TEST_F(AIOService, duplicate_start_monitoring_call_is_ignored)
     whenEventIsRaised();
 
     thenEventHasBeenReported();
+}
+
+TEST(AIOServiceStartup, every_thread_id_is_known_when_initialize_returns)
+{
+    aio::AIOService service;
+    ASSERT_TRUE(service.initialize(64));
+
+    std::set<nx::utils::ThreadId> ids;
+    for (auto thread: service.getAllAioThreads())
+        ids.insert(thread->systemThreadId());
+    service.pleaseStopSync();
+
+    ASSERT_EQ(64, ids.size());
+    ASSERT_FALSE(ids.contains(0));
 }
 
 } // namespace nx::network::aio::test

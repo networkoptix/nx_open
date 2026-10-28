@@ -50,6 +50,18 @@ AioThread::~AioThread()
     NX_ASSERT(m_taskQueue->empty());
 }
 
+void AioThread::start(Priority priority)
+{
+    if (isRunning())
+        return;
+
+    m_started = {};
+    auto started = m_started.get_future();
+    nx::utils::Thread::start(priority);
+    if (isRunning())
+        started.wait();
+}
+
 void AioThread::pleaseStop()
 {
     nx::utils::Thread::pleaseStop();
@@ -221,7 +233,7 @@ static constexpr std::chrono::milliseconds kErrorResetTimeout(1);
 
 void AioThread::run()
 {
-    initSystemThreadId();
+    m_started.set_value();
     NX_DEBUG(this, "AIO thread started");
 
     while (!needToStop())

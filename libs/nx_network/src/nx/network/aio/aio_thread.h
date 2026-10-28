@@ -3,6 +3,7 @@
 #pragma once
 
 #include <atomic>
+#include <future>
 #include <memory>
 #include <optional>
 
@@ -65,6 +66,8 @@ public:
         AioThreadWatcher* aioThreadsWatcher = nullptr);
     virtual ~AioThread();
 
+    // Returns once the thread runs, so systemThreadId() is valid for any caller after that.
+    virtual void start(Priority priority = InheritPriority) override;
     virtual void pleaseStop() override;
 
     virtual void post(
@@ -115,6 +118,7 @@ private:
     std::unique_ptr<AbstractPollSet> m_pollSet;
     std::unique_ptr<detail::AioTaskQueue> m_taskQueue;
     std::atomic<int> m_processingPostedCalls{0};
+    std::promise<void> m_started;
     // TODO: #akolesnikov This mutex seem to be redundant after introduction of detail::AioTaskQueue.
     mutable nx::Mutex m_mutex;
 

@@ -8,8 +8,8 @@
 #include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/aio/aio_task_queue.h>
 #include <nx/network/aio/aio_thread.h>
-#include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/aio/pollset.h>
+#include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -286,6 +286,19 @@ TEST_F(AIOThreadWithFailingPollSet, stop_monitoring_does_nothing_after_failed_st
     givenSocketFailedToMonitor();
     whenInvokedStopMonitoring();
     thenStopMonitoringCompletedSuccessfully();
+}
+
+TEST(AioThreadStart, repeated_start_is_noop_and_restart_works)
+{
+    aio::AioThread thread;
+    thread.start();
+    thread.start();
+    ASSERT_TRUE(thread.isRunning());
+
+    thread.pleaseStop();
+    thread.wait();
+    thread.start();
+    ASSERT_TRUE(thread.isRunning());
 }
 
 } // namespace nx::network::aio::test
