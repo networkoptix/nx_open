@@ -33,5 +33,6 @@ private:
     QHash<QString, StorageFactory> m_factoryByProtocol;
     StorageFactory m_defaultFactory;
     static nx::Lockable<StorageFactory> s_factory;
-    nx::Mutex m_mutex; // TODO: #rvasilenko this mutex is not used, is it intentional?
+    // Guards the factory registry.
+    nx::Mutex m_mutex;
 };
