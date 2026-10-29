@@ -42,6 +42,7 @@ CheckBox
         {
             anchors.fill: parent
             clip: true
+            radius: backgroundItem.radius
             rippleSize: 160
             mouseArea: control
         }

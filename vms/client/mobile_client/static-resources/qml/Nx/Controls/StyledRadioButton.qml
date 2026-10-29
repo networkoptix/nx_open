@@ -50,6 +50,7 @@ T.RadioButton
         {
             anchors.fill: parent
             clip: true
+            radius: parent.radius
             rippleSize: 160
             mouseArea: control
         }

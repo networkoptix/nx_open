@@ -42,6 +42,7 @@ Control
         {
             anchors.fill: parent
             clip: true
+            radius: parent.radius
             rippleSize: 160
             mouseArea: backgroudMouseArea
         }
