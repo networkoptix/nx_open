@@ -2,24 +2,20 @@
 
 #include "stream_reader.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <time.h>
-#include <unistd.h>
-#endif
-
-#include <sys/timeb.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
+#include <cstring>
 #include <fstream>
+#include <functional>
+#include <iterator>
 #include <memory>
+#include <thread>
 
 #include "dir_contents_manager.h"
 #include "dir_iterator.h"
-#include "ilp_video_packet.h"
 #include "ilp_empty_packet.h"
+#include "ilp_video_packet.h"
 #include "motion_data_picture.h"
 
 //if defined, random motion is generated
@@ -28,25 +24,19 @@
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
 
-static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
-static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
-
-StreamReader::StreamReader(
-    nxpt::CommonRefManager* const parentRefManager,
+StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
     DirContentsManager* const dirContentsManager,
     unsigned int frameDurationUsec,
     bool liveMode,
-    int /*encoderNumber*/)
-:
-    m_refManager( parentRefManager ),
-    m_dirContentsManager( dirContentsManager ),
-    m_curTimestamp( 0 ),
-    m_frameDuration( frameDurationUsec ),
-    m_liveMode( liveMode ),
-    m_streamReset( true ),
-    m_nextFrameDeployTime( 0 ),
-    m_isReverse( false ),
-    m_cSeq( 0 )
+    int /*encoderNumber*/):
+    m_refManager(parentRefManager),
+    m_dirContentsManager(dirContentsManager),
+    m_curTimestamp(0),
+    m_frameDuration(frameDurationUsec),
+    m_liveMode(liveMode),
+    m_streamReset(true),
+    m_isReverse(false),
+    m_cSeq(0)
 {
     readDirContents();
 
@@ -194,31 +184,30 @@ void StreamReader::interrupt()
 }
 
 nxcip::UsecUTCTimestamp StreamReader::setPosition(
-    unsigned int cSeq,
-    nxcip::UsecUTCTimestamp timestamp )
+    unsigned int cSeq, nxcip::UsecUTCTimestamp timestamp)
 {
-    Mutex::ScopedLock lk( &m_mutex );
+    Mutex::ScopedLock lk(&m_mutex);
+    return setPositionUnsafe(cSeq, timestamp);
+}
 
-    if( m_dirEntries.empty() )
+nxcip::UsecUTCTimestamp StreamReader::setPositionUnsafe(
+    unsigned int cSeq, nxcip::UsecUTCTimestamp timestamp)
+{
+    if (m_dirEntries.empty())
         return nxcip::INVALID_TIMESTAMP_VALUE;
 
-    std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator it = m_dirEntries.begin();
-    if( !m_isReverse )
-    {
-        //forward direction
-        it = m_dirEntries.lower_bound( timestamp );
-    }
-    else
-    {
-        it = m_dirEntries.upper_bound( timestamp );
-        if( it != m_dirEntries.begin() )
-            --it;   //taking last frame
-        else
-            it = m_dirEntries.end();
-    }
+    m_curPos = std::invoke(
+        [this, timestamp]
+        {
+            if (!m_isReverse)
+                return m_dirEntries.lower_bound(timestamp);
 
-    m_curPos = it;
-    m_curTimestamp = it == m_dirEntries.end() ? nxcip::INVALID_TIMESTAMP_VALUE : it->first;
+            // The last frame at or before the timestamp.
+            const auto next = m_dirEntries.upper_bound(timestamp);
+            return next == m_dirEntries.begin() ? m_dirEntries.end() : std::prev(next);
+        });
+    m_curTimestamp =
+        m_curPos == m_dirEntries.end() ? nxcip::INVALID_TIMESTAMP_VALUE : m_curPos->first;
     m_streamReset = true;
     m_cSeq = cSeq;
 
@@ -226,25 +215,19 @@ nxcip::UsecUTCTimestamp StreamReader::setPosition(
 }
 
 nxcip::UsecUTCTimestamp StreamReader::setReverseMode(
-    unsigned int cSeq,
-    bool isReverse,
-    nxcip::UsecUTCTimestamp timestamp )
+    unsigned int cSeq, bool isReverse, nxcip::UsecUTCTimestamp timestamp)
 {
-    Mutex::ScopedLock lk( &m_mutex );
+    Mutex::ScopedLock lk(&m_mutex);
 
-    if( m_isReverse == isReverse && timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
+    if (m_isReverse == isReverse && timestamp == nxcip::INVALID_TIMESTAMP_VALUE)
         return m_curTimestamp;
 
     m_isReverse = isReverse;
-    if( timestamp == nxcip::INVALID_TIMESTAMP_VALUE )
-    {
-        m_cSeq = cSeq;
-        return m_curTimestamp;
-    }
-    else
-    {
-        return setPosition( cSeq, timestamp );
-    }
+    if (timestamp != nxcip::INVALID_TIMESTAMP_VALUE)
+        return setPositionUnsafe(cSeq, timestamp);
+
+    m_cSeq = cSeq;
+    return m_curTimestamp;
 }
 
 bool StreamReader::isReverse() const
@@ -254,29 +237,9 @@ bool StreamReader::isReverse() const
 
 void StreamReader::doLiveDelay()
 {
-    struct timeb curBTime;
-    memset( &curBTime, 0, sizeof(curBTime) );
-    ftime( &curBTime );
-    const nxcip::UsecUTCTimestamp curTimeUsec = curBTime.time * USEC_IN_SEC + curBTime.millitm * USEC_IN_MS;
-
-    if( m_nextFrameDeployTime > curTimeUsec )
-    {
-#ifdef _WIN32
-        ::Sleep( (DWORD) ((m_nextFrameDeployTime - curTimeUsec) / USEC_IN_MS) );
-#elif _POSIX_C_SOURCE >= 199309L
-        static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
-        struct timespec delay;
-        memset( &delay, 0, sizeof(delay) );
-        delay.tv_sec = (m_nextFrameDeployTime - curTimeUsec) / USEC_IN_SEC;
-        delay.tv_nsec = ((m_nextFrameDeployTime - curTimeUsec) % USEC_IN_SEC) * NSEC_IN_USEC;
-#else
-        ::sleep( (m_nextFrameDeployTime - curTimeUsec) / USEC_IN_SEC );
-#endif
-    }
-
-    ftime( &curBTime );
-
-    m_nextFrameDeployTime = (curBTime.time * USEC_IN_SEC + curBTime.millitm * USEC_IN_MS) + m_frameDuration;
+    std::this_thread::sleep_until(m_nextFrameDeployTime);
+    m_nextFrameDeployTime =
+        std::chrono::steady_clock::now() + std::chrono::microseconds(m_frameDuration);
 }
 
 void StreamReader::readDirContents()

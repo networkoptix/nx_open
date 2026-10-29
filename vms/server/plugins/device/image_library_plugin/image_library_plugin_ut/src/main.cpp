@@ -8,5 +8,5 @@ int main(int argc, char** argv)
 {
     QCoreApplication application(argc, argv);
 
-    return nx::utils::runTest(argc, argv);
+    return nx::utils::test::runTest(argc, argv);
 }

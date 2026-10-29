@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <map>
 #include <string>
 
@@ -64,12 +65,15 @@ private:
     std::map<nxcip::UsecUTCTimestamp, std::string> m_dirEntries;
     std::map<nxcip::UsecUTCTimestamp, std::string>::const_iterator m_curPos;
     bool m_streamReset;
-    nxcip::UsecUTCTimestamp m_nextFrameDeployTime;
+    std::chrono::steady_clock::time_point m_nextFrameDeployTime;
     mutable Mutex m_mutex;
     bool m_isReverse;
     unsigned int m_cSeq;
 
     void doLiveDelay();
+    //! Same as \a setPosition, but \a m_mutex must be locked by the caller.
+    nxcip::UsecUTCTimestamp setPositionUnsafe(
+        unsigned int cSeq, nxcip::UsecUTCTimestamp timestamp);
     void readDirContents();
     void moveCursorToNextFrame();
 };
