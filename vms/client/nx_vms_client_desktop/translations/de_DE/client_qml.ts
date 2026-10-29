@@ -87,7 +87,7 @@
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation>Erweiterte Updateeinstellungen</translation>
+      <translation>Erweiterte Update-Einstellungen</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -99,11 +99,11 @@
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation>Automatische Clientupdates</translation>
+      <translation>Automatische Client Updates</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation>Aktivieren Sie diese Option, um angeschlossene Clients automatisch auf die neueste kompatible Version zu aktualisieren.</translation>
+      <translation>Aktivieren Sie diese Option, um verbundene Clients automatisch auf die neueste kompatible Version zu aktualisieren.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation>Alle verbundenen Clients aktualisieren auf Version %1.</translation>
+      <translation>Alle verbundenen Clients werden auf Version %1 aktualisiert.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
@@ -169,7 +169,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation>Objekttyp</translation>
+      <translation>Objekt-Typ</translation>
     </message>
   </context>
   <context>
@@ -199,7 +199,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kameraplugineinstellungen zu konfigurieren</translation>
+      <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kamera-Plugin-Einstellungen zu konfigurieren</translation>
     </message>
   </context>
   <context>
@@ -268,7 +268,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Die Kameraanalytik funktioniert nur, wenn die Kamera betrachtet wird. Aktivieren Sie die Aufnahme, damit sie die ganze Zeit funktioniert.</translation>
+      <translation>Die Kameraanalyse funktioniert nur, wenn die Kamera angezeigt wird. Aktivieren Sie die Aufzeichnung, damit sie dauerhaft funktioniert.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -355,7 +355,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Löschen</translation>
+      <translation>Entfernen</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -655,11 +655,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation>Thumbnails ausblenden</translation>
+      <translation>Miniaturansichten anzeigen</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation>Thumbnails anzeigen</translation>
+      <translation>Miniaturansichten anzeigen</translation>
     </message>
   </context>
   <context>
@@ -968,7 +968,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>Äquidistant</translation>
+      <translation>Gleichmäßig</translation>
     </message>
     <message>
       <source>Stereographic</source>
@@ -1416,7 +1416,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation>Auf Standardwert zurücksetzen</translation>
+      <translation>Auf Standardwerte zurücksetzen</translation>
     </message>
   </context>
   <context>
@@ -1427,7 +1427,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation>Vergrößern / Verkleinern</translation>
+      <translation>Einzoomen / Auszoomen</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
@@ -1524,7 +1524,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation>Zeile ist ungültig. Entfernen Sie die Überschneidungen, um fortzufahren.</translation>
+      <translation>Linie ist ungültig. Entfernen Sie die Überschneidungen, um fortzufahren.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
@@ -1546,7 +1546,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation>Klicken Sie auf jeden Pfeil, um die gewünschte Richtung umzuschalten.</translation>
+      <translation>Klicken Sie auf die Pfeile, um auf die gewünschte Richtung umzuschalten.</translation>
     </message>
   </context>
   <context>
@@ -1565,15 +1565,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation>Anwesend</translation>
+      <translation>Vorhanden</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation>Abwesend</translation>
+      <translation>Fehlend</translation>
     </message>
     <message>
       <source>value</source>
-      <translation>wert</translation>
+      <translation>Wert</translation>
     </message>
   </context>
   <context>
@@ -2478,11 +2478,11 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>Die Website wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
+      <translation>Die Site wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation>Die Website wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
+      <translation>Die Site wurde vorübergehend deaktiviert. Um die Integration für das aktuelle Gerät zu aktiviren/deaktivieren, muss die Site aktiv sein. Wenden Sie sich für weitere Informationen an Ihren Vertriebspartner</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
@@ -2697,7 +2697,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Mindestens 3 Zeichen</translation>
     </message>
   </context>
   <context>
@@ -2902,7 +2902,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-Mail</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2938,7 +2938,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation>Passwörter stimmen nicht überrein</translation>
+      <translation>Die Passwörter stimmen nicht überein</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
@@ -3012,7 +3012,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-Mail</translation>
     </message>
     <message>
       <source>Change password</source>
@@ -3070,7 +3070,7 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation>Stellen Sie sicher, dass dieser Computer eine Verbindung zu %1 Herstellen kann</translation>
+      <translation>Stellen Sie sicher, dass dieser Computer eine Verbindung zum %1 herstellen kann</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
@@ -3082,7 +3082,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Die Anmeldedaten dieses Benutzers sind identisch mit denen eines anderen Benutzers. Keiner der Benutzer kann sich anmelden. Um dieses Problem zu beheben, können Sie die Anmeldedaten des Benutzers ändern oder Benutzer mit doppelten Anmeldedaten deaktivieren oder löschen.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3132,11 +3132,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Auf Standardeinstellungen zurücksetzen...</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Ereignisse testen...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3144,7 +3144,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 ausgewählt:</translation>
     </message>
     <message>
       <source>Schedule</source>
