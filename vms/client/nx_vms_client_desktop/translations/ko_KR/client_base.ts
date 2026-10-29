@@ -9428,7 +9428,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>시스템들는 다른 소프트웨어 버전이 입니다. 둘다 최신 빌드 로 업데이트 하십시요.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

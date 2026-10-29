@@ -9570,11 +9570,11 @@ Webstedets ydeevne er forringet.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Sitene har uoverensstemmelser i softwareversionerne. Opdater venligst begge til den seneste version.</translation>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>Se udgivelsesnoter</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12186,23 +12186,23 @@ Pin ikke dette certifikat, hvis du ikke har ændret %2 Serverens SSL certifikat.
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+Denne integration præsenterede et certifikat, der ikke er tillid til. Det anbefales ikke at åbne denne integration, medmindre risiciene er forstået og accepteret.</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+Denne webside præsenterede et certifikat, der ikke er tillid til. Det anbefales ikke at åbne denne webside, medmindre risiciene er forstået og accepteret.</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>Åbn Integration</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Åbn Webside</translation>
     </message>
   </context>
   <context>

@@ -12203,7 +12203,7 @@ This web page presented an untrusted certificate. It is not recommended to open 
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Webseite öffnen</translation>
     </message>
   </context>
   <context>

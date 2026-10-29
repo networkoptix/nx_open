@@ -9570,7 +9570,7 @@ Les performances du client sont dégradées.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Les versions logicielles des sites ne correspondent pas. Veuillez les mettre à jour vers la dernière version.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

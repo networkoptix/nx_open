@@ -9570,7 +9570,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Οι τοποθείες έχουν εκδόσεις λογισμικού που δεν ταιριάζουν. Παρακαλούμε ενημερώστε και τις δύο στην πιο πρόσφατη έκδοση.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

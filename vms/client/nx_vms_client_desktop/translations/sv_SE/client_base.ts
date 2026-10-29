@@ -9570,7 +9570,7 @@ Platsens prestanda är försämrad.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Systemen har felaktiga programversioner. Vänligen uppdatera dem båda till senaste versionen.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

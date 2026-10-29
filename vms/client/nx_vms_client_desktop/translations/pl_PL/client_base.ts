@@ -9853,7 +9853,7 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Witryny mają niezgodne wersje oprogramowania. Proszę zaktualizować obie do najnowszej kompilacji.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

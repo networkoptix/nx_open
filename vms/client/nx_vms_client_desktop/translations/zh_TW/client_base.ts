@@ -9428,11 +9428,11 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>站點軟體版本不符。請將兩個站點皆更新為最新版本。</translation>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>查看版本發布說明</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12006,23 +12006,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+此整合出示的憑證是未受信任的。除非您了解並接受相關風險，否則不建議開啟此整合。</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+此網頁出示的憑證是未受信任的。除非您了解並接受相關風險，否則不建議開啟此網頁。</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>開啟整合</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>開啟網頁</translation>
     </message>
   </context>
   <context>

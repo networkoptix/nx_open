@@ -9433,11 +9433,11 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>サイトのソフトウェアバージョンが一致していません。両方とも最新ビルドに更新してください。</translation>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>リリースノートを表示</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12014,23 +12014,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+このインテグレーションは信頼できない証明書を提示しました。リスクを理解したうえで受け入れない限り、このインテグレーションを開くことは推奨されません。</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+このWebページは信頼できない証明書を提示しました。リスクを理解したうえで受け入れない限り、このWebページを開くことは推奨されません。</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>インテグレーションを開く</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Webページを開く</translation>
     </message>
   </context>
   <context>

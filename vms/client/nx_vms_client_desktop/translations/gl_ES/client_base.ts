@@ -9570,7 +9570,7 @@ O rendemento do sitio web está degradado.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Os sitios web teñen versións de software que non coinciden. Por favor, actualíza os dous á versión máis recente.</translation>
     </message>
     <message>
       <source>View Release Notes</source>

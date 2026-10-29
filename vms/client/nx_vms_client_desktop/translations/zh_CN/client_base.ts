@@ -12022,7 +12022,7 @@ This web page presented an untrusted certificate. It is not recommended to open 
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>打开web页面</translation>
     </message>
   </context>
   <context>

@@ -9428,7 +9428,7 @@ Hiệu suất Chi nhánh bị giảm.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation type="unfinished">The sites have mismatching software versions. Please update both of them to the latest build.</translation>
+      <translation>Các Chi nhánh có phiên bản phần mềm không khớp nhau. Vui lòng cập nhật cả hai lên bản dựng mới nhất.</translation>
     </message>
     <message>
       <source>View Release Notes</source>
