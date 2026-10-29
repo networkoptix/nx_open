@@ -22,7 +22,9 @@ Screens::Screens(WindowContext* context, QObject* parent):
 bool Screens::show2faValidationScreen(const network::http::Credentials& credentials) const
 {
     QVariantMap properties;
+    properties["user"] = QString::fromStdString(credentials.username);
     properties["token"] = QString::fromStdString(credentials.authToken.value);
+    properties["twoFactorValidation"] = true;
     return QmlWrapperHelper::showScreen(windowContext(), kLoginScreenUrl, properties) == "success";
 }
 

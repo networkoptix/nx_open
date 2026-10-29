@@ -69,13 +69,13 @@ void CredentialsHelper::clearSavedPasswords()
 }
 
 core::OauthClient* CredentialsHelper::createOauthClient(
-    const QString& token,
-    const QString& user,
-    bool forced) const
+    const QString& token, const QString& user, bool forced, bool twoFactorValidation) const
 {
-    const core::OauthClientType type = token.isEmpty()
-        ? core::OauthClientType::loginCloud
-        : core::OauthClientType::renew;
+    core::OauthClientType type = core::OauthClientType::renew;
+    if (twoFactorValidation)
+        type = core::OauthClientType::system2faAuth;
+    else if (token.isEmpty())
+        type = core::OauthClientType::loginCloud;
 
     static constexpr std::chrono::days kRefreshTokenLifetime(180);
     const auto result = new core::OauthClient(type, core::OauthViewType::mobile, /*cloudSystem*/ {},
@@ -86,6 +86,9 @@ core::OauthClient* CredentialsHelper::createOauthClient(
         token.isEmpty()
             ? nx::network::http::AuthToken{}
             : nx::network::http::BearerAuthToken(token.toStdString())));
+
+    if (twoFactorValidation)
+        return result;
 
     connect(result, &core::OauthClient::authDataReady, this,
         [result, forced]()

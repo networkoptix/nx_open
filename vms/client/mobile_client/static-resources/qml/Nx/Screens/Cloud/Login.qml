@@ -20,6 +20,9 @@ Page
 
     property bool forced: false
 
+    /** Validates the token with 2FA only, the cloud credentials are not changed. */
+    property bool twoFactorValidation: false
+
     signal gotResult(value: string)
 
     title: qsTr("Log In")
@@ -104,6 +107,13 @@ Page
 
             redirectUrlWorkaround.stop()
 
+            // On 2FA validation the cloud returns the validated token as the code.
+            if (screen.twoFactorValidation)
+            {
+                d.oauthClient.twoFaVerified(code)
+                return
+            }
+
             screen.gotResult("success")
             d.oauthClient.setCode(code)
         }
@@ -126,8 +136,11 @@ Page
 
     Component.onCompleted:
     {
-        const helper = appContext.credentialsHelper.createOauthClient(token, user, forced)
+        const helper = appContext.credentialsHelper.createOauthClient(
+            token, user, forced, twoFactorValidation)
         const closePage = ()=>Workflow.popCurrentScreen()
+        if (twoFactorValidation)
+            helper.authDataReady.connect(()=>screen.gotResult("success"))
         helper.authDataReady.connect(closePage)
         helper.cancelled.connect(closePage)
         helper.setLocale(locale.name)
