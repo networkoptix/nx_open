@@ -10,3 +10,7 @@ nx_add_server_plugin(image_library_plugin NO_MOC NO_GTEST OPTIONAL
     SOURCE_DIR "plugin"
     PRIVATE_LIBS image_library_plugin_integration
 )
+
+if(withTests)
+    add_subdirectory(image_library_plugin_ut)
+endif()
