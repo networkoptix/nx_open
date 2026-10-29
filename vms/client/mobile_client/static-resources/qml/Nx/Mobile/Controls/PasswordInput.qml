@@ -107,7 +107,7 @@ FocusScope
             MaterialEffect
             {
                 anchors.fill: parent
-                rounded: true
+                radius: parent.radius
                 mouseArea: mouseArea
                 rippleColor: "transparent"
             }
