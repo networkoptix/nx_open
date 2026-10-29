@@ -154,7 +154,7 @@
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>在佈局中切換攝影機</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
@@ -190,7 +190,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>如何連接？</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -605,11 +605,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>教學</translation>
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>請參閱介面導覽</translation>
     </message>
   </context>
   <context>
@@ -767,7 +767,7 @@
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>在位移偵測、物件和書籤之間切換時間軸</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
@@ -812,11 +812,11 @@
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>重新打開已收合的面板</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>點擊懸浮按鈕開啟面板</translation>
     </message>
   </context>
   <context>
@@ -1468,7 +1468,7 @@
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>開啟軟觸發攝影機動作</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
@@ -1533,7 +1533,7 @@
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>長按即可查看事件細節</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
@@ -1548,7 +1548,7 @@
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>雙指捏合或展開即可縮放時間軸</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
@@ -1570,7 +1570,7 @@
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>教學</translation>
     </message>
   </context>
   <context>
