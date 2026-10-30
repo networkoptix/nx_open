@@ -5,7 +5,7 @@
 #include <time.h>
 
 #if defined(__clang__) && defined(_MSC_VER)
-#include <comdef.h>
+    #include <comdef.h>
 #endif
 
 #include <boost/algorithm/string.hpp>
@@ -272,6 +272,11 @@ QString toString(const std::chrono::steady_clock::time_point& value)
     using namespace std::chrono;
 
     return "steady: " + toString(duration_cast<milliseconds>(value.time_since_epoch()));
+}
+
+QString toString(const std::filesystem::path& value)
+{
+    return toString(value.native());
 }
 
 } // namespace detail
