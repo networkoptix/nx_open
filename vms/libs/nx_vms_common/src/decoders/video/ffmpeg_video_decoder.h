@@ -67,7 +67,7 @@ private:
     /** Applies pixel format / aspect ratio / flags / channel bookkeeping shared by every
      * decoded frame this class hands out.
      */
-    bool finalizeDecodedFrame(const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutput* outFrame);
+    bool finalizeDecodedFrame(CLVideoDecoderOutput* outFrame);
 
 private:
     std::unique_ptr<nx::media::ffmpeg::FfmpegSharedMemoryBufferContext> m_shmBufferContext;
@@ -86,7 +86,6 @@ private:
     int m_forceSliceDecoding;
     mutable double m_prevSampleAspectRatio;
     int64_t m_prevTimestamp;
-    int64_t m_prevFrameDuration = 0;
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;
     bool m_needRecreate;

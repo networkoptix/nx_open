@@ -5,6 +5,7 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
+#include <cstring>
 
 extern "C" {
 #include <libavutil/cpu.h>
@@ -373,6 +374,7 @@ bool QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
         CodecParametersConstPtr(new CodecParameters(m_context)));
 
     determineOptimalThreadType(data);
+    m_context->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
 
     int status = avcodec_open2(m_context, codec, NULL);
     if (status < 0)
@@ -444,9 +446,17 @@ bool QnFfmpegVideoDecoder::decodeVideo(const QnConstCompressedVideoDataPtr& data
 {
     nx::media::ffmpeg::AvPacket avPacket(data.get());
     auto packet = avPacket.get();
-    packet->pts = AV_NOPTS_VALUE;
     if (data && isImage(data))
         packet->flags = AV_PKT_FLAG_KEY;
+
+    // Not every decoder carries packet dts into AVFrame::pkt_dts (libdav1d does not), but all of
+    // them copy opaque_ref. A buffer, not opaque itself, since a pointer is 32 bits on arm32.
+    if (data)
+    {
+        packet->opaque_ref = av_buffer_alloc(sizeof(data->timestamp));
+        if (packet->opaque_ref)
+            memcpy(packet->opaque_ref->data, &data->timestamp, sizeof(data->timestamp));
+    }
 
     // Frames are retrieved in the drain loop below, right after this send.
     m_lastDecodeResult = avcodec_send_packet(m_context, packet);
@@ -483,7 +493,10 @@ bool QnFfmpegVideoDecoder::decodeVideo(const QnConstCompressedVideoDataPtr& data
         if (m_metrics)
             m_metrics->decodedPixels() += frame->width * frame->height;
 
-        if (!finalizeDecodedFrame(data, frame.get()))
+        if (frame->opaque_ref)
+            memcpy(&frame->pkt_dts, frame->opaque_ref->data, sizeof(frame->pkt_dts));
+
+        if (!finalizeDecodedFrame(frame.get()))
             return false;
 
         m_outputFrames.push_back(frame);
@@ -491,15 +504,13 @@ bool QnFfmpegVideoDecoder::decodeVideo(const QnConstCompressedVideoDataPtr& data
     return true;
 }
 
-bool QnFfmpegVideoDecoder::finalizeDecodedFrame(
-    const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutput* outFrame)
+bool QnFfmpegVideoDecoder::finalizeDecodedFrame(CLVideoDecoderOutput* outFrame)
 {
     if (m_config.forceRgbaFormat && outFrame->format != AV_PIX_FMT_RGBA)
     {
         CLVideoDecoderOutput tmpFrame;
         tmpFrame.reallocate(outFrame->width, outFrame->height, AV_PIX_FMT_RGBA);
-        if (data)
-            tmpFrame.pkt_dts = data->timestamp;
+        tmpFrame.pkt_dts = outFrame->pkt_dts;
 
         if (outFrame->convertTo(&tmpFrame))
         {
@@ -515,13 +526,6 @@ bool QnFfmpegVideoDecoder::finalizeDecodedFrame(
     outFrame->sample_aspect_ratio = getSampleAspectRatio();
     outFrame->flags = m_lastFlags;
     outFrame->channel = m_lastChannelNumber;
-    // In case of b-frames stream ffmpeg gives last flushed frames with AV_NOPTS_VALUE, so use
-    // m_prevFrameDuration to get frame pts.
-    if (!data && outFrame->pkt_dts == AV_NOPTS_VALUE)
-    {
-        outFrame->pkt_dts = m_prevTimestamp + m_prevFrameDuration;
-        m_prevTimestamp = outFrame->pkt_dts;
-    }
     return m_context->pix_fmt != AV_PIX_FMT_NONE;
 }
 
@@ -637,9 +641,6 @@ bool QnFfmpegVideoDecoder::decode(
                 }
             }
         }
-        if (m_prevTimestamp != AV_NOPTS_VALUE)
-            m_prevFrameDuration = data->timestamp - m_prevTimestamp;
-
         m_prevTimestamp = data->timestamp;
     }
     else
