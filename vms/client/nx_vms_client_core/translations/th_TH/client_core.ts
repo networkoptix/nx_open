@@ -325,8 +325,8 @@
       <translation>30 วันที่แล้ว</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>ตลอดเวลา</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

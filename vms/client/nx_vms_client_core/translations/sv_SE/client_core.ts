@@ -326,8 +326,8 @@
       <translation>Senaste 30 Dagarna</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>När som helst</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

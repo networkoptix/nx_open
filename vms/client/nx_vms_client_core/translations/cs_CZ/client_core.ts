@@ -328,8 +328,8 @@
       <translation>Posledních 30 dní</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Kdykoliv</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

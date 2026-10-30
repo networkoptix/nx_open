@@ -325,8 +325,8 @@
       <translation>過去 30 天</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>任何時間</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

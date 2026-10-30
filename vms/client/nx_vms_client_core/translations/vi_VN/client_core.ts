@@ -325,8 +325,8 @@
       <translation>30 ngày qua</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Mọi lúc</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

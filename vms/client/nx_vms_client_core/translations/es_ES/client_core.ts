@@ -326,8 +326,8 @@
       <translation>Últimos 30 días</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Cualquier momento</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

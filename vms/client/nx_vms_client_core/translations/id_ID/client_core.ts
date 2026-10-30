@@ -325,8 +325,8 @@
       <translation>30 Hari terakhir</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Semua waktu</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>
