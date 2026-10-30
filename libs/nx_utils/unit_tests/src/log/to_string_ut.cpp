@@ -2,6 +2,7 @@
 
 #include <QtCore>
 #include <bitset>
+#include <filesystem>
 #include <optional>
 
 #include <gtest/gtest.h>
@@ -66,6 +67,19 @@ TEST(ToString, Std)
 
     assertToString(std::bitset<8>(), "0b00000000");
     assertToString(std::bitset<8>(0xFF), "0b11111111");
+
+    assertToString(std::filesystem::path(), "");
+    assertToString(std::filesystem::path("main.log"), "main.log");
+    assertToString(std::filesystem::path("/opt/mediaserver/var/log/main.log"),
+        "/opt/mediaserver/var/log/main.log");
+    assertToString(std::vector<std::filesystem::path>{"a.log", "b.log"}, "{ a.log, b.log }");
+#if !defined(_WIN32)
+    // Must not throw on a file name which is not a valid UTF-8.
+    EXPECT_EQ(QString("bad") + QChar(QChar::ReplacementCharacter) + ".log",
+        nx::toString(std::filesystem::path("bad\xFF.log")));
+#endif
+    EXPECT_EQ(QLatin1String("Log file main.log"),
+        nx::format("Log file %1", std::filesystem::path("main.log")).toQString());
 }
 
 TEST(ToString, Qt)
