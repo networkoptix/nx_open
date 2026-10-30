@@ -953,12 +953,12 @@ float QnVirtualCameraResource::getMaxFps(nx::vms::api::StreamIndex streamIndex) 
         .value_or(kDefaultMaxFps);
 }
 
-std::set<float> QnVirtualCameraResource::getAvailableFps(
-    nx::vms::api::StreamIndex streamIndex/* = nx::vms::api::StreamIndex::primary*/) const
+std::set<double> QnVirtualCameraResource::getAvailableFps(
+    nx::vms::api::StreamIndex streamIndex /* = nx::vms::api::StreamIndex::primary*/) const
 {
     return streamCapability(streamIndex)
         .transform([](const auto& caps) { return caps.availableFps; })
-        .value_or(std::set<float>{});
+        .value_or(std::set<double>{});
 }
 
 float QnVirtualCameraResource::strictFpsToLimits(float fps,
@@ -970,8 +970,7 @@ float QnVirtualCameraResource::strictFpsToLimits(float fps,
 }
 
 void QnVirtualCameraResource::setAvailableFps(
-    std::set<float> availableFps,
-    nx::vms::api::StreamIndex streamIndex)
+    std::set<double> availableFps, nx::vms::api::StreamIndex streamIndex)
 {
     updateCameraMediaCapability(
         [streamIndex, fps = std::move(availableFps)](nx::vms::api::CameraMediaCapability& capability)

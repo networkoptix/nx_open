@@ -255,12 +255,13 @@ public:
     void setMotionType(nx::vms::api::MotionType value);
 
     virtual float getMaxFps(nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
-    std::set<float> getAvailableFps(nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
+    std::set<double> getAvailableFps(
+        nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const;
     float strictFpsToLimits(float initialFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary) const noexcept;
 
     void setFpsLimits(float minFps, float maxFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
     void setMaxFps(float maxFps, nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
-    void setAvailableFps(std::set<float> availableFps,
+    void setAvailableFps(std::set<double> availableFps,
         nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::primary);
 
     virtual int reservedSecondStreamFps() const;

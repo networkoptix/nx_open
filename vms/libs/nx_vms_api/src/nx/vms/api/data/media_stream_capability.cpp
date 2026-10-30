@@ -2,6 +2,7 @@
 
 #include "media_stream_capability.h"
 
+#include <algorithm>
 #include <ranges>
 
 #include <nx/fusion/model_functions.h>
@@ -33,7 +34,10 @@ float CameraStreamCapability::strictFps(const float fps) const noexcept
     const auto findFloorFps = [this](float fps) -> std::optional<float>
     {
         if (availableFps.empty()) return std::nullopt;
-        auto it = availableFps.upper_bound(fps);
+        // Compared as float: fps is often a value of availableFps narrowed to float, and 3.33f
+        // is less than 3.33.
+        auto it =
+            std::ranges::upper_bound(availableFps, fps, {}, [](double v) { return (float) v; });
         return (it != availableFps.begin()) ? *std::prev(it) : *it;
     };
     const auto tryClamp = [this](float fps)

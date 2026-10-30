@@ -25,10 +25,10 @@ struct NX_VMS_API CameraStreamCapability
     float minFps = 0.0;
     float maxFps = 0.0;
 
-    /**%apidoc:{std::vector<float>}
+    /**%apidoc:{std::vector<double>}
      * If empty, the incoming fps is clamped to the range [minFps; maxFps].
      */
-    std::set<float> availableFps;
+    std::set<double> availableFps;
 
     QString toString() const;
     float calcMaxFps() const noexcept;
