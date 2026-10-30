@@ -1667,7 +1667,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 ausgewählt:</translation>
     </message>
     <message>
       <source>Delete</source>

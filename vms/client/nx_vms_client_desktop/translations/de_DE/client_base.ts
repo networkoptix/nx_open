@@ -9214,9 +9214,9 @@ Site performance is degraded.</translation>
     <message numerus="yes">
       <source>%n selected:</source>
       <comment>Numerus: %n is a number of selected rows</comment>
-      <translation type="unfinished">
-        <numerusform>%n selected:</numerusform>
-        <numerusform>%n selected:</numerusform>
+      <translation>
+        <numerusform>%n ausgewählt:</numerusform>
+        <numerusform>%n ausgewählt:</numerusform>
       </translation>
     </message>
     <message>
