@@ -325,8 +325,8 @@
       <translation>直近 30 日間</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>期間指定なし</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

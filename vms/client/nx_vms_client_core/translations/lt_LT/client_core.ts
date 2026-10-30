@@ -328,8 +328,8 @@
       <translation type="unfinished">Last 30 days</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

@@ -327,8 +327,8 @@
       <translation>30 הימים האחרונים</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>בכל עת</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

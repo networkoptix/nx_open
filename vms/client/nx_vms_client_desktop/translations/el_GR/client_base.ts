@@ -9574,7 +9574,7 @@ Site performance is degraded.</source>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>Προβολή Σημειώσεων Έκδοσης</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12187,23 +12187,23 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</so
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+Αυτή η ενσωμάτωση παρουσίασε ένα μη αξιόπιστο πιστοποιητικό. Δεν συνιστάται το άνοιγμα αυτής της ενσωμάτωσης, εκτός εάν οι κίνδυνοι είναι κατανοητοί και αποδεκτοί.</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+Αυτή η ιστοσελίδα παρουσίαζε ένα μη αξιόπιστο πιστοποιητικό. Δεν συνιστάται το άνοιγμα αυτής της ιστοσελίδας, εκτός εάν κατανοείτε και αποδέχεστε τους κινδύνους.</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>Άνοιγμα Ενσωμάτωσης</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Άνοιγμα Ιστοσελίδας</translation>
     </message>
   </context>
   <context>

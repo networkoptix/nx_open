@@ -286,16 +286,16 @@
     </message>
     <message>
       <source>Total number of events</source>
-      <translation type="unfinished">Total number of events</translation>
+      <translation>العدد الإجمالي للأحداث</translation>
     </message>
     <message>
       <source>Removed subject</source>
       <comment>The subject is user or group</comment>
-      <translation type="unfinished">Removed subject</translation>
+      <translation>تم حذف الموضوع</translation>
     </message>
     <message>
       <source>Removed device</source>
-      <translation type="unfinished">Removed device</translation>
+      <translation>تم إزالة الجهاز</translation>
     </message>
     <message>
       <source>Removed camera</source>
@@ -303,58 +303,58 @@
     </message>
     <message>
       <source>Removed server</source>
-      <translation type="unfinished">Removed server</translation>
+      <translation>تمت إزالة الخادم</translation>
     </message>
     <message>
       <source>Removed layout</source>
-      <translation type="unfinished">Removed layout</translation>
+      <translation>تمت إزالة التخطيط</translation>
     </message>
     <message numerus="yes">
       <source>Selected devices were removed</source>
       <comment>Numerus form depend on devices count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
-        <numerusform>Selected devices were removed</numerusform>
+      <translation>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
+        <numerusform>تمت إزالة الأجهزة المحددة</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected cameras were removed</source>
       <comment>Numerus form depend on cameras count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
-        <numerusform>Selected cameras were removed</numerusform>
+      <translation>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
+        <numerusform>تمت إزالة كاميرات محددة</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected servers were removed</source>
       <comment>Numerus form depend on servers count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
-        <numerusform>Selected servers were removed</numerusform>
+      <translation>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
+        <numerusform>تمت إزالة الخوادم المحددة</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected layouts were removed</source>
       <comment>Numerus form depend on layouts count</comment>
-      <translation type="unfinished">
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
-        <numerusform>Selected layouts were removed</numerusform>
+      <translation>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
+        <numerusform>تمت إزالة التخطيطات المحددة</numerusform>
       </translation>
     </message>
     <message>
@@ -1224,7 +1224,7 @@
     <name>nx::vms::rules::SoftTriggerEvent</name>
     <message>
       <source>Soft Trigger</source>
-      <translation type="unfinished">Soft Trigger</translation>
+      <translation>مشغل ناعم</translation>
     </message>
     <message>
       <source>Name</source>

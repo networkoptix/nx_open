@@ -328,8 +328,8 @@
       <translation>Останні 30 днів</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Будь-який час</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

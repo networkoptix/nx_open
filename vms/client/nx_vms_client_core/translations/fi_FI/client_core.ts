@@ -326,8 +326,8 @@
       <translation>Viimeiset 30 päivää</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Milloin tahansa</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

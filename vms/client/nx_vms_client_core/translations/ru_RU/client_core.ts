@@ -328,8 +328,8 @@
       <translation>Последние 30 дней</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>Любое время</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>

@@ -1660,7 +1660,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 ausgewählt:</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2695,7 +2695,7 @@ Press Alt + Click to follow object</translation>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Mindestens 3 Zeichen</translation>
     </message>
   </context>
   <context>
@@ -3080,7 +3080,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Die Anmeldedaten dieses Benutzers sind identisch mit denen eines anderen Benutzers. Keiner der Benutzer kann sich anmelden. Um dieses Problem zu beheben, können Sie die Anmeldedaten des Benutzers ändern oder Benutzer mit doppelten Anmeldedaten deaktivieren oder löschen.</translation>
     </message>
     <message>
       <source>Notification Language</source>
@@ -3130,11 +3130,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Auf Standardeinstellungen zurücksetzen...</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Ereignisse testen...</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -3142,7 +3142,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>%1 ausgewählt:</translation>
     </message>
     <message>
       <source>Schedule</source>

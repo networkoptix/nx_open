@@ -9853,11 +9853,11 @@ Wydajność witryny jest obniżona.</translation>
     </message>
     <message>
       <source>The sites have mismatching software versions. Please update both of them to the latest build.</source>
-      <translation>Witryny mają niezgodne wersje oprogramowania. Proszę zaktualizować obie do najnowszej kompilacji.</translation>
+      <translation>Systemy mają różne wersje oprogramowania. Zaktualizuj oba do najnowszej wersji.</translation>
     </message>
     <message>
       <source>View Release Notes</source>
-      <translation type="unfinished">View Release Notes</translation>
+      <translation>Zobacz informacje o wydaniu</translation>
     </message>
     <message>
       <source>You are about to merge Sites with Starter licenses.</source>
@@ -12541,23 +12541,23 @@ Nie przypinaj tego certyfikatu, jeśli nie zmodyfikowałeś %2 certyfikatu SSL s
       <source>%1
 This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</source>
       <comment>%1 is the integration address</comment>
-      <translation type="unfinished">%1
-This integration presented an untrusted certificate. It is not recommended to open this integration unless the risks are understood and accepted.</translation>
+      <translation>%1
+Ta integracja przedstawiła niezaufany certyfikat. Nie zaleca się otwierania tej integracji, chyba że rozumiesz i akceptujesz ryzyko.</translation>
     </message>
     <message>
       <source>%1
 This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">%1
-This web page presented an untrusted certificate. It is not recommended to open this web page unless the risks are understood and accepted.</translation>
+      <translation>%1
+Ta strona internetowa przedstawiła niezaufany certyfikat. Nie zaleca się otwierania tej strony internetowej, chyba że rozumiesz i akceptujesz ryzyko.</translation>
     </message>
     <message>
       <source>Open Integration</source>
-      <translation type="unfinished">Open Integration</translation>
+      <translation>Otwórz integrację</translation>
     </message>
     <message>
       <source>Open Web Page</source>
-      <translation type="unfinished">Open Web Page</translation>
+      <translation>Otwórz stronę internetową</translation>
     </message>
   </context>
   <context>

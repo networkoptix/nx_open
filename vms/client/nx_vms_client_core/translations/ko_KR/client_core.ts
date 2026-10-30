@@ -325,8 +325,8 @@
       <translation>지난 30 일</translation>
     </message>
     <message>
-      <source>Any time</source>
-      <translation>모든 시간</translation>
+      <source>Any Period</source>
+      <translation type="unfinished">Any Period</translation>
     </message>
     <message>
       <source>Any</source>
