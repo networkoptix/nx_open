@@ -11591,7 +11591,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>لا توجد خوادم مناسبة</translation>
     </message>
   </context>
   <context>
