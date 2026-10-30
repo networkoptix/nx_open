@@ -9,6 +9,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 #include <QtQml/QQmlComponent>
+#include <QtWebChannel/QWebChannel>
 
 #include <nx/vms/client/desktop/utils/qml_property.h>
 #include <nx/vms/client/desktop/webpage/web_engine.h>
@@ -17,6 +18,28 @@
 
 namespace nx::vms::client::desktop {
 namespace test {
+
+namespace {
+
+struct WebViewDeleter
+{
+    void operator()(QObject* webView) const
+    {
+        // QWebChannel does not expect signals from a registered QML object while it is being
+        // destroyed (an assertion in debug Qt), so deregister the objects first.
+        if (const auto webChannel = webView->findChild<QWebChannel*>("nxWebChannel"))
+        {
+            for (QObject* object: webChannel->registeredObjects())
+                webChannel->deregisterObject(object);
+        }
+
+        delete webView;
+    }
+};
+
+using WebViewPtr = std::unique_ptr<QObject, WebViewDeleter>;
+
+} // namespace
 
 class WebEngineViewTest: public testing::Test
 {
@@ -35,7 +58,7 @@ TEST_F(WebEngineViewTest, clipboardIsUnavailableWithoutUserAction)
         "qrc:/web_engine_view_ut/WebEngineViewClipboardTest.qml",
         QQmlComponent::PreferSynchronous);
 
-    std::unique_ptr<QObject> webView;
+    WebViewPtr webView;
     webView.reset(webViewComponent.create());
     ASSERT_TRUE(webView != nullptr) << webViewComponent.errorString().toStdString();
 
@@ -72,6 +95,70 @@ TEST_F(WebEngineViewTest, clipboardIsUnavailableWithoutUserAction)
     EXPECT_FALSE(invoke("checkWritingTextClipboard"));
     EXPECT_FALSE(invoke("checkReadingTextClipboard"));
     EXPECT_FALSE(invoke("checkPasteCommand"));
+}
+
+TEST_F(WebEngineViewTest, apiIsAvailableAfterCrossSiteNavigation)
+{
+    // The page reports through the web channel when the injected API is initialized.
+    static const QByteArray kQml = R"qml(
+        import QtQml
+
+        import Nx.Controls
+
+        WebEngineView
+        {
+            property alias apiInitialized: testObject.apiInitialized
+
+            enableInjections: true
+
+            // See the comment in WebEngineViewClipboardTest.qml.
+            QtObject
+            {
+                id: testObject
+
+                property var apiInitialized: null
+            }
+
+            Component.onCompleted: webView.webChannel.registerObjects({"test": testObject})
+
+            function loadPage(baseUrl)
+            {
+                apiInitialized = null
+                webView.loadHtml("<html><script>"
+                    + "window.vmsApiInit = () => test.apiInitialized = true"
+                    + "</script></html>", baseUrl)
+            }
+        }
+    )qml";
+
+    QmlTestEnvironment env;
+    QQmlComponent webViewComponent(env.engine());
+    webViewComponent.setData(kQml, QUrl());
+
+    WebViewPtr webView;
+    webView.reset(webViewComponent.create());
+    ASSERT_TRUE(webView != nullptr) << webViewComponent.errorString().toStdString();
+
+    auto waitForApi = [&webView]()
+    {
+        constexpr std::chrono::milliseconds kWaitResultTimeout = std::chrono::minutes(1);
+
+        QmlProperty<QVariant> result(webView.get(), "apiInitialized");
+
+        QElapsedTimer timer;
+        timer.start();
+        while (result.value().isNull() && timer.elapsed() < kWaitResultTimeout.count())
+            qApp->processEvents();
+
+        return result.value().toBool();
+    };
+
+    // Each base URL is another site, so each load replaces the page frame.
+    for (const QString baseUrl: {"https://a.example/", "https://b.example/", "https://a.example/"})
+    {
+        QMetaObject::invokeMethod(webView.get(), "loadPage", Q_ARG(QVariant, baseUrl));
+        EXPECT_TRUE(waitForApi()) << baseUrl.toStdString();
+    }
 }
 
 } // namespace test

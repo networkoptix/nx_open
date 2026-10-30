@@ -304,9 +304,8 @@ struct WebViewController::Private: public QObject
                 if (!webChannel)
                     return;
 
-                // We should set "enableInjections" to true before registering any objects because
-                // it assigns "injectScripts" property to "userScripts" (see WebEngineView.qml)
-                // and "registerObjects" internally uses "userScripts".
+                // "enableInjections" attaches the web channel to the view, which enables the
+                // scripts exposing its objects to the page (see WebEngineView.qml).
                 root->setProperty("enableInjections", true);
 
                 if (NX_ASSERT(!webChannel->registeredObjects().contains(name)),

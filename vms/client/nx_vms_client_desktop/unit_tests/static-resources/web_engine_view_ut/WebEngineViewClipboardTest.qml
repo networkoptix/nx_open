@@ -9,16 +9,25 @@ WebEngineView
 {
     id: view
 
-    property var result: null
+    property alias result: testObject.result
     property var ready: null
     readonly property string kEmptyWebPage: "<html></html>"
 
     enableInjections: true
 
+    // Only a plain object is exposed to the page: the web channel also tracks the objects
+    // referenced by the properties of the exposed one, and the view items must not be among them.
+    QtObject
+    {
+        id: testObject
+
+        property var result: null
+    }
+
     Component.onCompleted:
     {
         webView.loadHtml(kEmptyWebPage, "https://localhost/") //< Some base url is required.
-        webView.webChannel.registerObjects({"test": view})
+        webView.webChannel.registerObjects({"test": testObject})
     }
 
     onLoadingStatusChanged: (status) => { ready = status == WebEngineView.LoadSucceededStatus }

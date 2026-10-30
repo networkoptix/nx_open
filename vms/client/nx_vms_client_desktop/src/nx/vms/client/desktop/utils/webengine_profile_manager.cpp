@@ -5,15 +5,19 @@
 #include <algorithm>
 
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QHash>
 #include <QtCore/QStandardPaths>
 #include <QtNetwork/QNetworkProxy>
 #include <QtQml/QtQml>
+#include <QtWebEngineCore/QWebEngineScript>
 #include <QtWebEngineQuick/QQuickWebEngineDownloadRequest>
+#include <QtWebEngineQuick/private/qquickwebenginescriptcollection_p.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/format.h>
 #include <nx/vms/client/core/qml/qml_ownership.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/resource/resources_changes_manager.h>
@@ -22,6 +26,71 @@
 #include <nx/vms/client/desktop/utils/local_proxy_server.h>
 
 namespace nx::vms::client::desktop::utils {
+
+namespace {
+
+QString readResource(const QString& path)
+{
+    QFile file(path);
+    if (!NX_ASSERT(file.open(QIODevice::ReadOnly), "Cannot open %1", path))
+        return {};
+
+    return QString::fromUtf8(file.readAll());
+}
+
+QWebEngineScript makeInjectionScript(const QString& name,
+    const QString& sourceCode,
+    QWebEngineScript::InjectionPoint injectionPoint)
+{
+    // The profile is shared by all views with the same profile parameters, so the script must
+    // run only in the views which have a web channel attached (see "enableInjections" in
+    // WebEngineView.qml). The function keeps the strict mode of the script and makes all its
+    // declarations local, so the script must assign the names it exports to "window".
+    const QString wrappedSourceCode = NX_FMT(R"JS(
+(function()
+{
+    "use strict";
+
+    if (!(window.qt && window.qt.webChannelTransport))
+        return;
+
+%1
+})();
+)JS",
+        sourceCode);
+
+    QWebEngineScript script;
+    script.setName(name);
+    script.setSourceCode(wrappedSourceCode);
+    script.setInjectionPoint(injectionPoint);
+    script.setWorldId(QWebEngineScript::MainWorld);
+    return script;
+}
+
+/**
+ * Installs the scripts which expose the objects of the web channel to the page JS.
+ * The scripts are installed on the profile instead of the view, because view scripts are not
+ * injected into the documents loaded after a cross-site navigation (Qt 6.11).
+ */
+void installInjectionScripts(QQuickWebEngineProfile* profile)
+{
+    auto scripts = profile->userScripts();
+
+    // QWebChannel is the only name the library exports, it is used by web_engine_inject.js.
+    scripts->insert(makeInjectionScript("QWebChannel",
+        readResource(":/qtwebchannel/qwebchannel.js") + "\nwindow.QWebChannel = QWebChannel;",
+        QWebEngineScript::DocumentCreation));
+
+    scripts->insert(makeInjectionScript("ObjectInjectorScriptConstants",
+        "window.isVmsApiEnabled = true",
+        QWebEngineScript::DocumentCreation));
+
+    scripts->insert(makeInjectionScript("ObjectInjectorScript",
+        readResource(":/qml/Nx/Controls/web_engine_inject.js"),
+        QWebEngineScript::DocumentReady));
+}
+
+} // namespace
 
 struct WebEngineProfileManager::Private
 {
@@ -80,6 +149,8 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
         // Web pages are re-created even on layout tab switch,
         // so profile should save as much data as possible.
         profile->setPersistentCookiesPolicy(QQuickWebEngineProfile::ForcePersistentCookies);
+
+        installInjectionScripts(profile);
 
         QObject::connect(profile, &QQuickWebEngineProfile::downloadRequested,
             parent, [this](QQuickWebEngineDownloadRequest* download)

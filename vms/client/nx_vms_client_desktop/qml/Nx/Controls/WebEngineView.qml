@@ -9,38 +9,9 @@ import nx.vms.client.desktop.utils
 Item
 {
     // Helper properties for providing additional JS APIs using Qt MetaObject system.
+    // Attaches the web channel. The scripts which expose its objects to the page are installed on
+    // the profile by WebEngineProfileManager and run only when the web channel is attached.
     property bool enableInjections: false
-    onEnableInjectionsChanged: loadUserScripts()
-
-    function loadUserScripts()
-    {
-        if (!enableInjections)
-        {
-            webView.userScripts.clear()
-            return
-        }
-
-        webView.userScripts.collection = [
-            {
-                injectionPoint: WebEngineScript.DocumentCreation,
-                worldId: WebEngineScript.MainWorld,
-                name: "QWebChannel",
-                sourceUrl: "qrc:///qtwebchannel/qwebchannel.js"
-            },
-            {
-                injectionPoint: WebEngineScript.DocumentCreation,
-                worldId: WebEngineScript.MainWorld,
-                name: "ObjectInjectorScriptConstants",
-                sourceCode: "window.isVmsApiEnabled = true"
-            },
-            {
-                worldId: WebEngineScript.MainWorld,
-                injectionPoint: WebEngineScript.DocumentReady,
-                name: "ObjectInjectorScript",
-                sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
-            }
-        ]
-    }
 
     // If set, then all connections are proxied via resourceId parent VMS Server.
     property string resourceId: ""
@@ -69,7 +40,6 @@ Item
     property bool loadIcon: false
 
     property alias url: webView.url
-    property alias userScripts: webView.userScripts
     property alias profile: webView.profile
 
     // Simplify access to WebEngineView subcomponent.
@@ -78,11 +48,7 @@ Item
     signal loadingStatusChanged(int status)
     signal closeWindows() //< Close all child windows.
 
-    Component.onCompleted:
-    {
-        WebEngineProfileManager.addProfileUser()
-        loadUserScripts()
-    }
+    Component.onCompleted: WebEngineProfileManager.addProfileUser()
     Component.onDestruction:
     {
         closeWindows()
@@ -210,7 +176,6 @@ Item
             {
                 // Copy properties to the newly created WebEngineView.
                 root.enableInjections = enableInjections
-                root.userScripts.collection = userScripts.collection //< FIXME: what should we do with registerObjects?
 
                 root.resourceId = resourceId
                 root.profile = profile
