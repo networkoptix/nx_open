@@ -21,11 +21,12 @@ using namespace std::chrono;
 
 namespace {
 
-const std::unordered_map<MetadataType, milliseconds> kDefaultDurationByType({
-    { MetadataType::Motion, 3000ms },
-    { MetadataType::ObjectDetection, 100ms },
-    { MetadataType::MediaStreamEvent, 1ms },
-    { MetadataType::InStream, 1ms }});
+const std::unordered_map<MetadataType, milliseconds> kDefaultDurationByType(
+    {{MetadataType::Motion, 3000ms},
+        {MetadataType::MediaStreamEvent, 1ms},
+        {MetadataType::InStream, 1ms}});
+
+using nx::common::metadata::kMinimalObjectDuration;
 
 milliseconds fromMicrosecondQint(qint64 microsecond)
 {
@@ -58,12 +59,12 @@ void MetadataCache<T>::insertMetadata(const QnConstAbstractCompressedMetadataPtr
 
     m_orderedMetadata.insert({fromMicrosecondQint(metadata->timestamp), unpackedMetadata});
 
-    // Store duration in milliseconds as well
+    // Used to find how far back to search.
     if (m_metadataType == MetadataType::ObjectDetection)
     {
-        m_maxDurationCounter->push(metadata->duration() > 0
-           ? metadata->duration() / 1000
-           : kDefaultDurationByType.at(MetadataType::ObjectDetection).count());
+        m_maxDurationCounter->push(std::max<qint64>(
+            duration_cast<milliseconds>(microseconds(metadata->duration())).count(),
+            kMinimalObjectDuration.count()));
     }
 }
 
@@ -148,7 +149,7 @@ template<>
 qint64 MetadataCache<QnConstMetaDataV1Ptr>::durationUs(const QnConstMetaDataV1Ptr& metadata)
 {
     if (metadata->duration() < 1)
-        return kDefaultDurationByType.at(MetadataType::Motion).count();
+        return microseconds(kDefaultDurationByType.at(MetadataType::Motion)).count();
 
     return metadata->duration();
 }
@@ -164,10 +165,7 @@ template<>
 qint64 MetadataCache<nx::common::metadata::ObjectMetadataPacketPtr>::durationUs(
     const nx::common::metadata::ObjectMetadataPacketPtr& metadata)
 {
-    if (metadata->durationUs < 1)
-        return kDefaultDurationByType.at(MetadataType::ObjectDetection).count() * 1000;
-
-    return metadata->durationUs;
+    return std::max<qint64>(metadata->durationUs, microseconds(kMinimalObjectDuration).count());
 }
 
 template class MetadataCache<QnConstMetaDataV1Ptr>;

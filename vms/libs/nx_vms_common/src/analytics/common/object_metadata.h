@@ -106,6 +106,12 @@ NX_VMS_COMMON_API GroupedAttributes groupAttributes(
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
 
+/**
+ * Objects stay visible at least this long after their last packet, both in the video player and
+ * in exported video. Otherwise they flicker when packets arrive less often than expected.
+ */
+static constexpr std::chrono::milliseconds kMinimalObjectDuration{200};
+
 /**%apidoc Describes whether the image should be loaded from the VMS Archive or an Integration. */
 NX_REFLECTION_ENUM_CLASS(ImageLocation,
     undefined,

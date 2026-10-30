@@ -253,7 +253,7 @@ TEST(ExportCachingMetadataConsumer, providedDurations)
     ASSERT_EQ(recievedObjectData[1]->objectMetadataList.front(), object1);
     ASSERT_EQ(recievedObjectData[1]->timestampUs, 1000 * 1000);
 
-    auto recievedObjectData2 = objectCache.metadata(1200ms, 0);
+    auto recievedObjectData2 = objectCache.metadata(1250ms, 0);
     ASSERT_EQ(recievedObjectData2.size(), 1);
     ASSERT_EQ(recievedObjectData2[0]->objectMetadataList.front(), object1);
     ASSERT_EQ(recievedObjectData2[0]->timestampUs, 1000 * 1000);
@@ -308,6 +308,61 @@ TEST(ExportCachingMetadataConsumer, checkFromTheMiddleOfCache)
     ASSERT_EQ(recievedObjectData4[1]->timestampUs, 1060 * 1000);
     ASSERT_EQ(recievedObjectData4[2]->objectMetadataList.front(), object2);
     ASSERT_EQ(recievedObjectData4[2]->timestampUs, 1030 * 1000);
+}
+
+TEST(ExportCachingMetadataConsumer, motionWithoutDurationUsesDefaultDuration)
+{
+    ExportCachingMetadataConsumer<QnConstMetaDataV1Ptr> motionCache(MetadataType::Motion, 10s);
+
+    auto data = prepareMotionData(0, 1000ms, 2, 3);
+    motionCache.processMetadata(data);
+
+    auto recievedData = motionCache.metadata(2000ms, 0);
+    ASSERT_EQ(recievedData.size(), 1);
+    motionsEQ(data, recievedData[0]);
+
+    ASSERT_TRUE(motionCache.metadata(4001ms, 0).empty());
+}
+
+TEST(ExportCachingMetadataConsumer, objectIsNotLostBetweenSparsePackets)
+{
+    ExportCachingMetadataConsumer<nx::common::metadata::ObjectMetadataPacketPtr> objectCache(
+        MetadataType::ObjectDetection, 10s);
+
+    const auto trackId = nx::Uuid("00000000-0000-0000-0000-000000000001");
+    auto object1 = prepareObject("object1", trackId, {1, 2, 3, 4});
+    auto object2 = prepareObject("object1", trackId, {5, 2, 3, 4}); //< The same track.
+
+    // No duration, 150ms between packets.
+    objectCache.processMetadata(compressedObjectPacket(object1, 1000, 0));
+    for (auto timestamp = 1000ms; timestamp < 1150ms; timestamp += 10ms)
+    {
+        auto recievedObjectData = objectCache.metadata(timestamp, 0);
+        ASSERT_EQ(recievedObjectData.size(), 1);
+        ASSERT_EQ(recievedObjectData[0]->objectMetadataList.front(), object1);
+    }
+
+    objectCache.processMetadata(compressedObjectPacket(object2, 1150, 0));
+    auto recievedObjectData = objectCache.metadata(1150ms, 0);
+    ASSERT_EQ(recievedObjectData.size(), 2);
+    ASSERT_EQ(recievedObjectData[0]->objectMetadataList.front(), object2);
+
+    // The object is gone 200ms after the last packet.
+    ASSERT_EQ(objectCache.metadata(1350ms, 0).size(), 1);
+    ASSERT_TRUE(objectCache.metadata(1351ms, 0).empty());
+}
+
+TEST(ExportCachingMetadataConsumer, shortDurationIsExtendedToMinimalLifetime)
+{
+    ExportCachingMetadataConsumer<nx::common::metadata::ObjectMetadataPacketPtr> objectCache(
+        MetadataType::ObjectDetection, 10s);
+
+    auto object =
+        prepareObject("object1", nx::Uuid("00000000-0000-0000-0000-000000000001"), {1, 2, 3, 4});
+    objectCache.processMetadata(compressedObjectPacket(object, 1000, 0, /*duration*/ 50000));
+
+    ASSERT_EQ(objectCache.metadata(1150ms, 0).size(), 1);
+    ASSERT_TRUE(objectCache.metadata(1201ms, 0).empty());
 }
 
 } // namespace test

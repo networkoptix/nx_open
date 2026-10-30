@@ -105,7 +105,8 @@ TEST_F(MotionFilterTest, TwoMotionPackages)
 
     metaDataPtr1->timestamp = std::chrono::system_clock::now().time_since_epoch().count() - 500;
     metaDataPtr2->timestamp = std::chrono::system_clock::now().time_since_epoch().count();
-    filter.setMetadata({metaDataPtr1, metaDataPtr2});
+    // MetadataCache returns the newest packet first.
+    filter.setMetadata({metaDataPtr2, metaDataPtr1});
     filter.updateImage(image);
 
     ASSERT_NE(image, prepareImage());

@@ -67,9 +67,10 @@ void MotionFilter::updateImage(QImage& image)
         return;
     }
 
-    for (auto iter = m_metadata.rbegin(); iter != m_metadata.rend(); ++iter)
+    // The newest packet is first.
+    for (const auto& metadata: m_metadata)
     {
-        const auto motionDataPacket = motionDataPacketFromMetadata(*iter);
+        const auto motionDataPacket = motionDataPacketFromMetadata(metadata);
         if (motionDataPacket)
         {
             paintMotionGrid(&painter, {0.0, 0.0, width, height}, motionDataPacket);
