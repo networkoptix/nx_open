@@ -99,6 +99,33 @@ Track* Tracks::audioTrack(nx::Uuid deviceId) const
     return nullptr;
 }
 
+void Tracks::removeTracks(nx::Uuid deviceId)
+{
+    for (auto it = m_tracks.begin(); it != m_tracks.end();)
+    {
+        auto& track = it->second;
+        if (track->deviceId != deviceId)
+        {
+            ++it;
+            continue;
+        }
+
+        if (track->midWasOffered)
+        {
+            // Keep the mid in the recycling pool, but not under this Device: without an encoder
+            // the track describes nothing, and leaving the deviceId on it would shadow the real
+            // track (videoTrack(), audioTrack()) if the Device were added again.
+            track->offerState = TrackState::inactive;
+            track->pendingAnswer = false;
+            track->deviceId = {};
+            ++it;
+            continue;
+        }
+
+        it = m_tracks.erase(it);
+    }
+}
+
 std::vector<Track> Tracks::allTracks() const
 {
     std::vector<Track> result;
@@ -186,6 +213,7 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
         if (t->offerState == TrackState::inactive && t->trackType == track->trackType)
         {
             track->mid = t->mid;
+            track->midWasOffered = true;
             m_tracks.erase(it);
             break;
         }

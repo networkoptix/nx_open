@@ -64,10 +64,13 @@ AVCodecID findEncoderCodecId(const QString& codecName)
     if (avCodec)
         return avCodec->id;
 
-    // Try to check codec substitutes if requested codecs not found.
-    static std::map<std::string, std::vector<std::string>> codecSubstitutesMap
-    {
-        { "h264", {"libopenh264"} },
+    // FFmpeg looks encoders up by their own name, not by the name of the codec they produce, and
+    // for most codecs the two differ. Map the codec name a caller would naturally pass onto the
+    // encoders that can produce it, best first.
+    static const std::map<std::string, std::vector<std::string>> codecSubstitutesMap{
+        {"h264", {"libopenh264"}},
+        {"vp8", {"libvpx"}},
+        {"vp9", {"libvpx-vp9"}},
     };
     auto substitutes = codecSubstitutesMap.find(codecLower.toUtf8().constData());
     if (substitutes == codecSubstitutesMap.end())

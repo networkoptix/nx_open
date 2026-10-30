@@ -17,14 +17,6 @@ namespace nx::webrtc {
 
 static const int kDataChannelMid = 128;
 
-enum AnswerResult
-{
-    success = 0,
-    again,
-    noop,
-    failed
-};
-
 enum class RenegotiationResult
 {
     offerSent, //< A new offer is sent, the provider restarts once it is answered.
@@ -60,8 +52,8 @@ public:
     void start(const QList<nx::network::SocketAddress>& addresses);
     void setAddress(const nx::network::SocketAddress& address);
     std::string constructSdp();
-    AnswerResult processSdpAnswer(const std::string& sdp);
-    AnswerResult setFallbackCodecs();
+    // Applies the answer to this session. Returns false if it leaves the session unusable.
+    bool processSdpAnswer(const std::string& sdp);
     Purpose purpose() const { return m_purpose; }
     std::string id() const { return m_localUfrag; }
     std::optional<SessionDescription> describe() const;
@@ -151,11 +143,19 @@ public:
 private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
-    // Restricts (re)initialization to a single track, unless UNKNOWN is passed.
-    bool initializeMuxersInternal(
+    // Builds the encoders of one provider, and of a single track of it unless UNKNOWN is passed.
+    // Already initialized providers are left alone, so that a broken one can't fail, or shadow,
+    // the Device the caller is actually working on.
+    bool initializeMuxersInternal(nx::Uuid deviceId,
         QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
     const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);
+    // Detaches the provider of `deviceId` from the session and stops it, leaving its tracks alone.
+    std::shared_ptr<AbstractCameraDataProvider> takeProvider(nx::Uuid deviceId);
+    // Undoes createProvider() for a Device that never reached an offer: no SDP is sent and
+    // nothing of the Device is left to describe, unlike removeProvider(), which retires the
+    // m-lines the client has already seen.
+    bool dropProvider(nx::Uuid deviceId);
     void sendOffer();
     SessionDescription describeUnsafe() const;
 
