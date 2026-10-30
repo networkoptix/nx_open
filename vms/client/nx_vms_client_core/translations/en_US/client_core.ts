@@ -326,8 +326,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>Any time</source>
-        <translation></translation>
+        <source>Any Period</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Any</source>
