@@ -4,6 +4,7 @@
 
 #include <bitset>
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <thread>
@@ -188,6 +189,12 @@ NX_UTILS_API QString toString(const std::chrono::system_clock::time_point& value
 NX_UTILS_API QString toString(const std::chrono::steady_clock::time_point& value);
 
 NX_UTILS_API QString toString(const std::thread::id& threadId);
+
+/**
+ * Path is iteratable, and each element is a path too, so it must not be printed as a container:
+ * a single-element path yields itself, which leads to an infinite recursion.
+ */
+NX_UTILS_API QString toString(const std::filesystem::path& value);
 
 template<typename T>
 QString toString(const T* value)

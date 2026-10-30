@@ -5,7 +5,7 @@
 #include <time.h>
 
 #if defined(__clang__) && defined(_MSC_VER)
-#include <comdef.h>
+    #include <comdef.h>
 #endif
 
 #include <boost/algorithm/string.hpp>
@@ -279,6 +279,11 @@ QString toString(const std::thread::id& threadId)
     std::stringstream ss;
     ss << threadId;
     return QString::fromStdString(ss.str());
+}
+
+QString toString(const std::filesystem::path& value)
+{
+    return toString(value.native());
 }
 
 } // namespace detail
