@@ -145,13 +145,13 @@ void Tracker::sendIce(const IceCandidate& candidate)
     sendJson(d);
 }
 
-AnswerResult Tracker::examineAnswer()
+bool Tracker::examineAnswer()
 {
     rapidjson::Document d;
     const auto s = m_buffer.toString();
     d.Parse(s.data());
     if (!d.IsObject())
-        return AnswerResult::noop;
+        return true;
     if (d.HasMember("ice"))
     {
         const auto& ice = d["ice"];
@@ -176,18 +176,23 @@ AnswerResult Tracker::examineAnswer()
         }
     }
     if (d.HasMember("error"))
-        return m_session->setFallbackCodecs();
+    {
+        // Transcoding is never offered implicitly, so there is no other offer to retry with.
+        // Close the session, so that the client sees the failure instead of waiting for media.
+        NX_WARNING(this, "Client reported an error instead of an answer: %1", s);
+        return false;
+    }
     if (!d.HasMember("sdp"))
-        return AnswerResult::noop; //< Case with remote ice-candidate received.
+        return true; //< Case with remote ice-candidate received.
     const auto& sdpRoot = d["sdp"];
     if (!sdpRoot.IsObject() || !sdpRoot.HasMember("type") || !sdpRoot.HasMember("sdp"))
-        return AnswerResult::noop;
+        return true;
     const auto& msgType = sdpRoot["type"];
     if (!msgType.IsString() || msgType.GetString() != std::string("answer"))
-        return AnswerResult::noop;
+        return true;
     const auto& sdp = sdpRoot["sdp"];
     if (!sdp.IsString())
-        return AnswerResult::noop;
+        return true;
     return m_session->processSdpAnswer(sdp.GetString());
 }
 
@@ -207,15 +212,9 @@ bool Tracker::processMessages()
      * is complete. This process can be repeated for additional offer/answer exchanges.
      */
 
-    AnswerResult result = examineAnswer();
-    NX_VERBOSE(this, "Answer examination result: %1", (int)result);
-    if (result == AnswerResult::again)
+    if (!examineAnswer())
     {
-        sendOffer();
-        return true;
-    }
-    else if (result == AnswerResult::failed)
-    {
+        NX_VERBOSE(this, "The answer leaves the session unusable, stop it");
         return false;
     }
 
