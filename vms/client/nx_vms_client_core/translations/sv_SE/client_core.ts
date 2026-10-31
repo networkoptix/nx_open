@@ -327,7 +327,7 @@
     </message>
     <message>
       <source>Any Period</source>
-      <translation type="unfinished">Any Period</translation>
+      <translation>Valfri period</translation>
     </message>
     <message>
       <source>Any</source>
