@@ -17,7 +17,7 @@ struct NX_VMS_API CameraDataEx:
     CameraData,
     CameraAttributesData
 {
-    ResourceStatus status;
+    ResourceStatus status = ResourceStatus::undefined;
     std::vector<ResourceParamData> addParams;
 
     bool operator==(const CameraDataEx& other) const = default;
