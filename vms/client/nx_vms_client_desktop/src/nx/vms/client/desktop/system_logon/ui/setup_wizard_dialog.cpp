@@ -25,7 +25,8 @@
 namespace nx::vms::client::desktop {
 
 namespace {
-static const QSize kSetupWizardSize(520, 456);
+
+static constexpr QSize kSetupWizardSize(1024, 768);
 
 QUrl constructUrl(const nx::network::SocketAddress& address)
 {
@@ -45,11 +46,8 @@ QUrl constructUrl(const nx::network::SocketAddress& address)
 } // namespace
 
 SetupWizardDialog::SetupWizardDialog(
-    nx::network::SocketAddress address,
-    const nx::Uuid& serverId,
-    QWidget* parent)
-    :
-    base_type(parent, Qt::MSWindowsFixedSizeDialogHint),
+    nx::network::SocketAddress address, const nx::Uuid& serverId, QWidget* parent):
+    base_type(parent),
     d(new SetupWizardDialogPrivate(this)),
     m_address(std::move(address))
 {
@@ -66,6 +64,7 @@ SetupWizardDialog::SetupWizardDialog(
             ) == nx::vms::client::core::CertificateVerifier::Status::ok;
         });
 
+    QSize size = kSetupWizardSize;
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(QMargins());
 
@@ -73,6 +72,7 @@ SetupWizardDialog::SetupWizardDialog(
     {
         auto urlLineEdit = new QLineEdit(this);
         urlLineEdit->setFocusPolicy(Qt::NoFocus);
+        size.rheight() += urlLineEdit->sizeHint().height();
         layout->addWidget(urlLineEdit);
         connect(urlLineEdit, &QLineEdit::returnPressed, this,
             [this, urlLineEdit]()
@@ -82,7 +82,9 @@ SetupWizardDialog::SetupWizardDialog(
     }
 
     layout->addWidget(d->webViewWidget);
-    setFixedSize(kSetupWizardSize);
+
+    setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint);
+    resize(size);
     setHelpTopic(this, HelpTopic::Id::Setup_Wizard);
 }
 
