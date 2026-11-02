@@ -12,6 +12,10 @@ TEST(TranscodingUtils, findEncoderCodecIdTest)
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("h263p"), AV_CODEC_ID_H263P);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("H263p"), AV_CODEC_ID_H263P);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("libvpx"), AV_CODEC_ID_VP8);
+    // FFmpeg has no encoder named after these codecs, they resolve through codecSubstitutesMap.
+    ASSERT_EQ(nx::transcoding::findEncoderCodecId("vp8"), AV_CODEC_ID_VP8);
+    ASSERT_EQ(nx::transcoding::findEncoderCodecId("VP8"), AV_CODEC_ID_VP8);
+    ASSERT_EQ(nx::transcoding::findEncoderCodecId("vp9"), AV_CODEC_ID_VP9);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("mpeg4"), AV_CODEC_ID_MPEG4);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("MPEG4"), AV_CODEC_ID_MPEG4);
     ASSERT_EQ(nx::transcoding::findEncoderCodecId("mpeg2video"), AV_CODEC_ID_MPEG2VIDEO);

@@ -30,7 +30,10 @@ struct NX_WEBRTC_API Track
 
     TrackState offerState{};
     TrackState answerState{};
-    bool useTranscoding = false;
+    // The mid was inherited from an m-line the client has already seen, because addTrack()
+    // recycles the mid of a retired track. Set there only, and read only by removeTracks(),
+    // which keeps such a track to hold its mid in the recycling pool.
+    bool midWasOffered = false;
     // A renegotiation offer was sent (Session::renegotiateProvider()) but not answered yet, so the
     // client doesn't know the new SSRC/payload type.
     bool pendingAnswer = false;
@@ -48,6 +51,14 @@ class NX_WEBRTC_API Tracks
 public:
 
     void addTrack(std::unique_ptr<Track> track);
+
+    // Drops the tracks of `deviceId`, for a Device that never reached an offer. A track that
+    // recycled the mid of a retired m-line keeps its place in the recycling pool instead, as a
+    // Device-less inactive one.
+    // NOTE: With no encoder behind it, such a track renders no m-line, so the next offer is one
+    // m-line shorter than the one the client accepted. Rare enough to live with: it takes a
+    // removed Device, a recycled mid, and a Device that fails to initialize.
+    void removeTracks(nx::Uuid deviceId);
 
     // Without `newSsrc` assigns a fresh random one, telling the receiver that the RTP stream
     // restarted, e.g. on a mid-session codec change. `newSsrc` can be set to roll back to the old

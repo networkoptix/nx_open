@@ -30,7 +30,9 @@ public:
 private:
     void readMessage();
     bool processMessages();
-    AnswerResult examineAnswer();
+    // Handles one signaling message: an SDP answer, an ICE candidate, or neither. Returns false
+    // only when the answer leaves the session unusable.
+    bool examineAnswer();
     void sendIce(const IceCandidate& candidate);
     void sendJson(const rapidjson::Document& doc);
     void onBytesRead(SystemError::ErrorCode errorCode, std::size_t /*bytesTransferred*/);
