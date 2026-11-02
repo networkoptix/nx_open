@@ -56,7 +56,7 @@ public:
 
     Property<QStringList> completedTutorials{this, "completedTutorials"};
 
-    Property<bool> showSaasPromo{this, "showSaasPromo", true};
+    Property<QSet<QString>> dismissedSaasPromo{this, "dismissedSaasPromo"};
 };
 
 } // namespace nx::vms::client::mobile
