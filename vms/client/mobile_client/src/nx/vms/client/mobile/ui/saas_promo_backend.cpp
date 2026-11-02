@@ -5,19 +5,34 @@
 #include <QtGui/QDesktopServices>
 #include <QtQml/QtQml>
 
+#include <core/resource/user_resource.h>
 #include <nx/branding.h>
 #include <nx/utils/url.h>
-#include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/settings/local_settings.h>
 #include <nx/vms/common/system_settings.h>
 
 namespace nx::vms::client::mobile {
 
+namespace {
+
+QString key(const core::SystemContext* context)
+{
+    if (!context->user())
+        return {};
+
+    return nx::format("%1/%2",
+        context->globalSettings()->localSystemId().toSimpleString(),
+        context->user()->getId().toSimpleString());
+}
+
+} // namespace
+
 SaasPromoBackend::SaasPromoBackend(QObject* parent): QObject(parent)
 {
-    connect(&appContext()->localSettings()->showSaasPromo,
+    connect(&appContext()->localSettings()->dismissedSaasPromo,
         &LocalSettings::BaseProperty::changed,
         this,
         &SaasPromoBackend::updateAvailability);
@@ -33,13 +48,8 @@ void SaasPromoBackend::setSystemContext(core::SystemContext* context)
 
     if (context)
     {
-        m_contextConnections << connect(context,
-            &core::SystemContext::userChanged,
-            this,
-            &SaasPromoBackend::updateAvailability);
-
-        m_contextConnections << connect(context->accessController(),
-            &core::AccessController::globalPermissionsChanged,
+        m_contextConnections << connect(context->userWatcher(),
+            &core::UserWatcher::isAdministratorUserChanged,
             this,
             &SaasPromoBackend::updateAvailability);
 
@@ -67,10 +77,10 @@ void SaasPromoBackend::updateAvailability()
 
         const auto settings = m_context->globalSettings();
 
-        return m_context->accessController()->hasPowerUserPermissions()
+        return m_context->userWatcher()->isAdministratorUser()
             && !settings->cloudSystemId().isEmpty() && settings->organizationId().isNull()
             && !nx::branding::saasPromoUrl().isEmpty()
-            && appContext()->localSettings()->showSaasPromo();
+            && !appContext()->localSettings()->dismissedSaasPromo().contains(key(m_context));
     }();
 
     if (m_available == available)
@@ -82,7 +92,12 @@ void SaasPromoBackend::updateAvailability()
 
 void SaasPromoBackend::dismiss()
 {
-    appContext()->localSettings()->showSaasPromo = false;
+    if (!m_context)
+        return;
+
+    auto dismissed = appContext()->localSettings()->dismissedSaasPromo();
+    dismissed.insert(key(m_context));
+    appContext()->localSettings()->dismissedSaasPromo = dismissed;
 }
 
 void SaasPromoBackend::openPromoUrl()

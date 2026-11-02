@@ -428,7 +428,7 @@ BaseSettingsPage
         Button
         {
             text: "Reset SaaS promo banner"
-            onClicked: appContext.settings.showSaasPromo = true
+            onClicked: appContext.settings.dismissedSaasPromo = []
         }
     }
 
