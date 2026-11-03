@@ -24,6 +24,12 @@ list(APPEND _additional_conan_parameters "-o withClangFormat=${with_clang_format
 
 list(APPEND _additional_conan_parameters "-o targetDevice=${targetDevice}")
 
+# With a single-config generator, CMakeDeps files are needed only for the CMake build type.
+get_property(is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(NOT is_multi_config AND CMAKE_BUILD_TYPE)
+    list(APPEND _additional_conan_parameters "-o cmakeBuildType=${CMAKE_BUILD_TYPE}")
+endif()
+
 if(NOT developerBuild)
     list(APPEND _additional_conan_parameters "-o installRuntimeDependencies=False")
 endif()
