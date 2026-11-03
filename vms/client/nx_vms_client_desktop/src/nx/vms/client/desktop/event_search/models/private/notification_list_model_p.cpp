@@ -14,6 +14,7 @@
 #include <nx/vms/client/core/cross_system/cloud_cross_system_manager.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
 #include <nx/vms/client/desktop/help/rules_help.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/menu/action_parameters.h>
@@ -52,6 +53,16 @@ bool canShowNotification(core::CloudCrossSystemContext::Status status)
 bool isConnected(core::CloudCrossSystemContext::Status status)
 {
     return status == core::CloudCrossSystemContext::Status::connected;
+}
+
+QnVirtualCameraResourcePtr previewCamera(const EventListModel::EventData& eventData)
+{
+    if (const auto camera = selectPreviewCamera(eventData.cameras, eventData.previewTime))
+        return camera;
+
+    // Cameras of another Site are fake until it is ready to use: the tile shows a placeholder.
+    return eventData.cloudSystemId.isEmpty() ? QnVirtualCameraResourcePtr()
+                                             : eventData.cameras.value(0);
 }
 
 // TODO: #amalov Simplify device transfer logic using list only.
@@ -221,6 +232,10 @@ void NotificationListModel::Private::updateCloudItems(
     {
         auto eventData = q->getEvent(q->indexOf(itemId).row());
         eventData.forcePreviewLoader = false;
+
+        // The Site cameras may have become available.
+        if (!eventData.cameras.empty())
+            eventData.previewCamera = previewCamera(eventData);
 
         updateAcknowledgeAction(status, eventData);
 
@@ -519,13 +534,13 @@ void NotificationListModel::Private::setupClientAction(
 
         case ClientAction::previewCamera:
             eventData.cameras = devices;
-            eventData.previewCamera = camera;
+            eventData.previewCamera = previewCamera(eventData);
             break;
 
         case ClientAction::previewCameraOnTime:
             eventData.cameras = devices;
-            eventData.previewCamera = camera;
             eventData.previewTime = action->timestamp();
+            eventData.previewCamera = previewCamera(eventData);
             break;
 
         case ClientAction::browseUrl:

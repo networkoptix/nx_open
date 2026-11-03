@@ -3,6 +3,8 @@
 #include "event_tile_p.h"
 #include "ui_event_tile.h"
 
+#include <cstdint>
+
 #include <QtGui/QTextDocument>
 
 #include <health/system_health_strings_helper.h>
@@ -16,6 +18,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/common/utils/command_action.h>
 #include <nx/vms/client/desktop/common/widgets/close_button.h>
+#include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/system_settings.h>
@@ -37,6 +40,13 @@ static constexpr char kMultipleResourcesSeparator = ',';
 static constexpr int kTileTitleLineLimit = 2;
 static constexpr int kTileDescriptionLineLimit = 5;
 static constexpr auto kRelativeTimestampUpdateTime = 30s;
+
+static constexpr int kPreviewCounterFontPixelSize = 10;
+static constexpr auto kPreviewCounterFontWeight = QFont::Medium;
+static constexpr int kPreviewCounterRoundingRadius = 2;
+static constexpr std::uint8_t kPreviewCounterBackgroundAlpha = 204; //< 80% opacity.
+static const QMargins kPreviewCounterContentsMargins(4, 0, 4, 0);
+static const QMargins kPreviewCounterAnchorMargins(0, 0, 4, 4);
 
 } // namespace
 
@@ -400,6 +410,48 @@ void EventTile::Private::updatePreviewsVisibility()
     q->ui->imagePreviewWidget->hide();
     q->ui->videoPreviewWidget->hide();
     q->ui->imagePreviewWidget->parentWidget()->hide();
+}
+
+void EventTile::Private::setupPreviewCounter()
+{
+    // The label is a child of the preview, so it moves and hides with it.
+    const auto previewCounterLabel = q->ui->previewCounterLabel;
+    previewCounterLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+    previewCounterLabel->setRoundingRadius(kPreviewCounterRoundingRadius, false);
+    previewCounterLabel->setContentsMargins(kPreviewCounterContentsMargins);
+    previewCounterLabel->setBackgroundColor(
+        core::colorTheme()->color("dark1", kPreviewCounterBackgroundAlpha));
+    previewCounterLabel->setStyleSheet(
+        QStringLiteral("QLabel { color: %1; }").arg(core::colorTheme()->color("light4").name()));
+
+    QFont font(previewCounterLabel->font());
+    font.setPixelSize(kPreviewCounterFontPixelSize);
+    font.setWeight(kPreviewCounterFontWeight);
+    previewCounterLabel->setFont(font);
+    previewCounterLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+
+    anchorWidgetToParent(
+        previewCounterLabel, Qt::RightEdge | Qt::BottomEdge, kPreviewCounterAnchorMargins);
+
+    previewCounterLabel->hide();
+}
+
+void EventTile::Private::updatePreviewCounter()
+{
+    const auto previewCounterLabel = q->ui->previewCounterLabel;
+
+    if (previewCount < 2)
+    {
+        previewCounterLabel->hide();
+        previewCounterLabel->clear();
+        return;
+    }
+
+    // The tile always shows the first snapshot.
+    previewCounterLabel->setText(QString("1/%1").arg(previewCount));
+    previewCounterLabel->adjustSize();
+    previewCounterLabel->show();
+    previewCounterLabel->raise();
 }
 
 void EventTile::Private::setWidgetHolder(QWidget* widget, QWidget* newHolder)

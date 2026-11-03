@@ -42,6 +42,7 @@ public:
 
     QnVirtualCameraResourcePtr previewCamera(const EventData& event) const;
     QnVirtualCameraResourceList accessibleCameras(const EventData& event) const;
+    QnVirtualCameraResourceList previewCameras(const EventData& event) const;
 
 private:
     EventListModel* const q = nullptr;

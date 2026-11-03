@@ -24,6 +24,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/metatypes.h>
 #include <nx/utils/range_adapters.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/access/access_controller.h>
 #include <nx/vms/client/core/common/models/concatenation_list_model.h>
@@ -399,6 +400,11 @@ void EventRibbon::Private::updateTilePreview(int index)
     auto obfuscationEnabled = checkTileObfuscation(index);
     widget->setObfuscationEnabled(obfuscationEnabled);
     widget->setPreviewEnabled(m_previewsEnabled && !obfuscationEnabled);
+
+    int previewCount = 0;
+    const auto previewCountGuard = nx::utils::makeScopeGuard(
+        [widget, &previewCount]() { widget->setPreviewCount(previewCount); });
+
     if (!m_previewsEnabled)
         return;
 
@@ -487,6 +493,10 @@ void EventRibbon::Private::updateTilePreview(int index)
     widget->setPlaceholder({});
     widget->setImageProvider(imagePreviewProvider.get(), forceUpdate);
     widget->setPreviewHighlightRect(previewCropRect);
+
+    // Other snapshots are shown in the tooltip, which has none for an obfuscated tile.
+    if (!obfuscationEnabled)
+        previewCount = modelIndex.data(Qn::PreviewCountRole).toInt();
 }
 
 core::ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(

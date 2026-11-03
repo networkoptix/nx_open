@@ -4,6 +4,7 @@
 
 #include <QtCore/QHash>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/scoped_connections.h>
 
 #include "../event_panel.h"
@@ -55,7 +56,9 @@ private:
     void setTabCurrent(QWidget* tab, bool current);
     void at_eventTileHovered(const QModelIndex& index, EventTile* tile);
     std::unique_ptr<MultiImageProvider> multiImageProvider(
-            const QModelIndex& index) const;
+        const QModelIndex& index, const QnVirtualCameraResourceList& cameras) const;
+    QnVirtualCameraResourceList tooltipCameras(
+        const QModelIndex& index, const EventTile* tile) const;
 
 private:
     class StateDelegate;

@@ -386,6 +386,11 @@ namespace Qn
 
         TileVisualStyleRole, /**< Role for event tile visual style (RightPanel::TileVisualStyle). */
 
+        /** Number of snapshots for the tile counter, zero if not shown (int). */
+        PreviewCountRole,
+        /** Cameras whose snapshots the user can see, the tile one first (QnResourceList). */
+        PreviewResourceListRole,
+
         ItemDataRoleCount,
     };
 

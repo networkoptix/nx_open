@@ -88,8 +88,8 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(CurrentLayoutMediaItemsRole),
 
         /**
-          * Special layout roles
-          */
+         * Special layout roles
+         */
 
         IDR_ITEM(IsSpecialLayoutRole),
         IDR_ITEM(LayoutIconRole),
@@ -209,6 +209,9 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         IDR_ITEM(RemoteConnectionRole),
 
         IDR_ITEM(TileVisualStyleRole),
+
+        IDR_ITEM(PreviewCountRole),
+        IDR_ITEM(PreviewResourceListRole),
 
         IDR_ITEM(ItemDataRoleCount)
 

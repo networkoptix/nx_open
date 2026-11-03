@@ -68,6 +68,9 @@ public:
     QRectF previewHighlightRect() const;
     void setPreviewHighlightRect(const QRectF& relativeRect);
 
+    /** Number of snapshots related to the tile. A counter is shown if more than one. */
+    void setPreviewCount(int value);
+
     CommandActionPtr action() const;
     void setAction(const CommandActionPtr& value);
 

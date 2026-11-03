@@ -8,6 +8,7 @@
 #include <nx/vms/client/core/event_search/utils/event_search_utils.h>
 #include <nx/vms/client/core/skin/color_theme.h>
 #include <nx/vms/client/core/skin/skin.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
@@ -91,6 +92,12 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
 
         case core::ResourceListRole:
             return QVariant::fromValue<QnResourceList>(d->accessibleCameras(event));
+
+        case Qn::PreviewCountRole:
+            return previewCount(d->previewCameras(event), d->previewCamera(event));
+
+        case Qn::PreviewResourceListRole:
+            return QVariant::fromValue<QnResourceList>(d->previewCameras(event));
 
         case core::DisplayedResourceListRole:
             if (event.source)

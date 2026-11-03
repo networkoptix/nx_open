@@ -13,6 +13,7 @@
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include <client/client_globals.h>
 #include <core/resource/camera_resource.h>
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/utils/metatypes.h>
@@ -29,6 +30,7 @@
 #include <nx/vms/client/desktop/event_search/synchronizers/bookmark_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/synchronizers/motion_search_synchronizer.h>
 #include <nx/vms/client/desktop/event_search/utils/call_alarm_manager.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/bookmark_search_widget.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
@@ -41,7 +43,6 @@
 #include <nx/vms/client/desktop/image_providers/multi_image_provider.h>
 #include <nx/vms/client/desktop/menu/action.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
-#include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/state/client_state_handler.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -575,10 +576,16 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
         return;
     }
 
-    auto multiImageProvider = this->multiImageProvider(index);
-    const auto imageProvider = multiImageProvider ? multiImageProvider.get() : tile->imageProvider();
+    auto multiImageProvider = this->multiImageProvider(index, tooltipCameras(index, tile));
 
     auto text = tile->toolTip();
+
+    // No other snapshots: show the tile snapshot enlarged, with the highlight.
+    const bool useTileSnapshot = !multiImageProvider && !tile->obfuscationEnabled();
+    const auto imageProvider = multiImageProvider
+        ? multiImageProvider.get()
+        : (useTileSnapshot ? tile->imageProvider() : nullptr);
+
     if (text.isEmpty() && imageProvider)
         text = tile->title();
     if (text.isEmpty())
@@ -591,7 +598,7 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
 
     m_tooltip->setText(text);
     m_tooltip->setImageProvider(imageProvider);
-    m_tooltip->setHighlightRect(tile->previewHighlightRect());
+    m_tooltip->setHighlightRect(useTileSnapshot ? tile->previewHighlightRect() : QRectF());
     m_tooltip->setAttributes(tile->attributeList());
     m_tooltip->adjustMaximumContentSize(index);
 
@@ -624,36 +631,34 @@ void EventPanel::Private::at_eventTileHovered(const QModelIndex& index, EventTil
             }));
 }
 
-std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
-    const QModelIndex& index) const
+QnVirtualCameraResourceList EventPanel::Private::tooltipCameras(
+    const QModelIndex& index, const EventTile* tile) const
 {
-    const auto previewTimeData = index.data(core::PreviewTimeRole);
-    if (previewTimeData.isNull())
+    // Unredacted video may be forbidden.
+    if (tile->obfuscationEnabled())
+        return {};
+
+    const auto cameras = index.data(Qn::PreviewResourceListRole)
+                             .value<QnResourceList>()
+                             .filtered<QnVirtualCameraResource>();
+    const auto tileCamera = index.data(core::ResourceRole)
+                                .value<QnResourcePtr>()
+                                .dynamicCast<QnVirtualCameraResource>();
+
+    // With previews turned off, the tile camera snapshot is shown only in the tooltip.
+    const auto snapshot = tile->previewEnabled() ? tileSnapshot(index) : TileSnapshot::none;
+
+    return tooltipPreviewCameras(cameras, tileCamera, snapshot);
+}
+
+std::unique_ptr<MultiImageProvider> EventPanel::Private::multiImageProvider(
+    const QModelIndex& index, const QnVirtualCameraResourceList& cameras) const
+{
+    if (cameras.empty())
         return {};
 
     const auto previewTimeMs =
-        duration_cast<milliseconds>(previewTimeData.value<microseconds>());
-
-    const auto requiredPermission = previewTimeMs > 0ms
-        ? Qn::ViewFootagePermission
-        : Qn::ViewLivePermission;
-
-    const auto cameras = index.data(core::ResourceListRole).value<QnResourceList>()
-        .filtered<QnVirtualCameraResource>(
-            [requiredPermission](const QnVirtualCameraResourcePtr& camera)
-            {
-                if (!NX_ASSERT(camera) || camera->hasFlags(Qn::ResourceFlag::fake))
-                    return false;
-
-                // Assuming the rights were checked before sending the notification.
-                if (camera->hasFlags(Qn::ResourceFlag::cross_system))
-                    return true;
-
-                return ResourceAccessManager::hasPermissions(camera, requiredPermission);
-            });
-
-    if (cameras.size() < 2)
-        return {};
+        duration_cast<milliseconds>(index.data(core::PreviewTimeRole).value<microseconds>());
 
     const bool precisePreview = index.data(core::ForcePrecisePreviewRole).toBool();
     const auto streamSelectionMode = index.data(core::PreviewStreamSelectionRole)

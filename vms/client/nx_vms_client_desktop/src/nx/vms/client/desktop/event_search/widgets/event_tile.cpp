@@ -206,6 +206,8 @@ EventTile::EventTile(QWidget* parent):
     static constexpr int kProgressLabelShift = 8;
     anchorWidgetToParent(d->progressLabel, {0, 0, 0, kProgressLabelShift});
 
+    d->setupPreviewCounter();
+
     ui->progressBar->setRange(0, kProgressBarResolution);
     ui->progressBar->setValue(0);
 
@@ -462,6 +464,15 @@ void EventTile::setImageProvider(core::ImageProvider* value, bool forceUpdate)
     // We don't initiate image loading here because it's controlled externally, from EventRibbon,
     // in accordance with several ini-config settings, to be able to reduce server load by preview
     // requests when they cause server performance drops.
+}
+
+void EventTile::setPreviewCount(int value)
+{
+    if (d->previewCount == value)
+        return;
+
+    d->previewCount = value;
+    d->updatePreviewCounter();
 }
 
 void EventTile::setVideoPreviewResource(const QnVirtualCameraResourcePtr& camera)
@@ -863,6 +874,7 @@ void EventTile::clear()
     setImageProvider({}, /*force*/ true);
     setVideoPreviewResource({});
     setPreviewHighlightRect({});
+    setPreviewCount(0);
     setAction({});
     setAdditionalAction({});
     setOnCloseAction({});

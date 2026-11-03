@@ -23,6 +23,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/event_search/models/private/event_model_data.h>
 #include <nx/vms/client/desktop/event_search/utils/event_data.h>
+#include <nx/vms/client/desktop/event_search/utils/event_preview_cameras.h>
 #include <nx/vms/client/desktop/help/help_topic.h>
 #include <nx/vms/client/desktop/rules/helpers/help_id.h>
 #include <nx/vms/client/desktop/settings/local_settings.h>
@@ -93,6 +94,38 @@ QnResourceList accessibleDevices(core::SystemContext* context, const UuidList& d
         {
             return accessController->hasPermissions(resource, Qn::ViewContentPermission);
         });
+}
+
+QnVirtualCameraResourceList accessibleCameras(
+    core::SystemContext* context, const QVariantMap& details)
+{
+    return accessibleDevices(context, nx::vms::rules::utils::EventLog::sourceDeviceIds(details))
+        .filtered<QnVirtualCameraResource>();
+}
+
+QVariant previewCamerasData(
+    int role, core::SystemContext* context, const QVariantMap& details, microseconds timestamp)
+{
+    // Snapshots of other cameras are shown only for the events with a preview.
+    if (!hasPreview(details))
+        return {};
+
+    const auto cameras = accessibleCameras(context, details);
+    const auto tileCamera = selectPreviewCamera(cameras, timestamp);
+    const auto snapshotCameras = previewCameras(cameras, tileCamera, timestamp);
+
+    switch (role)
+    {
+        case Qn::PreviewCountRole:
+            return previewCount(snapshotCameras, tileCamera);
+
+        case Qn::PreviewResourceListRole:
+            return QVariant::fromValue<QnResourceList>(snapshotCameras);
+
+        default:
+            NX_ASSERT(false, "Unexpected role: %1", role);
+            return {};
+    }
 }
 
 QColor color(const QVariantMap& details)
@@ -499,13 +532,24 @@ QVariant VmsEventSearchListModel::data(const QModelIndex& index, int role) const
 
         case core::ResourceRole: //< Resource for tile thumbnail preview only.
         {
-            auto devices = accessibleDevices(systemContext(), EventLog::sourceDeviceIds(details));
+            // Without the event preview, only a single source device is related to the event.
+            if (!hasPreview(details))
+            {
+                const auto devices =
+                    accessibleDevices(systemContext(), EventLog::sourceDeviceIds(details));
 
-            if (devices.count() == 1)
-                return QVariant::fromValue(devices.front());
+                return devices.size() == 1 ? QVariant::fromValue(devices.front()) : QVariant();
+            }
 
-            return {};
+            const auto camera = selectPreviewCamera(
+                accessibleCameras(systemContext(), details), event->timestamp());
+
+            return camera ? QVariant::fromValue<QnResourcePtr>(camera) : QVariant();
         }
+
+        case Qn::PreviewCountRole:
+        case Qn::PreviewResourceListRole:
+            return previewCamerasData(role, systemContext(), details, event->timestamp());
 
         case Qn::HelpTopicIdRole:
             return eventHelpId(event->type());

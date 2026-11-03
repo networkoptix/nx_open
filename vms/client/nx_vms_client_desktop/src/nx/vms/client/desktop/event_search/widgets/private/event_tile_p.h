@@ -41,6 +41,7 @@ public:
     std::unique_ptr<QAction> additionalAction;
     std::unique_ptr<QAction> onCloseAction;
     QnElidedLabel* const progressLabel;
+    int previewCount = 0;
     const QScopedPointer<QTimer> loadPreviewTimer;
     bool isPreviewLoadNeeded = true;
     bool forceNextPreviewUpdate = false;
@@ -87,6 +88,8 @@ public:
     void updatePreview(std::chrono::milliseconds delay);
     void showDebugPreviewTimestamp();
     void updatePreviewsVisibility();
+    void setupPreviewCounter();
+    void updatePreviewCounter();
     void setWidgetHolder(QWidget* widget, QWidget* newHolder);
     QString getSystemName(const QString& systemId);
     QString timestampText() const;
