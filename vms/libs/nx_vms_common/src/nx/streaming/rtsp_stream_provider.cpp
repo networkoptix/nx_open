@@ -340,7 +340,9 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
             result->channelNumber = track.logicalChannelNum;
             if (result->dataType == QnAbstractMediaData::VIDEO)
             {
-                if (result->channelNumber >= m_numberOfVideoChannels)
+                // The count is unknown in play-now mode, there is no DESCRIBE.
+                if (m_numberOfVideoChannels > 0
+                    && result->channelNumber >= m_numberOfVideoChannels)
                 {
                     NX_DEBUG(this, "Incorrect channel number: %1, total number of channels: %2",
                         result->channelNumber, m_numberOfVideoChannels);
@@ -948,6 +950,8 @@ void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
     TrackInfo trackInfo;
     trackInfo.rtpParsers.emplace(
         payloadType, std::make_unique<nx::rtp::RtpParser>(payloadType, std::move(codecParser)));
+    if (channelNumber != nx::rtp::kMetadataChannelNumber)
+        trackInfo.logicalChannelNum = channelNumber;
 
     if (*actualTransport == nx::vms::api::RtpTransportType::tcp)
         m_trackIndices[rtpChannelNumber] = channelNumber;
