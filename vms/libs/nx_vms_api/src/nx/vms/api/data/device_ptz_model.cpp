@@ -18,6 +18,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPositionLimits, (json), PtzPositionLimits_Fi
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzMovement, (json), PtzMovement_Fields)
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPresetLimits, (json), PtzPresetLimits_Fields)
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPresetFilter, (json), PtzPresetFilter_Fields)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(PtzPreset, (json), PtzPreset_Fields)

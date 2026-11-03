@@ -419,6 +419,19 @@ nx::Uuid ServerConnection::serverId() const
     return d->serverId;
 }
 
+Handle ServerConnection::getDevicePtzPresetLimits(const nx::Uuid& deviceId,
+    Callback<ErrorOrData<nx::vms::api::PtzPresetLimits>> callback,
+    nx::utils::AsyncHandlerExecutor executor,
+    std::optional<nx::Uuid> proxyToServer)
+{
+    return executeGet(
+        QString("/rest/v5/devices/%1/ptz/presets/*/limits").arg(deviceId.toSimpleString()),
+        {},
+        std::move(callback),
+        std::move(executor),
+        proxyToServer);
+}
+
 Handle ServerConnection::cameraHistoryAsync(
     const QnChunksRequestData& request,
     Callback<nx::vms::api::CameraHistoryDataList> callback,

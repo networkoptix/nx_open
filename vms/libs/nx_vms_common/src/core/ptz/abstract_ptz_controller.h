@@ -316,6 +316,14 @@ public slots: //< Class is exposed to QML. All functions in section below are in
     virtual bool getPresets(QnPtzPresetList* presets) const = 0;
 
     /**
+     * Gets native preset capacity independently of the preferred preset implementation.
+     * A successful result may contain an unknown maximum. An explicit zero is a known capacity.
+     * This metadata remains queryable without Ptz::Capability::presets, including a known zero.
+     * Asynchronous controllers deliver the result through finished(Command::getPresetLimits).
+     */
+    virtual bool getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const;
+
+    /**
      * Saves the given tour either as a new one, or replacing an existing one.
      * Note that id of the provided preset must be set.
      *

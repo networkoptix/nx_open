@@ -78,6 +78,7 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
 
     virtual bool getPresets(QnPtzPresetList* presets) const override;
+    virtual bool getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const override;
 
     virtual bool createTour(const QnPtzTour& tour) override;
 
@@ -129,6 +130,16 @@ public:
         const QByteArray& body,
         const Options& options,
         PtzDeserializationHelper responseHelper = {}) const;
+
+protected:
+    nx::MoveOnlyFunc<void(QVariant)> makePresetLimitsCompletion() const;
+
+    void processResponse(Command command, const QVariant& data);
+
+    void processResponse(Command command,
+        bool success,
+        const nx::network::rest::JsonResult& data,
+        const PtzDeserializationHelper& deserializer);
 
 private:
     bool isPointless(

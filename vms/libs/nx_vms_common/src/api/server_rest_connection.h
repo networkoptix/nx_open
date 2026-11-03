@@ -30,6 +30,7 @@
 #include <nx/vms/api/data/camera_history_data.h>
 #include <nx/vms/api/data/database_dump_data.h>
 #include <nx/vms/api/data/device_model.h>
+#include <nx/vms/api/data/device_ptz_model.h>
 #include <nx/vms/api/data/device_replacement.h>
 #include <nx/vms/api/data/device_search.h>
 #include <nx/vms/api/data/email_settings.h>
@@ -181,6 +182,11 @@ public: // Generic request methods.
     }
 
 public: // Specific request methods.
+    Handle getDevicePtzPresetLimits(const nx::Uuid& deviceId,
+        Callback<ErrorOrData<nx::vms::api::PtzPresetLimits>> callback,
+        nx::utils::AsyncHandlerExecutor executor = {},
+        std::optional<nx::Uuid> proxyToServer = {});
+
     /**
     * Load information about cross-server archive
     * @return value > 0 on success or <= 0 if it isn't started.

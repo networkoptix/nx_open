@@ -8,7 +8,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/rest/params.h>
+#include <nx/utils/async_handler_executor.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/vms/client/core/system_context.h>
 
 using namespace nx::vms::common::ptz;
@@ -153,16 +155,11 @@ bool RemotePtzController::sendRequest(
         helper = [](const nx::network::rest::JsonResult& /*data*/) { return QVariant(); };
 
     PtzServerCallback callback = nx::utils::guarded(this,
-        [this, command, deserializer=std::move(helper)](
+        [this, command, deserializer = std::move(helper)](
             bool success, rest::Handle /*handle*/, const nx::network::rest::JsonResult& data)
         {
-            QVariant value = deserializer(data);
-            auto notConstThis = const_cast<RemotePtzController*>(this);
-
-            if (!success && (command == Command::getPresets || command == Command::getTours))
-                notConstThis->invalidate(); //< Force update at the next time in case of error.
-
-            emit notConstThis->finished(command, value);
+            const_cast<RemotePtzController*>(this)->processResponse(
+                command, success, data, deserializer);
         });
 
     api->postJsonResult(
@@ -174,6 +171,27 @@ bool RemotePtzController::sendRequest(
         server->getId());
 
     return true;
+}
+
+void RemotePtzController::processResponse(Command command,
+    bool success,
+    const nx::network::rest::JsonResult& data,
+    const PtzDeserializationHelper& deserializer)
+{
+    const QVariant value = success ? deserializer(data) : QVariant();
+    processResponse(command, value);
+}
+
+void RemotePtzController::processResponse(Command command, const QVariant& data)
+{
+    if (!data.isValid()
+        && (command == Command::getPresets || command == Command::getTours
+            || command == Command::getPresetLimits))
+    {
+        invalidate(); //< Force update at the next time in case of error.
+    }
+
+    emit finished(command, data);
 }
 
 bool RemotePtzController::continuousMove(
@@ -341,6 +359,48 @@ bool RemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
     nx::network::rest::Params params;
     auto helper = makeDeserializationHelper<QnPtzPresetList>();
     return sendRequest(Command::getPresets, params, QByteArray(), kDefaultOptions, helper);
+}
+
+bool RemotePtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* /*limits*/) const
+{
+    const auto server = m_camera->getParentServer();
+    if (!server || isPointless(Command::getPresetLimits, kDefaultOptions))
+        return false;
+
+    const auto systemContext = SystemContext::fromResource(m_camera);
+    if (!NX_ASSERT(systemContext))
+        return false;
+
+    const auto api = systemContext->connectedServerApi();
+    if (!api)
+        return false;
+
+    auto callback = [complete = makePresetLimitsCompletion()](bool success,
+                        rest::Handle,
+                        rest::ErrorOrData<nx::vms::api::PtzPresetLimits> result) mutable
+    {
+        const QVariant data =
+            success && result ? QVariant::fromValue(std::move(*result)) : QVariant();
+        complete(data);
+    };
+    api->getDevicePtzPresetLimits(
+        m_camera->getId(), std::move(callback), this->thread(), server->getId());
+    // Even immediate rejection destroys the callback and delivers an unavailable result.
+    return true;
+}
+
+nx::MoveOnlyFunc<void(QVariant)> RemotePtzController::makePresetLimitsCompletion() const
+{
+    auto self = const_cast<RemotePtzController*>(this);
+    // ServerConnection cancellation destroys callbacks without invoking them.
+    auto canceled = nx::utils::makeScopeGuard(nx::utils::AsyncHandlerExecutor(self).bind(
+        [self]() { self->processResponse(Command::getPresetLimits, {}); }));
+    return nx::utils::mutableGuarded(this,
+        [self, canceled = std::move(canceled)](QVariant data) mutable
+        {
+            canceled.disarm();
+            self->processResponse(Command::getPresetLimits, data);
+        });
 }
 
 bool RemotePtzController::createTour(

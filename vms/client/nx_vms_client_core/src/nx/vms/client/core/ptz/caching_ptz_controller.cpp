@@ -89,68 +89,88 @@ bool CachingPtzController::getFlip(
     return true;
 }
 
-bool CachingPtzController::getPresets(QnPtzPresetList* presets) const
+template<class T, class Request>
+bool CachingPtzController::getCachedData(T* value,
+    DataField field,
+    T QnPtzData::* member,
+    UpdateTimerType timerType,
+    Request request) const
 {
     bool result = false;
-    bool requestBasePresets = false;
-    auto& timer = m_updateTimers[UpdateTimerType::presets];
+    bool requestFromBase = false;
+    auto& timer = m_updateTimers[timerType];
 
     {
         const NX_MUTEX_LOCKER locker(&m_mutex);
-        if (m_data.fields.testFlag(DataField::presets))
+        if (m_data.fields.testFlag(field))
         {
-            *presets = m_data.presets; //< Return any existing data anyway.
+            *value = m_data.*member;
             result = true;
         }
 
         if (!result || timer.hasExpired())
         {
-            // We rely either on returned data or future update signals here and start timer
-            // like if we have this data already.
             timer.setRemainingTime(kUpdateInterval);
-            requestBasePresets = true;
+            requestFromBase = true;
         }
     }
 
-    if (requestBasePresets && !(result = base_type::getPresets(presets)))
+    if (requestFromBase)
     {
-        const NX_MUTEX_LOCKER locker(&m_mutex);
-        timer.forceExpire(); //< Reset timer in case of failure.
+        const bool accepted = request();
+        if (!accepted)
+        {
+            const NX_MUTEX_LOCKER locker(&m_mutex);
+            timer.forceExpire();
+        }
+        result = accepted;
     }
 
     return result;
 }
 
+bool CachingPtzController::getPresets(QnPtzPresetList* presets) const
+{
+    return getCachedData(presets,
+        DataField::presets,
+        &QnPtzData::presets,
+        UpdateTimerType::presets,
+        [this, presets]() { return base_type::getPresets(presets); });
+}
+
+bool CachingPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
+{
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        if (m_presetLimits)
+        {
+            *limits = *m_presetLimits;
+            return true;
+        }
+
+        if (m_presetLimitsPending)
+            return false;
+
+        m_presetLimitsPending = true;
+    }
+
+    if (!base_type::getPresetLimits(limits))
+    {
+        const NX_MUTEX_LOCKER locker(&m_mutex);
+        m_presetLimitsPending = false;
+        m_discardPresetLimitsResponse = false;
+    }
+
+    return false;
+}
+
 bool CachingPtzController::getTours(QnPtzTourList* tours) const
 {
-    bool result = false;
-    bool requestBaseTours = false;
-    auto& timer = m_updateTimers[UpdateTimerType::tours];
-
-    {
-        const NX_MUTEX_LOCKER locker(&m_mutex);
-        if (m_data.fields.testFlag(DataField::tours))
-        {
-            *tours = m_data.tours; //< Return any existing data anyway.
-            result = true;
-        }
-
-        if (!result || timer.hasExpired())
-        {
-            // We rely either on returned data or future update signals here and start timer
-            // like if we have this data already.
-            timer.setRemainingTime(kUpdateInterval);
-            requestBaseTours = true;
-        }
-    }
-
-    if (requestBaseTours && !(result = base_type::getTours(tours)))
-    {
-        const NX_MUTEX_LOCKER locker(&m_mutex);
-        timer.forceExpire(); //< Reset timer in case of failure.
-    }
-
-    return result;
+    return getCachedData(tours,
+        DataField::tours,
+        &QnPtzData::tours,
+        UpdateTimerType::tours,
+        [this, tours]() { return base_type::getTours(tours); });
 }
 
 bool CachingPtzController::getActiveObject(QnPtzObject* activeObject) const
@@ -215,6 +235,22 @@ bool CachingPtzController::getData(
 void CachingPtzController::baseFinished(Command command, const QVariant& data)
 {
     DataFields changedFields = DataField::none;
+
+    if (command == Command::getPresetLimits)
+    {
+        bool accepted = false;
+        {
+            const NX_MUTEX_LOCKER locker(&m_mutex);
+            accepted = m_presetLimitsPending && !m_discardPresetLimitsResponse && data.isValid();
+            if (accepted)
+                m_presetLimits = data.value<nx::vms::api::PtzPresetLimits>();
+
+            m_presetLimitsPending = false;
+            m_discardPresetLimitsResponse = false;
+        }
+        base_type::baseFinished(command, accepted ? data : QVariant());
+        return;
+    }
 
     if (data.isValid())
     {
@@ -363,7 +399,10 @@ void CachingPtzController::initialize()
         [weakRef = guard.toWeakRef()]()
         {
             if (auto controller = weakRef.lock())
+            {
+                controller->invalidatePresetLimits();
                 controller->initializeInternal();
+            }
         };
 
     connect(resource().get(), &QnResource::statusChanged, this, safeInitialize);
@@ -462,8 +501,17 @@ DataFields CachingPtzController::updateCacheLocked(const QnPtzData& data)
     return changedFields;
 }
 
+void CachingPtzController::invalidatePresetLimits()
+{
+    const NX_MUTEX_LOCKER locker(&m_mutex);
+    m_presetLimits.reset();
+    // Drain the old request before starting another: completions carry no request id.
+    m_discardPresetLimitsResponse = m_presetLimitsPending;
+}
+
 void CachingPtzController::invalidate()
 {
+    invalidatePresetLimits();
     {
         const NX_MUTEX_LOCKER locker(&m_mutex);
 

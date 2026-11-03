@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <core/ptz/proxy_ptz_controller.h>
 #include <nx/utils/deadline_timer.h>
 #include <nx/utils/thread/mutex.h>
@@ -10,7 +12,7 @@
 namespace nx::vms::client::core {
 namespace ptz {
 
-class CachingPtzController:
+class NX_VMS_CLIENT_CORE_API CachingPtzController:
     public QnProxyPtzController,
     public QnFromThisToShared<CachingPtzController>
 {
@@ -37,6 +39,7 @@ public:
         const Options& options) const override;
 
     virtual bool getPresets(QnPtzPresetList* presets) const override;
+    virtual bool getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const override;
 
     virtual bool getTours(QnPtzTourList* tours) const override;
 
@@ -60,6 +63,22 @@ protected:
 
 private:
     bool initializeInternal();
+    void invalidatePresetLimits();
+
+    enum UpdateTimerType
+    {
+        presets,
+        tours,
+
+        count
+    };
+
+    template<class T, class Request>
+    bool getCachedData(T* value,
+        DataField field,
+        T QnPtzData::* member,
+        UpdateTimerType timerType,
+        Request request) const;
 
     template<class T>
     DataFields updateCacheLocked(
@@ -79,14 +98,10 @@ private:
     bool m_initialized;
     mutable nx::Mutex m_mutex;
     QnPtzData m_data;
+    std::optional<nx::vms::api::PtzPresetLimits> m_presetLimits;
+    mutable bool m_presetLimitsPending = false;
+    mutable bool m_discardPresetLimitsResponse = false;
 
-    enum UpdateTimerType
-    {
-        presets,
-        tours,
-
-        count
-    };
     mutable nx::utils::DeadlineTimer m_updateTimers[UpdateTimerType::count];
 };
 

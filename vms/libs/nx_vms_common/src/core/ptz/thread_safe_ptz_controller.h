@@ -71,6 +71,7 @@ public:
     virtual bool activatePreset(const QString& presetId, qreal speed) override;
 
     virtual bool getPresets(QnPtzPresetList* presets) const override;
+    virtual bool getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const override;
 
     virtual bool createTour(const QnPtzTour& tour) override;
 

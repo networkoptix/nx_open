@@ -192,6 +192,11 @@ bool QnProxyPtzController::QnProxyPtzController::getPresets(QnPtzPresetList* pre
         : false;
 }
 
+bool QnProxyPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
+{
+    return m_controller && m_controller->getPresetLimits(limits);
+}
+
 bool QnProxyPtzController::createTour(const QnPtzTour& tour)
 {
     return m_controller

@@ -301,6 +301,12 @@ bool QnThreadedPtzController::getPresets(QnPtzPresetList* /*presets*/) const
         {Type::operational});
 }
 
+bool QnThreadedPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* /*limits*/) const
+{
+    return requestData<nx::vms::api::PtzPresetLimits>(
+        Command::getPresetLimits, &QnAbstractPtzController::getPresetLimits, {Type::operational});
+}
+
 bool QnThreadedPtzController::createTour(const QnPtzTour& tour)
 {
     return executeCommand(

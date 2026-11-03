@@ -42,6 +42,12 @@ bool QnAbstractPtzController::supportsPtzType(Type type) const
         && getSupportedPtzTypes().testFlag(type);
 }
 
+bool QnAbstractPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
+{
+    *limits = {};
+    return true;
+}
+
 bool QnAbstractPtzController::hasCapabilities(
     Ptz::Capabilities capabilities,
     const Options& options) const
@@ -190,6 +196,10 @@ bool QnAbstractPtzController::supports(
         case Command::getAuxiliaryTraits:
         case Command::runAuxiliaryCommand:
             return capabilities.testFlag(Ptz::Capability::auxiliary);
+
+        case Command::getPresetLimits:
+            // Capacity metadata includes devices without executable preset operations.
+            return true;
 
         case Command::getData:
             return true;

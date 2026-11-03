@@ -128,6 +128,12 @@ bool ThreadSafePtzController::getPresets(QnPtzPresetList* presets) const
     return base_type::getPresets(presets);
 }
 
+bool ThreadSafePtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return base_type::getPresetLimits(limits);
+}
+
 bool ThreadSafePtzController::createTour(const QnPtzTour& tour)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);

@@ -472,6 +472,20 @@ void registerDeviceBaseHandlers(
         GlobalPermission::none,
         std::make_unique<ptz::PositionLimitsHandler>(serverModule, serverConnector));
 
+    /**%apidoc GET /rest/v{5-}/devices/{deviceId}/ptz/presets/%2A/limits
+     * Retrieves native PTZ preset capacity, if reported by the Device.
+     * %caption Get Device PTZ preset limits
+     * %ingroup Device PTZ
+     * %struct PtzDeviceId
+     * %param[ref] _format,_stripDefault,_language,_pretty,_ticket,_with
+     * %param[ref] _local,_strict
+     * %permissions Depends on Resource access rights.
+     * %return:{PtzPresetLimits} Native preset limits, independent of Server-stored presets.
+     */
+    reg("rest/v{5-}/devices/:deviceId/ptz/presets/*/limits",
+        GlobalPermission::none,
+        std::make_unique<ptz::PresetLimitsHandler>(serverModule, serverConnector));
+
     /**%apidoc GET /rest/v{3-}/devices/{deviceId}/ptz/presets
      * Retrieves the PTZ preset list.
      * %caption Get PTZ presets

@@ -150,6 +150,9 @@ enum class Command
      * %caption RelativeFocusPtzCommand
      */
     relativeFocus,
+
+    /** Internal completion identifier; preset capacity is queried through REST v5. */
+    getPresetLimits,
 };
 
 inline size_t qHash(const Command& command, uint seed)
@@ -164,8 +167,7 @@ constexpr auto nxReflectVisitAllEnumItems(Command*, Visitor&& visitor)
     // Such values should go before the correct ones, so both versions are supported on input,
     // and only deprecated misspelled version is supported on output.
     using Item = nx::reflect::enumeration::Item<Command>;
-    return visitor(
-        Item{Command::continuousMove, "ContinuousMovePtzCommand"},
+    return visitor(Item{Command::continuousMove, "ContinuousMovePtzCommand"},
         Item{Command::continuousFocus, "ContinuousFocusPtzCommand"},
         Item{Command::absoluteDeviceMove, "AbsoluteDeviceMovePtzCommand"},
         Item{Command::absoluteLogicalMove, "AbsoluteLogicalMovePtzCommand"},
@@ -198,8 +200,7 @@ constexpr auto nxReflectVisitAllEnumItems(Command*, Visitor&& visitor)
         Item{Command::getData, "GetDataPtzCommand"},
         Item{Command::relativeMove, "RelativeMovePtzCommand"},
         Item{Command::relativeFocus, "RelativeFocusPtzCommand"},
-        Item{Command::invalid, "InvalidPtzCommand"}
-    );
+        Item{Command::invalid, "InvalidPtzCommand"});
 }
 
 } // namespace ptz

@@ -162,6 +162,11 @@ bool QnFallbackPtzController::getPresets(QnPtzPresetList* presets) const
     return baseController({Type::operational})->getPresets(presets);
 }
 
+bool QnFallbackPtzController::getPresetLimits(nx::vms::api::PtzPresetLimits* limits) const
+{
+    return baseController({Type::operational})->getPresetLimits(limits);
+}
+
 bool QnFallbackPtzController::createTour(const QnPtzTour& tour)
 {
     return baseController({Type::operational})->createTour(tour);

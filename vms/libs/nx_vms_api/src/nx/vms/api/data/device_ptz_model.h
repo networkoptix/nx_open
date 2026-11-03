@@ -225,6 +225,21 @@ struct NX_VMS_API PtzViewportMove
 QN_FUSION_DECLARE_FUNCTIONS(PtzViewportMove, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(PtzViewportMove, PtzViewportMove_Fields)
 
+struct NX_VMS_API PtzPresetLimits
+{
+    /**%apidoc
+     * Maximum number of presets stored by the Device. Unset if unknown; zero means that the Device
+     * reports no native preset slots. This is total capacity, not the number of available slots,
+     * and does not limit presets stored by the Server.
+     */
+    std::optional<int> maximumNativePresetCount;
+
+    bool operator==(const PtzPresetLimits&) const = default;
+};
+#define PtzPresetLimits_Fields (maximumNativePresetCount)
+QN_FUSION_DECLARE_FUNCTIONS(PtzPresetLimits, (json), NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(PtzPresetLimits, PtzPresetLimits_Fields)
+
 struct NX_VMS_API PtzPresetFilter
 {
     /**%apidoc[immutable] */
