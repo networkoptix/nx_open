@@ -74,6 +74,24 @@ BaseSettingsPage
 
     LabeledSwitch
     {
+        id: useLogInToOrganizationFeature
+
+        width: parent.width
+
+        text: qsTr("Log In to Organization")
+        extraText: qsTr("Allow user to log in to organization")
+        checkState: appContext.settings.useLogInToOrganizationFeature
+            ? Qt.Checked
+            : Qt.Unchecked
+        onCheckStateChanged:
+        {
+            appContext.settings.useLogInToOrganizationFeature =
+                checkState !== Qt.Unchecked
+        }
+    }
+
+    LabeledSwitch
+    {
         id: mirrorTimelineSwitch
 
         width: parent.width

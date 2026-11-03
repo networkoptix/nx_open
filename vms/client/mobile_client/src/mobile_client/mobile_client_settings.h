@@ -52,6 +52,7 @@ public:
 
         // Beta features and settings flags.
         UseDownloadVideoFeature,
+        UseLogInToOrganizationFeature,
 
         UseMaxHardwareDecodersCount,
         MaxHardwareDecodersCount,
@@ -170,6 +171,12 @@ private:
             bool,
             useDownloadVideoFeature, setUseDownloadVideoFeature,
             UseDownloadVideoFeature, false)
+
+        QN_DECLARE_RW_PROPERTY(bool,
+            useLogInToOrganizationFeature,
+            setUseLogInToOrganizationFeature,
+            UseLogInToOrganizationFeature,
+            false)
 
         QN_DECLARE_RW_PROPERTY(
             bool,
