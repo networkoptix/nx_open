@@ -15,6 +15,9 @@ namespace Permissions {
 // Allows binding/unbinding systems to/from organization.
 static constexpr char kManageSystems[] = "manage_systems";
 
+// Allows configuring SSO for the organization.
+static constexpr char kConfigureSso[] = "configure_sso";
+
 } // namespace Permissions
 
 struct Organization
