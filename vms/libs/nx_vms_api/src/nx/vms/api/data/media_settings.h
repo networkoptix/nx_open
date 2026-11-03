@@ -129,8 +129,9 @@ struct NX_VMS_API MediaSettings
     bool panoramic = true;
 
     /**%apidoc
-     * Forces specific video codec. Causes error response if specified codec is not found or not
-     * supported for selected particular container (see `format`).
+     * Forces specific video codec. Causes error response if the specified codec is not found, or
+     * is not supported by whatever carries it: the container (see `format`), or, for WebRTC, the
+     * delivery method (see `deliveryMethod`).
      */
     std::optional<QString> videoCodec;
 
