@@ -134,10 +134,12 @@ void Tracker::sendIce(const IceCandidate& candidate)
     rapidjson::Value candidateValue(candidateStr, d.GetAllocator());
     ice.AddMember("candidate", candidateValue, d.GetAllocator());
 
-    const auto tracks = m_session->tracks()->allTracks();
-    int mid = tracks.empty() ? kDataChannelMid : tracks[0].mid;
-    ice.AddMember("sdpMid", mid, d.GetAllocator());
-    ice.AddMember("sdpMLineIndex", 0, d.GetAllocator());
+    // The candidate has to name an m-section of the BUNDLE group, or the client has no transport
+    // to attach it to: a free m-line is offered as rejected and left out of the group, see
+    // Session::constructSdp(). The data channel m-line is always offered and always bundled, and
+    // it comes after every track's, so it is the last index.
+    ice.AddMember("sdpMid", kDataChannelMid, d.GetAllocator());
+    ice.AddMember("sdpMLineIndex", (int) m_session->tracks()->tracks().size(), d.GetAllocator());
     std::string ufrag = m_session->id();
     rapidjson::Value ufragValue(ufrag, d.GetAllocator());
     ice.AddMember("usernameFragment", ufragValue, d.GetAllocator());

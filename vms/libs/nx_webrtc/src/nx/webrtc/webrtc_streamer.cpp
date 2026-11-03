@@ -111,23 +111,6 @@ static std::optional<int64_t> parseSeekMs(const rapidjson::Value& v)
     return std::nullopt;
 }
 
-static nx::vms::api::StreamIndex parseStreamIndex(const rapidjson::Value& obj)
-{
-    auto it = obj.FindMember("stream");
-    if (it == obj.MemberEnd())
-        return nx::vms::api::StreamIndex::primary;
-
-    const auto& v = it->value;
-    if ((v.IsString() && std::string{ v.GetString() } == "1")
-        || (v.IsInt() && v.GetInt() == 1)
-        || (v.IsInt64() && v.GetInt64() == 1))
-    {
-        return nx::vms::api::StreamIndex::secondary;
-    }
-
-    return nx::vms::api::StreamIndex::primary;
-}
-
 void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
 {
     rapidjson::Document d;
@@ -136,65 +119,7 @@ void Streamer::onDataChannelString(const std::string& data, int /*streamId*/)
         return;
 
     nx::Uuid deviceId = parseDeviceId(d); // TODO https://networkoptix.atlassian.net/browse/VMS-61664
-    if (auto it = d.FindMember("add"); it != d.MemberEnd())
-    {
-        const auto& addObj = it->value;
-        if (!addObj.IsObject())
-            return;
-
-        if (deviceId.isNull())
-            deviceId = parseDeviceId(addObj);
-
-        if (deviceId.isNull())
-            return;
-
-        std::optional<std::chrono::milliseconds> positionMs; //< Empty means live stream.
-        auto seekObj = addObj.FindMember("seek");
-        if (seekObj != addObj.MemberEnd())
-        {
-            const auto seekMs = parseSeekMs(seekObj->value);
-            if (seekMs && *seekMs >= 0)
-                positionMs = std::chrono::milliseconds(*seekMs);
-        }
-
-        const nx::vms::api::StreamIndex newStream = parseStreamIndex(addObj);
-        // Providers and muxers belong to the session thread, which is not this one when the
-        // stream runs over IceTcp.
-        m_session->consumer()->runInMuxingThread(
-            [this, deviceId, positionMs, newStream]()
-            {
-                try
-                {
-                    m_session->createProvider(
-                        deviceId, positionMs, newStream, std::nullopt /*speedOpt*/);
-                    m_session->consumer()->startProvidersIfNeeded(); // TODO It looks suspicious.
-                }
-                catch (const std::exception& e)
-                {
-                    NX_WARNING(this, "Can't create provider: %1", e.what());
-                }
-            });
-        return;
-    }
-
-    if (d.HasMember("remove"))
-    {
-        if (deviceId.isNull())
-        {
-            if (const auto& value = d["remove"]; value.IsString())
-                deviceId = nx::Uuid::fromStringSafe(value.GetString());
-        }
-        if (!deviceId.isNull())
-        {
-            m_session->consumer()->runInMuxingThread(
-                [this, deviceId]() { m_session->removeProvider(deviceId); });
-        }
-        else
-        {
-            NX_WARNING(this, "deviceId should be provided to remove stream");
-        }
-    }
-    else if (d.HasMember("seek"))
+    if (d.HasMember("seek"))
     {
         int64_t timestamp = 0;
         const auto& seekValue = d["seek"];

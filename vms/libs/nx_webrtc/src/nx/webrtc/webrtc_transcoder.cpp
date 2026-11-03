@@ -220,6 +220,26 @@ QnUniversalRtpEncoderPtr Transcoder::createRtpEncoder(
     return universalEncoder;
 }
 
+void Transcoder::removeEncoders(nx::Uuid deviceId)
+{
+    m_videoEncoders.erase(deviceId);
+    m_audioEncoders.erase(deviceId);
+
+    // Left behind, this would report EOF for a Device added again under the same id, and start
+    // a renegotiation for a stream that has not even begun.
+    m_eof.erase(deviceId);
+}
+
+void Transcoder::removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
+{
+    // m_eof is kept, since it belongs to the Device as a whole: it is set by the MSE muxer,
+    // which has no tracks to tell apart, and the Device streams on.
+    if (videoOrAudio == QnAbstractMediaData::VIDEO)
+        m_videoEncoders.erase(deviceId);
+    else if (videoOrAudio == QnAbstractMediaData::AUDIO)
+        m_audioEncoders.erase(deviceId);
+}
+
 void Transcoder::setSrtpEncryptionData(const rtsp::EncryptionData& data)
 {
     m_encryptionData = data;
@@ -377,6 +397,18 @@ QnUniversalRtpEncoder* Transcoder::setDataPacket(nx::Uuid deviceId, QnConstAbstr
     m_lastTimestampMs = media->timestamp / 1000;
     if (m_method == nx::vms::api::WebRtcMethod::srtp)
     {
+        // Whatever is packetized for a track the client did not take, or for one that is gone
+        // along with its Device, is discarded on arrival at best, so spend neither the CPU nor
+        // the bandwidth on it. See Session::processSdpAnswer() and Session::dropProvider().
+        const Track* track = nullptr;
+        if (media->dataType == QnAbstractMediaData::VIDEO)
+            track = m_session->tracks()->videoTrack(deviceId);
+        else if (media->dataType == QnAbstractMediaData::AUDIO)
+            track = m_session->tracks()->audioTrack(deviceId);
+
+        if (!track || track->offerState != TrackState::active)
+            return nullptr;
+
         QnUniversalRtpEncoder* rtpEncoder = getRtpEncoder(deviceId, media->dataType);
         if (!rtpEncoder)
             return nullptr; //< Skip not supported data.

@@ -29,16 +29,15 @@ struct NX_WEBRTC_API Track
     TrackType trackType = TrackType::unknown;
 
     TrackState offerState{};
-    TrackState answerState{};
-    // The mid was inherited from an m-line the client has already seen, because addTrack()
-    // recycles the mid of a retired track. Set there only, and read only by removeTracks(),
-    // which keeps such a track to hold its mid in the recycling pool.
-    bool midWasOffered = false;
     // A renegotiation offer was sent (Session::renegotiateProvider()) but not answered yet, so the
     // client doesn't know the new SSRC/payload type.
     bool pendingAnswer = false;
     // Valid only while pendingAnswer: where to resume the provider (DATETIME_NOW for live).
     int64_t resumePositionUs = 0;
+
+    // No Device holds this m-line. It is still offered, as a rejected one, and the next Device
+    // that needs an m-line of this type takes it, see Tracks::addTrack().
+    bool isFree() const { return deviceId.isNull() && offerState == TrackState::inactive; }
 };
 
 const std::string& toSdpAttribute(Purpose purpose);
@@ -49,16 +48,17 @@ class NX_WEBRTC_API Tracks
     Tracks& operator=(const Tracks&) = delete;
 
 public:
-
+    // Puts `track` on a free m-line of its type, or on a new one. An m-line the client has seen
+    // is never taken away: a later offer can gain m-lines, but cannot lose or reorder them.
     void addTrack(std::unique_ptr<Track> track);
 
-    // Drops the tracks of `deviceId`, for a Device that never reached an offer. A track that
-    // recycled the mid of a retired m-line keeps its place in the recycling pool instead, as a
-    // Device-less inactive one.
-    // NOTE: With no encoder behind it, such a track renders no m-line, so the next offer is one
-    // m-line shorter than the one the client accepted. Rare enough to live with: it takes a
-    // removed Device, a recycled mid, and a Device that fails to initialize.
-    void removeTracks(nx::Uuid deviceId);
+    // Hands the m-lines of `deviceId` back. They stay in the offer, rejected, until addTrack()
+    // gives one to another Device.
+    void freeTracks(nx::Uuid deviceId);
+
+    // Hands one m-line back, leaving the other m-lines of its Device alone: that Device goes on
+    // streaming whatever the client took of it. See freeTracks().
+    void freeTrack(Track* track);
 
     // Without `newSsrc` assigns a fresh random one, telling the receiver that the RTP stream
     // restarted, e.g. on a mid-session codec change. `newSsrc` can be set to roll back to the old
@@ -71,20 +71,34 @@ public:
     Track* videoTrack(nx::Uuid deviceId) const;
     Track* audioTrack(nx::Uuid deviceId) const;
     Track* track(uint32_t ssrc) const;
-    std::vector<Track> allTracks() const;
-    std::map<uint32_t, std::unique_ptr<Track>>& tracks() { return m_tracks; }
+    // Every m-line of the session, keyed and ordered by its index in the offer.
+    std::map<int, std::unique_ptr<Track>>& tracks() { return m_tracks; }
 
     virtual std::string mimeType() const = 0;
     virtual bool examineSdp(const std::string& sdp) = 0;
 
+    // The media description of `track`, or {} when nothing backs it any more -- then the m-line
+    // is offered as a rejected one, see rejectedSdpForTrack().
     virtual std::string getSdpForTrack(const Track* track, uint16_t port) const;
+
+    // An m-line with no media to describe, offered with port 0 so that the client keeps seeing
+    // it: rejected, and out of the BUNDLE group (RFC 3264 section 8.2, RFC 8843 section 7.3.3).
+    std::string rejectedSdpForTrack(const Track* track) const;
 
 protected:
     Session* m_session = nullptr;
 
 private:
-    std::map<uint32_t, std::unique_ptr<Track>> m_tracks;
-    int m_lastMid = 0;
+    Track* deviceTrack(nx::Uuid deviceId, TrackType trackType) const;
+    bool isSsrcTaken(uint32_t ssrc) const;
+    int nextMid();
+
+private:
+    // Keyed by the index of the m-line in the offer, which a slot holds for the whole session.
+    // What identifies it to the client, the mid, is a field of the track: a slot handed to
+    // another Device is a transceiver the client has not seen, and carries a new mid.
+    std::map<int, std::unique_ptr<Track>> m_tracks;
+    int m_nextMid = 0;
 };
 
 class NX_WEBRTC_API TracksForSend: public Tracks
