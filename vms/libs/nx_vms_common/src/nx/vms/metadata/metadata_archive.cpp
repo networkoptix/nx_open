@@ -41,12 +41,12 @@ Index::Index(MetadataArchive* owner): m_owner(owner)
 
 qint64 Index::indexFileSize() const
 {
-    return records.size() * kIndexRecordSize + kMetadataIndexHeaderSize;
+    return std::ssize(records) * kIndexRecordSize + kMetadataIndexHeaderSize;
 }
 
 qint64 Index::mediaFileSize(bool noGeometryMode) const
 {
-    return dataOffset(records.size(), noGeometryMode);
+    return dataOffset((int) records.size(), noGeometryMode);
 }
 
 qint64 Index::dataOffset(int indexRecordNumber, bool noGeometryMode) const
@@ -66,7 +66,7 @@ qint64 Index::mediaSize(int from, int suggestedbufferSize, bool noGeometryMode) 
 {
     const int baseRecordSize = noGeometryMode ? header.noGeometryRecordSize() : header.recordSize;
     qint64 result = 0;
-    for (int i = from; i < records.size(); ++i)
+    for (int i = from; i < std::ssize(records); ++i)
     {
         const int count = records[i].recordCount();
         int recordSize = (baseRecordSize + records[i].extraWords * header.wordSize) * count;
@@ -122,10 +122,11 @@ bool Index::updateTail(AbstractMetadataBinaryFile* indexFile)
     }
 
     // rewrite last record if exists
-    if (!records.isEmpty())
+    if (!records.empty())
     {
-        indexFile->seek(kMetadataIndexHeaderSize + (records.size() - 1) * kIndexRecordSize);
-        return indexFile->write((const char*)&records.last(), kIndexRecordSize) == kIndexRecordSize;
+        indexFile->seek(kMetadataIndexHeaderSize + (std::ssize(records) - 1) * kIndexRecordSize);
+        return indexFile->write((const char*) &records.back(), kIndexRecordSize)
+            == kIndexRecordSize;
     }
     return true;
 }
@@ -137,7 +138,7 @@ bool Index::truncateToBytes(qint64 mediaSize, bool noGeometryMode)
     const int baseRecordSize = noGeometryMode
         ? header.noGeometryRecordSize() : header.recordSize;
 
-    for (int i = 0; i < records.size(); ++i)
+    for (int i = 0; i < std::ssize(records); ++i)
     {
         const int indexRecords = records[i].recordCount();
         const int fullRecordSize = baseRecordSize + records[i].extraWords * header.wordSize;
@@ -152,7 +153,7 @@ bool Index::truncateToBytes(qint64 mediaSize, bool noGeometryMode)
                 records[i].setRecordCount(newIndexRecords);
                 processedBytes += newIndexRecords * fullRecordSize;
                 ++i;
-                if (i == records.size())
+                if (i == std::ssize(records))
                     break;
             }
             NX_VERBOSE(this, "Metadata index is truncated from %1 to %2 records",
@@ -230,7 +231,7 @@ bool Index::load(AbstractMetadataBinaryFile& indexFile)
 
     records.resize(recordCount);
 
-    const int sizeInBytes = kIndexRecordSize * records.size();
+    const qint64 sizeInBytes = recordCount * kIndexRecordSize;
     read = indexFile.read((char*)records.data(), sizeInBytes);
     if (read != sizeInBytes)
     {
@@ -375,17 +376,26 @@ bool MetadataArchive::openFiles(qint64 timestampMs)
         return false;
     }
 
-    if (m_detailedIndexFile->size() == 0)
+    const bool isLoaded = m_detailedIndexFile->size() > 0 && m_index.load(*m_detailedIndexFile);
+    if (isLoaded)
     {
-        m_index.header.startTimeMs = m_firstTime;
-        m_detailedIndexFile->write((const char*) &m_index.header, sizeof(IndexHeader));
+        m_firstTime = m_index.header.startTimeMs;
+        if (!m_index.records.empty())
+            m_lastRecordedTime = m_index.records.back().start + m_index.header.startTimeMs;
     }
     else
     {
-        m_index.load(*m_detailedIndexFile);
-        m_firstTime = m_index.header.startTimeMs;
-        if (m_index.records.size() > 0)
-            m_lastRecordedTime = m_index.records.last().start + m_index.header.startTimeMs;
+        // The file is either new or has just been removed by load() as a corrupt one. In both
+        // cases the month is started over, so the index file must exist and hold a valid header.
+        m_index.reset();
+        if (!m_detailedIndexFile->isOpen() && !m_detailedIndexFile->openRW())
+        {
+            NX_WARNING(this, "Failed to open file %1", m_detailedIndexFile->fileName());
+            return false;
+        }
+        m_index.header.startTimeMs = m_firstTime;
+        m_detailedIndexFile->seek(0);
+        m_detailedIndexFile->write((const char*) &m_index.header, sizeof(IndexHeader));
     }
 
     if (m_index.header.noGeometryModeSupported() && m_index.header.noGeometryRecordSize() > 0)
@@ -646,14 +656,13 @@ bool addToResultDescUnordered(
     return true;
 }
 
-void MetadataArchive::loadDataFromIndex(
-    AddRecordFunc addRecordFunc,
+void MetadataArchive::loadDataFromIndex(AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const std::vector<IndexRecord>::const_iterator startItr,
+    const std::vector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(/*capacity*/ 0, kAlignment);
@@ -671,7 +680,7 @@ void MetadataArchive::loadDataFromIndex(
     qint64 dataOffset = index.dataOffset(indexRecordNumber, recordMatcher->isNoGeometryMode());
     metadataFile.seek(dataOffset);
 
-    QVector<IndexRecord>::const_iterator i = startItr;
+    std::vector<IndexRecord>::const_iterator i = startItr;
     int mediaRecordsPerIndexRecord = i->recordCount();
     while (mediaRecordsLeft > 0)
     {
@@ -716,13 +725,12 @@ void MetadataArchive::loadDataFromIndex(
     }
 }
 
-void MetadataArchive::loadDataFromIndex(
-    AddRecordFunc addRecordFunc,
+void MetadataArchive::loadDataFromIndex(AddRecordFunc addRecordFunc,
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const std::vector<IndexRecord>::const_iterator startItr,
+    const std::vector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     for(auto i = startItr; i < endItr;  ++i)
@@ -737,14 +745,13 @@ void MetadataArchive::loadDataFromIndex(
     }
 }
 
-void MetadataArchive::loadDataFromIndexDesc(
-    AddRecordFunc addRecordFunc,
+void MetadataArchive::loadDataFromIndexDesc(AddRecordFunc addRecordFunc,
     RecordMatcher* recordMatcher,
     std::function<bool()> interruptionCallback,
     AbstractMetadataBinaryFile& metadataFile,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const std::vector<IndexRecord>::const_iterator startItr,
+    const std::vector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
     nx::utils::ByteArray buffer(/*capacity*/ 0, kAlignment);
@@ -759,8 +766,8 @@ void MetadataArchive::loadDataFromIndexDesc(
         return;
 
     // math file (one month)
-    QVector<IndexRecord>::const_iterator i = endItr - 1;
-    const QVector<IndexRecord>::const_iterator itBegin = index.records.begin();
+    std::vector<IndexRecord>::const_iterator i = endItr - 1;
+    const std::vector<IndexRecord>::const_iterator itBegin = index.records.begin();
     int64_t mediaFileOffset = index.dataOffset(endItr - itBegin, recordMatcher->isNoGeometryMode());
     while (mediaRecordsLeft > 0)
     {
@@ -797,27 +804,27 @@ void MetadataArchive::loadDataFromIndexDesc(
             --mediaRecordsLeft;
             if (--mediaRecordsPerIndexRecord == 0)
             {
-                if (--i >= startItr)
-                {
-                    mediaRecordsPerIndexRecord = i->recordCount();
-                    fullRecordSize = baseRecordSize + index.extraRecordSize(i - itBegin);
-                }
+                if (i == startItr)
+                    return;
+                --i;
+                mediaRecordsPerIndexRecord = i->recordCount();
+                fullRecordSize = baseRecordSize + index.extraRecordSize(i - itBegin);
             }
         }
     }
 }
 
-void MetadataArchive::loadDataFromIndexDesc(
-    AddRecordFunc addRecordFunc,
+void MetadataArchive::loadDataFromIndexDesc(AddRecordFunc addRecordFunc,
     const Filter* filter,
     std::function<bool()> interruptionCallback,
     const Index& index,
-    const QVector<IndexRecord>::const_iterator startItr,
-    const QVector<IndexRecord>::const_iterator endItr,
+    const std::vector<IndexRecord>::const_iterator startItr,
+    const std::vector<IndexRecord>::const_iterator endItr,
     QnTimePeriodList& rez) const
 {
-    for (auto i = endItr - 1; i >= startItr; --i)
+    for (auto i = endItr; i != startItr;)
     {
+        --i;
         const qint64 fullStartTimeMs = i->start + index.header.startTimeMs;
         if (!checkPeriod(filter, fullStartTimeMs, i->duration))
             continue;
@@ -891,8 +898,8 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
                 if (metadataFile->isOpen())
                     index.truncateToBytes(metadataFile->size(), noGeometryMode);
 
-                QVector<IndexRecord>::iterator startItr = index.records.begin();
-                QVector<IndexRecord>::iterator endItr = index.records.end();
+                std::vector<IndexRecord>::iterator startItr = index.records.begin();
+                std::vector<IndexRecord>::iterator endItr = index.records.end();
 
                 if (!hasDiscontinue)
                 {

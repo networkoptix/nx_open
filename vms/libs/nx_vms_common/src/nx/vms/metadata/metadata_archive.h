@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QFile>
 #include <QtCore/QString>
-#include <QtCore/QVector>
 
 #include <nx/media/meta_data_packet.h>
 #include <nx/utils/thread/mutex.h>
@@ -132,7 +133,7 @@ struct NX_VMS_COMMON_API Index
     qint64 indexFileSize() const;
 
     IndexHeader header;
-    QVector<IndexRecord> records;
+    std::vector<IndexRecord> records;
     MetadataArchive* m_owner = nullptr;
 };
 
@@ -230,40 +231,36 @@ private:
 
     using AddRecordFunc = std::function<bool(const Filter*, qint64, qint32, QnTimePeriodList&)>;
 
-    void loadDataFromIndex(
-        AddRecordFunc addRecordFunc,
+    void loadDataFromIndex(AddRecordFunc addRecordFunc,
         RecordMatcher* recordMatcher,
         std::function<bool()> interruptionCallback,
         AbstractMetadataBinaryFile& motionFile,
         const Index& index,
-        const QVector<IndexRecord>::const_iterator startItr,
-        const QVector<IndexRecord>::const_iterator endItr,
+        const std::vector<IndexRecord>::const_iterator startItr,
+        const std::vector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
-    void loadDataFromIndex(
-        AddRecordFunc addRecordFunc,
+    void loadDataFromIndex(AddRecordFunc addRecordFunc,
         const Filter* filter,
         std::function<bool()> interruptionCallback,
         const Index& index,
-        const QVector<IndexRecord>::const_iterator startItr,
-        const QVector<IndexRecord>::const_iterator endItr,
+        const std::vector<IndexRecord>::const_iterator startItr,
+        const std::vector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
 
-    void loadDataFromIndexDesc(
-        AddRecordFunc addRecordFunc,
+    void loadDataFromIndexDesc(AddRecordFunc addRecordFunc,
         RecordMatcher* recordMatcher,
         std::function<bool()> interruptionCallback,
         AbstractMetadataBinaryFile& motionFile,
         const Index& index,
-        const QVector<IndexRecord>::const_iterator startItr,
-        const QVector<IndexRecord>::const_iterator endItr,
+        const std::vector<IndexRecord>::const_iterator startItr,
+        const std::vector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
-    void loadDataFromIndexDesc(
-        AddRecordFunc addRecordFunc,
+    void loadDataFromIndexDesc(AddRecordFunc addRecordFunc,
         const Filter* filter,
         std::function<bool()> interruptionCallback,
         const Index& index,
-        const QVector<IndexRecord>::const_iterator startItr,
-        const QVector<IndexRecord>::const_iterator endItr,
+        const std::vector<IndexRecord>::const_iterator startItr,
+        const std::vector<IndexRecord>::const_iterator endItr,
         QnTimePeriodList& rez) const;
 
 protected:
