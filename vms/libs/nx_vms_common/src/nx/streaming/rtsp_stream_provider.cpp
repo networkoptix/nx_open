@@ -329,7 +329,9 @@ QnAbstractMediaDataPtr RtspStreamProvider::getNextDataInternal()
             result->channelNumber = track.logicalChannelNum;
             if (result->dataType == QnAbstractMediaData::VIDEO)
             {
-                if (result->channelNumber >= m_numberOfVideoChannels)
+                // The count is unknown in play-now mode, there is no DESCRIBE.
+                if (m_numberOfVideoChannels > 0
+                    && result->channelNumber >= m_numberOfVideoChannels)
                 {
                     NX_DEBUG(this, "Incorrect channel number: %1, total number of channels: %2",
                         result->channelNumber, m_numberOfVideoChannels);
@@ -906,13 +908,15 @@ void RtspStreamProvider::registerPredefinedTrack(int rtpChannelNumber)
     TrackInfo trackInfo;
     trackInfo.rtpParsers.emplace(
         payloadType, std::make_unique<nx::rtp::RtpParser>(payloadType, std::move(codecParser)));
+    if (channelNumber != nx::rtp::kMetadataChannelNumber)
+        trackInfo.logicalChannelNum = channelNumber;
 
-        if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
-            m_trackIndices[rtpChannelNumber] = channelNumber;
+    if (m_RtpSession.getActualTransport() == nx::vms::api::RtpTransportType::tcp)
+        m_trackIndices[rtpChannelNumber] = channelNumber;
 
-        NX_MUTEX_LOCKER lock(&m_tracksMutex);
-        m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
-        m_tracks[channelNumber] = std::move(trackInfo);
+    NX_MUTEX_LOCKER lock(&m_tracksMutex);
+    m_tracks.resize(std::max(m_tracks.size(), size_t(channelNumber + 1)));
+    m_tracks[channelNumber] = std::move(trackInfo);
 }
 
 void RtspStreamProvider::createTrackParsers()
