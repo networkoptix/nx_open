@@ -45,6 +45,10 @@ struct NX_VMS_API CameraMediaCapability
     std::map<nx::vms::api::StreamIndex, CameraStreamCapability> streamCapabilities;
     bool hasDualStreaming = false;
     bool hasAudio = false;
+    /**%apidoc Device supports secure streaming. */
+    bool hasSecureStreaming = false;
+    /**%apidoc Secure streaming is enabled on device side. */
+    bool isSecureStreamingEnabled = false;
 
     /**%apidoc:string
      * Resolution in format `{width}x{height}`. The string either may contain width
@@ -55,7 +59,9 @@ struct NX_VMS_API CameraMediaCapability
 
     // TODO: move more fields to here like io port settings e.t.c
 };
-#define CameraMediaCapability_Fields (streamCapabilities)(hasDualStreaming)(hasAudio)(maxResolution)
+#define CameraMediaCapability_Fields \
+    (streamCapabilities)(hasDualStreaming)( \
+        hasAudio) (hasSecureStreaming) (isSecureStreamingEnabled) (maxResolution)
 QN_FUSION_DECLARE_FUNCTIONS(CameraMediaCapability, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(CameraMediaCapability, CameraMediaCapability_Fields)
 
