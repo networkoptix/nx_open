@@ -80,72 +80,57 @@ const std::string& toSdpAttribute(Purpose purpose)
     }
 }
 
+Track* Tracks::deviceTrack(nx::Uuid deviceId, TrackType trackType) const
+{
+    for (const auto& [_, track]: m_tracks)
+    {
+        if (!track->isFree() && track->deviceId == deviceId && track->trackType == trackType)
+            return track.get();
+    }
+    return nullptr;
+}
+
 Track* Tracks::videoTrack(nx::Uuid deviceId) const
 {
-    for (const auto& [_,track]: m_tracks)
-    {
-        if (track->deviceId == deviceId && track->trackType == TrackType::video)
-            return track.get();
-    }
-    return nullptr;
+    return deviceTrack(deviceId, TrackType::video);
 }
+
 Track* Tracks::audioTrack(nx::Uuid deviceId) const
 {
-    for (const auto& [_, track]: m_tracks)
-    {
-        if (track->deviceId == deviceId && track->trackType == TrackType::audio)
-            return track.get();
-    }
-    return nullptr;
+    return deviceTrack(deviceId, TrackType::audio);
 }
 
-void Tracks::removeTracks(nx::Uuid deviceId)
+void Tracks::freeTracks(nx::Uuid deviceId)
 {
-    for (auto it = m_tracks.begin(); it != m_tracks.end();)
+    for (auto& [_, track]: m_tracks)
     {
-        auto& track = it->second;
         if (track->deviceId != deviceId)
-        {
-            ++it;
             continue;
-        }
 
-        if (track->midWasOffered)
-        {
-            // Keep the mid in the recycling pool, but not under this Device: without an encoder
-            // the track describes nothing, and leaving the deviceId on it would shadow the real
-            // track (videoTrack(), audioTrack()) if the Device were added again.
-            track->offerState = TrackState::inactive;
-            track->pendingAnswer = false;
-            track->deviceId = {};
-            ++it;
-            continue;
-        }
-
-        it = m_tracks.erase(it);
+        freeTrack(track.get());
     }
 }
 
-std::vector<Track> Tracks::allTracks() const
+void Tracks::freeTrack(Track* track)
 {
-    std::vector<Track> result;
-    for (const auto& [_, track]: m_tracks)
-        result.emplace_back(*track.get());
-
-    std::ranges::sort(
-        result,
-        [](const auto& t1, const auto& t2)
-        {
-            return t1.mid < t2.mid;
-        });
-
-    return result;
+    track->offerState = TrackState::inactive;
+    track->pendingAnswer = false;
+    track->deviceId = {};
 }
 
 Track* Tracks::track(uint32_t ssrc) const
 {
-    const auto it = m_tracks.find(ssrc);
-    return it != m_tracks.end() ? it->second.get() : nullptr;
+    for (const auto& [_, track]: m_tracks)
+    {
+        if (track->ssrc == ssrc)
+            return track.get();
+    }
+    return nullptr;
+}
+
+bool Tracks::isSsrcTaken(uint32_t ssrc) const
+{
+    return track(ssrc) != nullptr;
 }
 
 uint32_t Tracks::updateSsrc(Track* track, std::optional<uint32_t> newSsrc)
@@ -157,21 +142,14 @@ uint32_t Tracks::updateSsrc(Track* track, std::optional<uint32_t> newSsrc)
     {
         do
             newSsrc = nx::utils::random::number<uint32_t>();
-        while (m_tracks.contains(*newSsrc));
+        while (isSsrcTaken(*newSsrc));
     }
-    else if (m_tracks.contains(*newSsrc))
+    else if (isSsrcTaken(*newSsrc))
     {
         return 0;
     }
 
-    auto it = m_tracks.find(track->ssrc);
-    if (!NX_ASSERT(it != m_tracks.end() && it->second.get() == track, "Foreign track"))
-        return 0;
-
-    auto ownedTrack = std::move(it->second);
-    m_tracks.erase(it);
-    ownedTrack->ssrc = *newSsrc;
-    m_tracks.emplace(*newSsrc, std::move(ownedTrack));
+    track->ssrc = *newSsrc;
     return *newSsrc;
 }
 
@@ -184,7 +162,7 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
 {
     do {
         track->ssrc = nx::utils::random::number<uint32_t>();
-    } while (m_tracks.find(track->ssrc) != m_tracks.end());
+    } while (isSsrcTaken(track->ssrc));
     track->purpose = m_session->purpose();
 
     // Find existing track with same deviceId
@@ -207,21 +185,32 @@ void Tracks::addTrack(std::unique_ptr<Track> track)
     }
     track->trackId = nx::Uuid::createUuid().toSimpleStdString();
 
-    for (auto it = m_tracks.begin(); it != m_tracks.end(); ++it)
+    // A free m-line of the same type is taken over, keeping its place in the offer; otherwise a
+    // new one is opened at the end. Either way this is a transceiver the client has not seen, so
+    // the m-line carries a mid of its own: a rejected m-line stops the transceiver behind it for
+    // good, and recycling it under the mid it used to have would tie the Device to that dead
+    // transceiver (RFC 8829 section 5.2.2).
+    int index = (int) m_tracks.size();
+    for (const auto& [freeIndex, t]: m_tracks)
     {
-        const auto& t = it->second;
-        if (t->offerState == TrackState::inactive && t->trackType == track->trackType)
+        if (t->isFree() && t->trackType == track->trackType)
         {
-            track->mid = t->mid;
-            track->midWasOffered = true;
-            m_tracks.erase(it);
+            index = freeIndex;
             break;
         }
     }
 
-    if (track->mid == -1)
-        track->mid = m_lastMid++;
-    m_tracks.emplace(track->ssrc, std::move(track));
+    track->mid = nextMid();
+    m_tracks[index] = std::move(track);
+}
+
+int Tracks::nextMid()
+{
+    // The m-line of the data channel is never recycled and holds this one for the whole session.
+    if (m_nextMid == kDataChannelMid)
+        ++m_nextMid;
+
+    return m_nextMid++;
 }
 
 std::string TracksForSend::mimeType() const
@@ -292,6 +281,17 @@ std::string Tracks::getSdpForTrack(const Track* track, uint16_t /*port*/) const
     // Mid in RTP extension is not used now.
     //sdp += "a=extmap:1 urn:ietf:params:rtp-hdrext:sdes:mid" ENDL;
     return sdp;
+}
+
+std::string Tracks::rejectedSdpForTrack(const Track* track) const
+{
+    const std::string mediaType = track->trackType == TrackType::audio ? "audio" : "video";
+
+    // Port 0 rejects the m-line, and nothing but its mid means anything while no Device backs
+    // it. The format list is not read either, but it cannot be empty, so the payload type this
+    // m-line last offered stays on it.
+    return "m=" + mediaType + " 0 UDP/TLS/RTP/SAVPF " + std::to_string(track->payloadType)
+        + "\r\na=mid:" + std::to_string(track->mid) + "\r\n";
 }
 
 std::string TracksForSend::getSdpForTrack(const Track* track, uint16_t port) const

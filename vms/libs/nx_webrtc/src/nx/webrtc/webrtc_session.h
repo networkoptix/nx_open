@@ -107,6 +107,25 @@ public:
         std::optional<float> speedOpt);
 
     /**
+     * Adds a Device to the session and starts streaming it: the asynchronous counterpart of
+     * createProvider(), for a caller that is not in the session thread. The work is posted to
+     * aioThread(), the one that owns the providers and the muxer, and `handler` -- which may be
+     * empty -- is called there with `success`, or with `nodata` for a Device that could not be
+     * added, an unknown one and one the session already has among them.
+     */
+    void addDevice(nx::Uuid deviceId,
+        std::optional<std::chrono::milliseconds> positionMs,
+        nx::vms::api::StreamIndex stream,
+        Consumer::StatusHandler handler = nullptr);
+
+    /**
+     * Removes a Device from the session: the asynchronous counterpart of removeProvider(). See
+     * addDevice() for the threading and for `handler`, which gets `nodata` for a Device the
+     * session does not have.
+     */
+    void removeDevice(nx::Uuid deviceId, Consumer::StatusHandler handler = nullptr);
+
+    /**
      * @return false, if session already locked.
      * NOTE: Cancel session deletion timer for keepAliveTimeoutSec and lock the session for other
      * ices.
@@ -144,9 +163,11 @@ private:
     std::string dataChannelSdp() const;
     std::string constructFingerprint() const;
     // Builds the encoders of one provider, and of a single track of it unless UNKNOWN is passed.
-    // Already initialized providers are left alone, so that a broken one can't fail, or shadow,
-    // the Device the caller is actually working on.
-    bool initializeMuxersInternal(nx::Uuid deviceId,
+    // `provider` has to be in the session already: the encoders are built around the tracks that
+    // addProvider() made for it. Not to be called twice for the same provider unless its encoders
+    // are meant to be rebuilt -- it re-opens the transcoder of the Device, which is what
+    // renegotiation asks for and what an ordinary caller does not.
+    bool initializeMuxer(AbstractCameraDataProvider* provider,
         QnAbstractMediaData::DataType videoOrAudio = QnAbstractMediaData::UNKNOWN);
     const QnUniversalRtpEncoder* encoderForTrack(const Track* track) const;
     void addProvider(std::shared_ptr<AbstractCameraDataProvider> provider);

@@ -28,6 +28,14 @@ public:
         nx::Uuid deviceId,
         AVCodecParameters* videoParameters,
         AVCodecParameters* audioParameters);
+
+    // Lets go of everything kept for `deviceId`. Its encoders outlive it otherwise, for the
+    // whole session, and getEncryptor() and getLastTimestamps() go on picking them.
+    void removeEncoders(nx::Uuid deviceId);
+
+    // Lets go of the encoder of a single track of `deviceId`, leaving the other one, which the
+    // Device still streams with. See removeEncoders().
+    void removeEncoder(nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio);
     void setSrtpEncryptionData(const rtsp::EncryptionData& data);
     rtsp::SrtpDecryptor* getDecryptor() const;
     nx::vms::api::WebRtcMethod method() const { return m_method; }

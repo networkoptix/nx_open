@@ -47,11 +47,13 @@ std::string generatePwd(int size)
     return result;
 }
 
-static const AVCodecID kFallbackSrtpVideoCodec = AV_CODEC_ID_VP8;
-static const AVCodecID kFallbackSrtpAudioCodec = AV_CODEC_ID_PCM_MULAW;
+// What a Device is transcoded to when the request names no codec of its own: whatever the
+// delivery method carries by default.
+static const AVCodecID kDefaultSrtpVideoCodec = AV_CODEC_ID_VP8;
+static const AVCodecID kDefaultSrtpAudioCodec = AV_CODEC_ID_PCM_MULAW;
 
-static const AVCodecID kFallbackMseVideoCodec = AV_CODEC_ID_H264;
-static const AVCodecID kFallbackMseAudioCodec = AV_CODEC_ID_AAC;
+static const AVCodecID kDefaultMseVideoCodec = AV_CODEC_ID_H264;
+static const AVCodecID kDefaultMseAudioCodec = AV_CODEC_ID_AAC;
 
 // Neither H.264 nor Opus has a statically assigned RTP payload type, so both take one from the
 // dynamic range (96-127). These are the values browsers use, which keeps the offer familiar.
@@ -107,14 +109,12 @@ Session::Session(nx::vms::common::SystemContext* context,
     {
         m_tracks = std::make_unique<TracksForRecv>(this);
         auto video = std::make_unique<Track>(Track{
-            .mid = 0,
             .payloadType = kH264PayloadType,
             .trackType = TrackType::video,
             .offerState = TrackState::active,
         });
         m_tracks->addTrack(std::move(video));
         auto audio = std::make_unique<Track>(Track{
-            .mid = 1,
             .payloadType = kOpusPayloadType,
             .trackType = TrackType::audio,
             .offerState = TrackState::active,
@@ -234,12 +234,20 @@ AbstractCameraDataProviderPtr Session::createProvider(
         return nullptr;
     }
     provider->setStreamDataFilter(m_streamDataFilter);
-    addProvider(provider);
 
     // The provider is keyed by the id of the resource the factory resolved, which is what the
     // calls below have to follow -- `deviceId` is only what was asked for.
     const auto providerId = provider->resource()->getId();
-    if (!initializeMuxersInternal(providerId))
+    if (this->provider(providerId))
+    {
+        // Adding it again would give it a second set of m-lines while m_providers kept the
+        // provider it already has, and dropProvider() would then take down the one that streams.
+        NX_WARNING(this, "Device %1 is in the session already", providerId);
+        return nullptr;
+    }
+
+    addProvider(provider);
+    if (!initializeMuxer(provider.get()))
     {
         NX_WARNING(this, "Can't create data provider for device %1", deviceId);
         // Leave the session as it was: the already streaming Devices keep their offer, and this
@@ -255,17 +263,60 @@ AbstractCameraDataProviderPtr Session::createProvider(
 
 bool Session::removeProvider(nx::Uuid deviceId)
 {
-    if (!takeProvider(deviceId))
+    if (!dropProvider(deviceId))
         return false;
-
-    if (auto track = m_tracks->videoTrack(deviceId))
-        track->offerState = TrackState::inactive;
-    if (auto track = m_tracks->audioTrack(deviceId))
-        track->offerState = TrackState::inactive;
 
     sendOffer();
 
     return true;
+}
+
+void Session::addDevice(nx::Uuid deviceId,
+    std::optional<std::chrono::milliseconds> positionMs,
+    nx::vms::api::StreamIndex stream,
+    Consumer::StatusHandler handler)
+{
+    if (!NX_ASSERT(m_consumer))
+        return;
+
+    // Providers and the muxer belong to the session thread, which is not the caller's: the
+    // signaling connection the call arrives on lives in a thread of its own.
+    m_consumer->runInMuxingThread(
+        [this, deviceId, positionMs, stream, handler = std::move(handler)]()
+        {
+            auto status = Consumer::StreamStatus::nodata;
+            try
+            {
+                if (createProvider(deviceId, positionMs, stream, std::nullopt /*speedOpt*/))
+                {
+                    m_consumer->startProvidersIfNeeded(); // TODO It looks suspicious.
+                    status = Consumer::StreamStatus::success;
+                }
+            }
+            catch (const std::exception& e)
+            {
+                NX_WARNING(this, "Can't create provider: %1", e.what());
+            }
+
+            if (handler)
+                handler(deviceId, status);
+        });
+}
+
+void Session::removeDevice(nx::Uuid deviceId, Consumer::StatusHandler handler)
+{
+    if (!NX_ASSERT(m_consumer))
+        return;
+
+    m_consumer->runInMuxingThread(
+        [this, deviceId, handler = std::move(handler)]()
+        {
+            const auto status = removeProvider(deviceId) ? Consumer::StreamStatus::success
+                                                         : Consumer::StreamStatus::nodata;
+
+            if (handler)
+                handler(deviceId, status);
+        });
 }
 
 RenegotiationResult Session::renegotiateProvider(
@@ -298,6 +349,18 @@ RenegotiationResult Session::renegotiateProvider(
         return RenegotiationResult::failed;
     }
 
+    // Nothing is packetized for an m-line that is not offered as active, so a renegotiation of
+    // one can only come from a caller that made it up. createRtpEncoders() would put the m-line
+    // back in the offer as a live one, which is the one thing a refused m-line must never be.
+    if (track->offerState != TrackState::active)
+    {
+        NX_DEBUG(this,
+            "Track %1 of device %2 is not offered, nothing to renegotiate",
+            track->mid,
+            deviceId);
+        return RenegotiationResult::failed;
+    }
+
     // Without this, every packet that hits the still-EOF encoder would start another round.
     if (track->pendingAnswer)
         return RenegotiationResult::pending;
@@ -321,12 +384,10 @@ RenegotiationResult Session::renegotiateProvider(
     track->pendingAnswer = true;
     track->resumePositionUs = resumePositionUs;
 
-    provider->setInitialized(false);
-
     // createRtpEncoders() reports success if either track got an encoder, so check this one:
     // otherwise the offer would advertise an SSRC that the (still EOF) old encoder never emits,
     // and the next packet would trigger another renegotiation.
-    if (!initializeMuxersInternal(deviceId, dataType) || encoderForTrack(track) == oldEncoder)
+    if (!initializeMuxer(provider.get(), dataType) || encoderForTrack(track) == oldEncoder)
     {
         NX_DEBUG(
             this, "No encoder for the new codec of track %1, device %2", track->mid, deviceId);
@@ -381,14 +442,22 @@ bool Session::dropProvider(nx::Uuid deviceId)
     if (!takeProvider(deviceId))
         return false;
 
-    // The Device never made it into an offer, so its tracks can go: left behind, they would
-    // describe a Device that streams nothing in every later offer, and would shadow the real
-    // ones if the client retried the same Device. A mid that addTrack() recycled from a retired
-    // m-line is kept, see Tracks::removeTracks().
-    // NOTE: Tracks belongs to the session AIO thread, which both callers of this run in. The
+    // Nothing of this Device is to be sent any more: what it has left in the queue would be
+    // packetized under the ssrc of an m-line that is not its own by then, and its encoders would
+    // outlive it for the rest of the session.
+    if (m_consumer)
+        m_consumer->clearQueueForDevice(deviceId);
+    if (m_muxer)
+        m_muxer->removeEncoders(deviceId);
+
+    // The m-lines of the Device stay in the offer, rejected, until another Device takes them:
+    // the client has seen them and they cannot disappear. Dropping the Device off them keeps
+    // them from describing a Device that streams nothing, and from shadowing the real tracks if
+    // the client adds the same Device again.
+    // NOTE: Tracks belongs to the session AIO thread, which every caller of this runs in. The
     // lock only mirrors addProvider(), where these tracks were added.
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_tracks->removeTracks(deviceId);
+    m_tracks->freeTracks(deviceId);
 
     return true;
 }
@@ -439,8 +508,8 @@ void Session::setTranscodingParams(nx::vms::api::WebRtcMethod method,
     m_muxer = std::make_unique<Transcoder>(this, m_method, m_mseFormat);
 }
 
-bool Session::initializeMuxersInternal(
-    nx::Uuid deviceId, QnAbstractMediaData::DataType videoOrAudio)
+bool Session::initializeMuxer(
+    AbstractCameraDataProvider* provider, QnAbstractMediaData::DataType videoOrAudio)
 {
     // Ignore aspect ratio if user specifies the full resolution.
     if (m_resolution && m_resolution->size.width() > 0)
@@ -450,16 +519,6 @@ bool Session::initializeMuxersInternal(
     // it already streams with, RTP sequence numbers included. See renegotiateProvider().
     const bool doVideo = videoOrAudio != QnAbstractMediaData::AUDIO;
     const bool doAudio = videoOrAudio != QnAbstractMediaData::VIDEO;
-
-    const auto provider = this->provider(deviceId);
-    if (!provider)
-    {
-        NX_DEBUG(this, "No provider of device %1 to initialize", deviceId);
-        return false;
-    }
-
-    if (provider->isInitialized())
-        return true;
 
     auto videoCodecParamaters = doVideo ? provider->getVideoCodecParameters() : nullptr;
     if (videoCodecParamaters)
@@ -481,8 +540,8 @@ bool Session::initializeMuxersInternal(
         {
             QnFfmpegVideoTranscoder::Config config(transcodePolicy);
             config.targetCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
-                ? kFallbackSrtpVideoCodec
-                : kFallbackMseVideoCodec;
+                ? kDefaultSrtpVideoCodec
+                : kDefaultMseVideoCodec;
 
             // A request that names the codec gets that codec rather than the default of the
             // delivery method: the client knows what it can decode and says so.
@@ -544,8 +603,8 @@ bool Session::initializeMuxersInternal(
         if (audioTranscodingRequired)
         {
             auto audioCodecId = m_method == nx::vms::api::WebRtcMethod::srtp
-                ? kFallbackSrtpAudioCodec
-                : kFallbackMseAudioCodec;
+                ? kDefaultSrtpAudioCodec
+                : kDefaultMseAudioCodec;
             if (!provider->addAudioTranscoder(audioCodecId))
                 return false;
 
@@ -561,7 +620,6 @@ bool Session::initializeMuxersInternal(
     {
         return false;
     }
-    provider->setInitialized(true);
     return true;
 }
 
@@ -641,7 +699,27 @@ std::string Session::constructFingerprint() const
 
 std::string Session::constructSdp()
 {
-    const auto tracks = m_tracks->allTracks();
+    const auto port = m_localAddress.port;
+
+    // An m-line with nothing to describe is still offered, rejected, so that the client keeps
+    // every m-line it has seen. Such an m-line is out of the BUNDLE group, which may name only
+    // m-lines the offer carries, or the client rejects the offer whole.
+    std::string mediaSections;
+    std::string bundleMids;
+    for (const auto& [_, track]: m_tracks->tracks())
+    {
+        const auto media = m_tracks->getSdpForTrack(track.get(), port);
+        if (media.empty())
+        {
+            mediaSections += m_tracks->rejectedSdpForTrack(track.get());
+            continue;
+        }
+
+        bundleMids += " " + std::to_string(track->mid);
+        mediaSections += media;
+        mediaSections += "a=bundle-only\r\n";
+    }
+    bundleMids += " " + std::to_string(kDataChannelMid);
 
     std::string sdp;
     std::string localAddress =
@@ -657,11 +735,8 @@ std::string Session::constructSdp()
     sdp += "a=ice-lite" ENDL;
     // Fingerprint of certificate which will be used for DTLS.
     sdp += constructFingerprint() + ENDL;
-    // Group MediaID==0 (video), mediaID==1 (audio if exists) and MediaID==2 (data).
-    sdp += "a=group:BUNDLE";
-    for (const auto& track: tracks)
-        sdp += " " + std::to_string(track.mid);
-    sdp += " " + std::to_string(kDataChannelMid) + ENDL;
+    // Every m-line the offer carries, the data channel one last.
+    sdp += "a=group:BUNDLE" + bundleMids + ENDL;
     // Inform that ice candidates will be sent later.
     sdp += "a=ice-options:trickle" ENDL;
     // Probably unused.
@@ -670,13 +745,7 @@ std::string Session::constructSdp()
     sdp += "a=ice-ufrag:" + m_localUfrag + ENDL;
     sdp += "a=ice-pwd:" + m_localPwd + ENDL;
 
-    auto port = m_localAddress.port;
-
-    for (size_t i = 0; i < tracks.size(); ++i)
-    {
-        sdp += m_tracks->getSdpForTrack(&tracks[i], port);
-        sdp += std::string("a=bundle-only") + ENDL;
-    }
+    sdp += mediaSections;
     sdp += dataChannelSdp();
     return sdp;
 }
@@ -706,19 +775,90 @@ bool Session::processSdpAnswer(const std::string& sdp)
         return false;
     }
 
+    // There is no second offer to try, so the answer is the last word on every track. One the
+    // client did not take is not offered as active any more, and nothing is packetized for it,
+    // see Transcoder::setDataPacket().
+    //
+    // How many of its offered tracks the client took, per Device: one that is in here with none
+    // taken streams nothing at all.
+    std::map<nx::Uuid, int> acceptedPerDevice;
+    std::vector<Track*> refused;
+    int offeredTracks = 0;
+    int acceptedTracks = 0;
+
+    const auto& answered = m_sdpParseResult.tracksState;
     for (auto& [_, track]: m_tracks->tracks())
     {
-        const auto state = m_sdpParseResult.tracksState[track->mid];
-        track->answerState = state;
-        if (state == TrackState::inactive && track->offerState == TrackState::active)
+        if (track->offerState != TrackState::active)
+            continue;
+
+        // An answer carries an m-line for each one of the offer it answers (RFC 3264 section 6),
+        // so a mid it says nothing about belongs to an m-line it has never been offered -- a
+        // Device added while the client was still answering an earlier offer. Reading that
+        // silence as a refusal would drop a Device the client has not been asked about yet, or
+        // end the session, if it were the only one streaming by then.
+        const auto state = answered.find(track->mid);
+        if (state == answered.end())
+            continue;
+
+        ++offeredTracks;
+        auto& accepted = acceptedPerDevice[track->deviceId];
+        if (state->second == TrackState::active)
         {
-            // There is no second round to try: the track stays inactive and the rest of the
-            // session keeps streaming.
-            NX_WARNING(this,
-                "Track %1 of device %2 was rejected by the client",
-                track->mid,
-                track->deviceId);
+            ++accepted;
+            ++acceptedTracks;
+            continue;
         }
+
+        NX_DEBUG(
+            this, "Track %1 of device %2 was rejected by the client", track->mid, track->deviceId);
+        track->offerState = TrackState::inactive;
+        refused.push_back(track.get());
+    }
+
+    // Nothing of what was offered is going to be played, and no later offer can change that, so
+    // let the client see the session end instead of waiting out the keep-alive for media that
+    // will never come.
+    if (offeredTracks > 0 && acceptedTracks == 0)
+    {
+        NX_DEBUG(this, "The client took none of the %1 tracks offered", offeredTracks);
+        return false;
+    }
+
+    // A Device left without a single track streams nothing, and the client has said as much
+    // itself, so there is nothing to renegotiate and no offer to send.
+    for (const auto& [deviceId, accepted]: acceptedPerDevice)
+    {
+        if (accepted > 0 || deviceId.isNull())
+            continue;
+
+        NX_DEBUG(this, "No track of device %1 was taken by the client, drop it", deviceId);
+        dropProvider(deviceId);
+    }
+
+    // A refused m-line is answered with port 0 and left out of the BUNDLE group, which stops the
+    // transceiver behind it for good, so offering it again as a live, bundled m-line under the
+    // same mid is what RFC 8829 section 5.2.2 forbids -- and the client is free to reject the
+    // whole offer over it, taking down the tracks it did take along with it. Hand the m-line
+    // back instead: from here on it is offered rejected, like any other free one, until
+    // addTrack() gives it to another Device under a mid of its own.
+    for (Track* track: refused)
+    {
+        if (track->deviceId.isNull())
+            continue; //< Its Device took nothing of the offer and is gone, m-lines and all.
+
+        // Whatever is encoded for it is discarded on arrival, and the encoder would otherwise
+        // outlive the m-line, for getEncryptor() and getLastTimestamps() to pick.
+        if (m_muxer)
+        {
+            m_muxer->removeEncoder(track->deviceId,
+                track->trackType == TrackType::audio ? QnAbstractMediaData::AUDIO
+                                                     : QnAbstractMediaData::VIDEO);
+        }
+
+        // NOTE: the lock mirrors the one in dropProvider(), see the note there.
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_tracks->freeTrack(track);
     }
 
     // This answer is final, there is no other round: any track renegotiated mid-session (see

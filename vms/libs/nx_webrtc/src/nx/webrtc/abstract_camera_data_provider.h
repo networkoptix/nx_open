@@ -26,10 +26,10 @@ public:
         std::function<void (const QnConstAbstractMediaDataPtr& packet)>;
 
     int64_t getPosition() const { return m_positionUs; }
-    void setPosition(int64_t positionUs) { m_positionUs = (positionUs >= 0 ? positionUs : DATETIME_NOW); }
-
-    bool isInitialized() const { return m_initialized;}
-    void setInitialized(bool value) { m_initialized = value; }
+    void setPosition(int64_t positionUs)
+    {
+        m_positionUs = (positionUs >= 0 ? positionUs : DATETIME_NOW);
+    }
     virtual bool isStarted() const = 0;
 
     void setDataConsumer(std::weak_ptr<Consumer> consumer);
@@ -71,7 +71,6 @@ public: // Playback.
 protected:
     int64_t m_positionUs = DATETIME_NOW;
     AuditHandle m_auditHandle;
-    bool m_initialized = false;
     std::weak_ptr<Consumer> m_consumer;
 };
 
