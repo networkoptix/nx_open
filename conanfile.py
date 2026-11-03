@@ -69,9 +69,11 @@ class NxOpenConan(ConanFile):
         "customization": ["ANY"],
         "installRuntimeDependencies": [True, False],
         "withAnalyticsServer": [True, False],
+        "cmakeBuildType": [None, "ANY"],
     }
     default_options = {
         "targetDevice": None,
+        "cmakeBuildType": None,
         "useClang": False,
         "withClangFormat": False,
         "customization": "metavms",
@@ -115,9 +117,14 @@ class NxOpenConan(ConanFile):
                               "cmake_target_name", f"opencv-static::{comp}")
         # Conan packages may be built with a different build_type than the CMake project
         # (e.g. Release on Linux, RelWithDebInfo on Windows/Android). Generate cmake
-        # integration for all configurations so that targets are not restricted to a single
+        # integration for the CMake build type, or for all configurations if it is unknown (e.g.
+        # multi-config generators), so that targets are not restricted to a different
         # configuration via generator expressions.
-        for config in ("Debug", "Release", "RelWithDebInfo"):
+        if self.options.cmakeBuildType:
+            configurations = (str(self.options.cmakeBuildType),)
+        else:
+            configurations = ("Debug", "Release", "RelWithDebInfo")
+        for config in configurations:
             deps.configuration = config
             deps.generate()
 
