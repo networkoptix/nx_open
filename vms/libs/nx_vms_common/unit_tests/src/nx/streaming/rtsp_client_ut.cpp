@@ -77,6 +77,166 @@ TEST(Sdp, SetupResponse2)
     ASSERT_EQ(5565, track.ioDevice->rtcpAddressInfo().address.port);
 }
 
+namespace {
+
+struct VideoAlternative
+{
+    QString profile;
+    bool hasCodec = true;
+    bool hasKeyManagement = true; //< Used for secure profiles only.
+};
+
+// SDP with audio, the given alternatives of one video stream and metadata. The video alternatives
+// get payload types 96, 97, ... in the given order.
+QString makeSdpWithAlternativeVideo(const std::vector<VideoAlternative>& alternatives)
+{
+    QString result =
+        "v=0\r\n"
+        "o=- 1 1 IN IP4 10.0.0.1\r\n"
+        "s=Live\r\n"
+        "t=0 0\r\n"
+        "m=audio 0 RTP/AVP 0\r\n"
+        "a=control:trackID=0\r\n";
+    int payloadType = 96;
+    for (const auto& alternative: alternatives)
+    {
+        const QString type = QString::number(payloadType++);
+        result += "m=video 0 " + alternative.profile + " " + type + "\r\n";
+        result += "a=control:trackID=1\r\n";
+        if (alternative.profile.startsWith("RTP/SAVP") && alternative.hasKeyManagement)
+            result += "a=key-mgmt:mikey AQAFgM0XflABAAAAAAAAAAAAAA==\r\n";
+        if (alternative.hasCodec)
+            result += "a=rtpmap:" + type + " H264/90000\r\n";
+    }
+    return result
+        + "m=application 0 RTP/AVP 107\r\n"
+        "a=control:trackID=2\r\n"
+        "a=rtpmap:107 vnd.onvif.metadata/90000\r\n";
+}
+
+} // namespace
+
+namespace {
+
+struct Session
+{
+    bool isSecureScheme = false;
+    bool isDirectTlsConnection = false;
+    nx::vms::api::RtpTransportType transport = nx::vms::api::RtpTransportType::automatic;
+};
+
+using nx::vms::api::RtpTransportType;
+constexpr Session kRtsp{false, false, RtpTransportType::automatic};
+constexpr Session kRtspsAutomatic{true, true, RtpTransportType::automatic};
+constexpr Session kRtspsTcp{true, true, RtpTransportType::tcp};
+constexpr Session kRtspsUdp{true, true, RtpTransportType::udp};
+constexpr Session kRtspsMulticast{true, true, RtpTransportType::multicast};
+constexpr Session kRtspsProxied{true, false, RtpTransportType::automatic};
+
+std::vector<QnRtspClient::StreamMedia> selectStreamMedia(
+    const nx::rtp::Sdp& sdp, const Session& session)
+{
+    return QnRtspClient::selectStreamMedia(
+        sdp, session.isSecureScheme, session.isDirectTlsConnection, session.transport);
+}
+
+} // namespace
+
+TEST(Sdp, SelectStreamMedia)
+{
+    struct TestCase
+    {
+        std::vector<VideoAlternative> alternatives;
+        Session session;
+        int expectedPayloadType = 0;
+        int expectedSecureAlternativePayloadType = 0; //< 0: none.
+    };
+    const std::vector<TestCase> testCases{
+        // The same stream as plain and secure, in both orders.
+        {{{"RTP/AVP"}, {"RTP/SAVP"}}, kRtsp, 96},
+        {{{"RTP/AVP"}, {"RTP/SAVP"}}, kRtspsUdp, 97},
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtsp, 97},
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsUdp, 96},
+        // The first alternative of the preferred security.
+        {{{"RTP/AVP"}, {"RTP/SAVPF"}, {"RTP/SAVP"}, {"RTP/AVP"}}, kRtsp, 96},
+        {{{"RTP/AVP"}, {"RTP/SAVPF"}, {"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsUdp, 97},
+        // The first alternative if there is none of the preferred security.
+        {{{"RTP/SAVP"}, {"RTP/SAVP"}}, kRtsp, 96},
+        // Unusable alternatives lose: SRTP without key management, no codec.
+        {{{"RTP/SAVP", true, false}, {"RTP/AVP"}}, kRtspsUdp, 97},
+        {{{"RTP/SAVP", false}, {"RTP/AVP"}}, kRtspsUdp, 97},
+        {{{"RTP/AVP", false}, {"RTP/SAVP"}}, kRtsp, 97},
+        // On rtsps plain RTP only if interleaved into a direct TLS connection, keeping SRTP for
+        // the case it is not.
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsAutomatic, 97, 96},
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsTcp, 97, 96},
+        {{{"RTP/AVP"}, {"RTP/SAVPF"}, {"RTP/SAVP"}}, kRtspsTcp, 96, 97},
+        {{{"RTP/SAVP", true, false}, {"RTP/AVP"}}, kRtspsTcp, 97},
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsMulticast, 96},
+        {{{"RTP/SAVP"}, {"RTP/AVP"}}, kRtspsProxied, 96},
+    };
+
+    for (size_t i = 0; i < testCases.size(); ++i)
+    {
+        SCOPED_TRACE(::testing::Message() << "Test case " << i);
+        const auto& testCase = testCases[i];
+
+        nx::rtp::Sdp sdp;
+        sdp.parse(makeSdpWithAlternativeVideo(testCase.alternatives));
+        const auto streams = selectStreamMedia(sdp, testCase.session);
+
+        // Audio, a single video stream and metadata.
+        ASSERT_EQ(3, streams.size());
+        const auto& video = streams[1];
+        ASSERT_EQ(nx::rtp::Sdp::MediaType::Video, video.media.mediaType);
+        ASSERT_EQ(testCase.expectedPayloadType, video.media.payloadType);
+        ASSERT_EQ(testCase.expectedSecureAlternativePayloadType,
+            video.secureAlternative ? video.secureAlternative->payloadType : 0);
+    }
+}
+
+TEST(Sdp, SelectStreamMediaKeepsDistinctStreams)
+{
+    // A multi-sensor device: several video tracks with different control URLs. Plus a back
+    // channel: the same control URL as the received audio, but the other direction.
+    nx::rtp::Sdp sdp;
+    sdp.parse(
+        "v=0\r\n"
+        "o=- 1 1 IN IP4 10.0.0.1\r\n"
+        "s=Live\r\n"
+        "t=0 0\r\n"
+        "m=video 0 RTP/AVP 96\r\n"
+        "a=control:trackID=1\r\n"
+        "a=rtpmap:96 H264/90000\r\n"
+        "m=video 0 RTP/SAVP 96\r\n"
+        "a=control:trackID=2\r\n"
+        "a=key-mgmt:mikey AQAFgM0XflABAAAAAAAAAAAAAA==\r\n"
+        "a=rtpmap:96 H264/90000\r\n"
+        "m=video 0 RTP/AVP 96\r\n"
+        "a=rtpmap:96 H264/90000\r\n"
+        "m=video 0 RTP/SAVP 96\r\n"
+        "a=key-mgmt:mikey AQAFgM0XflABAAAAAAAAAAAAAA==\r\n"
+        "a=rtpmap:96 H264/90000\r\n"
+        "m=audio 0 RTP/AVP 0\r\n"
+        "a=control:trackID=3\r\n"
+        "a=recvonly\r\n"
+        "m=audio 0 RTP/AVP 0\r\n"
+        "a=control:trackID=3\r\n"
+        "a=sendonly\r\n");
+    ASSERT_EQ(6, selectStreamMedia(sdp, kRtspsUdp).size());
+}
+
+TEST(Sdp, SelectStreamMediaDropsUnusableStream)
+{
+    // SRTP without key management can't be set up, even if there is no alternative.
+    nx::rtp::Sdp sdp;
+    sdp.parse(makeSdpWithAlternativeVideo({{"RTP/SAVP", true, false}}));
+    const auto streams = selectStreamMedia(sdp, kRtspsUdp);
+    ASSERT_EQ(2, streams.size());
+    ASSERT_EQ(nx::rtp::Sdp::MediaType::Audio, streams[0].media.mediaType);
+    ASSERT_EQ(nx::rtp::Sdp::MediaType::Metadata, streams[1].media.mediaType);
+}
+
 TEST(Rtsp, ParseTextMessage)
 {
     {

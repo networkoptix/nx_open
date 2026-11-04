@@ -27,6 +27,14 @@ AES256_CM_MIKEY = (
     "KO639QYLmqb2hHUjCwA="
 )
 
+# Codec parameters of the test video.
+VIDEO_FMTP = (
+    "a=fmtp:96 packetization-mode=1;profile-level-id=640028;"
+    "sprop-parameter-sets="
+    "Z2QAKK2EBUViuKxUdCAqKxXFYqOhAVFYrisVHQgKisVxWKjoQFRWK4rFR0ICorFcVio6ECSF"
+    "ITk8nyfk/k/J8nm5s00IEkKQnJ5Pk/J/J+T5PNzZprQFAW0qQAAAAwCAAAAPGBAAD0JAAAiVQ"
+    "ve+F4RCNQAAAAE=,aO48sA==\r\n")
+
 MIKEY_PARAM_ENCRYPTION_ALGORITHM = 0
 MIKEY_PARAM_ENCRYPTION_KEY_LENGTH = 1
 MIKEY_PARAM_AUTHENTICATION_ALGORITHM = 2
@@ -555,6 +563,12 @@ def serve(client, mode, video_file):
             # No session has been created, so there is nothing to tear down.
             if teardown_session is not None:
                 raise RuntimeError("Unexpected TEARDOWN without a session")
+        if mode in ("avp_savp_alternatives", "savp_avp_alternatives"):
+            # RTP/AVP and RTP/SAVP media with the same control URL are one stream (VMS-63124).
+            if setup_attempt != 1 or stream is None:
+                raise RuntimeError(
+                    "Expected one accepted SETUP of the RTP/AVP alternative, received "
+                    f"{setup_attempt} SETUP requests")
         if mode == "avp_play_rejected":
             if setup_attempt != 1 or play_attempt != 1:
                 raise RuntimeError(
@@ -602,6 +616,35 @@ def serve(client, mode, video_file):
                     ).encode()
                     client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
                     continue
+                if mode in ("avp_savp_alternatives", "savp_avp_alternatives"):
+                    # Some cameras describe each stream twice on an rtsps URL: as RTP/AVP and as
+                    # RTP/SAVP with the same control URL.
+                    avp_media = (
+                        "m=video 0 RTP/AVP 96\r\n"
+                        "c=IN IP4 0.0.0.0\r\n"
+                        "a=recvonly\r\n"
+                        "a=control:trackID=1\r\n"
+                        "a=rtpmap:96 H264/90000\r\n"
+                        f"{VIDEO_FMTP}")
+                    savp_media = (
+                        "m=video 0 RTP/SAVP 96\r\n"
+                        "c=IN IP4 0.0.0.0\r\n"
+                        "a=recvonly\r\n"
+                        "a=control:trackID=1\r\n"
+                        f"a=key-mgmt:mikey {server_mikey}\r\n"
+                        "a=rtpmap:96 H264/90000\r\n"
+                        f"{VIDEO_FMTP}")
+                    body = (
+                        "v=0\r\n"
+                        "o=- 0 0 IN IP4 127.0.0.1\r\n"
+                        "s=Alternative media functional test\r\n"
+                        "t=0 0\r\n"
+                        f"a=control:{uri}/\r\n"
+                        + (avp_media + savp_media if mode == "avp_savp_alternatives"
+                            else savp_media + avp_media)
+                    ).encode()
+                    client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
+                    continue
                 if mode in ("avp_setup_service_unavailable", "avp_play_rejected"):
                     body = (
                         "v=0\r\n"
@@ -637,11 +680,7 @@ def serve(client, mode, video_file):
                     "a=control:trackID=1\r\n"
                     f"{media_key_management}"
                     "a=rtpmap:96 H264/90000\r\n"
-                    "a=fmtp:96 packetization-mode=1;profile-level-id=640028;"
-                    "sprop-parameter-sets="
-                    "Z2QAKK2EBUViuKxUdCAqKxXFYqOhAVFYrisVHQgKisVxWKjoQFRWK4rFR0ICorFcVio6ECSF"
-                    "ITk8nyfk/k/J8nm5s00IEkKQnJ5Pk/J/J+T5PNzZprQFAW0qQAAAAwCAAAAPGBAAD0JAAAiVQ"
-                    "ve+F4RCNQAAAAE=,aO48sA==\r\n"
+                    f"{VIDEO_FMTP}"
                 ).encode()
                 client.sendall(response(200, "OK", cseq, f"Content-Base: {uri}\r\n", body))
             elif method == "SETUP":
@@ -653,6 +692,26 @@ def serve(client, mode, video_file):
                     continue
                 if mode == "avp_play_rejected":
                     setup_attempt += 1
+                    client.sendall(response(
+                        200,
+                        "OK",
+                        cseq,
+                        f"Session: {session};timeout=60\r\n"
+                        "Transport: RTP/AVP/TCP;unicast;interleaved=0-1"))
+                    continue
+                if mode in ("avp_savp_alternatives", "savp_avp_alternatives"):
+                    setup_attempt += 1
+                    transport = header(request, "Transport")
+                    # The URL is not secure, so the plain alternative must be set up, and only
+                    # once. Like the cameras from VMS-63124 over TCP, reject anything else.
+                    if (setup_attempt != 1
+                        or "trackID=1" not in uri
+                        or "RTP/AVP/TCP" not in transport
+                        or header(request, "KeyMgmt")):
+                        client.sendall(response(461, "Unsupported Transport", cseq))
+                        continue
+                    stream = GstreamerStream(client, video_file)
+                    stream.start_args = (None, None, 0x12345678, False)
                     client.sendall(response(
                         200,
                         "OK",
@@ -820,7 +879,9 @@ def main():
             "savp",
             "avp_second_track_transport_rejected",
             "avp_setup_service_unavailable",
-            "avp_play_rejected"),
+            "avp_play_rejected",
+            "avp_savp_alternatives",
+            "savp_avp_alternatives"),
         default="savp_axis")
     parser.add_argument("--rtp-transport", choices=("tcp", "udp"), required=True)
     parser.add_argument("--video-file", required=True)

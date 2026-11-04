@@ -41,6 +41,10 @@ static const int TCP_RECEIVE_TIMEOUT_MS = 1000 * 5;
 static const std::chrono::seconds kDefaultTcpConnectionTimeout(5);
 static const int SDP_TRACK_STEP = 2;
 
+static constexpr std::string_view kRtpAvpProfile = "RTP/AVP"; //< Plain RTP, RFC 3551.
+static constexpr std::string_view kRtpSavpProfile = "RTP/SAVP"; //< SRTP, RFC 3711.
+static constexpr std::string_view kRtpSavpfProfile = "RTP/SAVPF"; //< SRTP with feedback, RFC 5124.
+
 using namespace std::chrono;
 
 namespace {
@@ -69,6 +73,28 @@ auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
 bool equalsIgnoreCase(std::string_view left, std::string_view right)
 {
     return nx::utils::stricmp(left, right) == 0;
+}
+
+bool isSecureProfile(std::string_view protocol)
+{
+    return equalsIgnoreCase(protocol, kRtpSavpProfile)
+        || equalsIgnoreCase(protocol, kRtpSavpfProfile);
+}
+
+// Media lines that describe the same stream and so can't be set up separately.
+bool isAlternative(const nx::rtp::Sdp::Media& left, const nx::rtp::Sdp::Media& right)
+{
+    return !left.control.isEmpty() && left.control == right.control
+        && left.mediaType == right.mediaType && left.sendOnly == right.sendOnly;
+}
+
+// Media without a codec, or SRTP media without MIKEY key management, can't be set up.
+bool isUsableMedia(
+    const nx::rtp::Sdp::Media& media, const std::vector<std::string>& sessionSdpAttributes)
+{
+    return !media.rtpmap.codecName.isEmpty()
+        && (!isSecureProfile(media.protocol)
+            || nx::streaming::rtsp::getMikeyPayload(media, sessionSdpAttributes));
 }
 
 bool isKeyManagementFailure(const QByteArray& response)
@@ -455,10 +481,14 @@ bool QnRtspClient::parseSDP(const QByteArray& response)
     if (m_sdp.media.size() > 0 && m_sdp.media[0].connectionAddress.isMulticast())
         m_transport = nx::vms::api::RtpTransportType::multicast;
 
-    for (const auto& media: m_sdp.media)
+    const bool isSecureScheme =
+        m_url.scheme().toLower() == nx::network::rtsp::kSecureUrlSchemeName;
+    for (auto& stream:
+        selectStreamMedia(m_sdp, isSecureScheme, m_isDirectTlsConnection, m_transport))
     {
-        if (!media.rtpmap.codecName.isEmpty())
-            m_sdpTracks.emplace_back(media, this, m_transport, media.serverPort);
+        auto& track =
+            m_sdpTracks.emplace_back(stream.media, this, m_transport, stream.media.serverPort);
+        track.secureAlternative = std::move(stream.secureAlternative);
     }
 
     m_sdpTracks.erase(std::remove_if(
@@ -479,6 +509,65 @@ bool QnRtspClient::parseSDP(const QByteArray& response)
     }
 
     return true;
+}
+
+std::vector<QnRtspClient::StreamMedia> QnRtspClient::selectStreamMedia(const nx::rtp::Sdp& sdp,
+    bool isSecureScheme,
+    bool isDirectTlsConnection,
+    nx::vms::api::RtpTransportType transport)
+{
+    // Interleaved RTP is protected by TLS. Automatic transport tries TCP first.
+    const bool isInterleaved = transport == nx::vms::api::RtpTransportType::tcp
+        || transport == nx::vms::api::RtpTransportType::automatic;
+    const bool preferSecure = isSecureScheme && !(isDirectTlsConnection && isInterleaved);
+
+    // Usable media lines of each stream, in the SDP order.
+    std::vector<std::vector<const nx::rtp::Sdp::Media*>> streams;
+    size_t usableMediaCount = 0;
+    for (const auto& media: sdp.media)
+    {
+        if (!isUsableMedia(media, sdp.sdpAttributes))
+            continue;
+
+        ++usableMediaCount;
+        const auto stream = std::ranges::find_if(streams,
+            [&media](const auto& stream) { return isAlternative(*stream.front(), media); });
+        if (stream == streams.end())
+            streams.push_back({&media});
+        else
+            stream->push_back(&media);
+    }
+    NX_DEBUG(NX_SCOPE_TAG, "Use %1 of %2 SDP media", usableMediaCount, sdp.media.size());
+
+    std::vector<StreamMedia> result;
+    for (auto& stream: streams)
+    {
+        // The first media of the preferred security is selected, else the first media.
+        std::ranges::stable_partition(stream,
+            [&](const nx::rtp::Sdp::Media* media)
+            { return isSecureProfile(media->protocol) == preferSecure; });
+        const nx::rtp::Sdp::Media* media = stream.front();
+        if (stream.size() > 1)
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Select %1 of %2 alternative SDP media for %3",
+                media->protocol,
+                stream.size(),
+                media->control);
+        }
+
+        std::optional<nx::rtp::Sdp::Media> secureAlternative;
+        if (isSecureScheme && !isSecureProfile(media->protocol))
+        {
+            const auto secure = std::ranges::find_if(stream,
+                [](const nx::rtp::Sdp::Media* alternative)
+                { return isSecureProfile(alternative->protocol); });
+            if (secure != stream.end())
+                secureAlternative = **secure;
+        }
+        result.push_back({*media, std::move(secureAlternative)});
+    }
+    return result;
 }
 
 void QnRtspClient::parseRangeHeader(const QString& rangeStr)
@@ -535,6 +624,7 @@ CameraDiagnostics::Result QnRtspClient::open(const nx::Url& url, qint64 startTim
             "Bearer token authorization can't be used with insecure url scheme.");
     }
 
+    m_isDirectTlsConnection = isSslRequired && !m_proxySocket && !m_proxyAddress;
     if (m_proxySocket)
     {
         setTcpSocket(std::move(m_proxySocket));
@@ -901,11 +991,12 @@ std::optional<QnRtspClient::SetupRequest> QnRtspClient::createSetupRequest(const
     addCommonHeaders(result.request.headers);
 
     // Generating transport header.
-    nx::String transportStr = "RTP/AVP/";
-    if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savp"))
-        transportStr = "RTP/SAVP/";
-    else if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savpf"))
-        transportStr = "RTP/SAVPF/";
+    std::string_view profile = kRtpAvpProfile;
+    if (equalsIgnoreCase(track.sdpMedia.protocol, kRtpSavpProfile))
+        profile = kRtpSavpProfile;
+    else if (equalsIgnoreCase(track.sdpMedia.protocol, kRtpSavpfProfile))
+        profile = kRtpSavpfProfile;
+    nx::String transportStr = nx::String(profile) + "/";
     transportStr += transport == nx::vms::api::RtpTransportType::tcp ? "TCP" : "UDP";
 
     transportStr +=
@@ -1095,11 +1186,35 @@ bool QnRtspClient::sendSetup()
             m_actualTransport.value_or(m_transport == nx::vms::api::RtpTransportType::automatic
                     ? nx::vms::api::RtpTransportType::tcp
                     : m_transport);
+        const auto switchToSecureAlternative = [this, &track]()
+        {
+            if (!track.secureAlternative)
+                return false;
+            NX_DEBUG(this,
+                "Use %1 SDP media instead of %2 for %3",
+                track.secureAlternative->protocol,
+                track.sdpMedia.protocol,
+                track.sdpMedia.control);
+            track.sdpMedia = *std::exchange(track.secureAlternative, std::nullopt);
+            return true;
+        };
+
+        // Plain RTP is used only if it is interleaved into the TLS connection.
+        if (setupTransport != nx::vms::api::RtpTransportType::tcp)
+            switchToSecureAlternative();
         auto setupResult = sendSetupWithTransport(setupUrl, track, i, setupTransport);
+
+        // The device may accept only SRTP.
+        if (!setupResult && setupTransport == nx::vms::api::RtpTransportType::tcp
+            && switchToSecureAlternative())
+        {
+            setupResult = sendSetupWithTransport(setupUrl, track, i, setupTransport);
+        }
 
         if (!setupResult && isTransportProbe)
         {
             setupTransport = nx::vms::api::RtpTransportType::udp;
+            switchToSecureAlternative();
             setupResult = sendSetupWithTransport(setupUrl, track, i, setupTransport);
         }
 
@@ -1279,8 +1394,7 @@ nx::network::http::Request QnRtspClient::createPlayRequest( qint64 startPos, qin
     bool hasSrtpTrack = false;
     for (const auto& track: m_sdpTracks)
     {
-        if (equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savp")
-            || equalsIgnoreCase(track.sdpMedia.protocol, "rtp/savpf"))
+        if (isSecureProfile(track.sdpMedia.protocol))
         {
             hasSrtpTrack = true;
             break;

@@ -1312,23 +1312,53 @@ uint32_t RtspResourceStreamProvider::numberOfVideoChannels() const
 
 void RtspResourceStreamProvider::at_numberOfVideoChannelsChanged()
 {
-    QString manualConfiguredLayout = m_resource->configuredVideoLayout();
-    if (m_numberOfVideoChannels > 1 && manualConfiguredLayout.isEmpty())
-    {
-        NX_MUTEX_LOCKER lock(&m_layoutMutex);
-        QString newVideoLayout;
-        m_customVideoLayout = QnCustomResourceVideoLayoutPtr(
-            new QnCustomResourceVideoLayout(QSize(m_numberOfVideoChannels, 1)));
-        for (uint32_t i = 0; i < m_numberOfVideoChannels; ++i)
-            m_customVideoLayout->setChannel(i, 0, i); // arrange multi video layout from left to right
+    if (!m_resource->configuredVideoLayout().isEmpty())
+        return;
 
-        newVideoLayout = m_customVideoLayout->toString();
-        if (m_role == Qn::CR_LiveVideo &&
-            m_resource->setProperty(nx::vms::api::device_properties::kVideoLayout, newVideoLayout))
+    // Arrange multi video layout from left to right.
+    const auto makeVideoLayout = [](uint32_t channelCount)
+    {
+        auto layout = QnCustomResourceVideoLayoutPtr(
+            new QnCustomResourceVideoLayout(QSize(channelCount, 1)));
+        for (uint32_t i = 0; i < channelCount; ++i)
+            layout->setChannel(i, 0, i);
+        return layout;
+    };
+
+    NX_MUTEX_LOCKER lock(&m_layoutMutex);
+    if (m_numberOfVideoChannels > 1)
+    {
+        m_customVideoLayout = makeVideoLayout(m_numberOfVideoChannels);
+        if (m_role == Qn::CR_LiveVideo
+            && m_resource->setProperty(
+                nx::vms::api::device_properties::kVideoLayout, m_customVideoLayout->toString()))
         {
             m_resource->saveProperties();
         }
+        return;
     }
+
+    m_customVideoLayout.reset();
+    if (m_role != Qn::CR_LiveVideo || !m_resource->allowRtspVideoLayout())
+        return;
+
+    // The stream has a single video track now, so a layout saved above for an earlier stream with
+    // several video tracks is stale. Only an exact match is dropped, other layouts are kept.
+    const QString videoLayout =
+        m_resource->getProperty(nx::vms::api::device_properties::kVideoLayout);
+    if (videoLayout.isEmpty())
+        return;
+
+    const QSize size = QnCustomResourceVideoLayout::fromString(videoLayout)->size();
+    if (size.height() != 1 || size.width() <= 1
+        || videoLayout != makeVideoLayout(size.width())->toString())
+    {
+        return;
+    }
+
+    NX_DEBUG(this, "Reset video layout %1: the stream has a single video track", videoLayout);
+    if (m_resource->setProperty(nx::vms::api::device_properties::kVideoLayout, QString()))
+        m_resource->saveProperties();
 }
 
 bool RtspResourceStreamProvider::isRtcpReportsForced() const

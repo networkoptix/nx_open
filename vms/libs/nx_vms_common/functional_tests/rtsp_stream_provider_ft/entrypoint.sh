@@ -120,6 +120,9 @@ run_test rtsp_server.py avp_second_track_transport_rejected tcp 8562 "" automati
 run_test rtsp_server.py avp_setup_service_unavailable tcp 8564 "" tcp 2
 # A rejected PLAY must tear down the session created by SETUP.
 run_test rtsp_server.py avp_play_rejected tcp 8565 "" tcp 2
+# RTP/AVP and RTP/SAVP media with the same control URL are one stream, set up once.
+run_test rtsp_server.py avp_savp_alternatives tcp 8566 "$EXPECTED_VIDEO_SHA256"
+run_test rtsp_server.py savp_avp_alternatives tcp 8567 "$EXPECTED_VIDEO_SHA256"
 
 # Secure RTSP tests.
 run_test gstreamer_rtsp_server.py savp tcp 8555 "$EXPECTED_VIDEO_SHA256"

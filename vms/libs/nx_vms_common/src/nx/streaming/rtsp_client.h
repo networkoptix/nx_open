@@ -192,6 +192,9 @@ public:
         std::shared_ptr<QnRtspIoDevice> ioDevice;
         std::shared_ptr<nx::rtsp::SrtpDecryptor> srtpDecryptor;
         std::shared_ptr<nx::rtsp::SrtpEncryptor> srtpEncryptor;
+        // The SRTP alternative of the plain sdpMedia, used unless the track is interleaved into
+        // the TLS connection.
+        std::optional<nx::rtp::Sdp::Media> secureAlternative;
     };
     QnRtspClient(const Config& config);
 
@@ -360,6 +363,18 @@ public:
     QElapsedTimer lastReceivedDataTimer() const;
 
     bool parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
+
+    struct StreamMedia
+    {
+        nx::rtp::Sdp::Media media;
+        std::optional<nx::rtp::Sdp::Media> secureAlternative;
+    };
+
+    static std::vector<StreamMedia> selectStreamMedia(const nx::rtp::Sdp& sdp,
+        bool isSecureScheme,
+        bool isDirectTlsConnection,
+        nx::vms::api::RtpTransportType transport);
+
     std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
     QString sessionId() const { return m_SessionId; }
 
@@ -471,6 +486,7 @@ private:
     // Empty until SETUP selects a concrete RTP transport; never contains automatic.
     std::optional<nx::vms::api::RtpTransportType> m_actualTransport;
     bool m_doSendOptions = true;
+    bool m_isDirectTlsConnection = false;
 
     struct RtpChannel
     {
