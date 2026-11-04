@@ -35,12 +35,6 @@ Item
     function openPresetList() { state = "presets" }
     function openMoveOnTap() { state = "moveOnTap" }
 
-    function selectPreset(index)
-    {
-        presetViewModel.setCurrentPreset(index)
-        reset()
-    }
-
     state: "default"
 
     onActiveChanged:
@@ -62,6 +56,14 @@ Item
                 return control.overlayStyle ? null : moveOnTapSheetPage
 
             return control.overlayStyle ? null : panelSheetPage
+        }
+
+        function closePage()
+        {
+            if (control.overlayStyle)
+                sheet.close() //< Reset the state after the sheet is closed.
+            else
+                control.reset()
         }
 
         visible: control.active && !!currentPage
@@ -87,7 +89,7 @@ Item
         {
             if (!control.overlayStyle)
                 control.closed()
-            else if (control.state === "presets")
+            else if (currentPage)
                 control.reset()
         }
 
@@ -140,7 +142,11 @@ Item
 
                 model: presetViewModel.presets
                 currentIndex: presetViewModel.currentPresetIndex
-                onSelected: (index) => control.selectPreset(index)
+                onSelected: (index) =>
+                {
+                    presetViewModel.setCurrentPreset(index)
+                    sheet.closePage()
+                }
             }
         }
 
@@ -150,7 +156,7 @@ Item
         {
             text: sheet.currentPage?.cancelButtonText ?? ""
             type: Button.LightInterface
-            onClicked: control.reset()
+            onClicked: sheet.closePage()
         }
     }
 
