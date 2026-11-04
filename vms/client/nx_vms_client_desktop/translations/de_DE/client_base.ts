@@ -8633,7 +8633,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Änderungen übernehmen?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -11688,7 +11688,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Änderungen übernehmen?</translation>
     </message>
     <message>
       <source>Discard</source>
