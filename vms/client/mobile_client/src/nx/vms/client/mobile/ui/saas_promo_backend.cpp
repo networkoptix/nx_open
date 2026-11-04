@@ -7,8 +7,8 @@
 
 #include <core/resource/user_resource.h>
 #include <nx/branding.h>
-#include <nx/utils/url.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/client/core/utils/saas_promo_url.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/application_context.h>
 #include <nx/vms/client/mobile/settings/local_settings.h>
@@ -102,7 +102,11 @@ void SaasPromoBackend::dismiss()
 
 void SaasPromoBackend::openPromoUrl()
 {
-    const auto url = nx::Url::fromUserInput(nx::branding::saasPromoUrl());
+    if (!m_context)
+        return;
+
+    const auto url = core::saasPromoUrl(
+        core::SaasPromoClientType::mobile, m_context->globalSettings()->cloudSystemId());
     if (url.isValid())
         QDesktopServices::openUrl(url.toQUrl());
 }
