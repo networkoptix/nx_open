@@ -20,6 +20,18 @@ const int kMediaQueueSize = 512;
 // client that ignores mid-session offers.
 constexpr std::chrono::seconds kRenegotiationTimeout(10);
 
+namespace {
+
+struct CannotDecryptMedia
+{
+    nx::Uuid deviceId;
+    std::chrono::milliseconds timestampMs{};
+};
+NX_REFLECTION_INSTRUMENT(CannotDecryptMedia, (deviceId)(timestampMs))
+NX_REFLECTION_TAG_TYPE(CannotDecryptMedia, jsonSerializeChronoDurationAsNumber)
+
+} // namespace
+
 Consumer::Consumer(Session* session):
     m_mediaQueue(kMediaQueueSize),
     m_pollable(session->aioThread()),
@@ -86,7 +98,10 @@ void Consumer::startProvidersIfNeeded()
             for (auto& provider: m_session->allProviders())
             {
                 if (!provider->isStarted())
+                {
+                    m_undecryptableTimestampsUs.erase(provider->resource()->getId());
                     provider->play(provider->getPosition(), false);
+                }
             }
         });
 }
@@ -118,11 +133,13 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
 
             if (!deviceId.isNull())
             {
+                m_undecryptableTimestampsUs.erase(deviceId);
                 auto provider = m_session->provider(deviceId);
                 doSeek(timestampUs, provider, handler);
             }
             else
             {
+                m_undecryptableTimestampsUs.clear();
                 for (const auto& provider: m_session->allProviders())
                     doSeek(timestampUs, provider, handler);
             }
@@ -357,6 +374,31 @@ void Consumer::processNextData()
         {
             sendMetadata(metadata);
             return;
+        }
+
+        if (metadata && metadata->metadataType == MetadataType::MediaStreamEvent)
+        {
+            if (metadata->toMediaEventPacket().code != nx::media::StreamEvent::cannotDecryptMedia)
+                continue;
+
+            // Report each packet once, see m_undecryptableTimestampsUs.
+            const auto [reported, isNew] =
+                m_undecryptableTimestampsUs.try_emplace(metadata->deviceId, metadata->timestamp);
+            if (!isNew && reported->second == metadata->timestamp)
+                continue;
+
+            reported->second = metadata->timestamp;
+            nx::reflect::json::SerializationContext ctx;
+            ctx.flags = 0; //< Device id without braces, as in the other messages.
+            ctx.composer.startObject();
+            ctx.composer.writeAttributeName("cannotDecryptMedia");
+            nx::reflect::json::serialize(&ctx,
+                CannotDecryptMedia{.deviceId = metadata->deviceId,
+                    .timestampMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::microseconds(metadata->timestamp))});
+            ctx.composer.endObject(1);
+            m_streamer->ice()->writeDataChannelString(ctx.composer.take());
+            continue;
         }
 
         const auto deviceId = media->deviceId;
