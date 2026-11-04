@@ -10,7 +10,6 @@ using namespace nx::vms::common::system_health;
 
 static const std::set<MessageType> kMessagesNotSupportedBySaas{
     MessageType::noLicenses,
-    MessageType::saasPromo,
 };
 
 static const std::set<MessageType> kMessagesSpecificForSaas{
@@ -89,6 +88,7 @@ bool isMessageVisibleInSettings(MessageType message)
     switch (message)
     {
         case MessageType::cloudPromo:
+        case MessageType::saasPromo:
         case MessageType::defaultCameraPasswords:
         case MessageType::notificationLanguageDiffers:
 

@@ -59,6 +59,9 @@ public:
     Property<bool> channelPartnerUserNotificationClosed{this,
         "channelPartnerUserNotificationClosed"};
 
+    /** SaaS Promo informer on a site was closed by user. */
+    Property<bool> saasPromoClosed{this, "saasPromoClosed"};
+
     Property<RadassModeByLayoutItemIdHash> localLayoutItemRadassModes{this,
         "localLayoutItemRadassModes"};
 

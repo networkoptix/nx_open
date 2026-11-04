@@ -131,8 +131,8 @@ SystemHealthListModel::Private::Private(SystemHealthListModel* q):
     connect(systemHealthState, &SystemHealthState::stateChanged, this, &Private::toggleItem);
     connect(systemHealthState, &SystemHealthState::dataChanged, this, &Private::updateItem);
 
-    for (const auto index: common::system_health::allMessageTypes({
-        common::system_health::isMessageVisibleInSettings}))
+    for (const auto index:
+        common::system_health::allMessageTypes({common::system_health::isMessageVisible}))
     {
         if (systemHealthState->state(index))
             doAddItem(Message{.type = index}, true /*initial*/);

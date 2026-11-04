@@ -27,6 +27,7 @@
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/system_health/cloud_storage_watcher.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
@@ -224,7 +225,14 @@ SystemHealthState::Private::Private(SystemHealthState* q):
 
     connect(systemSettings(), &SystemSettings::cloudSettingsChanged, q, updateSlot(saasPromo));
 
-    connect(&showOnceSettings()->saasPromo, &ShowOnceSettings::BaseProperty::changed, q,
+    connect(systemContext()->saasServiceManager(),
+        &saas::ServiceManager::dataChanged,
+        q,
+        updateSlot(saasPromo));
+
+    connect(&systemContext()->localSettings()->saasPromoClosed,
+        &SystemSpecificLocalSettings::BaseProperty::changed,
+        q,
         updateSlot(saasPromo));
 
     update(SystemHealthIndex::saasPromo);
@@ -513,7 +521,9 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
             return user() && user()->isAdministrator()
                 && !systemSettings()->cloudSystemId().isEmpty()
                 && systemSettings()->organizationId().isNull()
-                && !nx::branding::saasPromoUrl().isEmpty() && !showOnceSettings()->saasPromo();
+                && !saas::saasInitialized(systemContext()->saasServiceManager())
+                && !nx::branding::saasPromoUrl().isEmpty()
+                && !systemContext()->localSettings()->saasPromoClosed();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");

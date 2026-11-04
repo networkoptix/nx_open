@@ -40,7 +40,8 @@ void SystemSpecificLocalSettings::resetWarningsForAllSystems()
     for (const auto& path: list)
     {
         std::unique_ptr<FileSystemBackend> backend(new FileSystemBackend(path));
-        backend->writeValue("channelPartnerUserNotificationClosed", "false");
+        backend->writeValue(channelPartnerUserNotificationClosed.name, "false");
+        backend->writeValue(saasPromoClosed.name, "false");
     }
 
     // Update the current instance. The changed() signals are sent inside.

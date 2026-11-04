@@ -121,6 +121,12 @@ QHash<QString, BaseProperty*> Storage::properties() const
 
 void Storage::loadProperty(BaseProperty* property)
 {
+    if (!m_backend->exists(property->name))
+    {
+        property->resetToDefault();
+        return;
+    }
+
     QString rawValue = readValue(property->name);
     if (property->secure)
         rawValue = crypt::decodeStringFromHexStringAES128CBC(rawValue, m_securityKey);

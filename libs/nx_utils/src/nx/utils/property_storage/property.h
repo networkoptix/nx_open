@@ -27,6 +27,7 @@ public:
     virtual void loadSerializedValue(const QString& value) = 0;
     virtual QVariant variantValue() const = 0;
     virtual void setVariantValue(const QVariant& value) = 0;
+    virtual void resetToDefault() = 0;
     bool exists() const;
 
     /** Default value string representation for the documentation. */
@@ -112,6 +113,8 @@ public:
     {
         setValue(value.value<T>());
     }
+
+    virtual void resetToDefault() override { setValue(m_defaultValue); }
 
     virtual QString defaultValueDoc() const override
     {

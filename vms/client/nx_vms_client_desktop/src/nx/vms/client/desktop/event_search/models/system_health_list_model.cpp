@@ -10,6 +10,7 @@
 #include <nx/vms/client/desktop/event_search/right_panel_globals.h>
 #include <nx/vms/client/desktop/menu/action_manager.h>
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
+#include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/notification_levels.h>
@@ -161,7 +162,7 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
         }
         else if (messageType == MessageType::saasPromo)
         {
-            executeLater([]() { showOnceSettings()->saasPromo = true; }, this);
+            executeLater([this]() { system()->localSettings()->saasPromoClosed = true; }, this);
             break;
         }
         else if (messageType == MessageType::cloudStorageIsAvailable)
