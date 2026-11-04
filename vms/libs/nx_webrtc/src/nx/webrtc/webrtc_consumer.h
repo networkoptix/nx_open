@@ -4,6 +4,7 @@
 
 #include <atomic>
 #include <deque>
+#include <map>
 
 #include <nx/media/annexb_to_mp4.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -91,6 +92,10 @@ private:
     int64_t m_lastReportedTimestampUs = AV_NOPTS_VALUE;
     std::chrono::milliseconds m_sendTimestampInterval {1000};
     bool m_sendInProgress = false;
+    // The Archive delegate repeats cannotDecryptMedia for the same packet until it is decrypted,
+    // so the last reported packet is kept per device, as a session can stream several devices, to
+    // report it once. Reset on seek and on start, to report the packet again.
+    std::map<nx::Uuid, int64_t> m_undecryptableTimestampsUs;
     const std::string m_sessionId;
 };
 

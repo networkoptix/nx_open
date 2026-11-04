@@ -2488,6 +2488,16 @@ static void registerDeviceHandlers(
      *   "timestampMs": 1674240507000,
      *   "status": 0
      * }</code></pre>
+     * When the Archive at the playback position is encrypted with an unknown password, the
+     * stream stops and the following message is sent once for the position, and again after a
+     * seek:
+     * <pre><code>{
+     *   "cannotDecryptMedia": {
+     *     "deviceId": "550e8400-e29b-41d4-a716-446655440000",
+     *     "timestampMs": 1674240507000
+     *   }
+     * }</code></pre>
+     * The stream continues when a key that decrypts the Archive is added.
      *
      * %jsonrpc[unused]
      * %caption Open WebRTC Tracker
