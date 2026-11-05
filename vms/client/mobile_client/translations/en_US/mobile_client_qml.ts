@@ -107,6 +107,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Log In to Organization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow user to log in to organization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Mirror Timeline</source>
         <translation type="unfinished"></translation>
     </message>
