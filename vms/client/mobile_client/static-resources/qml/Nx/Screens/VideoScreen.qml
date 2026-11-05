@@ -703,7 +703,10 @@ Page
 
         showPlaybackControls: d.hasArchive
         hasChunkNavigation: d.hasChunkNavigation
-        showCalendarControl: d.hasArchive
+
+        // For now we don't have any sort of timeline in the fullscreen, and calendar there is
+        // meaningless.
+        showCalendarControl: false
 
         hasActionButton: actionSheet.hasActions
         controlsVisibilityOverride:

@@ -161,6 +161,23 @@ NxObject
             return (mediaPlayer.liveMode && d.playing) ? -1 : mediaPlayer.position
         }
 
+        // Live (-1) resolved to the current time.
+        function absolutePosition(position)
+        {
+            return position === -1 ? NxGlobals.syncNowMs() : position
+        }
+
+        // Distance between the positions, 0 if any of them is invalid.
+        function positionDelta(oldPosition, newPosition)
+        {
+            oldPosition = absolutePosition(oldPosition)
+            newPosition = absolutePosition(newPosition)
+
+            return NxGlobals.isValidTime(oldPosition) && NxGlobals.isValidTime(newPosition)
+                ? newPosition - oldPosition
+                : 0
+        }
+
         onDesiredSpeedChanged:
         {
             if (!controller.playingLive)
@@ -381,23 +398,48 @@ NxObject
         }
     }
 
+    // Returns the jump distance in milliseconds, 0 if it is unknown.
     function jumpToNextChunk()
     {
-        const jumpToLive = nextChunkMs === -1
-        forcePosition(nextChunkMs, /*save*/ true)
+        const oldPosition = mediaPlayer.position
+        const newPosition = nextChunkMs
+        const jumpToLive = newPosition === -1
+
+        forcePosition(newPosition, /*save*/ true)
         if (jumpToLive)
             playLive()
+
+        return d.positionDelta(oldPosition, newPosition)
     }
 
+    // Returns the jump distance in milliseconds, 0 if it is unknown or there was no jump.
+    function jumpToPreviousChunk()
+    {
+        const newPosition = prevChunkMs
+        if (!NxGlobals.isValidTime(newPosition))
+            return 0
+
+        const oldPosition = mediaPlayer.position
+        forcePosition(newPosition, /*save*/ true)
+        return d.positionDelta(oldPosition, newPosition)
+    }
+
+    function jumpToFirstChunk()
+    {
+        if (NxGlobals.isValidTime(firstChunkMs))
+            forcePosition(firstChunkMs)
+    }
+
+    // Shifts the position by the given distance of recorded content, skipping the gaps between
+    // chunks, or switches to live if the shifted position reaches it. Does nothing when shifting
+    // forward in live, or before the first chunk. Returns the actual position change in
+    // milliseconds (gaps included), 0 if there was no jump.
     function jumpDistance(distance)
     {
         if (mediaPlayer.liveMode && distance >= 0)
             return 0
 
-        const oldPosition = mediaPlayer.position === -1
-            ? NxGlobals.syncNowMs()
-            : mediaPlayer.position
-
+        const oldPosition = d.absolutePosition(mediaPlayer.position)
         if (!NxGlobals.isValidTime(oldPosition))
             return 0
 
@@ -415,18 +457,6 @@ NxObject
             forcePosition(newPosition)
             return newPosition - oldPosition
         }
-    }
-
-    function jumpToPreviousChunk()
-    {
-        if (NxGlobals.isValidTime(prevChunkMs))
-            forcePosition(prevChunkMs, /*save*/ true)
-    }
-
-    function jumpToFirstChunk()
-    {
-        if (NxGlobals.isValidTime(firstChunkMs))
-            forcePosition(firstChunkMs)
     }
 
     function setResource(resource)

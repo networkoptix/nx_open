@@ -289,6 +289,45 @@ Item
         }
     }
 
+    ControlButton
+    {
+        id: pausedIndicator
+
+        readonly property bool shown: control.showPlaybackControls
+            && !opacityController.controlsShown
+            && !control.scrubbingActive
+            && !controller.playing
+
+        opacity: shown ? 1 : 0
+        visible: opacity > 0
+        enabled: false
+        suppressDisabledState: true
+
+        foregroundColor: ColorTheme.transparent(ColorTheme.colors.light1, 0.5)
+        backgroundColor: ColorTheme.transparent(ColorTheme.colors.dark3, 0.15)
+
+        text: "PAUSED" //< Intentionally not translatable.
+
+        icon.source: "image://skin/20x20/Solid/pause.svg"
+        icon.width: 20
+        icon.height: 20
+        leftPadding: 6
+        spacing: 0
+
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.margins: 16
+
+        Behavior on opacity
+        {
+            NumberAnimation
+            {
+                duration: 300
+                easing.type: Easing.InOutQuad
+            }
+        }
+    }
+
     Item
     {
         id: controlsContainer
@@ -430,7 +469,12 @@ Item
                 enabled: NxGlobals.isValidTime(controller.prevChunkMs)
                 opacity: enabled ? 1 : 0.3
 
-                onClicked: controller.jumpToPreviousChunk()
+                onClicked:
+                {
+                    const skippedMs = controller.jumpToPreviousChunk()
+                    if (skippedMs !== 0)
+                        control.showDurationHint(skippedMs)
+                }
             }
 
             ControlButton
@@ -470,7 +514,12 @@ Item
                 enabled: !controller.playingLive
                 opacity: enabled ? 1 : 0.3
 
-                onClicked: controller.jumpToNextChunk()
+                onClicked:
+                {
+                    const skippedMs = controller.jumpToNextChunk()
+                    if (skippedMs !== 0)
+                        control.showDurationHint(skippedMs)
+                }
             }
         }
     }
