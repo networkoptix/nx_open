@@ -259,6 +259,10 @@ DBResult SqlQuery::getLastError()
         const auto nativeErrorCode = m_sqlQuery.lastError().nativeErrorCode();
         if (nativeErrorCode == "1062") //< ERROR 1062 (23000): Duplicate entry
             res.code = DBResultCode::uniqueConstraintViolation;
+        else if (nativeErrorCode == "1213") //< ER_LOCK_DEADLOCK: whole transaction is rolled back.
+            res.code = DBResultCode::retryLater;
+        else if (nativeErrorCode == "1205") //< ER_LOCK_WAIT_TIMEOUT
+            res.code = DBResultCode::retryLater;
     }
 
     res.text = lastError.text().toStdString();
