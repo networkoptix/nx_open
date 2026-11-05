@@ -4,6 +4,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/url.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 #include <nx/vms/client/desktop/system_context_aware.h>
 
@@ -36,14 +37,18 @@ private:
 
     void atResourcesRemoved(const QnResourceList& resources);
     void atUserChanged(const QnUserResourcePtr& user);
+    void atServerAddressChanged();
 
     void disconnectCamera();
+    void reconnectCamera();
 
     /** Update current server. */
     void setServer(const QnMediaServerResourcePtr& server);
 
 private:
     QnMediaServerResourcePtr m_server;
+    nx::Url m_serverUrl;
+
     core::DesktopResourcePtr m_desktop;
 };
 

@@ -5,17 +5,14 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/network/network_module.h>
-#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/audio_only/desktop_audio_only_resource.h>
+#include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
 #include <nx/vms/client/core/system_context.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 
 using namespace nx::vms::client;
 
-namespace nx {
-namespace client {
-namespace mobile {
+namespace nx::client::mobile {
 
 ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
     nx::vms::client::core::SystemContext* systemContext,
@@ -25,14 +22,6 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
     SystemContextAware(systemContext)
 {
     const auto userWatcher = systemContext->userWatcher();
-
-    auto serverVersion = systemContext->moduleInformation().version;
-    if (serverVersion < nx::utils::SoftwareVersion(6, 1))
-    {
-        // To support servers 6.0 and before.
-        m_desktop.reset(new vms::client::core::DesktopAudioOnlyResource());
-        m_desktop->addToSystemContext(systemContext);
-    }
 
     connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &ServerAudioConnectionWatcher::handleResourceAdded);
@@ -44,8 +33,6 @@ ServerAudioConnectionWatcher::ServerAudioConnectionWatcher(
         this, &ServerAudioConnectionWatcher::handleRemoteIdChanged);
 
     handleRemoteIdChanged();
-    for (const auto& resource: resourcePool()->getResources<nx::vms::client::core::DesktopResource>())
-        handleResourceAdded(resource);
 }
 
 void ServerAudioConnectionWatcher::tryRemoveCurrentServerConnection()
@@ -66,13 +53,7 @@ void ServerAudioConnectionWatcher::tryAddCurrentServerConnection()
 
 void ServerAudioConnectionWatcher::handleResourceAdded(const QnResourcePtr& resource)
 {
-    if (const auto desktopResource = resource.dynamicCast<nx::vms::client::core::DesktopResource>())
-    {
-        tryRemoveCurrentServerConnection();
-        m_desktop = desktopResource;
-        tryAddCurrentServerConnection();
-    }
-    else if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
     {
         if (serverResource->getId() == m_remoteServerId)
         {
@@ -84,15 +65,7 @@ void ServerAudioConnectionWatcher::handleResourceAdded(const QnResourcePtr& reso
 
 void ServerAudioConnectionWatcher::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    if (const auto desktopResource = resource.dynamicCast<nx::vms::client::core::DesktopResource>())
-    {
-        if (desktopResource != m_desktop)
-            return;
-
-        tryRemoveCurrentServerConnection();
-        m_desktop.reset();
-    }
-    else if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
+    if (const auto serverResource = resource.dynamicCast<QnMediaServerResource>())
     {
         if (serverResource->getId() == m_remoteServerId)
         {
@@ -102,17 +75,36 @@ void ServerAudioConnectionWatcher::handleResourceRemoved(const QnResourcePtr& re
     }
 }
 
+void ServerAudioConnectionWatcher::updateLegacyDesktopResource()
+{
+    // Servers 6.0 and before receive two-way audio through the desktop camera connection.
+    const bool isRequired = !m_remoteServerId.isNull()
+        && systemContext()->moduleInformation().version < nx::utils::SoftwareVersion(6, 1);
+
+    if (isRequired && !m_desktop)
+    {
+        m_desktop.reset(new vms::client::core::DesktopAudioOnlyResource());
+        resourcePool()->addResource(m_desktop);
+    }
+    else if (!isRequired && m_desktop)
+    {
+        resourcePool()->removeResource(m_desktop);
+        m_desktop.reset();
+    }
+}
+
 void ServerAudioConnectionWatcher::handleRemoteIdChanged()
 {
     tryRemoveCurrentServerConnection();
+    m_server.reset();
 
     m_remoteServerId = systemContext()->currentServerId();
+    updateLegacyDesktopResource();
+
     if (m_remoteServerId.isNull())
         return;
 
     handleResourceAdded(resourcePool()->getResourceById<QnMediaServerResource>(m_remoteServerId));
 }
 
-} // namespace mobile
-} // namespace client
-} // namespace nx
+} // namespace nx::client::mobile

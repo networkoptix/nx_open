@@ -7,12 +7,7 @@
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/client/core/resource/resource_fwd.h>
 
-namespace nx::network::http {
-
-class HttpClient;
-class Credentials;
-
-} // namespace nx::network::http
+namespace nx::network::http { class HttpClient; } // namespace nx::network::http
 
 namespace nx::vms::client::core {
 
@@ -25,11 +20,7 @@ public:
     typedef QnLongRunnable base_type;
 
     DesktopCameraConnection(
-        DesktopResourcePtr owner,
-        const QnMediaServerResourcePtr& server,
-        const nx::Uuid& userId,
-        const nx::Uuid& moduleGuid,
-        const nx::network::http::Credentials& credentials);
+        DesktopResourcePtr owner, const QnMediaServerResourcePtr& server, nx::Uuid userId);
     virtual ~DesktopCameraConnection();
 
     virtual void pleaseStop() override;

@@ -5,7 +5,6 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/common/application_context.h>
 #include <nx/vms/common/system_context.h>
-#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/long_runable_cleanup.h>
 
 #include "desktop_camera_connection.h"
@@ -53,12 +52,7 @@ void DesktopResource::initializeConnection(
     NX_ASSERT(!m_connection, "Double initialization");
     disconnectFromServer();
 
-    m_connection.reset(new DesktopCameraConnection(
-        toSharedPointer(this),
-        server,
-        userId,
-        systemContext()->peerId(),
-        systemContext()->credentials()));
+    m_connection.reset(new DesktopCameraConnection(toSharedPointer(this), server, userId));
     m_connection->start();
 
     NX_DEBUG(this, "Desktop camera connection opened. User id: %1", userId);
