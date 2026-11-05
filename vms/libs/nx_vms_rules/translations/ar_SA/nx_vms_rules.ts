@@ -369,7 +369,7 @@
     <name>nx::vms::rules::ActionTextFieldValidator</name>
     <message>
       <source>Empty text is not allowed</source>
-      <translation type="unfinished">Empty text is not allowed</translation>
+      <translation>النص الفارغ غير مسموح به</translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
@@ -400,29 +400,29 @@
     </message>
     <message>
       <source>And attributes</source>
-      <translation type="unfinished">And attributes</translation>
+      <translation>و السمات</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsEventTypeFieldValidator</name>
     <message>
       <source>Analytics event type is not selected</source>
-      <translation type="unfinished">Analytics event type is not selected</translation>
+      <translation>لم يتم تحديد نوع حدث التحليلات</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::AnalyticsObjectEvent</name>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>تم الكشف عن كائن</translation>
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>تم اكتشاف كائن تحليلي</translation>
     </message>
     <message>
       <source>And Object</source>
-      <translation type="unfinished">And Object</translation>
+      <translation>و الكائن</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -434,18 +434,18 @@
     <name>nx::vms::rules::AnalyticsObjectTypeFieldValidator</name>
     <message>
       <source>Analytics object type is not selected</source>
-      <translation type="unfinished">Analytics object type is not selected</translation>
+      <translation>لم يتم تحديد نوع كائن التحليلات</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::BookmarkAction</name>
     <message>
       <source>Create Bookmark</source>
-      <translation type="unfinished">Create Bookmark</translation>
+      <translation>إنشاء علامة مرجعية</translation>
     </message>
     <message>
       <source>Add Tags</source>
-      <translation type="unfinished">Add Tags</translation>
+      <translation>أضف وسما</translation>
     </message>
   </context>
   <context>
@@ -456,41 +456,41 @@
     </message>
     <message>
       <source>Action Throttling</source>
-      <translation type="unfinished">Action Throttling</translation>
+      <translation>خنق الحركة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::CameraInputEvent</name>
     <message>
       <source>Input Port: %1</source>
-      <translation type="unfinished">Input Port: %1</translation>
+      <translation>منفذ الإدخال: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation type="unfinished">Input on %1</translation>
+      <translation>إدخال على %1</translation>
     </message>
     <message>
       <source>Input Signal on Device</source>
-      <translation type="unfinished">Input Signal on Device</translation>
+      <translation>إشارة الإدخال على الجهاز</translation>
     </message>
     <message>
       <source>With ID</source>
-      <translation type="unfinished">With ID</translation>
+      <translation>مع المعرف</translation>
     </message>
     <message>
       <source>Input Signal on Camera</source>
-      <translation type="unfinished">Input Signal on Camera</translation>
+      <translation>إشارة الإدخال على الكاميرا</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceDisconnectedEvent</name>
     <message>
       <source>Device Disconnected</source>
-      <translation type="unfinished">Device Disconnected</translation>
+      <translation>الجهاز غير متصل.</translation>
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation type="unfinished">Camera Disconnected</translation>
+      <translation>الكاميرا غير متصلة</translation>
     </message>
     <message>
       <source>Device</source>
@@ -502,65 +502,65 @@
     </message>
     <message>
       <source>Device disconnected</source>
-      <translation type="unfinished">Device disconnected</translation>
+      <translation>الجهاز غير متصل.</translation>
     </message>
     <message>
       <source>Camera disconnected</source>
-      <translation type="unfinished">Camera disconnected</translation>
+      <translation>الكاميرا غير متصلة</translation>
     </message>
     <message>
       <source>I/O Module disconnected</source>
-      <translation type="unfinished">I/O Module disconnected</translation>
+      <translation>وحدة I/O غير متصلة</translation>
     </message>
     <message>
       <source>Device disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Device disconnected at %1</translation>
+      <translation>الجهاز غير متصل عند %1</translation>
     </message>
     <message>
       <source>Camera disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Camera disconnected at %1</translation>
+      <translation>تم فصل الكاميرا عند %1</translation>
     </message>
     <message>
       <source>I/O Module disconnected at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">I/O Module disconnected at %1</translation>
+      <translation>تم فصل وحدة الإدخال/الإخراج عند %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::DeviceIpConflictEvent</name>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation type="unfinished">Conflicting Address: %1</translation>
+      <translation>عنوان متعارض: %1</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Device IP Conflict at %1</translation>
+      <translation>تعارض في عنوان IP للجهاز عند %1</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation type="unfinished">Camera IP Conflict at %1</translation>
+      <translation>تعارض في عنوان IP للكاميرا في %1</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
-      <translation type="unfinished">Device IP Conflict</translation>
+      <translation>تعارض عناوين IP للجهاز</translation>
     </message>
     <message>
       <source>Camera IP Conflict</source>
-      <translation type="unfinished">Camera IP Conflict</translation>
+      <translation>تعارض عناوين IP للكاميرا</translation>
     </message>
     <message>
       <source>Device #%1: %2 (%3)</source>
       <comment>Device #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Device #%1: %2 (%3)</translation>
+      <translation>الجهاز #%1: %2 (%3)</translation>
     </message>
     <message>
       <source>Camera #%1: %2 (%3)</source>
       <comment>Camera #1: &lt;device_name&gt; (MAC address)</comment>
-      <translation type="unfinished">Camera #%1: %2 (%3)</translation>
+      <translation>الكاميرا #%1: %2 (%3)</translation>
     </message>
   </context>
   <context>
@@ -571,7 +571,7 @@
     </message>
     <message>
       <source>Device Output</source>
-      <translation type="unfinished">Device Output</translation>
+      <translation>مخرج الجهاز</translation>
     </message>
   </context>
   <context>
@@ -586,7 +586,7 @@
     </message>
     <message>
       <source>Camera Recording</source>
-      <translation type="unfinished">Camera Recording</translation>
+      <translation>تسجيل الكاميرا</translation>
     </message>
     <message>
       <source>On</source>
@@ -601,11 +601,11 @@
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>تعيين إلى شاشة كاملة</translation>
     </message>
     <message>
       <source>Set for</source>
-      <translation type="unfinished">Set for</translation>
+      <translation>تعيين لـ</translation>
     </message>
   </context>
   <context>
@@ -619,38 +619,38 @@
     <name>nx::vms::rules::FanErrorEvent</name>
     <message>
       <source>Fan Failure</source>
-      <translation type="unfinished">Fan Failure</translation>
+      <translation>عطل في المروحة</translation>
     </message>
     <message>
       <source>Fan failure at %1</source>
-      <translation type="unfinished">Fan failure at %1</translation>
+      <translation>عطل في المروحة عند %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::GenericEvent</name>
     <message>
       <source>Generic Event</source>
-      <translation type="unfinished">Generic Event</translation>
+      <translation>حدث عام</translation>
     </message>
     <message>
       <source>Omit logging</source>
-      <translation type="unfinished">Omit logging</translation>
+      <translation>حذف التسجيل</translation>
     </message>
     <message>
       <source>And Source</source>
-      <translation type="unfinished">And Source</translation>
+      <translation>والمصدر</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation type="unfinished">Generic Event at %1</translation>
+      <translation>حدث عام في %1</translation>
     </message>
     <message>
       <source>Related devices:</source>
-      <translation type="unfinished">Related devices:</translation>
+      <translation>الأجهزة ذات الصلة:</translation>
     </message>
     <message>
       <source>Related cameras:</source>
-      <translation type="unfinished">Related cameras:</translation>
+      <translation>الكاميرات ذات الصلة:</translation>
     </message>
   </context>
   <context>
@@ -661,7 +661,7 @@
     </message>
     <message>
       <source>HTTP(S) Request</source>
-      <translation type="unfinished">HTTP(S) Request</translation>
+      <translation>طلب HTTP(S)</translation>
     </message>
     <message>
       <source>URL</source>
@@ -673,22 +673,22 @@
     </message>
     <message>
       <source>HTTP authentication</source>
-      <translation type="unfinished">HTTP authentication</translation>
+      <translation>مصادقة HTTP</translation>
     </message>
     <message>
       <source>Custom headers</source>
-      <translation type="unfinished">Custom headers</translation>
+      <translation>رؤوس مخصصة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::HttpAuthFieldValidator</name>
     <message>
       <source>User &amp; password fields should be filled in case of basic or digest auth method selected</source>
-      <translation type="unfinished">User &amp; password fields should be filled in case of basic or digest auth method selected</translation>
+      <translation>يجب ملء خانات اسم المستخدم وكلمة المرور في حالة اختيار طريقة المصادقة الأساسية أو طريقة المصادقة الموجزة.</translation>
     </message>
     <message>
       <source>Token field should be filled in case of bearer auth type selected</source>
-      <translation type="unfinished">Token field should be filled in case of bearer auth type selected</translation>
+      <translation>يجب ملء حقل الرمز المميز في حالة تحديد المصادقة باستخدام رمز التوثيق</translation>
     </message>
   </context>
   <context>
@@ -696,25 +696,25 @@
     <message numerus="yes">
       <source>Some of the headers are not valid</source>
       <comment>Numerus form depends on the amount of invalid headers</comment>
-      <translation type="unfinished">
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
-        <numerusform>Some of the headers are not valid</numerusform>
+      <translation>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
+        <numerusform>بعض العناوين غير صالحة</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All the headers are not valid</source>
       <comment>Numerus form depends on the total amount of headers</comment>
-      <translation type="unfinished">
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
-        <numerusform>All the headers are not valid</numerusform>
+      <translation>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
+        <numerusform>جميع العناوين غير صالحة</numerusform>
       </translation>
     </message>
   </context>
@@ -722,7 +722,7 @@
     <name>nx::vms::rules::HttpMethodFieldValidator</name>
     <message>
       <source>Not allowed HTTP method</source>
-      <translation type="unfinished">Not allowed HTTP method</translation>
+      <translation>طريقة HTTP غير مسموح بها</translation>
     </message>
   </context>
   <context>
@@ -740,26 +740,26 @@
     <name>nx::vms::rules::IntegrationDiagnosticEvent</name>
     <message>
       <source>For Plugin</source>
-      <translation type="unfinished">For Plugin</translation>
+      <translation>للملحق</translation>
     </message>
     <message>
       <source>And Level Is</source>
-      <translation type="unfinished">And Level Is</translation>
+      <translation>والمستوى هو</translation>
     </message>
     <message>
       <source>Integration Diagnostic at %1</source>
-      <translation type="unfinished">Integration Diagnostic at %1</translation>
+      <translation>تشخيص التكامل في %1</translation>
     </message>
     <message>
       <source>Integration Diagnostic</source>
-      <translation type="unfinished">Integration Diagnostic</translation>
+      <translation>تشخيص التكامل</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LayoutFieldValidator</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>اختر المخطط</translation>
     </message>
   </context>
   <context>
@@ -778,143 +778,143 @@
     </message>
     <message>
       <source>Failed to connect to the LDAP server.</source>
-      <translation type="unfinished">Failed to connect to the LDAP server.</translation>
+      <translation>فشل الاتصال بخادم LDAP.</translation>
     </message>
     <message>
       <source>Failed to complete the sync within a %1 timeout.</source>
       <comment>Timeout duration in human-readable form (ex.: 1 minute)</comment>
-      <translation type="unfinished">Failed to complete the sync within a %1 timeout.</translation>
+      <translation>فشل في إكمال المزامنة خلال مهلة زمنية قدرها %1.</translation>
     </message>
     <message>
       <source>No user accounts on LDAP server match the synchronization settings.</source>
-      <translation type="unfinished">No user accounts on LDAP server match the synchronization settings.</translation>
+      <translation>لا توجد حسابات مستخدم على خادم LDAP تطابق إعدادات المزامنة.</translation>
     </message>
     <message>
       <source>Some LDAP users or groups were not found in the LDAP database.</source>
-      <translation type="unfinished">Some LDAP users or groups were not found in the LDAP database.</translation>
+      <translation>لم يتم العثور على بعض مستخدمي أو مجموعات LDAP في قاعدة بيانات LDAP.</translation>
     </message>
     <message>
       <source>LDAP Sync Issue at %1</source>
-      <translation type="unfinished">LDAP Sync Issue at %1</translation>
+      <translation>مشكلة مزامنة LDAP في %1</translation>
     </message>
     <message>
       <source>LDAP Sync Issue</source>
-      <translation type="unfinished">LDAP Sync Issue</translation>
+      <translation>مشكلة مزامنة LDAP</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::LicenseIssueEvent</name>
     <message>
       <source>License Issue</source>
-      <translation type="unfinished">License Issue</translation>
+      <translation>مشكلة بالرخصة</translation>
     </message>
     <message>
       <source>Not enough licenses on %1</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">Not enough licenses on %1</translation>
+      <translation>لا توجد تراخيص كافية على %1</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following devices:</source>
-      <translation type="unfinished">Recording has been disabled on the following devices:</translation>
+      <translation>تم تعطيل التسجيل على الأجهزة التالية:</translation>
     </message>
     <message>
       <source>Recording has been disabled on the following cameras:</source>
-      <translation type="unfinished">Recording has been disabled on the following cameras:</translation>
+      <translation>تم تعطيل التسجيل على الكاميرات التالية:</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::MotionEvent</name>
     <message>
       <source>Motion on %1</source>
-      <translation type="unfinished">Motion on %1</translation>
+      <translation>الحركة على %1</translation>
     </message>
     <message>
       <source>Motion on Camera</source>
-      <translation type="unfinished">Motion on Camera</translation>
+      <translation>الحركة على الكاميرا</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NetworkIssueEvent</name>
     <message>
       <source>Network Issue</source>
-      <translation type="unfinished">Network Issue</translation>
+      <translation>مشكلة في الشبكة</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
-      <translation type="unfinished">
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
-        <numerusform>No data received during last %n seconds.</numerusform>
+      <translation>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
+        <numerusform>لم يتم استلام أي بيانات خلال آخر %n ثانية.</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1).</source>
-      <translation type="unfinished">RTP error in primary stream (%1).</translation>
+      <translation>خطأ RTP في البث الاساسي (%1).</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1).</source>
-      <translation type="unfinished">RTP error in secondary stream (%1).</translation>
+      <translation>خطأ RTP في البث الثانوي (%1).</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation type="unfinished">RTP packet loss detected.</translation>
+      <translation>تم اكتشاف فقدان حزمة RTP.</translation>
     </message>
     <message>
       <source>Camera time is back to normal.</source>
-      <translation type="unfinished">Camera time is back to normal.</translation>
+      <translation>عاد وقت الكاميرا إلى طبيعته.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation type="unfinished">Device does not respond to network requests.</translation>
+      <translation>الجهاز لا يستجيب لطلبات الشبكة.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on primary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on primary stream.</translation>
+      <translation>العنوان %1 قيد الاستخدام بالفعل بواسطة %2 على التدفق الأساسي.</translation>
     </message>
     <message>
       <source>Address %1 is already in use by %2 on secondary stream.</source>
       <comment>%1 is the address, %2 is the device name</comment>
-      <translation type="unfinished">Address %1 is already in use by %2 on secondary stream.</translation>
+      <translation>العنوان %1 قيد الاستخدام بالفعل بواسطة %2 على التدفق الثانوي.</translation>
     </message>
     <message>
       <source>Multicast address conflict detected.</source>
-      <translation type="unfinished">Multicast address conflict detected.</translation>
+      <translation>تم اكتشاف تعارض في عنوان البث المتعدد.</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address.</source>
-      <translation type="unfinished">Network address %1 is not a multicast address.</translation>
+      <translation>عنوان الشبكة %1 ليس عنوان بث متعدد.</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (primary stream) was unexpectedly closed.</translation>
+      <translation>تم إغلاق الاتصال بالكاميرا (البث الرئيسي) بشكل غير متوقع.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to camera (secondary stream) was unexpectedly closed.</translation>
+      <translation>تم إغلاق الاتصال بالكاميرا (البث الثانوي) بشكل غير متوقع.</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation type="unfinished">Connection to device was unexpectedly closed.</translation>
+      <translation>تم إغلاق الاتصال بالجهاز بشكل غير متوقع.</translation>
     </message>
     <message>
       <source>Failed to force using camera time, as it lags too much. Site time will be used instead.</source>
-      <translation type="unfinished">Failed to force using camera time, as it lags too much. Site time will be used instead.</translation>
+      <translation>تعذر استخدام وقت الكاميرا بسبب التأخير الكبير. سيتم استخدام وقت الموقع بدلاً من ذلك.</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
       <comment>%1 is a server name</comment>
-      <translation type="unfinished">Network Issue at %1</translation>
+      <translation>مشكلة في الشبكة في %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::NotificationAction</name>
     <message>
       <source>Show Desktop Notification</source>
-      <translation type="unfinished">Show Desktop Notification</translation>
+      <translation>إظهار إشعار سطح المكتب</translation>
     </message>
     <message>
       <source>Force Acknowledgment</source>
@@ -925,15 +925,15 @@
     <name>nx::vms::rules::ObjectLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>لم يتم تحديد القائمة</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>القائمة التي تحمل المعرّف المحدد &apos;%1&apos; غير موجودة</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; has invalid object type - &apos;%2&apos;, expected - &apos;%3&apos;</translation>
+      <translation>القائمة ذات المعرّف المحدد  &apos;%1&apos; تحتوي على نوع كائن غير صالح - &apos;%2&apos;، المتوقع هو - &apos;%3&apos;</translation>
     </message>
   </context>
   <context>
@@ -947,25 +947,25 @@
     <name>nx::vms::rules::OptionalTimeFieldValidator</name>
     <message>
       <source>Zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Zero duration cannot be set for the `%1` event state</translation>
+      <translation>لا يمكن ضبط مدة صفرية لحالة الحدث `%1`</translation>
     </message>
     <message>
       <source>Non zero duration cannot be set for the `%1` event state</source>
-      <translation type="unfinished">Non zero duration cannot be set for the `%1` event state</translation>
+      <translation>لا يمكن تحديد مدة غير صفرية لحالة الحدث `%1`</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PanicRecordingAction</name>
     <message>
       <source>Panic Recording</source>
-      <translation type="unfinished">Panic Recording</translation>
+      <translation>تسجيل حالة الذعر</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PlaySoundAction</name>
     <message>
       <source>Play Sound</source>
-      <translation type="unfinished">Play Sound</translation>
+      <translation>تشغيل الصوت</translation>
     </message>
   </context>
   <context>
@@ -980,38 +980,38 @@
     </message>
     <message>
       <source>PoE Over Budget</source>
-      <translation type="unfinished">PoE Over Budget</translation>
+      <translation>PoE فوق الحد المسموح</translation>
     </message>
     <message>
       <source>PoE over budget on %1</source>
-      <translation type="unfinished">PoE over budget on %1</translation>
+      <translation>PoE فوق الحد المسموح على %1</translation>
     </message>
     <message>
       <source>Current power consumption: %1 watts</source>
-      <translation type="unfinished">Current power consumption: %1 watts</translation>
+      <translation>استهلاك الطاقة الحالي: %1 واط</translation>
     </message>
     <message>
       <source>Upper consumption limit: %1 watts</source>
-      <translation type="unfinished">Upper consumption limit: %1 watts</translation>
+      <translation>الحد الأقصى للاستهلاك: %1 واط</translation>
     </message>
     <message>
       <source>Lower consumption limit: %1 watts</source>
-      <translation type="unfinished">Lower consumption limit: %1 watts</translation>
+      <translation>الحد الأدنى للاستهلاك: %1 واط</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::PtzPresetAction</name>
     <message>
       <source>Execute PTZ Preset</source>
-      <translation type="unfinished">Execute PTZ Preset</translation>
+      <translation>تنفيذ الإعداد المسبق لكاميرا PTZ</translation>
     </message>
     <message>
       <source>PTZ Preset</source>
-      <translation type="unfinished">PTZ Preset</translation>
+      <translation>إعدادات PTZ المسبقة</translation>
     </message>
     <message>
       <source>Execute to users</source>
-      <translation type="unfinished">Execute to users</translation>
+      <translation>تنفيذ للمستخدمين</translation>
     </message>
   </context>
   <context>
@@ -1022,104 +1022,104 @@
     </message>
     <message>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>المحتوى </translation>
     </message>
     <message>
       <source>Send Mobile Notification</source>
-      <translation type="unfinished">Send Mobile Notification</translation>
+      <translation>إرسال إشعار عبر الهاتف المحمول</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::RepeatSoundAction</name>
     <message>
       <source>Sound</source>
-      <translation type="unfinished">Sound</translation>
+      <translation>صوت</translation>
     </message>
     <message>
       <source>Repeat Sound</source>
-      <translation type="unfinished">Repeat Sound</translation>
+      <translation>تكرار الصوت</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::Rule</name>
     <message>
       <source>`%1` event filter field alerts:</source>
-      <translation type="unfinished">`%1` event filter field alerts:</translation>
+      <translation>'%1` تنبيهات حقل تصفية الأحداث:</translation>
     </message>
     <message>
       <source>`%1` action builder field alerts:</source>
-      <translation type="unfinished">`%1` action builder field alerts:</translation>
+      <translation>'%1` تنبيهات حقل إنشاء الإجراء:</translation>
     </message>
     <message>
       <source>Rule is not completed. One filter and one builder are required</source>
-      <translation type="unfinished">Rule is not completed. One filter and one builder are required</translation>
+      <translation>القاعدة غير مكتملة. مرشح واحد و وحدة بناء واحدة مطلوبة</translation>
     </message>
     <message>
       <source>The given filter is not compatible with the given builder</source>
-      <translation type="unfinished">The given filter is not compatible with the given builder</translation>
+      <translation>الفلتر المُعطى غير متوافق مع أداة الإنشاء المُعطاة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SaasIssueEvent</name>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
       </translation>
     </message>
     <message>
       <source>Services Issue</source>
-      <translation type="unfinished">Services Issue</translation>
+      <translation>مشكلة في الخدمات</translation>
     </message>
     <message>
       <source>Failed to migrate licenses.</source>
-      <translation type="unfinished">Failed to migrate licenses.</translation>
+      <translation>تعذرت عملية نقل التراخيص.</translation>
     </message>
     <message>
       <source>Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</source>
-      <translation type="unfinished">Skipped import of licenses. Another migration attempt will be automatically scheduled for later.</translation>
+      <translation>تم تخطي استيراد التراخيص. سيتم جدولة محاولة نقل أخرى تلقائيًا في وقت لاحق.</translation>
     </message>
     <message>
       <source>Services Issue on %1</source>
-      <translation type="unfinished">Services Issue on %1</translation>
+      <translation>مشكلة في الخدمات على %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SendEmailAction</name>
     <message>
       <source>Email Message</source>
-      <translation type="unfinished">Email Message</translation>
+      <translation>رسالة بريد إلكتروني</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation type="unfinished">Send Email</translation>
+      <translation>إرسال البريد إلكتروني</translation>
     </message>
     <message>
       <source>Additional Recipients</source>
@@ -1130,77 +1130,77 @@
     <name>nx::vms::rules::ServerCertificateErrorEvent</name>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>خطأ في شهادة الخادم</translation>
     </message>
     <message>
       <source>%1 certificate error</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 certificate error</translation>
+      <translation>%1 خطأ في الشهادة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerConflictEvent</name>
     <message>
       <source>Server Conflict</source>
-      <translation type="unfinished">Server Conflict</translation>
+      <translation>تعارض في الخادم</translation>
     </message>
     <message>
       <source>%1 Conflict</source>
       <comment>Server name will be substituted</comment>
-      <translation type="unfinished">%1 Conflict</translation>
+      <translation>%1 تضارب </translation>
     </message>
     <message>
       <source>Discovered a server with the same ID in the same local network</source>
-      <translation type="unfinished">Discovered a server with the same ID in the same local network</translation>
+      <translation>تم اكتشاف خادم بنفس المعرف في نفس الشبكة المحلية</translation>
     </message>
     <message>
       <source>Servers in the same local network have conflict on the following devices</source>
-      <translation type="unfinished">Servers in the same local network have conflict on the following devices</translation>
+      <translation>الخوادم في نفس الشبكة المحلية تعاني من تضارب على الأجهزة التالية</translation>
     </message>
     <message>
       <source>Server: %1</source>
-      <translation type="unfinished">Server: %1</translation>
+      <translation>الخادم: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerFailureEvent</name>
     <message>
       <source>Server Failure</source>
-      <translation type="unfinished">Server Failure</translation>
+      <translation>عطل في الخادم</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation type="unfinished">Connection to server is lost.</translation>
+      <translation>انقطع الاتصال بالخادم.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation type="unfinished">Server stopped unexpectedly.</translation>
+      <translation>توقف الخادم بشكل غير متوقع.</translation>
     </message>
     <message>
       <source>%1 Failure</source>
-      <translation type="unfinished">%1 Failure</translation>
+      <translation>%1 فشل</translation>
     </message>
     <message>
       <source>The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</source>
-      <translation type="unfinished">The local database was found to be corrupted and could not be recovered. A new empty database has been initialized. A backup copy of the corrupted database has been saved for reference.</translation>
+      <translation>تبين أن قاعدة البيانات المحلية تالفة ولا يمكن استعادتها. تم إنشاء قاعدة بيانات جديدة فارغة. تم حفظ نسخة احتياطية من قاعدة البيانات التالفة للرجوع إليها.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation type="unfinished">Server Started</translation>
+      <translation>تم تشغيل الخادم</translation>
     </message>
     <message>
       <source>%1 Started</source>
-      <translation type="unfinished">%1 Started</translation>
+      <translation>%1 بدأ</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation type="unfinished">Show on Alarm Layout</translation>
+      <translation>عرض على تخطيط الإنذار</translation>
     </message>
     <message>
       <source>Alarm: %1</source>
@@ -1208,14 +1208,14 @@
     </message>
     <message>
       <source>Force Alarm Layout Opening</source>
-      <translation type="unfinished">Force Alarm Layout Opening</translation>
+      <translation>فرض فتح تخطيط نظام الإنذار</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SiteHttpAction</name>
     <message>
       <source>Endpoint</source>
-      <translation type="unfinished">Endpoint</translation>
+      <translation>نقطة طرفية</translation>
     </message>
     <message>
       <source>Content</source>
@@ -1223,7 +1223,7 @@
     </message>
     <message>
       <source>Internal HTTPS Request</source>
-      <translation type="unfinished">Internal HTTPS Request</translation>
+      <translation>طلب HTTPS داخلي</translation>
     </message>
   </context>
   <context>
@@ -1242,25 +1242,25 @@
     </message>
     <message>
       <source>By</source>
-      <translation type="unfinished">By</translation>
+      <translation>بواسطة</translation>
     </message>
     <message>
       <source>User: %1</source>
-      <translation type="unfinished">User: %1</translation>
+      <translation>المستخدم: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SoundFieldValidator</name>
     <message>
       <source>Sound is not selected</source>
-      <translation type="unfinished">Sound is not selected</translation>
+      <translation>لم يتم تحديد الصوت</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::SpeakAction</name>
     <message>
       <source>Speak</source>
-      <translation type="unfinished">Speak</translation>
+      <translation>تحدث</translation>
     </message>
     <message>
       <source>Text</source>
@@ -1268,190 +1268,190 @@
     </message>
     <message>
       <source>At Device</source>
-      <translation type="unfinished">At Device</translation>
+      <translation>في الجهاز</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StateFieldValidator</name>
     <message>
       <source>`%1` state is not valid for the `%2` event and `%3` action with the given parameters</source>
-      <translation type="unfinished">`%1` state is not valid for the `%2` event and `%3` action with the given parameters</translation>
+      <translation> `%1` الحالة غير صالحة لل `%2` حدث و`%3` الإجراء بالمعايير المُعطاة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::StorageIssueEvent</name>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>مشكلة التخزين</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation type="unfinished">I/O error has occurred at %1.</translation>
+      <translation>حدث خطأ في الإدخال/الإخراج عند %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>القرص الصلب/القرص ذو الحالة الصلبة &quot;%1&quot; ممتلئ. يحتوي القرص على بيانات كثيرة لا يديرها نظام إدارة الفيديو</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>قرص النظام &quot;%1&quot; ممتلئ تقريبًا.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>تخزين التحليلات &quot;%1&quot; غير متصل.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>تخزين التحليلات &quot;%1&quot; ممتلئة تقريبا.</translation>
     </message>
     <message>
       <source>Archive backup failed. Failed to backup file %1.</source>
-      <translation type="unfinished">Archive backup failed. Failed to backup file %1.</translation>
+      <translation>فشل النسخ الاحتياطي للأرشيف. فشل في النسخ الاحتياطي للملف %1.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; database error: Insufficient permissions on the mount point.</translation>
+      <translation>تخزين التحليلات &quot;%1&quot; خطأ في قاعدة البيانات: الأذونات غير كافية في نقطة التجميع.</translation>
     </message>
     <message>
       <source>Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Cannot initialize AES encryption while recording is enabled on the media archive. Data is written unencrypted.</translation>
+      <translation>لا يمكن تهيئة تشفير AES أثناء تمكين التسجيل على أرشيف الوسائط. البيانات مكتوبة غير مشفرة.</translation>
     </message>
     <message>
       <source>RAID error: %1.</source>
-      <translation type="unfinished">RAID error: %1.</translation>
+      <translation>خطأ RAID: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD/Network speed for recording to %1.</source>
-      <translation type="unfinished">Not enough HDD/SSD/Network speed for recording to %1.</translation>
+      <translation>سرعة HDD/SSD/الشبكة غير كافية للتسجيل إلى %1.</translation>
     </message>
     <message>
       <source>Storage I/O Error at %1</source>
-      <translation type="unfinished">Storage I/O Error at %1</translation>
+      <translation>خطأ في إدخال/إخراج وحدة التخزين عند %1</translation>
     </message>
     <message>
       <source>Storage Too Slow at %1</source>
-      <translation type="unfinished">Storage Too Slow at %1</translation>
+      <translation>التخزين بطيء للغاية عند %1</translation>
     </message>
     <message>
       <source>Storage Disk Full at %1</source>
-      <translation type="unfinished">Storage Disk Full at %1</translation>
+      <translation>القرص التخزيني ممتلئ عند %1</translation>
     </message>
     <message>
       <source>System Disk Almost Full at %1</source>
-      <translation type="unfinished">System Disk Almost Full at %1</translation>
+      <translation>قرص النظام ممتلأ تقريبا في %1</translation>
     </message>
     <message>
       <source>Analytics Storage Offline at %1</source>
-      <translation type="unfinished">Analytics Storage Offline at %1</translation>
+      <translation>تخزين التحليلات غير متصل في %1</translation>
     </message>
     <message>
       <source>Analytics Storage Almost Full at %1</source>
-      <translation type="unfinished">Analytics Storage Almost Full at %1</translation>
+      <translation>تخزين التحليلات ممتلأ تقريبا في %1</translation>
     </message>
     <message>
       <source>Analytics Storage Permission Error at %1</source>
-      <translation type="unfinished">Analytics Storage Permission Error at %1</translation>
+      <translation>خطأ في أذونات تخزين التحليلات في %1</translation>
     </message>
     <message>
       <source>Storage Encryption Failed at %1</source>
-      <translation type="unfinished">Storage Encryption Failed at %1</translation>
+      <translation>فشل تشفير التخزين عند %1</translation>
     </message>
     <message>
       <source>RAID Storage Error at %1</source>
-      <translation type="unfinished">RAID Storage Error at %1</translation>
+      <translation>خطأ في تخزين RAID في %1</translation>
     </message>
     <message>
       <source>Archive Backup Failed at %1</source>
-      <translation type="unfinished">Archive Backup Failed at %1</translation>
+      <translation>فشل النسخ الاحتياطي للأرشيف في %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetDeviceFieldValidator</name>
     <message>
       <source>Failed to get event descriptor</source>
-      <translation type="unfinished">Failed to get event descriptor</translation>
+      <translation>فشل في الحصول على وصف الحدث</translation>
     </message>
     <message>
       <source>Event does not have source camera</source>
-      <translation type="unfinished">Event does not have source camera</translation>
+      <translation>الحدث ليس لديه كاميرا المصدر</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetLayoutFieldValidator</name>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>حدد تخطيط واحد على الأقل</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TargetServerFieldValidator</name>
     <message>
       <source>Select online server</source>
-      <translation type="unfinished">Select online server</translation>
+      <translation>اختر خادمًا متصل</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextLookupFieldValidator</name>
     <message>
       <source>List is not selected</source>
-      <translation type="unfinished">List is not selected</translation>
+      <translation>لم يتم تحديد القائمة</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; does not exist</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; does not exist</translation>
+      <translation>القائمة التي تحمل المعرّف المحدد &apos;%1&apos; غير موجودة</translation>
     </message>
     <message>
       <source>List with the given id &apos;%1&apos; is not a generic list</source>
-      <translation type="unfinished">List with the given id &apos;%1&apos; is not a generic list</translation>
+      <translation>القائمة التي تحمل المعرّف &apos;%1&apos; ليست قائمة عامة</translation>
     </message>
     <message>
       <source>Invalid UUID string</source>
-      <translation type="unfinished">Invalid UUID string</translation>
+      <translation>سلسلة UUID غير صالحة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextOverlayAction</name>
     <message>
       <source>Show Text Overlay</source>
-      <translation type="unfinished">Show Text Overlay</translation>
+      <translation>إظهار النص المتراكب</translation>
     </message>
     <message>
       <source>Custom Text</source>
-      <translation type="unfinished">Custom Text</translation>
+      <translation>نص مخصص</translation>
     </message>
     <message>
       <source>Show To</source>
-      <translation type="unfinished">Show To</translation>
+      <translation>إظهار إلى</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::TextWithFieldsValidator</name>
     <message>
       <source>Url cannot be empty</source>
-      <translation type="unfinished">Url cannot be empty</translation>
+      <translation>لا يمكن أن يكون عنوان URL فارغًا</translation>
     </message>
     <message>
       <source>Url must be valid</source>
-      <translation type="unfinished">Url must be valid</translation>
+      <translation>يجب أن يكون عنوان URL صالحًا</translation>
     </message>
     <message>
       <source>Url should not contains user or password</source>
-      <translation type="unfinished">Url should not contains user or password</translation>
+      <translation>يجب ألا يحتوي عنوان URL على اسم المستخدم أو كلمة المرور</translation>
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>لا يمكن أن تكون النقطة الطرفية فارغة</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>النهاية الطرفية يجب أن تكون&apos;تحتوي على أي مساحة</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::rules::WriteToLogAction</name>
     <message>
       <source>Write to Log</source>
-      <translation type="unfinished">Write to Log</translation>
+      <translation>الكتابة إلى السجل</translation>
     </message>
   </context>
 </TS>
