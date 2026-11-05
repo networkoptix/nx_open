@@ -2,11 +2,12 @@
 
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 
 #include "abstract_loader_delegate.h"
 
-namespace nx::vms::client::core { class ChunkProvider; }
+namespace nx::vms::client::core { class AbstractTimePeriodStorage; }
 
 namespace nx::vms::client::mobile {
 namespace timeline {
@@ -16,8 +17,11 @@ class MotionLoaderDelegate: public AbstractLoaderDelegate
     Q_OBJECT
 
 public:
-    explicit MotionLoaderDelegate(
-        core::ChunkProvider* chunkProvider, int maxMotionsPerBucket, QObject* parent = nullptr);
+    explicit MotionLoaderDelegate(core::AbstractTimePeriodStorage* periodStorage,
+        const QnResourcePtr& resource,
+        int maxMotionsPerBucket,
+        QObject* parent = nullptr);
+
     virtual ~MotionLoaderDelegate() override;
 
     virtual QFuture<MultiObjectData> load(const QnTimePeriod& period,

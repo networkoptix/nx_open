@@ -17,7 +17,6 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/scoped_connections.h>
 #include <nx/vms/api/data/bookmark_models.h>
 #include <nx/vms/client/core/analytics/analytics_attribute_helper.h>
 #include <nx/vms/client/core/client_core_globals.h>
@@ -26,6 +25,7 @@
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/client/mobile/system_context_accessor.h>
+#include <nx/vms/client/mobile/timeline/object_data.h>
 #include <nx/vms/client/mobile/ui/share_link_helper.h>
 #include <nx/vms/client/mobile/ui/ui_controller.h>
 #include <nx/vms/common/api/helpers/bookmark_api_converter.h>
@@ -37,11 +37,21 @@ namespace nx::vms::client::mobile {
 
 using namespace std::chrono;
 
+namespace {
+
+bool isSameObject(
+    const timeline::ObjectData* objectData, const std::optional<timeline::ObjectData>& other)
+{
+    return objectData && other && objectData->id == other->id
+        && objectData->startTimeMs == other->startTimeMs;
+}
+
+} // namespace
+
 struct ShareBookmarkBackend::Private: public SystemContextAccessor
 {
     ShareBookmarkBackend* const q;
-    QPointer<timeline::AbstractObjectData> objectData;
-    utils::ScopedConnection objectDataConnection;
+    std::optional<timeline::ObjectData> objectData;
 
     bool isAvailable = false;
     QnCameraBookmarksManager::BookmarkOperation operation;
@@ -218,28 +228,41 @@ ShareBookmarkBackend::~ShareBookmarkBackend()
 {
 }
 
-timeline::AbstractObjectData* ShareBookmarkBackend::objectData() const
+QVariant ShareBookmarkBackend::objectData() const
 {
-    return d->objectData;
+    return d->objectData ? QVariant::fromValue(*d->objectData) : QVariant();
 }
 
-void ShareBookmarkBackend::setObjectData(timeline::AbstractObjectData* objectData)
+void ShareBookmarkBackend::setObjectData(const QVariant& value)
 {
-    if (d->objectData == objectData)
-        return;
+    const auto objectData = get_if<timeline::ObjectData>(&value);
 
-    d->objectDataConnection.reset();
+    // QML re-assigns the data on every content update (e.g. of an ongoing analytics track). The
+    // working copy is reseeded only for another object, otherwise the user's edits would be lost,
+    // and a bookmark already created from this object would be created once again.
+    const bool isAnotherObject = !isSameObject(objectData, d->objectData);
 
-    d->objectData = objectData;
-    resetBookmarkData();
+    d->objectData = objectData ? std::make_optional(*objectData) : std::nullopt;
+
+    if (isAnotherObject)
+        resetBookmarkData();
+
     emit objectDataChanged();
+}
 
-    if (!d->objectData)
+QnResource* ShareBookmarkBackend::rawResource() const
+{
+    return d->rawResource();
+}
+
+void ShareBookmarkBackend::setRawResource(QnResource* value)
+{
+    if (value == d->rawResource())
         return;
 
-    d->objectDataConnection.reset(connect(
-        objectData, &timeline::AbstractObjectData::changed,
-        this, &ShareBookmarkBackend::bookmarkChanged));
+    d->setRawResource(value);
+    resetBookmarkData();
+    emit resourceChanged();
 }
 
 bool ShareBookmarkBackend::isAvailable()
@@ -249,7 +272,7 @@ bool ShareBookmarkBackend::isAvailable()
 
 bool ShareBookmarkBackend::isShared() const
 {
-    if (!d->objectData || !NX_ASSERT(d->systemContext()))
+    if (!d->objectData || !d->resource() || !NX_ASSERT(d->systemContext()))
         return false;
 
     constexpr api::BookmarkShareFilters kSharedBookmarkFilters =
@@ -386,15 +409,18 @@ bool ShareBookmarkBackend::stopSharing()
 
 void ShareBookmarkBackend::resetBookmarkData()
 {
-    d->setRawResource(d->objectData ? d->objectData->resource().get() : nullptr);
-
-    if (!d->objectData || !NX_ASSERT(d->systemContext()))
+    if (!d->objectData || !d->resource() || !NX_ASSERT(d->systemContext()))
     {
+        const bool hadBookmark = !d->bookmark.guid.isNull();
         d->bookmark = {};
+
+        if (hadBookmark)
+            emit bookmarkChanged();
+
         return;
     }
 
-    const auto source = d->objectData->convertToBookmark();
+    const auto source = timeline::toBookmark(*d->objectData, d->resource());
 
     // Keep the working copy for the same bookmark so a pending or just-applied share change is not
     // overwritten by the timeline's possibly-stale cached copy. Reseed only for a different

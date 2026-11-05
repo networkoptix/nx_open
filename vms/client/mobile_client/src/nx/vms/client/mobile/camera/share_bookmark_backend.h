@@ -3,9 +3,12 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QVariant>
 
+#include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/mobile/timeline/abstract_object_data.h>
+
+Q_MOC_INCLUDE("core/resource/resource.h")
 
 namespace nx::vms::client::mobile {
 
@@ -14,10 +17,10 @@ class ShareBookmarkBackend: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(timeline::AbstractObjectData* objectData
-        READ objectData
-        WRITE setObjectData
-        NOTIFY objectDataChanged)
+    /** Either `timeline::ObjectData` or an invalid value. */
+    Q_PROPERTY(QVariant objectData READ objectData WRITE setObjectData NOTIFY objectDataChanged)
+
+    Q_PROPERTY(QnResource* resource READ rawResource WRITE setRawResource NOTIFY resourceChanged)
 
     Q_PROPERTY(bool isAvailable
         READ isAvailable
@@ -65,8 +68,11 @@ public:
     ShareBookmarkBackend(QObject* parent = nullptr);
     virtual ~ShareBookmarkBackend() override;
 
-    timeline::AbstractObjectData* objectData() const;
-    void setObjectData(timeline::AbstractObjectData* value);
+    QVariant objectData() const;
+    void setObjectData(const QVariant& value);
+
+    QnResource* rawResource() const;
+    void setRawResource(QnResource* value);
 
     bool isAvailable();
 
@@ -98,6 +104,7 @@ public:
 
 signals:
     void objectDataChanged();
+    void resourceChanged();
     void bookmarkCreated();
     void bookmarkChanged();
     void isAvailableChanged();

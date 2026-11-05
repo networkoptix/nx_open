@@ -230,13 +230,14 @@ function openFeedScreen(push, feedState)
         stackView.replace(null, Qt.resolvedUrl("../Screens/FeedScreen.qml"), {"feedState": feedState})
 }
 
-function openDetailsScreen(objectsType, objectList)
+function openDetailsScreen(objectsType, objectList, resource)
 {
     stackView.push(
         Qt.resolvedUrl("../Screens/DetailsScreen.qml"),
         {
             "objectList": objectList,
-            "objectsType": objectsType
+            "objectsType": objectsType,
+            "resource": resource
         })
 }
 

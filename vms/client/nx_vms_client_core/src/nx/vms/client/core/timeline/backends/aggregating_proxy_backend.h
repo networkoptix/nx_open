@@ -225,22 +225,24 @@ void AggregatingProxyBackend<DataList>::requestBlock(
 {
     NX_MUTEX_LOCKER lk(&m_mutex);
     const int requestId = m_requestId++;
-    m_runningRequests.emplace(requestId, std::move(requests));
 
     NX_VERBOSE(this, "Sending aggregated request (%1) for [%2, %3), limit=%4, sources=%5",
         requestId, block.startTimeMs, block.endTimeMs(), limit, requests.size());
 
-    this->source()->load(block, limit)
+    m_runningRequests.emplace(requestId, std::move(requests));
+
+    auto sourceFuture = this->source()->load(block, limit);
+    sourceFuture
         .then(
             [this, requestId, block, limit, weakGuard = this->weak_from_this()](DataList result)
             {
-                if (weakGuard.lock())
+                if (const auto guard = weakGuard.lock())
                     handleDataReceived(requestId, block, limit, std::move(result));
             })
         .onCanceled(
             [this, requestId, block, limit, weakGuard = this->weak_from_this()]()
             {
-                if (weakGuard.lock())
+                if (const auto guard = weakGuard.lock())
                     handleDataReceived(requestId, block, limit, std::nullopt);
             });
 }
@@ -367,7 +369,7 @@ void AggregatingProxyBackend<DataList>::requestQueueProcessing()
             m_loadOp->setCallback(
                 [this, weakGuard]()
                 {
-                    if (weakGuard.lock())
+                    if (const auto guard = weakGuard.lock())
                         processQueuedRequests();
                 });
 

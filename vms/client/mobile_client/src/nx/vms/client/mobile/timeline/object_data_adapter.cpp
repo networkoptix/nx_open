@@ -2,20 +2,20 @@
 
 #include "object_data_adapter.h"
 
+#include <memory>
 #include <optional>
 
-#include <QtCore/QPersistentModelIndex>
 #include <QtQml/QtQml>
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 #include <nx/utils/math/math.h>
 #include <nx/vms/client/core/client_core_globals.h>
-#include <nx/vms/client/core/qml/qml_ownership.h>
 
-#include "analytics_data.h"
-#include "bookmark_data.h"
+#include "analytics_data_helper.h"
+#include "bookmark_data_helper.h"
 
 namespace nx::vms::client::mobile {
+
 namespace {
 
 std::optional<common::CameraBookmark> getBookmark(const QModelIndex& index)
@@ -34,6 +34,13 @@ std::optional<analytics::db::ObjectTrack> getTrack(const QModelIndex& index)
     return std::nullopt;
 }
 
+/** Whether a model data change can affect the object data. Empty `roles` means all roles. */
+bool affectsObjectData(const QList<int>& roles)
+{
+    return roles.isEmpty() || roles.contains(core::CameraBookmarkRole)
+        || roles.contains(core::ObjectTrackRole);
+}
+
 bool inRange(const QModelIndex& index, const auto& topLeft, const auto& bottomRight)
 {
     const int column = index.column();
@@ -43,59 +50,80 @@ bool inRange(const QModelIndex& index, const auto& topLeft, const auto& bottomRi
         && qBetween(topLeft.row(), row, bottomRight.row() + 1);
 }
 
-void updateOnChange(
-    const QPersistentModelIndex& index,
-    QPointer<timeline::AbstractObjectData> objectData,
-    std::function<void(const QModelIndex&)> updateFunction)
-{
-    if (!NX_ASSERT(objectData))
-        return;
-
-    QObject::connect(index.model(), &QAbstractItemModel::dataChanged, objectData,
-        [index, updateFunction](const auto& topLeft, const auto& bottomRight, const auto& /*roles*/)
-        {
-            if (!index.isValid() || !inRange(index, topLeft, bottomRight))
-                return;
-
-            updateFunction(index);
-        });
-};
-
 } // namespace
 
-timeline::AbstractObjectData* ObjectDataAdapter::create(const QModelIndex& index)
+EventSearchObjectData::EventSearchObjectData(const QModelIndex& index, QObject* parent):
+    QObject(parent),
+    m_index(index),
+    m_resource(index.data(core::ResourceRole).value<QnResourcePtr>())
 {
-    const auto resource = index.data(core::ResourceRole).value<QnResourcePtr>();
+    update();
 
-    if (!NX_ASSERT(resource))
+    if (!m_index.isValid())
+        return;
+
+    connect(m_index.model(),
+        &QAbstractItemModel::dataChanged,
+        this,
+        [this](const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles)
+        {
+            // Search models often change unrelated roles (e.g. timestamp text, visibility,
+            // preview state), and each `dataChanged()` makes QML re-set the details item data.
+            if (!m_index.isValid() || !affectsObjectData(roles)
+                || !inRange(m_index, topLeft, bottomRight))
+            {
+                return;
+            }
+
+            update();
+            emit dataChanged();
+        });
+}
+
+const timeline::ObjectData& EventSearchObjectData::data() const
+{
+    return m_data;
+}
+
+QnResourcePtr EventSearchObjectData::resource() const
+{
+    return m_resource;
+}
+
+bool EventSearchObjectData::isValid() const
+{
+    return m_valid;
+}
+
+void EventSearchObjectData::update()
+{
+    if (!m_resource)
+        return;
+
+    if (const auto bookmark = getBookmark(m_index))
+    {
+        m_data = timeline::BookmarkDataHelper::makeObjectData(*bookmark, m_resource);
+        m_valid = true;
+    }
+    else if (const auto track = getTrack(m_index))
+    {
+        m_data = timeline::AnalyticsDataHelper::makeObjectData(*track, m_resource);
+        m_valid = true;
+    }
+}
+
+QnResource* EventSearchObjectData::rawResource() const
+{
+    return m_resource.get();
+}
+
+EventSearchObjectData* ObjectDataAdapter::create(const QModelIndex& index)
+{
+    auto result = std::make_unique<EventSearchObjectData>(index);
+    if (!NX_ASSERT(result->resource()) || !result->isValid())
         return nullptr;
 
-    if (const auto bookmark = getBookmark(index))
-    {
-        QPointer result = new timeline::BookmarkData(*bookmark, resource); //< Qml ownership.
-
-        updateOnChange(index, result,
-            [result](const QModelIndex& index)
-            {
-                result->update(getBookmark(index).value_or(common::CameraBookmark{}));
-            });
-
-        return result;
-    }
-    else if (const auto track = getTrack(index))
-    {
-        QPointer result = new timeline::AnalyticsData(*track, resource); //< Qml ownership.
-
-        updateOnChange(index, result,
-            [result](const QModelIndex& index)
-            {
-                result->update(getTrack(index).value_or(nx::analytics::db::ObjectTrack{}));
-            });
-
-        return result;
-    }
-
-    return nullptr;
+    return result.release(); //< QML ownership.
 }
 
 void ObjectDataAdapter::registerQmlType()

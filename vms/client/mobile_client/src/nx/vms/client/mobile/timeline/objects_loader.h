@@ -3,6 +3,8 @@
 #pragma once
 
 #include <chrono>
+#include <memory>
+#include <optional>
 
 #include <QtCore/QObject>
 
@@ -17,6 +19,8 @@ namespace nx::vms::client::core { class ChunkProvider; }
 
 namespace nx::vms::client::mobile {
 namespace timeline {
+
+class AbstractLoaderDelegate;
 
 /**
  * A data model for ObjectList displayed in DataTimeline, loading and providing timeline objects
@@ -167,12 +171,12 @@ public:
     void setCacheSize(int value);
 
     /**
-     * A number of seconds after which the loaded buckets are subject to reload.
+     * A time after which the loaded buckets are subject to reload.
      * If zero, loaded buckets are never reloaded.
-     * Default 30.
+     * Default 30 seconds.
      */
-    std::chrono::seconds expirationTime() const;
-    void setExpirationTime(std::chrono::seconds value);
+    std::chrono::milliseconds expirationTime() const;
+    void setExpirationTime(std::chrono::milliseconds value);
     int expirationSeconds() const;
     void setExpirationSeconds(int value);
 
@@ -259,6 +263,22 @@ signals:
      * Sent when the content of one of *visible buckets* is changed.
      */
     void bucketChanged(int index);
+
+protected:
+    // These methods allow unit tests to replace the loader delegate, to work without
+    // a chunk provider and to shorten delays (see `objects_loader_ut.cpp`).
+
+    /** Returns null if the delegate cannot be created, e.g. if there's no chunk provider. */
+    virtual std::unique_ptr<AbstractLoaderDelegate> createLoaderDelegate();
+
+    void resetLoaderDelegate();
+    void setBottomBound(std::optional<std::chrono::milliseconds> value);
+
+    /** The delay after the last window change before the loading starts. */
+    void setLoadDelay(std::chrono::milliseconds value);
+
+    /** The interval of checking whether loaded buckets are expired. Default 1 second. */
+    void setPollingInterval(std::chrono::milliseconds value);
 
 private:
     struct InternalBucket;

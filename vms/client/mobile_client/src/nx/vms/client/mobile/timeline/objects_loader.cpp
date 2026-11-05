@@ -5,15 +5,16 @@
 #include <deque>
 #include <memory>
 #include <optional>
+#include <utility>
 
 #include <QtCore/QDeadlineTimer>
-#include <QtCore/QFutureWatcher>
+#include <QtCore/QFuture>
+#include <QtCore/QPointer>
 #include <QtCore/QTimer>
 #include <QtQml/QtQml>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/math.h>
-#include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/vms/client/core/media/chunk_provider.h>
 #include <nx/vms/client/core/timeline/backends/aggregating_proxy_backend.h>
@@ -41,18 +42,45 @@ using namespace nx::vms::client::core::timeline;
 
 struct ObjectsLoader::InternalBucket: public ObjectBucket
 {
-    std::unique_ptr<QFutureWatcher<MultiObjectData>> runningLoadingTask;
+    QFuture<void> runningLoadingTask;
+    quint64 requestId = 0; //< Non-zero ID of a currently running load request, or zero.
+
     QDeadlineTimer expiration{Qt::VeryCoarseTimer};
 
-    InternalBucket(InternalBucket&&) = default;
-    InternalBucket& operator=(InternalBucket&&) = default;
-
     InternalBucket(const qint64& startTimeMs): ObjectBucket{.startTimeMs = startTimeMs} {}
+    ~InternalBucket() { cancelLoading(); }
 
-    ~InternalBucket()
+    // A moved-from QFuture has no shared state and crashes in `cancelChain()`, so a moved-from
+    // bucket must be left with a default QFuture.
+    InternalBucket(InternalBucket&& other) noexcept:
+        ObjectBucket(std::move(other)),
+        runningLoadingTask(std::exchange(other.runningLoadingTask, {})),
+        requestId(std::exchange(other.requestId, 0)),
+        expiration(other.expiration)
     {
-        if (runningLoadingTask)
-            runningLoadingTask->cancel();
+        other.isLoading = false;
+    }
+
+    InternalBucket& operator=(InternalBucket&& other) noexcept
+    {
+        if (this == &other)
+            return *this;
+
+        cancelLoading();
+        ObjectBucket::operator=(std::move(other));
+        runningLoadingTask = std::exchange(other.runningLoadingTask, {});
+        requestId = std::exchange(other.requestId, 0);
+        expiration = other.expiration;
+        other.isLoading = false;
+        return *this;
+    }
+
+    void cancelLoading()
+    {
+        auto loadingTask = std::exchange(runningLoadingTask, {});
+        requestId = 0;
+        isLoading = false;
+        loadingTask.cancelChain();
     }
 };
 
@@ -86,7 +114,7 @@ struct ObjectsLoader::Private
     milliseconds liveTime{milliseconds::max()};
     milliseconds internalTopBound{milliseconds::max()};
 
-    seconds expirationTime = 30s;
+    milliseconds expirationTime = 30s;
 
     int maxObjectsPerBucket = 100;
 
@@ -102,6 +130,7 @@ struct ObjectsLoader::Private
     BackendPtr<ObjectTrackList> analyticsBackend;
     std::shared_ptr<CachingProxyBackend<QnCameraBookmarkList>> bookmarksBackend;
     std::unique_ptr<AbstractLoaderDelegate> loaderDelegate;
+    quint64 lastRequestId = 0;
 
     std::unique_ptr<AbstractContentWatcher> contentWatcher;
 
@@ -139,6 +168,16 @@ struct ObjectsLoader::Private
 
         connect(bookmarkChunks.get(), &CustomChunkAccumulator::updated,
             q, &ObjectsLoader::bookmarkChunksChanged);
+    }
+
+    ~Private()
+    {
+        // Destroying backends can cancel their pending promises and synchronously invoke
+        // continuations which access `cache`, so release them while `cache` is still alive.
+        cache.clear(); //< Delete all buckets & cancel all running futures.
+        loaderDelegate.reset();
+        bookmarksBackend.reset();
+        analyticsBackend.reset();
     }
 
     int maximumCacheSize() const
@@ -409,7 +448,7 @@ struct ObjectsLoader::Private
 
         for (int i = 0; i < loadedBucketCount; ++i, ++bucketIt, start += bucketSize)
         {
-            if (bucketIt->runningLoadingTask)
+            if (bucketIt->requestId)
                 continue;
 
             if (forceUpdate || bucketIt->expiration.hasExpired())
@@ -432,10 +471,7 @@ struct ObjectsLoader::Private
     {
         const auto bucketIt = findBucketContaining(cache, timestampMs, bucketSize.count());
         if (bucketIt != cache.end())
-        {
-            bucketIt->runningLoadingTask.reset();
-            bucketIt->isLoading = false;
-        }
+            bucketIt->cancelLoading();
 
         invalidateBackendCache(timestampMs);
 
@@ -452,53 +488,54 @@ struct ObjectsLoader::Private
 
     void update(BucketList::iterator bucketIt, QFuture<MultiObjectData>&& future)
     {
-        if (future.isCanceled())
-        {
-            handleBucketLoaded(bucketIt, std::nullopt);
-        }
-        else if (future.isFinished() && NX_ASSERT(future.isValid() && future.isResultReadyAt(0)))
-        {
-            handleBucketLoaded(bucketIt, future.result());
-        }
-        else
-        {
-            bucketIt->runningLoadingTask.reset(new QFutureWatcher<MultiObjectData>());
+        const auto requestId = ++lastRequestId;
+        const auto startTimeMs = bucketIt->startTimeMs;
+        bucketIt->requestId = requestId;
+        bucketIt->isLoading = true;
 
-            connect(bucketIt->runningLoadingTask.get(), &QFutureWatcher<MultiObjectData>::finished,
-                nx::utils::guarded(bucketIt->runningLoadingTask.get(),
-                    [this, startTimeMs = bucketIt->startTimeMs]()
+        // Continuations are invoked in this object's thread: immediately if the future is already
+        // finished, otherwise queued. A continuation can be already queued when the loading is
+        // canceled, so it must check that the request is current.
+        // If the loading is still pending when `q` is destroyed, its `destroyed()` signal cancels
+        // the continuation and invokes the `onCanceled` handler when this object is already
+        // destroyed. A `QPointer` to `q` is cleared before `destroyed()` is emitted.
+        auto loadingTask =
+            future
+                .then(/*context*/ q,
+                    [this, startTimeMs, requestId](MultiObjectData objectsData)
+                    { handleLoadingFinished(startTimeMs, requestId, std::move(objectsData)); })
+                .onCanceled(/*context*/ q,
+                    [this, startTimeMs, requestId, guard = QPointer<ObjectsLoader>(q)]()
                     {
-                        const auto bucketIt = find(startTimeMs);
-                        if (!NX_ASSERT(bucketIt != cache.end()
-                            && bucketIt->runningLoadingTask
-                            && bucketIt->runningLoadingTask->isFinished()))
-                        {
-                            return;
-                        }
+                        if (guard)
+                            handleLoadingFinished(startTimeMs, requestId, std::nullopt);
+                    });
 
-                        auto future = bucketIt->runningLoadingTask->future();
-                        auto objectsData = future.isValid() && future.isResultReadyAt(0)
-                            ? std::optional<MultiObjectData>(future.takeResult())
-                            : std::nullopt;
+        // The request is already handled if a continuation was invoked immediately.
+        if (bucketIt->requestId != requestId)
+            return;
 
-                        bucketIt->runningLoadingTask.release()->deleteLater();
-                        handleBucketLoaded(bucketIt, std::move(objectsData));
-                    }));
+        bucketIt->runningLoadingTask = std::move(loadingTask);
 
-            bucketIt->runningLoadingTask->setFuture(future);
-            bucketIt->isLoading = true;
+        const int index = std::distance(cache.begin(), bucketIt) - firstVisibleBucket;
+        if (index >= 0 && index < visibleBucketCount)
+            emit q->bucketChanged(index);
+    }
 
-            const int index = std::distance(cache.begin(), bucketIt) - firstVisibleBucket;
-            if (index >= 0 && index < visibleBucketCount)
-                emit q->bucketChanged(index);
-        }
+    void handleLoadingFinished(
+        qint64 startTimeMs, quint64 requestId, std::optional<MultiObjectData> objectsData)
+    {
+        const auto bucketIt = find(startTimeMs);
+        if (bucketIt != cache.end() && bucketIt->requestId == requestId)
+            handleBucketLoaded(bucketIt, std::move(objectsData));
     }
 
     void handleBucketLoaded(
         BucketList::iterator bucketIt, std::optional<MultiObjectData> objectsData)
     {
         bucketIt->isLoading = false;
-        bucketIt->runningLoadingTask.reset();
+        bucketIt->runningLoadingTask = {};
+        bucketIt->requestId = 0;
         bucketIt->data = objectsData;
         bucketIt->state = (objectsData && objectsData->count > 0)
             ? ObjectBucket::State::Ready
@@ -558,25 +595,7 @@ struct ObjectsLoader::Private
     void initializeLoaderDelegate()
     {
         loaderDelegate.reset();
-        if (!chunkProvider)
-            return;
-
-        switch (objectsType)
-        {
-            case ObjectsType::motion:
-                loaderDelegate.reset(new MotionLoaderDelegate(chunkProvider, maxObjectsPerBucket));
-                break;
-
-            case ObjectsType::bookmarks:
-                loaderDelegate.reset(new BookmarkLoaderDelegate(ensureBookmarksBackend(),
-				    maxObjectsPerBucket));
-                break;
-
-            case ObjectsType::analytics:
-                loaderDelegate.reset(new AnalyticsLoaderDelegate(chunkProvider,
-                    ensureAnalyticsBackend(), maxObjectsPerBucket));
-                break;
-        }
+        loaderDelegate = q->createLoaderDelegate();
     }
 
     void initializeContentWatcher()
@@ -943,12 +962,12 @@ void ObjectsLoader::setCacheSize(int value)
     // immediately. It will be cropped after a next window change instead.
 }
 
-seconds ObjectsLoader::expirationTime() const
+milliseconds ObjectsLoader::expirationTime() const
 {
     return d->expirationTime;
 }
 
-void ObjectsLoader::setExpirationTime(seconds value)
+void ObjectsLoader::setExpirationTime(milliseconds value)
 {
     if (d->expirationTime == value)
         return;
@@ -956,13 +975,13 @@ void ObjectsLoader::setExpirationTime(seconds value)
     d->expirationTime = value;
     emit expirationTimeChanged();
 
-    if (d->expirationTime > 0s)
+    if (d->expirationTime > 0ms)
         d->requestLoad();
 }
 
 int ObjectsLoader::expirationSeconds() const
 {
-    return expirationTime().count();
+    return (int) duration_cast<seconds>(expirationTime()).count();
 }
 
 void ObjectsLoader::setExpirationSeconds(int value)
@@ -1077,10 +1096,57 @@ void ObjectsLoader::invalidateData(qint64 timestampMs)
     d->invalidateData(timestampMs);
 }
 
+std::unique_ptr<AbstractLoaderDelegate> ObjectsLoader::createLoaderDelegate()
+{
+    if (!d->chunkProvider)
+        return {};
+
+    switch (d->objectsType)
+    {
+        case ObjectsType::motion:
+            return std::make_unique<MotionLoaderDelegate>(
+                d->chunkProvider, d->chunkProvider->resource(), d->maxObjectsPerBucket);
+
+        case ObjectsType::bookmarks:
+            return std::make_unique<BookmarkLoaderDelegate>(
+                d->ensureBookmarksBackend(), d->maxObjectsPerBucket);
+
+        case ObjectsType::analytics:
+            return std::make_unique<AnalyticsLoaderDelegate>(
+                d->ensureAnalyticsBackend(), d->maxObjectsPerBucket);
+    }
+
+    return {};
+}
+
+void ObjectsLoader::resetLoaderDelegate()
+{
+    d->initializeLoaderDelegate();
+}
+
+void ObjectsLoader::setBottomBound(std::optional<milliseconds> value)
+{
+    d->setBottomBound(value);
+}
+
+void ObjectsLoader::setPollingInterval(milliseconds value)
+{
+    d->pollingTimer.setInterval(value);
+}
+
+void ObjectsLoader::setLoadDelay(milliseconds value)
+{
+    d->loadOp.setInterval(value);
+}
+
 void ObjectsLoader::registerQmlTypes()
 {
+    qRegisterMetaType<ObjectData>();
     qRegisterMetaType<MultiObjectData>();
     qRegisterMetaType<ObjectBucket>();
+
+    qmlRegisterUncreatableType<ObjectData>(
+        "nx.vms.client.mobile.timeline", 1, 0, "ObjectData", "ObjectData is not a creatable type");
 
     qmlRegisterUncreatableType<MultiObjectData>("nx.vms.client.mobile.timeline", 1, 0, "MultiObjectData",
         "MultiObjectData is not a creatable type");

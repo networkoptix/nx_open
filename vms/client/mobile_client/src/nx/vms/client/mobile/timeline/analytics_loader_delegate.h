@@ -9,8 +9,6 @@
 
 #include "abstract_loader_delegate.h"
 
-namespace nx::vms::client::core { class ChunkProvider; }
-
 namespace nx::vms::client::mobile {
 namespace timeline {
 
@@ -20,8 +18,8 @@ class AnalyticsLoaderDelegate: public AbstractLoaderDelegate
     using BackendPtr = core::timeline::BackendPtr<analytics::db::LookupResult>;
 
 public:
-    explicit AnalyticsLoaderDelegate(core::ChunkProvider* chunkProvider, const BackendPtr& backend,
-        int maxTracksPerBucket, QObject* parent = nullptr);
+    explicit AnalyticsLoaderDelegate(
+        const BackendPtr& backend, int maxTracksPerBucket, QObject* parent = nullptr);
 
     virtual ~AnalyticsLoaderDelegate() override;
 

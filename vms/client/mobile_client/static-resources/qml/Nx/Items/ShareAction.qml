@@ -16,6 +16,7 @@ Action
 
     required property int objectsType
     property alias objectData: backend.objectData
+    property alias resource: backend.resource
     readonly property alias backend: backend
     property int preferredSheetEdge: Qt.RightEdge
 

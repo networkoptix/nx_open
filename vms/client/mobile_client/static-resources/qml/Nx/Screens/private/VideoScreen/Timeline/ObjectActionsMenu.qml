@@ -16,9 +16,6 @@ Menu
 
     required property ObjectSelectionSheet selector
 
-    // MultiObjectData owns single object data pointers, while MultiObjectData.perObjectData doesn't.
-    // So a copy of the entire MultiObjectData must be held here.
-    // TODO: #vkutin Fix that ownership hazard in the future.
     property Timeline.MultiObjectData multiObjectData
 
     property alias resource: downloadAction.resource
@@ -110,7 +107,7 @@ Menu
                 if (d.objectsData.length < 1)
                     return
 
-                Workflow.openDetailsScreen(menu.objectsType, d.objectsData)
+                Workflow.openDetailsScreen(menu.objectsType, d.objectsData, menu.resource)
 
                 if (!stackView.currentItem.showOnCameraRequested) //< Screen opening error check.
                     return
@@ -136,7 +133,8 @@ Menu
             id: shareAction
 
             objectsType: menu.objectsType
-            objectData: d.singleObjectData ?? null
+            objectData: d.singleObjectData
+            resource: menu.resource
             preferredSheetEdge: StyleHints.preferredSheetEdge
 
             backend.onSharingChanged:

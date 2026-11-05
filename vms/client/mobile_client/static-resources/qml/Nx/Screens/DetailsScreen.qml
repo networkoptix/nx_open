@@ -19,6 +19,7 @@ AdaptiveScreen
 
     required property int objectsType
     required property var objectList
+    required property Resource resource
 
     title: detailsItem.title
 
@@ -38,7 +39,7 @@ AdaptiveScreen
 
         objectsType: root.objectsType
         objectData: root.objectList[currentIndex]
-        resource: root.objectList[currentIndex].resource
+        resource: root.resource
         showPreviewImage: objectsType === Timeline.ObjectsLoader.ObjectsType.analytics
         gestureExclusionEnabled: LayoutController.isPortrait && root.isActive
 

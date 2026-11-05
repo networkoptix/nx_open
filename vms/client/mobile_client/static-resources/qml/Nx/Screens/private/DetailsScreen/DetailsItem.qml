@@ -24,7 +24,7 @@ Item
     readonly property string title: detailsItem.resource?.name ?? qsTr("Preview")
     property var uuid
     property int objectsType: Timeline.ObjectsLoader.ObjectsType.analytics
-    required property Timeline.AbstractObjectData objectData
+    required property var /*Timeline.ObjectData*/ objectData
     required property Resource resource
     readonly property Menu menu: menu.available ? menu : null
     property alias hasNext: preview.hasNext
@@ -264,8 +264,8 @@ Item
         }
     }
 
-    onResourceChanged: d.updateCurrentEvent()
-    onObjectDataChanged: d.updateCurrentEvent()
+    onResourceChanged:
+        d.updateCurrentEvent()
 
     ChunkProvider
     {
@@ -294,6 +294,16 @@ Item
             // Modes, when the item is located on the right panel of the application.
             return detailsItem.width < detailsItem.height
         }
+
+        // `objectData` is re-assigned on every content update, but the playback should be
+        // restarted only when another event is shown. A string property doesn't emit its change
+        // signal if its recalculated value is the same.
+        readonly property string eventKey: objectData
+            ? `${objectData.id.toString()}/${objectData.startTimeMs}`
+            : ""
+
+        onEventKeyChanged:
+            updateCurrentEvent()
 
         function updateCurrentEvent()
         {
@@ -397,6 +407,7 @@ Item
                 icon.width: 20
                 icon.height: 20
                 objectData: detailsItem.objectData
+                resource: detailsItem.resource
                 objectsType: detailsItem.objectsType
             }
         }

@@ -12,7 +12,7 @@
 #include <nx/utils/uuid.h>
 #include <recording/time_period.h>
 
-#include "abstract_object_data.h"
+#include "object_data.h"
 
 namespace nx::vms::client::mobile {
 namespace timeline {

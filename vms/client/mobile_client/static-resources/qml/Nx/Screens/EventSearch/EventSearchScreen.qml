@@ -238,6 +238,9 @@ AdaptiveScreen
 
         readonly property var menu: item?.menu
 
+        // Holds the current `EventSearchObjectData` which the loaded item binds to.
+        property var objectData: null
+
         Connections
         {
             target: detailsLoader.item ?? null
@@ -727,6 +730,7 @@ AdaptiveScreen
                 const modelIndex = view.model.index(currentIndex, 0)
                 const resource = NxGlobals.modelData(modelIndex, "resource")
                 const objectData = ObjectDataAdapter.create(modelIndex)
+                detailsLoader.objectData = objectData
 
                 detailsLoader.setSource(
                     Qt.resolvedUrl("../private/DetailsScreen/DetailsItem.qml"),
@@ -735,7 +739,7 @@ AdaptiveScreen
                         "objectsType": screenController.analyticsSearchMode
                             ? ObjectsLoader.ObjectsType.analytics
                             : ObjectsLoader.ObjectsType.bookmarks,
-                        "objectData": objectData,
+                        "objectData": Qt.binding(() => objectData?.data),
                         "hasNext": Qt.binding(() => view.currentIndex > 0),
                         "hasPrevious": Qt.binding(() => view.currentIndex < view.count - 1),
                         "resource": resource,
