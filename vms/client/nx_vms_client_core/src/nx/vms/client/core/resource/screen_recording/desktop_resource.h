@@ -21,14 +21,13 @@ public:
     virtual ~DesktopResource();
 
     static nx::Uuid getDesktopResourceUuid();
+    static QString calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId);
 
     bool isConnected() const;
     void initializeConnection(const QnMediaServerResourcePtr& server, const nx::Uuid& userId);
     void disconnectFromServer();
 
     virtual bool isRendererSlow() const = 0;
-
-    static QString calculateUniqueId(const nx::Uuid& moduleId, const nx::Uuid& userId);
 
 private:
     std::unique_ptr<DesktopCameraConnection> m_connection;

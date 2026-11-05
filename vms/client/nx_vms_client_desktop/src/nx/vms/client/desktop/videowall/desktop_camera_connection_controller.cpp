@@ -7,9 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_resource.h>
-#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/application_context.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -38,6 +36,11 @@ DesktopCameraConnectionController::DesktopCameraConnectionController(
     connect(systemContext->userWatcher(), &core::UserWatcher::userChanged,
         this, &DesktopCameraConnectionController::atUserChanged);
 
+    connect(systemContext,
+        &core::SystemContext::remoteIdChanged,
+        this,
+        &DesktopCameraConnectionController::reconnectCamera);
+
     rememberCamera();
 }
 
@@ -53,8 +56,8 @@ void DesktopCameraConnectionController::initialize()
 
 void DesktopCameraConnectionController::reinitialize()
 {
+    disconnectCamera();
     m_desktop.reset();
-    m_server.reset();
     initialize();
 }
 
@@ -77,7 +80,21 @@ void DesktopCameraConnectionController::disconnectCamera()
 {
     if (m_desktop)
         m_desktop->disconnectFromServer();
+    if (m_server)
+        m_server->disconnect(this);
     m_server.reset();
+    m_serverUrl.clear();
+}
+
+void DesktopCameraConnectionController::reconnectCamera()
+{
+    // The camera connection keeps the Server address and the certificate cache of the Server
+    // connection it was opened with, so it must be reopened when either of them changes.
+    if (!m_desktop || !m_desktop->isConnected())
+        return;
+
+    disconnectCamera();
+    initializeImpl();
 }
 
 void DesktopCameraConnectionController::atResourcesRemoved(const QnResourceList& resources)
@@ -107,6 +124,13 @@ void DesktopCameraConnectionController::atUserChanged(const QnUserResourcePtr& u
     }
 }
 
+void DesktopCameraConnectionController::atServerAddressChanged()
+{
+    // Extra URL check to prevent excess reconnect on primaryAddressChanged by discovery.
+    if (m_server && m_server->getApiUrl() != m_serverUrl)
+        reconnectCamera();
+}
+
 void DesktopCameraConnectionController::setServer(const QnMediaServerResourcePtr& server)
 {
     if (m_server == server && m_desktop && m_desktop->isConnected())
@@ -115,10 +139,20 @@ void DesktopCameraConnectionController::setServer(const QnMediaServerResourcePtr
     disconnectCamera();
 
     m_server = server;
+    if (m_server)
+    {
+        connect(m_server.get(),
+            &QnMediaServerResource::primaryAddressChanged,
+            this,
+            &DesktopCameraConnectionController::atServerAddressChanged);
+    }
 
     const auto user = systemContext()->userWatcher()->user();
     if (m_desktop && m_server && user)
+    {
+        m_serverUrl = m_server->getApiUrl();
         m_desktop->initializeConnection(m_server, user->getId());
+    }
 }
 
 } // namespace nx::vms::client::desktop

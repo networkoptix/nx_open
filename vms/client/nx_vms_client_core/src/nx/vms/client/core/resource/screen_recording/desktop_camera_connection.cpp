@@ -14,9 +14,8 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/utils/thread_affinity_deleter.h>
-#include <nx/vms/client/core/network/certificate_cache.h>
-#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/system_context.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 
 #include "desktop_resource.h"
@@ -229,7 +228,9 @@ void DesktopCameraConnectionProcessor::sendData(const char* data, int len)
 struct DesktopCameraConnection::Private
 {
     DesktopResourcePtr owner;
-    QnMediaServerResourcePtr server;
+    nx::Url url;
+    nx::utils::SoftwareVersion serverVersion;
+    nx::network::ssl::AdapterFunc adapterFunc;
     nx::Uuid userId;
     nx::Uuid moduleGuid;
     nx::network::http::Credentials credentials;
@@ -239,20 +240,27 @@ struct DesktopCameraConnection::Private
 };
 
 DesktopCameraConnection::DesktopCameraConnection(
-    DesktopResourcePtr owner,
-    const QnMediaServerResourcePtr& server,
-    const nx::Uuid& userId,
-    const nx::Uuid& moduleGuid,
-    const nx::network::http::Credentials& credentials)
-    :
+    DesktopResourcePtr owner, const QnMediaServerResourcePtr& server, nx::Uuid userId):
     QnLongRunnable(),
     d(new Private())
 {
     d->owner = owner;
-    d->server = server;
     d->userId = userId;
-    d->moduleGuid = moduleGuid;
-    d->credentials = credentials;
+
+    const auto systemContext = server->systemContext();
+    if (!NX_ASSERT(systemContext))
+        return;
+
+    const auto certificateVerifier = systemContext->certificateVerifier();
+    if (!NX_ASSERT(certificateVerifier, "Must be created while connected to the Server"))
+        return;
+
+    d->url = server->getApiUrl();
+    d->adapterFunc = certificateVerifier->makeAdapterFunc(server->getId(), d->url);
+    d->url.setPath("/desktop_camera");
+    d->serverVersion = server->getVersion();
+    d->moduleGuid = systemContext->peerId();
+    d->credentials = systemContext->credentials();
 }
 
 DesktopCameraConnection::~DesktopCameraConnection()
@@ -290,7 +298,6 @@ void DesktopCameraConnection::pleaseStop()
             d->processor->pleaseStop();
         if (d->httpClient)
             d->httpClient->pleaseStop();
-        d->server.reset();
     }
 
     base_type::pleaseStop();
@@ -298,6 +305,9 @@ void DesktopCameraConnection::pleaseStop()
 
 void DesktopCameraConnection::run()
 {
+    if (!d->adapterFunc) //< There was no Server connection on creation.
+        return;
+
     const auto setupNetwork =
         [this](
             std::unique_ptr<nx::network::http::HttpClient> newClient,
@@ -322,37 +332,7 @@ void DesktopCameraConnection::run()
 
     while (!m_needStop)
     {
-        nx::Url serverUrl;
-        nx::utils::SoftwareVersion serverVersion;
-        nx::network::ssl::AdapterFunc adapterFunc;
-
-        {
-            NX_MUTEX_LOCKER lock(&d->mutex);
-            auto server = d->server;
-            lock.unlock();
-
-            if (server)
-            {
-                if (const auto systemContext = SystemContext::fromResource(server);
-                    NX_ASSERT(systemContext))
-                {
-                    if (auto connection = systemContext->connection())
-                    {
-                        serverUrl = server->getApiUrl();
-                        serverVersion = server->getVersion();
-                        adapterFunc = connection->certificateCache()->makeAdapterFunc(
-                            server->getId(), serverUrl);
-                    }
-                }
-            }
-        }
-
-        if (!adapterFunc)
-            break;
-
-        serverUrl.setPath("/desktop_camera");
-
-        auto newClient = std::make_unique<nx::network::http::HttpClient>(adapterFunc);
+        auto newClient = std::make_unique<nx::network::http::HttpClient>(d->adapterFunc);
 
         newClient->addAdditionalHeader("user-name", d->credentials.username);
         const auto uniqueId = DesktopResource::calculateUniqueId(
@@ -363,15 +343,15 @@ void DesktopCameraConnection::run()
         newClient->setResponseReadTimeout(std::chrono::milliseconds(CONNECT_TIMEOUT));
         newClient->setCredentials(d->credentials);
 
-        setupNetwork(std::move(newClient), {}, serverVersion);
+        setupNetwork(std::move(newClient), {}, d->serverVersion);
 
-        if (!d->httpClient->doGet(serverUrl))
+        if (!d->httpClient->doGet(d->url))
         {
             terminatedSleep(1000 * 10);
             continue;
         }
 
-        setupNetwork({}, takeSocketFromHttpClient(d->httpClient), serverVersion);
+        setupNetwork({}, takeSocketFromHttpClient(d->httpClient), d->serverVersion);
 
         QElapsedTimer timeout;
         timeout.start();
