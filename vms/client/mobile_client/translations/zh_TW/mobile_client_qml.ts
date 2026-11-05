@@ -107,6 +107,14 @@
       <translation>使用多個解碼器以提高效能</translation>
     </message>
     <message>
+      <source>Log In to Organization</source>
+      <translation type="unfinished">Log In to Organization</translation>
+    </message>
+    <message>
+      <source>Allow user to log in to organization</source>
+      <translation type="unfinished">Allow user to log in to organization</translation>
+    </message>
+    <message>
       <source>Mirror Timeline</source>
       <translation>鏡像時間軸</translation>
     </message>

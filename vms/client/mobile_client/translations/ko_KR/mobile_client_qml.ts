@@ -107,6 +107,14 @@
       <translation>성능 향상을 위해 여러 개의 디코더를 사용하십시오</translation>
     </message>
     <message>
+      <source>Log In to Organization</source>
+      <translation type="unfinished">Log In to Organization</translation>
+    </message>
+    <message>
+      <source>Allow user to log in to organization</source>
+      <translation type="unfinished">Allow user to log in to organization</translation>
+    </message>
+    <message>
       <source>Mirror Timeline</source>
       <translation type="unfinished">Mirror Timeline</translation>
     </message>

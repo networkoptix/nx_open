@@ -107,6 +107,14 @@
       <translation type="unfinished">Use multiple decoders to improve performance</translation>
     </message>
     <message>
+      <source>Log In to Organization</source>
+      <translation type="unfinished">Log In to Organization</translation>
+    </message>
+    <message>
+      <source>Allow user to log in to organization</source>
+      <translation type="unfinished">Allow user to log in to organization</translation>
+    </message>
+    <message>
       <source>Mirror Timeline</source>
       <translation type="unfinished">Mirror Timeline</translation>
     </message>

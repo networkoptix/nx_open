@@ -107,6 +107,14 @@
       <translation>Χρησιμοποιήστε πολλαπλούς αποκωδικοποιητές για τη βελτίωση της απόδοσης</translation>
     </message>
     <message>
+      <source>Log In to Organization</source>
+      <translation type="unfinished">Log In to Organization</translation>
+    </message>
+    <message>
+      <source>Allow user to log in to organization</source>
+      <translation type="unfinished">Allow user to log in to organization</translation>
+    </message>
+    <message>
       <source>Mirror Timeline</source>
       <translation>Κατοπτρισμός χρονολογίου</translation>
     </message>
