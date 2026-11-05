@@ -263,6 +263,13 @@ DBResult SqlQuery::getLastError()
             res.code = DBResultCode::retryLater;
         else if (nativeErrorCode == "1205") //< ER_LOCK_WAIT_TIMEOUT
             res.code = DBResultCode::retryLater;
+        else if (nativeErrorCode == "2006" //< CR_SERVER_GONE_ERROR
+            || nativeErrorCode == "2013" //< CR_SERVER_LOST
+            || nativeErrorCode == "1053" //< ER_SERVER_SHUTDOWN
+            || nativeErrorCode == "4031") //< ER_CLIENT_INTERACTION_TIMEOUT
+        {
+            res.code = DBResultCode::connectionError;
+        }
     }
 
     res.text = lastError.text().toStdString();
