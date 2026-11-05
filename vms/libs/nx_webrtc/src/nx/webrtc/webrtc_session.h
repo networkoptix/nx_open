@@ -51,7 +51,18 @@ public:
 
     void start(const QList<nx::network::SocketAddress>& addresses);
     void setAddress(const nx::network::SocketAddress& address);
-    std::string constructSdp();
+    // The tag of the BUNDLE group: the m-line carrying the transport every bundled one shares,
+    // and the one a trickled ICE candidate names, see Tracker::sendIce().
+    struct BundleTag
+    {
+        int mid = kDataChannelMid;
+        int mLineIndex = 0;
+    };
+
+    // Builds the next offer and reports the tag of its BUNDLE group.
+    // NOTE: the tag moves from one offer to the next, so a candidate sent with it is good only
+    // for a client that has applied this offer. Both go out over the same WebSocket, in order.
+    std::string constructSdp(BundleTag* bundleTag = nullptr);
     // Applies the answer to this session. Returns false if it leaves the session unusable.
     bool processSdpAnswer(const std::string& sdp);
     Purpose purpose() const { return m_purpose; }
@@ -160,7 +171,7 @@ public:
     std::string idForToStringFromPtr() const;
 
 private:
-    std::string dataChannelSdp() const;
+    std::string dataChannelSdp(bool isBundleTag) const;
     std::string constructFingerprint() const;
     // Builds the encoders of one provider, and of a single track of it unless UNKNOWN is passed.
     // `provider` has to be in the session already: the encoders are built around the tracks that

@@ -85,10 +85,13 @@ void Tracker::readMessage()
 
 void Tracker::sendOffer()
 {
+    // m_bundleTag is written here and read in sendIce(), with no lock between them.
+    NX_ASSERT(m_pollable.isInSelfAioThread());
+
     rapidjson::Document d(rapidjson::kObjectType);
     rapidjson::Value sdpRoot(rapidjson::kObjectType);
     sdpRoot.AddMember("type", "offer", d.GetAllocator());
-    std::string sdp = m_session->constructSdp();
+    std::string sdp = m_session->constructSdp(&m_bundleTag);
     rapidjson::Value sdpValue(sdp, d.GetAllocator());
     sdpRoot.AddMember("sdp", sdpValue, d.GetAllocator());
     if (const auto& mime = m_session->tracks()->mimeType(); !mime.empty())
@@ -125,6 +128,8 @@ void Tracker::sendJson(const rapidjson::Document& doc)
 
 void Tracker::sendIce(const IceCandidate& candidate)
 {
+    NX_ASSERT(m_pollable.isInSelfAioThread()); //< See sendOffer().
+
     if (!candidate.matchFilter(m_candidateFilter))
         return;
     auto candidateStr = candidate.serialize();
@@ -133,12 +138,11 @@ void Tracker::sendIce(const IceCandidate& candidate)
     rapidjson::Value candidateValue(candidateStr, d.GetAllocator());
     ice.AddMember("candidate", candidateValue, d.GetAllocator());
 
-    // The candidate has to name an m-section of the BUNDLE group, or the client has no transport
-    // to attach it to: a free m-line is offered as rejected and left out of the group, see
-    // Session::constructSdp(). The data channel m-line is always offered and always bundled, and
-    // it comes after every track's, so it is the last index.
-    ice.AddMember("sdpMid", kDataChannelMid, d.GetAllocator());
-    ice.AddMember("sdpMLineIndex", (int) m_session->tracks()->tracks().size(), d.GetAllocator());
+    // The candidate names the tag of the BUNDLE group of the offer it follows: a bundled m-line
+    // that is not the tag has no transport of its own, so the candidate is lost with it and the
+    // client is left with no connectivity check to make.
+    ice.AddMember("sdpMid", m_bundleTag.mid, d.GetAllocator());
+    ice.AddMember("sdpMLineIndex", m_bundleTag.mLineIndex, d.GetAllocator());
     std::string ufrag = m_session->id();
     rapidjson::Value ufragValue(ufrag, d.GetAllocator());
     ice.AddMember("usernameFragment", ufragValue, d.GetAllocator());

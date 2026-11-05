@@ -39,6 +39,9 @@ private:
     void stopUnsafe();
 
 private:
+    // The tag of the BUNDLE group of the last offer sent. Written by sendOffer() and read by
+    // sendIce(), both of which run in m_pollable's thread.
+    Session::BundleTag m_bundleTag;
     std::optional<IceCandidate> m_srflxCandidate;
     WebSocketPtr m_webSocket;
     Session* m_session = nullptr;
