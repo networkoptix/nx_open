@@ -3,6 +3,7 @@
 #include "media_player_motion_provider.h"
 
 #include <chrono>
+#include <memory>
 
 #include <QtQml/QtQml>
 
@@ -19,7 +20,23 @@ class MediaPlayerMotionProvider::Private
 {
 public:
     MediaPlayer* mediaPlayer = nullptr;
-    ConsumingMotionMetadataProvider metadataProvider;
+
+    /** Recreated for every resource, so the metadata cached for another resource is dropped. */
+    std::unique_ptr<ConsumingMotionMetadataProvider> metadataProvider;
+
+    void resetMetadataProvider()
+    {
+        if (metadataProvider && mediaPlayer)
+            mediaPlayer->removeMetadataConsumer(metadataProvider->metadataConsumer());
+
+        metadataProvider.reset();
+
+        if (mediaPlayer)
+        {
+            metadataProvider = std::make_unique<ConsumingMotionMetadataProvider>();
+            mediaPlayer->addMetadataConsumer(metadataProvider->metadataConsumer());
+        }
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -48,7 +65,10 @@ void MediaPlayerMotionProvider::setMediaPlayer(MediaPlayer* value)
 
     if (d->mediaPlayer)
     {
-        d->mediaPlayer->removeMetadataConsumer(d->metadataProvider.metadataConsumer());
+        if (d->metadataProvider)
+            d->mediaPlayer->removeMetadataConsumer(d->metadataProvider->metadataConsumer());
+
+        d->metadataProvider.reset();
         d->mediaPlayer->disconnect(this);
     }
 
@@ -60,17 +80,27 @@ void MediaPlayerMotionProvider::setMediaPlayer(MediaPlayer* value)
             [this]()
             {
                 d->mediaPlayer = nullptr;
+                d->metadataProvider.reset();
                 emit mediaPlayerChanged();
+                emit motionMaskChanged();
             });
 
-        connect(d->mediaPlayer, &MediaPlayer::resourceChanged,
-            this, &MediaPlayerMotionProvider::motionMaskChanged);
-        connect(d->mediaPlayer, &MediaPlayer::positionChanged,
-            this, &MediaPlayerMotionProvider::motionMaskChanged);
-
-        d->mediaPlayer->addMetadataConsumer(d->metadataProvider.metadataConsumer());
+        connect(d->mediaPlayer,
+            &MediaPlayer::resourceChanged,
+            this,
+            [this]()
+            {
+                d->resetMetadataProvider();
+                emit motionMaskChanged();
+            });
+        connect(d->mediaPlayer,
+            &MediaPlayer::positionChanged,
+            this,
+            &MediaPlayerMotionProvider::motionMaskChanged);
     }
 
+    d->resetMetadataProvider();
+    emit mediaPlayerChanged();
     emit motionMaskChanged();
 }
 
@@ -79,18 +109,27 @@ QByteArray MediaPlayerMotionProvider::motionMask(int channel) const
     static constexpr int kMotionMaskSizeBytes = MotionGrid::kCellCount / 8;
     static QByteArray kEmptyMotionMask(kMotionMaskSizeBytes, 0);
 
-    if (!d->mediaPlayer)
+    if (!d->mediaPlayer || !d->metadataProvider)
         return kEmptyMotionMask;
 
     using namespace std::chrono;
     const auto timestamp = microseconds(milliseconds(d->mediaPlayer->position()));
-    const auto metadata = d->metadataProvider.metadata(timestamp, channel);
+    const auto metadata = d->metadataProvider->metadata(timestamp, channel);
     if (!metadata)
         return kEmptyMotionMask;
 
     QByteArray motionMask(metadata->data(), int(metadata->dataSize()));
     motionMask.resize(kMotionMaskSizeBytes);
     return motionMask;
+}
+
+QSharedPointer<nx::analytics::AbstractMetadataConsumer> MediaPlayerMotionProvider::
+    metadataConsumer() const
+{
+    if (!d->metadataProvider)
+        return {};
+
+    return d->metadataProvider->metadataConsumer();
 }
 
 void MediaPlayerMotionProvider::registerQmlType()
