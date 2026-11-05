@@ -102,6 +102,49 @@ std::vector<std::string> valuesOf(std::string_view sdp, std::string_view prefix)
     return result;
 }
 
+struct BundleTagInSdp
+{
+    std::string mid;
+    int mLineIndex = -1;
+};
+
+// The tag of the BUNDLE group as the offer itself states it: the first mid of the group, and
+// where that mid's m-line sits. Every m-line has exactly one a=mid, so the a=mid lines are the
+// m-lines, in order.
+BundleTagInSdp bundleTagOf(std::string_view offer)
+{
+    const auto bundled = valuesOf(offer, "a=group:BUNDLE ");
+    if (bundled.empty())
+        return {};
+
+    const auto mids = valuesOf(offer, "a=mid:");
+    const auto it = std::ranges::find(mids, bundled.front());
+    if (it == mids.end())
+        return {bundled.front(), -1};
+
+    return {bundled.front(), (int) (it - mids.begin())};
+}
+
+// The media description of `mid`: its m= line and everything up to the next one.
+std::string mediaSectionOf(std::string_view sdp, const std::string& mid)
+{
+    std::string section;
+    bool found = false;
+    for (const auto line: sdp | std::views::split("\r\n"sv))
+    {
+        const std::string_view text(line.begin(), line.end());
+        if (text.starts_with("m="))
+        {
+            if (found)
+                break;
+            section.clear();
+        }
+        section += std::string(text) + "\r\n";
+        found = found || text == "a=mid:" + mid;
+    }
+    return found ? section : std::string();
+}
+
 // Of the right shape, and that is all processSdpAnswer() asks of it: it is not checked against
 // a certificate.
 constexpr auto kFingerprint =
@@ -375,6 +418,138 @@ TEST_F(WebRtcSession, RefusedTrackStaysRetiredInLaterOffers)
     EXPECT_NE(offer.find("\r\nm=audio 0 "), std::string::npos) << offer;
     EXPECT_EQ(valuesOf(offer, "a=group:BUNDLE "), (std::vector<std::string>{"0", "2", "128"}))
         << offer;
+}
+
+// Given: a Device is streaming.
+// When: the offer is built.
+// Expect: the tag of its BUNDLE group is the Device's m-line, not the data channel one. A
+//     candidate naming a bundled m-line that is not the tag is lost with that m-line's
+//     transport, and the client makes no connectivity check at all (Tracker::sendIce()).
+TEST_F(WebRtcSession, BundleTagIsTheFirstBundledMLine)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+
+    Session::BundleTag tag;
+    const std::string offer = m_session->constructSdp(&tag);
+    const auto expected = bundleTagOf(offer);
+    ASSERT_EQ(expected.mid, "0") << offer;
+    ASSERT_EQ(expected.mLineIndex, 0) << offer;
+
+    EXPECT_EQ(std::to_string(tag.mid), expected.mid) << offer;
+    EXPECT_EQ(tag.mLineIndex, expected.mLineIndex) << offer;
+}
+
+// Given: the Device of the first m-line is removed and no other takes that m-line over, while a
+//     second one goes on streaming from the m-line after it.
+// When: the offer is built.
+// Expect: the tag passes over the rejected m-line, which is out of the group.
+TEST_F(WebRtcSession, BundleTagSkipsARejectedMLine)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    ASSERT_TRUE(m_session->createProvider(m_c->getId(), std::nullopt, {}, std::nullopt));
+    ASSERT_TRUE(m_session->removeProvider(m_a->getId()));
+
+    Session::BundleTag tag;
+    const std::string offer = m_session->constructSdp(&tag);
+    ASSERT_NE(offer.find("\r\nm=video 0 "), std::string::npos) << offer;
+    const auto expected = bundleTagOf(offer);
+    ASSERT_EQ(expected.mLineIndex, 1) << offer; //< the rejected m-line is the one before it
+
+    EXPECT_EQ(std::to_string(tag.mid), expected.mid) << offer;
+    EXPECT_EQ(tag.mLineIndex, expected.mLineIndex) << offer;
+}
+
+// Given: the only Device is removed, so no m-line of a track is left.
+// When: the offer is built.
+// Expect: the tag is the data channel m-line, all the group has left.
+TEST_F(WebRtcSession, BundleTagWithoutTracksIsTheDataChannel)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    ASSERT_TRUE(m_session->removeProvider(m_a->getId()));
+
+    Session::BundleTag tag;
+    const std::string offer = m_session->constructSdp(&tag);
+    const auto expected = bundleTagOf(offer);
+    ASSERT_EQ(expected.mid, std::to_string(kDataChannelMid)) << offer;
+    ASSERT_EQ(expected.mLineIndex, 1) << offer; //< the rejected m-line of the Device comes first
+
+    EXPECT_EQ(tag.mid, kDataChannelMid) << offer;
+    EXPECT_EQ(tag.mLineIndex, expected.mLineIndex) << offer;
+
+    // As the tag it holds the address:port of the group, instead of being `bundle-only` on 0.
+    const auto tagSection = mediaSectionOf(offer, std::to_string(kDataChannelMid));
+    EXPECT_FALSE(tagSection.starts_with("m=application 0 ")) << tagSection;
+    EXPECT_EQ(tagSection.find("a=bundle-only"), std::string::npos) << tagSection;
+}
+
+// Given: a Device with a video and an audio track, both taken into the BUNDLE group.
+// When: the offer is built.
+// Expect: the tag alone carries the address:port of the group, every other bundled m-line is
+//     `bundle-only` on port 0 (RFC 8843 section 7.5). The candidates name the tag, so it has to
+//     be the m-line that actually holds the transport.
+TEST_F(WebRtcSession, OnlyTheBundleTagCarriesThePort)
+{
+    ASSERT_TRUE(m_session->createProvider(m_d->getId(), std::nullopt, {}, std::nullopt));
+
+    Session::BundleTag tag;
+    const std::string offer = m_session->constructSdp(&tag);
+    ASSERT_EQ(valuesOf(offer, "a=group:BUNDLE "), (std::vector<std::string>{"0", "1", "128"}))
+        << offer;
+    ASSERT_EQ(tag.mid, 0) << offer;
+
+    const auto tagSection = mediaSectionOf(offer, "0");
+    EXPECT_FALSE(tagSection.starts_with("m=video 0 ")) << tagSection;
+    EXPECT_EQ(tagSection.find("a=bundle-only"), std::string::npos) << tagSection;
+
+    for (const auto& mid: {"1"s, std::to_string(kDataChannelMid)})
+        EXPECT_NE(mediaSectionOf(offer, mid).find("a=bundle-only"), std::string::npos) << offer;
+}
+
+// Given: the Device of the tag m-line is removed after the client answered the offer that
+//     carried it, and another Device takes that m-line over under a mid of its own.
+// When: the next offer is built.
+// Expect: the tag follows to the new mid. RFC 8843 section 7.5 lets a later offer pick any
+//     bundled m-line as its tag, and this one is the first of the group.
+TEST_F(WebRtcSession, BundleTagFollowsARecycledMLine)
+{
+    ASSERT_TRUE(m_session->createProvider(m_a->getId(), std::nullopt, {}, std::nullopt));
+    Session::BundleTag tag;
+    const auto mids = valuesOf(m_session->constructSdp(&tag), "a=mid:");
+    ASSERT_EQ(tag.mid, 0);
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, mids)));
+
+    ASSERT_TRUE(m_session->removeProvider(m_a->getId()));
+    ASSERT_TRUE(m_session->createProvider(m_c->getId(), std::nullopt, {}, std::nullopt));
+
+    const std::string offer = m_session->constructSdp(&tag);
+    const auto expected = bundleTagOf(offer);
+    EXPECT_NE(expected.mid, "0") << offer; //< the recycled m-line carries a new mid
+    EXPECT_EQ(std::to_string(tag.mid), expected.mid) << offer;
+    EXPECT_EQ(tag.mLineIndex, 0) << offer;
+    EXPECT_EQ(mediaSectionOf(offer, expected.mid).find("a=bundle-only"), std::string::npos)
+        << offer;
+}
+
+// Given: the client takes the audio track of a Device but refuses its video one, which was the
+//     tag of the offer it answered.
+// When: the next offer is built.
+// Expect: the tag moves to the audio m-line. The refused one is offered rejected and out of the
+//     group, so it holds no transport for a candidate to name.
+TEST_F(WebRtcSession, BundleTagLeavesARefusedTrack)
+{
+    ASSERT_TRUE(m_session->createProvider(m_d->getId(), std::nullopt, {}, std::nullopt));
+    Session::BundleTag tag;
+    const auto mids = valuesOf(m_session->constructSdp(&tag), "a=mid:");
+    ASSERT_EQ(mids, (std::vector<std::string>{"0", "1", "128"}));
+    ASSERT_EQ(tag.mid, 0);
+
+    ASSERT_TRUE(m_session->processSdpAnswer(makeAnswer(mids, {"1", "128"})));
+
+    const std::string offer = m_session->constructSdp(&tag);
+    ASSERT_NE(offer.find("\r\nm=video 0 "), std::string::npos) << offer;
+    EXPECT_EQ(valuesOf(offer, "a=group:BUNDLE "), (std::vector<std::string>{"1", "128"})) << offer;
+    EXPECT_EQ(tag.mid, 1) << offer;
+    EXPECT_EQ(tag.mLineIndex, 1) << offer;
 }
 
 } // namespace

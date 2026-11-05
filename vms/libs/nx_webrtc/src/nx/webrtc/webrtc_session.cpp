@@ -657,18 +657,21 @@ SessionDescription Session::describeUnsafe() const
     };
 }
 
-std::string Session::dataChannelSdp() const
+std::string Session::dataChannelSdp(bool isBundleTag) const
 {
 #define ENDL "\r\n";
     std::string sdp;
-    sdp += "m=application 0 UDP/DTLS/SCTP webrtc-datachannel" ENDL;
+    // As the tag of the BUNDLE group this m-line holds the address:port the group shares; as any
+    // other bundled one it is `bundle-only` on port 0 (RFC 8843 section 7.5).
+    const auto port = isBundleTag ? m_localAddress.port : 0;
+    sdp += "m=application " + std::to_string(port) + " UDP/DTLS/SCTP webrtc-datachannel" ENDL;
     sdp += "a=mid:" + std::to_string(kDataChannelMid) + ENDL;
     // Port in SCTP level.
     sdp += "a=sctp-port:" + std::to_string(kDefaultSctpPort) + ENDL;
     // SCTP max message size.
     sdp += "a=max-message-size:" + std::to_string(kSctpMaxMessageSize) + ENDL;
-    // Can be only bundled with another tracks.
-    sdp += "a=bundle-only" ENDL;
+    if (!isBundleTag)
+        sdp += "a=bundle-only" ENDL;
     /* https://datatracker.ietf.org/doc/html/rfc3264#section-5.1
      * If the offerer wishes to only send media on a stream to its peer, it
      * MUST mark the stream as sendonly with the "a=sendonly" attribute.
@@ -696,29 +699,47 @@ std::string Session::constructFingerprint() const
     return result;
 }
 
-std::string Session::constructSdp()
+std::string Session::constructSdp(BundleTag* bundleTag)
 {
     const auto port = m_localAddress.port;
 
     // An m-line with nothing to describe is still offered, rejected, so that the client keeps
     // every m-line it has seen. Such an m-line is out of the BUNDLE group, which may name only
-    // m-lines the offer carries, or the client rejects the offer whole.
+    // m-lines the offer carries, or the client rejects the offer whole. The first m-line of the
+    // group is its tag; with no track left in the group that is the data channel m-line.
     std::string mediaSections;
     std::string bundleMids;
+    int tagMid = kDataChannelMid;
+    int tagIndex = (int) m_tracks->tracks().size();
+    int mLineIndex = 0;
     for (const auto& [_, track]: m_tracks->tracks())
     {
         const auto media = m_tracks->getSdpForTrack(track.get(), port);
         if (media.empty())
         {
             mediaSections += m_tracks->rejectedSdpForTrack(track.get());
+            ++mLineIndex;
             continue;
         }
 
+        // The tag holds the address:port the whole group shares, and is the only bundled m-line
+        // that is not `bundle-only` (RFC 8843 section 7.5) -- which is why the ICE candidates
+        // name it, see Tracker::sendIce().
+        const bool isTag = bundleMids.empty();
+        if (isTag)
+        {
+            tagMid = track->mid;
+            tagIndex = mLineIndex;
+        }
         bundleMids += " " + std::to_string(track->mid);
         mediaSections += media;
-        mediaSections += "a=bundle-only\r\n";
+        if (!isTag)
+            mediaSections += "a=bundle-only\r\n";
+        ++mLineIndex;
     }
     bundleMids += " " + std::to_string(kDataChannelMid);
+    if (bundleTag)
+        *bundleTag = {tagMid, tagIndex};
 
     std::string sdp;
     std::string localAddress =
@@ -745,7 +766,7 @@ std::string Session::constructSdp()
     sdp += "a=ice-pwd:" + m_localPwd + ENDL;
 
     sdp += mediaSections;
-    sdp += dataChannelSdp();
+    sdp += dataChannelSdp(tagMid == kDataChannelMid);
     return sdp;
 }
 
