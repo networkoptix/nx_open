@@ -4,8 +4,11 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
 
 Q_MOC_INCLUDE("nx/vms/client/core/media/media_player.h")
+
+namespace nx::analytics { class AbstractMetadataConsumer; }
 
 namespace nx::vms::client::core {
 
@@ -14,7 +17,7 @@ class MediaPlayer;
 /**
  * Provides access to metadata acquired by specified media player from rtsp streams.
  */
-class MediaPlayerMotionProvider: public QObject
+class NX_VMS_CLIENT_CORE_API MediaPlayerMotionProvider: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(nx::vms::client::core::MediaPlayer* mediaPlayer
@@ -35,6 +38,10 @@ public:
 signals:
     void mediaPlayerChanged();
     void motionMaskChanged();
+
+protected:
+    /** Consumer of the current resource motion metadata, null w/o a media player. For tests. */
+    QSharedPointer<nx::analytics::AbstractMetadataConsumer> metadataConsumer() const;
 
 private:
     class Private;
