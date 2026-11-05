@@ -48,9 +48,6 @@ qint64 getChunkTime(
     static const auto defaultValue =
         [](bool searchForward) { return searchForward ? DATETIME_NOW : DATETIME_INVALID; };
 
-    if (periods.isEmpty())
-        defaultValue(searchForward);
-
     auto it = periods.findNearestPeriod(position, searchForward);
     if (it == periods.cend())
         return defaultValue(searchForward);
