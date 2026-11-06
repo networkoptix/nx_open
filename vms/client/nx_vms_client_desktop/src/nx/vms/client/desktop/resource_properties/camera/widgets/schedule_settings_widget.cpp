@@ -369,7 +369,8 @@ void ScheduleSettingsWidget::loadState(const CameraSettingsDialogState& state)
     {
         ui->advancedSettingsWidget->setEnabled(recordingParamsEnabled && !fpsLockedBitrate);
         ui->bitrateSpinBox->setRange(recording.minBitrateMbps, recording.maxBitrateMbps);
-        ui->bitrateSpinBox->setValue(recording.bitrateMbps);
+        if (!qFuzzyEquals(static_cast<float>(ui->bitrateSpinBox->value()), recording.bitrateMbps))
+            ui->bitrateSpinBox->setValue(recording.bitrateMbps);
         setReadOnly(ui->bitrateSpinBox, state.readOnly);
         setNormalizedValue(ui->bitrateSlider, recording.normalizedBitrate());
         setReadOnly(ui->bitrateSlider, state.readOnly);
