@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Išdėstymai</translation>
     </message>
   </context>
 </TS>

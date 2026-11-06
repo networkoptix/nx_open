@@ -95,7 +95,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation>Ẩn</translation>
+      <translation>Ngoại tuyến</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Bắt buộc sụp đổ</translation>
+      <translation>Buộc đóng</translation>
     </message>
   </context>
   <context>
@@ -371,7 +371,7 @@
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Hiện tại, tính năng thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt trên điện thoại của bạn</translation>
+      <translation>Hiện tại, thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt của điện thoại&apos;của bạn</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>Open</source>
-      <translation>mở</translation>
+      <translation>Mở</translation>
     </message>
   </context>
   <context>
@@ -594,7 +594,7 @@
     </message>
     <message>
       <source>Show more</source>
-      <translation>Xem thêm</translation>
+      <translation>Hiển thị thêm</translation>
     </message>
   </context>
   <context>
@@ -626,7 +626,7 @@
     <name>PerformanceSettingsScreen</name>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
+      <translation>Hiệu năng</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -670,7 +670,7 @@
     <name>PushExpertModeScreen</name>
     <message>
       <source>Notifications</source>
-      <translation>thông báo</translation>
+      <translation>Thông báo</translation>
     </message>
     <message>
       <source>Done</source>
@@ -976,11 +976,11 @@
     </message>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
+      <translation>Hiệu năng</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation>thông báo</translation>
+      <translation>Thông báo</translation>
     </message>
     <message>
       <source>Log in to the cloud to receive notifications</source>
@@ -988,7 +988,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>Đối với</translation>
+      <translation>Giới thiệu</translation>
     </message>
   </context>
   <context>
@@ -1206,7 +1206,7 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Paste</source>
