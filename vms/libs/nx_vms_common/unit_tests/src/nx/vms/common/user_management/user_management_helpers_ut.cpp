@@ -146,5 +146,37 @@ TEST_F(UserManagementHelpersTest, groupsWithParents)
             d.specialViewers.id, d.specialWorkers.id, kViewersGroupId}));
 }
 
+TEST_F(UserManagementHelpersTest, groupsWithParentsCycles)
+{
+    // Groups can be members of each other or of themselves, e.g. from LDAP.
+    auto groupA = createUserGroup("Group A");
+    const auto groupB = createUserGroup("Group B", groupA.id);
+    groupA.parentGroupIds = {groupB.id};
+    addOrUpdateUserGroup(groupA);
+
+    auto groupC = createUserGroup("Group C");
+    groupC.parentGroupIds = {groupC.id};
+    addOrUpdateUserGroup(groupC);
+
+    const auto hierarchy = systemContext()->accessSubjectHierarchy();
+
+    EXPECT_EQ(userGroupsWithParents(hierarchy, std::initializer_list<nx::Uuid>({groupA.id})),
+        QSet<nx::Uuid>({groupA.id, groupB.id}));
+
+    EXPECT_EQ(userGroupsWithParents(hierarchy, std::initializer_list<nx::Uuid>({groupC.id})),
+        QSet<nx::Uuid>({groupC.id}));
+}
+
+TEST_F(UserManagementHelpersTest, groupsWithParentsNotLoaded)
+{
+    const auto unknownGroupId = nx::Uuid::createUuid();
+    const auto group = createUserGroup("Group", unknownGroupId);
+
+    const auto hierarchy = systemContext()->accessSubjectHierarchy();
+
+    EXPECT_EQ(userGroupsWithParents(hierarchy, std::initializer_list<nx::Uuid>({group.id})),
+        QSet<nx::Uuid>({group.id, unknownGroupId}));
+}
+
 } // namespace test
 } // namespace nx::vms::common

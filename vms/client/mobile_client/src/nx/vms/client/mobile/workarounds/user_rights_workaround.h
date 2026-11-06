@@ -4,7 +4,6 @@
 
 #include <QtCore/QObject>
 
-#include <nx/utils/uuid.h>
 #include <nx/vms/client/mobile/system_context_aware.h>
 
 namespace nx::vms::client::mobile {
@@ -26,9 +25,6 @@ public:
 
 protected:
     explicit UserRightsWorkaround(SystemContext* systemContext, QObject* parent = nullptr);
-
-private:
-    bool isUserGroupLoaded(const nx::Uuid& groupId) const;
 };
 
 } // namespace nx::vms::client::mobile
