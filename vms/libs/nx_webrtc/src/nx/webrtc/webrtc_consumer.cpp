@@ -116,32 +116,24 @@ void Consumer::seek(nx::Uuid deviceId, int64_t timestampUs, StatusHandler handle
         {
             bool useAudioLastGop = //< TODO is it needed?
                 m_session->muxer()->method() == nx::vms::api::WebRtcMethod::mse;
-            auto doSeek =
-                [this, useAudioLastGop]
-                (int64_t timestampUs, auto provider, StatusHandler handler)
-                {
-                    auto status = provider && provider->play(timestampUs, useAudioLastGop)
-                        ? StreamStatus::success
-                        : StreamStatus::nodata;
-
-                    m_pollable.dispatch(
-                        [deviceId = provider->resource()->getId(), status, handler]()
-                        {
-                            handler(deviceId, status);
-                        });
-                };
+            auto doSeek = [useAudioLastGop, timestampUs](nx::Uuid id, auto provider, auto handler)
+            {
+                auto status = provider && provider->play(timestampUs, useAudioLastGop)
+                    ? StreamStatus::success
+                    : StreamStatus::nodata;
+                handler(id, status);
+            };
 
             if (!deviceId.isNull())
             {
                 m_undecryptableTimestampsUs.erase(deviceId);
-                auto provider = m_session->provider(deviceId);
-                doSeek(timestampUs, provider, handler);
+                doSeek(deviceId, m_session->provider(deviceId), handler);
             }
             else
             {
                 m_undecryptableTimestampsUs.clear();
                 for (const auto& provider: m_session->allProviders())
-                    doSeek(timestampUs, provider, handler);
+                    doSeek(provider->resource()->getId(), provider, handler);
             }
         });
 }
@@ -157,28 +149,21 @@ void Consumer::changeQuality(
     runInMuxingThread(
         [this, handler, deviceId, stream]()
         {
-            auto doChangeQuality =
-                [this](auto provider, auto stream, auto handler)
-                {
-                    auto status = provider && provider->changeQuality(stream)
-                        ? StreamStatus::success
-                        : StreamStatus::nodata;
-                    m_pollable.dispatch(
-                        [deviceId = provider->resource()->getId(), status, handler]()
-                        {
-                            handler(deviceId, status);
-                        });
-                };
+            auto doChangeQuality = [](nx::Uuid id, auto provider, auto stream, auto handler)
+            {
+                auto status = provider && provider->changeQuality(stream) ? StreamStatus::success
+                                                                          : StreamStatus::nodata;
+                handler(id, status);
+            };
 
             if (!deviceId.isNull())
             {
-                auto provider = m_session->provider(deviceId);
-                doChangeQuality(provider, stream, handler);
+                doChangeQuality(deviceId, m_session->provider(deviceId), stream, handler);
             }
             else
             {
                 for (const auto& provider: m_session->allProviders())
-                    doChangeQuality(provider, stream, handler);
+                    doChangeQuality(provider->resource()->getId(), provider, stream, handler);
             }
         });
 }
@@ -191,24 +176,21 @@ void Consumer::pause(nx::Uuid deviceId, StatusHandler handler)
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
-            auto doPause =
-                [](auto provider, auto handler)
-                {
-                    auto status = provider && provider->pause()
-                        ? StreamStatus::success
-                        : StreamStatus::nodata;
-                    handler(provider->resource()->getId(), status);
-                };
+            auto doPause = [](nx::Uuid id, auto provider, auto handler)
+            {
+                auto status =
+                    provider && provider->pause() ? StreamStatus::success : StreamStatus::nodata;
+                handler(id, status);
+            };
 
             if (!deviceId.isNull())
             {
-                auto provider = m_session->provider(deviceId);
-                doPause(provider, handler);
+                doPause(deviceId, m_session->provider(deviceId), handler);
             }
             else
             {
                 for (const auto& provider: m_session->allProviders())
-                    doPause(provider, handler);
+                    doPause(provider->resource()->getId(), provider, handler);
             }
         });
 }
@@ -218,24 +200,21 @@ void Consumer::resume(nx::Uuid deviceId, StatusHandler handler)
     runInMuxingThread(
         [this, handler = std::move(handler), deviceId]()
         {
-            auto doResume =
-                [](auto provider, auto handler)
-                {
-                    auto status = provider && provider->resume()
-                        ? StreamStatus::success
-                        : StreamStatus::nodata;
-                    handler(provider->resource()->getId(), status);
-                };
+            auto doResume = [](nx::Uuid id, auto provider, auto handler)
+            {
+                auto status =
+                    provider && provider->resume() ? StreamStatus::success : StreamStatus::nodata;
+                handler(id, status);
+            };
 
             if (!deviceId.isNull())
             {
-                auto provider = m_session->provider(deviceId);
-                doResume(provider, handler);
+                doResume(deviceId, m_session->provider(deviceId), handler);
             }
             else
             {
                 for (const auto& provider: m_session->allProviders())
-                    doResume(provider, handler);
+                    doResume(provider->resource()->getId(), provider, handler);
             }
         });
 }
