@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/settings/show_once_settings.h>
 #include <nx/vms/client/desktop/settings/system_specific_local_settings.h>
 #include <nx/vms/client/desktop/system_context.h>
+#include <nx/vms/client/desktop/system_health/system_health_state.h>
 #include <nx/vms/client/desktop/window_context.h>
 #include <ui/common/notification_levels.h>
 #include <ui/workbench/workbench_context.h>
@@ -157,12 +158,19 @@ bool SystemHealthListModel::removeRows(int row, int count, const QModelIndex& pa
         const auto messageType = d->message(row + i);
         if (messageType == MessageType::cloudPromo)
         {
-            executeLater([]() { showOnceSettings()->cloudPromo = true; }, this);
+            // Also called when the message state turns off, not only on user close.
+            // Mark it closed only if the state is still on, i.e. the user closed it.
+            if (system()->systemHealthState()->state(messageType))
+                executeLater([]() { showOnceSettings()->cloudPromo = true; }, this);
             break;
         }
         else if (messageType == MessageType::saasPromo)
         {
-            executeLater([this]() { system()->localSettings()->saasPromoClosed = true; }, this);
+            if (system()->systemHealthState()->state(messageType))
+            {
+                executeLater(
+                    [this]() { system()->localSettings()->saasPromoClosed = true; }, this);
+            }
             break;
         }
         else if (messageType == MessageType::cloudStorageIsAvailable)
