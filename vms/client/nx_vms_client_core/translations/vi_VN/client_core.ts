@@ -326,7 +326,7 @@
     </message>
     <message>
       <source>Any Period</source>
-      <translation type="unfinished">Any Period</translation>
+      <translation>Bất kỳ khoảng thời gian nào</translation>
     </message>
     <message>
       <source>Any</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
       <source>Local</source>
-      <translation>Vị trí</translation>
+      <translation>Cục bộ</translation>
     </message>
   </context>
   <context>
@@ -504,7 +504,7 @@
     </message>
     <message>
       <source>Camera</source>
-      <translation>Máy chụp hình</translation>
+      <translation>Camera</translation>
     </message>
   </context>
   <context>

@@ -1397,7 +1397,7 @@
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>اختر المخطط</translation>
     </message>
     <message>
       <source>Shared layouts</source>

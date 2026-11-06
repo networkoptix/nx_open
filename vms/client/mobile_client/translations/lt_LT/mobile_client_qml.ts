@@ -50,7 +50,7 @@
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Nėra archyvo</translation>
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
@@ -151,7 +151,7 @@
     <message>
       <source>Unknown</source>
       <comment>Unknown video quality</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
   </context>
   <context>
@@ -185,11 +185,11 @@
     </message>
     <message>
       <source>Follow the steps of wizard</source>
-      <translation type="unfinished">Follow the steps of wizard</translation>
+      <translation>Vykdykite vedlio veiksmus</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>If the site is &lt;font color=&apos;%2&apos;&gt;not connected&lt;/a&gt; to %1</source>
@@ -312,7 +312,7 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -336,7 +336,7 @@
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Bandyti dar kartą</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -391,14 +391,14 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
   </context>
   <context>
     <name>EventSearchScreen</name>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -422,7 +422,7 @@
     </message>
     <message>
       <source>Filters</source>
-      <translation type="unfinished">Filters</translation>
+      <translation>Filtrai</translation>
     </message>
     <message>
       <source>Details</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Atstatyti</translation>
     </message>
   </context>
   <context>
@@ -453,7 +453,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>No Notifications</source>
@@ -465,11 +465,11 @@
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Pabandykite pakeisti paieškos parametrus</translation>
     </message>
     <message>
       <source>No New Notifications</source>
@@ -544,7 +544,7 @@
     <name>HowItWorksSheet</name>
     <message>
       <source>How it works</source>
-      <translation type="unfinished">How it works</translation>
+      <translation>Kaip tai veikia</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -563,7 +563,7 @@
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -584,7 +584,7 @@
     <message>
       <source>%1 fps</source>
       <comment>%1 is a count of frames per second</comment>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 kadrai per sekundę</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -596,7 +596,7 @@
     <name>InterfaceSettingsPage</name>
     <message>
       <source>Interface</source>
-      <translation type="unfinished">Interface</translation>
+      <translation>Sąsaja</translation>
     </message>
     <message>
       <source>Live Previews</source>
@@ -627,7 +627,7 @@
     <name>InvalidOrChangedCertificateDialog</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Prisijungti vis tiek</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Prisijungti</translation>
     </message>
   </context>
   <context>
@@ -672,7 +672,7 @@
     <name>LogoutConfirmationPopup</name>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -692,7 +692,7 @@
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
     <message>
       <source>Logged in as %1</source>
@@ -708,25 +708,25 @@
     <name>MoveOnTapBanner</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Palieskite bet kurią vaizdo įrašo vietą, kad ten centruotumėte vaizdą</translation>
     </message>
   </context>
   <context>
     <name>MoveOnTapPage</name>
     <message>
       <source>Tap anywhere on video to center view there</source>
-      <translation type="unfinished">Tap anywhere on video to center view there</translation>
+      <translation>Palieskite bet kurią vaizdo įrašo vietą, kad ten centruotumėte vaizdą</translation>
     </message>
   </context>
   <context>
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation type="unfinished">Show more</translation>
+      <translation>Rodyti daugiau</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Nėra duomenų</translation>
     </message>
   </context>
   <context>
@@ -744,7 +744,7 @@
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Bendrinti</translation>
     </message>
     <message>
       <source>Select what to share</source>
@@ -789,7 +789,7 @@
     <name>ObjectsTypeSheet</name>
     <message>
       <source>View</source>
-      <translation type="unfinished">View</translation>
+      <translation>Peržiūrėti</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -797,11 +797,11 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -834,7 +834,7 @@
     <name>PasswordTextField</name>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Password field cannot be empty</source>
@@ -905,21 +905,21 @@
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Pasirinkite išankstinį nustatymą</translation>
     </message>
   </context>
   <context>
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation type="unfinished">Select Preset</translation>
+      <translation>Pasirinkite išankstinį nustatymą</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Cancel Re-Centering</source>
@@ -938,7 +938,7 @@
     <name>PushExpertModePage</name>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Svetainės</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -993,7 +993,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -1020,18 +1020,18 @@
     <name>RangeSelector</name>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Iš</translation>
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Į</translation>
     </message>
   </context>
   <context>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -1042,14 +1042,14 @@
     <name>ResourceTreeItem</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Kraunama...</translation>
     </message>
     <message>
       <source>Connecting...</source>
@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
     <message>
       <source>Timeline</source>
@@ -1106,14 +1106,14 @@
     <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
   </context>
   <context>
     <name>SecuritySettingsPage</name>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Saugumas</translation>
     </message>
     <message>
       <source>Save Passwords</source>
@@ -1129,7 +1129,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Laikyti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1160,11 +1160,11 @@
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -1172,7 +1172,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Host: Port</source>
@@ -1183,51 +1183,51 @@
     <name>SessionsScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organizacijos</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Svetainės</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Pabandykite pakeisti paieškos parametrus</translation>
     </message>
     <message>
       <source>No Organizations</source>
-      <translation type="unfinished">No Organizations</translation>
+      <translation>Nėra organizacijų</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Nepavyko pasiekti svetainės</translation>
     </message>
     <message>
       <source>Failed to access channel partner</source>
-      <translation type="unfinished">Failed to access channel partner</translation>
+      <translation>Nepavyko pasiekti kanalo partnerio</translation>
     </message>
     <message>
       <source>Failed to access organization</source>
-      <translation type="unfinished">Failed to access organization</translation>
+      <translation>Nepavyko pasiekti organizacijos</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partneriai</translation>
     </message>
     <message>
       <source>No Sites</source>
-      <translation type="unfinished">No Sites</translation>
+      <translation>Nėra svetainių</translation>
     </message>
     <message>
       <source>How to connect?</source>
@@ -1235,7 +1235,7 @@
     </message>
     <message>
       <source>Folder is empty</source>
-      <translation type="unfinished">Folder is empty</translation>
+      <translation>Aplankas tuščias</translation>
     </message>
     <message>
       <source>Access to Resources Denied</source>
@@ -1267,25 +1267,25 @@
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
   </context>
   <context>
     <name>ShareAction</name>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Bendrinama</translation>
     </message>
     <message>
       <source>Share</source>
-      <translation type="unfinished">Share</translation>
+      <translation>Bendrinti</translation>
     </message>
     <message>
       <source>Sharing opens the new bookmark dialog to generate a playback link after setting the sharing options</source>
@@ -1308,15 +1308,15 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Protect with Password (optional)</source>
-      <translation type="unfinished">Protect with Password (optional)</translation>
+      <translation>Apsaugoti slaptažodžiu (nebūtina)</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1332,19 +1332,19 @@
     </message>
     <message>
       <source>Expires in an hour</source>
-      <translation type="unfinished">Expires in an hour</translation>
+      <translation>Galioja po valandos</translation>
     </message>
     <message>
       <source>Expires in a day</source>
-      <translation type="unfinished">Expires in a day</translation>
+      <translation>Galioja po dienos</translation>
     </message>
     <message>
       <source>Expires in a month</source>
-      <translation type="unfinished">Expires in a month</translation>
+      <translation>Galioja po mėnesio</translation>
     </message>
     <message>
       <source>Never expires</source>
-      <translation type="unfinished">Never expires</translation>
+      <translation>Niekada negalioja</translation>
     </message>
     <message>
       <source>Shared link options</source>
@@ -1352,7 +1352,7 @@
     </message>
     <message>
       <source>Sharing</source>
-      <translation type="unfinished">Sharing</translation>
+      <translation>Dalijimasis</translation>
     </message>
     <message>
       <source>Share Link</source>
@@ -1375,11 +1375,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1410,11 +1410,11 @@
     <name>SiteList</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message>
       <source>Try changing the search parameters</source>
-      <translation type="unfinished">Try changing the search parameters</translation>
+      <translation>Pabandykite pakeisti paieškos parametrus</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -1422,7 +1422,7 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Log In to Cloud</source>
@@ -1433,11 +1433,11 @@
     <name>SiteListItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>NESUDERINAMAS</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>NEPRISIJUNGĘS</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -1449,11 +1449,11 @@
     </message>
     <message>
       <source>SUSPENDED</source>
-      <translation type="unfinished">SUSPENDED</translation>
+      <translation>SUSTABDYTA</translation>
     </message>
     <message>
       <source>SHUTDOWN</source>
-      <translation type="unfinished">SHUTDOWN</translation>
+      <translation>IŠJUNGIMAS</translation>
     </message>
     <message>
       <source>PENDING</source>
@@ -1498,7 +1498,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Galiojimo laikas baigiasi</translation>
     </message>
     <message>
       <source>Fingerprints</source>
@@ -1509,7 +1509,7 @@
     <name>StandardPopup</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
   </context>
   <context>
@@ -1588,7 +1588,7 @@
     <name>TwoFactorAuthenticationErrorDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Open account settings</source>
@@ -1657,11 +1657,11 @@
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Neprisijungęs</translation>
     </message>
     <message>
       <source>2FA disabled</source>
@@ -1669,7 +1669,7 @@
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Neleistinas</translation>
     </message>
     <message>
       <source>Unsupported</source>
@@ -1677,7 +1677,7 @@
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Nėra duomenų</translation>
     </message>
   </context>
   <context>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
     <message>
       <source>PTZ Mode</source>
@@ -1732,7 +1732,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Calendar</source>

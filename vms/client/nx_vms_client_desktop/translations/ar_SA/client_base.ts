@@ -7004,7 +7004,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Create Bookmark...</source>
-      <translation type="unfinished">Create Bookmark...</translation>
+      <translation>إنشاء علامة مرجعية...</translation>
     </message>
   </context>
   <context>
@@ -9266,7 +9266,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>تطبيق التغييرات?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -12003,35 +12003,35 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message numerus="yes">
       <source>Recording on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Recording on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
+        <numerusform>تم إيقاف التسجيل على قنوات %n بسبب الاستخدام المفرط للخدمة.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cloud storage backup on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Cloud storage backup on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف النسخ الاحتياطي للتخزين السحابي على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Paid integration service usage on %n channels was stopped due to service overuse.</source>
-      <translation type="unfinished">
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
-        <numerusform>Paid integration service usage on %n channels was stopped due to service overuse.</numerusform>
+      <translation>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
+        <numerusform>تم إيقاف استخدام خدمة التكامل المدفوعة على قنوات %n بسبب الإفراط في استخدام الخدمة.</numerusform>
       </translation>
     </message>
   </context>
@@ -12464,7 +12464,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>تطبيق التغييرات?</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -13240,7 +13240,7 @@ This web page presented an untrusted certificate. It is not recommended to open 
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>تعيين إلى شاشة كاملة</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
@@ -13653,7 +13653,7 @@ This web page presented an untrusted certificate. It is not recommended to open 
     </message>
     <message>
       <source>Select at least one layout</source>
-      <translation type="unfinished">Select at least one layout</translation>
+      <translation>حدد تخطيط واحد على الأقل</translation>
     </message>
     <message>
       <source>Select at least one User</source>

@@ -20,7 +20,7 @@
       <source>Activate %n more %1.</source>
       <comment>Numerus: %1 is substituted with the required license type</comment>
       <translation>
-        <numerusform>Kích hoạt %n khác %1.</numerusform>
+        <numerusform>Kích hoạt %n thêm %1.</numerusform>
       </translation>
     </message>
     <message numerus="yes">

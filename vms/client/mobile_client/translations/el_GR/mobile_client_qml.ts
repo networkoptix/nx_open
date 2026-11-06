@@ -108,11 +108,11 @@
     </message>
     <message>
       <source>Log In to Organization</source>
-      <translation type="unfinished">Log In to Organization</translation>
+      <translation>Συνδεθείτε στον Οργανισμό</translation>
     </message>
     <message>
       <source>Allow user to log in to organization</source>
-      <translation type="unfinished">Allow user to log in to organization</translation>
+      <translation>Επιτρέψτε στον χρήστη να συνδεθεί στον οργανισμό</translation>
     </message>
     <message>
       <source>Mirror Timeline</source>

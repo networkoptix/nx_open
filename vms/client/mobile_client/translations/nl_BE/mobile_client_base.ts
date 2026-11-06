@@ -2,6 +2,39 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl_BE" sourcelanguage="en">
   <context>
+    <name>AnalyticsDataHelper</name>
+    <message>
+      <source>Objects (%1)</source>
+      <translation type="unfinished">Objects (%1)</translation>
+    </message>
+    <message>
+      <source>Objects (&gt;%1)</source>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkDataHelper</name>
+    <message>
+      <source>Bookmarks (%1)</source>
+      <translation type="unfinished">Bookmarks (%1)</translation>
+    </message>
+    <message>
+      <source>Bookmarks (&gt;%1)</source>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+    </message>
+  </context>
+  <context>
+    <name>MotionDataHelper</name>
+    <message>
+      <source>Motion (&gt;%1)</source>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
+    </message>
+    <message>
+      <source>Motion (%1)</source>
+      <translation type="unfinished">Motion (%1)</translation>
+    </message>
+  </context>
+  <context>
     <name>ParametersVisualizationModel::Private</name>
     <message numerus="yes">
       <source>%n Object Attributes</source>
@@ -93,44 +126,24 @@
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
+    <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
-      <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
-    </message>
-    <message>
-      <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <source>Unknown</source>
+      <translation type="unfinished">Unknown</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::BookmarkData</name>
+    <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bladwijzer</translation>
-    </message>
-    <message>
-      <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
-    </message>
-    <message>
-      <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::mobile::timeline::MotionData</name>
+    <name>nx::vms::client::mobile::timeline::MotionDataHelper</name>
     <message>
       <source>Motion detected</source>
       <translation type="unfinished">Motion detected</translation>
-    </message>
-    <message>
-      <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
-    </message>
-    <message>
-      <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

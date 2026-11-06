@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>Credits</source>
-      <translation>Tín dụng</translation>
+      <translation>Nhà sản xuất</translation>
     </message>
     <message>
       <source>GPU Information</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Support</source>
-      <translation>Ủng hộ</translation>
+      <translation>Hỗ trợ</translation>
     </message>
     <message>
       <source>Developer</source>
@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>gần</translation>
+      <translation>Đóng</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -412,7 +412,7 @@
     </message>
     <message>
       <source>Password protection</source>
-      <translation type="unfinished">Password protection</translation>
+      <translation>Bảo vệ bằng mật khẩu</translation>
     </message>
   </context>
   <context>
@@ -720,7 +720,7 @@
     <name>CameraScheduleWidget</name>
     <message>
       <source>Recording</source>
-      <translation>Ghi âm</translation>
+      <translation>Ghi hình</translation>
     </message>
     <message>
       <source>Activate License...</source>
@@ -857,7 +857,7 @@
     </message>
     <message>
       <source>Restore from Backup...</source>
-      <translation>Trả lời từ bản sao lưu...</translation>
+      <translation>Khôi phục từ bản sao lưu...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1038,7 +1038,7 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -1058,7 +1058,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
   </context>
   <context>
@@ -1110,7 +1110,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trung bình (M)</translation>
+      <translation>Trung bình</translation>
     </message>
     <message>
       <source>High</source>
@@ -2216,7 +2216,7 @@ và nhấp vào nút &quot;Tìm kiếm&quot;</translation>
     <name>SecuritySettingsWidget</name>
     <message>
       <source>Enable audit trail</source>
-      <translation>Kích hoạt tính năng dấu vết kiểm toán</translation>
+      <translation>Bật báo cáo hành vi người dùng</translation>
     </message>
     <message>
       <source>Display watermark with username over video</source>
@@ -2483,7 +2483,7 @@ và nhấp vào nút &quot;Tìm kiếm&quot;</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
   </context>
   <context>
