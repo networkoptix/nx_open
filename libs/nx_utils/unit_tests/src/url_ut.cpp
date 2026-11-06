@@ -205,6 +205,13 @@ TEST(Url, webPageHostsEqual)
     EXPECT_FALSE(url::webPageHostsEqual("https://www.example.com/", "https://ftp.example.com/"));
 }
 
+TEST(Url, pathAndQuery)
+{
+    EXPECT_EQ(
+        "/path/file.cgi?a=1&b", Url("http://u:p@host:8080/path/file.cgi?a=1&b").pathAndQuery());
+    EXPECT_EQ("/path/file.cgi", Url("http://host/path/file.cgi").pathAndQuery());
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx

@@ -380,7 +380,7 @@ void Url::setPathAndQuery(std::string_view pathAndQuery, QUrl::ParsingMode mode)
 
 QString Url::pathAndQuery(QUrl::ComponentFormattingOptions options) const
 {
-    return path(options) + "?" + query(options);
+    return hasQuery() ? path(options) + "?" + query(options) : path(options);
 }
 
 bool Url::hasFragment() const

@@ -43,6 +43,7 @@ class QnMotionRegion;
 
 namespace nx::core::resource { class AbstractRemoteArchiveManager; }
 namespace nx::media { enum class StreamEvent; }
+namespace CameraDiagnostics { class Result; }
 
 class NX_VMS_COMMON_API QnVirtualCameraResource:
     public QnMediaResource,
@@ -177,17 +178,26 @@ public:
 
     virtual int getChannel() const;
 
-    /** Synchronous version of \a checkIfOnlineAsync(). */
-    bool ping();
+    /**
+     * Receives the check result: noError if the device is online, otherwise the reason why it is
+     * not.
+     */
+    using CheckIfOnlineHandler = std::function<void(CameraDiagnostics::Result)>;
+
+    /**
+     * Synchronous version of \a checkIfOnlineAsync(). Returns CannotEstablishConnectionResult if
+     * the check does not complete in time.
+     */
+    CameraDiagnostics::Result checkIfOnline();
 
     /**
      * Checks if camera is online
-     * \param completionHandler Invoked on check completion. Check result is passed to the functor
+     * \param completionHandler Invoked on check completion.
      * \note Implementation MUST check not only camera address:port accessibility, but also check
      * some unique parameters of camera
-     * \note Default implementation returns false
+     * \note Default implementation returns NotImplementedResult
      */
-    virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler);
+    virtual void checkIfOnlineAsync(CheckIfOnlineHandler completionHandler);
 
     static nx::Uuid physicalIdToId(const QString& uniqId);
 

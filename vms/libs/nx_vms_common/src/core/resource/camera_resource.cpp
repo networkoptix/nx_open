@@ -47,6 +47,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <recording/time_period_list.h>
 #include <utils/camera/camera_bitrate_calculator.h>
+#include <utils/camera/camera_diagnostics.h>
 #include <utils/common/util.h>
 
 #include "resource_data_structures.h"
@@ -814,21 +815,24 @@ int QnVirtualCameraResource::getChannel() const
     return 0;
 }
 
-bool QnVirtualCameraResource::ping()
+CameraDiagnostics::Result QnVirtualCameraResource::checkIfOnline()
 {
     NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread(),
-        "ping() blocks waiting for a completion that is delivered in an aio thread");
+        "checkIfOnline() blocks waiting for a completion that is delivered in an aio thread");
 
-    const auto result = std::make_shared<nx::utils::SyncQueue<bool>>();
-    checkIfOnlineAsync([result](bool isOnline) { result->push(isOnline); });
+    const auto result = std::make_shared<nx::utils::SyncQueue<CameraDiagnostics::Result>>();
+    checkIfOnlineAsync(
+        [result](CameraDiagnostics::Result checkResult) { result->push(std::move(checkResult)); });
 
-    return result->pop(getNetworkTimeout() * 3).value_or(false);
+    return result->pop(getNetworkTimeout() * 3)
+        .value_or(CameraDiagnostics::CannotEstablishConnectionResult(httpPort()));
 }
 
-void QnVirtualCameraResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
+void QnVirtualCameraResource::checkIfOnlineAsync(CheckIfOnlineHandler completionHandler)
 {
-    //calling completionHandler(false) in aio_thread
-    nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
+    nx::network::SocketGlobals::aioService().post(
+        [completionHandler = std::move(completionHandler)]
+        { completionHandler(CameraDiagnostics::NotImplementedResult()); });
 }
 
 nx::Uuid QnVirtualCameraResource::physicalIdToId(const QString& physicalId)

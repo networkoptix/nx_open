@@ -463,8 +463,7 @@ void downloadFileAsyncEx(
 
         if (httpClient->failed())
         {
-            completionHandlerEx(
-                SystemError::connectionReset,
+            completionHandlerEx(httpClient->lastSysErrorCode(),
                 nx::network::http::StatusCode::ok,
                 std::string(),
                 nx::Buffer(),
