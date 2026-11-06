@@ -95,41 +95,41 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
     <message>
       <source>Objects (%1)</source>
-      <translation>Đối tượng (%1)</translation>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation>Đối tượng (&gt;%1)</translation>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation>Dấu trang</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation>Dấu trang (%1)</translation>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation>Dấu trang (&gt;%1)</translation>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionData</name>
     <message>
       <source>Motion detected</source>
-      <translation>Phát hiện chuyển động</translation>
+      <translation type="unfinished">Motion detected</translation>
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation>Chuyển động (&gt;%1)</translation>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation>Chuyển động (%1)</translation>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>

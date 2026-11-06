@@ -107,7 +107,7 @@
     <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation>Lesezeichen</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>

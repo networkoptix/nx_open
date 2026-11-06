@@ -13,11 +13,11 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Press and hold</source>
-      <translation type="unfinished">Press and hold</translation>
+      <translation>Nhấn và giữ</translation>
     </message>
     <message>
       <source>Error</source>
@@ -35,7 +35,7 @@
     <name>AppInfoPage</name>
     <message>
       <source>About</source>
-      <translation>Đối với</translation>
+      <translation>Giới thiệu</translation>
     </message>
     <message>
       <source>User Manual</source>
@@ -54,15 +54,15 @@
     </message>
     <message>
       <source>You do not have permission to view the archive</source>
-      <translation type="unfinished">You do not have permission to view the archive</translation>
+      <translation>Bạn không có quyền xem kho lưu trữ</translation>
     </message>
     <message>
       <source>You do not have any recorded video in the archive</source>
-      <translation type="unfinished">You do not have any recorded video in the archive</translation>
+      <translation>Bạn không có bất kỳ video nào đã được ghi lại trong kho lưu trữ</translation>
     </message>
     <message>
       <source>Timeline is loading...</source>
-      <translation type="unfinished">Timeline is loading...</translation>
+      <translation>Đang tải dòng thời gian...</translation>
     </message>
   </context>
   <context>
@@ -108,11 +108,11 @@
     </message>
     <message>
       <source>Mirror Timeline</source>
-      <translation type="unfinished">Mirror Timeline</translation>
+      <translation>Phản chiếu dòng thời gian</translation>
     </message>
     <message>
       <source>Flip the timeline for left-handed use. Applies to phone-sized screens only.</source>
-      <translation type="unfinished">Flip the timeline for left-handed use. Applies to phone-sized screens only.</translation>
+      <translation>Lật ngược dòng thời gian để sử dụng cho người thuận tay trái. Chỉ áp dụng cho màn hình có kích thước tương đương điện thoại.</translation>
     </message>
   </context>
   <context>
@@ -150,15 +150,15 @@
     <name>CameraSwitcherTutorial</name>
     <message>
       <source>Swipe Between Resources</source>
-      <translation type="unfinished">Swipe Between Resources</translation>
+      <translation>Vuốt để chuyển đổi giữa các nguồn tài nguyên</translation>
     </message>
     <message>
       <source>Switch between cameras on a layout</source>
-      <translation type="unfinished">Switch between cameras on a layout</translation>
+      <translation>Chuyển đổi giữa các camera trên bố cục</translation>
     </message>
     <message>
       <source>Swipe right to switch to next Camera</source>
-      <translation type="unfinished">Swipe right to switch to next Camera</translation>
+      <translation>Vuốt sang phải để chuyển sang Camera tiếp theo</translation>
     </message>
   </context>
   <context>
@@ -190,7 +190,7 @@
     </message>
     <message>
       <source>How to Connect?</source>
-      <translation type="unfinished">How to Connect?</translation>
+      <translation>Cách thức kết nối?</translation>
     </message>
     <message>
       <source>Click &quot;Connect Site to %1&quot; in the %1 tab in Site Administration</source>
@@ -263,11 +263,11 @@
     </message>
     <message>
       <source>Search by %1</source>
-      <translation type="unfinished">Search by %1</translation>
+      <translation>Tìm kiếm theo %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
@@ -286,7 +286,7 @@
     </message>
     <message>
       <source>Force Crash</source>
-      <translation>Bắt buộc sụp đổ</translation>
+      <translation>Buộc đóng</translation>
     </message>
     <message>
       <source>Log Level</source>
@@ -365,7 +365,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
@@ -419,7 +419,7 @@
     </message>
     <message>
       <source>Reset All</source>
-      <translation type="unfinished">Reset All</translation>
+      <translation>Đặt lại tất cả</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -434,7 +434,7 @@
     </message>
     <message>
       <source>Notifications are currently disabled for this app. To enable notifications use your phone&apos;s settings</source>
-      <translation>Hiện tại, tính năng thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt trên điện thoại của bạn</translation>
+      <translation>Hiện tại, thông báo đã bị tắt cho ứng dụng này. Để bật thông báo, hãy sử dụng cài đặt của điện thoại&apos;của bạn</translation>
     </message>
     <message>
       <source>You disabled push notifications for this site. To enable them, go to the Settings page.</source>
@@ -519,7 +519,7 @@
     <name>FullscreenControlsOverlay</name>
     <message>
       <source>You are in Live Mode</source>
-      <translation type="unfinished">You are in Live Mode</translation>
+      <translation>Bạn đang ở Chế độ Xem Trực tiếp</translation>
     </message>
   </context>
   <context>
@@ -605,11 +605,11 @@
     </message>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Hướng dẫn</translation>
     </message>
     <message>
       <source>See the interface walkthrough</source>
-      <translation type="unfinished">See the interface walkthrough</translation>
+      <translation>Xem hướng dẫn sử dụng giao diện</translation>
     </message>
   </context>
   <context>
@@ -620,18 +620,18 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
     <name>LinkAboutToOpenDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>mở</translation>
+      <translation>Mở</translation>
     </message>
     <message>
       <source>Open external link in browser?</source>
@@ -665,12 +665,12 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Disconnect %1 from %2?</source>
       <comment>%1 is a user, %2 is a system</comment>
-      <translation type="unfinished">Disconnect %1 from %2?</translation>
+      <translation>Ngắt kết nối %1 khỏi %2?</translation>
     </message>
   </context>
   <context>
@@ -711,7 +711,7 @@
     <name>Notification</name>
     <message>
       <source>Show more</source>
-      <translation>Xem thêm</translation>
+      <translation>Hiển thị thêm</translation>
     </message>
     <message>
       <source>No data</source>
@@ -737,7 +737,7 @@
     </message>
     <message>
       <source>Select what to share</source>
-      <translation type="unfinished">Select what to share</translation>
+      <translation>Chọn nội dung bạn muốn chia sẻ</translation>
     </message>
     <message>
       <source>Download</source>
@@ -745,33 +745,33 @@
     </message>
     <message>
       <source>Select what to download</source>
-      <translation type="unfinished">Select what to download</translation>
+      <translation>Chọn mục tải xuống</translation>
     </message>
     <message>
       <source>Edit sharing</source>
-      <translation type="unfinished">Edit sharing</translation>
+      <translation>Chỉnh sửa chia sẻ</translation>
     </message>
   </context>
   <context>
     <name>ObjectSelectionSheet</name>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
     <name>ObjectTypesTutorial</name>
     <message>
       <source>View Mode</source>
-      <translation type="unfinished">View Mode</translation>
+      <translation>Chế độ xem</translation>
     </message>
     <message>
       <source>Switch the Timeline between Motion, Objects, and Bookmarks</source>
-      <translation type="unfinished">Switch the Timeline between Motion, Objects, and Bookmarks</translation>
+      <translation>Chuyển đổi giữa Dòng thời gian về Chuyển động, Đối tượng và Dấu trang</translation>
     </message>
     <message>
       <source>Tap to choose desired data type</source>
-      <translation type="unfinished">Tap to choose desired data type</translation>
+      <translation>Chạm để chọn loại dữ liệu mong muốn</translation>
     </message>
   </context>
   <context>
@@ -790,11 +790,11 @@
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
@@ -808,15 +808,15 @@
     <name>PanelButtonTutorial</name>
     <message>
       <source>Floating Panel Button</source>
-      <translation type="unfinished">Floating Panel Button</translation>
+      <translation>Nút bảng nổi</translation>
     </message>
     <message>
       <source>Reopen a collapsed panel</source>
-      <translation type="unfinished">Reopen a collapsed panel</translation>
+      <translation>Mở lại bảng điều khiển bị đóng</translation>
     </message>
     <message>
       <source>Tap the floating button to open the panel</source>
-      <translation type="unfinished">Tap the floating button to open the panel</translation>
+      <translation>Chạm vào nút nổi để mở bảng điều khiển</translation>
     </message>
   </context>
   <context>
@@ -834,7 +834,7 @@
     <name>PerformanceSettingsPage</name>
     <message>
       <source>Performance</source>
-      <translation>Hiệu suất cao</translation>
+      <translation>Hiệu năng</translation>
     </message>
     <message>
       <source>Hardware Acceleration</source>
@@ -849,27 +849,27 @@
     <name>Placeholder</name>
     <message>
       <source>No Bookmarks</source>
-      <translation type="unfinished">No Bookmarks</translation>
+      <translation>Không có dấu trang</translation>
     </message>
     <message>
       <source>No Objects</source>
-      <translation type="unfinished">No Objects</translation>
+      <translation>Không có Đối tượng</translation>
     </message>
     <message>
       <source>No Motion</source>
-      <translation type="unfinished">No Motion</translation>
+      <translation>Không có chuyển động</translation>
     </message>
     <message>
       <source>No bookmarks have been created on this timeline</source>
-      <translation type="unfinished">No bookmarks have been created on this timeline</translation>
+      <translation>Chưa có dấu trang nào được tạo trên dòng thời gian này</translation>
     </message>
     <message>
       <source>No objects have been detected on this timeline</source>
-      <translation type="unfinished">No objects have been detected on this timeline</translation>
+      <translation>Không có đối tượng nào được phát hiện trên dòng thời gian này</translation>
     </message>
     <message>
       <source>No motion has been detected on this timeline</source>
-      <translation type="unfinished">No motion has been detected on this timeline</translation>
+      <translation>Không phát hiện thấy chuyển động nào trên dòng thời gian này</translation>
     </message>
   </context>
   <context>
@@ -887,21 +887,21 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>gần</translation>
+      <translation>Đóng</translation>
     </message>
   </context>
   <context>
     <name>PresetSwitch</name>
     <message>
       <source>Select Preset</source>
-      <translation>Chọn thiết lập sẵn</translation>
+      <translation>Chọn cài đặt sẵn</translation>
     </message>
   </context>
   <context>
     <name>Presets</name>
     <message>
       <source>Select Preset</source>
-      <translation>Chọn thiết lập sẵn</translation>
+      <translation>Chọn cài đặt sẵn</translation>
     </message>
   </context>
   <context>
@@ -912,7 +912,7 @@
     </message>
     <message>
       <source>Cancel Re-Centering</source>
-      <translation type="unfinished">Cancel Re-Centering</translation>
+      <translation>Hủy bỏ việc căn giữa lại</translation>
     </message>
     <message>
       <source>PTZ Presets</source>
@@ -920,7 +920,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation>gần</translation>
+      <translation>Đóng</translation>
     </message>
   </context>
   <context>
@@ -931,7 +931,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation>thông báo</translation>
+      <translation>Thông báo</translation>
     </message>
     <message>
       <source>Done</source>
@@ -959,7 +959,7 @@
     </message>
     <message>
       <source>No</source>
-      <translation>Từ chối</translation>
+      <translation>Không</translation>
     </message>
     <message>
       <source>Save changes?</source>
@@ -967,11 +967,11 @@
     </message>
     <message>
       <source>SELECTED %1/%2</source>
-      <translation type="unfinished">SELECTED %1/%2</translation>
+      <translation>ĐÃ CHỌN %1/%2</translation>
     </message>
     <message>
       <source>Please select at least one site</source>
-      <translation type="unfinished">Please select at least one site</translation>
+      <translation>Vui lòng chọn ít nhất một Chi nhánh</translation>
     </message>
   </context>
   <context>
@@ -1084,7 +1084,7 @@
     <name>SaasPromoBanner</name>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Mở khóa các tính năng độc quyền để có thêm phân tích video thông minh và vận hành dựa trên dữ liệu ở quy mô lớn</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -1122,7 +1122,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Server Certificate Check</source>
@@ -1464,15 +1464,15 @@
     <name>SoftTriggersTutorial</name>
     <message>
       <source>Soft Triggers</source>
-      <translation type="unfinished">Soft Triggers</translation>
+      <translation>Kích hoạt mềm</translation>
     </message>
     <message>
       <source>Open Soft Trigger camera actions</source>
-      <translation type="unfinished">Open Soft Trigger camera actions</translation>
+      <translation>Mở các thao tác Kích hoạt mềm trên camera</translation>
     </message>
     <message>
       <source>Tap to invoke soft triggers panel</source>
-      <translation type="unfinished">Tap to invoke soft triggers panel</translation>
+      <translation>Chạm để mở bảng điều khiển kích hoạt mềm</translation>
     </message>
   </context>
   <context>
@@ -1529,30 +1529,30 @@
     <name>TimelinePreviewTutorial</name>
     <message>
       <source>Timeline Cards and Player</source>
-      <translation type="unfinished">Timeline Cards and Player</translation>
+      <translation>Thẻ dòng thời gian và trình phát</translation>
     </message>
     <message>
       <source>View event details with a long tap</source>
-      <translation type="unfinished">View event details with a long tap</translation>
+      <translation>Xem chi tiết sự kiện bằng cách nhấn giữ lâu</translation>
     </message>
     <message>
       <source>Long tap to invoke preview with more details</source>
-      <translation type="unfinished">Long tap to invoke preview with more details</translation>
+      <translation>Nhấn giữ để xem trước chi tiết hơn</translation>
     </message>
   </context>
   <context>
     <name>TimelineZoomTutorial</name>
     <message>
       <source>Zoom Timeline In/Out</source>
-      <translation type="unfinished">Zoom Timeline In/Out</translation>
+      <translation>Phóng to/thu nhỏ dòng thời gian</translation>
     </message>
     <message>
       <source>Pinch or spread to zoom the Timeline</source>
-      <translation type="unfinished">Pinch or spread to zoom the Timeline</translation>
+      <translation>Chụm hoặc kéo giãn để phóng to dòng thời gian</translation>
     </message>
     <message>
       <source>Pinch to Zoom Out and Spread to Zoom In</source>
-      <translation type="unfinished">Pinch to Zoom Out and Spread to Zoom In</translation>
+      <translation>Chụm hai ngón tay để thu nhỏ và kéo giãn để phóng to</translation>
     </message>
   </context>
   <context>
@@ -1563,14 +1563,14 @@
     </message>
     <message>
       <source>Ok, I got it</source>
-      <translation type="unfinished">Ok, I got it</translation>
+      <translation>Ok, đã hiểu</translation>
     </message>
   </context>
   <context>
     <name>TutorialsSettingsPage</name>
     <message>
       <source>Tutorials</source>
-      <translation type="unfinished">Tutorials</translation>
+      <translation>Hướng dẫn</translation>
     </message>
   </context>
   <context>
@@ -1588,7 +1588,7 @@
     <name>UnknownSslCertificateDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -1650,11 +1650,11 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation>Ẩn</translation>
+      <translation>Ngoại tuyến</translation>
     </message>
     <message>
       <source>2FA disabled</source>
-      <translation type="unfinished">2FA disabled</translation>
+      <translation>2FA đã được vô hiệu hoá</translation>
     </message>
     <message>
       <source>Unauthorized</source>
@@ -1662,7 +1662,7 @@
     </message>
     <message>
       <source>Unsupported</source>
-      <translation type="unfinished">Unsupported</translation>
+      <translation>Không được hỗ trợ</translation>
     </message>
     <message>
       <source>No data</source>
@@ -1705,27 +1705,27 @@
     </message>
     <message>
       <source>Live mode only</source>
-      <translation type="unfinished">Live mode only</translation>
+      <translation>Chỉ chế độ trực tiếp</translation>
     </message>
     <message>
       <source>Archive mode only</source>
-      <translation type="unfinished">Archive mode only</translation>
+      <translation>Chỉ ở chế độ lưu trữ</translation>
     </message>
     <message>
       <source>Camera Info</source>
-      <translation type="unfinished">Camera Info</translation>
+      <translation>Thông tin về Camera</translation>
     </message>
     <message>
       <source>Go to Live to activate soft triggers</source>
-      <translation type="unfinished">Go to Live to activate soft triggers</translation>
+      <translation>Vào chế độ Trực tiếp để kích hoạt các trình kích hoạt mềm</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation>Vận động</translation>
+      <translation>Chuyển động</translation>
     </message>
     <message>
       <source>Calendar</source>
-      <translation type="unfinished">Calendar</translation>
+      <translation>Lịch</translation>
     </message>
     <message>
       <source>Actions</source>
@@ -1745,7 +1745,7 @@
     </message>
     <message>
       <source>Back to Welcome Screen</source>
-      <translation type="unfinished">Back to Welcome Screen</translation>
+      <translation>Quay lại màn hình chào mừng</translation>
     </message>
     <message>
       <source>Log out</source>
@@ -1753,7 +1753,7 @@
     </message>
     <message>
       <source>Press back again to exit</source>
-      <translation type="unfinished">Press back again to exit</translation>
+      <translation>Bấm trở lại một lần nữa để thoát</translation>
     </message>
   </context>
 </TS>

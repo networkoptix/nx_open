@@ -96,41 +96,41 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsData</name>
     <message>
       <source>Objects (%1)</source>
-      <translation>Objekter (%1)</translation>
+      <translation type="unfinished">Objects (%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation>Objekter (&gt;%1)</translation>
+      <translation type="unfinished">Objects (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkData</name>
     <message>
       <source>Bookmark</source>
-      <translation>Bogmærke</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation>Bogmærker (%1)</translation>
+      <translation type="unfinished">Bookmarks (%1)</translation>
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation>Bogmærker (&gt;%1)</translation>
+      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionData</name>
     <message>
       <source>Motion detected</source>
-      <translation>Bevægelse registreret</translation>
+      <translation type="unfinished">Motion detected</translation>
     </message>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation>Bevægelse (&gt;%1)</translation>
+      <translation type="unfinished">Motion (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation>Bevægelse (%1)</translation>
+      <translation type="unfinished">Motion (%1)</translation>
     </message>
   </context>
 </TS>
