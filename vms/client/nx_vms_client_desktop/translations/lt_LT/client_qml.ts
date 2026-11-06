@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Login Attribute</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Synchronize Users</source>
@@ -247,7 +247,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>Tile Settings</source>
@@ -357,7 +357,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
     <message>
       <source>Remove Request</source>
@@ -417,7 +417,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Išjungta</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
@@ -507,7 +507,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>nėra</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -540,7 +540,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Neprisijungęs</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -548,15 +548,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Nesuderinama</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>Laukiama</translation>
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Sustabdyta</translation>
     </message>
     <message>
       <source>Shut Down</source>
@@ -604,7 +604,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
@@ -688,22 +688,22 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Raktas</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Vertė</translation>
     </message>
   </context>
   <context>
     <name>DewarpingSettings</name>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Iškraipymo mažinimas</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Žuvies akis</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
@@ -741,7 +741,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Column Name</source>
@@ -749,7 +749,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Create</source>
@@ -765,7 +765,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Attributes</source>
@@ -798,7 +798,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Vertė</translation>
     </message>
   </context>
   <context>
@@ -876,7 +876,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -894,7 +894,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FilterDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Base DN</source>
@@ -925,7 +925,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FilterSettingsDialog</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
   </context>
   <context>
@@ -992,7 +992,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dydis</translation>
     </message>
     <message>
       <source>X Offset</source>
@@ -1023,14 +1023,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Baigti</translation>
     </message>
   </context>
   <context>
     <name>GlobalLoaderIndicator</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Kraunama...</translation>
     </message>
   </context>
   <context>
@@ -1052,7 +1052,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1060,7 +1060,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1083,15 +1083,15 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Leidimų grupės</translation>
     </message>
   </context>
   <context>
@@ -1102,7 +1102,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1110,7 +1110,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -1129,11 +1129,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1145,11 +1145,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Leidimų grupės</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
@@ -1172,7 +1172,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupMembersTab</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1199,7 +1199,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupsComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pasirinkite</translation>
     </message>
     <message>
       <source>No groups</source>
@@ -1208,7 +1208,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>BUILT-IN</source>
@@ -1287,11 +1287,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>NEPRISIJUNGĘS</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Atnaujinti</translation>
     </message>
     <message>
       <source>Services Required</source>
@@ -1299,7 +1299,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>Gaivus...</translation>
     </message>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
@@ -1308,18 +1308,18 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
   </context>
   <context>
     <name>IntegrationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versija</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Pardavėjas</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -1331,7 +1331,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Usage</source>
-      <translation type="unfinished">Usage</translation>
+      <translation>Naudojimas</translation>
     </message>
   </context>
   <context>
@@ -1342,11 +1342,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
   </context>
   <context>
@@ -1372,11 +1372,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pauzė</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Leisti</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -1391,15 +1391,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>JoystickInvestigationWizard</name>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Išsaugoti</translation>
     </message>
     <message>
       <source>Previous</source>
-      <translation type="unfinished">Previous</translation>
+      <translation>Ankstesnis</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Toliau</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
@@ -1430,7 +1430,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Atkurti numatytuosius nustatymus</translation>
     </message>
   </context>
   <context>
@@ -1467,11 +1467,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>NEPRISIJUNGĘS</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -1491,7 +1491,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1591,7 +1591,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>value</source>
-      <translation type="unfinished">value</translation>
+      <translation>vertė</translation>
     </message>
   </context>
   <context>
@@ -1677,11 +1677,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksportuoti</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>%1 selected:</source>
@@ -1750,11 +1750,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>MultiSelectionComboBox</name>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pasirinkite</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message numerus="yes">
       <source>%n more</source>
@@ -1854,11 +1854,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -1877,7 +1877,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Reject</source>
-      <translation type="unfinished">Reject</translation>
+      <translation>Atmesti</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
@@ -1922,7 +1922,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>LDAP</source>
       <comment>Acronym for The Lightweight Directory Access Protocol</comment>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Built-in</source>
@@ -1943,7 +1943,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Current password</source>
@@ -1951,7 +1951,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>New password</source>
-      <translation type="unfinished">New password</translation>
+      <translation>Naujas slaptažodis</translation>
     </message>
     <message>
       <source>Confirm password</source>
@@ -1959,7 +1959,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Slaptažodžiai nesutampa</translation>
     </message>
   </context>
   <context>
@@ -2027,7 +2027,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
   </context>
   <context>
@@ -2057,7 +2057,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
   </context>
   <context>
@@ -2149,11 +2149,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Toliau</translation>
     </message>
   </context>
   <context>
@@ -2234,11 +2234,11 @@ Press Alt + Click to follow object</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>iš</translation>
     </message>
     <message>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>į</translation>
     </message>
   </context>
   <context>
@@ -2256,7 +2256,7 @@ Press Alt + Click to follow object</translation>
     <name>RemoteAccess</name>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Išjungta</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
@@ -2272,7 +2272,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
@@ -2292,7 +2292,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
@@ -2368,11 +2368,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Pabandykite ieškoti kažko kito</translation>
     </message>
   </context>
   <context>
@@ -2387,7 +2387,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Išdėstymai</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -2395,7 +2395,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Health Monitors</source>
@@ -2423,7 +2423,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourcePreview</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>OUTDATED</source>
@@ -2431,14 +2431,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>Prieiga draudžiama</translation>
     </message>
   </context>
   <context>
     <name>ResourceSearchPane</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Serveriai</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2446,7 +2446,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Išdėstymai</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -2458,7 +2458,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -2466,7 +2466,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
   </context>
   <context>
@@ -2488,7 +2488,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -2500,7 +2500,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
   </context>
   <context>
@@ -2541,7 +2541,7 @@ Press Alt + Click to follow object</translation>
     <name>SearchField</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
   </context>
   <context>
@@ -2566,7 +2566,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pasirinkite</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -2629,7 +2629,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Atstatyti</translation>
     </message>
   </context>
   <context>
@@ -2640,7 +2640,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>Activate License</source>
@@ -2673,11 +2673,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Neleistinas</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -2735,7 +2735,7 @@ Press Alt + Click to follow object</translation>
     <name>StyledRadioButton</name>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Loginis ID</translation>
     </message>
   </context>
   <context>
@@ -2794,7 +2794,7 @@ Press Alt + Click to follow object</translation>
     <name>TileGridPlaceholder</name>
     <message>
       <source>Nothing Found</source>
-      <translation type="unfinished">Nothing Found</translation>
+      <translation>Nieko nerasta</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
@@ -2825,7 +2825,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Show</source>
-      <translation type="unfinished">Show</translation>
+      <translation>Rodyti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2872,11 +2872,11 @@ Press Alt + Click to follow object</translation>
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
       </translation>
     </message>
   </context>
@@ -2888,7 +2888,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2896,7 +2896,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -2915,11 +2915,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Local</source>
-      <translation type="unfinished">Local</translation>
+      <translation>Vietinis</translation>
     </message>
     <message>
       <source>Cloud</source>
@@ -2927,19 +2927,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Pilnas vardas</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>El. paštas</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2955,7 +2955,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Leidimų grupės</translation>
     </message>
     <message>
       <source>Access</source>
@@ -2971,7 +2971,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Slaptažodžiai nesutampa</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
@@ -2990,7 +2990,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -2998,7 +2998,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Ištekliai</translation>
     </message>
     <message>
       <source>Global Permissions</source>
@@ -3033,11 +3033,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Pilnas vardas</translation>
     </message>
     <message>
       <source>Account Settings</source>
@@ -3045,7 +3045,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>El. paštas</translation>
     </message>
     <message>
       <source>Change password</source>
@@ -3065,7 +3065,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Permission Groups</source>
-      <translation type="unfinished">Permission Groups</translation>
+      <translation>Leidimų grupės</translation>
     </message>
     <message>
       <source>Access expires</source>
@@ -3077,7 +3077,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Copy Link</source>
-      <translation type="unfinished">Copy Link</translation>
+      <translation>Kopijuoti nuorodą</translation>
     </message>
     <message>
       <source>Terminate</source>
@@ -3185,11 +3185,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Išjungti</translation>
     </message>
   </context>
   <context>
@@ -3204,7 +3204,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Pagalba</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>

@@ -340,7 +340,7 @@
     </message>
     <message>
       <source>About...</source>
-      <translation>Đối với...</translation>
+      <translation>Giới thiệu...</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -624,7 +624,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong</translation>
+      <translation>Trung bình</translation>
     </message>
     <message>
       <source>Large</source>
@@ -724,7 +724,7 @@
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>Nhật ký bookmark...</translation>
+      <translation>Nhật ký dấu trang...</translation>
     </message>
     <message>
       <source>Showreel...</source>
@@ -1122,7 +1122,7 @@
       <source>Show on Items</source>
       <comment>Numerus form depends on the amount of items</comment>
       <translation>
-        <numerusform>Hiển thị trên các khoản mục</numerusform>
+        <numerusform>Hiển thị trên các mục</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1195,7 +1195,7 @@
     <message>
       <source>Also include</source>
       <comment>Part of the text, action duration: Also include &lt;time&gt; Before Event</comment>
-      <translation>Cũng bao gồm</translation>
+      <translation>Bao gồm</translation>
     </message>
     <message>
       <source>Begin</source>
@@ -1539,12 +1539,12 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Cannot connect to Server %1.</source>
       <comment>%1 is a Server name</comment>
-      <translation type="unfinished">Cannot connect to Server %1.</translation>
+      <translation>Không thể kết nối đến Máy chủ %1.</translation>
     </message>
     <message>
       <source>Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</source>
       <comment>%1 is a Server name, %2 is an address of the target Site</comment>
-      <translation type="unfinished">Server %1 cannot connect to %2. Make sure the address is correct and the target Site is online and reachable from %1.</translation>
+      <translation>Máy chủ %1 không thể kết nối với %2. Hãy đảm bảo địa chỉ chính xác và Chi nhánh mục tiêu đang hoạt động và có thể truy cập được từ %1.</translation>
     </message>
   </context>
   <context>
@@ -2692,7 +2692,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Disconnect Site from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Ngắt kết nối Chi nhánh từ %1</translation>
+      <translation>Ngắt kết nối Chi nhánh với %1</translation>
     </message>
     <message>
       <source>Connect Site to %1...</source>
@@ -2722,7 +2722,7 @@ Khóa giấy phép: %2</translation>
     <message>
       <source>Disconnect site from %1?</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation>Ngắt kết nối Chi nhánh từ %1?</translation>
+      <translation>Ngắt kết nối Chi nhánh với %1?</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
@@ -2864,7 +2864,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation>Máy trạm và Máy chủ có các phiên bản khác nhau</translation>
+      <translation>Máy khách và Máy chủ có các phiên bản khác nhau</translation>
     </message>
     <message>
       <source>Client - %1</source>
@@ -3433,7 +3433,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation>Gian của khách hàng</translation>
+      <translation>Thời gian máy khách</translation>
     </message>
     <message>
       <source>Stretch</source>
@@ -3449,7 +3449,7 @@ Khóa giấy phép: %2</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation>Tùy chọn này sẽ không ảnh hưởng đến Schedule Recording. Lịch trình ghi âm luôn luôn dựa trên Server Time.</translation>
+      <translation>Tùy chọn này sẽ không ảnh hưởng đến Lịch ghi hình. Lịch ghi hình luôn dựa trên Thời gian máy chủ.</translation>
     </message>
     <message>
       <source>Select File...</source>
@@ -4479,7 +4479,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>Ghi âm được kích hoạt trên USB lưu trữ</translation>
+      <translation>Ghi hình được kích hoạt trên USB lưu trữ</translation>
     </message>
     <message>
       <source>Choose a read-write policy to define how interact with storage directories.</source>
@@ -4788,7 +4788,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Routing</source>
-      <translation>Routing</translation>
+      <translation>Định tuyến</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5773,7 +5773,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong</translation>
+      <translation>Trung bình</translation>
     </message>
     <message>
       <source>High</source>
@@ -6236,7 +6236,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Minimize</source>
-      <translation>giảm thiểu</translation>
+      <translation>Thu nhỏ</translation>
     </message>
     <message>
       <source>Video transcoding is required. Export session restarted.</source>
@@ -6986,7 +6986,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant</source>
-      <translation>Cài đặt chất lượng và tốc độ khung hình (FPS) trong Lịch ghi âm sẽ trở nên không có liên quan</translation>
+      <translation>Các thiết lập chất lượng và tốc độ khung hình (FPS) trong Lịch ghi hình sẽ trở nên không còn liên quan</translation>
     </message>
     <message>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on performance</source>
@@ -7137,7 +7137,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Phát hiện chuyển động sẽ chỉ hoạt động khi camera đang được xem. Bật tính năng ghi âm để luôn hoạt động.</translation>
+      <translation>Phát hiện chuyển động sẽ chỉ hoạt động khi camera đang được xem. Bật tính năng ghi hình để luôn hoạt động.</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
@@ -7318,7 +7318,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Recording</source>
-      <translation>Ghi âm</translation>
+      <translation>Ghi hình</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7338,7 +7338,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Expert</source>
-      <translation>Chế độ Chuyên gia</translation>
+      <translation>Cài đặt nâng cao</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -7810,7 +7810,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation>Ghi âm không thể được kích hoạt cho một số camera.</translation>
+      <translation>Không thể bật chức năng ghi hình đối với một số camera.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
@@ -8343,7 +8343,7 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong</translation>
+      <translation>Trung bình</translation>
     </message>
     <message>
       <source>High</source>
@@ -8940,7 +8940,7 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     <name>nx::vms::client::desktop::LogsManagementModel</name>
     <message>
       <source>Unit</source>
-      <translation>Đơn vị</translation>
+      <translation>Thành phần</translation>
     </message>
     <message>
       <source>Current Level</source>
@@ -8948,7 +8948,7 @@ Hãy nhớ khôi phục Mức ghi nhật ký về cài đặt mặc định sau 
     </message>
     <message>
       <source>Client</source>
-      <translation>Khách hàng</translation>
+      <translation>Máy khách</translation>
     </message>
     <message>
       <source>Error</source>
@@ -10912,7 +10912,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Client</source>
-      <translation>Khách hàng</translation>
+      <translation>Máy khách</translation>
     </message>
     <message>
       <source>Component</source>
@@ -11347,7 +11347,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11442,7 +11442,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -11485,7 +11485,7 @@ Không ghim chứng chỉ này nếu bạn không sửa đổi chứng chỉ SSL
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -12513,7 +12513,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Add Title or Comment</source>
-      <translation>Thêm tiêu đề hoặc bình luận</translation>
+      <translation>Thêm tiêu đề hoặc ghi chú</translation>
     </message>
     <message>
       <source>The rule is not valid and may not work</source>
@@ -12621,7 +12621,7 @@ Chúng tôi khuyến nghị bạn không nên mở trang web này. Nếu bạn h
     </message>
     <message>
       <source>Comment</source>
-      <translation>Bình luận</translation>
+      <translation>Ghi chú</translation>
     </message>
     <message>
       <source>No source</source>
@@ -13270,7 +13270,7 @@ Bạn có thể chọn vị trí lưu trữ khác trong tab &quot;Quản lý lư
     </message>
     <message>
       <source>Client auto-updates</source>
-      <translation>Cập nhật tự động của khách hàng</translation>
+      <translation>Tự động cập nhật máy khách</translation>
     </message>
   </context>
   <context>
