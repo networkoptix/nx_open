@@ -171,7 +171,7 @@
     </message>
     <message>
       <source>Power Users</source>
-      <translation type="unfinished">Power Users</translation>
+      <translation>Patyrę vartotojai</translation>
     </message>
     <message>
       <source>Advanced Viewers</source>
@@ -179,40 +179,40 @@
     </message>
     <message>
       <source>Viewers</source>
-      <translation type="unfinished">Viewers</translation>
+      <translation>Žiūrovai</translation>
     </message>
     <message>
       <source>Live Viewers</source>
-      <translation type="unfinished">Live Viewers</translation>
+      <translation>Tiesioginiai žiūrovai</translation>
     </message>
     <message>
       <source>Members of this group can view live videos, I/O modules and web pages.</source>
-      <translation type="unfinished">Members of this group can view live videos, I/O modules and web pages.</translation>
+      <translation>Šios grupės nariai gali peržiūrėti tiesioginius vaizdo įrašus, įvesties / išvesties modulius ir tinklalapius.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Viewers group, see and activate PTZ positions and PTZ tours, use 2-way audio, operate I/O module buttons, create and edit bookmarks, and view the Event Log.</translation>
+      <translation>Šios grupės nariai, be „Peržiūros grupės“ suteiktų leidimų, gali matyti ir aktyvuoti PTZ pozicijas ir PTZ turus, naudoti dvipusį garsą, valdyti įvesties/išvesties modulio mygtukus, kurti ir redaguoti žymes bei peržiūrėti įvykių žurnalą.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Live Viewers group, view and export archive and Bookmarks.</translation>
+      <translation>Šios grupės nariai, be tiesioginių žiūrovų grupės suteiktų leidimų, gali peržiūrėti ir eksportuoti archyvą bei žymes.</translation>
     </message>
     <message>
       <source>Site Health Viewers</source>
-      <translation type="unfinished">Site Health Viewers</translation>
+      <translation>Svetainės būklės peržiūros priemonės</translation>
     </message>
     <message>
       <source>Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Members of this group have unlimited Site privileges. Administrators can create and modify Power Users, merge Sites and connect or disconnect Site to %1.</translation>
+      <translation>Šios grupės nariai turi neribotas svetainės teises. Administratoriai gali kurti ir modifikuoti galingus vartotojus, sujungti svetaines ir prijungti arba atjungti svetainę prie %1.</translation>
     </message>
     <message>
       <source>Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</source>
-      <translation type="unfinished">Members of this group can, in addition to the permissions granted by the Advanced Viewers group, control most of the Site configuration, but are not allowed to change any Administrator related settings, like delete or change their own groups and permissions, and cannot create or edit other Power Users.</translation>
+      <translation>Šios grupės nariai, be išplėstinių peržiūrų grupės suteiktų leidimų, gali valdyti didžiąją dalį svetainės konfigūracijos, tačiau jiems neleidžiama keisti jokių su administratoriumi susijusių nustatymų, pvz., ištrinti ar keisti savo grupių ir leidimų, ir jie negali kurti ar redaguoti kitų galingų vartotojų.</translation>
     </message>
     <message>
       <source>Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</source>
-      <translation type="unfinished">Members of this group can view Site Health Monitoring information and server processor load in real-time (Server Monitoring).</translation>
+      <translation>Šios grupės nariai gali peržiūrėti svetainės sveikatos stebėjimo informaciją ir serverio procesoriaus apkrovą realiuoju laiku (serverio stebėjimas).</translation>
     </message>
   </context>
   <context>
@@ -290,7 +290,7 @@
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Pasirinkite kamerą</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -307,7 +307,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -323,7 +323,7 @@
     </message>
     <message>
       <source>(unknown)</source>
-      <translation type="unfinished">(unknown)</translation>
+      <translation>(nežinoma)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
@@ -642,11 +642,11 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Profesionalus</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
@@ -654,15 +654,15 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Įvesties/išvesties modulis</translation>
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Pradėti</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -702,7 +702,7 @@
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Neteisingas</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
@@ -714,7 +714,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Laikas</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NGRR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
@@ -1139,7 +1139,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -1274,21 +1274,21 @@
     <message numerus="yes">
       <source>minutes</source>
       <comment>Numerus: Full suffix for displaying minutes</comment>
-      <translation type="unfinished">
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
-        <numerusform>minutes</numerusform>
+      <translation>
+        <numerusform>minutės(ių)</numerusform>
+        <numerusform>minutės(ių)</numerusform>
+        <numerusform>minutės(ių)</numerusform>
+        <numerusform>minutės(ių)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Numerus: Full suffix for displaying hours</comment>
-      <translation type="unfinished">
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
-        <numerusform>hours</numerusform>
+      <translation>
+        <numerusform>valandų</numerusform>
+        <numerusform>valandų</numerusform>
+        <numerusform>valandų</numerusform>
+        <numerusform>valandų</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1709,7 +1709,7 @@
     </message>
     <message>
       <source>Time synchronization enabled.</source>
-      <translation type="unfinished">Time synchronization enabled.</translation>
+      <translation>Laiko sinchronizavimas įjungtas.</translation>
     </message>
     <message>
       <source>Primary time synchronization Server ID.</source>
@@ -1721,11 +1721,11 @@
     </message>
     <message>
       <source>OS time change check period.</source>
-      <translation type="unfinished">OS time change check period.</translation>
+      <translation>OS laiko keitimo tikrinimo laikotarpis.</translation>
     </message>
     <message>
       <source>Sync time synchronization interval for network requests.</source>
-      <translation type="unfinished">Sync time synchronization interval for network requests.</translation>
+      <translation>Tinklo užklausų sinchronizavimo laiko sinchronizavimo intervalas.</translation>
     </message>
     <message>
       <source>Sync time epsilon. New value is not applied if time delta less than epsilon.</source>
@@ -1753,7 +1753,7 @@
     </message>
     <message>
       <source>Site name.</source>
-      <translation type="unfinished">Site name.</translation>
+      <translation>Svetainės pavadinimas.</translation>
     </message>
     <message>
       <source>Last master Site merge ID.</source>
@@ -1777,15 +1777,15 @@
     </message>
     <message>
       <source>Send plain-text emails.</source>
-      <translation type="unfinished">Send plain-text emails.</translation>
+      <translation>Siųsti paprasto teksto el. laiškus.</translation>
     </message>
     <message>
       <source>Use Windows line feed in emails.</source>
-      <translation type="unfinished">Use Windows line feed in emails.</translation>
+      <translation>Naudokite „Windows“ eilutės skirtuką el. laiškuose.</translation>
     </message>
     <message>
       <source>Enable audit trail.</source>
-      <translation type="unfinished">Enable audit trail.</translation>
+      <translation>Įgalinti audito seką.</translation>
     </message>
     <message>
       <source>Audit trail period (days, 14-730).</source>
@@ -1865,7 +1865,7 @@
     </message>
     <message>
       <source>RTP timeout (milliseconds).</source>
-      <translation type="unfinished">RTP timeout (milliseconds).</translation>
+      <translation>RTP skirtasis laikas (milisekundėmis).</translation>
     </message>
     <message>
       <source>Max RTSP connection duration (seconds).</source>
@@ -1921,7 +1921,7 @@
     </message>
     <message>
       <source>Watermark settings.</source>
-      <translation type="unfinished">Watermark settings.</translation>
+      <translation>Vandenženklio nustatymai.</translation>
     </message>
     <message>
       <source>Pixelation settings.</source>
@@ -1961,11 +1961,11 @@
     </message>
     <message>
       <source>Low quality screen video codec.</source>
-      <translation type="unfinished">Low quality screen video codec.</translation>
+      <translation>Žemos kokybės ekrano vaizdo kodekas.</translation>
     </message>
     <message>
       <source>License server.</source>
-      <translation type="unfinished">License server.</translation>
+      <translation>Licencijų serveris.</translation>
     </message>
     <message>
       <source>URI for resource_data.json automatic update.</source>
@@ -1973,7 +1973,7 @@
     </message>
     <message>
       <source>Meta data storage change policy.</source>
-      <translation type="unfinished">Meta data storage change policy.</translation>
+      <translation>Meta duomenų saugojimo pakeitimų politika.</translation>
     </message>
     <message>
       <source>Persistent Servers for update storage.</source>
@@ -2073,7 +2073,7 @@
     </message>
     <message>
       <source>Max scene items (0 means default)</source>
-      <translation type="unfinished">Max scene items (0 means default)</translation>
+      <translation>Maksimalus scenos elementų skaičius (0 reiškia numatytąjį)</translation>
     </message>
   </context>
 </TS>

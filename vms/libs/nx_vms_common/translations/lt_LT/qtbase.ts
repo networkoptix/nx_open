@@ -12,7 +12,7 @@
     <name>MAC_APPLICATION_MENU</name>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Paslaugos</translation>
     </message>
     <message>
       <source>Hide %1</source>
@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Show All</source>
-      <translation type="unfinished">Show All</translation>
+      <translation>Rodyti viską</translation>
     </message>
     <message>
       <source>Preferences...</source>
@@ -200,7 +200,7 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Sąranka</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Išeiti</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -318,15 +318,15 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>am</source>
-      <translation type="unfinished">am</translation>
+      <translation>rytas</translation>
     </message>
     <message>
       <source>PM</source>
-      <translation type="unfinished">PM</translation>
+      <translation>PM</translation>
     </message>
     <message>
       <source>pm</source>
-      <translation type="unfinished">pm</translation>
+      <translation>vakaro</translation>
     </message>
   </context>
   <context>
@@ -340,18 +340,18 @@ Press ESC to cancel</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
   </context>
   <context>
     <name>QDirModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dydis</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -361,7 +361,7 @@ Press ESC to cancel</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -503,7 +503,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Išsaugoti</translation>
     </message>
     <message>
       <source>All Files (*)</source>
@@ -511,11 +511,11 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation type="unfinished">Show </translation>
+      <translation>Rodyti </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation type="unfinished">&amp;Rename</translation>
+      <translation>&amp;Pervadinti</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -527,7 +527,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation type="unfinished">&amp;New Folder</translation>
+      <translation>&amp;Naujas aplankas</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -561,7 +561,7 @@ Please verify the correct file name was given.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation type="unfinished">New Folder</translation>
+      <translation>Naujas aplankas</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -587,7 +587,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -655,11 +655,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dydis</translation>
     </message>
     <message>
       <source>Kind</source>
@@ -669,7 +669,7 @@ Do you want to delete it anyway?</translation>
     <message>
       <source>Type</source>
       <comment>All other platforms</comment>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Date Modified</source>
@@ -692,11 +692,11 @@ Do you want to delete it anyway?</translation>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;Gerai</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Išsaugoti</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
@@ -850,22 +850,22 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Pagalba</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Išsaugoti</translation>
     </message>
     <message>
       <source>Save All</source>
@@ -897,7 +897,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Bandyti dar kartą</translation>
     </message>
     <message>
       <source>Ignore</source>
@@ -913,11 +913,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Išmesti</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Pagalba</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -925,7 +925,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Atstatyti</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -1052,7 +1052,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Pradžia</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1176,7 +1176,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
   </context>
 </TS>

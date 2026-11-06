@@ -402,7 +402,7 @@
     </message>
     <message>
       <source>Local</source>
-      <translation>Vị trí</translation>
+      <translation>Cục bộ</translation>
     </message>
   </context>
   <context>
