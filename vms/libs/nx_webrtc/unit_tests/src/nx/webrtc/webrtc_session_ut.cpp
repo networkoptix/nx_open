@@ -1,5 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <future>
 #include <ranges>
 #include <string_view>
 
@@ -551,6 +552,30 @@ TEST_F(WebRtcSession, BundleTagLeavesARefusedTrack)
     EXPECT_EQ(valuesOf(offer, "a=group:BUNDLE "), (std::vector<std::string>{"1", "128"})) << offer;
     EXPECT_EQ(tag.mid, 1) << offer;
     EXPECT_EQ(tag.mLineIndex, 1) << offer;
+}
+
+// Given: the client names a Device the session does not stream.
+// Expect: each command reports nodata for that Device instead of crashing the server.
+TEST_F(WebRtcSession, CommandForUnknownDevice)
+{
+    const auto unknown = nx::Uuid::createUuid();
+    const auto consumer = m_session->consumer();
+    const std::vector<std::function<void(Consumer::StatusHandler)>> commands{
+        [&](auto handler) { consumer->seek(unknown, /*timestampUs*/ 0, handler); },
+        [&](auto handler)
+        { consumer->changeQuality(unknown, nx::vms::api::StreamIndex::secondary, handler); },
+        [&](auto handler) { consumer->pause(unknown, handler); },
+        [&](auto handler) { consumer->resume(unknown, handler); },
+    };
+    for (const auto& command: commands)
+    {
+        std::promise<std::pair<nx::Uuid, Consumer::StreamStatus>> reported;
+        command(
+            [&](nx::Uuid id, Consumer::StreamStatus status) { reported.set_value({id, status}); });
+        auto result = reported.get_future();
+        ASSERT_EQ(result.wait_for(10s), std::future_status::ready);
+        EXPECT_EQ(result.get(), std::pair(unknown, Consumer::nodata));
+    }
 }
 
 } // namespace
