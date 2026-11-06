@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Už</translation>
     </message>
   </context>
   <context>
@@ -113,7 +113,7 @@
     <name>CertificatesModel</name>
     <message>
       <source>Subject</source>
-      <translation type="unfinished">Subject</translation>
+      <translation>Tema</translation>
     </message>
     <message>
       <source>Issuer</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Galiojimo laikas baigiasi</translation>
     </message>
   </context>
   <context>
@@ -174,7 +174,7 @@
     <name>ContextMenu</name>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Pagalba</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>Vaizdo siena...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -234,7 +234,7 @@
     </message>
     <message>
       <source>New Layout...</source>
-      <translation type="unfinished">New Layout...</translation>
+      <translation>Naujas išdėstymas...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
@@ -353,15 +353,15 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Išeiti</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation type="unfinished">Mark Selection Start</translation>
+      <translation>Pažymėti pasirinkimo pradžią</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation type="unfinished">Mark Selection End</translation>
+      <translation>Pažymėti pasirinkimo pabaigą</translation>
     </message>
     <message>
       <source>Clear Selection</source>
@@ -441,7 +441,7 @@
     </message>
     <message>
       <source>Save Layout</source>
-      <translation type="unfinished">Save Layout</translation>
+      <translation>Išsaugoti išdėstymą</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
@@ -449,7 +449,7 @@
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation type="unfinished">Maximize Item</translation>
+      <translation>Maksimaliai padidinti elementą</translation>
     </message>
     <message>
       <source>Restore Item</source>
@@ -509,11 +509,11 @@
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Pašalinti iš maketo</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Pervadinti</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -593,7 +593,7 @@
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation type="unfinished">Layout Settings...</translation>
+      <translation>Išdėstymo nustatymai...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
@@ -621,11 +621,11 @@
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation type="unfinished">Server Settings...</translation>
+      <translation>Serverio nustatymai...</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
     <message>
       <source>Small</source>
@@ -633,7 +633,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Vidutinis</translation>
     </message>
     <message>
       <source>Large</source>
@@ -641,7 +641,7 @@
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>Close</source>
@@ -653,19 +653,19 @@
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Leisti</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pauzė</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Ankstesnis kadras</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Kitas kadras</translation>
     </message>
     <message>
       <source>To Start</source>
@@ -689,7 +689,7 @@
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation type="unfinished">Jump to Live</translation>
+      <translation>Pereiti prie tiesioginės transliacijos</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
@@ -761,7 +761,7 @@
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Eksportuoti vaizdo įrašą...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -913,11 +913,11 @@
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Pasukti į</translation>
     </message>
     <message>
       <source>Create Group</source>
@@ -1045,7 +1045,7 @@
     </message>
     <message>
       <source>Site Administration...</source>
-      <translation type="unfinished">Site Administration...</translation>
+      <translation>Svetainės administravimas...</translation>
     </message>
     <message>
       <source>Site Update...</source>
@@ -1061,7 +1061,7 @@
     </message>
     <message>
       <source>Merge Sites...</source>
-      <translation type="unfinished">Merge Sites...</translation>
+      <translation>Sujungti svetaines...</translation>
     </message>
     <message>
       <source>Open in</source>
@@ -1085,7 +1085,7 @@
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Rezoliucija</translation>
     </message>
     <message>
       <source>JavaScript API...</source>
@@ -1105,7 +1105,7 @@
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Naujas išdėstymas</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
@@ -1228,7 +1228,7 @@
     <message>
       <source>End</source>
       <comment>Part of the text, action duration: End &lt;time&gt; After Event</comment>
-      <translation type="unfinished">End</translation>
+      <translation>Pabaiga</translation>
     </message>
     <message>
       <source>After Event</source>
@@ -1400,7 +1400,7 @@
     </message>
     <message>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Aparatinės įrangos ID</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -1459,7 +1459,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Bandykite dar kartą vėliau.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -1651,7 +1651,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Sėkmė</translation>
     </message>
     <message>
       <source>Authentication failed</source>
@@ -1848,19 +1848,19 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Tolinama...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Judėjimas...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Prisijungiama...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Fokusavimas...</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
@@ -1937,11 +1937,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Phones</source>
-      <translation type="unfinished">Phones</translation>
+      <translation>Telefonai</translation>
     </message>
     <message>
       <source>Emails</source>
-      <translation type="unfinished">Emails</translation>
+      <translation>El. laiškai</translation>
     </message>
     <message>
       <source>RHI backend</source>
@@ -1984,7 +1984,7 @@ License Key: %2</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Kraunama...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -2018,7 +2018,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Išjungta</translation>
     </message>
     <message>
       <source>Recommended</source>
@@ -2108,7 +2108,7 @@ License Key: %2</translation>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Leisti</translation>
     </message>
     <message>
       <source>User settings...</source>
@@ -2147,7 +2147,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Įrenginiai</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -2248,7 +2248,7 @@ License Key: %2</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -2256,7 +2256,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -2320,11 +2320,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Laikas</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2471,7 +2471,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>This action was performed by a plugin.</source>
@@ -2533,7 +2533,7 @@ License Key: %2</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2676,23 +2676,23 @@ License Key: %2</translation>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Įrašymas</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Pardavėjas</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modelis</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Programinė įranga</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2704,7 +2704,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>ID</source>
@@ -2712,18 +2712,18 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Loginis ID</translation>
     </message>
   </context>
   <context>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Naujas slaptažodis</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Pakartokite slaptažodį</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
@@ -2735,14 +2735,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Slaptažodžiai nesutampa</translation>
     </message>
   </context>
   <context>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Naujas slaptažodis</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2754,7 +2754,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
-      <translation type="unfinished">Passwords do not match</translation>
+      <translation>Slaptažodžiai nesutampa</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one</source>
@@ -2774,7 +2774,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
     <message>
       <source>Disconnect Site from %1</source>
@@ -2813,7 +2813,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Recording will stop and all Service Subscriptions will be removed</source>
-      <translation type="unfinished">Recording will stop and all Service Subscriptions will be removed</translation>
+      <translation>Įrašymas bus sustabdytas ir visos paslaugų prenumeratos bus pašalintos.</translation>
     </message>
     <message>
       <source>All %1 users will be removed from the site</source>
@@ -2830,11 +2830,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Existing data (site settings and archive) will be preserved</source>
-      <translation type="unfinished">Existing data (site settings and archive) will be preserved</translation>
+      <translation>Esami duomenys (svetainės nustatymai ir archyvas) bus išsaugoti</translation>
     </message>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>Šio veiksmo negalima atšaukti</translation>
     </message>
   </context>
   <context>
@@ -2857,7 +2857,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Per daug bandymų. Bandykite dar kartą po minutės.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2903,14 +2903,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Per daug bandymų. Bandykite dar kartą po minutės.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation type="unfinished">Logging in...</translation>
+      <translation>Prisijungiama...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -2969,7 +2969,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Paleisti iš naujo</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -2977,7 +2977,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Bandykite dar kartą</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
@@ -3017,7 +3017,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Sesijos laikas baigėsi</translation>
     </message>
     <message>
       <source>Please sign in again with your link to continue</source>
@@ -3088,7 +3088,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Atkurti</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -3137,7 +3137,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3204,7 +3204,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
     <message>
       <source>Open Integrations</source>
@@ -3222,7 +3222,7 @@ License Key: %2</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3230,17 +3230,17 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Išjungta</translation>
     </message>
     <message>
       <source>Input</source>
@@ -3255,7 +3255,7 @@ License Key: %2</translation>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Neteisingas</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
@@ -3337,7 +3337,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Savybės</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
@@ -3360,7 +3360,7 @@ License Key: %2</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3368,11 +3368,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Būsena</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3380,11 +3380,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Nebegalioja</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3392,11 +3392,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>Serveris nerastas</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Galiojimo laikas baigiasi</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3472,7 +3472,7 @@ License Key: %2</translation>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Look and Feel</source>
@@ -3566,15 +3566,15 @@ License Key: %2</translation>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation type="unfinished">Screenshot</translation>
+      <translation>Ekrano kopija</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Iškraipymo mažinimas</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -3586,7 +3586,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>GYVAI</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -3594,7 +3594,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>Įvesties/išvesties modulis</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -3618,7 +3618,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Mute</source>
-      <translation type="unfinished">Mute</translation>
+      <translation>Nutildyti</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n devices</source>
@@ -3634,7 +3634,7 @@ License Key: %2</translation>
     <name>QnMessageBox</name>
     <message>
       <source>Overwrite</source>
-      <translation type="unfinished">Overwrite</translation>
+      <translation>Perrašyti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -3642,7 +3642,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Atstatyti</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -3669,7 +3669,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -3760,7 +3760,7 @@ License Key: %2</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -3768,7 +3768,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Pradžia</translation>
     </message>
     <message>
       <source>Details</source>
@@ -3784,7 +3784,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -3846,14 +3846,14 @@ License Key: %2</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -3876,7 +3876,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Žemas</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -3884,7 +3884,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Aukštas</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -3908,7 +3908,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Neteisingas</translation>
     </message>
   </context>
   <context>
@@ -3952,7 +3952,7 @@ License Key: %2</translation>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation type="unfinished">Space</translation>
+      <translation>Vieta</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -3987,7 +3987,7 @@ License Key: %2</translation>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Sveikatos monitorius</translation>
     </message>
   </context>
   <context>
@@ -3998,11 +3998,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation type="unfinished">Rotate</translation>
+      <translation>Pasukti</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -4014,7 +4014,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation type="unfinished">Zoom Window</translation>
+      <translation>Mastelio keitimo langas</translation>
     </message>
     <message>
       <source>Move to a dedicated window</source>
@@ -4025,19 +4025,19 @@ License Key: %2</translation>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Įveskite URL</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>Neteisingas URL</translation>
     </message>
     <message>
       <source>URL already added</source>
@@ -4071,18 +4071,18 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>N/A</translation>
     </message>
   </context>
   <context>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -4094,7 +4094,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Žymos</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -4110,7 +4110,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
   </context>
   <context>
@@ -4238,11 +4238,11 @@ License Key: %2</translation>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation type="unfinished">Storage Analytics</translation>
+      <translation>Saugyklos analizė</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
@@ -4254,7 +4254,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Serverio nustatymai</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -4378,11 +4378,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Set</source>
-      <translation type="unfinished">Set</translation>
+      <translation>Nustatyti</translation>
     </message>
     <message>
       <source>Log In</source>
-      <translation type="unfinished">Log In</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
@@ -4397,11 +4397,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>NEPRISIJUNGĘS</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>NELEISTAS</translation>
     </message>
     <message>
       <source>UNSUPPORTED</source>
@@ -4409,7 +4409,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>REIKALINGAS SLAPTAŽODIS</translation>
     </message>
     <message>
       <source>SITE SHUT DOWN</source>
@@ -4421,11 +4421,11 @@ License Key: %2</translation>
     </message>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>Prieiga draudžiama</translation>
     </message>
     <message>
       <source>NO EXPORT PERMISSION</source>
@@ -4437,7 +4437,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>TIESIOGINĖS TRANSLIACIJOS NĖRA</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -4484,7 +4484,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Atnaujinti</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -4530,7 +4530,7 @@ License Key: %2</translation>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Pagrindinis</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -4570,7 +4570,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>Ką daryti su dabartiniais analitiniais duomenimis?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -4578,7 +4578,7 @@ License Key: %2</translation>
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Laikyti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -4616,15 +4616,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Išskirtinis</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Bendrinama</translation>
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Izoliuotas</translation>
     </message>
     <message>
       <source>The Site Servers have different read-write policies for the storage</source>
@@ -4696,11 +4696,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Nepasiekiama</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -4716,7 +4716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Kraunama...</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -4724,7 +4724,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Pagrindinis</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -4732,11 +4732,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reserved</source>
-      <translation type="unfinished">Reserved</translation>
+      <translation>Rezervuota</translation>
     </message>
     <message>
       <source>local</source>
-      <translation type="unfinished">local</translation>
+      <translation>vietinis</translation>
     </message>
     <message>
       <source>ram</source>
@@ -4752,7 +4752,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>network</source>
-      <translation type="unfinished">network</translation>
+      <translation>tinklas</translation>
     </message>
     <message>
       <source>smb</source>
@@ -4772,11 +4772,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Path</source>
-      <translation type="unfinished">Path</translation>
+      <translation>Pataisymas</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Purpose</source>
@@ -4784,19 +4784,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Dydis</translation>
     </message>
     <message>
       <source>Isolated</source>
-      <translation type="unfinished">Isolated</translation>
+      <translation>Izoliuotas</translation>
     </message>
     <message>
       <source>Exclusive</source>
-      <translation type="unfinished">Exclusive</translation>
+      <translation>Išskirtinis</translation>
     </message>
     <message>
       <source>Shared</source>
-      <translation type="unfinished">Shared</translation>
+      <translation>Bendrinama</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -4804,7 +4804,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>removable</source>
-      <translation type="unfinished">removable</translation>
+      <translation>nuimamas</translation>
     </message>
     <message>
       <source>Unknown size</source>
@@ -4812,7 +4812,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The storage has different read-write policies across various Servers in the Site</source>
-      <translation type="unfinished">The storage has different read-write policies across various Servers in the Site</translation>
+      <translation>Saugykla turi skirtingas skaitymo ir rašymo politikas įvairiuose svetainės serveriuose</translation>
     </message>
     <message>
       <source>Click on the icon to see Servers list</source>
@@ -4820,7 +4820,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Read-Write Policy</source>
-      <translation type="unfinished">Read-Write Policy</translation>
+      <translation>Skaitymo ir rašymo politika</translation>
     </message>
     <message>
       <source>Adaptive</source>
@@ -4862,7 +4862,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>Neteisingas saugyklos kelias</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
@@ -4889,15 +4889,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation type="unfinished">Licenses</translation>
+      <translation>Licencijos</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>El. paštas</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -4905,7 +4905,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Saugumas</translation>
     </message>
     <message>
       <source>User Management</source>
@@ -4929,11 +4929,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Paslaugos</translation>
     </message>
     <message>
       <source>Failed to save site settings</source>
@@ -5391,7 +5391,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Atnaujinti</translation>
     </message>
   </context>
   <context>
@@ -5402,7 +5402,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -5433,19 +5433,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Prisijungiama...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Tolinama...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Judėjimas...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Fokusavimas...</translation>
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
@@ -5528,7 +5528,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -5548,7 +5548,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Nepavyko pritaikyti pakeitimų</translation>
     </message>
     <message>
       <source>Stop Video Wall?</source>
@@ -5653,7 +5653,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Overwrite existing layout?</source>
-      <translation type="unfinished">Overwrite existing layout?</translation>
+      <translation>Perrašyti esamą išdėstymą?</translation>
     </message>
     <message>
       <source>There is another layout with the same name.</source>
@@ -5678,7 +5678,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -5811,7 +5811,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Perkelti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -5869,11 +5869,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete layout?</source>
-      <translation type="unfinished">Delete layout?</translation>
+      <translation>Ištrinti maketą?</translation>
     </message>
     <message>
       <source>Delete user?</source>
-      <translation type="unfinished">Delete user?</translation>
+      <translation>Ištrinti vartotoją?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n matrices?</source>
@@ -5997,15 +5997,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Žemas</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Vidutinis</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Aukštas</translation>
     </message>
     <message>
       <source>Best</source>
@@ -6100,11 +6100,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Įspėjimas</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -6143,7 +6143,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pasirinkite</translation>
     </message>
     <message>
       <source>Source camera</source>
@@ -6293,11 +6293,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>Cross-Site features</source>
@@ -6474,7 +6474,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Keep</source>
-      <translation type="unfinished">Keep</translation>
+      <translation>Laikyti</translation>
     </message>
     <message>
       <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
@@ -6489,7 +6489,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>VmsRulesDialogHelper</name>
     <message>
       <source>This action cannot be undone</source>
-      <translation type="unfinished">This action cannot be undone</translation>
+      <translation>Šio veiksmo negalima atšaukti</translation>
     </message>
     <message>
       <source>Reset all rules to defaults?</source>
@@ -6523,7 +6523,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Išsaugomas išdėstymas</translation>
     </message>
     <message>
       <source>Exporting video</source>
@@ -6554,7 +6554,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AbstractPreferencesDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Apply</source>
@@ -6646,7 +6646,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>nėra</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
@@ -6786,7 +6786,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -6907,7 +6907,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>Judesio aptikimas išjungtas</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
@@ -6923,7 +6923,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kokybė</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -6939,7 +6939,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Nepalaikoma</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
@@ -6990,7 +6990,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Rezoliucija</translation>
     </message>
     <message>
       <source>Setting was changed</source>
@@ -7027,7 +7027,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kokybė</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
@@ -7081,7 +7081,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BackupSettingsWidget</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Nustatymai</translation>
     </message>
     <message>
       <source>Bandwidth Limit</source>
@@ -7107,7 +7107,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
     <message>
       <source>Backup settings are not available</source>
@@ -7146,7 +7146,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Šio veiksmo negalima atšaukti.</translation>
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
@@ -7253,11 +7253,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
   </context>
   <context>
@@ -7385,11 +7385,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>Prieiga draudžiama</translation>
     </message>
     <message>
       <source>Select Target...</source>
@@ -7508,15 +7508,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Šio veiksmo negalima atšaukti.</translation>
     </message>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Pirminis srautas</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Antrinis srautas</translation>
     </message>
     <message>
       <source>Force Motion Detection</source>
@@ -7551,11 +7551,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Toliau</translation>
     </message>
     <message>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Baigti</translation>
     </message>
     <message>
       <source>Camera for Replacement</source>
@@ -7665,11 +7665,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Įrašymas</translation>
     </message>
     <message>
       <source>I/O Ports</source>
@@ -7677,7 +7677,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7748,7 +7748,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Dewarping</source>
-      <translation type="unfinished">Dewarping</translation>
+      <translation>Iškraipymo mažinimas</translation>
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
@@ -7792,7 +7792,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
   </context>
   <context>
@@ -7856,11 +7856,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraStreamsDialog</name>
     <message>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Pirminis srautas</translation>
     </message>
     <message>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Antrinis srautas</translation>
     </message>
     <message>
       <source>No secondary stream</source>
@@ -7884,7 +7884,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Pasirinkite</translation>
     </message>
   </context>
   <context>
@@ -8044,7 +8044,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Enter access link to continue your session</source>
@@ -8069,7 +8069,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
   </context>
   <context>
@@ -8159,11 +8159,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Sąranka</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Sėkmė</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8275,7 +8275,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
     <message>
       <source>Device search failed</source>
@@ -8296,7 +8296,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
     <message>
       <source>Initializing scan...</source>
@@ -8362,7 +8362,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Site Administration</source>
-      <translation type="unfinished">Site Administration</translation>
+      <translation>Svetainės administravimas</translation>
     </message>
     <message>
       <source>Maximum number of Devices for the Site is reached</source>
@@ -8515,7 +8515,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8530,7 +8530,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
   </context>
   <context>
@@ -8605,7 +8605,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportSettingsDialog</name>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksportuoti</translation>
     </message>
     <message>
       <source>Rapid Review</source>
@@ -8637,7 +8637,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Vaizdas</translation>
     </message>
     <message>
       <source>Add Text</source>
@@ -8705,7 +8705,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -8732,15 +8732,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FailoverPriorityColumnItemDelegate</name>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Žemas</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Vidutinis</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Aukštas</translation>
     </message>
     <message>
       <source>No Failover</source>
@@ -8794,7 +8794,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -8821,7 +8821,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Įjungti</translation>
     </message>
   </context>
   <context>
@@ -8832,7 +8832,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modelis</translation>
     </message>
     <message>
       <source>Address</source>
@@ -8901,11 +8901,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Taikyti pakeitimus?</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Išmesti</translation>
     </message>
     <message>
       <source>New Group</source>
@@ -8925,11 +8925,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Išsaugoti</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Nepavyko pritaikyti pakeitimų</translation>
     </message>
     <message>
       <source>Delete groups</source>
@@ -9035,7 +9035,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::JumpToLiveButton</name>
     <message>
       <source>Go to Live</source>
-      <translation type="unfinished">Go to Live</translation>
+      <translation>Eiti į tiesioginę transliaciją</translation>
     </message>
   </context>
   <context>
@@ -9065,7 +9065,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Layout</source>
-      <translation type="unfinished">New Layout</translation>
+      <translation>Naujas išdėstymas</translation>
     </message>
     <message>
       <source>Enter the name of the layout to create:</source>
@@ -9122,7 +9122,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Bendra</translation>
     </message>
     <message>
       <source>Background</source>
@@ -9133,7 +9133,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LayoutThumbnailLoader</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>DISABLED</source>
@@ -9148,7 +9148,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Atjungti</translation>
     </message>
     <message>
       <source>Reset Settings</source>
@@ -9160,7 +9160,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Atstatyti</translation>
     </message>
     <message>
       <source>Connection failed</source>
@@ -9200,11 +9200,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Nepavyko pritaikyti pakeitimų</translation>
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
     <message>
       <source>Cannot connect to LDAP server</source>
@@ -9232,7 +9232,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Eksportuoti</translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
@@ -9253,7 +9253,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Pašalinti</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -9314,7 +9314,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::LogSettingsDialog</name>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Atkurti numatytuosius nustatymus</translation>
     </message>
     <message>
       <source>Must be greater than or equal to the value set for Split File by Size</source>
@@ -9376,11 +9376,11 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Įspėjimas</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Debug</source>
@@ -9388,7 +9388,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>Verbose</source>
-      <translation type="unfinished">Verbose</translation>
+      <translation>Išsamus</translation>
     </message>
     <message>
       <source>Default Logging level</source>
@@ -9404,7 +9404,7 @@ Remember to return the Logging Level to its default setting after you have colle
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Nėra</translation>
     </message>
   </context>
   <context>
@@ -9491,7 +9491,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Bandyti dar kartą</translation>
     </message>
     <message numerus="yes">
       <source>%n selected:</source>
@@ -9578,7 +9578,7 @@ Site performance is degraded.</translation>
     <message>
       <source>Value</source>
       <comment>A value of some attribute</comment>
-      <translation type="unfinished">Value</translation>
+      <translation>Vertė</translation>
     </message>
   </context>
   <context>
@@ -9604,7 +9604,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -9645,7 +9645,7 @@ Site performance is degraded.</translation>
     <name>nx::vms::client::desktop::MergeSystemsDialog</name>
     <message>
       <source>URL is invalid.</source>
-      <translation type="unfinished">URL is invalid.</translation>
+      <translation>URL neteisingas.</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
@@ -9669,7 +9669,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>support</source>
-      <translation type="unfinished">support</translation>
+      <translation>pagalba</translation>
     </message>
     <message>
       <source>It is recommended to contact %1 before proceeding.</source>
@@ -9677,7 +9677,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merge Sites</source>
-      <translation type="unfinished">Merge Sites</translation>
+      <translation>Sujungti svetaines</translation>
     </message>
     <message>
       <source>Enter your account password to merge Sites</source>
@@ -9690,7 +9690,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Merging Sites...</source>
-      <translation type="unfinished">Merging Sites...</translation>
+      <translation>Svetainių sujungimas...</translation>
     </message>
     <message>
       <source>This is the current Site URL.</source>
@@ -9722,7 +9722,7 @@ Site performance is degraded.</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Sėkmė</translation>
     </message>
   </context>
   <context>
@@ -9856,7 +9856,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::MultiServerUpdatesWidget</name>
     <message>
       <source>Release notes</source>
-      <translation type="unfinished">Release notes</translation>
+      <translation>Išleidimo pastabos</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -9965,7 +9965,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Try again</source>
-      <translation type="unfinished">Try again</translation>
+      <translation>Bandykite dar kartą</translation>
     </message>
     <message>
       <source>Cancel Update</source>
@@ -9989,7 +9989,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -10160,7 +10160,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Serveris neprisijungęs</translation>
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
@@ -10369,14 +10369,14 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::OverlappableSearchWidget</name>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Nepalaikoma</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation type="unfinished">Sign In</translation>
+      <translation>Prisijungti</translation>
     </message>
   </context>
   <context>
@@ -10463,7 +10463,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Vidinė serverio klaida.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -10514,7 +10514,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port'as</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -10526,7 +10526,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Būsena</translation>
     </message>
     <message>
       <source>Power</source>
@@ -10553,11 +10553,11 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -10777,7 +10777,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Sveikatos monitorius</translation>
     </message>
   </context>
   <context>
@@ -10847,7 +10847,7 @@ You can force motion detection, but it may lead to a substantial increase in CPU
     </message>
     <message>
       <source>Suspended</source>
-      <translation type="unfinished">Suspended</translation>
+      <translation>Sustabdyta</translation>
     </message>
     <message>
       <source>Shut down</source>
@@ -11050,14 +11050,14 @@ You can still change quality and FPS directly on the camera.</translation>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Paieška</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation type="unfinished">Tracks and logs all user actions.</translation>
+      <translation>Seka ir registruoja visus naudotojo veiksmus.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
@@ -11073,7 +11073,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Įgalina RTSP srauto šifravimą.</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -11104,7 +11104,7 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Encrypting video traffic may significantly increase CPU usage</source>
-      <translation type="unfinished">Encrypting video traffic may significantly increase CPU usage</translation>
+      <translation>Vaizdo įrašų srauto šifravimas gali žymiai padidinti procesoriaus apkrovą</translation>
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost</source>
@@ -11214,7 +11214,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Contact a user with Administrators permissions to resolve this issue.</source>
@@ -11237,7 +11237,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Prisijungti vis tiek</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -11301,11 +11301,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versija</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Pardavėjas</translation>
     </message>
     <message>
       <source>no error</source>
@@ -11349,7 +11349,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Būsena</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
@@ -11383,11 +11383,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::ServerUpdatesModel</name>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Būsena</translation>
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Žinutė</translation>
     </message>
     <message>
       <source>Store Update Files</source>
@@ -11410,11 +11410,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -11488,7 +11488,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -11601,7 +11601,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::SystemTabBar</name>
     <message>
       <source>Open in New Window</source>
-      <translation type="unfinished">Open in New Window</translation>
+      <translation>Atidaryti naujame lange</translation>
     </message>
     <message>
       <source>Close</source>
@@ -11613,7 +11613,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>ir</translation>
     </message>
     <message>
       <source>Your access to the Site expires %1</source>
@@ -11638,7 +11638,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -11662,11 +11662,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Žymos</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Open</source>
@@ -11674,7 +11674,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Atidaryti naujame skirtuke</translation>
     </message>
     <message>
       <source>This action is not supported for notifications from other Sites</source>
@@ -11693,11 +11693,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message numerus="yes">
       <source>... and %n more</source>
       <comment>Numerus: placeholder for more items</comment>
-      <translation type="unfinished">
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
-        <numerusform>... and %n more</numerusform>
+      <translation>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
+        <numerusform>... ir %n daugiau</numerusform>
       </translation>
     </message>
   </context>
@@ -11705,7 +11705,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::TimeSynchronizationServersModel</name>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>Time Zone</source>
@@ -11721,7 +11721,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS laikas</translation>
     </message>
   </context>
   <context>
@@ -11832,11 +11832,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Group is not found in the LDAP database.</source>
@@ -11935,11 +11935,11 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>El. paštas</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11963,7 +11963,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Full Name</source>
-      <translation type="unfinished">Full Name</translation>
+      <translation>Pilnas vardas</translation>
     </message>
     <message>
       <source>There is another user with this login. To avoid issues it is required for all users to have a unique login.</source>
@@ -11982,7 +11982,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <name>nx::vms::client::desktop::UserManagementTabWidget</name>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Groups</source>
@@ -11990,7 +11990,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>LDAP</source>
-      <translation type="unfinished">LDAP</translation>
+      <translation>LDAP</translation>
     </message>
   </context>
   <context>
@@ -12014,19 +12014,19 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Išsaugoti</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
-      <translation type="unfinished">Failed to apply changes</translation>
+      <translation>Nepavyko pritaikyti pakeitimų</translation>
     </message>
     <message>
       <source>Apply changes?</source>
-      <translation type="unfinished">Apply changes?</translation>
+      <translation>Taikyti pakeitimus?</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Išmesti</translation>
     </message>
     <message>
       <source>Copy Access Link</source>
@@ -12091,7 +12091,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>and</source>
       <comment>Example: 1 month and 2 days</comment>
-      <translation type="unfinished">and</translation>
+      <translation>ir</translation>
     </message>
     <message>
       <source>New User</source>
@@ -12125,7 +12125,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>The user with the specified email already has Administrator access via the Channel Partner</source>
-      <translation type="unfinished">The user with the specified email already has Administrator access via the Channel Partner</translation>
+      <translation>Vartotojas su nurodytu el. pašto adresu jau turi administratoriaus prieigą per kanalo partnerį</translation>
     </message>
   </context>
   <context>
@@ -12136,7 +12136,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versija</translation>
     </message>
     <message>
       <source>Invalid version.</source>
@@ -12144,7 +12144,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -12373,7 +12373,7 @@ Do not pin this certificate if you did not modify %2 Server SSL certificate.</tr
     <message>
       <source>(%1 of %2)</source>
       <comment>Uploaded and total number of files will be substituted</comment>
-      <translation type="unfinished">(%1 of %2)</translation>
+      <translation>(%1 iš %2)</translation>
     </message>
     <message>
       <source>Finalizing %1...</source>
@@ -12470,7 +12470,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Developer Tools</source>
-      <translation type="unfinished">Developer Tools</translation>
+      <translation>Kūrėjo įrankiai</translation>
     </message>
     <message>
       <source>Unavailable in dedicated window mode</source>
@@ -12575,7 +12575,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Release Notes...</source>
-      <translation type="unfinished">Release Notes...</translation>
+      <translation>Išleidimo pastabos...</translation>
     </message>
     <message>
       <source>%1 Version is available</source>
@@ -12594,7 +12594,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Title</source>
-      <translation type="unfinished">Title</translation>
+      <translation>Pavadinimas</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -12613,11 +12613,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Judesys</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -12654,7 +12654,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Serveriai</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -12662,7 +12662,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Išdėstymai</translation>
     </message>
     <message>
       <source>Showreels</source>
@@ -12670,11 +12670,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -12706,7 +12706,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Integrations</source>
-      <translation type="unfinished">Integrations</translation>
+      <translation>Integracijos</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
@@ -12714,7 +12714,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Other Sites</source>
-      <translation type="unfinished">Other Sites</translation>
+      <translation>Kitos svetainės</translation>
     </message>
   </context>
   <context>
@@ -12732,7 +12732,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::integrations::ImportFromDeviceDialogModel</name>
     <message>
       <source>No data</source>
-      <translation type="unfinished">No data</translation>
+      <translation>Nėra duomenų</translation>
     </message>
     <message>
       <source>In progress... (%1 left)</source>
@@ -12740,7 +12740,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Disabled</source>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Išjungta</translation>
     </message>
     <message>
       <source>Error</source>
@@ -12748,7 +12748,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Imported up to</source>
@@ -12756,7 +12756,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Būsena</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -12825,7 +12825,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Keli</translation>
     </message>
   </context>
   <context>
@@ -12840,7 +12840,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Pasirinktas maketas</translation>
     </message>
   </context>
   <context>
@@ -12921,11 +12921,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Žemas</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Aukštas</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -12936,11 +12936,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::menu::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informacija</translation>
     </message>
     <message>
       <source>Objects</source>
-      <translation type="unfinished">Objects</translation>
+      <translation>Objektai</translation>
     </message>
     <message>
       <source>Regions of Interest</source>
@@ -13065,11 +13065,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Prisijungti</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Slaptažodis</translation>
     </message>
     <message>
       <source>Token</source>
@@ -13112,11 +13112,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::rules::KeyValueModel</name>
     <message>
       <source>Key</source>
-      <translation type="unfinished">Key</translation>
+      <translation>Raktas</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Vertė</translation>
     </message>
   </context>
   <context>
@@ -13138,11 +13138,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Už</translation>
     </message>
     <message>
       <source>Value</source>
-      <translation type="unfinished">Value</translation>
+      <translation>Vertė</translation>
     </message>
   </context>
   <context>
@@ -13219,7 +13219,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Svetainė</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
@@ -13281,7 +13281,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>From</source>
-      <translation type="unfinished">From</translation>
+      <translation>Iš</translation>
     </message>
     <message>
       <source>Not contains keywords</source>
@@ -13345,15 +13345,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::saas::ServicesUsageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipas</translation>
     </message>
     <message>
       <source>Total</source>
-      <translation type="unfinished">Total</translation>
+      <translation>Iš viso</translation>
     </message>
     <message>
       <source>Used</source>
@@ -13399,7 +13399,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Vartotojai</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -13415,7 +13415,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Toliau</translation>
     </message>
     <message>
       <source>Name is necessary</source>
@@ -13427,11 +13427,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>El. paštas</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -13549,7 +13549,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Perkelti</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -13636,7 +13636,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>Gerai</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -13765,7 +13765,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Ankstesnis kadras</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -13773,11 +13773,11 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Kitas kadras</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation type="unfinished">Previous Chunk</translation>
+      <translation>Ankstesnis fragmentas</translation>
     </message>
     <message>
       <source>To Start</source>
@@ -13785,7 +13785,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation type="unfinished">Next Chunk</translation>
+      <translation>Kitas fragmentas</translation>
     </message>
     <message>
       <source>To End</source>

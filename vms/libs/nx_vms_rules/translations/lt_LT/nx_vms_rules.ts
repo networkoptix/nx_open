@@ -129,7 +129,7 @@
     </message>
     <message>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Į</translation>
     </message>
     <message>
       <source>Occurs At</source>
@@ -157,11 +157,11 @@
     </message>
     <message>
       <source>State</source>
-      <translation type="unfinished">State</translation>
+      <translation>Valstija</translation>
     </message>
     <message>
       <source>Volume</source>
-      <translation type="unfinished">Volume</translation>
+      <translation>Tūris</translation>
     </message>
     <message>
       <source>Rewind</source>
@@ -206,7 +206,7 @@
     </message>
     <message>
       <source>For</source>
-      <translation type="unfinished">For</translation>
+      <translation>Už</translation>
     </message>
     <message>
       <source>Time value cannot be less than zero</source>
@@ -258,7 +258,7 @@
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Aprašymas</translation>
     </message>
     <message>
       <source>Source</source>
@@ -564,11 +564,11 @@
     <name>nx::vms::rules::DeviceRecordingAction</name>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kokybė</translation>
     </message>
     <message>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <source>Camera Recording</source>
@@ -576,7 +576,7 @@
     </message>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Įjungta</translation>
     </message>
   </context>
   <context>
@@ -651,7 +651,7 @@
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Content</source>
@@ -954,7 +954,7 @@
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Serveris</translation>
     </message>
     <message>
       <source>PoE Over Budget</source>
@@ -996,7 +996,7 @@
     <name>nx::vms::rules::PushNotificationAction</name>
     <message>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Antraštė</translation>
     </message>
     <message>
       <source>Body</source>
@@ -1206,7 +1206,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Vardas</translation>
     </message>
     <message>
       <source>Icon</source>
