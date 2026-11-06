@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Membership</source>
@@ -220,7 +220,7 @@
     </message>
     <message>
       <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
+      <translation>Lên đầu trang</translation>
     </message>
     <message>
       <source>No objects</source>
@@ -259,7 +259,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Phân tích trên camera sẽ chỉ hoạt động khi camera đang được mở xem. Kích hoạt ghi âm để làm cho nó hoạt động mọi lúc.</translation>
+      <translation>Tính năng phân tích camera chỉ hoạt động khi camera đang được xem. Hãy bật chế độ ghi hình để tính năng này hoạt động mọi lúc.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
@@ -541,7 +541,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>New</source>
-      <translation>Tạo</translation>
+      <translation>Mới</translation>
     </message>
   </context>
   <context>
@@ -1030,7 +1030,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1080,7 +1080,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1111,7 +1111,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Members</source>
@@ -1150,7 +1150,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>No members</source>
@@ -1446,7 +1446,7 @@ Chọn Tích hợp để bắt đầu cấu hình các tham số của tích h�
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Last Sync</source>
@@ -2836,7 +2836,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2938,7 +2938,7 @@ Nhấn Alt + Click để theo dõi đối tượng</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation>Các nhóm</translation>
+      <translation>Nhóm</translation>
     </message>
     <message>
       <source>Resources</source>

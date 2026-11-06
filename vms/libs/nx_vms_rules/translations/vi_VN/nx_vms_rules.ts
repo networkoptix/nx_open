@@ -455,7 +455,7 @@
     </message>
     <message>
       <source>Camera Disconnected</source>
-      <translation>Camera Ngắt kết nối</translation>
+      <translation>Camera mất kết nối</translation>
     </message>
     <message>
       <source>Device</source>
@@ -1119,7 +1119,7 @@
     <name>nx::vms::rules::ServerStartedEvent</name>
     <message>
       <source>Server Started</source>
-      <translation>Máy chủ đã bắt đầu</translation>
+      <translation>Máy chủ khởi động</translation>
     </message>
     <message>
       <source>%1 Started</source>
@@ -1130,7 +1130,7 @@
     <name>nx::vms::rules::ShowOnAlarmLayoutAction</name>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>Hiển thị trên diện cảnh báo</translation>
+      <translation>Hiển thị trên Bố cục cảnh báo</translation>
     </message>
     <message>
       <source>Alarm: %1</source>

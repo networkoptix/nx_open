@@ -2575,7 +2575,7 @@ Press Alt + Click to follow object</translation>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>اختر المخطط</translation>
     </message>
   </context>
   <context>

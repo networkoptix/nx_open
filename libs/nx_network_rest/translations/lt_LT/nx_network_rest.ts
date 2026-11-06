@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Neteisingas slaptažodis</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your Site administrator.</source>
@@ -116,7 +116,7 @@
     <message>
       <source>Not found.</source>
       <comment>Generic HTTP response</comment>
-      <translation type="unfinished">Not found.</translation>
+      <translation>Nerasta.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Unauthorized.</source>
-      <translation type="unfinished">Unauthorized.</translation>
+      <translation>Neleistinas.</translation>
     </message>
     <message>
       <source>Session expired.</source>
