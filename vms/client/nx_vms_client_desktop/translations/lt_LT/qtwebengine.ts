@@ -275,7 +275,7 @@
     </message>
     <message>
       <source>&amp;Reload</source>
-      <translation type="unfinished">&amp;Reload</translation>
+      <translation>&amp;Įkelti iš naujo</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -294,7 +294,7 @@
     </message>
     <message>
       <source>Reload</source>
-      <translation type="unfinished">Reload</translation>
+      <translation>Įkelti iš naujo</translation>
     </message>
     <message>
       <source>Cut</source>

@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Your Site</source>
-      <translation type="unfinished">Your Site</translation>
+      <translation>Jūsų svetainė</translation>
     </message>
     <message>
       <source>Owner: %1</source>
@@ -54,7 +54,7 @@
     <message>
       <source>Restore the connection to %1 and try again</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Restore the connection to %1 and try again</translation>
+      <translation>Atkurkite ryšį su %1 ir bandykite dar kartą</translation>
     </message>
     <message>
       <source>The server is incompatible.</source>
@@ -90,7 +90,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>Per daug bandymų. Bandykite dar kartą po minutės.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -111,7 +111,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Sesijos laikas baigėsi</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
       <source>Two-factor authentication is required.</source>
-      <translation type="unfinished">Two-factor authentication is required.</translation>
+      <translation>Reikalingas dviejų veiksnių autentifikavimas.</translation>
     </message>
     <message>
       <source>You can enable two-factor authentication in your %1.</source>
@@ -182,11 +182,11 @@
     </message>
     <message>
       <source>This user has been disabled by a site administrator.</source>
-      <translation type="unfinished">This user has been disabled by a site administrator.</translation>
+      <translation>Šį vartotoją išjungė svetainės administratorius.</translation>
     </message>
     <message>
       <source>Failed to access site</source>
-      <translation type="unfinished">Failed to access site</translation>
+      <translation>Nepavyko pasiekti svetainės</translation>
     </message>
   </context>
   <context>
@@ -261,11 +261,11 @@
     <name>nx::vms::client::core::CloudCrossSystemContext</name>
     <message>
       <source>Inaccessible</source>
-      <translation type="unfinished">Inaccessible</translation>
+      <translation>Nepasiekiama</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Kraunama...</translation>
     </message>
     <message>
       <source>Click to Show Cameras</source>
@@ -307,7 +307,7 @@
     <name>nx::vms::client::core::DirectSystemFinder</name>
     <message>
       <source>Site</source>
-      <translation type="unfinished">Site</translation>
+      <translation>Svetainė</translation>
     </message>
     <message>
       <source>Site (%1)</source>
@@ -385,19 +385,19 @@
     <name>nx::vms::client::core::OrganizationsModel</name>
     <message>
       <source>Organizations</source>
-      <translation type="unfinished">Organizations</translation>
+      <translation>Organizacijos</translation>
     </message>
     <message>
       <source>Folders</source>
-      <translation type="unfinished">Folders</translation>
+      <translation>Aplankai</translation>
     </message>
     <message>
       <source>Sites</source>
-      <translation type="unfinished">Sites</translation>
+      <translation>Svetainės</translation>
     </message>
     <message>
       <source>Partners</source>
-      <translation type="unfinished">Partners</translation>
+      <translation>Partneriai</translation>
     </message>
   </context>
   <context>
