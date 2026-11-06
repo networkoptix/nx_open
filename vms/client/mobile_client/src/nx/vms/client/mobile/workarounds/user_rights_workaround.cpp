@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/mobile/system_context.h>
 #include <nx/vms/common/user_management/user_group_manager.h>
+#include <nx/vms/common/user_management/user_management_helpers.h>
 
 namespace nx::vms::client::mobile {
 
@@ -43,12 +44,14 @@ UserRightsWorkaround::UserRightsWorkaround(SystemContext* systemContext, QObject
             if (!NX_ASSERT(user))
                 return;
 
-            const auto userGroups = user->allGroupIds();
-            const bool groupsLoaded = std::all_of(userGroups.cbegin(), userGroups.cend(),
-                [this](const nx::Uuid& groupId) { return isUserGroupLoaded(groupId); });
-
-            if (groupsLoaded)
+            // The subject hierarchy handles group cycles (e.g. from LDAP) and includes parent
+            // groups that are not loaded yet.
+            if (nx::vms::common::allUserGroupsExist(userGroupManager(),
+                    nx::vms::common::userGroupsWithParents(
+                        this->systemContext()->accessSubjectHierarchy(), user->allGroupIds())))
+            {
                 return;
+            }
 
             connectedServerApi()->getRawResult("/rest/v3/userGroups", {},
                 nx::utils::guarded(this,
@@ -78,21 +81,6 @@ UserRightsWorkaround::UserRightsWorkaround(SystemContext* systemContext, QObject
                     }),
                 thread());
         });
-}
-
-bool UserRightsWorkaround::isUserGroupLoaded(const nx::Uuid& groupId) const
-{
-    const auto group = userGroupManager()->find(groupId);
-    if (!group)
-        return false;
-
-    for (const auto& parentGroupId: group->parentGroupIds)
-    {
-        if (!isUserGroupLoaded(parentGroupId))
-            return false;
-    }
-
-    return true;
 }
 
 } // namespace nx::vms::client::mobile
