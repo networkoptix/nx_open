@@ -157,36 +157,26 @@ bool QnThreadedPtzController::continuousFocus(
 }
 
 bool QnThreadedPtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
-    return executeCommand(
-        spaceCommand(Command::absoluteDeviceMove, space),
+    return executeCommand(spaceCommand(Command::absoluteDeviceMove, space),
         position,
         &QnAbstractPtzController::absoluteMove,
         options,
         space,
         position,
-        speed,
         options);
 }
 
 bool QnThreadedPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
-    return executeCommand(
-        Command::viewportMove,
+    return executeCommand(Command::viewportMove,
         viewport,
         &QnAbstractPtzController::viewportMove,
         options,
         aspectRatio,
         viewport,
-        speed,
         options);
 }
 

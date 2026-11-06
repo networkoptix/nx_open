@@ -86,21 +86,15 @@ bool QnFallbackPtzController::continuousFocus(
 }
 
 bool QnFallbackPtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
-    return baseController(options)->absoluteMove(space, position, speed, options);
+    return baseController(options)->absoluteMove(space, position, options);
 }
 
 bool QnFallbackPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
-    return baseController(options)->viewportMove(aspectRatio, viewport, speed, options);
+    return baseController(options)->viewportMove(aspectRatio, viewport, options);
 }
 
 bool QnFallbackPtzController::relativeMove(

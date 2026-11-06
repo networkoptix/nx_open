@@ -33,10 +33,7 @@ bool QnBasicPtzController::continuousFocus(
 }
 
 bool QnBasicPtzController::absoluteMove(
-    CoordinateSpace /*space*/,
-    const Vector& /*position*/,
-    qreal /*speed*/,
-    const Options& /*options*/)
+    CoordinateSpace /*space*/, const Vector& /*position*/, const Options& /*options*/)
 {
     return false;
 }
@@ -56,10 +53,7 @@ bool QnBasicPtzController::relativeFocus(
 }
 
 bool QnBasicPtzController::viewportMove(
-    qreal /*ratio*/,
-    const QRectF& /*viewport*/,
-    qreal /*speed*/,
-    const Options& /*options*/)
+    qreal /*ratio*/, const QRectF& /*viewport*/, const Options& /*options*/)
 {
     return false;
 }

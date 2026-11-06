@@ -85,25 +85,15 @@ bool QnProxyPtzController::continuousFocus(
 }
 
 bool QnProxyPtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
-    return m_controller
-        ? m_controller->absoluteMove(space, position, speed, options)
-        : false;
+    return m_controller ? m_controller->absoluteMove(space, position, options) : false;
 }
 
 bool QnProxyPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
-    return m_controller
-        ? m_controller->viewportMove(aspectRatio, viewport, speed, options)
-        : false;
+    return m_controller ? m_controller->viewportMove(aspectRatio, viewport, options) : false;
 }
 
 bool QnProxyPtzController::relativeMove(

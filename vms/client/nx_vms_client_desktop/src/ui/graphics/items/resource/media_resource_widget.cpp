@@ -3027,10 +3027,9 @@ void QnMediaResourceWidget::updateZoomWindowDewarping()
     if (!options().testFlag(DisplayDewarped) || !isZoomWindow() || !m_ptzController)
         return;
 
-    m_ptzController->absoluteMove(
-        common_ptz::CoordinateSpace::logical,
+    m_ptzController->absoluteMove(common_ptz::CoordinateSpace::logical,
         QnFisheyePtzController::positionFromRect(m_dewarpingParams, zoomRect()),
-        2.0);
+        {.speed = 2.0});
 }
 
 void QnMediaResourceWidget::at_ptzController_changed(common_ptz::DataFields fields)

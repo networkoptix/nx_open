@@ -20,10 +20,7 @@ public:
     virtual bool continuousFocus(qreal speed, const Options& options) override;
 
     virtual bool absoluteMove(
-        CoordinateSpace space,
-        const Vector& position,
-        qreal speed,
-        const Options& options) override;
+        CoordinateSpace space, const Vector& position, const Options& options) override;
 
     virtual bool relativeMove(
         const Vector& direction,
@@ -32,10 +29,7 @@ public:
     virtual bool relativeFocus(qreal direction, const Options& options) override;
 
     virtual bool viewportMove(
-        qreal aspectRatio,
-        const QRectF& viewport,
-        qreal speed,
-        const Options& options) override;
+        qreal aspectRatio, const QRectF& viewport, const Options& options) override;
 
     virtual bool getPosition(
         Vector* position,

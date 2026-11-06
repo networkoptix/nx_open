@@ -3,8 +3,8 @@
 #include "preset_ptz_controller.h"
 #include "ptz_preset.h"
 
-#include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource.h>
 
 using namespace nx::core;
 
@@ -154,7 +154,8 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
             QnPtzPresetData data = records.value(preset.id).data;
 
-            if (!absoluteMove(data.space, data.position, speed, {Type::operational}))
+            if (!absoluteMove(
+                    data.space, data.position, {.type = Type::operational, .speed = speed}))
                 return false;
 
             return true;

@@ -34,10 +34,7 @@ public:
         const Options& options) override;
 
     virtual bool absoluteMove(
-        CoordinateSpace space,
-        const Vector& position,
-        qreal speed,
-        const Options& options) override;
+        CoordinateSpace space, const Vector& position, const Options& options) override;
 
     virtual bool getPosition(
         Vector* outPosition,

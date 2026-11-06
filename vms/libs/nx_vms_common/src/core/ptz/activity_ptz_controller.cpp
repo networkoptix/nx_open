@@ -69,12 +69,9 @@ bool QnActivityPtzController::continuousMove(
 }
 
 bool QnActivityPtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
-    if (!base_type::absoluteMove(space, position, speed, options))
+    if (!base_type::absoluteMove(space, position, options))
         return false;
 
     if (m_mode != Client)
@@ -83,12 +80,9 @@ bool QnActivityPtzController::absoluteMove(
 }
 
 bool QnActivityPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
-    if (!base_type::viewportMove(aspectRatio, viewport, speed, options))
+    if (!base_type::viewportMove(aspectRatio, viewport, options))
         return false;
 
     if (m_mode != Client)

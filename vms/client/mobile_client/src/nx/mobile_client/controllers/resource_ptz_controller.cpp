@@ -40,6 +40,11 @@ ResourcePtzController::~ResourcePtzController()
 {
 }
 
+bool ResourcePtzController::viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed)
+{
+    return base_type::viewportMove(aspectRatio, viewport, {.speed = speed});
+}
+
 Ptz::Capabilities ResourcePtzController::operationalCapabilities() const
 {
     return getCapabilities({Type::operational});

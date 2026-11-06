@@ -15,7 +15,11 @@ struct Options
 {
     Type type = Type::operational;
 
-    /** Optional relative movement speed in [0, 1]. Unsupported overrides are ignored. */
+    /**
+     * Optional movement speed in [0, 1]; fisheye positioning also accepts values above 1 for
+     * immediate movement. Omission uses the operation's default. Unsupported relative movement
+     * speed overrides are ignored.
+     */
     std::optional<double> speed;
 };
 #define PtzOptions_Fields (type)(speed)

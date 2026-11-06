@@ -144,16 +144,17 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Ptz::Capability::absolutePanTiltZoomRotation</tt>.
      *
+     * Movement speed is specified by options.speed, defaulting to 1.0 when omitted.
+     * Physical controllers expect [0, 1]; fisheye positioning also uses values above 1
+     * to request immediate movement without animation.
+     *
      * @param space Coordinate space of the provided position.
      * @param position Position to move to.
-     * @param speed Movement speed, in range [0, 1].
      * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool absoluteMove(
-        CoordinateSpace space,
+    virtual bool absoluteMove(CoordinateSpace space,
         const Vector& position,
-        qreal speed,
         const Options& options = {Type::operational}) = 0;
 
     /**
@@ -164,16 +165,15 @@ public slots: //< Class is exposed to QML. All functions in section below are in
      * This function is expected to be implemented only if this controller has
      * <tt>Ptz::Capability::viewport</tt>.
      *
+     * Movement speed is specified by options.speed, defaulting to 1.0 when omitted.
+     *
      * @param aspectRatio Actual aspect ratio of the current viewport.
      * @param viewport New viewport position.
-     * @param speed Movement speed, in range [0, 1].
      * @param options Additional options (e.g. ptz type)
      * @returns Whether the operation was successful.
      */
-    virtual bool viewportMove(
-        qreal aspectRatio,
+    virtual bool viewportMove(qreal aspectRatio,
         const QRectF& viewport,
-        qreal speed,
         const Options& options = {Type::operational}) = 0;
 
     /**

@@ -49,6 +49,7 @@ public:
     Q_INVOKABLE int indexOfPreset(const QString& id) const;
 
     Q_INVOKABLE bool continuousMove(const QVector3D& speed);
+    Q_INVOKABLE bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed);
 
 signals:
     void resourceChanged();
@@ -61,6 +62,7 @@ signals:
 
 private:
     using QnProxyPtzController::continuousMove;
+    using QnProxyPtzController::viewportMove;
     QnResource* rawResource() const;
     void setRawResource(QnResource* value);
 

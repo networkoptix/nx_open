@@ -44,10 +44,7 @@ Ptz::Capabilities QnViewportPtzController::getCapabilities(
 }
 
 bool QnViewportPtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
     Vector oldPosition;
     if(!getPosition(&oldPosition, CoordinateSpace::logical, options))
@@ -113,7 +110,7 @@ bool QnViewportPtzController::viewportMove(
         Vector newPosition(newPan, newTilt, 0.0, newFov);
 
         /* Send it to the camera. */
-        return absoluteMove(CoordinateSpace::logical, newPosition, speed, options);
+        return absoluteMove(CoordinateSpace::logical, newPosition, options);
     } else {
         /* Calculate new position. */
         float newPan = oldPosition.pan + oldPosition.zoom * delta.x();
@@ -122,6 +119,6 @@ bool QnViewportPtzController::viewportMove(
         auto newPosition = qBound(Vector(newPan, newTilt, 0.0, newFov), limits);
 
         /* Send it to the camera. */
-        return absoluteMove(CoordinateSpace::logical, newPosition, speed, options);
+        return absoluteMove(CoordinateSpace::logical, newPosition, options);
     }
 }

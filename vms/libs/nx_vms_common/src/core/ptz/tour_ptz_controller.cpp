@@ -76,23 +76,23 @@ bool QnTourPtzController::continuousMove(const Vector& speed, const Options& opt
 }
 
 bool QnTourPtzController::absoluteMove(
-    CoordinateSpace space, const Vector& position, qreal speed, const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
     if (!supports(spaceCommand(Command::absoluteDeviceMove, space), options))
         return false;
 
     stopActiveTour();
-    return base_type::absoluteMove(space, position, speed, options);
+    return base_type::absoluteMove(space, position, options);
 }
 
 bool QnTourPtzController::viewportMove(
-    qreal aspectRatio, const QRectF& viewport, qreal speed, const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
     if (!supports(Command::viewportMove, options))
         return false;
 
     stopActiveTour();
-    return base_type::viewportMove(aspectRatio, viewport, speed, options);
+    return base_type::viewportMove(aspectRatio, viewport, options);
 }
 
 bool QnTourPtzController::activatePreset(const QString& presetId, qreal speed)

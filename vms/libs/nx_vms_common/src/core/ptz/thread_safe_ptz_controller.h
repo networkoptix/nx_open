@@ -28,16 +28,12 @@ public:
         qreal speed,
         const Options& options = {Type::operational}) override;
 
-    virtual bool absoluteMove(
-        CoordinateSpace space,
+    virtual bool absoluteMove(CoordinateSpace space,
         const Vector& position,
-        qreal speed,
         const Options& options = {Type::operational}) override;
 
-    virtual bool viewportMove(
-        qreal aspectRatio,
+    virtual bool viewportMove(qreal aspectRatio,
         const QRectF& viewport,
-        qreal speed,
         const Options& options = {Type::operational}) override;
 
     virtual bool relativeMove(

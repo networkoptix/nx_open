@@ -220,11 +220,9 @@ bool RemotePtzController::continuousFocus(
 }
 
 bool RemotePtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
+    const auto speed = options.speed.value_or(1.0);
     nx::network::rest::Params params;
     params.insert("xPos", QnLexical::serialized(position.pan));
     params.insert("yPos", QnLexical::serialized(position.tilt));
@@ -239,11 +237,9 @@ bool RemotePtzController::absoluteMove(
 }
 
 bool RemotePtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
+    const auto speed = options.speed.value_or(1.0);
     nx::network::rest::Params params;
     params.insert("aspectRatio", QnLexical::serialized(aspectRatio));
     params.insert("viewportTop", QnLexical::serialized(viewport.top()));

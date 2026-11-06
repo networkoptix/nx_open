@@ -335,11 +335,9 @@ bool QnFisheyePtzController::continuousMove(
 }
 
 bool QnFisheyePtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
+    const auto speed = options.speed.value_or(1.0);
     if (!supportsPtzType(options.type))
     {
         NX_WARNING(

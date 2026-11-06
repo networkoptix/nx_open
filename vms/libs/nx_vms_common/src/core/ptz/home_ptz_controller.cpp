@@ -10,8 +10,8 @@
 
 #include <utils/common/invocation_event.h>
 
-#include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/home_ptz_executor.h>
+#include <core/ptz/ptz_controller_pool.h>
 
 using namespace nx::core;
 
@@ -68,12 +68,9 @@ bool QnHomePtzController::continuousMove(
 }
 
 bool QnHomePtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
-    if(!base_type::absoluteMove(space, position, speed, options))
+    if (!base_type::absoluteMove(space, position, options))
         return false;
 
     restartExecutor();
@@ -81,12 +78,9 @@ bool QnHomePtzController::absoluteMove(
 }
 
 bool QnHomePtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
-    if(!base_type::viewportMove(aspectRatio, viewport, speed, options))
+    if (!base_type::viewportMove(aspectRatio, viewport, options))
         return false;
 
     restartExecutor();

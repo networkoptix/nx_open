@@ -34,26 +34,20 @@ bool ThreadSafePtzController::continuousFocus(qreal speed, const Options& option
 }
 
 bool ThreadSafePtzController::absoluteMove(
-    CoordinateSpace space,
-    const Vector& position,
-    qreal speed,
-    const Options& options)
+    CoordinateSpace space, const Vector& position, const Options& options)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    return base_type::absoluteMove(space, position, speed, options);
+    return base_type::absoluteMove(space, position, options);
 }
 
 bool ThreadSafePtzController::viewportMove(
-    qreal aspectRatio,
-    const QRectF& viewport,
-    qreal speed,
-    const Options& options)
+    qreal aspectRatio, const QRectF& viewport, const Options& options)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!supports(Command::viewportMove, options))
         return false;
 
-    return base_type::viewportMove(aspectRatio, viewport, speed, options);
+    return base_type::viewportMove(aspectRatio, viewport, options);
 }
 
 bool ThreadSafePtzController::relativeMove(

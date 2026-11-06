@@ -33,15 +33,9 @@ public:
         const Vector& speed,
         const Options& options) override;
     virtual bool absoluteMove(
-        CoordinateSpace space,
-        const Vector& position,
-        qreal speed,
-        const Options& options) override;
+        CoordinateSpace space, const Vector& position, const Options& options) override;
     virtual bool viewportMove(
-        qreal aspectRatio,
-        const QRectF& viewport,
-        qreal speed,
-        const Options& options) override;
+        qreal aspectRatio, const QRectF& viewport, const Options& options) override;
 
     virtual bool removePreset(const QString& presetId) override;
     virtual bool activatePreset(const QString& presetId, qreal speed) override;

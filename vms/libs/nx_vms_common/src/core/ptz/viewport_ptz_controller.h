@@ -16,10 +16,7 @@ public:
 
     virtual Ptz::Capabilities getCapabilities(const Options& options) const override;
     virtual bool viewportMove(
-        qreal aspectRatio,
-        const QRectF& viewport,
-        qreal speed,
-        const Options& options) override;
+        qreal aspectRatio, const QRectF& viewport, const Options& options) override;
 };
 
 

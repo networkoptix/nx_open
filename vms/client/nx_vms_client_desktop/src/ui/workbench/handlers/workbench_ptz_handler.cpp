@@ -505,7 +505,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered()
     for (int i = 0; i <= 20; i++)
     {
         position.zoom = startZ + (endZ - startZ) * i / 20.0;
-        controller->absoluteMove(CoordinateSpace::device, position, 1.0);
+        controller->absoluteMove(CoordinateSpace::device, position, {.speed = 1.0});
 
         QEventLoop loop;
         QTimer::singleShot(10000, &loop, SLOT(quit()));

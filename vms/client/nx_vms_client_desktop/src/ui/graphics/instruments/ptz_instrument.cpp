@@ -892,7 +892,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect,
     handlePtzRedirect(widget);
     const qreal aspectRatio = Geometry::aspectRatio(widget->size());
     const QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
-    widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
+    widget->ptzController()->viewportMove(aspectRatio, viewport, {.speed = 1.0});
 
     if (m_dataByWidget.value(widget).isFisheye())
         return;
@@ -1372,10 +1372,9 @@ void PtzInstrument::dragMove(DragInfo* info)
                 * (appContext()->localSettings()->ptzAimOverlayEnabled() ? 1 : -1);
 
             const Vector positionDelta(shift.x() * speed, shift.y() * speed, 0.0, 0.0);
-            target()->ptzController()->absoluteMove(
-                CoordinateSpace::logical,
+            target()->ptzController()->absoluteMove(CoordinateSpace::logical,
                 position + positionDelta,
-                /*instant movement*/ 2.0);
+                {.speed = 2.0}); //< Instant movement.
 
             if (appContext()->localSettings()->ptzAimOverlayEnabled())
             {
@@ -1750,9 +1749,7 @@ bool PtzInstrument::wheelEvent(QGraphicsScene* /*scene*/, QGraphicsSceneWheelEve
         position.zoom -= event->delta() / 120.0 * kWheelFisheyeZoomSensitivity;
 
         target()->ptzController()->absoluteMove(
-            CoordinateSpace::logical,
-            position,
-            /*instant movement*/ 2.0);
+            CoordinateSpace::logical, position, {.speed = 2.0}); //< Instant movement.
 
         return true;
     }
