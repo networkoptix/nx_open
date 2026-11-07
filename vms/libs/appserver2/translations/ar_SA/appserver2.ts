@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>الخادم %1 غير موجود.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>

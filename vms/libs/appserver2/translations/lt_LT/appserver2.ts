@@ -177,7 +177,7 @@
     </message>
     <message>
       <source>Server %1 does not exist.</source>
-      <translation type="unfinished">Server %1 does not exist.</translation>
+      <translation>Serveris %1 neegzistuoja.</translation>
     </message>
     <message>
       <source>Storage %1 does not belong to this Server.</source>
@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Device %1 not found</source>
-      <translation type="unfinished">Device %1 not found</translation>
+      <translation>Įrenginys %1 nerastas</translation>
     </message>
     <message>
       <source>There is no license for camera %1</source>
@@ -321,7 +321,7 @@
     </message>
     <message>
       <source>Invalid parameter `%1`</source>
-      <translation type="unfinished">Invalid parameter `%1`</translation>
+      <translation>Neteisingas parametras `%1`</translation>
     </message>
     <message>
       <source>User &apos;%1(%2)&apos; is not permitted to create new User Groups.</source>

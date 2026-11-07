@@ -19,7 +19,7 @@
   <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpCloseButton">Uždaryti</String>
-  <String Id="InstallOptionsButton">Options</String>
+  <String Id="InstallOptionsButton">Nustatymai</String>
   <String Id="InstallInstallButton">Install</String>
   <String Id="InstallCloseButton">Uždaryti</String>
   <String Id="InstallAcceptCheckbox">Aš sutinku su</String>
@@ -57,7 +57,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
   <String Id="FilesInUseOkButton">Gerai</String>
   <String Id="FilesInUseCancelButton">Atšaukti</String>
-  <String Id="Options">Options</String>
+  <String Id="Options">Nustatymai</String>
   <String Id="SelectApps">Select applications to be installed:</String>
   <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
