@@ -5,7 +5,7 @@
     <name>AddLookupListEntryDialog</name>
     <message>
       <source>Add Entry</source>
-      <translation type="unfinished">Add Entry</translation>
+      <translation>Pridėti įrašą (Automatic Translation)</translation>
     </message>
     <message>
       <source>Add</source>
@@ -16,7 +16,7 @@
     <name>AdvancedSettingsDialog</name>
     <message>
       <source>LDAP - Advanced Settings</source>
-      <translation type="unfinished">LDAP - Advanced Settings</translation>
+      <translation>LDAP – išplėstiniai nustatymai</translation>
     </message>
     <message>
       <source>Users</source>
@@ -24,31 +24,31 @@
     </message>
     <message>
       <source>Login Attribute</source>
-      <translation type="unfinished">Login Attribute</translation>
+      <translation>Vartotojo vardo atributas</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Membership</source>
-      <translation type="unfinished">Membership</translation>
+      <translation>Narystė</translation>
     </message>
     <message>
       <source>Search Timeout</source>
-      <translation type="unfinished">Search Timeout</translation>
+      <translation>Paieškos skirtasis laikas</translation>
     </message>
     <message>
       <source>To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To enable digest authentication for LDAP users that are already added to the VMS database, you need to enable it directly in these users&apos; settings.</translation>
+      <translation>Norėdami įjungti santraukos autentifikavimą LDAP vartotojams, kurie jau yra įtraukti į VMS duomenų bazę, turite jį įjungti tiesiogiai šių vartotojų&apos; nustatymuose.</translation>
     </message>
     <message>
       <source>To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</source>
-      <translation type="unfinished">To disable digest authentication for LDAP users that are already added to the VMS database, you need to disable it directly in these users&apos; settings.</translation>
+      <translation>Norėdami išjungti santraukos autentifikavimą LDAP vartotojams, kurie jau yra įtraukti į VMS duomenų bazę, turite jį išjungti tiesiogiai šių vartotojų&apos; nustatymuose.</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication for imported users</source>
-      <translation type="unfinished">Allow insecure (digest) authentication for imported users</translation>
+      <translation>Leisti importuotiems vartotojams nesaugų (santraukos) autentifikavimą</translation>
     </message>
     <message>
       <source>General</source>
@@ -56,109 +56,109 @@
     </message>
     <message>
       <source>Synchronize Users</source>
-      <translation type="unfinished">Synchronize Users</translation>
+      <translation>Narių sinchronizacija</translation>
     </message>
     <message>
       <source>Sync Interval</source>
-      <translation type="unfinished">Sync Interval</translation>
+      <translation>Sinchronizavimo intervalas</translation>
     </message>
     <message>
       <source>Group Members Attribute</source>
-      <translation type="unfinished">Group Members Attribute</translation>
+      <translation>Grupės narių atributas</translation>
     </message>
     <message>
       <source>Proxy LDAP requests via server</source>
-      <translation type="unfinished">Proxy LDAP requests via server</translation>
+      <translation>Tarpinio serverio LDAP užklausos per serverį</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Debesų pranešimų kalba</translation>
     </message>
     <message>
       <source>User ID Attribute</source>
-      <translation type="unfinished">User ID Attribute</translation>
+      <translation>Naudotojo ID atributas</translation>
     </message>
     <message>
       <source>Group ID Attribute</source>
-      <translation type="unfinished">Group ID Attribute</translation>
+      <translation>Grupės ID atributas</translation>
     </message>
   </context>
   <context>
     <name>AdvancedUpdateSettings</name>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Išplėstiniai svetainės nustatymai</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Pranešimai</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Pranešti apie galimus atnaujinimus</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatiniai kliento atnaujinimai</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Įjunkite šią parinktį, kad prijungti klientai automatiškai atnaujintų programą į naujausią suderinamą versiją.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Prisijungiantys klientai bus automatiškai atnaujinti į naują versiją, kai tik ji bus prieinama.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Visi prisijungiantys klientai atnaujinami į %1 versiją.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Prisijungiantys klientai bus atnaujinti į %1 versiją %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Tikrinti, ar yra atnaujinimų</translation>
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Paspartinkite šį atnaujinimą</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>Naudojate pasirinktinį klientą. Norėdami gauti atnaujinimo instrukcijas, susisiekite su %1.</translation>
     </message>
     <message>
       <source>Offline client updates</source>
-      <translation type="unfinished">Offline client updates</translation>
+      <translation>Neprisijungus pasiekiamų klientų atnaujinimai</translation>
     </message>
     <message>
       <source>Offline updates are enabled and files are stored on servers.</source>
-      <translation type="unfinished">Offline updates are enabled and files are stored on servers.</translation>
+      <translation>Atnaujinimai neprisijungus yra įjungti, o failai saugomi serveriuose.</translation>
     </message>
     <message>
       <source>Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</source>
-      <translation type="unfinished">Turning this option on will enable downloading of additional files to servers which can be used to update connecting clients even without internet access.</translation>
+      <translation>Įjungus šią parinktį, bus galima atsisiųsti papildomus failus į serverius, kuriuos galima naudoti prisijungiantiems klientams atnaujinti net ir neturint interneto prieigos.</translation>
     </message>
     <message>
       <source>This will delete all update files on servers.</source>
-      <translation type="unfinished">This will delete all update files on servers.</translation>
+      <translation>Tai ištrins visus serveriuose esančius atnaujinimo failus.</translation>
     </message>
     <message>
       <source>Proceed anyway?</source>
-      <translation type="unfinished">Proceed anyway?</translation>
+      <translation>Vis tiek tęsti</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsEventSelector</name>
     <message>
       <source>Event Type</source>
-      <translation type="unfinished">Event Type</translation>
+      <translation>Renginio tipas</translation>
     </message>
     <message>
       <source>All</source>
@@ -169,81 +169,81 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Objekto tipas</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsObjectAttributesSelector</name>
     <message>
       <source>Select / Deselect All</source>
-      <translation type="unfinished">Select / Deselect All</translation>
+      <translation>Pasirinkti / Atšaukti visų pasirinkimą</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsPanel</name>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pasirinkti vietą</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pasirinkite tam tikrą vaizdo įrašo sritį...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Pasirinktoje srityje</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Nėra objektų</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukonfigūruoti objektų aptikimą kameros įskiepio nustatymuose.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Išplėstinė objektų paieška</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Pasirinkti vietą</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Pasirinkite tam tikrą vaizdo įrašo sritį...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Pasirinktoje srityje</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
-      <translation type="unfinished">
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
-        <numerusform>%n new results</numerusform>
+      <translation>
+        <numerusform>%n nauji rezultatai</numerusform>
+        <numerusform>%n nauji rezultatai</numerusform>
+        <numerusform>%n nauji rezultatai</numerusform>
+        <numerusform>%n nauji rezultatai</numerusform>
       </translation>
     </message>
     <message>
       <source>To the top</source>
-      <translation type="unfinished">To the top</translation>
+      <translation>Į viršų</translation>
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Nėra objektų</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukonfigūruoti objektų aptikimą kameros įskiepio nustatymuose.</translation>
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Bet koks įskiepis</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -251,53 +251,53 @@
     </message>
     <message>
       <source>Tile Settings</source>
-      <translation type="unfinished">Tile Settings</translation>
+      <translation>Plytelės nustatymai</translation>
     </message>
     <message>
       <source>Table Settings</source>
-      <translation type="unfinished">Table Settings</translation>
+      <translation>Svetainės nustatymai</translation>
     </message>
     <message>
       <source>Switch to table view</source>
-      <translation type="unfinished">Switch to table view</translation>
+      <translation>Perjungti į lentelės rodinį</translation>
     </message>
     <message>
       <source>Switch to card view</source>
-      <translation type="unfinished">Switch to card view</translation>
+      <translation>Perjungti į kortelių rodinį</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Kameros analizė veiks tik tada, kai bus žiūrima į kamerą. Įjunkite įrašymą, kad jis veiktų visą laiką.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Norėdami sukonfigūruoti šį papildinį, patikrinkite kameros nustatymus.</translation>
     </message>
     <message>
       <source>This plugin has no settings for this camera.</source>
-      <translation type="unfinished">This plugin has no settings for this camera.</translation>
+      <translation>Šis įskiepis neturi nustatymų šiai kamerai.</translation>
     </message>
     <message>
       <source>Check Site Administration settings to configure this plugin.</source>
-      <translation type="unfinished">Check Site Administration settings to configure this plugin.</translation>
+      <translation>Norėdami sukonfigūruoti šį papildinį, patikrinkite svetainės administravimo nustatymus.</translation>
     </message>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Šis įskiepis neturi nustatymų svetainės lygmeniu.</translation>
     </message>
   </context>
   <context>
     <name>AnalyticsSettingsMenu</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Įskiepiai</translation>
     </message>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Visos integracijos</translation>
     </message>
   </context>
   <context>
@@ -305,31 +305,31 @@
     <message>
       <source>Integrations allow the seamless utilization of video analytics on various devices from the VMS.
 Select an Integration to begin configuring its parameters.</source>
-      <translation type="unfinished">Integrations allow the seamless utilization of video analytics on various devices from the VMS.
-Select an Integration to begin configuring its parameters.</translation>
+      <translation>Integracijos leidžia sklandžiai naudoti vaizdo įrašų analizę įvairiuose VMS įrenginiuose.
+Pasirinkite integraciją, kad pradėtumėte konfigūruoti jos parametrus.</translation>
     </message>
   </context>
   <context>
     <name>ApiIntegrations</name>
     <message>
       <source>API Integrations</source>
-      <translation type="unfinished">API Integrations</translation>
+      <translation>Visos integracijos</translation>
     </message>
     <message>
       <source>API Integrations interact with %1 Server via REST API and exchange metadata</source>
-      <translation type="unfinished">API Integrations interact with %1 Server via REST API and exchange metadata</translation>
+      <translation>API integracijos sąveikauja su %1 serveriu per REST API ir keičiasi metaduomenimis</translation>
     </message>
     <message>
       <source>New requests</source>
-      <translation type="unfinished">New requests</translation>
+      <translation>Nauja užklausa</translation>
     </message>
     <message>
       <source>API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</source>
-      <translation type="unfinished">API Integration may be enabled after verifying the code received from Integration provider. New requests may be disabled to prevent unwanted interaction.</translation>
+      <translation>API integraciją galima įjungti patikrinus iš integracijos teikėjo gautą kodą. Naujos užklausos gali būti išjungtos, siekiant išvengti nepageidaujamos sąveikos.</translation>
     </message>
     <message>
       <source>Enable %1?</source>
-      <translation type="unfinished">Enable %1?</translation>
+      <translation>Įjungti 2FA?</translation>
     </message>
     <message>
       <source>This Integration will be able to:
@@ -337,23 +337,23 @@ Select an Integration to begin configuring its parameters.</translation>
  • get access to archive
  • process video streams
  • exchange metadata over the network</source>
-      <translation type="unfinished">This Integration will be able to:
- • change settings on cameras
- • get access to archive
- • process video streams
- • exchange metadata over the network</translation>
+      <translation>Ši integracija galės:
+ • keisti kamerų nustatymus
+ • gauti prieigą prie archyvo
+ • apdoroti vaizdo srautus
+ • keistis metaduomenimis tinkle</translation>
     </message>
     <message>
       <source>Enable Integration</source>
-      <translation type="unfinished">Enable Integration</translation>
+      <translation>Įgalinti integraciją</translation>
     </message>
     <message>
       <source>Remove %1?</source>
-      <translation type="unfinished">Remove %1?</translation>
+      <translation>Pašalinti %1?</translation>
     </message>
     <message>
       <source>This will remove Integration request</source>
-      <translation type="unfinished">This will remove Integration request</translation>
+      <translation>Tai pašalins integracijos užklausą</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -361,25 +361,25 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remove Request</source>
-      <translation type="unfinished">Remove Request</translation>
+      <translation>Pašalinti užklausą</translation>
     </message>
   </context>
   <context>
     <name>AuthCode</name>
     <message>
       <source>Wrong pairing code</source>
-      <translation type="unfinished">Wrong pairing code</translation>
+      <translation>Neteisingas susiejimo kodas</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Įklijuoti</translation>
     </message>
   </context>
   <context>
     <name>AutoTextField</name>
     <message>
       <source>This field cannot be empty</source>
-      <translation type="unfinished">This field cannot be empty</translation>
+      <translation>Šis laukas negali būti tuščias</translation>
     </message>
     <message>
       <source>Auto</source>
@@ -390,30 +390,30 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BatchUserEditDialog</name>
     <message numerus="yes">
       <source>Batch Edit - %n Users</source>
-      <translation type="unfinished">
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
-        <numerusform>Batch Edit - %n Users</numerusform>
+      <translation>
+        <numerusform>Paketinis redagavimas - %n Vartotojai</numerusform>
+        <numerusform>Paketinis redagavimas - %n Vartotojai</numerusform>
+        <numerusform>Paketinis redagavimas - %n Vartotojai</numerusform>
+        <numerusform>Paketinis redagavimas - %n Vartotojai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
+        <numerusform>Nėra vartotojų</numerusform>
       </translation>
     </message>
     <message>
       <source>User status</source>
       <comment>Whether users are enabled or disabled</comment>
-      <translation type="unfinished">User status</translation>
+      <translation>Vartotojo būsena</translation>
     </message>
     <message>
       <source>Enabled</source>
-      <translation type="unfinished">Enabled</translation>
+      <translation>Įjungti</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -421,11 +421,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Insecure (digest) authentication</source>
-      <translation type="unfinished">Insecure (digest) authentication</translation>
+      <translation>Nesaugus (santraukos) autentifikavimas</translation>
     </message>
     <message>
       <source>keep current value</source>
-      <translation type="unfinished">keep current value</translation>
+      <translation>išlaikyti dabartinę vertę</translation>
     </message>
   </context>
   <context>
@@ -439,71 +439,71 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>BookmarksPanel</name>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Žymių nėra</translation>
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Laiko juostoje pasirinkite laiko tarpą ir dešiniuoju pelės mygtuku spustelėkite paryškintą dalį, kad sukurtumėte žymę.</translation>
     </message>
   </context>
   <context>
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
   </context>
   <context>
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Karštasis klavišas %1</translation>
     </message>
   </context>
   <context>
     <name>Buttons</name>
     <message>
       <source>Press each button several times and write the names of these buttons in the table below.</source>
-      <translation type="unfinished">Press each button several times and write the names of these buttons in the table below.</translation>
+      <translation>Kelis kartus paspauskite kiekvieną mygtuką ir užrašykite šių mygtukų pavadinimus žemiau esančioje lentelėje.</translation>
     </message>
   </context>
   <context>
     <name>CameraSelector</name>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Bet kuris prietaisas</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>Bet kokia kamera</translation>
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Įrenginiai išdėstyme</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Kameros išdėstyme</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Pasirinktas įrenginys</translation>
     </message>
     <message>
       <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
+      <translation>Pasirinkite kamerą</translation>
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Pasirinkite įrenginius...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Pasirinkite kameras...</translation>
     </message>
     <message>
       <source>none</source>
@@ -511,29 +511,29 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
+        <numerusform>%n pasirinkti įrenginiai</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
+        <numerusform>%n pasirinktos kameros</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Pasirinktas įrenginys</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Pasirinkta kamera</translation>
     </message>
   </context>
   <context>
@@ -544,7 +544,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Nepasiekiamas</translation>
     </message>
     <message>
       <source>Incompatible</source>
@@ -560,47 +560,47 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Shut Down</source>
-      <translation type="unfinished">Shut Down</translation>
+      <translation>Išjungti</translation>
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Naujas</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to</source>
-      <translation type="unfinished">Log in to</translation>
+      <translation>Prisijungti prie</translation>
     </message>
   </context>
   <context>
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Prisijungti prie serverio</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Prisijungti prie serverio</translation>
     </message>
   </context>
   <context>
     <name>ConnectionSettingsDialog</name>
     <message>
       <source>LDAP - Connection Settings</source>
-      <translation type="unfinished">LDAP - Connection Settings</translation>
+      <translation>LDAP – ryšio nustatymai</translation>
     </message>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Hostas</translation>
     </message>
     <message>
       <source>Login DN</source>
-      <translation type="unfinished">Login DN</translation>
+      <translation>Prisijungimo DN</translation>
     </message>
     <message>
       <source>Password</source>
@@ -608,75 +608,75 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Ignore LDAP server certificate errors</source>
-      <translation type="unfinished">Ignore LDAP server certificate errors</translation>
+      <translation>Ignoruoti LDAP serverio sertifikato klaidas</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testuoti</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Jungiamasi...</translation>
     </message>
     <message>
       <source>Use StartTLS</source>
-      <translation type="unfinished">Use StartTLS</translation>
+      <translation>Naudokite StartTLS</translation>
     </message>
     <message>
       <source>Host cannot be empty</source>
-      <translation type="unfinished">Host cannot be empty</translation>
+      <translation>prisijungimas negali būti tuščias</translation>
     </message>
     <message>
       <source>Login DN cannot be empty</source>
-      <translation type="unfinished">Login DN cannot be empty</translation>
+      <translation>Prisijungimo DN negali būti tuščias</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Password cannot be empty</translation>
     </message>
     <message>
       <source>To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</source>
-      <translation type="unfinished">To allow LDAP users to log in to %1, it is necessary to establish a connection between %1 and a corporate LDAP server.</translation>
+      <translation>Kad LDAP vartotojai galėtų prisijungti prie %1, būtina užmegzti ryšį tarp %1 ir įmonės LDAP serverio.</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Norėdami sužinoti daugiau, spustelėkite piktogramą</translation>
     </message>
   </context>
   <context>
     <name>CopyableLabel</name>
     <message>
       <source>copied</source>
-      <translation type="unfinished">copied</translation>
+      <translation>nukopijuotas</translation>
     </message>
   </context>
   <context>
     <name>CounterBlock</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>Pridėti informaciją</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>Nėra informacijos</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>Slėpti miniatiūras</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>Rodyti miniatiūras</translation>
     </message>
   </context>
   <context>
     <name>CustomHttpHeadersDialog</name>
     <message>
       <source>Custom HTTP headers</source>
-      <translation type="unfinished">Custom HTTP headers</translation>
+      <translation>Pasirinktinės HTTP antraštės</translation>
     </message>
     <message>
       <source>Add</source>
@@ -707,22 +707,22 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° lygiakampis</translation>
     </message>
   </context>
   <context>
     <name>EditContextMenu</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Iškirpti</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Įklijuoti</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -733,11 +733,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EditLookupListDialog</name>
     <message>
       <source>List Settings</source>
-      <translation type="unfinished">List Settings</translation>
+      <translation>Sąrašų nustatymai</translation>
     </message>
     <message>
       <source>New List</source>
-      <translation type="unfinished">New List</translation>
+      <translation>Naujas sąrašas</translation>
     </message>
     <message>
       <source>Name</source>
@@ -745,7 +745,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Column Name</source>
-      <translation type="unfinished">Column Name</translation>
+      <translation>Stulpelio pavadinimas</translation>
     </message>
     <message>
       <source>OK</source>
@@ -761,7 +761,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Bendrinis</translation>
     </message>
     <message>
       <source>Type</source>
@@ -773,27 +773,27 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Select type</source>
-      <translation type="unfinished">Select type</translation>
+      <translation>Pasirinkite tipą</translation>
     </message>
     <message>
       <source>Removing attributes will delete all associated data</source>
-      <translation type="unfinished">Removing attributes will delete all associated data</translation>
+      <translation>Pašalinus atributus, bus ištrinti visi susiję duomenys</translation>
     </message>
     <message>
       <source>Deleting the list will erase all the data inside it.</source>
-      <translation type="unfinished">Deleting the list will erase all the data inside it.</translation>
+      <translation>Ištrynus sąrašą, bus ištrinti visi jame esantys duomenys.</translation>
     </message>
     <message>
       <source>Delete List?</source>
-      <translation type="unfinished">Delete List?</translation>
+      <translation>Ištrinti sąrašą</translation>
     </message>
     <message numerus="yes">
       <source>This list is associated with %n Event Rules. Are you sure you want to delete it?</source>
-      <translation type="unfinished">
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
-        <numerusform>This list is associated with %n Event Rules. Are you sure you want to delete it?</numerusform>
+      <translation>
+        <numerusform>Šis sąrašas susietas su %n įvykių taisyklėmis. Ar tikrai norite jį ištrinti?</numerusform>
+        <numerusform>Šis sąrašas susietas su %n įvykių taisyklėmis. Ar tikrai norite jį ištrinti?</numerusform>
+        <numerusform>Šis sąrašas susietas su %n įvykių taisyklėmis. Ar tikrai norite jį ištrinti?</numerusform>
+        <numerusform>Šis sąrašas susietas su %n įvykių taisyklėmis. Ar tikrai norite jį ištrinti?</numerusform>
       </translation>
     </message>
     <message>
@@ -805,11 +805,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventTestDialog</name>
     <message>
       <source>Event Test</source>
-      <translation type="unfinished">Event Test</translation>
+      <translation>Įvykio testas</translation>
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testuoti</translation>
     </message>
   </context>
   <context>
@@ -823,26 +823,26 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>EventsPanel</name>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>Nėra įvykių</translation>
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukurti įvykio taisyklę</translation>
     </message>
   </context>
   <context>
     <name>ExportEntriesProgressDialog</name>
     <message>
       <source>Export Lists</source>
-      <translation type="unfinished">Export Lists</translation>
+      <translation>Eksportuoti sąrašus</translation>
     </message>
     <message>
       <source>Exporting</source>
-      <translation type="unfinished">Exporting</translation>
+      <translation>Eksportavimas (Automatic Translation)</translation>
     </message>
     <message>
       <source>Open File Folder...</source>
-      <translation type="unfinished">Open File Folder...</translation>
+      <translation>Atidaryti failų aplanką...</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -857,15 +857,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figūra</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Paspauskite norėdami pridėti</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Rodyti vaizdo įraše</translation>
     </message>
   </context>
   <context>
@@ -887,7 +887,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>PERŽIŪROS NĖRA</translation>
     </message>
   </context>
   <context>
@@ -898,27 +898,27 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Base DN</source>
-      <translation type="unfinished">Base DN</translation>
+      <translation>Bazinis (Automatic Translation)</translation>
     </message>
     <message>
       <source>Base DN cannot be empty</source>
-      <translation type="unfinished">Base DN cannot be empty</translation>
+      <translation>Bazinis DN negali būti tuščias</translation>
     </message>
     <message>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtras</translation>
     </message>
     <message>
       <source>The Base DN sets the starting point for LDAP searches and synchronization.</source>
-      <translation type="unfinished">The Base DN sets the starting point for LDAP searches and synchronization.</translation>
+      <translation>Bazinis DN nustato LDAP paieškų ir sinchronizavimo pradžios tašką.</translation>
     </message>
     <message>
       <source>Edit Search Base</source>
-      <translation type="unfinished">Edit Search Base</translation>
+      <translation>Redaguoti paieškos bazę</translation>
     </message>
     <message>
       <source>Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</source>
-      <translation type="unfinished">Filters help control access to the site and synchronization by specifying which users and/or groups from the Base DN are allowed.</translation>
+      <translation>Filtrai padeda kontroliuoti prieigą prie svetainės ir sinchronizavimą, nurodydami, kuriems vartotojams ir (arba) grupėms iš bazinio DN leidžiama prieiti.</translation>
     </message>
   </context>
   <context>
@@ -932,63 +932,63 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>FisheyeDewarpingSettings</name>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>Vaizdas nėra apvalus</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>Vaizdas gali būti per blankus</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>Neteisingas įvesties vaizdas</translation>
     </message>
     <message>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Rodyti tinklelį</translation>
     </message>
     <message>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Automatinė kalibracija (senas)</translation>
     </message>
     <message>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Įdėti</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Lubos</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Siena</translation>
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Grindys/stalas</translation>
     </message>
     <message>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Kampas</translation>
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Kameros ritinio taisymas</translation>
     </message>
     <message>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Objektyvo projekcija</translation>
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Lygiagrečiai</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereografinis</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Lygiai kietas</translation>
     </message>
     <message>
       <source>Size</source>
@@ -996,26 +996,26 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X poslinkis</translation>
     </message>
     <message>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y poslinkis</translation>
     </message>
     <message>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Elipsiškumas</translation>
     </message>
     <message>
       <source>Auto calibration failed</source>
-      <translation type="unfinished">Auto calibration failed</translation>
+      <translation>Automatinis kalibravimas nepavyko</translation>
     </message>
   </context>
   <context>
     <name>FixLookupListImportPage</name>
     <message>
       <source>Some values could not be automatically matched. Please map them manually.</source>
-      <translation type="unfinished">Some values could not be automatically matched. Please map them manually.</translation>
+      <translation>Kai kurių reikšmių nepavyko automatiškai suderinti. Susiekite jas rankiniu būdu.</translation>
     </message>
     <message>
       <source>Back</source>
@@ -1037,18 +1037,18 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GlobalPermissionsTab</name>
     <message>
       <source>At the site level, group members have permissions to:</source>
-      <translation type="unfinished">At the site level, group members have permissions to:</translation>
+      <translation>Svetainės lygmeniu grupės nariai turi šias teises:</translation>
     </message>
     <message>
       <source>At the site level, the user has permissions to:</source>
-      <translation type="unfinished">At the site level, the user has permissions to:</translation>
+      <translation>Svetainės lygmeniu vartotojas turi šias teises:</translation>
     </message>
   </context>
   <context>
     <name>GroupCreateDialog</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nauja Grupė</translation>
     </message>
     <message>
       <source>General</source>
@@ -1056,7 +1056,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1064,22 +1064,22 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globalūs leidimai</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Nariai</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Pridėti grupę</translation>
     </message>
   </context>
   <context>
     <name>GroupCreateTab</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nauja Grupė</translation>
     </message>
     <message>
       <source>Name</source>
@@ -1098,7 +1098,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>GroupEditDialog</name>
     <message>
       <source>Group - %1</source>
-      <translation type="unfinished">Group - %1</translation>
+      <translation>Grupė - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -1106,7 +1106,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -1114,11 +1114,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globalūs leidimai</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Nariai</translation>
     </message>
   </context>
   <context>
@@ -1137,11 +1137,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Members</source>
-      <translation type="unfinished">Members</translation>
+      <translation>Nariai</translation>
     </message>
     <message>
       <source>Users</source>
@@ -1153,19 +1153,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</source>
-      <translation type="unfinished">The group has another group as both its parent, and as a child member, or is a part of such a circular reference chain. Resolve this chain to prevent incorrect calculation of permissions.</translation>
+      <translation>Grupė turi kitą grupę kaip pirminę ir antrinę grupes arba yra tokios ciklinės nuorodų grandinės dalis. Išspręskite šią grandinę, kad išvengtumėte neteisingo leidimų skaičiavimo.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, groups do not synchronize automatically. To update this group, initiate a manual sync.</translation>
+      <translation>Kai išjungtas nuolatinis sinchronizavimas su LDAP serveriu, grupės automatiškai nesinchronizuojamos. Norėdami atnaujinti šią grupę, pradėkite rankinį sinchronizavimą.</translation>
     </message>
     <message>
       <source>This group is not found in the LDAP database.</source>
-      <translation type="unfinished">This group is not found in the LDAP database.</translation>
+      <translation>Šios grupės LDAP duomenų bazėje nėra.</translation>
     </message>
     <message>
       <source>Another group with the same name exists. It is recommended to assign unique names to the groups.</source>
-      <translation type="unfinished">Another group with the same name exists. It is recommended to assign unique names to the groups.</translation>
+      <translation>Jau yra kita grupė tuo pačiu pavadinimu. Rekomenduojama grupėms priskirti unikalius pavadinimus.</translation>
     </message>
   </context>
   <context>
@@ -1176,23 +1176,23 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>No members</source>
-      <translation type="unfinished">No members</translation>
+      <translation>Nėra narių</translation>
     </message>
     <message>
       <source>Use controls on the left to add members</source>
-      <translation type="unfinished">Use controls on the left to add members</translation>
+      <translation>Norėdami pridėti narių, naudokite kairėje esančius valdiklius</translation>
     </message>
     <message>
       <source>Members summary</source>
-      <translation type="unfinished">Members summary</translation>
+      <translation>Narių santrauka</translation>
     </message>
     <message>
       <source>Inherits membership in current group</source>
-      <translation type="unfinished">Inherits membership in current group</translation>
+      <translation>Paveldi narystę dabartinėje grupėje</translation>
     </message>
   </context>
   <context>
@@ -1203,7 +1203,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Nėra grupių</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1213,12 +1213,12 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>BUILT-IN</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">BUILT-IN</translation>
+      <translation>ĮMONTUOTA</translation>
     </message>
     <message>
       <source>CUSTOM</source>
       <comment>Section name in a list of items: &apos;Custom groups&apos;</comment>
-      <translation type="unfinished">CUSTOM</translation>
+      <translation>PASIRINKTINIS</translation>
     </message>
   </context>
   <context>
@@ -1226,64 +1226,64 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Norėdami suaktyvinti veiksmus, palaikykite nuspaudę %1</translation>
     </message>
   </context>
   <context>
     <name>ImportFromDeviceDialog</name>
     <message>
       <source>Import From Devices</source>
-      <translation type="unfinished">Import From Devices</translation>
+      <translation>Importuoti iš įrenginių</translation>
     </message>
   </context>
   <context>
     <name>InformationBubble</name>
     <message>
       <source>Detected by</source>
-      <translation type="unfinished">Detected by</translation>
+      <translation>Aptikta</translation>
     </message>
   </context>
   <context>
     <name>Initial</name>
     <message>
       <source>Select the joystick.</source>
-      <translation type="unfinished">Select the joystick.</translation>
+      <translation>Pasirinkite valdymo svirtį.</translation>
     </message>
     <message>
       <source>No devices connected.</source>
-      <translation type="unfinished">No devices connected.</translation>
+      <translation>Nėra prijungtų įrenginių</translation>
     </message>
   </context>
   <context>
     <name>InsecureBanner</name>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used.</translation>
+      <translation>Santraukos autentifikavimas yra nebenaudojamas ir bus išjungtas kitame leidime, ir turėtų būti naudojamas tik tada, kai negalima naudoti numatytojo nešėjo autentifikavimo.</translation>
     </message>
     <message>
       <source>Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</source>
-      <translation type="unfinished">Digest authentication is deprecated and will be disabled in the next release, and should only be used when default Bearer Authentication cannot be used. User logins must consist only of lowercase letters.</translation>
+      <translation>Santraukos autentifikavimas nebenaudojamas ir bus išjungtas kitame leidime. Jį reikėtų naudoti tik tada, kai negalima naudoti numatytojo nešėjo autentifikavimo. Vartotojų prisijungimo duomenys turi būti sudaryti tik iš mažųjų raidžių.</translation>
     </message>
   </context>
   <context>
     <name>IntegrationHeader</name>
     <message>
       <source>Insufficient services</source>
-      <translation type="unfinished">Insufficient services</translation>
+      <translation>Nepakankamos paslaugos</translation>
     </message>
     <message numerus="yes">
       <source>%n suitable integration services are required to turn on the integration</source>
       <comment>Required integration count</comment>
-      <translation type="unfinished">
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
-        <numerusform>%n suitable integration services are required to turn on the integration</numerusform>
+      <translation>
+        <numerusform>%n Norint įjungti integraciją, reikalingos tinkamos integravimo paslaugos</numerusform>
+        <numerusform>%n Norint įjungti integraciją, reikalingos tinkamos integravimo paslaugos</numerusform>
+        <numerusform>%n Norint įjungti integraciją, reikalingos tinkamos integravimo paslaugos</numerusform>
+        <numerusform>%n Norint įjungti integraciją, reikalingos tinkamos integravimo paslaugos</numerusform>
       </translation>
     </message>
     <message>
       <source>0 suitable services available</source>
-      <translation type="unfinished">0 suitable services available</translation>
+      <translation>0 tinkamų paslaugų</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1295,7 +1295,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Services Required</source>
-      <translation type="unfinished">Services Required</translation>
+      <translation>Reikalingas serveris</translation>
     </message>
     <message>
       <source>Refreshing...</source>
@@ -1304,7 +1304,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</source>
       <comment>%1 will be substituted by a date</comment>
-      <translation type="unfinished">There are more cameras using this integration than available services. Please disable integration for some cameras or add more suitable services. Otherwise, it will be done automatically on %1</translation>
+      <translation>Šią integraciją naudoja daugiau kamerų nei yra galimų paslaugų. Išjunkite kai kurių kamerų integraciją arba pridėkite daugiau tinkamų paslaugų. Priešingu atveju tai bus padaryta automatiškai %1</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -1323,11 +1323,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Kameros srautas</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Pasirinkite vaizdo srautą iš kameros analizei</translation>
     </message>
     <message>
       <source>Usage</source>
@@ -1338,7 +1338,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsDialog</name>
     <message>
       <source>Manage Integrations</source>
-      <translation type="unfinished">Manage Integrations</translation>
+      <translation>Tvarkyti integracijas</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -1353,22 +1353,22 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>IntegrationsTab</name>
     <message>
       <source>This plugin has no settings at the Site level.</source>
-      <translation type="unfinished">This plugin has no settings at the Site level.</translation>
+      <translation>Šis įskiepis neturi nustatymų svetainės lygmeniu.</translation>
     </message>
     <message>
       <source>Check Camera Settings to configure this plugin.</source>
-      <translation type="unfinished">Check Camera Settings to configure this plugin.</translation>
+      <translation>Norėdami sukonfigūruoti šį papildinį, patikrinkite kameros nustatymus.</translation>
     </message>
   </context>
   <context>
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Perjungti nutildyti</translation>
     </message>
     <message>
       <source>Previous Object</source>
-      <translation type="unfinished">Previous Object</translation>
+      <translation>Ankstesnis objektas</translation>
     </message>
     <message>
       <source>Pause</source>
@@ -1380,11 +1380,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Next Object</source>
-      <translation type="unfinished">Next Object</translation>
+      <translation>Kitas objektas</translation>
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Perjungti kartojimą</translation>
     </message>
   </context>
   <context>
@@ -1403,30 +1403,30 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Joystick Investigation</source>
-      <translation type="unfinished">Joystick Investigation</translation>
+      <translation>Vairasvirtės tyrimas</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Valdymo svirties nustatymai</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>vairasvirtė</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Pagrindiniai veiksmai</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Su modifikatoriumi</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Šis modelis nepalaikomas</translation>
     </message>
     <message>
       <source>Reset to Default</source>
@@ -1437,33 +1437,33 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Pakreipkite ir pasukite</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Priartinti / Atitolinti</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Pasirinkite kamerą makete</translation>
     </message>
     <message>
       <source>Log in to the site to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the site to configure how to open layouts</translation>
+      <translation>Prisijunkite prie svetainės, kad sukonfigūruotumėte, kaip atidaryti maketus</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Numatytoji reikšmė</translation>
     </message>
   </context>
   <context>
     <name>LdapSettings</name>
     <message>
       <source>ONLINE</source>
-      <translation type="unfinished">ONLINE</translation>
+      <translation>INTERNETU</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -1475,11 +1475,11 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Last Sync</source>
-      <translation type="unfinished">Last Sync</translation>
+      <translation>Paskutinis Sinchr</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -1487,7 +1487,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Advanced Settings</source>
-      <translation type="unfinished">Advanced Settings</translation>
+      <translation>Išplėstiniai nustatymai</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -1499,95 +1499,95 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Not configured yet</source>
-      <translation type="unfinished">Not configured yet</translation>
+      <translation>Dar nesukonfigūruota</translation>
     </message>
     <message>
       <source>Configure</source>
-      <translation type="unfinished">Configure</translation>
+      <translation>Konfigūruoti</translation>
     </message>
     <message>
       <source>Search Bases</source>
-      <translation type="unfinished">Search Bases</translation>
+      <translation>Paieškos svetainės</translation>
     </message>
     <message>
       <source>Add Search Base</source>
-      <translation type="unfinished">Add Search Base</translation>
+      <translation>Pridėti paieškos bazę</translation>
     </message>
     <message>
       <source>Specify at least one search base to synchronize users and groups</source>
-      <translation type="unfinished">Specify at least one search base to synchronize users and groups</translation>
+      <translation>Nurodykite bent vieną paieškos bazę, kad sinchronizuotumėte naudotojus ir grupes</translation>
     </message>
     <message>
       <source>Connect your Site to an LDAP server for easier user management</source>
-      <translation type="unfinished">Connect your Site to an LDAP server for easier user management</translation>
+      <translation>Prijunkite savo svetainę prie LDAP serverio, kad būtų lengviau valdyti naudotojus</translation>
     </message>
     <message>
       <source>Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</source>
-      <translation type="unfinished">Continuous import from LDAP server is disabled for this site. Updates to groups and user and groups membership will occur solely through manual synchronization.</translation>
+      <translation>Šioje svetainėje išjungtas nuolatinis importavimas iš LDAP serverio. Grupių, vartotojų ir grupių narystės atnaujinimai bus atliekami tik rankiniu būdu sinchronizuojant.</translation>
     </message>
     <message>
       <source>No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</source>
-      <translation type="unfinished">No users or groups match synchronization settings and are added to the site DB. Make sure LDAP server parameters and filters are configured correctly.</translation>
+      <translation>Nėra naudotojų ar grupių, kurios atitiktų sinchronizavimo nustatymus ir būtų pridėtos prie svetainės duomenų bazės. Įsitikinkite, kad LDAP serverio parametrai ir filtrai yra tinkamai sukonfigūruoti.</translation>
     </message>
     <message>
       <source>Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</source>
-      <translation type="unfinished">Please use care when altering LDAP settings. Incorrect configuration could disrupt site availability for a large number of users simultaneously.</translation>
+      <translation>Keisdami LDAP nustatymus, būkite atsargūs. Neteisinga konfigūracija gali sutrikdyti svetainės prieinamumą daugeliui vartotojų vienu metu.</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Eilutė negalioja. Norėdami tęsti, pašalinkite savęs susikirtimus.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Šiai linijai reikia bent %n taškų.</numerusform>
+        <numerusform>Šiai linijai reikia bent %n taškų.</numerusform>
+        <numerusform>Šiai linijai reikia bent %n taškų.</numerusform>
+        <numerusform>Šiai linijai reikia bent %n taškų.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Spustelėkite paskutinį tašką, kad užbaigtumėte linijos braižymą.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Spustelėkite kiekvieną rodyklę, kad perjungtumėte norimą kryptį.</translation>
     </message>
   </context>
   <context>
     <name>LookupListElementEditor</name>
     <message>
       <source>Any %1</source>
-      <translation type="unfinished">Any %1</translation>
+      <translation>Bet koks %1</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Dabartis</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Nebuvęs</translation>
     </message>
     <message>
       <source>value</source>
@@ -1598,15 +1598,15 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>LookupListImportDialog</name>
     <message>
       <source>Import List</source>
-      <translation type="unfinished">Import List</translation>
+      <translation>Importuoti sąrašą</translation>
     </message>
     <message>
       <source>Import Options</source>
-      <translation type="unfinished">Import Options</translation>
+      <translation>Importavimo nuostatos</translation>
     </message>
     <message>
       <source>File:</source>
-      <translation type="unfinished">File:</translation>
+      <translation>Failas:</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1614,19 +1614,19 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Separator:</source>
-      <translation type="unfinished">Separator:</translation>
+      <translation>Skyriklis</translation>
     </message>
     <message>
       <source>Data contains header</source>
-      <translation type="unfinished">Data contains header</translation>
+      <translation>Duomenyse yra antraštė</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Peržiūra</translation>
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Importuoti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1634,38 +1634,38 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Importing</source>
-      <translation type="unfinished">Importing</translation>
+      <translation>Importavimas</translation>
     </message>
     <message>
       <source>Could not open file</source>
-      <translation type="unfinished">Could not open file</translation>
+      <translation>Nepavyko atidaryti failo</translation>
     </message>
     <message>
       <source>Please ensure that file exists and you have access to selected file</source>
-      <translation type="unfinished">Please ensure that file exists and you have access to selected file</translation>
+      <translation>Įsitikinkite, kad failas egzistuoja ir turite prieigą prie pasirinkto failo</translation>
     </message>
     <message>
       <source>Fixing imported entries</source>
-      <translation type="unfinished">Fixing imported entries</translation>
+      <translation>Importuotų įrašų taisymas</translation>
     </message>
     <message>
       <source>Could not import selected file</source>
-      <translation type="unfinished">Could not import selected file</translation>
+      <translation>Nepavyko importuoti pasirinkto failo</translation>
     </message>
     <message>
       <source>The file appears to be empty.</source>
-      <translation type="unfinished">The file appears to be empty.</translation>
+      <translation>Failas atrodo tuščias.</translation>
     </message>
     <message>
       <source>Please ensure the selected file exists and you have access.</source>
-      <translation type="unfinished">Please ensure the selected file exists and you have access.</translation>
+      <translation>Įsitikinkite, kad pasirinktas failas egzistuoja ir turite prieigą prie jo.</translation>
     </message>
   </context>
   <context>
     <name>LookupListsDialog</name>
     <message>
       <source>Lookup Lists</source>
-      <translation type="unfinished">Lookup Lists</translation>
+      <translation>Paieškos sąrašai</translation>
     </message>
     <message>
       <source>Add</source>
@@ -1673,7 +1673,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Import</source>
-      <translation type="unfinished">Import</translation>
+      <translation>Importuoti</translation>
     </message>
     <message>
       <source>Export</source>
@@ -1685,7 +1685,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>Pažymėta %1</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -1693,57 +1693,57 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Įrašų nėra</translation>
     </message>
     <message>
       <source>New List...</source>
-      <translation type="unfinished">New List...</translation>
+      <translation>Naujas sąrašas...</translation>
     </message>
     <message>
       <source>Could not save file</source>
-      <translation type="unfinished">Could not save file</translation>
+      <translation>Nepavyko išsaugoti failo</translation>
     </message>
     <message>
       <source>Please ensure that you have access to selected folder and enough disk space</source>
-      <translation type="unfinished">Please ensure that you have access to selected folder and enough disk space</translation>
+      <translation>Įsitikinkite, kad turite prieigą prie pasirinkto aplanko ir pakankamai vietos diske</translation>
     </message>
     <message>
       <source>Export failed</source>
-      <translation type="unfinished">Export failed</translation>
+      <translation>Eksportuoti nepavyko</translation>
     </message>
     <message>
       <source>Export Selected</source>
-      <translation type="unfinished">Export Selected</translation>
+      <translation>Eksportuoti pasirinktus</translation>
     </message>
   </context>
   <context>
     <name>MotionAreaSelector</name>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>Pasirinktoje srityje</translation>
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Pasirinkite vaizdo įrašo sritį, kad filtruotumėte rezultatus</translation>
     </message>
   </context>
   <context>
     <name>MotionPanel</name>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Pasirinkite kamerą, kad matytumėte jos judesio įvykius</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Judejimas neaptiktas</translation>
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Pabandykite pakeisti filtrus arba įjungti judesio įrašymą</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Pasirinkite kamerą...</translation>
     </message>
   </context>
   <context>
@@ -1759,11 +1759,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <message numerus="yes">
       <source>%n more</source>
       <comment>Numerus: %n is the number of remaining groups</comment>
-      <translation type="unfinished">
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
-        <numerusform>%n more</numerusform>
+      <translation>
+        <numerusform>%n daugiau</numerusform>
+        <numerusform>%n daugiau</numerusform>
+        <numerusform>%n daugiau</numerusform>
+        <numerusform>%n daugiau</numerusform>
       </translation>
     </message>
   </context>
@@ -1771,11 +1771,11 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NewLinkDialog</name>
     <message>
       <source>New Link - %1</source>
-      <translation type="unfinished">New Link - %1</translation>
+      <translation>Nauja nuoroda - %1</translation>
     </message>
     <message>
       <source>The previous link will be invalidated once a new one has been issued</source>
-      <translation type="unfinished">The previous link will be invalidated once a new one has been issued</translation>
+      <translation>Ankstesnė nuoroda bus panaikinta, kai bus išleista nauja</translation>
     </message>
     <message>
       <source>Create</source>
@@ -1786,60 +1786,60 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>NoListsPage</name>
     <message>
       <source>No Lists</source>
-      <translation type="unfinished">No Lists</translation>
+      <translation>Nėra sąrašų</translation>
     </message>
     <message>
       <source>You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</source>
-      <translation type="unfinished">You have not created any Lists yet. With lists you can store multiple values to use them in Event Rules. Create a new List to start adding entries.</translation>
+      <translation>Dar nesukūrėte jokių sąrašų. Naudodami sąrašus galite saugoti kelias reikšmes, kad galėtumėte jas naudoti įvykių taisyklėse. Sukurkite naują sąrašą, kad pradėtumėte kurti įrašus.</translation>
     </message>
     <message>
       <source>Create New...</source>
-      <translation type="unfinished">Create New...</translation>
+      <translation>Kurti naują...</translation>
     </message>
   </context>
   <context>
     <name>NotificationsPanel</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>Nėra naujų pranešimų</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Pranešimų nustatymai</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Dabartis</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Nėra</translation>
     </message>
   </context>
   <context>
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Dydžio apribojimai</translation>
     </message>
   </context>
   <context>
     <name>ObjectTypeSelector</name>
     <message numerus="yes">
       <source>with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
-        <numerusform>with %n attributes</numerusform>
+      <translation>
+        <numerusform>su %n atributais</numerusform>
+        <numerusform>su %n atributais</numerusform>
+        <numerusform>su %n atributais</numerusform>
+        <numerusform>su %n atributais</numerusform>
       </translation>
     </message>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Bet kokio tipo</translation>
     </message>
   </context>
   <context>
@@ -1850,7 +1850,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL arba pagrindinis kompiuteris: prievadas</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1866,14 +1866,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Prisiminti mane</translation>
     </message>
   </context>
   <context>
     <name>PanelBase</name>
     <message>
       <source>Approve</source>
-      <translation type="unfinished">Approve</translation>
+      <translation>Approve</translation>
     </message>
     <message>
       <source>Reject</source>
@@ -1881,14 +1881,14 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Integration pairing code</source>
-      <translation type="unfinished">Integration pairing code</translation>
+      <translation>Integracijos susiejimo kodas</translation>
     </message>
   </context>
   <context>
     <name>ParentGroupsTab</name>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Pridėti grupę</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1896,28 +1896,28 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>No custom groups yet</source>
-      <translation type="unfinished">No custom groups yet</translation>
+      <translation>Dar nėra tinkintų grupių</translation>
     </message>
     <message>
       <source>No groups found</source>
-      <translation type="unfinished">No groups found</translation>
+      <translation>Nerasta jokių grupių</translation>
     </message>
     <message>
       <source>Change search criteria or create a new group</source>
-      <translation type="unfinished">Change search criteria or create a new group</translation>
+      <translation>Pakeiskite paieškos kriterijus arba sukurkite naują grupę</translation>
     </message>
     <message>
       <source>No groups</source>
-      <translation type="unfinished">No groups</translation>
+      <translation>Nėra grupių</translation>
     </message>
     <message>
       <source>Use controls on the left to add to a group</source>
-      <translation type="unfinished">Use controls on the left to add to a group</translation>
+      <translation>Norėdami pridėti prie grupės, naudokite kairėje esančius valdiklius</translation>
     </message>
     <message>
       <source>Member of</source>
       <extracomment>&apos;Member of&apos; as in sentence: &apos;Current user/group is a member of: group1, group2, group3&apos;.</extracomment>
-      <translation type="unfinished">Member of</translation>
+      <translation>Narys asamblėjoje</translation>
     </message>
     <message>
       <source>LDAP</source>
@@ -1927,7 +1927,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Built-in</source>
       <comment>Section name in a list of items: &apos;Built-in groups&apos;</comment>
-      <translation type="unfinished">Built-in</translation>
+      <translation>Įmontuotas</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -1939,7 +1939,7 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PasswordChangeDialog</name>
     <message>
       <source>Change password - %1</source>
-      <translation type="unfinished">Change password - %1</translation>
+      <translation>Keisti slaptažodį</translation>
     </message>
     <message>
       <source>Login</source>
@@ -1947,7 +1947,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Current password</source>
-      <translation type="unfinished">Current password</translation>
+      <translation>Esamas slaptažodis</translation>
     </message>
     <message>
       <source>New password</source>
@@ -1955,7 +1955,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Confirm password</source>
-      <translation type="unfinished">Confirm password</translation>
+      <translation>Confirm password</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -1966,53 +1966,53 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PermissionSummary</name>
     <message>
       <source>No custom permissions</source>
-      <translation type="unfinished">No custom permissions</translation>
+      <translation>Nėra pasirinktinių leidimų</translation>
     </message>
   </context>
   <context>
     <name>Permissions</name>
     <message>
       <source>Required permission group</source>
-      <translation type="unfinished">Required permission group</translation>
+      <translation>Privaloma leidimų grupė</translation>
     </message>
     <message>
       <source>View Permissions</source>
-      <translation type="unfinished">View Permissions</translation>
+      <translation>Vartotojo teisės</translation>
     </message>
     <message>
       <source>Hide Permissions</source>
-      <translation type="unfinished">Hide Permissions</translation>
+      <translation>Nėra leidimų</translation>
     </message>
   </context>
   <context>
     <name>PermissionsTab</name>
     <message>
       <source>No resources found</source>
-      <translation type="unfinished">No resources found</translation>
+      <translation>Nerasta jokių išteklių</translation>
     </message>
     <message>
       <source>Automatically add dependent permissions</source>
-      <translation type="unfinished">Automatically add dependent permissions</translation>
+      <translation>Automatiškai pridėti priklausomus leidimus</translation>
     </message>
     <message>
       <source>Use %1 or %2 to select multiple resources, or %3 to clear the selection</source>
       <comment>%1, %2 and %3 will be replaced with keyboard key names</comment>
-      <translation type="unfinished">Use %1 or %2 to select multiple resources, or %3 to clear the selection</translation>
+      <translation>Norėdami pasirinkti kelis išteklius, naudokite %1 arba %2 , o norėdami išvalyti pasirinkimą, naudokite %3.</translation>
     </message>
     <message>
       <source>Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</source>
-      <translation type="unfinished">Resources table gives you an overview of user or group permissions and allows you to assign permissions for specific resources.</translation>
+      <translation>Išteklių lentelėje pateikiama naudotojų arba grupių teisių apžvalga ir galite priskirti teises konkretiems ištekliams.</translation>
     </message>
     <message>
       <source>If you select a permission that depends on another permission both permissions will be granted automatically.</source>
-      <translation type="unfinished">If you select a permission that depends on another permission both permissions will be granted automatically.</translation>
+      <translation>Jei pasirinksite leidimą, kuris priklauso nuo kito leidimo, abu leidimai bus suteikti automatiškai.</translation>
     </message>
   </context>
   <context>
     <name>PixelationIntensityDialog</name>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensyvumas</translation>
     </message>
   </context>
   <context>
@@ -2034,26 +2034,26 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PluginSelector</name>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Bet koks įskiepis</translation>
     </message>
   </context>
   <context>
     <name>Plugins</name>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Pluginai</translation>
     </message>
     <message>
       <source>Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</source>
       <comment>%1 is like Nx Witness</comment>
-      <translation type="unfinished">Plugins are programs that run on the %1 Server to enable seamless video analytics integrations.</translation>
+      <translation>Įskiepiai – tai programos, veikiančios %1 serveryje, kad būtų galima sklandžiai integruoti vaizdo įrašų analizę.</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Nėra įdiegtų įskiepių</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -2071,28 +2071,28 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>Daugiakampis negalioja. Norėdami tęsti, pašalinkite susikirtimus.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Šiam daugiakampiui reikia bent %n taškų.</numerusform>
+        <numerusform>Šiam daugiakampiui reikia bent %n taškų.</numerusform>
+        <numerusform>Šiam daugiakampiui reikia bent %n taškų.</numerusform>
+        <numerusform>Šiam daugiakampiui reikia bent %n taškų.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Spustelėkite paskutinį tašką, kad užbaigtumėte daugiakampio braižymą.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
+        <numerusform>Pasiektas maksimalus taškų skaičius (%n taškų).</numerusform>
       </translation>
     </message>
   </context>
@@ -2100,34 +2100,34 @@ Select an Integration to begin configuring its parameters.</translation>
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Peržiūra negalima</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Pasirinkite objektą, kad būtų rodoma peržiūra</translation>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation type="unfinished">Show on Layout</translation>
+      <translation>Rodyti makete</translation>
     </message>
     <message>
       <source>Preview is not available for the selected object</source>
-      <translation type="unfinished">Preview is not available for the selected object</translation>
+      <translation>Pasirinkto objekto peržiūra negalima</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopijuoti</translation>
     </message>
     <message>
       <source>Filter by</source>
-      <translation type="unfinished">Filter by</translation>
+      <translation>Filtruoti pagal</translation>
     </message>
   </context>
   <context>
     <name>PreviewTableView</name>
     <message>
       <source>Select attribute</source>
-      <translation type="unfinished">Select attribute</translation>
+      <translation>Pasirinkite atributus</translation>
     </message>
   </context>
   <context>
@@ -2142,7 +2142,7 @@ Select an Integration to begin configuring its parameters.</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>Baigta</translation>
     </message>
   </context>
   <context>
@@ -2161,73 +2161,73 @@ Select an Integration to begin configuring its parameters.</translation>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Vilkite virš bet kurios vaizdo įrašo dalies
+, kad suaktyvintumėte PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Eikite į vietinius nustatymus, kad įjungtumėte vilkimo žymeklį vaizdo įrašo centre.</translation>
     </message>
     <message>
       <source>Press arrow keys to move around. Use plus and minus keys to zoom.</source>
-      <translation type="unfinished">Press arrow keys to move around. Use plus and minus keys to zoom.</translation>
+      <translation>Norėdami judėti, spauskite rodyklių klavišus. Norėdami priartinti, naudokite pliuso ir minuso klavišus.</translation>
     </message>
     <message>
       <source>Use mouse wheel to zoom</source>
-      <translation type="unfinished">Use mouse wheel to zoom</translation>
+      <translation>Norėdami priartinti, naudokite pelės ratuką</translation>
     </message>
     <message>
       <source>You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</source>
-      <translation type="unfinished">You can enable this guide again by going to Local Settings &gt; Advanced &gt; Reset All Warnings</translation>
+      <translation>Šį vadovą galite vėl įjungti nuėję į Vietiniai nustatymai &gt; Išplėstiniai &gt; Atstatyti visus įspėjimus</translation>
     </message>
     <message>
       <source>Introducing
 New PTZ controls</source>
-      <translation type="unfinished">Introducing
-New PTZ controls</translation>
+      <translation>Pristatome naujus PTZ valdiklius
+</translation>
     </message>
     <message>
       <source>Click, double-click, or drag
 mouse pointer while pressing
 Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag
-mouse pointer while pressing
-Shift key to use Advanced PTZ</translation>
+      <translation>Spustelėkite, dukart spustelėkite arba vilkite pelės žymeklį
+ir tuo pačiu metu paspauskite
+„Shift“, kad naudotumėte išplėstinį PTZ režimą.</translation>
     </message>
     <message>
       <source>Here is a quick guide
 on what has changed.</source>
-      <translation type="unfinished">Here is a quick guide
-on what has changed.</translation>
+      <translation>Čia pateikiamas trumpas vadovas
+apie tai, kas pasikeitė.</translation>
     </message>
     <message>
       <source>To use Target Lock Tracking,
 Press Alt + Click to follow object</source>
-      <translation type="unfinished">To use Target Lock Tracking,
-Press Alt + Click to follow object</translation>
+      <translation>Norėdami naudoti taikinio stebėjimo funkciją,
+paspauskite Alt + spustelėkite, kad sektumėte objektą</translation>
     </message>
   </context>
   <context>
     <name>QuickIntervalPanel</name>
     <message>
       <source>today</source>
-      <translation type="unfinished">today</translation>
+      <translation>šiandieną</translation>
     </message>
     <message>
       <source>-1 hour</source>
-      <translation type="unfinished">-1 hour</translation>
+      <translation>-1 valanda</translation>
     </message>
     <message>
       <source>-24 hours</source>
-      <translation type="unfinished">-24 hours</translation>
+      <translation>-24 valandos</translation>
     </message>
     <message>
       <source>-7 days</source>
-      <translation type="unfinished">-7 days</translation>
+      <translation>-dienos</translation>
     </message>
     <message>
       <source>-30 days</source>
-      <translation type="unfinished">-30 days</translation>
+      <translation>-30 dienų</translation>
     </message>
   </context>
   <context>
@@ -2245,11 +2245,11 @@ Press Alt + Click to follow object</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Objekto tipas</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Potipis (Automatic Translation)</translation>
     </message>
   </context>
   <context>
@@ -2260,15 +2260,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Server is not configured for remote access feature</source>
-      <translation type="unfinished">Server is not configured for remote access feature</translation>
+      <translation>Serveris nesukonfigūruotas nuotolinės prieigos funkcijai</translation>
     </message>
     <message>
       <source>Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</source>
-      <translation type="unfinished">Remote access tool is currently disabled. Please enable it or contact your administrator to turn it on.</translation>
+      <translation>Nuotolinės prieigos įrankis šiuo metu išjungtas. Įjunkite jį arba susisiekite su administratoriumi, kad jį įjungtų.</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Sužinokite daugiau</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -2276,19 +2276,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Connect %1 client application to localhost:%2</source>
-      <translation type="unfinished">Connect %1 client application to localhost:%2</translation>
+      <translation>Prijunkite kliento programą %1 prie localhost:%2</translation>
     </message>
     <message>
       <source>Local port</source>
-      <translation type="unfinished">Local port</translation>
+      <translation>Vietinis prievadas</translation>
     </message>
     <message>
       <source>An error occurred</source>
-      <translation type="unfinished">An error occurred</translation>
+      <translation>Įvyko klaida</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Naudotojo vardas</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2296,7 +2296,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Remote access is unavailable</source>
-      <translation type="unfinished">Remote access is unavailable</translation>
+      <translation>Nuotolinė prieiga negalima</translation>
     </message>
   </context>
   <context>
@@ -2315,56 +2315,56 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Has %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Has %1 permission</translation>
+      <translation>Turi %1 leidimą</translation>
     </message>
     <message>
       <source>Add %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 and dependent permissions</translation>
+      <translation>Pridėti %1 ir priklausomus leidimus</translation>
     </message>
     <message>
       <source>Add %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Add %1 permission</translation>
+      <translation>Pridėti %1 leidimą</translation>
     </message>
     <message>
       <source>Remove %1 and dependent permissions</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 and dependent permissions</translation>
+      <translation>Pašalinkite %1 ir su tuo susijusius leidimus</translation>
     </message>
     <message>
       <source>Remove %1 permission</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Remove %1 permission</translation>
+      <translation>Pašalinti %1 leidimą</translation>
     </message>
     <message>
       <source>Also inherits it from</source>
       <comment>&apos;it&apos; refers to a permission</comment>
-      <translation type="unfinished">Also inherits it from</translation>
+      <translation>Taip pat paveldi iš</translation>
     </message>
     <message>
       <source>Inherits %1 permission from</source>
       <comment>%1 will be substituted with a permission name</comment>
-      <translation type="unfinished">Inherits %1 permission from</translation>
+      <translation>Paveldi %1 leidimą iš</translation>
     </message>
     <message>
       <source>Already inherited from</source>
-      <translation type="unfinished">Already inherited from</translation>
+      <translation>Jau paveldėta iš</translation>
     </message>
     <message>
       <source>Will stay inherited from</source>
-      <translation type="unfinished">Will stay inherited from</translation>
+      <translation>Liks paveldėta iš</translation>
     </message>
   </context>
   <context>
     <name>ResourceBrowser</name>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Nėra vietinių failų</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Nuvilkite vaizdo failus arba vaizdus į kliento langą arba pridėkite vietinį medijos aplanką per vietinių nustatymų dialogo langą</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -2379,7 +2379,7 @@ Press Alt + Click to follow object</translation>
     <name>ResourceFilterButton</name>
     <message>
       <source>Available by Permissions</source>
-      <translation type="unfinished">Available by Permissions</translation>
+      <translation>Pasiekiama pagal leidimus</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
@@ -2391,7 +2391,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Web Pages &amp; Integrations</source>
-      <translation type="unfinished">Web Pages &amp; Integrations</translation>
+      <translation>Tinklalapiai ir integracijos</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2399,11 +2399,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Health Monitors</source>
-      <translation type="unfinished">Health Monitors</translation>
+      <translation>Sveikatos monitorius</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Vaizdo siena</translation>
     </message>
   </context>
   <context>
@@ -2427,7 +2427,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>PASENUSI</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
@@ -2450,11 +2450,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Rodyti filmus</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Vaizdo siena</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -2462,7 +2462,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Vietiniai failai</translation>
     </message>
     <message>
       <source>Integrations</source>
@@ -2477,14 +2477,14 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Peržiūra pasenusi</translation>
     </message>
   </context>
   <context>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Pranešimai</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -2496,7 +2496,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Įvykiai</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -2507,34 +2507,34 @@ Press Alt + Click to follow object</translation>
     <name>SaasBanner</name>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Svetainė sustabdyta. Norint įjungti / išjungti integracijos naudojimą dabartiniame įrenginyje, svetainė turi būti aktyvios būsenos. Dėl išsamesnės informacijos kreipkitės į savo kanalo partnerį.</translation>
     </message>
     <message>
       <source>Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been suspended. To enable/disable the integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Svetainė sustabdyta. Norint įjungti / išjungti integracijos naudojimą kai kuriuose įrenginiuose, svetainė turi būti aktyvios būsenos. Dėl išsamesnės informacijos kreipkitės į savo kanalo partnerį.</translation>
     </message>
     <message>
       <source>Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To enable this integration usage for current device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Svetainė uždaryta. Norint įjungti šią integraciją dabartiniame įrenginyje, svetainė turi būti aktyvios būsenos. Dėl išsamesnės informacijos kreipkitės į savo kanalo partnerį.</translation>
     </message>
     <message>
       <source>Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</source>
-      <translation type="unfinished">Site has been shut down. To activate this integration usage for some device the Site must be in active state. Contact your channel partner for details</translation>
+      <translation>Svetainė uždaryta. Norint aktyvuoti šią integraciją kai kuriuose įrenginiuose, svetainė turi būti aktyvios būsenos. Dėl išsamesnės informacijos kreipkitės į savo kanalo partnerį.</translation>
     </message>
   </context>
   <context>
     <name>SavingResults</name>
     <message>
       <source>Choose file to save</source>
-      <translation type="unfinished">Choose file to save</translation>
+      <translation>Pasirinkite failus, kuriais norite dalintis</translation>
     </message>
     <message>
       <source>JSON files (*.json)</source>
-      <translation type="unfinished">JSON files (*.json)</translation>
+      <translation>JSON failai (*.json)</translation>
     </message>
     <message>
       <source>File to save the results:</source>
-      <translation type="unfinished">File to save the results:</translation>
+      <translation>Failas rezultatams išsaugoti:</translation>
     </message>
   </context>
   <context>
@@ -2548,21 +2548,21 @@ Press Alt + Click to follow object</translation>
     <name>SecurityOverlay</name>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Nėra priėjimo</translation>
     </message>
   </context>
   <context>
     <name>SelectLayoutDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Pasirinkite išdėstymą</translation>
     </message>
   </context>
   <context>
     <name>SelectOverlappedIdDialog</name>
     <message>
       <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
-      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+      <translation>Laiko juostos identifikatorius, kuris sukuriamas, kai nuotoliniame NVR laikas keičiamas atgal. Nauja laiko juosta gali persidengti su esama.</translation>
     </message>
     <message>
       <source>Select</source>
@@ -2577,55 +2577,55 @@ Press Alt + Click to follow object</translation>
     <name>SensitivityItem</name>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Jautrumas</translation>
     </message>
   </context>
   <context>
     <name>SettingsDialog</name>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Įveskite parametrus</translation>
     </message>
     <message>
       <source>This action requires some parameters to be filled.</source>
-      <translation type="unfinished">This action requires some parameters to be filled.</translation>
+      <translation>Šiam veiksmui atlikti reikia užpildyti kai kuriuos parametrus.</translation>
     </message>
   </context>
   <context>
     <name>SettingsTab</name>
     <message>
       <source>Accept API Integrations registration requests</source>
-      <translation type="unfinished">Accept API Integrations registration requests</translation>
+      <translation>Priimti API integracijų registracijos užklausas</translation>
     </message>
     <message>
       <source>Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</source>
-      <translation type="unfinished">Enabling this option lets third parties request approval to register an Integration. Safeguards are in place, but disable it once all necessary Integrations are installed - extended use is not recommended.</translation>
+      <translation>Įjungus šią parinktį, trečiosios šalys gali prašyti patvirtinimo registruoti integraciją. Apsaugos priemonės yra įdiegtos, tačiau jas reikia išjungti, kai įdiegiamos visos būtinos integracijos – ilgalaikis naudojimas nerekomenduojamas.</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MAKS</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MIN.</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Nustatykite minimalų ir maksimalų objekto dydį.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>Minimalus objekto dydis negali būti didesnis už maksimalų.</translation>
     </message>
   </context>
   <context>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Horizonto korekcija</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -2636,7 +2636,7 @@ Press Alt + Click to follow object</translation>
     <name>StatusOverlay</name>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnostika</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -2644,7 +2644,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktyvuoti licencija</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -2652,23 +2652,23 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Įvesties / išvesties modulio nustatymai</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Įrenginio nustatymai</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Nustatyti šiai kamerai</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
-        <numerusform>Set for all %n Cameras</numerusform>
+      <translation>
+        <numerusform>Nustatyti visoms %n kameroms</numerusform>
+        <numerusform>Nustatyti visoms %n kameroms</numerusform>
+        <numerusform>Nustatyti visoms %n kameroms</numerusform>
+        <numerusform>Nustatyti visoms %n kameroms</numerusform>
       </translation>
     </message>
     <message>
@@ -2681,54 +2681,54 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Patikrinkite autentifikavimo informaciją</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Nėra signalo</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Nepakanka licencijų</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Serveris nepasiekiamas</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Nėra priėjimo</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Įrenginys išjungtas</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Iš viso jungčių</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Nepavyksta iššifruoti medijos</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Būtinas slaptažodis</translation>
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Nėra tiesioginės transliacijos</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Nepalaikoma programinės įrangos versija</translation>
     </message>
   </context>
   <context>
     <name>StringEditor</name>
     <message>
       <source>Min 3 characters</source>
-      <translation type="unfinished">Min 3 characters</translation>
+      <translation>Min. 3 simbolių</translation>
     </message>
   </context>
   <context>
@@ -2742,15 +2742,15 @@ Press Alt + Click to follow object</translation>
     <name>SyncComboBox</name>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Niekada</translation>
     </message>
     <message>
       <source>Always</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Visada</translation>
     </message>
     <message>
       <source>On Log In</source>
-      <translation type="unfinished">On Log In</translation>
+      <translation>Prisijungus</translation>
     </message>
   </context>
   <context>
@@ -2758,36 +2758,36 @@ Press Alt + Click to follow object</translation>
     <message>
       <source>Valid from %1 to %2 (by server time)</source>
       <extracomment>Example: Valid from 14.05.2023 to 24.05.2023, 12:24 (by server time)</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time)</translation>
+      <translation>Galioja nuo %1 iki %2 (pagal serverio laiką)</translation>
     </message>
     <message>
       <source>Valid from %1 to %2 (by server time) or for %3 after login</source>
       <extracomment>Valid from 14.05.2023 to 24.05.2023 (by server time) or for 12 hours after login</extracomment>
-      <translation type="unfinished">Valid from %1 to %2 (by server time) or for %3 after login</translation>
+      <translation>Galioja nuo %1 iki %2 (pagal serverio laiką) arba %3 po prisijungimo</translation>
     </message>
   </context>
   <context>
     <name>TemporaryLinkSettings</name>
     <message>
       <source>Link Valid Until</source>
-      <translation type="unfinished">Link Valid Until</translation>
+      <translation>Nuoroda galioja iki</translation>
     </message>
     <message>
       <source>The link will remain accessible until the date specified (including, based on server time)</source>
-      <translation type="unfinished">The link will remain accessible until the date specified (including, based on server time)</translation>
+      <translation>Nuoroda bus pasiekiama iki nurodytos datos (imtinai, atsižvelgiant į serverio laiką)</translation>
     </message>
     <message>
       <source>Revoke access after login</source>
-      <translation type="unfinished">Revoke access after login</translation>
+      <translation>Atšaukti prieigą prisijungus</translation>
     </message>
     <message>
       <source>Access may be revoked earlier if the link validity period ends</source>
-      <translation type="unfinished">Access may be revoked earlier if the link validity period ends</translation>
+      <translation>Prieiga gali būti panaikinta anksčiau, jei baigiasi nuorodos galiojimo laikotarpis</translation>
     </message>
     <message>
       <source>In</source>
       <extracomment>&apos;In&apos; as in sentence: &apos;Revoke access after login in N hours&apos;.</extracomment>
-      <translation type="unfinished">In</translation>
+      <translation>Čia - </translation>
     </message>
   </context>
   <context>
@@ -2798,19 +2798,19 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Favorite Sites</source>
-      <translation type="unfinished">No Favorite Sites</translation>
+      <translation>Nėra mėgstamiausių svetainių</translation>
     </message>
     <message>
       <source>No Hidden Sites</source>
-      <translation type="unfinished">No Hidden Sites</translation>
+      <translation>Nėra paslėptų svetainių</translation>
     </message>
     <message>
       <source>You can add site to the favorites from the context menu</source>
-      <translation type="unfinished">You can add site to the favorites from the context menu</translation>
+      <translation>Galite pridėti svetainę prie mėgstamiausių iš kontekstinio meniu</translation>
     </message>
     <message>
       <source>You can hide sites from the main list from the context menu</source>
-      <translation type="unfinished">You can hide sites from the main list from the context menu</translation>
+      <translation>Galite paslėpti svetaines nuo pagrindinio sąrašo kontekstiniame meniu</translation>
     </message>
   </context>
   <context>
@@ -2821,7 +2821,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Paslėpti</translation>
     </message>
     <message>
       <source>Show</source>
@@ -2833,38 +2833,38 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Pridėti į adresyną</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Pašalinti iš mėgstamų</translation>
     </message>
   </context>
   <context>
     <name>TimeSelector</name>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>Bet kada</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>Vakar</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>Paskutinės 7 dienos</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>Paskutinės 30 dienų</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>Pasirinkta laiko juostoje</translation>
     </message>
     <message>
       <source>Time is unavailable due to DST changes</source>
-      <translation type="unfinished">Time is unavailable due to DST changes</translation>
+      <translation>Laikas nepasiekiamas dėl vasaros laiko pakeitimų</translation>
     </message>
   </context>
   <context>
@@ -2884,7 +2884,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateDialog</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Naujas Vartotojas</translation>
     </message>
     <message>
       <source>General</source>
@@ -2892,7 +2892,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -2900,7 +2900,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globalūs leidimai</translation>
     </message>
     <message>
       <source>Add User</source>
@@ -2911,7 +2911,7 @@ Press Alt + Click to follow object</translation>
     <name>UserCreateTab</name>
     <message>
       <source>New User</source>
-      <translation type="unfinished">New User</translation>
+      <translation>Naujas Vartotojas</translation>
     </message>
     <message>
       <source>Type</source>
@@ -2943,15 +2943,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Patvirtinkite slaptažodį</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Leisti nesaugų (santraukos) autentifikavimą</translation>
     </message>
     <message>
       <source>You need to specify only user&apos;s email address.</source>
-      <translation type="unfinished">You need to specify only user&apos;s email address.</translation>
+      <translation>Reikia nurodyti tik naudotojo&apos;el. pašto adresą.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -2959,15 +2959,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access</source>
-      <translation type="unfinished">Access</translation>
+      <translation>Prieiga</translation>
     </message>
     <message>
       <source>Regular user with credentials</source>
-      <translation type="unfinished">Regular user with credentials</translation>
+      <translation>Įprastas vartotojas su prisijungimo duomenimis</translation>
     </message>
     <message>
       <source>Temporary with link</source>
-      <translation type="unfinished">Temporary with link</translation>
+      <translation>Laikinas su nuoroda</translation>
     </message>
     <message>
       <source>Passwords do not match</source>
@@ -2975,18 +2975,18 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</source>
-      <translation type="unfinished">The added site will quickly become visible to users with an existing cloud account, while users without an existing cloud account will receive instructions by Email.</translation>
+      <translation>Pridėta svetainė greitai taps matoma vartotojams, turintiems esamą debesijos paskyrą, o vartotojai, neturintys esamos debesijos paskyros, gaus instrukcijas el. paštu.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Debesų pranešimų kalba</translation>
     </message>
   </context>
   <context>
     <name>UserEditDialog</name>
     <message>
       <source>User - %1</source>
-      <translation type="unfinished">User - %1</translation>
+      <translation>Vartotojas - %1</translation>
     </message>
     <message>
       <source>General</source>
@@ -2994,7 +2994,7 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
     <message>
       <source>Resources</source>
@@ -3002,30 +3002,30 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Global Permissions</source>
-      <translation type="unfinished">Global Permissions</translation>
+      <translation>Globalūs leidimai</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">This user has not yet signed up for %1</translation>
+      <translation>Šis naudotojas dar neužsiregistravo %1</translation>
     </message>
   </context>
   <context>
     <name>UserEnabledSwitch</name>
     <message>
       <source>Enabled user</source>
-      <translation type="unfinished">Enabled user</translation>
+      <translation>Įgalinti vartotojai</translation>
     </message>
     <message>
       <source>Disabled user</source>
-      <translation type="unfinished">Disabled user</translation>
+      <translation>Disabled user</translation>
     </message>
   </context>
   <context>
     <name>UserGeneralTab</name>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Audit trail</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -3053,15 +3053,15 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Set password to enable insecure authentication</source>
-      <translation type="unfinished">Set password to enable insecure authentication</translation>
+      <translation>Nustatykite slaptažodį, kad įjungtumėte nesaugų autentifikavimą</translation>
     </message>
     <message>
       <source>Allow insecure (digest) authentication</source>
-      <translation type="unfinished">Allow insecure (digest) authentication</translation>
+      <translation>Leisti nesaugų (santraukos) autentifikavimą</translation>
     </message>
     <message>
       <source>This user is not found in LDAP database and is not able to log in.</source>
-      <translation type="unfinished">This user is not found in LDAP database and is not able to log in.</translation>
+      <translation>Šis vartotojas nerastas LDAP duomenų bazėje ir negali prisijungti.</translation>
     </message>
     <message>
       <source>Permission Groups</source>
@@ -3069,11 +3069,11 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Access expires</source>
-      <translation type="unfinished">Access expires</translation>
+      <translation>Prieigos galiojimo laikas baigiasi</translation>
     </message>
     <message>
       <source>Access Link</source>
-      <translation type="unfinished">Access Link</translation>
+      <translation>Prieigos nuoroda</translation>
     </message>
     <message>
       <source>Copy Link</source>
@@ -3081,71 +3081,71 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>Terminate</source>
-      <translation type="unfinished">Terminate</translation>
+      <translation>Nutraukti</translation>
     </message>
     <message>
       <source>New Link...</source>
-      <translation type="unfinished">New Link...</translation>
+      <translation>Nauja nuoroda...</translation>
     </message>
     <message>
       <source>No valid link for this user</source>
-      <translation type="unfinished">No valid link for this user</translation>
+      <translation>Šiam vartotojui nėra galiojančios nuorodos</translation>
     </message>
     <message>
       <source>Copied</source>
       <comment>Copied here means that a link is copied</comment>
-      <translation type="unfinished">Copied</translation>
+      <translation>Nukopijuota</translation>
     </message>
     <message>
       <source>Obtaining Link...</source>
-      <translation type="unfinished">Obtaining Link...</translation>
+      <translation>Gaunama nuoroda...</translation>
     </message>
     <message>
       <source>Ensure that this computer is able to connect to the %1</source>
       <comment>%1 is the cloud name</comment>
-      <translation type="unfinished">Ensure that this computer is able to connect to the %1</translation>
+      <translation>Įsitikinkite, kad šis kompiuteris gali prisijungti prie %1</translation>
     </message>
     <message>
       <source>LDAP server is offline. User is not able to log in.</source>
-      <translation type="unfinished">LDAP server is offline. User is not able to log in.</translation>
+      <translation>LDAP serveris neprisijungęs. Vartotojas negali prisijungti.</translation>
     </message>
     <message>
       <source>When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</source>
-      <translation type="unfinished">When continuous sync with LDAP server is disabled, user membership in groups does not synchronize automatically. To update this information, initiate a manual sync.</translation>
+      <translation>Kai išjungtas nuolatinis sinchronizavimas su LDAP serveriu, vartotojų narystė grupėse automatiškai nesinchronizuojama. Norėdami atnaujinti šią informaciją, pradėkite rankinį sinchronizavimą.</translation>
     </message>
     <message>
       <source>This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</source>
-      <translation type="unfinished">This user’s login duplicates the login of another user. None of them is able to log in. To resolve this issue you can change user’s login or disable or delete users with duplicating logins.</translation>
+      <translation>Šio vartotojo prisijungimo duomenys dubliuoja kito vartotojo prisijungimo duomenis. Nei vienas iš jų negali prisijungti. Norėdami išspręsti šią problemą, galite pakeisti vartotojo prisijungimo duomenis arba išjungti arba ištrinti vartotojus su pasikartojančiais prisijungimo duomenimis.</translation>
     </message>
     <message>
       <source>Notification Language</source>
-      <translation type="unfinished">Notification Language</translation>
+      <translation>Debesų pranešimų kalba</translation>
     </message>
     <message>
       <source>Interface Language</source>
-      <translation type="unfinished">Interface Language</translation>
+      <translation>Sąsajos kalba</translation>
     </message>
   </context>
   <context>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Paslėpta</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Adresynas</translation>
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Visa svetainė</translation>
     </message>
   </context>
   <context>
     <name>VmsRulesDialog</name>
     <message>
       <source>Add Rule</source>
-      <translation type="unfinished">Add Rule</translation>
+      <translation>Pridėti taisyklę</translation>
     </message>
     <message>
       <source>Duplicate</source>
@@ -3157,31 +3157,31 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>No Entries</source>
-      <translation type="unfinished">No Entries</translation>
+      <translation>Nėra įrašų</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Įvykių žurnalas...</translation>
     </message>
     <message>
       <source>Reset To Defaults...</source>
-      <translation type="unfinished">Reset To Defaults...</translation>
+      <translation>Atkurti numatytuosius nustatymus...</translation>
     </message>
     <message>
       <source>Test Events...</source>
-      <translation type="unfinished">Test Events...</translation>
+      <translation>Bandomieji įvykiai...</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Renginio taisyklės</translation>
     </message>
     <message>
       <source>%1 selected:</source>
-      <translation type="unfinished">%1 selected:</translation>
+      <translation>Pažymėta %1</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Planuotojas</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -3196,11 +3196,11 @@ Press Alt + Click to follow object</translation>
     <name>WelcomeScreen</name>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Oficiali svetainė</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Pagalba ir naudotojo vadovas</translation>
     </message>
     <message>
       <source>Support</source>
@@ -3208,28 +3208,28 @@ Press Alt + Click to follow object</translation>
     </message>
     <message>
       <source>You do not have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You do not have access to the %1. Please check your internet connection.</translation>
+      <translation>Jūs neturite prieigos prie %1. Patikrinkite interneto ryšį.</translation>
     </message>
   </context>
   <context>
     <name>XAxis</name>
     <message>
       <source>Move the joystick left and right several times.</source>
-      <translation type="unfinished">Move the joystick left and right several times.</translation>
+      <translation>Kelis kartus perkelkite valdymo svirtį į kairę ir į dešinę.</translation>
     </message>
   </context>
   <context>
     <name>YAxis</name>
     <message>
       <source>Move the joystick up and down several times.</source>
-      <translation type="unfinished">Move the joystick up and down several times.</translation>
+      <translation>Kelis kartus pajudinkite valdymo svirtį aukštyn ir žemyn.</translation>
     </message>
   </context>
   <context>
     <name>ZAxis</name>
     <message>
       <source>Rotate the joystick clockwise and counterclockwise several times.</source>
-      <translation type="unfinished">Rotate the joystick clockwise and counterclockwise several times.</translation>
+      <translation>Kelis kartus pasukite valdymo svirtį pagal laikrodžio rodyklę ir prieš laikrodžio rodyklę.</translation>
     </message>
   </context>
 </TS>
