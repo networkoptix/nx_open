@@ -32,7 +32,7 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Visos kameros</translation>
     </message>
   </context>
   <context>
@@ -85,7 +85,7 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Galioja iki %@</translation>
     </message>
     <message>
       <source>Error</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Visi įrenginiai</translation>
     </message>
     <message>
       <source>Layouts</source>
