@@ -5,33 +5,33 @@
     <name>AnalyticsDataHelper</name>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>Obiekty (%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>Obiekty (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>BookmarkDataHelper</name>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>Zakładki (%1)</translation>
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>Zakładki (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>MotionDataHelper</name>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
+      <translation>Ruch (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
+      <translation>Ruch (%1)</translation>
     </message>
   </context>
   <context>
@@ -131,21 +131,21 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Utwórz zakładkę</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionDataHelper</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>Wykryto ruch</translation>
     </message>
   </context>
 </TS>

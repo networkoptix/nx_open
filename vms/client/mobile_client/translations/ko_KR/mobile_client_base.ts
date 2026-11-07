@@ -5,22 +5,22 @@
     <name>AnalyticsDataHelper</name>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>객체(%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>객체(%1)</translation>
     </message>
   </context>
   <context>
     <name>BookmarkDataHelper</name>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>북마크(%1)</translation>
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>북마크(&gt;%1)</translation>
     </message>
   </context>
   <context>
@@ -128,21 +128,21 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>알 수 없음</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>즐겨찾기</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionDataHelper</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>모션 감지</translation>
     </message>
   </context>
 </TS>

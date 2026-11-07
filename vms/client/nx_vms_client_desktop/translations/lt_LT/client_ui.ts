@@ -40,7 +40,7 @@
     <name>AdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Vaizdo gerinimas</translation>
     </message>
     <message>
       <source>Enable image enhancement</source>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Logs Management</source>
-      <translation type="unfinished">Logs Management</translation>
+      <translation>Sąrašų valdymas</translation>
     </message>
     <message>
       <source>Download</source>
@@ -162,7 +162,7 @@
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -184,15 +184,15 @@
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Stebėjimo archyvas</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Eksportuoti vaizdo įrašą</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Stebima tiesiogiai</translation>
     </message>
     <message>
       <source>Login/logout</source>
@@ -212,11 +212,11 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Audit trail</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -232,7 +232,7 @@
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Renginio taisyklės</translation>
     </message>
     <message>
       <source>Site actions</source>
@@ -359,7 +359,7 @@
     </message>
     <message>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Žymių žurnalas</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -381,7 +381,7 @@
     <name>CameraBookmarkSharingLinkDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Bendrinti žymę</translation>
     </message>
     <message>
       <source>URL</source>
@@ -404,7 +404,7 @@
     <name>CameraBookmarkSharingSettingsDialog</name>
     <message>
       <source>Share Bookmark</source>
-      <translation type="unfinished">Share Bookmark</translation>
+      <translation>Bendrinti žymę</translation>
     </message>
     <message>
       <source>Lifetime</source>
@@ -430,7 +430,7 @@
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Atstatyti numatytas parinktis</translation>
     </message>
     <message>
       <source>Keep camera stream and profile settings</source>
@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Web Page Port</source>
@@ -585,7 +585,7 @@
     <name>CameraHotspotsSettingsWidget</name>
     <message>
       <source>Hotspots</source>
-      <translation type="unfinished">Hotspots</translation>
+      <translation>Karštieji taškai</translation>
     </message>
     <message>
       <source>Add</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Tinklalapiai</translation>
     </message>
     <message>
       <source>Primary Stream</source>
@@ -640,7 +640,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Įvykių žurnalas</translation>
     </message>
     <message>
       <source>Camera rules</source>
@@ -659,7 +659,7 @@
     <name>CameraLicensePanelWidget</name>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktyvuoti nemokamą licenciją...</translation>
     </message>
   </context>
   <context>
@@ -677,7 +677,7 @@
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Jautrumas</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -686,7 +686,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>į</translation>
     </message>
   </context>
   <context>
@@ -724,7 +724,7 @@
     </message>
     <message>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktyvuoti nemokamą licenciją...</translation>
     </message>
     <message>
       <source>Copying Schedule</source>
@@ -743,11 +743,11 @@
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Visos kameros</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Pasirinkite kameras</translation>
     </message>
   </context>
   <context>
@@ -813,7 +813,7 @@
     <name>ConnectingToServerDialog</name>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Jungiamasi...</translation>
     </message>
   </context>
   <context>
@@ -924,7 +924,7 @@
     </message>
     <message>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Sustabdyti</translation>
     </message>
     <message>
       <source>Add all Devices</source>
@@ -973,7 +973,7 @@
     <name>EventLogDialog</name>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Įvykių žurnalas</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -989,7 +989,7 @@
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Renginio taisyklės...</translation>
     </message>
   </context>
   <context>
@@ -1129,7 +1129,7 @@
     <name>FailoverWidget</name>
     <message>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Perėjimas per atsarginę kopiją</translation>
     </message>
     <message>
       <source>Server Location ID:</source>
@@ -1286,7 +1286,7 @@
     </message>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Nėra paveikslėlio</translation>
     </message>
   </context>
   <context>
@@ -1397,7 +1397,7 @@
     <name>LayoutSelectionDialog</name>
     <message>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Pasirinkite išdėstymą</translation>
     </message>
     <message>
       <source>Shared layouts</source>
@@ -1416,7 +1416,7 @@
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Bendrinis</translation>
     </message>
     <message>
       <source>Features</source>
@@ -1458,7 +1458,7 @@
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktyvuoti licencija</translation>
     </message>
     <message>
       <source>Internet Activation</source>
@@ -1466,11 +1466,11 @@
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licencijos raktas</translation>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Neteisingas licencijos raktas</translation>
     </message>
     <message>
       <source>Activation Key File</source>
@@ -1485,7 +1485,7 @@
     <name>LocalSettingsDialog</name>
     <message>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Vietiniai nustatymai</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1515,7 @@
     <name>LoginDialog</name>
     <message>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Hostas</translation>
     </message>
     <message>
       <source>Port</source>
@@ -1531,7 +1531,7 @@
     </message>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Testuoti</translation>
     </message>
     <message>
       <source>Use Credentials</source>
@@ -1585,7 +1585,7 @@
     <name>LookAndFeelPreferencesWidget</name>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Išvaizda ir jausmas</translation>
     </message>
     <message>
       <source>Browse...</source>
@@ -1609,7 +1609,7 @@
     </message>
     <message>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensyvumas</translation>
     </message>
     <message>
       <source>Show additional info in tree</source>
@@ -1617,7 +1617,7 @@
     </message>
     <message>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekundės</translation>
     </message>
     <message>
       <source>Tour cycle</source>
@@ -1664,7 +1664,7 @@
     </message>
     <message>
       <source>Take system name and settings from</source>
-      <translation type="unfinished">Take system name and settings from</translation>
+      <translation>Paimkite sistemos pavadinimą ir nustatymus iš</translation>
     </message>
   </context>
   <context>
@@ -1687,7 +1687,7 @@
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Atsisiųsti ir įdiegti</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -1699,7 +1699,7 @@
     </message>
     <message>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Išplėstiniai svetainės nustatymai</translation>
     </message>
     <message>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
@@ -1707,7 +1707,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Išplėstiniai nustatymai</translation>
     </message>
     <message>
       <source>Get Update File</source>
@@ -1726,7 +1726,7 @@
     <name>MultipleLayoutSelectionDialog</name>
     <message>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Pasirinktas maketas</translation>
     </message>
   </context>
   <context>
@@ -1828,7 +1828,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Naudotojo vardas</translation>
     </message>
     <message>
       <source>Mail from</source>
@@ -1847,7 +1847,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Naudotojo vardas</translation>
     </message>
     <message>
       <source>Sign in to web page</source>
@@ -1862,7 +1862,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Įvykiai</translation>
     </message>
     <message>
       <source>Site Notifications</source>
@@ -1873,7 +1873,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>PtzManageDialog</name>
     <message>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Išsaugoti dabartinę poziciją</translation>
     </message>
     <message>
       <source>Go To Position</source>
@@ -1893,7 +1893,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>No Tour Selected</source>
@@ -1901,7 +1901,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Peržiūra</translation>
     </message>
     <message>
       <source>No preview available</source>
@@ -1924,25 +1924,25 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Spartusis klavišas:</translation>
     </message>
   </context>
   <context>
     <name>QnAttachToVideowallDialog</name>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Pritvirtinkite prie vaizdo sienos...</translation>
     </message>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Peržiūra</translation>
     </message>
   </context>
   <context>
     <name>QnCameraBookmarkDialog</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Žymės</translation>
     </message>
   </context>
   <context>
@@ -2016,7 +2016,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>QnVideowallSettingsDialog</name>
     <message>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Vaizdo sienos nustatymai</translation>
     </message>
     <message>
       <source>Launch video wall when Windows starts.</source>
@@ -2047,7 +2047,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Greitis</translation>
     </message>
     <message>
       <source>Frames interval</source>
@@ -2085,7 +2085,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Šaltinis</translation>
     </message>
     <message>
       <source>Resolution</source>
@@ -2101,7 +2101,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Ekranas</translation>
     </message>
     <message>
       <source>Additional Options</source>
@@ -2116,11 +2116,11 @@ and click on the &quot;Search&quot; button</translation>
     <name>RecordingThresholdWidget</name>
     <message>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Išankstinis įrašymas</translation>
     </message>
     <message>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Po įrašymo</translation>
     </message>
   </context>
   <context>
@@ -2177,11 +2177,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Tik judesys</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Judesys + maža raiška</translation>
     </message>
     <message>
       <source>Do Not Record</source>
@@ -2276,7 +2276,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Configure...</source>
-      <translation type="unfinished">Configure...</translation>
+      <translation>Konfigūruoti...</translation>
     </message>
     <message>
       <source>Blur</source>
@@ -2339,14 +2339,14 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
   </context>
   <context>
     <name>ServerSelectionDialog</name>
     <message>
       <source>Select Servers</source>
-      <translation type="unfinished">Select Servers</translation>
+      <translation>Ištrinti serverį</translation>
     </message>
   </context>
   <context>
@@ -2475,7 +2475,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Pasirinkite naudotojus</translation>
     </message>
     <message>
       <source>Nothing matches your search.</source>
@@ -2483,14 +2483,14 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Groups</source>
-      <translation type="unfinished">Groups</translation>
+      <translation>Grupės</translation>
     </message>
   </context>
   <context>
     <name>SystemSettingsWidget</name>
     <message>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(rekomenduojama)</translation>
     </message>
     <message>
       <source>Send anonymous usage and crash statistics to software developers</source>
@@ -2505,7 +2505,7 @@ and click on the &quot;Search&quot; button</translation>
     <name>TextOverlaySettingsWidget</name>
     <message>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Tekstas</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -2566,7 +2566,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Add Group</source>
-      <translation type="unfinished">Add Group</translation>
+      <translation>Pridėti grupę</translation>
     </message>
     <message>
       <source>Del</source>
@@ -2607,7 +2607,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Jautrumas</translation>
     </message>
   </context>
   <context>
@@ -2637,11 +2637,11 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Įkelti failą...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Įkelti aplanką...</translation>
     </message>
   </context>
   <context>
@@ -2656,7 +2656,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Papildomi nustatymai</translation>
     </message>
     <message>
       <source>Allow using Client API</source>
@@ -2691,7 +2691,7 @@ and click on the &quot;Search&quot; button</translation>
     </message>
     <message>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Planuotojas</translation>
     </message>
     <message>
       <source>Note: Schedule is based on server time.</source>

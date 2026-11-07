@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Išjungta pagal tvarkaraštį</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -39,7 +39,7 @@
     </message>
     <message>
       <source>User Manual</source>
-      <translation type="unfinished">User Manual</translation>
+      <translation>Naudotojo vadovas</translation>
     </message>
   </context>
   <context>
@@ -69,11 +69,11 @@
     <name>AttributeSetSelector</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Dabartis</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Nėra</translation>
     </message>
   </context>
   <context>
@@ -127,11 +127,11 @@
     <name>BooleanSelector</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
   </context>
   <context>
@@ -231,7 +231,7 @@
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Prisijungti prie serverio</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -267,7 +267,7 @@
     <name>DetailsItem</name>
     <message>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Peržiūra</translation>
     </message>
     <message>
       <source>Search by %1</source>
@@ -305,7 +305,7 @@
     <name>DeviceSelector</name>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Įrenginys</translation>
     </message>
   </context>
   <context>
@@ -324,15 +324,15 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Atšaukti</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -406,15 +406,15 @@
     </message>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Nėra objektų</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Žymių nėra</translation>
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Pabandykite pakeisti filtrus arba sukonfigūruoti objektų aptikimą kameros įskiepio nustatymuose.</translation>
     </message>
     <message>
       <source>Try changing the filters to display the results</source>
@@ -426,7 +426,7 @@
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>Reset All</source>
@@ -567,11 +567,11 @@
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Didelės raiškos</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Žemos raiškos</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
@@ -589,7 +589,7 @@
     <message>
       <source>%1 Mbps</source>
       <comment>%1 is a mebgabits per second</comment>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
@@ -608,7 +608,7 @@
     </message>
     <message>
       <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
+      <translation>Serverio laikas</translation>
     </message>
     <message>
       <source>Allows to show server time for the camera</source>
@@ -642,7 +642,7 @@
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Atidaryti</translation>
     </message>
     <message>
       <source>Open external link in browser?</source>
@@ -654,7 +654,7 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Nepavyksta prisijungti prie %1</translation>
     </message>
     <message>
       <source>Log In</source>
@@ -697,7 +697,7 @@
     <message>
       <source>Logged in as %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Logged in as %1</translation>
+      <translation>Prisijungta kaip %@</translation>
     </message>
     <message>
       <source>Add Server</source>
@@ -733,14 +733,14 @@
     <name>NotificationDetailsItem</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
   </context>
   <context>
     <name>ObjectActionsMenu</name>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Išsami informacija</translation>
     </message>
     <message>
       <source>Share</source>
@@ -942,7 +942,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Pranešimai</translation>
     </message>
     <message>
       <source>Done</source>
@@ -958,7 +958,7 @@
     </message>
     <message>
       <source>All Sites</source>
-      <translation type="unfinished">All Sites</translation>
+      <translation>Visa svetainė</translation>
     </message>
     <message>
       <source>Selected Sites</source>
@@ -966,11 +966,11 @@
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Taip</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Ne</translation>
     </message>
     <message>
       <source>Save changes?</source>
@@ -1035,7 +1035,7 @@
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Potipis (Automatic Translation)</translation>
     </message>
   </context>
   <context>
@@ -1053,7 +1053,7 @@
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Jungiamasi...</translation>
     </message>
     <message>
       <source>Stop Connecting</source>
@@ -1081,7 +1081,7 @@
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Visi įrenginiai</translation>
     </message>
   </context>
   <context>
@@ -1095,11 +1095,11 @@
     <name>SaasPromoBanner</name>
     <message>
       <source>Unlock exclusive features for actionable video intelligence and data-driven operations at scale</source>
-      <translation type="unfinished">Unlock exclusive features for actionable video intelligence and data-driven operations at scale</translation>
+      <translation>Atraskite išskirtines funkcijas, skirtas veiksmingoms vaizdo įrašų analizės ir duomenimis pagrįstoms operacijoms dideliu mastu</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Sužinokite daugiau</translation>
     </message>
   </context>
   <context>
@@ -1141,7 +1141,7 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Rekomenduojama</translation>
     </message>
     <message>
       <source>Your confirmation will be requested to pin self-signed certificates</source>
@@ -1149,7 +1149,7 @@
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Griežtas</translation>
     </message>
     <message>
       <source>Connect only servers with public certificates</source>
@@ -1570,7 +1570,7 @@
     <name>TutorialToolTip</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Praleisti</translation>
     </message>
     <message>
       <source>Ok, I got it</source>
@@ -1625,15 +1625,15 @@
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Nepakanka licencijų</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Būtinas slaptažodis</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>Iš viso jungčių</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
@@ -1641,11 +1641,11 @@
     </message>
     <message>
       <source>No live stream</source>
-      <translation type="unfinished">No live stream</translation>
+      <translation>Nėra tiesioginės transliacijos</translation>
     </message>
     <message>
       <source>Set Up 2FA</source>
-      <translation type="unfinished">Set Up 2FA</translation>
+      <translation>Nustatyti 2FA</translation>
     </message>
     <message>
       <source>Archive encrypted</source>
@@ -1748,7 +1748,7 @@
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Nepavyksta prisijungti prie %1</translation>
     </message>
     <message>
       <source>Connection lost. Reconnecting...</source>

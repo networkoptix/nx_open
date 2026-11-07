@@ -55,7 +55,7 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Visos kameros</translation>
     </message>
   </context>
   <context>
@@ -109,14 +109,14 @@
     <message>
       <source>Expires in %1</source>
       <comment>%1 is time text like &apos;48 minutes&apos;</comment>
-      <translation type="unfinished">Expires in %1</translation>
+      <translation>Galioja iki %@</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::entity_resource_tree::ResourceTreeItemFactory</name>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Visi įrenginiai</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -131,14 +131,14 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nežinoma</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Žymės</translation>
     </message>
   </context>
   <context>

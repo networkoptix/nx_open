@@ -130,14 +130,14 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>לא ידוע</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>סימניה</translation>
     </message>
   </context>
   <context>

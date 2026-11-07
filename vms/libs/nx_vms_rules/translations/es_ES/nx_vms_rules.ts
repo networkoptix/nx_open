@@ -1383,11 +1383,11 @@
     </message>
     <message>
       <source>Endpoint cannot be empty</source>
-      <translation type="unfinished">Endpoint cannot be empty</translation>
+      <translation>El punto final no puede estar vacío</translation>
     </message>
     <message>
       <source>Endpoint mustn&apos;t contains any space</source>
-      <translation type="unfinished">Endpoint mustn&apos;t contains any space</translation>
+      <translation>Endpoint debe&apos;t contener cualquier espacio</translation>
     </message>
   </context>
   <context>

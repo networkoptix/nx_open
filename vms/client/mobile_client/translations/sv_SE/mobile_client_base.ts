@@ -5,33 +5,33 @@
     <name>AnalyticsDataHelper</name>
     <message>
       <source>Objects (%1)</source>
-      <translation type="unfinished">Objects (%1)</translation>
+      <translation>Objekt (%1)</translation>
     </message>
     <message>
       <source>Objects (&gt;%1)</source>
-      <translation type="unfinished">Objects (&gt;%1)</translation>
+      <translation>Objekt (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>BookmarkDataHelper</name>
     <message>
       <source>Bookmarks (%1)</source>
-      <translation type="unfinished">Bookmarks (%1)</translation>
+      <translation>Bokmärken (%1)</translation>
     </message>
     <message>
       <source>Bookmarks (&gt;%1)</source>
-      <translation type="unfinished">Bookmarks (&gt;%1)</translation>
+      <translation>Bokmärken (&gt;%1)</translation>
     </message>
   </context>
   <context>
     <name>MotionDataHelper</name>
     <message>
       <source>Motion (&gt;%1)</source>
-      <translation type="unfinished">Motion (&gt;%1)</translation>
+      <translation>Rörelse (&gt;%1)</translation>
     </message>
     <message>
       <source>Motion (%1)</source>
-      <translation type="unfinished">Motion (%1)</translation>
+      <translation>Rörelse (%1)</translation>
     </message>
   </context>
   <context>
@@ -129,21 +129,21 @@
     <name>nx::vms::client::mobile::timeline::AnalyticsDataHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Okänd</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::BookmarkDataHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bokmärke</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::mobile::timeline::MotionDataHelper</name>
     <message>
       <source>Motion detected</source>
-      <translation type="unfinished">Motion detected</translation>
+      <translation>Rörelse detekterad</translation>
     </message>
   </context>
 </TS>
